@@ -330,7 +330,7 @@ class Walker:
         try:
             fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
         except OSError, err:
-            hachoir_log.error(str(err))
+            hachoir_log.error(unicode(str(err), self.charset))
         else:
             copyfileobj(InputFieldStream(self.focus.field).file(), os.fdopen(fd, 'w'))
 
@@ -583,28 +583,28 @@ def exploreFieldSet(field_set, args, options={}):
                     if e == "window resize":
                         size = ui.get_cols_rows()
                         resize = log.height
-                        continue
-                    e = top.get_focus()[0].keypress(size[:1], e)
-                    if e is None:
-                        pass
-                    elif e == 'f1':
-                        try:
-                            body.select(body.tabs.index(help))
-                        except ValueError:
-                            body.append(help)
+                    else:
+                        e = top.get_focus()[0].keypress(size[:1], e)
+                        if e is None:
+                            pass
+                        elif e == 'f1':
+                            try:
+                                body.select(body.tabs.index(help))
+                            except ValueError:
+                                body.append(help)
+                                resize = log.height
+                        elif e in ('esc', 'ctrl w'):
+                            body.close()
+                            if body.box_widget is None:
+                                return
                             resize = log.height
-                    elif e in ('esc', 'ctrl w'):
-                        body.close()
-                        if body.box_widget is None:
+                        elif e == '+':
+                            if log.height:
+                                resize = log.height - 1
+                        elif e == '-':
+                            resize = log.height + 1
+                        elif e == 'q':
                             return
-                        resize = log.height
-                    elif e == '+':
-                        if log.height:
-                            resize = log.height - 1
-                    elif e == '-':
-                        resize = log.height + 1
-                    elif e == 'q':
-                        return
                 #except AssertionError:
                 #    hachoir_log.error(getBacktrace())
                 except NewTab_Stream, e:
