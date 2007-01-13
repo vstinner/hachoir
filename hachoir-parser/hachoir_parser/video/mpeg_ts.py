@@ -1,6 +1,10 @@
 """
 MPEG-2 Transport Stream parser.
 
+Documentation:
+- MPEG-2 Transmission
+  http://erg.abdn.ac.uk/research/future-net/digital-video/mpeg2-trans.html
+
 Author: Victor Stinner
 Creation date: 13 january 2007
 """
