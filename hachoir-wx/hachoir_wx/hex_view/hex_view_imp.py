@@ -1,0 +1,52 @@
+# -*- coding: utf-8 -*-
+
+import wx
+from hex_view import get_page_size
+from stubs import clamp_range, byte_addr, bit_addr, safe_seek, get_page_num, calc_field_mark, get_page_offset
+from hachoir_core.error import warning
+
+MAX_SIZE = 10 * 1024
+
+class hex_view_imp_t:
+    def on_file_ready(self, dispatcher, file):
+        assert file is not None
+        self.input = file
+        self.field = None
+        self.pos = 0
+
+    def on_hex_view_ready(self, dispatcher, view):
+        assert view is not None
+        self.view = view
+        self.fill_view(0)
+
+    def fill_view(self, pos):
+        paged_pos = get_page_offset(pos, self.view.get_width_chars())
+
+        if safe_seek(self.input, paged_pos):
+            size = clamp_range(get_page_size(self.view), 1, MAX_SIZE)
+            self.view.display_data(self.input.read(size))
+            self.pos = paged_pos
+
+    def on_resized(self):
+        self.fill_view(self.pos)
+        self.update_mark()
+
+        self.dispatcher.trigger('hex_view_resized', self.view, self.pos)
+
+    def on_show_offset(self, dispatcher, pos):
+        self.fill_view(pos)
+        self.update_mark()
+
+    def on_field_selected(self, dispatcher, field):
+        self.fill_view(byte_addr(field._getAbsoluteAddress()))
+        self.update_set_mark(field)
+
+    def update_set_mark(self, field):
+        self.field = field
+        self.update_mark()
+
+    def update_mark(self):
+        if self.field:
+            self.view.unmark()
+            mark = calc_field_mark(self.pos, self.field)
+            self.view.mark_range(mark[0], mark[1])

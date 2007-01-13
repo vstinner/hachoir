@@ -1,0 +1,259 @@
+hachoir-parser is a package of most common file format parsers written for
+Hachoir framework. Not all parsers are complete, some are very good and other
+are poor: only parser first level of the tree for example.
+
+A perfect parser have no "raw" field: with a perfect parser you are able to
+know *each* bit meaning. Some good (but not perfect ;-)) parsers:
+
+ * Matroska video
+ * Microsoft RIFF (AVI video, WAV audio, CDA file)
+ * PNG picture
+ * TAR and ZIP archive
+
+Website: http://hachoir.org/wiki/hachoir-parser
+
+What's new in hachoir-parser 0.8?
+=================================
+
+New parsers:
+ * 7-zip archive
+ * Aldus Placeable Metafile (APM), variant of WMF
+ * Audio Interchange File Format (AIFF)
+ * Audio Interchange File Format Compressed (AIFC)
+ * Linux swap file
+ * LucasArts Font
+ * New Technology File System (NTFS)
+ * Microsoft Enhanced Metafile (EMF)
+ * Microsoft Windows Metafile (WMF)
+ * Musical Instrument Digital Interface (MIDI) audio file parser
+ * Real Audio (.ra)
+ * Real Media (.rm)
+ * Truevision Targa Graphic (TGA) picture
+
+New features:
+ * Add method to compute real content size
+ * Add magic string to find file start
+ * Add method to get file extension (file name suffix)
+ * Add method to choose the best MIME type
+ * Really better file validation, sometimes use arbitrary limits to detect
+   invalid file. Examples: 50 MB for maximum SWF file size, 6000 pixels for
+   maximum GIF picture width, etc.
+
+Changes:
+ * Lazy decompression for bzip2 and gzip parsers
+ * ZIP: add more MIME types and file extensions
+ * EXE: better PE detection
+ * Set constant name to upper case
+ * Always use a tuple for common file extensions
+ * Bitmap: add padding to pixels if needed, fix size of pixels field
+ * Tcpdump: display ARP layer info (if any) and reject file if link
+   type is unknown
+
+What's new in hachoir-parser 0.7?
+=================================
+
+New parsers:
+ * AMF metadata, used in Flash video
+ * Flash animation (SWF)
+ * Flash video (FLV)
+ * Java class
+ * Ogg/Vorbis (audio)
+ * Ogg/Theora (video)
+ * Reiser file system version 3
+
+Important parser improvments:
+ * bzip2 and gzip parser are able to decompress file
+ * JPEG picture:
+
+   * Parse quantization table and restart interval
+   * Write stronger validate method
+
+ * GIF picture: support image comment, graphic control and
+   netscape 2.0 extension
+ * ID3v1: support ID3 version 1.1 and 1.1b (track number and genre)
+ * MPEG audio:
+
+   * Better file validation (less false positive), don't allow padding
+     between frames anymore
+   * Fix computation of frame size: now works with MPEG version 2 and 2.5
+
+ * RIFF: parse AVI and ODML headers
+ * Tcpdump: add parser for Unicast (layer 2)
+
+Other parser improvments:
+ * Photoshop metadata: fix header, "reserved" is a string not four nul bytes
+ * Bitmap: support version 4
+ * PNG: add background color parser
+ * Sun/NeXT audio: add more codec description
+ * Matroska video container: add ISO 639-2 language names
+ * EXT2 file system: use bits for file mode (instead of 16-bit integer)
+
+Developer changes:
+ * Split run_testcase.py in three: download_testcase.py, run_testcase.py for
+   hachoir-parser and run_testcase.py for hachoir-metadata
+ * Update for hachoir-core 0.7:
+
+   * Use NullBits/NullBytes for nul padding
+   * Rename _createDescription() to createDescription()
+   * Rename _createValue() to createValue()
+
+ * Create function parseStream() to parse a stream
+ * Palette is now PaletteRGB and is based on UserVector class
+ * New Parser class based on the simple Parser class from hachoir-core
+
+What's new in hachoir-parser 0.6?
+=================================
+
+News of version 0.6.2:
+
+ * Fix Microsoft Office parser: misuse of new array() function
+ * Fix SECT.display attribute (convert integer to string)
+
+News of version 0.6.1:
+
+ * Fix EXIF parser: SubFile import was missing
+
+News of version 0.6:
+
+ * hachoir-parser is now a separated component so it's easier to release
+   new versions and write small bugfix
+ * New parsers:
+   * 3DO model (by Cyril Zorin)
+   * Abstract Syntax Notation One (ASN.1)
+   * MPEG video
+   * Spider-Man video (by Mike Melanson)
+   * Tcpdump: Ethernet, IPv4, ARP, ICMP, TCP, UDP
+   * TIFF image
+   * ZSNES save (by Jason Gorski)
+ * Better parsers:
+   * MPEG audio: support padding between frames, better file validation, and
+   guess if bit rate is constant (CBR) or variable (VBR)
+   * Python PYC: rewritten from scratch, now support python 1.5 to 2.5
+   * ID3v2: support picture in v2.3.0, safer charset code
+ * Many small bugfixes in ID3, MPEG audio and other parsers
+
+Since hachoir core 0.6 is able to "autofix" more bugs, hachoir-parser 0.6 is
+even stronger.
+
+Parser list
+===========
+
+Archive
+-------
+
+ * application/x-7z-compressed: 7-zip archive
+ * application/x-debian-package, application/x-archive, application/x-dpkg:
+   Unix archive
+ * application/x-bzip2: bzip2 archive
+ * application/x-gzip: gzip archive
+ * application/x-rpm: RPM package
+ * application/x-tar, application/x-gtar: TAR archive
+ * application/zip, application/x-zip, application/vnd.sun.xml.writer,
+   application/vnd.sun.xml.writer.template,
+   application/vnd.sun.xml.writer.global, application/vnd.sun.xml.calc,
+   application/vnd.sun.xml.calc.template, application/vnd.sun.xml.impress,
+   application/vnd.sun.xml.impress.template, application/vnd.sun.xml.draw,
+   application/vnd.sun.xml.draw.template, application/vnd.sun.xml.math,
+   application/x-jar, application/java-archive: ZIP archive
+
+Audio
+-----
+
+ * audio/x-aiff: Audio Interchange Format File (AIFF)
+ * audio/basic: Sun/NeXT audio
+ * iPod iTunesDB file
+ * audio/midi: MIDI audio
+ * audio/mpeg: MPEG audio version 1, 2, 2.5
+ * audio/vorbis: OGG/Vorbis audio
+ * audio/x-realaudio: Real audio
+
+Container
+---------
+
+ * Abstract Syntax Notation One (ASN.1)
+ * application/x-shockwave-flash: Flash SWF animation
+ * video/x-matroska, audio/x-matroska: Matroska multimedia container
+ * application/ogg: Ogg multimedia container, with Vorbis and Theora parser
+ * video/x-msvideo, audio/x-wav: Microsoft RIFF container
+ * video/x-pn-realvideo, audio/x-pn-realaudio: Real media
+
+
+File system
+-----------
+
+ * EXT2/EXT3 file system
+ * FAT12 filesystem
+ * FAT16 filesystem
+ * FAT32 filesystem
+ * Linux swap file
+ * ISO 9660 file system
+ * MS-DOS hard drive with Master Boot Record (MBR)
+ * ReiserFS version 3
+
+Game
+----
+
+ * The Amazing Spider-Man vs. The Kingpin (Sega CD) FMV video
+ * ZSNES Save State File (only version 143)
+
+Image
+-----
+
+ * image/x-ms-bmp, image/x-bmp: Microsoft bitmap (BMP) picture
+ * image/gif: GIF picture
+ * image/x-ico: Microsoft icon or cursor
+ * image/jpeg: JPEG picture
+ * image/x-pcx: PC Paintbrush (PCX) picture
+ * image/png, image/x-png: Portable Network Graphics (PNG) picture
+ * image/image/x-photoshop: Photoshop (PSD) picture
+ * image/tiff: TIFF picture
+ * image/targa, image/tga: Truevision Targa Graphic (TGA)
+ * image/x-xcf, application/x-gimp-image: Gimp (XCF) picture
+ * image/wmf, application/x-msmetafile: Microsoft Windows Metafile (WMF)
+
+Metadata
+--------
+
+ * 8BIM: Photoshop metadata, used in JPEG picture
+ * AMF, used in FLV video
+ * EXIF, used in JPEG picture
+ * ID3 version 1.0, 1.1, 2.2, 2.3 and 2.4, used in MPEG audio
+ * IPTC, used in 8BIM metadata (JPEG picture)
+
+Misc
+----
+
+ * image/x-3do: renderdroid 3d model.
+ * image/x-3ds: 3D Studio Max model
+
+Network
+-------
+
+ * Tcpdump file (network)
+
+Office
+------
+
+ * application/msword, application/msexcel, application/mspowerpoint:
+   Microsoft Office document
+
+Program
+-------
+
+ * application/x-executable, application/x-object, application/x-sharedlib,
+   application/x-executable-file, application/x-coredump: ELF Unix/BSD
+   program/library
+ * application/x-dosexec: Microsoft Windows Portable Executable
+ * Compiled Python script (.pyc/.pyo files)
+ * application/java-vm: Java classes (file.class)
+
+Video
+-----
+
+ * video/x-ms-asf, video/x-ms-wmv, audio/x-ms-wma: ASF container (WMV video,
+   WMA audio)
+ * video/mpeg, video/mp2p: MPEG video, version 1 or 2
+ * video/quicktime: Apple QuickTime movie
+ * video/theora: Ogg/Theora video
+ * video/x-flv: Flash FLV video
+

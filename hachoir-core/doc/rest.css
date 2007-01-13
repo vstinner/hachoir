@@ -1,0 +1,127 @@
+/*
+:Author: Fred L. Drake, Jr.
+:Author: Olivier Grisel <olivier.grisel@ensta.org>
+:date: $Date: 2004/03/31 22:31:05 $
+:version: $Revision: 1.7 $
+*/
+
+@import url(default.css);
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #333;
+  margin: 2% 5% 2% 5%;
+}
+
+
+div.document {
+  font-size: 13px;
+  padding: 3em 5em 3em 5em;
+  background-color: white;
+  border: 1px outset black;
+/*  background-image: url(strands.png);
+  background-position: 2em 0;
+  background-repeat: repeat-y; */
+}
+
+h1.title {
+  font-size: 170%;
+}
+
+div.section {
+  margin: 0px 0px 1.5em 0px;
+}
+
+div.section h1 {
+  padding: 0.3em;
+  margin-top: 1em;
+  background-color: #333;
+  border: 1px solid;
+  border-color: #666 #222 #222 #666;
+}
+
+div.section h1 a {
+  color: white;
+}
+
+h1 {
+  font-family: sans-serif;
+  font-size: 135%;
+  margin-bottom: 4ex; }
+
+h2 {
+  font-family: sans-serif;
+  font-size: 120%; }
+
+h3 {
+  font-family: sans-serif;
+  font-size: 105%; }
+
+h4 {
+  font-family: sans-serif;
+  font-size: 100%; }
+
+h5 {
+  font-family: sans-serif;
+  font-size: 100%; }
+
+h6 {
+  font-family: sans-serif;
+  font-style: italic;
+  font-size: 100%; }
+
+a, a:visited {
+  color: #333;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a:active {
+ color: #666;
+}
+
+hr {
+  width: 75%;
+}
+
+p {
+  text-align: justify;
+}
+
+.literal .pre {
+  background-color: white;
+  font-family: lucidatypewriter, "lucida typewriter", sans-serif; }
+
+.literal-block {
+  border: thin solid rgb(180,180,180);
+  font-family: lucidatypewriter, "lucida typewriter", monospace;
+  font-size: 90%;
+  color: #111;
+  line-height: 140%;
+  background-color: #eee;
+  padding: 0.5em;
+  margin-bottom: 1.5em;
+}
+
+table.table {
+  margin-left: 2em;
+  margin-right: 2em; }
+
+table.table thead {
+  background-color: rgb(230,230,230); }
+
+dt {
+  font-weight: bold; }
+
+/* docutils uses the "option" class with both "col" and "span"
+   elements, so we have to be explicit here */
+.option-list span.option {
+  font-weight: bold; }
+
+.option-list kbd {
+  font-family: inherit; }

@@ -1,0 +1,25 @@
+digraph GenericFieldSet {
+	rankdir=LR;
+	{
+		node [shape=box];
+		StopIteration [ color=green ];
+		FieldError [ color=red, rank=max ];
+		ParserError -> FieldError;
+	};
+
+	_addField -> { _setUniqFieldName _fixFieldSize };
+	readFirstFields -> readMoreFields;
+	{ _stopFeeding _fixFeedError } -> _fixLastField -> _deleteField;
+	{ __iter__ _feedAll readMoreFields _feedUntil }
+	-> _addField;
+	{ __iter__ _feedAll readMoreFields _feedUntil }
+	-> _stopFeeding [ color=green ];
+	{ __iter__ _feedAll readMoreFields _feedUntil }
+	-> { _fixFeedError FieldError } [ color=red ];
+
+	{ _addField _stopFeeding } -> ParserError;
+	_fixFieldSize -> StopIteration;
+
+	{ __len__ _getSize } -> _feedAll;
+	_getField -> _feedUntil;
+}

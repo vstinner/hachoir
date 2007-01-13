@@ -1,0 +1,757 @@
+# translation of fr.po to
+# Hachoir french translation.
+# Copyright (C) 2006 Hachoir team
+# This file is distributed under the same license as the Hachoir package.
+#
+# Victor Stinner <victor.stinner AT haypocalc.com>, 2006.
+msgid ""
+msgstr ""
+"Project-Id-Version: fr\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-08-25 03:32+0200\n"
+"PO-Revision-Date: 2006-09-04 20:08+0100\n"
+"Last-Translator: Victor Stinner <victor.stinner AT haypocalc.com>\n"
+"Language-Team:  <fr@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: KBabel 1.11.4\n"
+
+#: script/hachoir-console:20
+#, python-format
+msgid "Hachoir console version %s"
+msgstr "Hachoir console version %s"
+
+#: script/hachoir-console:21
+#: script/hachoir-grep:24
+#: script/hachoir-metadata:23
+#: script/hachoir-urwid:22
+#, python-format
+msgid "Hachoir library version %s"
+msgstr "Bibliothèque Hachoir version %s"
+
+#: script/hachoir-console:23
+#: script/hachoir-grep:26
+#: script/hachoir-metadata:25
+#: script/hachoir-urwid:24
+#, python-format
+msgid "Website: %s"
+msgstr "Site internet : %s"
+
+#: script/hachoir-console:29
+msgid "Option of console display/export"
+msgstr "Option d'affiche de la console/de l'exportation"
+
+#: script/hachoir-console:30
+msgid "Disable interactive curses mode"
+msgstr "Désactive le mode interactive curses"
+
+#: script/hachoir-console:32
+msgid "Export in XML file"
+msgstr "Exportation dans un fichier XML"
+
+#: script/hachoir-console:34
+msgid "Maximum field depth"
+msgstr "Profondeur maximale d'un champ"
+
+#: script/hachoir-console:36
+#: script/hachoir-console:40
+msgid "Don't display field value"
+msgstr "N'affiche pas la valeur des champs"
+
+#: script/hachoir-console:38
+msgid "Don't display field description"
+msgstr "N'affiche pas la description des champs"
+
+#: script/hachoir-console:42
+msgid "Display absolute addresses (instead of relative)"
+msgstr "Affiche l'adresse absolue (au lieu de la relative)"
+
+#: script/hachoir-console:44
+msgid "Display addresses in hexadecimal"
+msgstr "Affiche les adresses en hexadécimal"
+
+#: script/hachoir-console:46
+msgid "Disable human sizes (eg. 4 KB)"
+msgstr "Désactive les tailles humaines (ex: 4 Ko)"
+
+#: script/hachoir-console:48
+#: script/hachoir-metadata:42
+#: script/hachoir-urwid:37
+msgid "Display version and exit"
+msgstr "Affiche la version et quitte"
+
+#: script/hachoir-console:66
+#, python-format
+msgid "Wrote output in file: %s"
+msgstr "Le résultat a été écrit dans le fichier : %s"
+
+#: script/hachoir-console:96
+#: script/hachoir-urwid:59
+#, python-format
+msgid "Unable to open file: %s"
+msgstr "Impossible d'ouvrir le fichier : %s"
+
+#: script/hachoir-console:99
+#: script/hachoir-metadata:65
+#: script/hachoir-urwid:62
+#, python-format
+msgid "Unable to parse file: %s"
+msgstr "Impossible de parser le fichier : %s"
+
+#: script/hachoir-console:113
+#: script/hachoir-metadata:137
+msgid "Program interrupted (CTRL+C)."
+msgstr "Programme interrompu (CTRL+C)."
+
+#: script/hachoir-grep:23
+#, python-format
+msgid "Hachoir grep version %s"
+msgstr "Hachoir grep version %s"
+
+#: script/hachoir-metadata:22
+#, python-format
+msgid "Metadata extractor version %s"
+msgstr "Extraction de méta-données version %s"
+
+#: script/hachoir-metadata:31
+msgid "Option of metadata extraction and display"
+msgstr "Option d'extraction des méta-données et de l'affichage"
+
+#: script/hachoir-metadata:32
+msgid "Only display MIME type"
+msgstr "Affiche uniquement le type MIME"
+
+#: script/hachoir-metadata:35
+msgid "Quantify of information to display from 1 to 9 (9 is the maximum)"
+msgstr "Quantité d'information à afficher de 1 à 9 (9 est le maximum)"
+
+#: script/hachoir-metadata:38
+msgid "Disable human display"
+msgstr "Désactive l'affichage humain"
+
+#: script/hachoir-metadata:40
+msgid "Run benchmark"
+msgstr "Lance une mesure de performance"
+
+#: script/hachoir-metadata:75
+#, python-format
+msgid "Hachoir can't extract metadata, but is able to parse: %s"
+msgstr "Hachoir ne peut extraire les méta-données, mais peut parser : %s"
+
+#: script/hachoir-metadata:82
+msgid "(no metadata, priority may be too small)"
+msgstr "(aucun méta-donnée, la priorité doit être trop faible)"
+
+#: script/hachoir-metadata:101
+msgid "No suitable parser"
+msgstr "Aucun parseur adapté"
+
+#: script/hachoir-metadata:103
+#, python-format
+msgid "Open error: %s"
+msgstr "Erreur d'ouverture : %s"
+
+#: script/hachoir-urwid:21
+#, python-format
+msgid "Hachoir urwid version %s"
+msgstr "Hachoir urwid version %s"
+
+#: script/hachoir-urwid:30
+msgid "Option of urwid explorer"
+msgstr "Option de l'explorateur urwid"
+
+#: script/hachoir-urwid:31
+msgid "Number of fields to preload at each read"
+msgstr "Nombre de champs à précharger à chaque lecture"
+
+#: script/hachoir-urwid:33
+msgid "Initial path to focus on"
+msgstr "Chemin initial sur lequel mettre le focus"
+
+#: script/hachoir-urwid:35
+msgid "Force MIME type to choose parser"
+msgstr "Forcer le type MIME pour choisir un parseur"
+
+#: hachoir/benchmark.py:21
+#, python-format
+msgid "Benchmark: best=%s  average=%s  worst=%s  total=%s"
+msgstr "Benchmark : meilleur=%s  moyenne=%s  pire=%s  total=%s"
+
+#: hachoir/benchmark.py:44
+#, python-format
+msgid "Run benchmark: %s calls (estimate: %s)"
+msgstr "Lance le benchmark : %s appels (estimation : %s)"
+
+#: hachoir/benchmark.py:50
+#: hachoir/benchmark.py:65
+#, python-format
+msgid "Result %s/%s: %s  (best: %s)"
+msgstr "Résultat %s/%s : %s (meilleur : %s)"
+
+#: hachoir/cmd_line.py:57
+msgid "Hachoir library"
+msgstr "Bibliothèque Hachoir"
+
+#: hachoir/cmd_line.py:59
+msgid "Verbose mode"
+msgstr "Mode bavard"
+
+#: hachoir/cmd_line.py:61
+msgid "Write log in a file"
+msgstr "Écrit les logs dans un fichier"
+
+#: hachoir/cmd_line.py:63
+msgid "Quiet mode (don't display warning)"
+msgstr "Mode silencieux (n'affiche pas les avertissements)"
+
+#: hachoir/cmd_line.py:65
+msgid "Debug mode"
+msgstr "Mode débogage"
+
+#: hachoir/cmd_line.py:68
+msgid "Display parser list"
+msgstr "Affiche la liste des parseurs"
+
+#: hachoir/dict.py:49
+#, python-format
+msgid "Key '%s' already exists"
+msgstr "La clé '%s' existe déjà"
+
+#: hachoir/dict.py:79
+#, python-format
+msgid "list assignment index out of range (%s/%s)"
+msgstr "index d'assignement d'une liste en dehors de limites (%s/%s)"
+
+#: hachoir/dict.py:90
+#, python-format
+msgid "Insert error: key '%s' ready exists"
+msgstr "Erreur d'insertion : la clé '%s' existe déjà"
+
+#: hachoir/dict.py:95
+#, python-format
+msgid "Insert error: index '%s' is invalid"
+msgstr "Erreur d'insertion : l'index %s' est invalide"
+
+#: hachoir/endian.py:12
+msgid "Big endian"
+msgstr "Gros boutiste"
+
+#: hachoir/endian.py:13
+msgid "Little endian"
+msgstr "Petit boutiste"
+
+#: hachoir/export_xml.py:213
+#, python-format
+msgid "File already exists: %s"
+msgstr "Le fichier existe déjà: %s"
+
+#: hachoir/log.py:25
+msgid "Stop Hachoir"
+msgstr "Arrête Hachoir"
+
+#: hachoir/log.py:48
+msgid "Starting Hachoir"
+msgstr "Démarrage de Hachoir"
+
+#: hachoir/log.py:52
+#, python-format
+msgid "[Log] setFilename(%s) fails: no such file"
+msgstr "[Log] setFilename(%s) a échoué : fichier introuvable"
+
+#: hachoir/plugin.py:45
+msgid "List of Hachoir parsers."
+msgstr "Liste des parseurs Hachoir."
+
+#: hachoir/plugin.py:78
+#, python-format
+msgid "Guess parser: %s"
+msgstr "Essaye le parseur : %s"
+
+#: hachoir/plugin.py:87
+#, python-format
+msgid "Skip parser %s: %s"
+msgstr "Passe parser %s : %s"
+
+#: hachoir/plugin.py:98
+#, python-format
+msgid "Unable to create parser %s: %s"
+msgstr "Impossible de créer le parseur %s : %s"
+
+#: hachoir/text_handler.py:31
+msgid "(not set)"
+msgstr "(non défini)"
+
+#: hachoir/text_handler.py:59
+#, python-format
+msgid "invalid msdos datetime (%s)"
+msgstr "estampille de temps msdos invalide (%s)"
+
+#: hachoir/tools.py:136
+#: hachoir/ui/urwid/urwid_ui.py:245
+#, python-format
+msgid "%u byte"
+msgid_plural "%u bytes"
+msgstr[0] "%u octet"
+msgstr[1] "%u octets"
+
+#: hachoir/tools.py:137
+msgid "KB"
+msgstr "Ko"
+
+#: hachoir/tools.py:137
+msgid "MB"
+msgstr "Mo"
+
+#: hachoir/tools.py:137
+msgid "GB"
+msgstr "Go"
+
+#: hachoir/tools.py:137
+msgid "TB"
+msgstr "To"
+
+#: hachoir/tools.py:159
+#, python-format
+msgid "%u bit"
+msgid_plural "%u bits"
+msgstr[0] "%u bit"
+msgstr[1] "%u bits"
+
+#: hachoir/ui/text/curses_ui.py:39
+msgid "[ q to quit - move with arrows, page up/down, home/end ]"
+msgstr "[ q pour quitter - touches fléchées, page haut/bas, début/fin ]"
+
+#: hachoir/ui/text/curses_ui.py:40
+msgid "Hachoir is parsing your stream (be patient)..."
+msgstr "Hachoir est en train de parser votre flux (patience)..."
+
+#: hachoir/ui/text/curses_ui.py:152
+msgid "Restart drawing since field has changed..."
+msgstr "Redémarre l'affichage étant donné qu'un champ a été modifié..."
+
+#: hachoir/ui/urwid/urwid_ui.py:404
+msgid "Application:"
+msgstr "Application :"
+
+#: hachoir/ui/urwid/urwid_ui.py:405
+msgid "exit"
+msgstr "quitter"
+
+#: hachoir/ui/urwid/urwid_ui.py:406
+msgid "help"
+msgstr "aide"
+
+#: hachoir/ui/urwid/urwid_ui.py:407
+msgid "prev/next tab"
+msgstr "tab précédent/suivant"
+
+#: hachoir/ui/urwid/urwid_ui.py:408
+msgid "move separator vertically"
+msgstr "déplacer le séparateur vertical"
+
+#: hachoir/ui/urwid/urwid_ui.py:409
+msgid "close current tab"
+msgstr "fermer l'onglet courant"
+
+#: hachoir/ui/urwid/urwid_ui.py:410
+msgid "Parser window:"
+msgstr "Fenêtre du parseur :"
+
+#: hachoir/ui/urwid/urwid_ui.py:411
+msgid "absolute address"
+msgstr "adresse absolue"
+
+#: hachoir/ui/urwid/urwid_ui.py:412
+msgid "address in hexadecimal"
+msgstr "adresse en hexadécimal"
+
+#: hachoir/ui/urwid/urwid_ui.py:413
+msgid "human display"
+msgstr "affichage humain"
+
+#: hachoir/ui/urwid/urwid_ui.py:414
+msgid "description"
+msgstr "description"
+
+#: hachoir/ui/urwid/urwid_ui.py:415
+msgid "field set size"
+msgstr "taille des ensembles de champ"
+
+#: hachoir/ui/urwid/urwid_ui.py:416
+msgid "field type"
+msgstr "type de champ"
+
+#: hachoir/ui/urwid/urwid_ui.py:417
+msgid "field value"
+msgstr "valeur du champ"
+
+#: hachoir/ui/urwid/urwid_ui.py:418
+msgid "collapse/expand"
+msgstr "déplier/replier"
+
+#: hachoir/ui/urwid/urwid_ui.py:419
+msgid "move (1 page) up/down"
+msgstr "déplacement (d'une page) haut/bas"
+
+#: hachoir/ui/urwid/urwid_ui.py:420
+msgid "move to parent field"
+msgstr "aller au champ parent"
+
+#: hachoir/ui/urwid/urwid_ui.py:421
+msgid "move to last (parent) field"
+msgstr "aller au dernier champ (du parent)"
+
+#: hachoir/ui/urwid/urwid_ui.py:422
+msgid "scroll horizontally"
+msgstr "déplacement horizontal"
+
+#: hachoir/ui/urwid/urwid_ui.py:423
+msgid "parse the selected field"
+msgstr "parser le champ actif"
+
+#: hachoir/ui/urwid/urwid_ui.py:448
+msgid "F1: help"
+msgstr "F1 : aide"
+
+#: hachoir/ui/urwid/urwid_ui.py:491
+#, python-format
+msgid "No parser found for %s"
+msgstr "Aucun parseur trouvé pour %s"
+
+#: hachoir/stream/input.py:21
+#, python-format
+msgid "Error: input size is nul (source='%s')!"
+msgstr "Erreur : la taille de l'entrée est nulle (source='%s') !"
+
+#: hachoir/stream/input.py:152
+msgid "Error: Buffers too small. Can't seek backward."
+msgstr "Erreur : Les tampons sont trop petits. Impossible de revenir en arrière."
+
+#: hachoir/stream/input.py:232
+#, python-format
+msgid "Can't read %u bytes at address %u (got %u bytes)!"
+msgstr "Impossible de lire %u octets à l'adresse %u (lu %u octets) !"
+
+#: hachoir/stream/input.py:246
+#, python-format
+msgid "Unable to open file %s: %s"
+msgstr "Impossible d'ouvrir le fichier %s : %s"
+
+#: hachoir/metadata/archive.py:8
+msgid "File"
+msgstr "Fichier"
+
+#: hachoir/metadata/archive.py:11
+msgid "File name"
+msgstr "Nom du fichier"
+
+#: hachoir/metadata/archive.py:12
+msgid "File size"
+msgstr "Taille du fichier"
+
+#: hachoir/metadata/archive.py:13
+msgid "File attributes"
+msgstr "Attributs du fichier"
+
+#: hachoir/metadata/archive.py:14
+msgid "File type"
+msgstr "Type du fichier"
+
+#: hachoir/metadata/archive.py:17
+msgid "Compressed file"
+msgstr "Fichier compressé"
+
+#: hachoir/metadata/archive.py:21
+msgid "Compressed file size"
+msgstr "Taille du fichier compressé"
+
+#: hachoir/metadata/archive.py:22
+msgid "Compression rate"
+msgstr "Taux de compression"
+
+#: hachoir/metadata/archive.py:41
+#, python-format
+msgid "Created on operating system: %s"
+msgstr "Crée sur le système d'exploitation : %s"
+
+#: hachoir/metadata/archive.py:72
+#, python-format
+msgid "File \"%s\""
+msgstr "Fichier \"%s\""
+
+#: hachoir/metadata/audio.py:7
+msgid "Audio"
+msgstr "Audio"
+
+#: hachoir/metadata/audio.py:9
+msgid "mono"
+msgstr "mono"
+
+#: hachoir/metadata/audio.py:10
+msgid "stereo"
+msgstr "stéréo"
+
+#: hachoir/metadata/audio.py:15
+msgid "Album"
+msgstr "Album"
+
+#: hachoir/metadata/audio.py:16
+msgid "Track number"
+msgstr "Numéro de la piste"
+
+#: hachoir/metadata/audio.py:18
+msgid "Channel"
+msgstr "Canal"
+
+#: hachoir/metadata/audio.py:19
+msgid "Sample rate"
+msgstr "Taux d'échantillonage"
+
+#: hachoir/metadata/audio.py:21
+msgid "Bits/second"
+msgstr "Bits/seconde"
+
+#: hachoir/metadata/audio.py:100
+msgid "Variable bit rate (VBR)"
+msgstr ""
+
+#: hachoir/metadata/image.py:9
+msgid "Image"
+msgstr "Image"
+
+#: hachoir/metadata/image.py:12
+msgid "Image width"
+msgstr "Largeur de l'image"
+
+#: hachoir/metadata/image.py:13
+msgid "Image height"
+msgstr "Hauteur de l'image"
+
+#: hachoir/metadata/image.py:14
+msgid "Image orientation"
+msgstr "Orientation de l'image"
+
+#: hachoir/metadata/image.py:16
+msgid "Number of colors"
+msgstr "Nombre de couleurs"
+
+#: hachoir/metadata/image.py:17
+msgid "Bits/pixel"
+msgstr "Bits/pixel"
+
+#: hachoir/metadata/image.py:18
+msgid "Image format"
+msgstr "Format de l'image"
+
+#: hachoir/metadata/image.py:54
+#, python-format
+msgid "Icon #%u (%ux%u)"
+msgstr "Icône #%u (%ux%u)"
+
+#: hachoir/metadata/image.py:64
+msgid "Run-length encoding (RLE)"
+msgstr ""
+
+#: hachoir/metadata/image.py:110
+msgid "RGBA"
+msgstr "RVBA"
+
+#: hachoir/metadata/image.py:112
+msgid "RGB"
+msgstr "RVB"
+
+#: hachoir/metadata/image.py:114
+msgid "Color index"
+msgstr "Couleur indexées"
+
+#: hachoir/metadata/image.py:135
+msgid "LZW"
+msgstr "LZW"
+
+#: hachoir/metadata/jpeg.py:36
+msgid "Horizontal (normal)"
+msgstr "Horizontal (normal)"
+
+#: hachoir/metadata/jpeg.py:37
+msgid "Mirrored horizontal"
+msgstr "Miroir horizontal"
+
+#: hachoir/metadata/jpeg.py:38
+msgid "Rotated 180"
+msgstr "Rotation à 180°"
+
+#: hachoir/metadata/jpeg.py:39
+msgid "Mirrored vertical"
+msgstr "Miroir vertical"
+
+#: hachoir/metadata/jpeg.py:40
+msgid "Mirrored horizontal then rotated 90 counter-clock-wise"
+msgstr ""
+
+#: hachoir/metadata/jpeg.py:41
+msgid "Rotated 90 clock-wise"
+msgstr ""
+
+#: hachoir/metadata/jpeg.py:42
+msgid "Mirrored horizontal then rotated 90 clock-wise"
+msgstr ""
+
+#: hachoir/metadata/jpeg.py:43
+msgid "Rotated 90 counter clock-wise"
+msgstr ""
+
+#: hachoir/metadata/jpeg.py:48
+msgid "Camera aperture"
+msgstr "Ouverture de l'appareil photo"
+
+#: hachoir/metadata/jpeg.py:49
+msgid "Camera focal"
+msgstr "Focale de l'appareil photo"
+
+#: hachoir/metadata/jpeg.py:50
+msgid "Camera exposure"
+msgstr "Exposition de l'appareil photo"
+
+#: hachoir/metadata/jpeg.py:51
+msgid "Camera brightness"
+msgstr "Luminosité de l'appareil photo"
+
+#: hachoir/metadata/jpeg.py:52
+msgid "Camera model"
+msgstr "Modèle de l'appareil photo"
+
+#: hachoir/metadata/jpeg.py:53
+msgid "Camera manufacturer"
+msgstr "Fabriquant de l'appareil photo"
+
+#: hachoir/metadata/jpeg.py:63
+msgid "YCbCr"
+msgstr ""
+
+#: hachoir/metadata/jpeg.py:65
+msgid "Grayscale"
+msgstr "Nuances de gris"
+
+#: hachoir/metadata/metadata.py:41
+msgid "Title"
+msgstr "Titre"
+
+#: hachoir/metadata/metadata.py:42
+msgid "Author"
+msgstr "Auteur"
+
+#: hachoir/metadata/metadata.py:43
+msgid "Duration"
+msgstr "Durée"
+
+#: hachoir/metadata/metadata.py:45
+msgid "Creation date"
+msgstr "Date de création"
+
+#: hachoir/metadata/metadata.py:46
+msgid "Last modification"
+msgstr "Dernière modification"
+
+#: hachoir/metadata/metadata.py:48
+msgid "Compression"
+msgstr "Compression"
+
+#: hachoir/metadata/metadata.py:49
+msgid "Copyright"
+msgstr "Droit d'auteur"
+
+#: hachoir/metadata/metadata.py:50
+msgid "URL"
+msgstr "URL"
+
+#: hachoir/metadata/metadata.py:52
+msgid "Producer"
+msgstr "Producteur"
+
+#: hachoir/metadata/metadata.py:53
+msgid "Comment"
+msgstr "Commentaire"
+
+#: hachoir/metadata/metadata.py:54
+msgid "Format version"
+msgstr "Version du format"
+
+#: hachoir/metadata/metadata.py:55
+msgid "MIME type"
+msgstr "Type MIME"
+
+#: hachoir/metadata/metadata.py:56
+msgid "Endian"
+msgstr "Endian"
+
+#: hachoir/metadata/metadata.py:66
+#, python-format
+msgid "%s has no metadata '%s'"
+msgstr "%s n'a pas de méta-donnée '%s'"
+
+#: hachoir/metadata/metadata.py:79
+#, python-format
+msgid "Attribute %s (%s) is not repetable!"
+msgstr "L'attribut %s (%s) n'est pas répétable !"
+
+#: hachoir/metadata/metadata.py:91
+#, python-format
+msgid "%s has no attribute '%s'"
+msgstr "%s n'a pas d'attribut '%s'"
+
+#: hachoir/metadata/metadata.py:99
+#, python-format
+msgid "Attribute '%s' of %s is not set"
+msgstr "L'attribut '%s' de %s n'est pas défini"
+
+#: hachoir/metadata/metadata.py:160
+msgid "Common"
+msgstr "Commun"
+
+#: hachoir/metadata/riff.py:118
+#, python-format
+msgid "Has audio/video index (%s)"
+msgstr "A un index audio/vidéo (%s)"
+
+#: hachoir/metadata/video.py:11
+msgid "Video"
+msgstr "Vidéo"
+
+#: hachoir/metadata/video.py:15
+msgid "Artist"
+msgstr "Artiste"
+
+#: hachoir/metadata/video.py:17
+msgid "Frame rate"
+msgstr "Débit d'images"
+
+#: hachoir/metadata/video.py:35
+msgid "Invalid Matroska video"
+msgstr "Vidéo Matroska invalide"
+
+#: hachoir/metadata/video.py:129
+#, python-format
+msgid "Play speed: %.1f%%"
+msgstr "Vitesse de lecture : %.1f%%"
+
+#: hachoir/metadata/video.py:130
+#, python-format
+msgid "User volume: %.1f%%"
+msgstr "Volume utilisateur : %.1f%%"
+
+#: hachoir/parser/program/python.py:68
+#, python-format
+msgid "%s item"
+msgid_plural "%s items"
+msgstr[0] "%u élément"
+msgstr[1] "%u éléments"
+
+#: hachoir/parser/program/python.py:87
+#, python-format
+msgid "%s key"
+msgid_plural "%s keys"
+msgstr[0] "%s clé"
+msgstr[1] "%s clés"
+

@@ -1,0 +1,405 @@
+#!/usr/bin/env python2.4
+
+from hachoir_core.i18n import _
+from hachoir_core import config
+from hachoir_core.cmd_line import unicodeFilename
+from hachoir_core.error import HachoirError, error
+from hachoir_core.stream import FileInputStream, InputSubStream, FileOutputStream
+from hachoir_core.tools import humanFilesize, humanDuration
+from hachoir_parser.guess import loadParsers, parseStream
+from optparse import OptionGroup, OptionParser
+import sys
+from time import time
+from errno import EEXIST
+import os
+
+__version__ = "0.0.0"
+
+FILE_MAX_SIZE = 100 * 1024 * 1024   # Max. file size in bytes (100 MB)
+SLICE_SIZE = 64*1024                # Slice size in bytes (64 KB)
+HARD_MEMORY_LIMIT = 100*1024*1024
+PROGRESS_UPDATE = 1.5   # Minimum number of second between two progress messages
+DATARATE_UPDATE = 1.0   # Time slice (in second) for datarate computation
+
+def getTotalMemory():
+    try:
+        line = open('/proc/meminfo').readlines()[0].split()
+    except IOError:
+        return None
+    if line[2] != 'kB':
+        raise ValueError("Don't support %s memory unit" % line[2])
+    return int(line[1]) * 1024
+
+def setMemoryLimit(max_mem):
+    """
+    Set memory limit using setrlimit(RLIMIT_AS, ...).
+    Use value -1 to disable memory limit.
+
+    Return True if limit is set, False on error.
+    """
+    try:
+        from resource import setrlimit, RLIMIT_AS
+        try:
+            setrlimit(RLIMIT_AS, (max_mem, -1))
+        except ValueError:
+            return False
+    except ImportError:
+        return False
+    return True
+
+from hachoir_metadata import extractMetadata
+def metadataFilter(parser):
+    try:
+        metadata = extractMetadata(parser)
+    except HachoirError, err:
+        metadata = None
+    if metadata:
+        if hasattr(metadata, "width") and metadata.width[0] < 256:
+            print >>sys.stderr, "Skip picture with width < 256 pixels"
+            return False
+        if hasattr(metadata, "height") and metadata.height[0] < 256:
+            print >>sys.stderr, "Skip picture with height < 256 pixels"
+            return False
+    return True
+
+class Output:
+    """
+    Store files found by HachoirSubfile tool.
+    """
+    def __init__(self, directory):
+        self.directory_raw = directory
+        self.directory_unicode = unicodeFilename(directory)
+        self.mkdir = False
+        self.file_id = 1
+
+    def createDirectory(self):
+        try:
+            os.mkdir(self.directory_raw)
+        except OSError, error:
+            if error.errno == EEXIST:
+                pass
+            else:
+                raise
+
+    def createFilename(self, file_ext=None):
+        filename = "file-%04u" % self.file_id
+        self.file_id += 1
+        if file_ext:
+            filename += file_ext
+        return filename
+
+    def writeFile(self, filename, stream, offset, size):
+        # Create directory (only on first call)
+        if not self.mkdir:
+            self.createDirectory()
+            self.mkdir = True
+
+        # Create output file
+        filename, real_filename = os.path.join(self.directory_unicode, filename), \
+                                  os.path.join(self.directory_raw, filename)
+        output = FileOutputStream(filename, real_filename=real_filename)
+
+        # Write output
+        output.copyBytesFrom(stream, offset, size//8)
+
+class DataRate:
+    """
+    Compute average speed in bits per second of a function.
+    Store self.size data rates to compute good average speed.
+    Don't compute average before self.min_size values are computed.
+    """
+    def __init__(self, offset, size=30, min_size=3):
+        self.last_offset = offset
+        self.last_time = time()
+        self.datarates = []
+        # Average bit rate
+        self.average = None
+        # Number of stored value used to compute average data rate
+        self.size = size
+        self.min_size = min_size
+
+    def update(self, offset):
+        # Compute time delta
+        difftime = time() - self.last_time
+        if difftime < DATARATE_UPDATE:
+            # Only update each second
+            return
+        self.last_time = time()
+
+        # Compute data rate
+        rate = float(offset - self.last_offset) / difftime
+        self.last_offset = offset
+
+        # Update statistics
+        self.datarates.append(rate)
+        self.datarates = self.datarates[-self.size:]
+        if self.min_size <= len(self.datarates):
+            self.average = sum(self.datarates) / len(self.datarates)
+
+class HachoirSubfile:
+    def __init__(self, filename, directory, offset=0, size=None, verbose=True, debug=True):
+        """
+        Setup search tool, parameter:
+         - filename: Input filename in locale charset
+         - directory: Directory filename in locale charset where
+           output files will be written
+         - offset: Offset (in bytes) of the beginning of the search
+         - size: Limit size (in bytes) of input file (None: no limit)
+         - debug: Debug mode flag (display debug information)
+        """
+        self.verbose = verbose
+        self.debug = debug
+        self.stream = FileInputStream(unicodeFilename(filename), real_filename=filename)
+        if size is not None:
+            self.size = min(self.stream.size, size*8)
+        else:
+            self.size = self.stream.size
+        self.slice_size = SLICE_SIZE*8   # 64 KB (in bits)
+        self.start_offset = offset*8
+        self.guess_stat = {}
+        self.datarate = DataRate(self.start_offset)
+        if directory:
+            self.output = Output(directory)
+        else:
+            self.output = None
+        self.total_mem = getTotalMemory()
+        self.main_start = time()
+        self.filter = None
+
+    def loadMagics(self):
+        parsers = loadParsers()
+        self.magics = []
+        for parser in parsers:
+            if "magic" in parser.tags:
+                for (magic, offset) in parser.tags["magic"]:
+                    if self.slice_size < offset:
+                        self.slice_size = offset + 8
+                        error("Use slice size of %s because of '%s' parser magic offset" % (
+                            (self.slice_size//8), parser.__name__))
+                    self.magics.append((magic, offset, parser))
+                    self.guess_stat[parser] = [0,0]
+
+    def main(self):
+        """
+        Run the search.
+        Return True if ok, False otherwise.
+        """
+
+        # Initialize
+        self.loadMagics()
+        self.limitMemory()
+        self.mainHeader()
+
+        # Prepare search
+        self.current_offset = self.start_offset
+        self.main_start = time()
+        main_error = False
+        try:
+            # Run search
+            self.searchSubfiles()
+        except KeyboardInterrupt:
+            print >>sys.stderr, "[!] Program interrupted (CTRL+C)"
+            main_error = True
+        except MemoryError:
+            main_error = True
+            if not self.total_mem:
+                raise
+            setMemoryLimit(self.total_mem)   # Disable memory limit
+            print >>sys.stderr, "[!] Memory error: %s limit exceed!" % humanFilesize(max_mem)
+        self.mainFooter()
+        return not(main_error)
+
+    def mainHeader(self):
+        print >>sys.stderr, "[+] Start search (%s)" % \
+            humanFilesize((self.size-self.start_offset)//8)
+        print >>sys.stderr
+
+    def limitMemory(self):
+        if not self.total_mem:
+            return
+        max_mem = min(int(0.25 * self.total_mem), HARD_MEMORY_LIMIT)
+        if setMemoryLimit(max_mem):
+            print >>sys.stderr, "Set maximum memory to %s" % humanFilesize(max_mem)
+        else:
+            print >>sys.stderr, "(unable to set memory limit)"
+
+    def mainFooter(self):
+        print >>sys.stderr
+        print >>sys.stderr, "[+] End of search -- offset=%s (%s)" % (
+            self.current_offset//8, humanFilesize(self.current_offset//8))
+        size = (self.current_offset - self.start_offset) // 8
+        duration = time() - self.main_start
+        if 1.0 <= duration:
+            print >>sys.stderr, "Total time: %s -- global rate: %s/sec" % (
+                humanDuration(duration*1000), humanFilesize(size // duration))
+
+    def searchSubfiles(self):
+        """
+        Search all subfiles in the stream, call processParser() for each parser.
+        """
+        self.next_progress = time() + PROGRESS_UPDATE
+        while self.current_offset < self.size:
+            self.datarate.update(self.current_offset)
+            if self.verbose and self.next_progress <= time():
+                self.displayProgress()
+            found = []
+            for magic in self.magics:
+                for parser in self.findMagic(self.current_offset, *magic):
+                    found.append(parser)
+            for offset, parser in sorted(found):
+                self.processParser(offset, parser)
+            self.current_offset = min(self.current_offset + self.slice_size, self.size)
+
+    def processParser(self, offset, parser):
+        """
+        Process a valid parser.
+        """
+        format = parser.__class__.__name__
+        if self.debug:
+            print >>sys.stderr, "Found %s at offset %s" % (format, offset//8)
+        text = "[+] Found file at %s" % (offset//8)
+        if parser.content_size is not None:
+            text += " size=%s (%s)" % (parser.content_size//8, humanFilesize(parser.content_size//8))
+        if not(parser.content_size) or parser.content_size//8 < FILE_MAX_SIZE:
+            text += ": " + parser.description
+        else:
+            text += ": " + format
+
+        if self.output and parser.content_size:
+            if (offset == 0 and parser.content_size == self.size):
+                text += " (don't copy whole file)"
+            elif parser.content_size//8 >= FILE_MAX_SIZE:
+                text += " (don't copy file, too big)"
+            elif self.filter and self.filter(parser):
+                filename = self.output.createFilename(parser.filename_suffix)
+                self.output.writeFile(filename, self.stream, offset, parser.content_size)
+                text += " => %s" % filename
+        print text
+        self.next_progress = time() + PROGRESS_UPDATE
+
+    def findMagic(self, offset, magic_str, magic_offset, parser_cls):
+        """
+        Find all 'magic_str' strings in stream in offset interval:
+          offset..(offset+self.slice_size).
+
+        The function returns a generator with values (offset, parser) where
+        offset is beginning of a file (relative to stream begin), and not the
+        position of the magic.
+        """
+        offset += magic_offset
+        max_offset = offset + self.slice_size + 8 * (len(magic_str) - 1)
+        max_offset = min(max_offset, self.size)
+        while True:
+            offset = self.stream.searchBytes(magic_str, offset, max_offset)
+            if offset is None:
+                return
+            parser = self.guess(offset-magic_offset, parser_cls)
+            if parser:
+                yield (offset-magic_offset, parser)
+            offset += 8
+
+    def guess(self, offset, parser_cls):
+        """
+        Try the specified parser at stream offset 'offset'.
+
+        Return the parser object, or None on failure.
+        """
+        self.guess_stat[parser_cls][0] += 1
+        substream = InputSubStream(self.stream, offset)
+        (parser, error) = parseStream(parser_cls, substream)
+        if parser:
+            self.guess_stat[parser_cls][1] += 1
+        return parser
+
+    def displayProgress(self):
+        """
+        Display progress (to stdout) of the whole process.
+        Compute data rate (in byte per sec) and time estimation.
+        """
+        # Program next update
+        self.next_progress = time() + PROGRESS_UPDATE
+
+        # Progress offset
+        percent = float(self.current_offset - self.start_offset) * 100 / (self.size - self.start_offset)
+        offset = self.current_offset // 8
+        message = "Search: %.2f%% -- offset=%u (%s)" % (
+            percent, offset, humanFilesize(offset))
+
+        # Compute data rate (byte/sec)
+        average = self.datarate.average
+        if average:
+            message += " -- %s/sec " % humanFilesize(average // 8)
+            eta = float(self.size - self.current_offset) / average
+            message += " -- ETA: %s" % humanDuration(eta * 1000)
+
+        # Display message
+        print >>sys.stderr, message
+
+def displayVersion(*args):
+    import hachoir_core
+    print _("Hachoir subfile version %s") % __version__
+    print _("Hachoir library version %s") % hachoir_core.__version__
+    print
+    print _("Website: %s/wiki/hachoir-grep") % hachoir_core.WEBSITE
+    sys.exit(0)
+
+def parseOptions():
+    parser = OptionParser(usage="%prog [options] filename [output_directory]")
+
+    common = OptionGroup(parser, "hachoir-subfile", _("Option of hachoir-subfile"))
+    common.add_option("--offset", help=_("Skip first bytes of input file"),
+        action="store", type='int', default=0)
+    common.add_option("--size", help=_("Maximum size of input file"),
+        action="store", type='int', default=None)
+    common.add_option("--version", help=_("Display version and exit"),
+        action="callback", callback=displayVersion)
+    common.add_option("--quiet", help=_("Be quiet"),
+        action="store_true", default=False)
+    common.add_option("--debug", help=_("Enable debug mode"),
+        action="store_true", default=False)
+    parser.add_option_group(common)
+
+    values, arguments = parser.parse_args()
+    if len(arguments) == 1:
+        filename, output = arguments[0], None
+    elif len(arguments) == 2:
+        filename, output = arguments
+    else:
+        parser.print_help()
+        sys.exit(1)
+    return values, filename, output
+
+def main():
+    # Initialize
+    values, filename, output = parseOptions()
+    config.quiet = True
+    subfile = HachoirSubfile(filename, output,
+        offset=values.offset,
+        size=values.size,
+        verbose=not(values.quiet),
+        debug=values.debug)
+
+    # Use filter?
+#    subfile.filter = metadataFilter
+
+    # Search subfiles
+    ok = subfile.main()
+
+    # Display statistics (only in debug mode)
+    if subfile.debug:
+        subfile.magics.sort(key=lambda value: len(value[0]))
+        for magic, offset, parser in subfile.magics:
+            print "%s (%u): %s" % (repr(magic), len(magic), parser.__name__)
+        print "--"
+        data = [(parser, stat[0], stat[1]) for parser, stat in subfile.guess_stat.iteritems() ]
+        data.sort(key=lambda values: values[1])
+        for parser, hit, valid in data:
+            print "Parser %s: %s magic / %s valid" % (parser.__name__, hit, valid)
+
+    # Exit
+    if not ok:
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
+

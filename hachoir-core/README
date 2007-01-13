@@ -1,0 +1,124 @@
+Hachoir library
+===============
+
+Hachoir is a Python library used to represent of a binary file as a tree of
+Python objects. Each object has a type, a value, an address, etc. The goal is
+to be able to know the meaning of each bit in a file.
+
+Why using slow Python code instead of fast hardcoded C code? Hachoir has many
+interresting features:
+
+ * Autofix: Hachoir is able to open invalid / truncated files
+ * Lazy: Open a file is very fast since no information is read from file,
+   data are read and/or computed when the user ask for it
+ * Types: Hachoir has many predefined field types (integer, bit, string, etc.)
+   and supports string with charset (ISO-8859-1, UTF-8, UTF-16, ...)
+ * Addresses and sizes are stored in bit, so flags are stored as classic fields
+ * Endian: You have to set endian once, and then number are converted in the
+   right endian
+ * Editor: Using Hachoir reprensentation of data, you can edit, insert, remove
+   data and then save in a new file.
+
+Website: http://hachoir.org/
+
+Installation
+============
+
+For the installation: see INSTALL file or http://hachoir.org/wiki/Install
+
+What's new in hachoir-core 0.7.1?
+=================================
+
+ * New field type Float80 (80-bit flotting point number)
+ * New field type CompressedField (for compressed content)
+ * Create utility function createDict()
+ * Remove (old and unused) unit tests
+
+What's new in hachoir-core 0.7?
+===============================
+
+Important changes:
+
+ * Rename the component "hachoir" to "hachoir-core"
+ * Editor supports Float32, Float64 and Character types
+ * Floats are now field set: it's possible
+   to read sign, exponent and mantissa
+ * New type EncodedFile to parse "encoded" subfile:
+   compressed, crypted, encoded in base64, etc.
+ * New types GenericVector and UserVector to parse vectors
+ * Raw display is now closer to hexadecimal reprensentation for many types
+ * Rewrite documentation (hachoir-api.txt)
+ * Parser: don't have mime_type or tags attributes anymore
+ * Cleanup some Field methods: getOriginalDisplay() becomes raw_display
+   property, methods _createValue() and _createDescription() become public,
+   etc.
+ * FileInputStream() and FileOutputStream() now have optional "real_filename"
+   to accept invalid unicode filename
+
+Minor changes:
+
+ * Add __repr__() and __unicode__() methods to Field
+ * Use cache for array() method
+ * New types Int24 and UInt24
+ * Field value is now read-only
+ * FieldSet.seekBit()/seekByte() has null optional argument to create
+   nul padding
+ * createPaddingField() raise an exception on invalid size
+   instead of using assertion
+ * str2hex() always returns Unicode string
+ * Remove file export_xml.py (moved to hachoir-console component)
+
+Bugfixes:
+
+ * Use fstat() to get input size instead of seek()+tell() since unusual
+   files on /proc on Linux returns invalid size
+ * GenericString: fix UnixLine, fix UTF-16 with BOM,
+   remove ISO-8859-12 charset (doesn't exist)
+ * Catch seek() error in InputStream and raise InputStreamError()
+ * Fix _fixFieldSize() method for field set with nul size
+ * Fix UnicodeStdout on 8-bit terminal (eg. MS-Dos terminal on Windows)
+ * Fix makePrintable(): quote quote character if needed
+
+what's new in hachoir 0.6.1?
+============================
+
+Bugfixes:
+
+ * Fix GenericString length attribute: wasn't initialized for UTF-* strings
+ * Fix and improve FakeArray (created with fieldset.array("name"))
+
+Improvements:
+
+ * Add text_handler optional argument to Bits and RawBits
+ * On name duplicate error (a field was same name already exists), add "[]"
+   to its name instead and display an error raising an exception
+
+Minor changes:
+
+ * Add class documentation to all types (PaddingBits, Float32, ...)
+ * Fix reversed() code and __all__ constant in hachoir.compatiblity
+ * Add available_types variable to hachoir.field (used by hachoir-wx)
+
+What's new in Hachoir 0.6?
+==========================
+
+First of all, Hachoir projet is splitted in backend: hachoir core and
+hachoir-parser, and in frontends: hachoir-console, hachoir-urwid,
+hachoir-metadata, etc. Changes listed here are only about hachoir core.
+
+ * Hachoir is able to edit a file: edit field value, delete field, insert
+   new field
+ * Suppport of piped input: use small data cache and try to do the most
+   without knowing stream size
+ * Better autofix feature to be able to open invalid / truncated files
+ * Support charset UTF-16 (and UTF-32) for strings
+ * Use Unicode strings everywhere (but only for text, not for binary data)
+ * Use gettext to translate messages => but disabled by default since
+   setup.py is not able to compile .po file to .mo...
+
+Changes for developers:
+
+ * Add new field types: NullBits, NullBytes and SubFile
+ * Create array() method for field set: self["name[%u]" % index] is now
+   the same then self.array("name")[index]
+

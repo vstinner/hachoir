@@ -1,0 +1,140 @@
+hachoir-metadata extracts metadata from multimedia files: music, picture,
+video, but also archives. It supports most common file formats:
+
+ * Archives: bzip2, gzip, zip, tar
+ * Audio: MPEG audio ("MP3"), WAV, Sun/NeXT audio, Ogg/Vorbis (OGG), MIDI,
+   AIFF, AIFC, Real audio (RA)
+ * Image: BMP, CUR, EMF, ICO, GIF, JPEG, PCX, PNG, TGA, TIFF, WMF, XCF
+ * Video: ASF format (WMV video), AVI, Matroska (MKV), Quicktime (MOV),
+   Ogg/Theora, Real media (RM)
+
+It tries to give the more informations as possible. For some file formats,
+it gives really more informations then libextractor for example. RIFF parser
+is really good for example, it can extract creation date, software used to
+generate the file, etc. But hachoir-metadata can not guess informations. The
+most complex operation is just to compute duration of a music using frame size
+and file size.
+
+hachoir-metadata has three modes:
+
+ * classic mode: extract metadata, you can use --level=LEVEL to limit quantity
+   of information to display (and not to extract)
+ * --type: show on one line the file format and most important informations
+ * --mime: just display file MIME type
+
+The command 'hachoir-metadata --mime' works like 'file --mime',
+and 'hachoir-metadata --type' like 'file'. But today file command supports
+more file formats then hachoir-metadata.
+
+Website: http://hachoir.org/wiki/hachoir-metadata
+
+Example
+=======
+
+Example on AVI video (RIFF file format)::
+
+    $ hachoir-metadata pacte_des_gnous.avi
+    Common:
+    - Duration: 4 min 25 sec
+    - Comment: Has audio/video index (248.9 KB)
+    - MIME type: video/x-msvideo
+    - Endian: Little endian
+    Video stream:
+    - Image width: 600
+    - Image height: 480
+    - Bits/pixel: 24
+    - Compression: DivX v4 (fourcc:"divx")
+    - Frame rate: 30.0
+    Audio stream:
+    - Channel: stereo
+    - Sample rate: 22.1 KHz
+    - Compression: MPEG Layer 3
+
+Modes --mime and --type
+=======================
+
+Option --mime ask to just display file MIME type (works like UNIX
+"file --mime" program)::
+
+    $ hachoir-metadata --mime logo-Kubuntu.png sheep_on_drugs.mp3 wormux_32x32_16c.ico
+    logo-Kubuntu.png: image/png
+    sheep_on_drugs.mp3: audio/mpeg
+    wormux_32x32_16c.ico: image/x-ico
+
+Option --file display short description of file type (works like
+UNIX "file" program)::
+
+    $ hachoir-metadata --type logo-Kubuntu.png sheep_on_drugs.mp3 wormux_32x32_16c.ico
+    logo-Kubuntu.png: PNG picture: 331x90x8 (alpha layer)
+    sheep_on_drugs.mp3: MPEG v1 layer III, 128.0 Kbit/sec, 44.1 KHz, Joint stereo
+    wormux_32x32_16c.ico: Microsoft Windows icon: 16x16x32
+
+What's new in hachoir-metadata 0.8.1?
+=====================================
+
+ * Fix --version command line option (rename module hachoir to hachoir_core)
+
+What's new in hachoir-metadata 0.8?
+===================================
+
+New formats:
+ * Aldus Placeable Metafile (APM) picture
+ * Audio Interchange File Format (AIFF)
+ * Audio Interchange File Format Compressed (AIFC)
+ * Microsoft Enhanced Metafile (EMF) picture
+ * Microsoft Windows Metafile (WMF) picture
+ * Real audio
+ * Real media
+ * Targa picture
+
+Changes:
+ * For string, strip spaces and then skip empty string
+ * ICO: use 8 bits/pixel if bpp=0
+ * JPEG: format version is "JFIF %u.%02u" (and not "JPEG %s.%s")
+ * JPEG: don't compute JPEG quality if needed fields are missing
+ * RIFF: compute duration of each stream since audio stream may be
+   shorter than video stream
+
+
+What's new in hachoir-metadata 0.7?
+===================================
+
+Important changes:
+ * New extractors: Ogg/Vorbis and Ogg/Theora
+ * JPEG: compute JPEG quality
+ * Matroska: extract subtitle info, support multiple audio and video streams,
+   read audio codec, read audio/video title and language
+ * Audio: extract bits/sample for audio
+ * GIF: read comments and pixel format
+ * RIFF: able to use AVI header, support multiple audio streams
+ * ID3: also extract creation date
+ * IPTC: recognize more tags (author, country, title)
+ * Add --parser-list and --profiler command line options
+
+Small changes:
+ * Strip spaces (space, tab, new line) for all strings
+   keep the longer value
+ * Remove duplicate string and also if you have "verlongtext" and "verylo",
+ * Add warning when a tag is skipped (for ID3, etc.)
+ * Support invalid unicode filenames
+ * Fix all divison to avoid divison by zero
+ * TAR and ZIP archives: only process first 5 files
+ * EXIF: ignore image size if we already know the size since EXIF size is not
+   updated when an image is resized
+ * Bitmap: read format version
+
+Developer changes:
+ * Use array() to simply code
+ * Convert raw string to unicode string using charset ISO-8859-1
+ * Add get() method to Metadata class
+ * Group name can be "name[]": replaced by name[0], name[1], ...
+
+Similar projects
+================
+
+ * Kaa - http://freevo.sourceforge.net/cgi-bin/freevo-2.0/Kaa (written in Python)
+ * libextractor: http://gnunet.org/libextractor/ (written in C)
+
+A *lot* of other libraries are written to read and/or write metadata in MP3
+music and/or EXIF photo.
+

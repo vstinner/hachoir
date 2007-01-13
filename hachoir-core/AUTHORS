@@ -1,0 +1,14 @@
+ * Team
+
+Julien Muchembled <jm AT jm10 DOT no-ip DOT com>
+Victor Stinner aka haypo <victor DOT stinner AT haypocalc DOT com>
+
+ * Packagers
+
+Arnaud Pithon aka bildoon <apithon AT free DOT fr> - ArchLinux package (v0.5.2 and svn)
+Emmanuel GARETTE aka GnunuX <gnunux AT laposte DOT net> - ArchLinux package (v0.5.2)
+Michael Scherer aka misc <misc AT mandriva DOT org> - Mandriva package (v0.5.2)
+Michel Casabona aka plumbear <michel DOT casabona AT free DOT fr> - Debian package (v0.5.2)
+Richard DEMONGEOT <richard AT demongeot DOT biz> - Debian package (v0.5.2)
+Thomas de Grenier de Latour TGL <degrenier AT easyconnect DOT fr> - Gentoo ebuild
+

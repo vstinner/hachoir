@@ -1,0 +1,58 @@
+hachoir-grep is an experimantal search program based on Hachoir. Its goal is
+to search a substring in a binary file or list all strings.
+
+Examples
+========
+
+List all strings::
+
+    $ .hachoir-grep --all sheep_on_drugs.mp3
+    0:ID3
+    10:TAL
+    17:Bilmusik vol 1. Stainless Steel Providers
+    (...)
+    143:COM
+    150:eng
+    154:Stainless Steel Provider is compilated to the car of Twinstar.
+
+Search substring::
+
+    $ hachoir-grep "il" sheep_on_drugs.mp3
+    17:Bilmusik vol 1. Stainless Steel Providers
+    154:Stainless Steel Provider is compilated to the car of Twinstar.
+
+Search substring with case sensitive and display string path::
+
+    $ hachoir-grep --path --case Car sheep_on_drugs.mp3
+    78:/id3v2/field[2]/content/text:Car music
+
+Other options:
+
+ * --no-value: Don't display the string value
+ * --no-addr: Don't display string address
+ * --percent: Display search percent (on stderr)
+ * Get full option list using --help
+
+Comparaison to grep and strings
+===============================
+
+The difference between hachoir-grep and grep or strings are:
+
+ * hachoir-grep don't parse non-string data
+ * hachoir-grep cares about string charset (ISO-8859-1, UTF-8, UTF-16, etc.)
+   but search is charset independant
+ * hachoir-grep can display string address
+
+Drawbacks:
+
+ * hachoir-grep is slow and might use a lot of memory
+ * results depend on the quality of Hachoir parsers
+
+Links
+=====
+
+ * Hachoir library:
+   http://hachoir.org/wiki/HachoirYield
+ * hachoir-grep program:
+   http://hachoir.org/wiki/hachoir-grep
+

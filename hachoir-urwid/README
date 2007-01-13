@@ -1,0 +1,61 @@
+hachoir-urwid is a binary file explorer based on Hachoir library to parse the
+files. Using this tool you can exactly know the meaning of each bit/byte of
+your files. With direction keys, you can navigate in the field tree. The key
+'h' will disable 'human display' and switch to 'raw display'. It's sometime
+useful when you would like to compare hexadecimal data and Hachoir
+reprensentation.
+
+Website: http://hachoir.org/wiki/hachoir-urwid
+
+Startup options
+===============
+
+ * --preload=10: Load 10 fields when loading a new field set
+ * --path="/header/bpp": Open the specified path and focus on the field
+
+Usefull keys
+============
+
+Move:
+
+ * up/down: move up/down
+ * home: go to parent
+ * end: go to the last field of a field set
+ * left/right: horizontal scrolling
+
+Setup display:
+
+ * h: most important option :-) switch between human display (default)
+   and raw value
+ * v / d / s: show or hide field value / description / size
+ * a: switch between relative (default) and absolute address
+ * b: switch between address in decimal (default) and hexadecimal
+
+Interaction:
+
+ * enter: on a field set, expand/collaspe the children
+ * space: parse a file/stream contained in the current field
+
+Application:
+
+ * q: quit
+ * < / >: previous / next tab
+ * + / -: move separator vertically
+ * esc or CTRL+W: close current tab
+ * F1: display help
+
+Getting help
+============
+
+Command line options: use --help option.
+
+In hachoir-use, use F1 key to get help (keyboard keys).
+
+What's new in hachoir-urwid 0.7?
+================================
+
+ * Support invalid unicode filename
+ * Support decompression of a subfile
+ * Better managment of "raw display"
+ * Add command line option --parser-list
+
