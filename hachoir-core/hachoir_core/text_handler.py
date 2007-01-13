@@ -10,6 +10,7 @@ from hachoir_core.tools import (
     humanFrequency as doHumanFrequency,
     timestampUNIX as doTimestampUNIX,
     humanDatetime,
+    alignValue,
 )
 from hachoir_core.i18n import _
 
@@ -153,7 +154,8 @@ def hexadecimal(field):
     """
     assert hasattr(field, "value") and hasattr(field, "size")
     size = field.size
-    assert 0 < size <= 64 and not size % 8
-    pattern = u"0x%%0%ux" % (size/4)
+#    assert 0 < size <= 64 and not size % 8
+    padding = alignValue(size, 4) // 4
+    pattern = u"0x%%0%ux" % padding
     return pattern % field.value
 
