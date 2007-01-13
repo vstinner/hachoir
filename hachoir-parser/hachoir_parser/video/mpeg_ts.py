@@ -11,7 +11,7 @@ Creation date: 13 january 2007
 
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
-    UInt8, Bit, Bits, RawBytes)
+    UInt8, Enum, Bit, Bits, RawBytes)
 from hachoir_core.endian import BIG_ENDIAN
 from hachoir_core.text_handler import hexadecimal
 
@@ -23,6 +23,11 @@ class Packet(FieldSet):
         else:
             self._size = 188*8
 
+    PID = {
+        0x44: "video",
+        0x45: "audio",
+    }
+
     def createFields(self):
         yield UInt8(self, "sync", 8, text_handler=hexadecimal)
         if self["sync"].value != 0x47:
@@ -30,7 +35,7 @@ class Packet(FieldSet):
         yield Bit(self, "has_error")
         yield Bit(self, "payload_unit_start")
         yield Bit(self, "priority")
-        yield Bits(self, "pid", 13, text_handler=hexadecimal)
+        yield Enum(Bits(self, "pid", 13, text_handler=hexadecimal), self.PID)
         yield Bits(self, "scrambling_control", 2)
 
         yield Bit(self, "has_adaptation")
