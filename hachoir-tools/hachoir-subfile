@@ -101,6 +101,7 @@ class Output:
 
         # Write output
         output.copyBytesFrom(stream, offset, size//8)
+        return filename
 
 class DataRate:
     """
@@ -296,9 +297,9 @@ class HachoirSubfile:
                 text += " (don't copy whole file)"
             elif parser.content_size//8 >= FILE_MAX_SIZE:
                 text += " (don't copy file, too big)"
-            elif self.filter and self.filter(parser):
+            elif not self.filter or self.filter(parser):
                 filename = self.output.createFilename(parser.filename_suffix)
-                self.output.writeFile(filename, self.stream, offset, parser.content_size)
+                filename = self.output.writeFile(filename, self.stream, offset, parser.content_size)
                 text += " => %s" % filename
         print text
         self.next_progress = time() + PROGRESS_UPDATE
