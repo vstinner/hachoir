@@ -11,18 +11,11 @@ class ParserList(object):
     VALID_CATEGORY = ("archive", "audio", "container", "file_system",
         "game", "image", "misc", "program", "video")
     ID_REGEX = re.compile("^[a-z0-9][a-z0-9_]{2,}$")
-    _instance = None
-
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = object.__new__(cls)
-        return cls._instance
 
     def __init__(self):
         self.parser_list = []
         self.byid = {}
         self.bycategory = {}
-        self._load()
 
     def add(self, parser):
         # Check parser
@@ -49,35 +42,6 @@ class ParserList(object):
 
     def __iter__(self):
         return iter(self.parser_list)
-
-    def _load(self):
-        """
-        Load all parsers from "hachoir.parser" module.
-
-        Return the list of loaded parsers.
-        """
-        # Parser list is already loaded?
-        if self.parser_list:
-            return self.parser_list
-
-        todo = []
-        module = __import__("hachoir_parser")
-        for attrname in dir(module):
-            attr = getattr(module, attrname)
-            if isinstance(attr, types.ModuleType):
-                parser = attr
-                todo.append(attr)
-
-        for module in todo:
-            attributes = ( getattr(module, name) for name in dir(module) )
-            parsers = list( attr for attr in attributes \
-                if isinstance(attr, type) \
-                   and issubclass(attr, Parser) \
-                   and hasattr(attr, "tags"))
-            for parser in parsers:
-                self.add(parser)
-        assert 1 <= len(self.parser_list)
-        return self.parser_list
 
     def checkParser(self, parser):
         """
@@ -125,14 +89,57 @@ class ParserList(object):
             print _("List of Hachoir parsers.")
 
         # Create parser list sorted by module
-        for category in self.bycategory.iterkeys():
-            print "\n[%s]" % category
+        for category in sorted(self.bycategory.iterkeys()):
+            print
+            print "[%s]" % category
             parser_list = sorted(self.bycategory[category],
                 key=lambda parser: parser.tags["id"])
             for parser in parser_list:
                 self.printParser(parser, verbose)
         print
+        print "Total: %s parsers" % len(self.parser_list)
 
     def __getitem__(self, key):
         return self.byid[key]
+
+class HachoirParserList(ParserList):
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = object.__new__(cls)
+        return cls._instance
+
+    def __init__(self):
+        ParserList.__init__(self)
+        self._load()
+
+    def _load(self):
+        """
+        Load all parsers from "hachoir.parser" module.
+
+        Return the list of loaded parsers.
+        """
+        # Parser list is already loaded?
+        if self.parser_list:
+            return self.parser_list
+
+        todo = []
+        module = __import__("hachoir_parser")
+        for attrname in dir(module):
+            attr = getattr(module, attrname)
+            if isinstance(attr, types.ModuleType):
+                parser = attr
+                todo.append(attr)
+
+        for module in todo:
+            attributes = ( getattr(module, name) for name in dir(module) )
+            parsers = list( attr for attr in attributes \
+                if isinstance(attr, type) \
+                   and issubclass(attr, Parser) \
+                   and hasattr(attr, "tags"))
+            for parser in parsers:
+                self.add(parser)
+        assert 1 <= len(self.parser_list)
+        return self.parser_list
 

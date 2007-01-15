@@ -4,7 +4,7 @@ from hachoir_core.cmd_line import (getHachoirOptions,
     configureHachoir, unicodeFilename)
 from hachoir_core.stream import InputStreamError, FileInputStream
 from hachoir_core.i18n import _
-from hachoir_parser import createParser, parseStream, ParserList
+from hachoir_parser import createParser, parseStream, HachoirParserList
 from hachoir_urwid import exploreFieldSet
 from optparse import OptionGroup, OptionParser
 import sys
@@ -19,7 +19,7 @@ def displayVersion(*args):
     sys.exit(0)
 
 def displayParserList(*args):
-    ParserList().print_()
+    HachoirParserList().print_()
     sys.exit(0)
 
 def parseOptions():
@@ -30,7 +30,7 @@ def parseOptions():
         type="int", action="store", default=3)
     common.add_option("--path", help=_("Initial path to focus on"),
         type="str", action="store", default=None)
-    common.add_option("--force-parser", help=_("Force a parser by its identifier"),
+    common.add_option("--parser", help=_("Use the specified parser (use its identifier)"),
         type="str", action="store", default=None)
     common.add_option("--offset", help=_("Skip first bytes of input file"),
         type="long", action="store", default=None)
@@ -78,20 +78,21 @@ def runProfiler(*args):
     finally:
         unlink(profile_filename)
 
-def openParser(force_parser, filename):
+def openParser(parser_id, filename, offset, size):
     try:
         filename, realname = unicodeFilename(filename), filename
-        if force_parser:
+        if parser_id:
             try:
-                parser_cls = ParserList()[force_parser]
+                parser_cls = HachoirParserList()[parser_id]
             except KeyError:
-                error(_("No parser with identifier: %s") % force_parser)
+                error(_("No parser with identifier: %s") % parser_id)
                 sys.exit(1)
             stream = FileInputStream(filename, real_filename=realname)
+            # TODO: Use offset and size
             return parseStream(parser_cls, stream, False)
         else:
             parser = createParser(filename,
-                offset=values.offset, size=values.size, real_filename=realname)
+                offset=offset, size=size, real_filename=realname)
     except InputStreamError, err:
         return None, _("Unable to open file: %s") % err
     if not parser:
@@ -104,7 +105,7 @@ def main():
     configureHachoir(values)
 
     # Open file and create parser
-    parser, err = openParser(values.force_parser, filename)
+    parser, err = openParser(values.parser, filename, values.offset, values.size)
     if err:
         print err
         sys.exit(1)

@@ -9,7 +9,7 @@ try:
     from hachoir_core.benchmark import Benchmark
     from hachoir_core.stream import InputStreamError
     from hachoir_core.tools import makePrintable
-    from hachoir_parser import createParser,printParserList
+    from hachoir_parser import createParser, ParserList
 except ImportError, err:
     raise
     print >>sys.stderr, "Unable to import an Hachoir module: %s" % err
@@ -20,8 +20,10 @@ from hachoir_metadata.metadata import extractors as metadata_extractors
 
 
 def displayParserList(*args):
-    extractor_list = metadata_extractors
-    printParserList(extractor_list, _("List of Hachoir parsers with extractor"))
+    parser_list = ParserList()
+    for parser in metadata_extractors.keys():
+        parser_list.add(parser)
+    parser_list.print_(_("List of metadata extractors."))
     sys.exit(0)
 
 def displayVersion(*args):

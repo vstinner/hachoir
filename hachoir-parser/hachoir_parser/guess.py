@@ -6,7 +6,7 @@ Parser list managment:
 
 import os
 from hachoir_core.error import warning, info, HACHOIR_ERRORS
-from hachoir_parser import Parser
+from hachoir_parser import Parser, HachoirParserList
 from hachoir_core.stream import FileInputStream, InputSubStream
 from hachoir_core.i18n import _
 from hachoir_core.tools import makePrintable
@@ -78,7 +78,7 @@ def _guessParserByTag(stream, parser_list, tag_name, tag_value, validate=True):
 
 def _guessParsers(stream, file_ext=None, force_mime=None):
     # Filter by minimum size
-    parser_list = [ parser for parser in ParserList() \
+    parser_list = [ parser for parser in HachoirParserList() \
         if "min_size" not in parser.tags or stream.sizeGe(parser.tags["min_size"]) ]
 
     # Guess my MIME type
