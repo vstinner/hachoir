@@ -5,7 +5,7 @@ from hachoir_core import config
 from hachoir_core.cmd_line import unicodeFilename
 from hachoir_core.error import HachoirError, error
 from hachoir_core.stream import FileInputStream, InputSubStream, FileOutputStream
-from hachoir_core.tools import humanFilesize, humanDuration
+from hachoir_core.tools import humanFilesize, humanDuration, makePrintable
 from hachoir_parser.guess import HachoirParserList, parseStream
 from optparse import OptionGroup, OptionParser
 from hachoir_subfile_regex import createRegex
@@ -218,6 +218,8 @@ class HachoirSubfile:
             magic_strings.append(magic)
             self.magics[magic] = (offset, parser)
         regex = createRegex(magic_strings)
+        if self.debug:
+            print "Use regex >>>%s<<<" % makePrintable(regex, "ASCII")
         self.magic_regex = re.compile(regex)
 
     def main(self):
@@ -233,8 +235,6 @@ class HachoirSubfile:
         self.mainHeader()
 
         # Prepare search
-        self.current_offset = self.start_offset
-        self.main_start = time()
         main_error = False
         try:
             # Run search
@@ -255,6 +255,9 @@ class HachoirSubfile:
         print >>sys.stderr, "[+] Start search (%s)" % \
             humanFilesize((self.size-self.start_offset)//8)
         print >>sys.stderr
+        self.stats = {}
+        self.current_offset = self.start_offset
+        self.main_start = time()
 
     def limitMemory(self):
         if not self.total_mem:
@@ -332,7 +335,11 @@ class HachoirSubfile:
         for magic, offset in inputStreamSearchRegex(self.stream, self.magic_regex, offset, max_offset):
             magic_offset, parser_cls = self.magics[magic]
             parser = self.guess(offset-magic_offset, parser_cls)
+            if parser_cls not in self.stats:
+                self.stats[parser_cls] = [0, 0]
+            self.stats[parser_cls][0] += 1
             if parser:
+                self.stats[parser_cls][1] += 1
                 yield (offset-magic_offset, parser)
 
     def guess(self, offset, parser_cls):
@@ -432,10 +439,26 @@ def main():
 #    subfile.filter = metadataFilter
 
     # Search subfiles
-    if subfile.main():
-        sys.exit(0)
-    else:
-        sys.exit(1)
+    ok = subfile.main()
+
+    if values.debug:
+        stats = [ (parser.tags["id"], stats[0], stats[1]) for parser, stats in subfile.stats.iteritems() ]
+        print
+        print "[ Match statistics ]"
+        total_hit = 0
+        total_valid = 0
+        if stats:
+            stats.sort(key=lambda values: values[1])
+            for parser_id, hit, valid in stats:
+                print " - %s: %u hit/%u valid" % (parser_id, hit, valid)
+                total_hit += hit
+                total_valid += valid
+            print
+        else:
+            print "(no match)"
+        print "Total: %u hit/%u valid" % (total_hit, total_valid)
+        print "(using %u parsers)" % len(subfile.magics)
+    sys.exit(int(not ok))
 
 if __name__ == "__main__":
     main()
