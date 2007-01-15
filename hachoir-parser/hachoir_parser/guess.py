@@ -6,106 +6,13 @@ Parser list managment:
 """
 
 import os
-import types
-from hachoir_core.error import warning, info, HachoirError, HACHOIR_ERRORS
+from hachoir_core.error import warning, info, HACHOIR_ERRORS
 from hachoir_parser import Parser
 from hachoir_core.stream import FileInputStream, InputSubStream
 from hachoir_core.i18n import _
 from hachoir_core.tools import makePrintable
 from hachoir_core import config
 from hachoir_core.editor import createEditor as createEditorFromParser
-
-_hachoir_parsers_list = None
-
-### Parser list ################################################################
-
-def validParser(parser):
-    # Check tags attribute
-    if not hasattr(parser, "tags"):
-        return "No tags attribute (tags)"
-    if not parser.tags.get("description", ""):
-        return "Empty description (description)"
-    if not parser.tags.get("min_size", 0):
-        return "Nul minimum size (min_size)"
-    if "mime" in parser.tags and not isinstance(parser.tags["mime"], (list, tuple)):
-        return "MIME type (mime) have to be a list or tuple"
-    if "file_ext" in parser.tags and not isinstance(parser.tags["file_ext"], (list, tuple)):
-        return "File extensions (file_ext) have to be a list or tuple"
-    return ""
-
-def loadParsers():
-    """
-    Load all parsers from "hachoir.parser" module.
-
-    Return the list of loaded parsers.
-    """
-    global _hachoir_parsers_list
-
-    # Parser list is already loaded?
-    if _hachoir_parsers_list:
-        return _hachoir_parsers_list
-
-    _hachoir_parsers_list = []
-    todo = []
-    module = __import__("hachoir_parser")
-    for attrname in dir(module):
-        attr = getattr(module, attrname)
-        if isinstance(attr, types.ModuleType):
-            parser = attr
-            todo.append(attr)
-
-    for module in todo:
-        attributes = ( getattr(module, name) for name in dir(module) )
-        parsers = list( attr for attr in attributes \
-            if isinstance(attr, type) \
-               and issubclass(attr, Parser) \
-               and hasattr(attr, "tags"))
-        for parser in parsers:
-            err = validParser(parser)
-            if err:
-                raise HachoirError("Invalid parser %s: %s" % (parser.__name__, err))
-        _hachoir_parsers_list.extend(parsers)
-    assert 1 <= len(_hachoir_parsers_list)
-    return _hachoir_parsers_list
-
-def printParserList(parser_list=None, title=None):
-    """Display a list of parser with its title
-     * title : title of the list to display
-     * parser_list : list of parser (default get from loadParser())
-    """
-
-    if title:
-        print title
-    else:
-        print _("List of Hachoir parsers.")
-
-    # Get parser list (if not specified)
-    if not parser_list:
-        parser_list = loadParsers()
-
-    # Create parser list sorted by module
-    parsers_by_module = {}
-    for parser in parser_list:
-        module = parser.__module__.split(".")[1]
-        if module in parsers_by_module:
-            parsers_by_module[module].append(parser)
-        else:
-            parsers_by_module[module] = [parser]
-    for module in sorted(parsers_by_module):
-        print "\n[%s]" % module
-        for parser in parsers_by_module[module]:
-            text = ["- "]
-            mimes = parser.tags.get("mime", ())
-            if not isinstance(mimes, str):
-                if len(mimes):
-                    mimes = ", ".join(mimes)
-                    text.append(mimes)
-                    text.append(": ")
-                else:
-                    mimes = "(no mime type)"
-            text.append(parser.tags["description"])
-            print "".join(text)
-    print
 
 ### Parse a stream #############################################################
 
