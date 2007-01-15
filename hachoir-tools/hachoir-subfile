@@ -8,10 +8,12 @@ from hachoir_core.stream import FileInputStream, InputSubStream, FileOutputStrea
 from hachoir_core.tools import humanFilesize, humanDuration
 from hachoir_parser.guess import HachoirParserList, parseStream
 from optparse import OptionGroup, OptionParser
+from hachoir_subfile_regex import createRegex
 import sys
 from time import time
 from errno import EEXIST
 import os
+import re
 
 __version__ = "0.0.0"
 
@@ -20,6 +22,11 @@ SLICE_SIZE = 64*1024                # Slice size in bytes (64 KB)
 HARD_MEMORY_LIMIT = 100*1024*1024
 PROGRESS_UPDATE = 1.5   # Minimum number of second between two progress messages
 DATARATE_UPDATE = 1.0   # Time slice (in second) for datarate computation
+
+def inputStreamSearchRegex(stream, regex, start, end):
+    data = stream.readBytes(start, (end-start)//8)
+    return [ (match.group(0), start+match.start(0)*8)
+        for match in regex.finditer(data) ]
 
 def getTotalMemory():
     try:
@@ -165,7 +172,6 @@ class HachoirSubfile:
             self.size = self.stream.size
         self.slice_size = SLICE_SIZE*8   # 64 KB (in bits)
         self.start_offset = offset*8
-        self.guess_stat = {}
         self.datarate = DataRate(self.start_offset)
         if directory:
             self.output = Output(directory)
@@ -194,7 +200,7 @@ class HachoirSubfile:
             parser_list = hachoir_parser
 
         # Load parser magics
-        self.magics = []
+        magics = []
         for parser in parser_list:
             if "magic" in parser.tags:
                 for (magic, offset) in parser.tags["magic"]:
@@ -202,8 +208,17 @@ class HachoirSubfile:
                         self.slice_size = offset + 8
                         error("Use slice size of %s because of '%s' parser magic offset" % (
                             (self.slice_size//8), parser.__name__))
-                    self.magics.append((magic, offset, parser))
-                    self.guess_stat[parser] = [0,0]
+                    magics.append((magic, offset, parser))
+
+        # Build regex
+        self.max_magic_len = max( len(magic) for magic in magics )
+        self.magics = {}
+        magic_strings = []
+        for magic, offset, parser in magics:
+            magic_strings.append(magic)
+            self.magics[magic] = (offset, parser)
+        regex = createRegex(magic_strings)
+        self.magic_regex = re.compile(regex)
 
     def main(self):
         """
@@ -270,9 +285,8 @@ class HachoirSubfile:
             if self.verbose and self.next_progress <= time():
                 self.displayProgress()
             found = []
-            for magic in self.magics:
-                for parser in self.findMagic(self.current_offset, *magic):
-                    found.append(parser)
+            for parser in self.findMagic(self.current_offset):
+                found.append(parser)
             for offset, parser in sorted(found):
                 self.processParser(offset, parser)
             self.current_offset = min(self.current_offset + self.slice_size, self.size)
@@ -304,7 +318,7 @@ class HachoirSubfile:
         print text
         self.next_progress = time() + PROGRESS_UPDATE
 
-    def findMagic(self, offset, magic_str, magic_offset, parser_cls):
+    def findMagic(self, offset):
         """
         Find all 'magic_str' strings in stream in offset interval:
           offset..(offset+self.slice_size).
@@ -313,17 +327,13 @@ class HachoirSubfile:
         offset is beginning of a file (relative to stream begin), and not the
         position of the magic.
         """
-        offset += magic_offset
-        max_offset = offset + self.slice_size + 8 * (len(magic_str) - 1)
+        max_offset = offset + self.slice_size + 8 * (self.max_magic_len-1)
         max_offset = min(max_offset, self.size)
-        while True:
-            offset = self.stream.searchBytes(magic_str, offset, max_offset)
-            if offset is None:
-                return
+        for magic, offset in inputStreamSearchRegex(self.stream, self.magic_regex, offset, max_offset):
+            magic_offset, parser_cls = self.magics[magic]
             parser = self.guess(offset-magic_offset, parser_cls)
             if parser:
                 yield (offset-magic_offset, parser)
-            offset += 8
 
     def guess(self, offset, parser_cls):
         """
@@ -331,11 +341,10 @@ class HachoirSubfile:
 
         Return the parser object, or None on failure.
         """
-        self.guess_stat[parser_cls][0] += 1
+        if offset < 0:
+            return None
         substream = InputSubStream(self.stream, offset)
         (parser, error) = parseStream(parser_cls, substream)
-        if parser:
-            self.guess_stat[parser_cls][1] += 1
         return parser
 
     def displayProgress(self):
@@ -423,21 +432,9 @@ def main():
 #    subfile.filter = metadataFilter
 
     # Search subfiles
-    ok = subfile.main()
-
-    # Display statistics (only in debug mode)
-    if subfile.debug:
-        subfile.magics.sort(key=lambda value: len(value[0]))
-        for magic, offset, parser in subfile.magics:
-            print "%s (%u): %s" % (repr(magic), len(magic), parser.__name__)
-        print "--"
-        data = [(parser, stat[0], stat[1]) for parser, stat in subfile.guess_stat.iteritems() ]
-        data.sort(key=lambda values: values[1])
-        for parser, hit, valid in data:
-            print "Parser %s: %s magic / %s valid" % (parser.__name__, hit, valid)
-
-    # Exit
-    if not ok:
+    if subfile.main():
+        sys.exit(0)
+    else:
         sys.exit(1)
 
 if __name__ == "__main__":
