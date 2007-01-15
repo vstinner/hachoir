@@ -109,7 +109,7 @@ class DataRate:
     Store self.size data rates to compute good average speed.
     Don't compute average before self.min_size values are computed.
     """
-    def __init__(self, offset, size=30, min_size=3):
+    def __init__(self, offset, size=20, min_size=3):
         self.last_offset = offset
         self.last_time = time()
         self.datarates = []
@@ -160,7 +160,7 @@ class HachoirSubfile:
         self.debug = debug
         self.stream = FileInputStream(unicodeFilename(filename), real_filename=filename)
         if size is not None:
-            self.size = min(self.stream.size, size*8)
+            self.size = min(self.stream.size, (offset+size)*8)
         else:
             self.size = self.stream.size
         self.slice_size = SLICE_SIZE*8   # 64 KB (in bits)
