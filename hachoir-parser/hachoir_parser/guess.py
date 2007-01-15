@@ -1,6 +1,5 @@
 """
 Parser list managment:
-- loadParsers() load all parsers ;
 - getParsersByStream() find the best parser for a binary stream ;
 - createParser() find the best parser for a file.
 """
@@ -78,10 +77,8 @@ def _guessParserByTag(stream, parser_list, tag_name, tag_value, validate=True):
     return False, next_try
 
 def _guessParsers(stream, file_ext=None, force_mime=None):
-    parser_list = loadParsers()
-
     # Filter by minimum size
-    parser_list = [ parser for parser in parser_list \
+    parser_list = [ parser for parser in ParserList() \
         if "min_size" not in parser.tags or stream.sizeGe(parser.tags["min_size"]) ]
 
     # Guess my MIME type
@@ -144,9 +141,6 @@ def createParser(filename, force_mime=None, offset=None, size=None, real_filenam
     - size (long): maximum size in bytes of the input file ;
     - real_filename (str|unicode): Real file name.
     """
-    # Load parsers (do nothing if function has already been call)
-    loadParsers()
-
     # Create input stream
     stream = FileInputStream(filename, real_filename)
     if offset or size:
