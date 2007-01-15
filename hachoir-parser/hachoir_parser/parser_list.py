@@ -133,3 +133,6 @@ class ParserList(object):
                 self.printParser(parser, verbose)
         print
 
+    def __getitem__(self, key):
+        return self.byid[key]
+
