@@ -43,6 +43,9 @@ class ParserList(object):
     def __iter__(self):
         return iter(self.parser_list)
 
+    def getByCategory(self, category):
+        return self.bycategory[category]
+
     def checkParser(self, parser):
         """
         Check 'tags' attribute of a parser.
