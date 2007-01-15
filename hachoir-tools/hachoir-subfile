@@ -142,7 +142,7 @@ class HachoirSubfile:
 
     To use it:
     - instanciate the class: subfile = HachoirSubfile()
-    - load magics: subfile.loadMagics()
+    - (optional) choose magics with: subfile.loadMagics(categories, parser_ids)
     - run the search: subfile.main()
     """
     def __init__(self, filename, directory, offset=0, size=None, verbose=True, debug=True):
@@ -181,7 +181,11 @@ class HachoirSubfile:
         parser_list = set()
         if parser_ids:
             for parser_id in parser_ids:
-                parser_list |= set( (hachoir_parser[parser_id],) )
+                try:
+                    parser_list |= set( (hachoir_parser[parser_id],) )
+                except KeyError:
+                    error("No parser with identifier: %s" % parser_id)
+                    sys.exit(1)
         if categories:
             for category in categories:
                 parser_list |= set( hachoir_parser.getByCategory(category) )
@@ -207,6 +211,8 @@ class HachoirSubfile:
         """
 
         # Initialize
+        if not self.magics:
+            self.loadMagics()
         self.limitMemory()
         self.mainHeader()
 
