@@ -8,6 +8,7 @@
 #
 
 AUDIO_MICROSOFT_PCM = 1
+AUDIO_IEEE_FLOAT32 = 3
 
 audio_codec_name = {
 0x0000: 'Microsoft Unknown Wave Format',

@@ -77,7 +77,8 @@ def checkLogoUbuntuMeta(metadata): return (
 def checkClickMeta(metadata): return (
     checkAttr(metadata, "producer", "Sound Forge 4.5"),
     checkAttr(metadata, "creation_date", "2001-02-21"),
-    checkAttr(metadata, "audio/duration", 39),
+    checkAttr(metadata, "audio/duration", float(1724*8*1000) / 705600),
+    checkAttr(metadata, "audio/bit_rate", 705600),
     checkAttr(metadata, "audio/sample_rate", 22050))
 
 def checkGzipMeta(metadata): return (

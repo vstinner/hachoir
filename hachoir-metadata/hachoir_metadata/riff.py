@@ -4,7 +4,7 @@ Extract metadata from RIFF file format: AVI video and WAV sound.
 
 from hachoir_metadata.metadata import Metadata, MultipleMetadata, registerExtractor
 from hachoir_parser.container.riff import RiffFile
-from hachoir_parser.video.fourcc import AUDIO_MICROSOFT_PCM
+from hachoir_parser.video.fourcc import AUDIO_MICROSOFT_PCM, AUDIO_IEEE_FLOAT32
 from hachoir_core.tools import humanFilesize
 from hachoir_core.error import warning
 from hachoir_core.i18n import _
@@ -12,19 +12,20 @@ from hachoir_core.i18n import _
 class WavMetadata(Metadata):
     def extract(self, wav):
         format = wav["format"]
-        self.sample_rate = format["sample_per_sec"].value
+
+        # Number of channel, bits/sample, sample rate
         self.nb_channel = format["nb_channel"].value
+        self.bits_per_sample = format["bit_per_sample"].value
+        self.sample_rate = format["sample_per_sec"].value
+
         self.compression = format["codec"].display
-        duration_scale = (self.sample_rate[0] / 1000)
-        if "nb_sampe/nb_sample" in wav and duration_scale:
-            self.duration = wav["nb_sample/nb_sample"].value / duration_scale
-        elif format["codec"].value == AUDIO_MICROSOFT_PCM:
-            self.bits_per_sample = format["bit_per_sample"].value
-            nb_frame = (format["bit_per_sample"].value / 8) * duration_scale
-            if nb_frame:
-                self.duration = wav["audio_data/size"].value / nb_frame
-        if "audio_data" in wav and hasattr(self, "duration") and self.duration[0]:
-            self.bit_rate = (wav["audio_data"].size * 1000) / self.duration[0]
+        if "nb_sample/nb_sample" in wav:
+            self.duration = float(wav["nb_sample/nb_sample"].value) * 1000 / self.sample_rate[0]
+        if format["codec"].value in (AUDIO_MICROSOFT_PCM, AUDIO_IEEE_FLOAT32):
+            # Codec with fixed bit rate
+            self.bit_rate = self.nb_channel[0] * self.bits_per_sample[0] * self.sample_rate[0]
+            if not hasattr(self, "duration"):
+                self.duration = float(wav["audio_data/size"].value * 8) * 1000 / self.bit_rate[0]
 
 class RiffMetadata(MultipleMetadata):
     tag_to_key = {
