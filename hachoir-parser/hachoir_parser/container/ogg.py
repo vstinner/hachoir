@@ -158,6 +158,8 @@ class OggPage(FieldSet):
 class OggFile(Parser):
     MAGIC = "OggS"
     tags = {
+        "id": "ogg",
+        "category": "container",
         "file_ext": ("ogg", "ogm"),
         "mime": (
             "application/ogg", "application/x-ogg",

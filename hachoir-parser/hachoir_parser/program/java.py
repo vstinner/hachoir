@@ -618,6 +618,8 @@ class JavaCompiledClassFile(Parser):
     endian = BIG_ENDIAN
 
     tags = {
+        "id": "java_class",
+        "category": "program",
         "file_ext": ("class",),
         "mime": ("application/java-vm",),
         "min_size": (32 + 3*16),

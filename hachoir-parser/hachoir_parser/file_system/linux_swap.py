@@ -19,6 +19,8 @@ PAGE_SIZE = 4096
 
 class LinuxSwapFile(Parser):
     tags = {
+        "id": "linux_swap",
+        "category": "file_system",
         "min_size": PAGE_SIZE*8,
         "description": "Linux swap file",
         "magic": (

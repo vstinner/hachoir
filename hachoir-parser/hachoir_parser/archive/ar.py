@@ -24,6 +24,8 @@ class ArchiveFile(Parser):
     endian = BIG_ENDIAN
     MAGIC = '!<arch>\n'
     tags = {
+        "id": "unix_archive",
+        "category": "archive",
         "file_ext": ("a", "deb"),
         "mime":
             ("application/x-debian-package",

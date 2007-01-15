@@ -32,6 +32,8 @@ except ImportError:
 class GzipParser(Parser):
     endian = LITTLE_ENDIAN
     tags = {
+        "id": "gzip",
+        "category": "archive",
         "file_ext": ("gz",),
         "mime": ["application/x-gzip"],
         "min_size": 18*8,

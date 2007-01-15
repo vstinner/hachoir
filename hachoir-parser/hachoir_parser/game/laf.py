@@ -46,6 +46,8 @@ class CharInfo(FieldSet):
 
 class LafFile(Parser):
   tags = {
+    "id": "lucasarts_font",
+    "category": "game",
     "file_ext" : ("laf",),
     "min_size" : 8,
     "description" : "LucasArts Font"

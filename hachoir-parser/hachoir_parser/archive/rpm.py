@@ -218,6 +218,8 @@ class PropertySet(FieldSet):
 
 class RpmFile(Parser):
     tags = {
+        "id": "rpm",
+        "category": "archive",
         "file_ext": ("rpm",),
         "mime": ["application/x-rpm"],
         "min_size": (96 + 16 + 16)*8, # file header + checksum + content header

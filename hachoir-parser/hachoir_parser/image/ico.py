@@ -1,5 +1,5 @@
 """
-ICO picture file format parser.
+Microsoft Windows icon and cursor file format parser.
 
 Author: Victor Stinner
 """
@@ -61,6 +61,8 @@ class IconData(FieldSet):
 class IcoFile(Parser):
     endian = LITTLE_ENDIAN
     tags = {
+        "id": "ico",
+        "category": "image",
         "file_ext": ("ico",),
         "mime": ["image/x-ico"],
         "min_size": (22 + 40)*8,
@@ -76,7 +78,7 @@ class IcoFile(Parser):
             #   (nb_color=0 or 16, reserved=0, nb_plane=0 or 1,
             #    bpp in (0, 4, 8, 24, 32))
         ),
-        "description": "Microsoft icon or cursor"
+        "description": "Microsoft Windows icon or cursor",
     }
     TYPE_NAME = {
         1: "icon",

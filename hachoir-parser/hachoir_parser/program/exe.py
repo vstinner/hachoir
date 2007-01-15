@@ -109,6 +109,8 @@ class PE_Header(FieldSet):
 
 class ExeFile(Parser):
     tags = {
+        "id": "exe",
+        "category": "program",
         "file_ext": ("exe",),
         "mime": ("application/x-dosexec",),
         "min_size": 64*8,

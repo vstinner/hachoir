@@ -90,6 +90,8 @@ class SuperBlock(FieldSet):
 
 class REISER_FS(Parser):
     tags = {
+        "id": "reiserfs",
+        "category": "file_system",
         # 130 blocks before the journal +
         # Minimal size of journal (513 blocks) +
         # 1 block for the rest

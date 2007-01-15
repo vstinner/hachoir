@@ -26,6 +26,8 @@ class Metadata(FieldSet):
 class RealAudioFile(Parser):
     MAGIC = ".ra\xFD"
     tags = {
+        "id": "real_audio",
+        "category": "audio",
         "file_ext": ["ra"],
         "mime": ["audio/x-realaudio", "audio/x-pn-realaudio"],
         "min_size": 6*8,

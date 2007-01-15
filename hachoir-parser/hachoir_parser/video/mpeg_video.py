@@ -244,6 +244,8 @@ class Chunk(FieldSet):
 
 class MPEGVideoFile(Parser):
     tags = {
+        "id": "mpeg_video",
+        "category": "video",
         "file_ext": ("mpeg", "mpg", "mpe", "vob"),
         "mime": ("video/mpeg", "video/mp2p"),
         "min_size": 12*8,

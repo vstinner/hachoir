@@ -367,6 +367,8 @@ class FAT_FS(Parser):
 
 class FAT12(FAT_FS):
     tags = {
+        "id": "fat12",
+        "category": "file_system",
         "description": "FAT12 filesystem",
         "min_size": 512*8,
         "magic": (("FAT12   ", 54*8),),
@@ -379,6 +381,8 @@ class FAT12(FAT_FS):
 
 class FAT16(FAT_FS):
     tags = {
+        "id": "fat16",
+        "category": "file_system",
         "description": "FAT16 filesystem",
         "min_size": 512*8,
         "magic": (("FAT16   ", 54*8),),
@@ -391,6 +395,8 @@ class FAT16(FAT_FS):
 
 class FAT32(FAT_FS):
     tags = {
+        "id": "fat32",
+        "category": "file_system",
         "description": "FAT32 filesystem",
         "min_size": 512*8,
         "magic": (("FAT32   ", 54*8),),

@@ -114,6 +114,8 @@ class Chunk(FieldSet):
 
 class FlvFile(Parser):
     tags = {
+        "id": "flv",
+        "category": "video",
         "file_ext": ["flv"],
         "mime": ["video/x-flv"],
         "min_size": 9*4,

@@ -260,6 +260,8 @@ class DataBase(FieldSet):
 
 class ITunesDBFile(Parser):
     tags = {
+        "id": "itunesdb",
+        "category": "audio",
         "min_size": 44*8,
         "magic": (('mhbd',0),),
         "description": "iPod iTunesDB file"

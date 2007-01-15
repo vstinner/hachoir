@@ -519,6 +519,8 @@ class EBML(FieldSet):
 
 class MkvFile(Parser):
     tags = {
+        "id": "matroska",
+        "category": "container",
         "file_ext": ("mka", "mkv"),
         "mime": ("video/x-matroska", "audio/x-matroska"),
         "min_size": 5*8,

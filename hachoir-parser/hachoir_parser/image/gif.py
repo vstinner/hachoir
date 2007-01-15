@@ -141,6 +141,8 @@ class GifFile(Parser):
         ";": "Terminator"
     }
     tags = {
+        "id": "gif",
+        "category": "image",
         "file_ext": ("gif",),
         "mime": ["image/gif"],
         "min_size": (6 + 7 + 1 + 9)*8,   # signature + screen + separator + image

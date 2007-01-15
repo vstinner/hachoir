@@ -26,6 +26,8 @@ except ImportError:
 
 class Bzip2Parser(Parser):
     tags = {
+        "id": "bzip2",
+        "category": "archive",
         "file_ext": ("bz2",),
         "mime": ["application/x-bzip2"],
         "min_size": 10*8,

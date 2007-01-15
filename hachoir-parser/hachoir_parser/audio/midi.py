@@ -178,6 +178,8 @@ class Header(FieldSet):
 class MidiFile(Parser):
     MAGIC = "MThd"
     tags = {
+        "id": "midi",
+        "category": "audio",
         "file_ext": ["mid", "midi"],
         "mime": ("audio/mime", ),
         "magic": ((MAGIC, 0),),

@@ -296,6 +296,8 @@ class ChunkWAVE(Chunk):
 
 class RiffFile(Parser):
     tags = {
+        "id": "riff",
+        "category": "container",
         "file_ext": ("avi", "cda", "wav"),
         "min_size": 16*8,
         "mime": ("video/x-msvideo", "audio/x-wav", "audio/x-cda"),

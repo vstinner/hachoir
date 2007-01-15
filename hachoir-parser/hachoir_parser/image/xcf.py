@@ -254,6 +254,8 @@ def readProperties(parser):
 
 class XcfFile(Parser):
     tags = {
+        "id": "xcf",
+        "category": "image",
         "file_ext": ("xcf",),
         "mime": ("image/x-xcf", "application/x-gimp-image"),
         "min_size": (26 + 8 + 4 + 4)*8, # header+empty property+layer offset+channel offset

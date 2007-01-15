@@ -13,6 +13,8 @@ from hachoir_core.tools import createDict
 
 class AuFile(Parser):
     tags = {
+        "id": "sun_next_snd",
+        "category": "audio",
         "file_ext": ("au", "snd"),
         "mime": ("audio/basic",),
         "min_size": 24*8,

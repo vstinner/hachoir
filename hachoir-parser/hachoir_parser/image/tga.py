@@ -35,6 +35,8 @@ class Pixels(FieldSet):
 
 class TargaFile(Parser):
     tags = {
+        "id": "targa",
+        "category": "image",
         "file_ext": ("tga",),
         "mime": ("image/targa", "image/tga", "image/x-tga"),
         "min_size": 18*8,

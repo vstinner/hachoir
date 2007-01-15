@@ -200,6 +200,8 @@ class MSDos_HardDrive(Parser):
     endian = LITTLE_ENDIAN
     MAGIC = "\x55\xAA"
     tags = {
+        "id": "msdos_harddrive",
+        "category": "file_system",
         "description": "MS-DOS hard drive with Master Boot Record (MBR)",
         "min_size": 512*8,
 #        "magic": ((MAGIC, 510*8),),

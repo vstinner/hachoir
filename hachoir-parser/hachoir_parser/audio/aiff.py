@@ -90,6 +90,8 @@ class Chunk(FieldSet):
 
 class AiffFile(Parser):
     tags = {
+        "id": "aiff",
+        "category": "audio",
         "file_ext": ("aif", "aiff", ".aifc"),
         "mime": ("audio/x-aiff",),
         # FIXME: Use magic regex "FORM.{4}AIF[CF]"

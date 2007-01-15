@@ -89,6 +89,8 @@ class ISO9660(Parser):
     MAGIC = "\x01CD001"
     NULL_BYTES = 0x8000
     tags = {
+        "id": "iso9660",
+        "category": "file_system",
         "description": "ISO 9660 file system",
         "min_size": (NULL_BYTES + 6)*8,
         "magic": ((MAGIC, NULL_BYTES*8),),

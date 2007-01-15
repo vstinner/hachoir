@@ -485,6 +485,8 @@ class EMF_Header(FieldSet):
 
 class WMF_File(Parser):
     tags = {
+        "id": "wmf",
+        "category": "image",
         "file_ext": ("wmf", "apm", "emf"),
         "mime": (
             "image/wmf", "image/x-wmf", "image/x-win-metafile",

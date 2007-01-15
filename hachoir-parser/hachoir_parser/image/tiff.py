@@ -83,6 +83,8 @@ class IFD(FieldSet):
 
 class TiffFile(Parser):
     tags = {
+        "id": "tiff",
+        "category": "image",
         "file_ext": ("tif", "tiff"),
         "mime": ("image/tiff",),
         "min_size": 8*8,

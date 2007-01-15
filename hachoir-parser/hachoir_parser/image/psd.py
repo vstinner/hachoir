@@ -24,6 +24,8 @@ class Config(FieldSet):
 class PsdFile(Parser):
     endian = BIG_ENDIAN
     tags = {
+        "id": "psd",
+        "category": "image",
         "file_ext": ("psd",),
         "mime": ("image/psd", "image/photoshop", "image/x-photoshop"),
         "min_size": 4*8,

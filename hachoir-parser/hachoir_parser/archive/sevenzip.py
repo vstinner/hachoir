@@ -34,6 +34,8 @@ class SignatureHeader(FieldSet):
 
 class SevenZipParser(Parser):
     tags = {
+        "id": "7zip",
+        "category": "archive",
         "file_ext": ("7z",),
         "mime": ("application/x-7z-compressed",),
         "min_size": 6*8,

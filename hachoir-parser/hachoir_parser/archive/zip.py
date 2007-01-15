@@ -144,6 +144,8 @@ class ZipFile(Parser):
         "application/vnd.oasis.opendocument.text-template": "ott",
     }
     tags = {
+        "id": "zip",
+        "category": "archive",
         "file_ext": list(set(MIME_TYPES.values())),
         "mime": MIME_TYPES.keys(),
 # FIXME: Re-enable magic

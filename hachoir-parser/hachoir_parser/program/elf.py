@@ -131,6 +131,8 @@ def sortSection(a, b):
 
 class ElfFile(Parser):
     tags = {
+        "id": "elf",
+        "category": "program",
         "file_ext": ("so",), # What about "no extension"?
         "min_size": (4+32)*8,  # At least one program header
         "mime": (

@@ -127,6 +127,8 @@ class OLE_Document(Parser):
     BIG_BLOCK_SIZE = 512
 
     tags = {
+        "id": "ole2",
+        "category": "misc",
         "file_ext": (
             "doc", "dot",                # Microsoft Word
             "ppt", "ppz", "pps", "pot",  # Microsoft Powerpoint

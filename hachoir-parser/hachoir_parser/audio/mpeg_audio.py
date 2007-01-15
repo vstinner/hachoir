@@ -243,6 +243,8 @@ def createMpegAudioMagic():
 
 class MpegAudioFile(Parser):
     tags = {
+        "id": "mpeg_audio",
+        "category": "audio",
         "file_ext": ("mpa", "mp1", "mp2", "mp3"),
         "mime": ["audio/mpeg"],
         "min_size": 4*8,

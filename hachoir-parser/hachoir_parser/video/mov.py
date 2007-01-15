@@ -185,6 +185,8 @@ class Atom(FieldSet):
 
 class MovFile(Parser):
     tags = {
+        "id": "mov",
+        "category": "video",
         "file_ext": ("mov", "qt", "mp4", "m4v", "m4a", "m4p", "m4b"),
         "mime": ["video/quicktime"],
         "min_size": 8*8,

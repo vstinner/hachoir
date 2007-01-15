@@ -47,6 +47,8 @@ class Chunk(FieldSet):
 
 class SpiderManVideoFile(Parser):
     tags = {
+        "id": "spiderman_video",
+        "category": "game",
         "file_ext": ("bin",),
         "min_size": 8*8,
         "description": "The Amazing Spider-Man vs. The Kingpin (Sega CD) FMV video"

@@ -176,6 +176,8 @@ class Materials(FieldSet):
 
 class File3do(Parser):
     tags = {
+        "id": "3do",
+        "category": "misc",
         "file_ext": ("3do",),
         "mime": ("image/x-3do",),
         "min_size": 8,

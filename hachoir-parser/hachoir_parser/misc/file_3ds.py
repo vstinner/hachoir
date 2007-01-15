@@ -156,6 +156,8 @@ class Chunk(FieldSet):
 class File3ds(Parser):
     endian = LITTLE_ENDIAN
     tags = {
+        "id": "3ds",
+        "category": "misc",
         "file_ext": ("3ds",),
         "mime": ["image/x-3ds"],
         "min_size": 16*8,

@@ -90,6 +90,8 @@ class MasterBootRecord(FieldSet):
 class NTFS(Parser):
     MAGIC = "\xEB\x52\x90NTFS    "
     tags = {
+        "id": "ntfs",
+        "category": "file_system",
         "description": "NTFS file system",
         "min_size": 1024*8,
         "magic": ((MAGIC, 0),),

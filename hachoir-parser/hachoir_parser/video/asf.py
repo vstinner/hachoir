@@ -296,6 +296,8 @@ Object.TAG_INFO = dict( (parser[1].guid, parser) for parser in tag_info_list )
 class AsfFile(Parser):
     MAGIC = "\x30\x26\xB2\x75\x8E\x66\xCF\x11\xA6\xD9\x00\xAA\x00\x62\xCE\x6C"
     tags = {
+        "id": "asf",
+        "category": "video",
         "file_ext": ("wmv", "wma", "asf"),
         "mime": ("video/x-ms-asf", "video/x-ms-wmv", "audio/x-ms-wma"),
         "min_size": 24*8,

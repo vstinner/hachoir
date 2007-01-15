@@ -348,6 +348,8 @@ class Tag(FieldSet):
 class SwfFile(Parser):
     VALID_VERSIONS = set(xrange(1, 8+1))
     tags = {
+        "id": "swf",
+        "category": "container",
         "file_ext": ["swf"],
         "mime": ["application/x-shockwave-flash"],
         "min_size": 64,

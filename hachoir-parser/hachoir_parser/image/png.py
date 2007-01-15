@@ -176,6 +176,8 @@ class Chunk(FieldSet):
 
 class PngFile(Parser):
     tags = {
+        "id": "png",
+        "category": "image",
         "file_ext": ("png",),
         "mime": ("image/png", "image/x-png"),
         "min_size": 8*8, # just the identifier

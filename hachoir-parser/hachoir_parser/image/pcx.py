@@ -13,6 +13,8 @@ from hachoir_core.endian import LITTLE_ENDIAN
 class PcxFile(Parser):
     endian = LITTLE_ENDIAN
     tags = {
+        "id": "pcx",
+        "category": "image",
         "file_ext": ("pcx",),
         "mime": ["image/x-pcx"],
         "min_size": 128*8,

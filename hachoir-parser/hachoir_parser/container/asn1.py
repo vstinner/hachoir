@@ -231,6 +231,8 @@ class Object(FieldSet):
 
 class ASN1File(Parser):
     tags = {
+        "id": "asn1",
+        "category": "container",
         "file_ext": ("der",),
         "min_size": 16,
         "description": "Abstract Syntax Notation One (ASN.1)"

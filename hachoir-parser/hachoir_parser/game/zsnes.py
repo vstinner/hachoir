@@ -210,6 +210,8 @@ class ZSTppu(FieldSet):
 
 class ZSNESFile(Parser):
     tags = {
+        "id": "zsnes",
+        "category": "game",
         "description": "ZSNES Save State File (only version 143)",
         "min_size": 3091*8,
         "file_ext": ("zst", "zs1", "zs2", "zs3", "zs4", "zs5", "zs6",

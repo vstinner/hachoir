@@ -24,8 +24,13 @@ class Packet(FieldSet):
             self._size = 188*8
 
     PID = {
-        0x44: "video",
-        0x45: "audio",
+        0x0000: "Program Association Table (PAT)",
+        0x0001: "Conditional Access Table (CAT)",
+        # 0x0002..0x000f: reserved
+
+        # TODO: Check above values
+        0x0044: "video",
+        0x0045: "audio",
     }
 
     def createFields(self):
@@ -37,10 +42,8 @@ class Packet(FieldSet):
         yield Bit(self, "priority")
         yield Enum(Bits(self, "pid", 13, text_handler=hexadecimal), self.PID)
         yield Bits(self, "scrambling_control", 2)
-
         yield Bit(self, "has_adaptation")
         yield Bit(self, "has_payload")
-
         yield Bits(self, "counter", 4)
         yield RawBytes(self, "payload", 184)
         if self["has_error"].value:
@@ -59,6 +62,8 @@ class Packet(FieldSet):
 
 class MPEG_TS(Parser):
     tags = {
+        "id": "mpeg_ts",
+        "category": "video",
         "file_ext": ("ts",),
         "min_size": 188*8,
         "description": u"MPEG-2 Transport Stream"

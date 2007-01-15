@@ -85,6 +85,8 @@ class FileEntry(FieldSet):
 class TarFile(Parser):
     endian = BIG_ENDIAN
     tags = {
+        "id": "tar",
+        "category": "archive",
         "file_ext": ("tar",),
         "mime": ("application/x-tar", "application/x-gtar"),
         "min_size": 512*8,

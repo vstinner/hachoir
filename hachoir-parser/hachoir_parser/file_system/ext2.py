@@ -391,6 +391,8 @@ class EXT2_FS(Parser):
        * ...
     """
     tags = {
+        "id": "ext2",
+        "category": "file_system",
         "description": "EXT2/EXT3 file system",
         "min_size": (1024*2)*8,
         "magic": (

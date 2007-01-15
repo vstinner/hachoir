@@ -209,6 +209,8 @@ class Object(FieldSet):
 
 class PythonCompiledFile(Parser):
     tags = {
+        "id": "python",
+        "category": "program",
         "file_ext": ("pyc", "pyo"),
         "min_size": 9*8,
         "description": "Compiled Python script (.pyc/.pyo files)"

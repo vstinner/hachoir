@@ -105,6 +105,8 @@ class BmpHeader(FieldSet):
 
 class BmpFile(Parser):
     tags = {
+        "id": "bmp",
+        "category": "image",
         "file_ext": ("bmp",),
         "mime": ("image/x-ms-bmp", "image/x-bmp"),
         "min_size": 30*8,
