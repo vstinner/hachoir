@@ -9,24 +9,6 @@ from hachoir_core.tools import humanFilesize
 from hachoir_core.error import warning
 from hachoir_core.i18n import _
 
-class WavMetadata(Metadata):
-    def extract(self, wav):
-        format = wav["format"]
-
-        # Number of channel, bits/sample, sample rate
-        self.nb_channel = format["nb_channel"].value
-        self.bits_per_sample = format["bit_per_sample"].value
-        self.sample_rate = format["sample_per_sec"].value
-
-        self.compression = format["codec"].display
-        if "nb_sample/nb_sample" in wav:
-            self.duration = float(wav["nb_sample/nb_sample"].value) * 1000 / self.sample_rate[0]
-        if format["codec"].value in (AUDIO_MICROSOFT_PCM, AUDIO_IEEE_FLOAT32):
-            # Codec with fixed bit rate
-            self.bit_rate = self.nb_channel[0] * self.bits_per_sample[0] * self.sample_rate[0]
-            if not hasattr(self, "duration"):
-                self.duration = float(wav["audio_data/size"].value * 8) * 1000 / self.bit_rate[0]
-
 class RiffMetadata(MultipleMetadata):
     tag_to_key = {
         "INAM": "title",
@@ -49,12 +31,27 @@ class RiffMetadata(MultipleMetadata):
         key = self.tag_to_key[tag]
         setattr(self, key, value)
 
+    def extractWAVE(self, wav):
+        format = wav["format"]
+
+        # Number of channel, bits/sample, sample rate
+        self.nb_channel = format["nb_channel"].value
+        self.bits_per_sample = format["bit_per_sample"].value
+        self.sample_rate = format["sample_per_sec"].value
+
+        self.compression = format["codec"].display
+        if "nb_sample/nb_sample" in wav:
+            self.duration = wav["nb_sample/nb_sample"].value * 1000 // self.sample_rate[0]
+        if format["codec"].value in (AUDIO_MICROSOFT_PCM, AUDIO_IEEE_FLOAT32):
+            # Codec with fixed bit rate
+            self.bit_rate = self.nb_channel[0] * self.bits_per_sample[0] * self.sample_rate[0]
+            if not hasattr(self, "duration"):
+                self.duration = wav["audio_data/size"].value * 8 * 1000 // self.bit_rate[0]
+
     def extract(self, riff):
         type = riff["type"].value
         if type == "WAVE":
-            wav = WavMetadata()
-            wav.extract(riff)
-            self.addGroup("audio", wav, "Audio (WAV)")
+            self.extractWAVE(riff)
         elif type == "AVI ":
             self.extractAVI(riff)
         if "info" in riff:

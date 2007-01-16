@@ -77,9 +77,9 @@ def checkLogoUbuntuMeta(metadata): return (
 def checkClickMeta(metadata): return (
     checkAttr(metadata, "producer", "Sound Forge 4.5"),
     checkAttr(metadata, "creation_date", "2001-02-21"),
-    checkAttr(metadata, "audio/duration", float(1724*8*1000) / 705600),
-    checkAttr(metadata, "audio/bit_rate", 705600),
-    checkAttr(metadata, "audio/sample_rate", 22050))
+    checkAttr(metadata, "duration", 19),
+    checkAttr(metadata, "bit_rate", 705600),
+    checkAttr(metadata, "sample_rate", 22050))
 
 def checkGzipMeta(metadata): return (
     checkAttr(metadata, "file_size", 99),
@@ -205,6 +205,15 @@ def check25min(meta): return (
     checkAttr(meta, "compression", u"Little-endian, no compression"),
 )
 
+def checkLadouce(meta): return (
+    checkAttr(meta, "duration", 4592516),
+    checkAttr(meta, "nb_channel", 6),
+    checkAttr(meta, "sample_rate", 44100),
+    checkAttr(meta, "bits_per_sample", 32),
+    checkAttr(meta, "compression", "IEEE Float"),
+    checkAttr(meta, "bit_rate", 8467200),
+)
+
 testcase_files = (
     (u"logo-Kubuntu.png", checkLogoUbuntuMeta),
     (u"KDE_Click.wav", checkClickMeta),
@@ -228,6 +237,7 @@ testcase_files = (
     (u"hero.tga", checkHero),
     (u"firstrun.rm", checkFirstrun),
     (u"25min.aifc", check25min),
+    (u"ladouce_1h15.wav", checkLadouce),
 )
 
 def checkFile(filename, check_metadata):

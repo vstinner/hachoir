@@ -62,6 +62,7 @@ testcase_files = (
     (u"grasslogo_vector.emf", 6932, "6fe03cdf34ac3ee6e797c7aeb8c92e41"),
     (u"ocr10.laf", 17264, "4f0a15d2abe84c5e4bd1eca11195dc87"),
     (u"kino14s.laf", 30957, "9fbb52a92ff9db88b85a57cf4359acd8"),
+    (u"ladouce_1h15.wav", 5112, "964250e59d1967ab86d60e635a298bbe"),
 )
 
 def stringMD5(text):
