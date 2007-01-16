@@ -3,7 +3,6 @@ from hachoir_core.field import (BasicFieldSet, Field, ParserError,
 from hachoir_core.event_handler import EventHandler
 from hachoir_core.dict import Dict, UniqKeyError
 from hachoir_core.endian import BIG_ENDIAN, LITTLE_ENDIAN
-from hachoir_core.stream import InputStream, InputStreamError
 from hachoir_core.error import error, warning, info, HACHOIR_ERRORS
 from hachoir_core.tools import lowerBound
 import hachoir_core.config as config
@@ -47,8 +46,6 @@ class GenericFieldSet(BasicFieldSet):
     - and maybe set endian and static_size class attributes.
     """
 
-    is_field_set = True
-    endian = None
     _event_handler = None
     _current_size = 0
 
@@ -67,44 +64,12 @@ class GenericFieldSet(BasicFieldSet):
         @param size: Size in bits. If it's None, size will be computed. You
             can also set size with class attribute static_size
         """
-
-        # Set field set size
-        if self.static_size is not None:
-            assert isinstance(self.static_size, (int, long))
-            size = self.static_size
-
-        # Make some tests on arguments
-        assert not parent or issubclass(parent.__class__, GenericFieldSet)
-        assert issubclass(stream.__class__, InputStream)
-        assert (size is None) or (0 < size)
-
-        # Call parent class constructor
-        self._parent = parent
-        self._name = name
-        self._size = size
-        self._description = description
-
-        # Set endian
-        if self.endian is None:
-            assert parent is not None and parent.endian is not None
-            self.endian = parent.endian
-        assert self.endian in (BIG_ENDIAN, LITTLE_ENDIAN)
-
+        BasicFieldSet.__init__(self, parent, name, stream, description, size)
         self._fields = Dict()
         self._field_generator = self.createFields()
         self._field_array_count = {}
         self._array_cache = {}
-        if parent:
-            # This field set is one of the root leafs
-            self._address = parent._current_size
-            self.root = parent.root
-            self.stream = parent.stream
-        else:
-            # This field set is the root
-            self._address = 0
-            self.root = self
-            assert issubclass(stream.__class__, InputStream)
-            self.stream = stream
+        if not parent:
             self._global_event_handler = None
 
     def array(self, key):
@@ -480,19 +445,9 @@ class GenericFieldSet(BasicFieldSet):
             if field:
                 yield field
 
-    def createFields(self):
-        """
-        DON'T CALL THIS FUNCTION DIRECTLY!
-        Use: __iter__() or __getitem__() to access fields.
-
-        This function have to be implemented in concrete field set.
-        """
-        raise NotImplementedError()
-
     def _isDone(self):
         return (self._field_generator is None)
     done = property(_isDone, doc="Boolean to know if parsing is done or not")
-
 
     #
     # FieldSet_SeekUtility
