@@ -22,8 +22,9 @@ from hachoir_core.field.helper import (isString, isInteger,
 
 # FieldSet classes
 from hachoir_core.field.fake_array import FakeArray
-from hachoir_core.field.generic_field_set import (GenericFieldSet,
+from hachoir_core.field.basic_field_set import (BasicFieldSet,
     ParserError, MatchError)
+from hachoir_core.field.generic_field_set import GenericFieldSet
 from hachoir_core.field.field_set import FieldSet
 from hachoir_core.field.float import Float32, Float64, Float80
 from hachoir_core.field.static_field_set import StaticFieldSet

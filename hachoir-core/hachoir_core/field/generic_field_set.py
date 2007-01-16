@@ -1,4 +1,4 @@
-from hachoir_core.field import (Field, FieldError,
+from hachoir_core.field import (BasicFieldSet, Field, ParserError,
     createRawField, createNullField, createPaddingField, FakeArray)
 from hachoir_core.event_handler import EventHandler
 from hachoir_core.dict import Dict, UniqKeyError
@@ -8,24 +8,7 @@ from hachoir_core.error import error, warning, info, HACHOIR_ERRORS
 from hachoir_core.tools import lowerBound
 import hachoir_core.config as config
 
-class ParserError(FieldError):
-    """
-    Error raised by a L{GenericFieldSet} (or L{FieldSet}/L{Parser}).
-
-    @see: L{FieldError}
-    """
-    pass
-
-class MatchError(FieldError):
-    """
-    Error raised by a L{FieldSet} or a L{Parser} when the stream content
-    doesn't match to file format.
-
-    @see: L{FieldError}
-    """
-    pass
-
-class GenericFieldSet(Field):
+class GenericFieldSet(BasicFieldSet):
     """
     Ordered list of fields. Use operator [] to access fields using their
     name (field names are unique in a field set, but not in the whole
