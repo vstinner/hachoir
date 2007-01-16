@@ -130,6 +130,7 @@ class InputStream:
         self._size = size   # in bits
         if size == 0:
             raise NullStreamError(source)
+        self.tags = [ ]
 
     def askSize(self, client):
         if self._size != self._current_size:
@@ -380,7 +381,6 @@ class InputIOStream(InputStream):
                     raise InputStreamError(_("Unable to get size of %s: %s") % (source, errmsg))
         self._input = input
         InputStream.__init__(self, source, size)
-        self.tags = [ ]
 
     def __current_size(self):
         if self._size:

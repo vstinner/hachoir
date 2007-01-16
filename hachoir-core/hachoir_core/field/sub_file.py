@@ -16,7 +16,7 @@ class SubFile(Bytes):
         Bytes.__init__(self, parent, name, length, description)
         tags = []
         if parser is not None:
-            tags.append(parser)
+            tags.append(( "id", parser.tags["id"]))
         if mime_type:
             tags.append(( "mime", mime_type ))
         if filename:

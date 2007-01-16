@@ -218,7 +218,7 @@ class Field(object):
             stream = self._sub_istream()
         if stream is None:
             stream = self._createInputStream()
-            stream.tags = self._getIStreamTags()
+            stream.tags[:0] = self._getIStreamTags()
             self._sub_istream = weakref_ref(stream)
         return stream
 

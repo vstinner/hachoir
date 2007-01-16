@@ -90,21 +90,15 @@ def guessParser(stream, force_mime=None):
 
     # Guess using stream tags
     for tag in stream.tags:
-        if type(tag) is tuple:
-            if tag[0] == "filename":
-                filename = os.path.basename(tag[1]).split(".")
-                if len(filename) <= 1:
-                    continue
-                tag = "file_ext", filename[-1]
-            ok, result = _guessParserByTag(stream, parser_list, *tag)
-            if ok:
-                return result
-            parser_list = result
-        else:
-            parser, error_msg = parseStream(tag, stream)
-            if parser:
-                return parser
-            error(_("Unable to parse stream using %s: %s") % (tag.__name__, error_msg))
+        if tag[0] == "filename":
+            filename = os.path.basename(tag[1]).split(".")
+            if len(filename) <= 1:
+                continue
+            tag = "file_ext", filename[-1]
+        ok, result = _guessParserByTag(stream, parser_list, *tag)
+        if ok:
+            return result
+        parser_list = result
 
     # Guess other parser
     for cls in parser_list:
