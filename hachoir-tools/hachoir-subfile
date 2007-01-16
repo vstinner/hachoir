@@ -54,20 +54,20 @@ def setMemoryLimit(max_mem):
         return False
     return True
 
-from hachoir_metadata import extractMetadata
-def metadataFilter(parser):
-    try:
-        metadata = extractMetadata(parser)
-    except HachoirError, err:
-        metadata = None
-    if metadata:
-        if hasattr(metadata, "width") and metadata.width[0] < 256:
-            print >>sys.stderr, "Skip picture with width < 256 pixels"
-            return False
-        if hasattr(metadata, "height") and metadata.height[0] < 256:
-            print >>sys.stderr, "Skip picture with height < 256 pixels"
-            return False
-    return True
+#from hachoir_metadata import extractMetadata
+#def metadataFilter(parser):
+#    try:
+#        metadata = extractMetadata(parser)
+#    except HachoirError, err:
+#        metadata = None
+#    if metadata:
+#        if hasattr(metadata, "width") and metadata.width[0] < 256:
+#            print >>sys.stderr, "Skip picture with width < 256 pixels"
+#            return False
+#        if hasattr(metadata, "height") and metadata.height[0] < 256:
+#            print >>sys.stderr, "Skip picture with height < 256 pixels"
+#            return False
+#    return True
 
 class Output:
     """
