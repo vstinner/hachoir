@@ -24,7 +24,7 @@ class Parser(GenericParser):
         GenericParser.__init__(self, stream, None)
         self._mime_type = None
 
-    #--- Methods which can by override --------------------------------------
+    #--- Methods that can be overridden -------------------------------------
     def createDescription(self):
         """
         Create an Unicode description

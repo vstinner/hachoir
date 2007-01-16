@@ -2,7 +2,7 @@
 from hachoir_core.field.field import Field, FieldError, MissingField, joinPath
 from hachoir_core.field.bit_field import Bit, Bits, RawBits
 from hachoir_core.field.byte_field import Bytes, RawBytes
-from hachoir_core.field.sub_file import SubFile, EncodedFile, CompressedField
+from hachoir_core.field.sub_file import SubFile, CompressedField
 from hachoir_core.field.character import Character
 from hachoir_core.field.integer import (
     Int8,  Int16,  Int24,  Int32,  Int64,
@@ -38,7 +38,7 @@ from hachoir_core.field.link import Link, Fragment
 available_types = (
     Bit, Bits, RawBits,
     Bytes, RawBytes,
-    SubFile, EncodedFile,
+    SubFile,
     Character,
     Int8, Int16, Int32, Int64,
     UInt8, UInt16, UInt32, UInt64,

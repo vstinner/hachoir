@@ -548,31 +548,6 @@ def exploreFieldSet(field_set, args, options={}):
         top.set_focus(0)
     input = Input(input_enter, input_leave)
 
-    def newTabStream(field):
-        # Choose the parser and parse the stream
-        stream = field.createInputStream()
-        if issubclass(field.__class__, SubFile):
-            if field.parser:
-                # Special case: we already know the good parser
-                parser, error_msg = parseStream(field.parser, stream)
-                if error_msg:
-                    hachoir_log.error(_("Unable to parse stream using %s: %s") % (field.parser.__name__, error_msg))
-                    return
-            else:
-                parser = guessParser(stream,
-                    filename=field.filename,
-                    force_mime=field.mime_type)
-        else:
-            parser = guessParser(stream)
-
-        # Error?
-        if not parser:
-            hachoir_log.error(_("No parser found for %s") % stream.source)
-        else:
-            body.append(("%u/%u" % (body.active, stream.address),
-                TreeBox(charset, Node(parser, None), preload_fields, options)))
-            resize = log.height
-
     def run():
         msg = _resize = retry = 0
         events = ( "window resize", )
@@ -608,7 +583,14 @@ def exploreFieldSet(field_set, args, options={}):
                 #except AssertionError:
                 #    hachoir_log.error(getBacktrace())
                 except NewTab_Stream, e:
-                    newTabStream(e.field)
+                    stream = e.field.getSubIStream()
+                    parser = guessParser(stream)
+                    if not parser:
+                        hachoir_log.error(_("No parser found for %s") % stream.source)
+                    else:
+                        body.append(("%u/%s" % (body.active, stream.address),
+                            TreeBox(charset, Node(parser, None), preload_fields, options)))
+                        resize = log.height
                 except NeedInput, e:
                     input.do(*e.args)
                 if profile_display:

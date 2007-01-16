@@ -9,7 +9,7 @@ from hachoir_core.field import (FieldSet, Link,
     MissingField, ParserError,
     Enum as _Enum, String as _String,
     Float32, Float64,
-    NullBits, Bits, Bit, RawBytes, SubFile,
+    NullBits, Bits, Bit, RawBytes, Bytes,
     Int16, GenericInteger)
 from hachoir_core.endian import BIG_ENDIAN
 from hachoir_core.error import error
@@ -73,10 +73,32 @@ def EnumString(parent, enum):
 def Binary(parent):
     return RawBytes(parent, 'binary', parent['size'].value)
 
-def AttachedFile(parent):
-    filename = parent["../FileName/unicode"].value
-    mime = parent["../FileMimeType/string"].value
-    return SubFile(parent, 'file', parent['size'].value, filename=filename, mime_type=mime)
+class AttachedFile(Bytes):
+    def __init__(self, parent):
+        Bytes.__init__(self, parent, 'file', parent['size'].value, None)
+    def _getFilename(self):
+        if not hasattr(self, "_filename"):
+            try:
+                self._filename = self["../../FileName/unicode"].value
+            except MissingField:
+                self._filename = None
+        return self._filename
+    def createDescription(self):
+        filename = self._getFilename()
+        if filename:
+            return 'File "%s"' % filename
+        return "('Filename' entry not found)"
+    def _getIStreamTags(self):
+        try:
+            mime = self["../../FileMimeType/string"]
+        except MissingField:
+            tags = [ ]
+        else:
+            tags = [ ("mime", mime.value) ]
+        filename = self._getFilename()
+        if filename:
+            tags.append(("filename", filename))
+        return tags
 
 def UTF8(parent):
     return _String(parent,'unicode', parent['size'].value, charset='UTF-8')

@@ -75,6 +75,6 @@ class Bzip2Parser(Parser):
             data = SubFile(self, "file", size, filename=filename)
             if has_deflate:
                 CompressedField(self, Bunzip2)
-                data.createInputStream = lambda: self.createInputStream()
+                data._createInputStream = lambda: self._createInputStream()
             yield data
 

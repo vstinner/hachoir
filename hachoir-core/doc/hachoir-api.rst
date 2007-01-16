@@ -179,7 +179,6 @@ List of field types
 * PascalString8, PascalString16 and PascalString32: string prefixed with
   length in a unsigned 8 / 16 / 32 bits integer (use parent endian) ;
 * SubFile: a file contained in the stream ;
-* EncodedFile: an encoded file (compressed, cyphered, etc.) ;
 
 Other special types/tools:
 
@@ -218,7 +217,8 @@ Method that can be replaced:
 * createDescription(): create value of 'description' attribute
 * createValue(): create value of 'value' attribute
 * createDisplay(): create value of 'display' attribute
-* createInputStream(): create an InputStream containing the field content
+* _createInputStream(): create an InputStream containing the field content
+* _getIStreamTags(): return tags for an InputStream containing the field content
 
 Aliases (method):
 
@@ -234,6 +234,7 @@ Other methods:
 * getField(key, const=True): get the field with specified key,
   if const is True the field set will not be changed
 * __contains__(key)
+* getSubIStream(): return a tagged InputStream containing the field content
 
 
 Field set class

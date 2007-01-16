@@ -380,6 +380,7 @@ class InputIOStream(InputStream):
                     raise InputStreamError(_("Unable to get size of %s: %s") % (source, errmsg))
         self._input = input
         InputStream.__init__(self, source, size)
+        self.tags = [ ]
 
     def __current_size(self):
         if self._size:
@@ -504,3 +505,40 @@ class FragmentedStream(InputStream):
             a, fa, fs = self.fragments[i]
             i += 1
 
+
+class ConcatStream(InputStream):
+    # TODO: concatene any number of any type of stream
+    def __init__(self, streams, source=None):
+        if len(streams) > 2 or not streams[0].checked:
+            raise NotImplementedError
+        self.__size0 = streams[0].size
+        size = streams[1].askSize(self)
+        if size is not None:
+            size += self.__size0
+        self.__streams = streams
+        self.address = None
+        InputStream.__init__(self, source, size)
+
+    _current_size = property(lambda self: self.__size0 + self.__streams[1]._current_size)
+
+    def read(self, address, size):
+        _size = self._size
+        s = self.__size0 - address
+        shift, data, missing = None, '', False
+        if s > 0:
+            s = min(size, s)
+            shift, data, w = self.__streams[0].read(address, s)
+            assert not w
+            a, s = 0, size - s
+        else:
+            a, s = -s, size
+        if s:
+            u, v, missing = self.__streams[1].read(a, s)
+            if missing and _size == self._size:
+                raise ReadStreamError(s, a)
+            if shift is None:
+                shift = u
+            else:
+                assert not u
+            data += v
+        return shift, data, missing

@@ -14,25 +14,14 @@ class SubFile(Bytes):
             if not description:
                 description = 'File "%s" (%s)' % (filename, humanFilesize(length))
         Bytes.__init__(self, parent, name, length, description)
-        self.filename = filename
-        self.mime_type = mime_type
-        self.parser = parser
-        self._stream = None
-
-class EncodedFile(SubFile):
-    def __init__(self, parent, name, length, decoder, description=None,
-    parser=None, filename=None, mime_type=None):
-        SubFile.__init__(self, parent, name, length, description,
-            parser, filename, mime_type)
-        self._decoder = decoder
-        self._stream = None
-
-    def createInputStream(self):
-        if not self._stream:
-            input_stream = SubFile.createInputStream(self)
-            self._stream = self._decoder(input_stream, self)
-            self._stream.address = self.absolute_address
-        return self._stream
+        tags = []
+        if parser is not None:
+            tags.append(parser)
+        if mime_type:
+            tags.append(( "mime", mime_type ))
+        if filename:
+            tags.append(( "filename", filename ))
+        self._getIStreamTags = lambda: tags
 
 class CompressedStream:
     offset = 0
@@ -66,7 +55,7 @@ class CompressedStream:
 
 def CompressedField(field, decompressor, size=None):
     if field._parent:
-        cis = field.createInputStream
+        cis = field._createInputStream
     else:
         cis = lambda: field.stream
     def createInputStream(size=size):
@@ -79,5 +68,5 @@ def CompressedField(field, decompressor, size=None):
         stream = InputIOStream(input, source, size)
         stream.address = address
         return stream
-    field.createInputStream = createInputStream
+    field._createInputStream = createInputStream
     return field

@@ -6,6 +6,7 @@ from hachoir_core.compatibility import reversed
 from hachoir_core.stream import InputFieldStream
 from hachoir_core.error import HachoirError, HACHOIR_ERRORS, error
 from hachoir_core.tools import makePrintable
+from weakref import ref as weakref_ref
 
 class FieldError(HachoirError):
     """
@@ -206,9 +207,20 @@ class Field(object):
         except FieldError:
             return False
 
-    def createInputStream(self):
+    def _createInputStream(self):
         assert self._parent
         return InputFieldStream(self)
+    def _getIStreamTags(self):
+        return []
+    def getSubIStream(self):
+        stream = None
+        if hasattr(self, "_sub_istream"):
+            stream = self._sub_istream()
+        if stream is None:
+            stream = self._createInputStream()
+            stream.tags = self._getIStreamTags()
+            self._sub_istream = weakref_ref(stream)
+        return stream
 
     def __nonzero__(self):
         """

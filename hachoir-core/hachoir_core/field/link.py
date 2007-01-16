@@ -35,10 +35,10 @@ class Fragment(FieldSet):
             error(str(e))
         return None
 
-    def createInputStream(self):
+    def _createInputStream(self):
         if self.first is self and hasattr(self.first, "_getData"):
             return FragmentedStream(self.first)
-        return FieldSet.createInputStream(self)
+        return FieldSet._createInputStream(self)
 
     def _createNext(self):
         return None

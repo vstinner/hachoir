@@ -16,13 +16,13 @@ Creation date: 29 october 2006
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
     Bit, Bits, UInt8, UInt32, UInt16, CString, Enum,
-    RawBytes, NullBits, String, SubFile, EncodedFile)
+    Bytes, RawBytes, NullBits, String, SubFile, CompressedField)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_core.text_handler import humanFilesize
 from hachoir_core.tools import paddingSize, humanFrequency
 from hachoir_parser.image.common import RGB
 from hachoir_parser.image.jpeg import JpegChunk, JpegFile
-from hachoir_core.stream import StringInputStream
+from hachoir_core.stream import StringInputStream, ConcatStream
 import math
 
 # Maximum file size (50 MB)
@@ -31,16 +31,16 @@ MAX_FILE_SIZE = 50 * 1024 * 1024
 TWIPS = 20
 
 try:
-    import zlib
+    from zlib import decompressobj
 
-    def decompressSWF(stream, field):
-        # TODO: Write lazy decompressor
-        main_stream = field["/"].stream
-        header = "FWS" + main_stream.readBytes(3*8, 5)
-        data = stream.readBytes(0, stream.size//8)
-        data = header + zlib.decompress(data)
-        source = "deflate:source=(%s), offset=%s" % (main_stream.source, field.absolute_address)
-        return StringInputStream(data, source)
+    class Gunzip:
+        def __init__(self, stream):
+            self.gzip = decompressobj()
+
+        def __call__(self, size, data=None):
+            if data is None:
+                data = self.gzip.unconsumed_tail
+            return self.gzip.decompress(data, size)
 
     has_deflate = True
 except ImportError:
@@ -388,9 +388,16 @@ class SwfFile(Parser):
         else:
             size = (self.size - self.current_size) // 8
             if has_deflate:
-                yield EncodedFile(self, "compressed_data", size, decompressSWF, parser=SwfFile)
+                data = CompressedField(SubFile(self, "compressed_data", size, parser=SwfFile), Gunzip)
+                cis = data._createInputStream
+                def createInputStream():
+                    stream = cis()
+                    header = StringInputStream("FWS" + self.stream.readBytes(3*8, 5))
+                    return ConcatStream((header, stream), stream.source)
+                data._createInputStream = createInputStream
+                yield data
             else:
-                yield SubFile(self, "compressed_data", size)
+                yield Bytes(self, "compressed_data", size)
 
     def createDescription(self):
         desc = ["version %u" % self["version"].value]

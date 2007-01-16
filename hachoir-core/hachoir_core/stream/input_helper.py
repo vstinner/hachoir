@@ -26,4 +26,6 @@ def FileInputStream(filename, real_filename=None):
         errmsg = unicode(str(err), charset)
         raise InputStreamError(_("Unable to open file %s: %s")
             % (filename, errmsg))
-    return InputIOStream(inputio, "file:%s" % filename)
+    stream = InputIOStream(inputio, "file:%s" % filename)
+    stream.tags.append(("filename", filename))
+    return stream

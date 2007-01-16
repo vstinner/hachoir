@@ -5,7 +5,7 @@ Parser list managment:
 """
 
 import os
-from hachoir_core.error import warning, info, HACHOIR_ERRORS
+from hachoir_core.error import error, warning, info, HACHOIR_ERRORS
 from hachoir_parser import Parser, HachoirParserList
 from hachoir_core.stream import FileInputStream, InputSubStream
 from hachoir_core.i18n import _
@@ -76,27 +76,35 @@ def _guessParserByTag(stream, parser_list, tag_name, tag_value, validate=True):
             next_try.append(cls)
     return False, next_try
 
-def _guessParsers(stream, file_ext=None, force_mime=None):
+def guessParser(stream, force_mime=None):
     # Filter by minimum size
-    parser_list = [ parser for parser in HachoirParserList() \
+    parser_list = [ parser for parser in HachoirParserList()
         if "min_size" not in parser.tags or stream.sizeGe(parser.tags["min_size"]) ]
 
-    # Guess my MIME type
+    # Guess by MIME type
     if force_mime:
-        ok, result = _guessParserByTag(stream, parser_list,
-            "mime", force_mime, validate=False)
+        ok, result = _guessParserByTag(stream, parser_list, "mime", force_mime, False)
         if ok:
             return result
-        else:
-            parser_list = result
+        parser_list = result
 
-    # Guess by file extension
-    if file_ext:
-        ok, result = _guessParserByTag(stream, parser_list, "file_ext", file_ext)
-        if ok:
-            return result
-        else:
+    # Guess using stream tags
+    for tag in stream.tags:
+        if type(tag) is tuple:
+            if tag[0] == "filename":
+                filename = os.path.basename(tag[1]).split(".")
+                if len(filename) <= 1:
+                    continue
+                tag = "file_ext", filename[-1]
+            ok, result = _guessParserByTag(stream, parser_list, *tag)
+            if ok:
+                return result
             parser_list = result
+        else:
+            parser, error_msg = parseStream(tag, stream)
+            if parser:
+                return parser
+            error(_("Unable to parse stream using %s: %s") % (tag.__name__, error_msg))
 
     # Guess other parser
     for cls in parser_list:
@@ -105,32 +113,12 @@ def _guessParsers(stream, file_ext=None, force_mime=None):
         parser, error_msg = parseStream(cls, stream, True)
         if parser:
             return parser
-        else:
-            info(_("Skip parser %s: %s") % (cls.__name__, error_msg))
+        info(_("Skip parser %s: %s") % (cls.__name__, error_msg))
     return None
-
-def guessParser(stream, filename=None, force_mime=None):
-    """
-    Choose the best parser for the specified stream. Optional argument
-    helping the choice:
-
-     * filename: only file extension will be used
-     * force_mime: try parser which match given MIME type before the others
-
-    Returns the parser or None on error. May display info/warning on error.
-    """
-    file_ext = None
-    if filename:
-        # Extract file extension
-        filename = os.path.basename(filename)
-        filename = filename.split(".")
-        if 1 < len(filename):
-            file_ext = filename[-1]
-    return _guessParsers(stream, file_ext=file_ext, force_mime=force_mime)
 
 ### Choose parser for a file ###################################################
 
-def createParser(filename, force_mime=None, offset=None, size=None, real_filename=None):
+def createParser(filename, force_mime=None, offset=0, size=None, real_filename=None):
     """
     Create a parser from a file or returns None on error.
 
@@ -144,10 +132,7 @@ def createParser(filename, force_mime=None, offset=None, size=None, real_filenam
     # Create input stream
     stream = FileInputStream(filename, real_filename)
     if offset or size:
-        if offset:
-            offset *= 8
-        else:
-            offset = 0
+        offset *= 8
         if size:
             size *= 8
         stream = InputSubStream(stream, offset, size)
@@ -157,7 +142,7 @@ def createParser(filename, force_mime=None, offset=None, size=None, real_filenam
         filename = real_filename
     if offset:
         filename = None
-    field_set = guessParser(stream, filename, force_mime=force_mime)
+    field_set = guessParser(stream, force_mime)
     return field_set
 
 def createEditor(filename, force_mime=None, offset=None, size=None):
