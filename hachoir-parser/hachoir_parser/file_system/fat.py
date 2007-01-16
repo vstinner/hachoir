@@ -149,8 +149,9 @@ class InodeLink(Link):
 
     def createValue(self):
         field = InodeGen(self["/"], self.parent, self._getTargetPath())(self)
-        self._display = field.path
-        return Link.createValue(self)
+        if field:
+            self._display = field.path
+            return Link.createValue(self)
 
     def createDisplay(self):
         return "/%s[0]" % self._getTargetPath()

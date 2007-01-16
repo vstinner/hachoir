@@ -112,7 +112,7 @@ def guessParser(stream, force_mime=None):
 
 ### Choose parser for a file ###################################################
 
-def createParser(filename, force_mime=None, offset=0, size=None, real_filename=None):
+def createParser(filename, force_mime=None, offset=None, size=None, real_filename=None):
     """
     Create a parser from a file or returns None on error.
 
@@ -126,10 +126,9 @@ def createParser(filename, force_mime=None, offset=0, size=None, real_filename=N
     # Create input stream
     stream = FileInputStream(filename, real_filename)
     if offset or size:
-        offset *= 8
         if size:
             size *= 8
-        stream = InputSubStream(stream, offset, size)
+        stream = InputSubStream(stream, 8 * max(0, offset), size)
 
     # Create field set
     if real_filename:

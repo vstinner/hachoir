@@ -199,7 +199,8 @@ class Walker:
                     self.event = False
                     root.refresh()
                     assert not self.event
-                self.set_focus(self.fromField(root, target.path))
+                if target:
+                    self.set_focus(self.fromField(root, target.path))
         elif key == ' ':
             if self.focus.parent and self.focus.field.size != 0:
                 raise NewTab_Stream(self.focus.field)
