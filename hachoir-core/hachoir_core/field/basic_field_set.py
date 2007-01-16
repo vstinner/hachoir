@@ -1,6 +1,7 @@
 from hachoir_core.field import Field, FieldError
 from hachoir_core.stream import InputStream
 from hachoir_core.endian import BIG_ENDIAN, LITTLE_ENDIAN
+from hachoir_core.event_handler import EventHandler
 
 class ParserError(FieldError):
     """
@@ -20,6 +21,7 @@ class MatchError(FieldError):
     pass
 
 class BasicFieldSet(Field):
+    _event_handler = None
     is_field_set = True
     endian = None
 
@@ -54,6 +56,7 @@ class BasicFieldSet(Field):
             # This field set is the root
             self._address = 0
             self.root = self
+            self._global_event_handler = None
 
         # Sanity checks (post-conditions)
         assert self.endian in (BIG_ENDIAN, LITTLE_ENDIAN)
@@ -65,4 +68,46 @@ class BasicFieldSet(Field):
         raise NotImplementedError()
     def __len__(self):
         raise NotImplementedError()
+    def getField(self, key, const=True):
+        raise NotImplementedError()
+
+    def connectEvent(self, event_name, handler, local=True):
+        assert event_name in (
+            # Callback prototype: def f(field)
+            # Called when new value is already set
+            "field-value-changed",
+
+            # Callback prototype: def f(field)
+            # Called when field size is already set
+            "field-resized",
+
+            # A new field has been insered in the field set
+            # Callback prototype: def f(index, new_field)
+            "field-insered",
+
+            # Callback prototype: def f(old_field, new_field)
+            # Called when new field is already in field set
+            "field-replaced",
+
+            # Callback prototype: def f(field, new_value)
+            # Called to ask to set new value
+            "set-field-value"
+        )
+        if local:
+            if self._event_handler is None:
+                self._event_handler = EventHandler()
+            self._event_handler.connect(event_name, handler)
+        else:
+            if self.root._global_event_handler is None:
+                self.root._global_event_handler = EventHandler()
+            self.root._global_event_handler.connect(event_name, handler)
+
+    def raiseEvent(self, event_name, *args):
+        # Transfer event to local listeners
+        if self._event_handler is not None:
+            self._event_handler.raiseEvent(event_name, *args)
+
+        # Transfer event to global listeners
+        if self.root._global_event_handler is not None:
+            self.root._global_event_handler.raiseEvent(event_name, *args)
 

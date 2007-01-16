@@ -1,8 +1,6 @@
 from hachoir_core.field import (BasicFieldSet, Field, ParserError,
     createRawField, createNullField, createPaddingField, FakeArray)
-from hachoir_core.event_handler import EventHandler
 from hachoir_core.dict import Dict, UniqKeyError
-from hachoir_core.endian import BIG_ENDIAN, LITTLE_ENDIAN
 from hachoir_core.error import error, warning, info, HACHOIR_ERRORS
 from hachoir_core.tools import lowerBound
 import hachoir_core.config as config
@@ -25,7 +23,7 @@ class GenericFieldSet(BasicFieldSet):
     - stream: Input stream used to feed fields' value
     - root: The root of all field sets ;
     - __len__(): Number of fields, may need to create field set ;
-    - __getitem(): Get an field by it's name or it's path.
+    - __getitem__(): Get an field by it's name or it's path.
 
     And attributes inherited from Field class:
     - parent: Parent field (may be None if it's the root) ;
@@ -46,7 +44,6 @@ class GenericFieldSet(BasicFieldSet):
     - and maybe set endian and static_size class attributes.
     """
 
-    _event_handler = None
     _current_size = 0
 
     def __init__(self, parent, name, stream, description=None, size=None):
@@ -69,8 +66,6 @@ class GenericFieldSet(BasicFieldSet):
         self._field_generator = self.createFields()
         self._field_array_count = {}
         self._array_cache = {}
-        if not parent:
-            self._global_event_handler = None
 
     def array(self, key):
         try:
@@ -79,37 +74,6 @@ class GenericFieldSet(BasicFieldSet):
             array = FakeArray(self, key)
             self._array_cache[key] = array
             return self._array_cache[key]
-
-    def connectEvent(self, event_name, handler, local=True):
-        assert event_name in (
-            # Callback prototype: def f(field)
-            # Called when new value is already set
-            "field-value-changed",
-
-            # Callback prototype: def f(field)
-            # Called when field size is already set
-            "field-resized",
-
-            # A new field has been insered in the field set
-            # Callback prototype: def f(index, new_field)
-            "field-insered",
-
-            # Callback prototype: def f(old_field, new_field)
-            # Called when new field is already in field set
-            "field-replaced",
-
-            # Callback prototype: def f(field, new_value)
-            # Called to ask to set new value
-            "set-field-value"
-        )
-        if local:
-            if self._event_handler is None:
-                self._event_handler = EventHandler()
-            self._event_handler.connect(event_name, handler)
-        else:
-            if self.root._global_event_handler is None:
-                self.root._global_event_handler = EventHandler()
-            self.root._global_event_handler.connect(event_name, handler)
 
     def reset(self):
         """
@@ -130,15 +94,6 @@ class GenericFieldSet(BasicFieldSet):
     def __str__(self):
         return '<%s path=%s, current_size=%s, current length=%s>' % \
             (self.__class__.__name__, self.path, self._current_size, len(self._fields))
-
-    def raiseEvent(self, event_name, *args):
-        # Transfer event to local listeners
-        if self._event_handler is not None:
-            self._event_handler.raiseEvent(event_name, *args)
-
-        # Transfer event to global listeners
-        if self.root._global_event_handler is not None:
-            self.root._global_event_handler.raiseEvent(event_name, *args)
 
     def __len__(self):
         """
