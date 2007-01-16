@@ -445,6 +445,9 @@ class FragmentedStream(InputStream):
         self.fragments = [ (0, data.absolute_address, data.size) ]
         self.next = field.next
         InputStream.__init__(self, self.stream.source + field.path, size)
+        if not self.next:
+            self._current_size = data.size
+            self._setSize()
 
     def _feed(self, end):
         if self._current_size < end:
