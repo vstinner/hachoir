@@ -419,7 +419,6 @@ class InputSubStream(InputStream):
         if None < size <= 0:
             raise ValueError("InputSubStream: offset is outside input stream")
         self.stream = stream
-        self.address = offset
         self._offset = offset
         if source is None:
             source = "<substream input=%s offset=%s size=%s>" % \
@@ -442,7 +441,6 @@ def InputFieldStream(field):
 class FragmentedStream(InputStream):
     def __init__(self, field, size=None):
         self.stream = field.parent.stream
-        self.address = field.absolute_address
         data = field.getData()
         self.fragments = [ (0, data.absolute_address, data.size) ]
         self.next = field.next
@@ -516,7 +514,6 @@ class ConcatStream(InputStream):
         if size is not None:
             size += self.__size0
         self.__streams = streams
-        self.address = None
         InputStream.__init__(self, source, size)
 
     _current_size = property(lambda self: self.__size0 + self.__streams[1]._current_size)

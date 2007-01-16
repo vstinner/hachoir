@@ -588,7 +588,7 @@ def exploreFieldSet(field_set, args, options={}):
                     if not parser:
                         hachoir_log.error(_("No parser found for %s") % stream.source)
                     else:
-                        body.append(("%u/%s" % (body.active, stream.address),
+                        body.append(("%u/%s" % (body.active, e.field.absolute_address),
                             TreeBox(charset, Node(parser, None), preload_fields, options)))
                         resize = log.height
                 except NeedInput, e:

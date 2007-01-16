@@ -8,6 +8,7 @@ from hachoir_core.field.integer import GenericInteger
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.text_handler import hexadecimal
 from hachoir_core.error import error
+from hachoir_core.tools import humanFilesize
 import datetime
 import re
 
@@ -135,11 +136,9 @@ class Date(FieldSet):
 
 
 class InodeLink(Link):
-    def __init__(self, parent, name, target_size, cluster, target=None):
+    def __init__(self, parent, name, target=None):
         Link.__init__(self, parent, name)
-        self.cluster = cluster
         self.target = target
-        self.target_size = target_size
         self.first = None
 
     def _getTargetPath(self):
@@ -149,7 +148,7 @@ class InodeLink(Link):
         return self.target
 
     def createValue(self):
-        field = InodeGen(self["/"], self.cluster, self._getTargetPath(), self.target_size)(self)
+        field = InodeGen(self["/"], self.parent, self._getTargetPath())(self)
         self._display = field.path
         return Link.createValue(self)
 
@@ -241,7 +240,8 @@ class FileEntry(FieldSet):
                         target_size = 0
                 elif not target_size:
                     return
-                yield InodeLink(self, "data", 8*target_size, self.getCluster)
+                self.target_size = 8 * target_size
+                yield InodeLink(self, "data")
         else:
             yield UInt8(self, "seq_no", "Sequence Number")
             yield String(self, "name[]", 10, "(5 UTF-16 characters)",
@@ -270,12 +270,13 @@ class File(Fragment):
             yield createPaddingField(self, padding)
 
 class InodeGen:
-    def __init__(self, root, cluster, path, filesize):
+    def __init__(self, root, entry, path):
         self.root = root
-        self.cluster = root.clusters(cluster)
+        self.cluster = root.clusters(entry.getCluster)
         self.path = path
-        self.filesize = filesize
+        self.filesize = entry.target_size
         self.done = 0
+        self.tags = lambda: [ ("filename", entry.getFilename()) ]
 
     def __call__(self, prev):
         name = self.path + "[]"
@@ -285,6 +286,9 @@ class InodeGen:
                 error("(FAT) bad metadata for " + self.path)
                 return
             field = File(self.root, name, size=size, first=prev.first)
+            if prev.first is None:
+                field._getIStreamTags = self.tags
+                field._description = 'File size: %s' % humanFilesize(self.filesize//8)
             field.datasize = min(self.filesize - self.done, size)
             self.done += field.datasize
         else:
@@ -353,7 +357,9 @@ class FAT_FS(Parser):
         self.cluster_size = boot["cluster_size"].value * self.sector_size * 8
         self.fat = self["fat[0]"]
         if "root_start" in boot:
-            yield InodeLink(self, "root", 0, lambda: boot["root_start"].value, "root")
+            self.target_size = 0
+            self.getCluster = lambda: boot["root_start"].value
+            yield InodeLink(self, "root", "root")
         else:
             yield Directory(self, "root[]", size=boot["max_root"].value * 32 * 8)
         self.data_start = self.current_size - 2 * self.cluster_size
