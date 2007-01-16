@@ -60,6 +60,7 @@ fi
 # Include some tools
 if [ $TOOLS -eq 1 ]; then
     cp hachoir-tools/hachoir-subfile $TMPDIR/
+    cp hachoir-tools/hachoir_subfile_regex.py $TMPDIR/
     cp hachoir-tools/hachoir-grep $TMPDIR/
     cp hachoir-tools/hachoir-strip $TMPDIR/
 fi
