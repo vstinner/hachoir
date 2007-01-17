@@ -2,7 +2,7 @@ import re
 import types
 from hachoir_core.error import HachoirError
 from hachoir_core.i18n import _
-from hachoir_parser import Parser
+from hachoir_parser import HachoirParser
 from hachoir_core import config
 
 ### Parser list ################################################################
@@ -144,7 +144,7 @@ class HachoirParserList(ParserList):
             attributes = ( getattr(module, name) for name in dir(module) )
             parsers = list( attr for attr in attributes \
                 if isinstance(attr, type) \
-                   and issubclass(attr, Parser) \
+                   and issubclass(attr, HachoirParser) \
                    and hasattr(attr, "tags"))
             for parser in parsers:
                 self.add(parser)

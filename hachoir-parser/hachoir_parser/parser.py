@@ -2,7 +2,7 @@ from hachoir_core.field import MissingField, Field, Parser as GenericParser
 from hachoir_core.error import HACHOIR_ERRORS, error
 from hachoir_core.tools import makePrintable
 
-class Parser(GenericParser):
+class HachoirParser:
     """
     A parser is the root of all other fields. It create first level of fields
     and have special attributes and methods:
@@ -19,9 +19,7 @@ class Parser(GenericParser):
       None otherwise).
     """
 
-    def __init__(self, stream):
-        # Call parent constructor
-        GenericParser.__init__(self, stream, None)
+    def __init__(self):
         self._mime_type = None
 
     #--- Methods that can be overridden -------------------------------------
@@ -100,4 +98,9 @@ class Parser(GenericParser):
             self._filename_extension = self.createFilenameSuffix()
         return self._filename_extension
     filename_suffix = property(_getFilenameSuffix)
+
+class Parser(HachoirParser, GenericParser):
+    def __init__(self, stream):
+        GenericParser.__init__(self, stream, None)
+        HachoirParser.__init__(self)
 
