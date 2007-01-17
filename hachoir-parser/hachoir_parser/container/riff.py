@@ -89,9 +89,9 @@ def parseAVIStreamHeader(self):
     if self["size"].value != 56:
         raise ParserError("Invalid stream header size")
     yield String(self, "stream_type", 4, "Stream type four character code", charset="ASCII")
-    field = String(self, "fourcc", 4, "Stream four character code", strip=" \0", charset="ASCII")
+    field = String(self, "fourcc", 4, "Stream four character code", strip=" \0", charset="ISO-8859-1")
     if self["stream_type"].value == "vids":
-        yield Enum(field, video_fourcc_name, unicode.upper)
+        yield Enum(field, video_fourcc_name, lambda text: text.upper())
     else:
         yield field
     yield UInt32(self, "flags", "Stream flags")
