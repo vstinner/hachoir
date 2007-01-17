@@ -107,6 +107,12 @@ def humanDuration(millisec):
     >>> humanDuration(6402309)
     u'1 hour(s) 46 min 42 sec'
     """
+    if millisec < 0:
+        raise ValueError("Invalid duration value (%s)" % millisec)
+    if isinstance(millisec, float):
+        millisec = int(millisec)
+    if not isinstance(millisec, (int, long)):
+        raise ValueError("humanDuration() argument must be a positive integer")
 
     # Milliseconds
     if millisec < 1000:
