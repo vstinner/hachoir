@@ -90,16 +90,21 @@ class ParserList(object):
             print title
         else:
             print _("List of Hachoir parsers.")
+        print
 
         # Create parser list sorted by module
         for category in sorted(self.bycategory.iterkeys()):
-            print
-            print "[%s]" % category
-            parser_list = sorted(self.bycategory[category],
-                key=lambda parser: parser.tags["id"])
-            for parser in parser_list:
-                self.printParser(parser, verbose)
-        print
+            if False:
+                parser_list = [ parser.tags["id"] for parser in self.bycategory[category] ]
+                parser_list.sort()
+                print "- %s: %s" % (category.title(), ", ".join(parser_list))
+            else:
+                print "[%s]" % category
+                parser_list = sorted(self.bycategory[category],
+                    key=lambda parser: parser.tags["id"])
+                for parser in parser_list:
+                    self.printParser(parser, verbose)
+                print
         print "Total: %s parsers" % len(self.parser_list)
 
     def __getitem__(self, key):
