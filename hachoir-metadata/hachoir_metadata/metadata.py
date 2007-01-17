@@ -11,17 +11,18 @@ from hachoir_core.error import warning
 from datetime import datetime
 from hachoir_metadata.filter import Filter, NumberFilter
 
-MAX_STR_LENGTH = 80*10
-MAX_SAMPLE_RATE = 192000
-MAX_DURATION = 366*24*60*60*1000
-MAX_NB_CHANNEL = 16
-MAX_WIDTH = 200000
+MAX_STR_LENGTH = 80*10            # 800 characters
+MAX_SAMPLE_RATE = 192000          # 192 kHz
+MAX_DURATION = 366*24*60*60*1000  # 1 year
+MAX_NB_CHANNEL = 16               # 16 channels
+MAX_WIDTH = 200000                # 200 000 pixels
 MAX_HEIGHT = MAX_WIDTH
-MAX_NB_COLOR = 2 ** 24
-MAX_BITS_PER_PIXEL = 64
-MIN_YEAR = 1900
+MAX_NB_COLOR = 2 ** 24            # 16 million of color
+MAX_BITS_PER_PIXEL = 256          # 256 bits/pixel
+MIN_YEAR = 1900                   # Year in 1900..2030
 MAX_YEAR = 2030
-MAX_FRAME_RATE = 150
+MAX_FRAME_RATE = 150              # 150 frame/sec
+MAX_BIT_RATE = 500 * 1024 ** 2    # 500 Mbit/sec
 DATETIME_FILTER = Filter(datetime, datetime(MIN_YEAR, 1, 1), datetime(MAX_YEAR, 12, 31))
 
 extractors = {}
@@ -111,7 +112,8 @@ class Metadata(object):
         self.register("url", 602, _("URL"))
         self.register("frame_rate", 603, _("Frame rate"),
             filter=NumberFilter(1, MAX_FRAME_RATE))
-        self.register("bit_rate", 604, _("Bit rate"), handler=humanBitRate)
+        self.register("bit_rate", 604, _("Bit rate"), handler=humanBitRate,
+            filter=NumberFilter(1, MAX_BIT_RATE))
         self.register("aspect_ratio", 604, _("Aspect ratio"))
 
         self.register("producer", 901, _("Producer"))
