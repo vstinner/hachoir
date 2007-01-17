@@ -40,12 +40,15 @@ class RiffMetadata(MultipleMetadata):
         self.sample_rate = format["sample_per_sec"].value
 
         self.compression = format["codec"].display
-        if "nb_sample/nb_sample" in wav:
-            self.duration = wav["nb_sample/nb_sample"].value * 1000 // self.sample_rate[0]
+        if "nb_sample/nb_sample" in wav \
+        and 0 < format["sample_per_sec"].value:
+            self.duration = wav["nb_sample/nb_sample"].value * 1000 // format["sample_per_sec"].value
         if format["codec"].value in (AUDIO_MICROSOFT_PCM, AUDIO_IEEE_FLOAT32):
             # Codec with fixed bit rate
-            self.bit_rate = self.nb_channel[0] * self.bits_per_sample[0] * self.sample_rate[0]
-            if not hasattr(self, "duration"):
+            self.bit_rate = format["nb_channel"].value * format["bit_per_sample"].value * format["sample_per_sec"].value
+            if not hasattr(self, "duration") \
+            and "audio_data/size" in wav \
+            and hasattr(self, "bit_rate"):
                 self.duration = wav["audio_data/size"].value * 8 * 1000 // self.bit_rate[0]
 
     def extract(self, riff):

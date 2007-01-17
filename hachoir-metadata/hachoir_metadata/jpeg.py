@@ -5,7 +5,7 @@ from hachoir_parser.image.jpeg import (JpegFile,
     QUALITY_HASH_GRAY, QUALITY_SUM_GRAY)
 from hachoir_core.field import MissingField
 from hachoir_core.i18n import _
-from hachoir_core.error import warning
+from hachoir_core.error import warning, HACHOIR_ERRORS
 import types
 
 class JpegMetadata(Metadata):
@@ -67,7 +67,10 @@ class JpegMetadata(Metadata):
         if "exif/content" in jpeg:
             for ifd in jpeg.array("exif/content/ifd"):
                 for entry in ifd.array("entry"):
-                    self.processIfdEntry(ifd, entry)
+                    try:
+                        self.processIfdEntry(ifd, entry)
+                    except HACHOIR_ERRORS:
+                        pass
         if "psd/content" in jpeg:
             psd = jpeg["psd/content"]
             if "iptc" in psd:
@@ -150,7 +153,8 @@ class JpegMetadata(Metadata):
         elif tag == ExifEntry.TAG_EXPOSURE:
             if not value:
                 return
-            value = "1/%g" % (1/value)
+            if isinstance(value, float):
+                value = "1/%g" % (1/value)
         elif rational:
             value = "%.3g" % value
 

@@ -5,6 +5,7 @@ from hachoir_parser.image import (
     XcfFile, TargaFile, WMF_File, PsdFile)
 from hachoir_parser.image.xcf import XcfProperty
 from hachoir_core.i18n import _
+from hachoir_core.error import HACHOIR_ERRORS
 
 class BmpMetadata(Metadata):
     def extract(self, image):
@@ -134,7 +135,10 @@ class PngMetadata(Metadata):
         self.bits_per_pixel = bpp
         self.compression = header["compression"].display
         if "time" in png:
-            self.creation_date = str(png["time"].value)
+            try:
+                self.creation_date = png["time"].value
+            except HACHOIR_ERRORS:
+                pass
         for comment in png.array("text"):
             if "text" not in comment:
                 continue

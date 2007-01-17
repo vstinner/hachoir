@@ -78,12 +78,12 @@ class AuMetadata(Metadata):
         self.compression = audio["codec"].display
         if "info" in audio:
             self.comment = audio["info"].value
-        bits_per_sample = audio.getBitsPerSample()
-        if bits_per_sample:
-            self.bits_per_sample = bits_per_sample
-            self.bit_rate = bits_per_sample * self.nb_channel[0] * self.sample_rate[0]
-            if self.bit_rate[0]:
-                self.duration = audio["audio_data"].size * 1000 / self.bit_rate[0]
+        self.bits_per_sample = audio.getBitsPerSample()
+        if hasattr(self, "bits_per_sample"):
+            self.bit_rate = self.bits_per_sample[0] * audio["channels"].value * audio["sample_rate"].value
+        if "audio_data" in audio \
+        and hasattr(self, "bit_rate"):
+            self.duration = audio["audio_data"].size * 1000 / self.bit_rate[0]
 
 class RealAudioMetadata(Metadata):
     def extract(self, real):
