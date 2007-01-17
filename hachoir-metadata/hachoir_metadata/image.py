@@ -109,7 +109,10 @@ class XcfMetadata(Metadata):
     def extract(self, xcf):
         self.width = xcf["width"].value
         self.height = xcf["height"].value
-        self.bits_per_pixel = self.type_to_bpp[ xcf["type"].value ]
+        try:
+            self.bits_per_pixel = self.type_to_bpp[ xcf["type"].value ]
+        except KeyError:
+            pass
         self.format_version = xcf["type"].display
         self.readProperties(xcf)
 
