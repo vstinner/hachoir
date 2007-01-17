@@ -9,7 +9,7 @@ hexadecimal() from hachoir_core.text_handler module.
 """
 
 import types
-from hachoir_core.field import Bits
+from hachoir_core.field import Bits, FieldError
 
 class GenericInteger(Bits):
     """
@@ -17,8 +17,8 @@ class GenericInteger(Bits):
     """
     def __init__(self, parent, name, signed, size, description=None,
     text_handler=None):
-        # WARNING: If you edit this constructor don't forget to edit
-        # Integer constructor (from integerFactory())
+        if 256 < size:
+            raise FieldError("Integer size bigger than 256: %s bits" % size)
         Bits.__init__(self, parent, name, size, description)
         self.signed = signed
         if text_handler:
