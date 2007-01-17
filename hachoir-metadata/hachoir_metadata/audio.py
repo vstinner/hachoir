@@ -219,8 +219,9 @@ class AiffMetadata(Metadata):
         if "common" in aiff:
             info = aiff["common"]
             rate = int(info["sample_rate"].value)
-            self.sample_rate = rate
-            self.duration = info["nb_sample"].value * 1000 / rate
+            if rate:
+                self.sample_rate = rate
+                self.duration = info["nb_sample"].value * 1000 // rate
             self.nb_channel = info["nb_channel"].value
             self.bits_per_sample = info["sample_size"].value
             if "codec" in info:
