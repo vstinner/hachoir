@@ -8,6 +8,8 @@ from hachoir_core.tools import (
 from hachoir_core.dict import Dict
 from hachoir_core.i18n import _
 
+MAX_STR_LENGTH = 80*10
+
 extractors = {}
 
 class Data:
@@ -108,6 +110,8 @@ class Metadata(object):
             value = value.strip(" \t\v\n\r\0")
             if not value:
                 return
+            if MAX_STR_LENGTH < len(value):
+                value = value[:MAX_STR_LENGTH] + "(...)"
 
         # Skip duplicates
         data = self.__data[key]
