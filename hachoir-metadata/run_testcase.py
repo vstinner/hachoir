@@ -125,7 +125,7 @@ def checkCornerBMPMeta(meta): return (
 )
 
 def checkSmallville(metadata): return (
-    checkAttr(metadata, "duration", 879500000/333.0),
+    checkAttr(metadata, "duration", 2641141),
     checkAttr(metadata, "producer", u"VirtualDubMod 1.5.10.1 (build 2366/release)"),
     checkAttr(metadata, "video/width", 640),
     checkAttr(metadata, "video/height", 352),

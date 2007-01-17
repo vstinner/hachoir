@@ -75,7 +75,7 @@ class RiffMetadata(MultipleMetadata):
             % (header["fourcc"].display, header["fourcc"].value)
         if header["rate"].value and header["scale"].value:
             meta.frame_rate = float(header["rate"].value) / header["scale"].value
-            self.duration = meta.duration = header["length"].value * 1000 / meta.frame_rate[0]
+            self.duration = meta.duration = int(header["length"].value * 1000 // meta.frame_rate[0])
 
         if "stream_fmt/width" in video:
             format = video["stream_fmt"]
@@ -97,7 +97,7 @@ class RiffMetadata(MultipleMetadata):
         header = audio["stream_hdr"]
         if header["rate"].value and header["scale"].value:
             frame_rate = float(header["rate"].value) / header["scale"].value
-            meta.duration = header["length"].value * 1000 / frame_rate
+            meta.duration = header["length"].value * 1000 // frame_rate
         if header["fourcc"].value != "":
             meta.compression = "%s (fourcc:\"%s\")" \
                 % (format["codec"].display, header["fourcc"].value)
@@ -112,7 +112,7 @@ class RiffMetadata(MultipleMetadata):
         if microsec:
             self.frame_rate = 1000000.0 / microsec
             if "total_frame" in header and header["total_frame"].value:
-                self.duration = header["total_frame"].value * microsec / 1000
+                self.duration = int(header["total_frame"].value * microsec) // 1000
 
     def extractAVI(self, avi):
         # Process (audio and video) streams
