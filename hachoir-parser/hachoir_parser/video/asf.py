@@ -96,7 +96,8 @@ class HeaderExtension(FieldSet):
         yield GUID(self, "reserved[]")
         yield UInt16(self, "reserved[]")
         yield UInt32(self, "size")
-        yield PaddingBytes(self, "data", self["size"].value)
+        if self["size"].value:
+            yield RawBytes(self, "data", self["size"].value)
 
 class Header(FieldSet):
     guid = "75B22630-668E-11CF-A6D9-00AA0062CE6C"
