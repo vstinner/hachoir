@@ -7,13 +7,48 @@ from hachoir_core.tools import (
     humanFrequency, humanBitSize)
 from hachoir_core.dict import Dict
 from hachoir_core.i18n import _
+from hachoir_core.error import warning
+from datetime import datetime
 
 MAX_STR_LENGTH = 80*10
+MAX_SAMPLE_RATE = 192000
+MAX_DURATION = 366*24*60*60*1000
+MAX_NB_CHANNEL = 16
+MAX_WIDTH = 200000
+MAX_HEIGHT = MAX_WIDTH
+MAX_NB_COLOR = 2 ** 24
+MAX_BITS_PER_PIXEL = 64
+MIN_YEAR = 1900
+MAX_YEAR = 2030
+MAX_FRAME_RATE = 150
 
 extractors = {}
 
+class Filter:
+    def __init__(self, valid_types, min=None, max=None):
+        self.types = valid_types
+        self.min = min
+        self.max = max
+
+    def __call__(self, value):
+        if not isinstance(value, self.types):
+            return True
+        if self.min is not None and value < self.min:
+            return False
+        if self.max is not None and self.max < value:
+            return False
+        return True
+
+class NumberFilter(Filter):
+    def __init__(self, min=None, max=None):
+        Filter.__init__(self, (int, long, float), min, max)
+
+class DatetimeFilter(Filter):
+    def __init__(self, min=None, max=None):
+        Filter.__init__(self, datetime, min, max)
+
 class Data:
-    def __init__(self, key, priority, description,  handler=None):
+    def __init__(self, key, priority, description,  handler=None, filter=None):
         """
         handler is only used if value is not string nor unicode, prototype:
            def handler(value) -> str/unicode
@@ -24,6 +59,7 @@ class Data:
         self.description = description
         self.values = []
         self.handler = handler
+        self.filter = filter
         self.priority = priority
 
     def __contains__(self, value):
@@ -50,27 +86,39 @@ class Metadata(object):
         self.register("music_composer", 102, _("Music composer"))
 
         self.register("album", 200, _("Album"))
-        self.register("duration", 201, _("Duration"), handler=humanDuration) # type: int, in millisec
+        self.register("duration", 201, _("Duration"), # integer in milliseconde
+            handler=humanDuration, filter=NumberFilter(1, MAX_DURATION))
         self.register("music_genre", 202, _("Music genre"))
         self.register("language", 203, _("Language"))
-        self.register("track_number", 204, _("Track number"))
+        self.register("track_number", 204, _("Track number"),
+            filter=NumberFilter(1, 99))
         self.register("organization", 205, _("Organization"))
 
-        self.register("nb_channel", 300, _("Channel"), handler=humanAudioChannel)
-        self.register("sample_rate", 301, _("Sample rate"), handler=humanFrequency)
-        self.register("bits_per_sample", 302, _("Bits/sample"), handler=humanBitSize)
+        self.register("nb_channel", 300, _("Channel"),
+            handler=humanAudioChannel, filter=NumberFilter(1, MAX_NB_CHANNEL))
+        self.register("sample_rate", 301, _("Sample rate"),
+            handler=humanFrequency, filter=NumberFilter(1, MAX_SAMPLE_RATE))
+        self.register("bits_per_sample", 302, _("Bits/sample"),
+            handler=humanBitSize, filter=NumberFilter(1, 64))
         self.register("artist", 303, _("Artist"))
-        self.register("width", 304, _("Image width"))
-        self.register("height", 305, _("Image height"))
+        self.register("width", 304, _("Image width"),
+            filter=NumberFilter(1, MAX_WIDTH))
+        self.register("height", 305, _("Image height"),
+            filter=NumberFilter(1, MAX_HEIGHT))
         self.register("image_orientation", 306, _("Image orientation"))
-        self.register("nb_colors", 315, _("Number of colors"))
-        self.register("bits_per_pixel", 316, _("Bits/pixel"))
+        self.register("nb_colors", 315, _("Number of colors"),
+            filter=NumberFilter(1, MAX_NB_COLOR))
+        self.register("bits_per_pixel", 316, _("Bits/pixel"),
+            filter=NumberFilter(1, MAX_BITS_PER_PIXEL))
         self.register("pixel_format", 317, _("Pixel format"))
 
         self.register("subtitle_author", 400, _("Subtitle author"))
 
-        self.register("creation_date", 500, _("Creation date"))
-        self.register("last_modification", 501, _("Last modification"))
+        datetime_filter = DatetimeFilter( datetime(MIN_YEAR, 1, 1), datetime(MAX_YEAR, 12, 31))
+        self.register("creation_date", 500, _("Creation date"),
+            filter=datetime_filter)
+        self.register("last_modification", 501, _("Last modification"),
+            filter=datetime_filter)
         self.register("country", 502, _("Country"))
 
         self.register("camera_aperture", 520, _("Camera aperture"))
@@ -83,7 +131,8 @@ class Metadata(object):
         self.register("compression", 600, _("Compression"))
         self.register("copyright", 601, _("Copyright"))
         self.register("url", 602, _("URL"))
-        self.register("frame_rate", 603, _("Frame rate"))
+        self.register("frame_rate", 603, _("Frame rate"),
+            filter=NumberFilter(1, MAX_FRAME_RATE))
         self.register("bit_rate", 604, _("Bit rate"), handler=humanBitRate)
         self.register("aspect_ratio", 604, _("Aspect ratio"))
 
@@ -116,6 +165,11 @@ class Metadata(object):
         # Skip duplicates
         data = self.__data[key]
         if value in data:
+            return
+
+        # Use filter
+        if data.filter and not data.filter(value):
+            warning("Skip value %s=%r (filter)" % (key, value))
             return
 
         # For string, if you have "verlongtext" and "verylo",
@@ -190,9 +244,9 @@ class Metadata(object):
             return u''
 
 
-    def register(self, key, priority, title, handler=None):
+    def register(self, key, priority, title, handler=None, filter=None):
         assert key not in self.__data
-        self.__data[key] = Data(key, priority, title, handler)
+        self.__data[key] = Data(key, priority, title, handler, filter)
 
     def __iter__(self):
         return self.__data.itervalues()

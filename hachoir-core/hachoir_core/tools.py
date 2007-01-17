@@ -107,13 +107,6 @@ def humanDuration(millisec):
     >>> humanDuration(6402309)
     u'1 hour(s) 46 min 42 sec'
     """
-    if millisec < 0:
-        raise ValueError("Invalid duration value (%s)" % millisec)
-    if isinstance(millisec, float):
-        millisec = int(millisec)
-    if not isinstance(millisec, (int, long)):
-        raise ValueError("humanDuration() argument must be a positive integer")
-
     # Milliseconds
     if millisec < 1000:
         return u"%u ms" % millisec
@@ -143,7 +136,7 @@ def humanDuration(millisec):
 
     # Years
     year, day = divmod(day, 365)
-    if hour != 0:
+    if day != 0:
         text = u"%u year(s) %u day(s)" % (year, day)
     else:
         text = u"%u year(s)" % (year)
@@ -229,7 +222,7 @@ def humanFrequency(hertz):
         hertz = hertz / divisor
         if hertz < divisor:
             return u"%.1f %s" % (hertz, unit)
-    return u"%u %s" % (hertz, unit)
+    return u"%s %s" % (hertz, unit)
 
 regex_control_code = re.compile("([\x00-\x1f\x7f])")
 controlchars = tuple({
