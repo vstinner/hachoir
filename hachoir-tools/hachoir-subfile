@@ -274,7 +274,7 @@ class HachoirSubfile:
             self.current_offset//8, humanFilesize(self.current_offset//8))
         size = (self.current_offset - self.start_offset) // 8
         duration = time() - self.main_start
-        if 0.5 < duration:
+        if 0.1 <= duration:
             print >>sys.stderr, "Total time: %s -- global rate: %s/sec" % (
                 humanDuration(duration*1000), humanFilesize(size // duration))
 
