@@ -119,10 +119,15 @@ class GzipParser(Parser):
             if self["has_filename"].value:
                 filename = self["filename"].value
             else:
-                filename = None
+                for tag, filename in self.stream.tags:
+                    if tag == "filename" and filename.endswith(".gz"):
+                        filename = filename[:-3]
+                        break
+                else:
+                    filename = None
             data = SubFile(self, "file", size, filename=filename)
             if has_deflate:
-                data = CompressedField(data, Gunzip)
+                CompressedField(data, Gunzip)
             yield data
 
         # Footer

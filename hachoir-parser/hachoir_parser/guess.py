@@ -128,7 +128,7 @@ def createParser(filename, force_mime=None, offset=None, size=None, real_filenam
     if offset or size:
         if size:
             size *= 8
-        stream = InputSubStream(stream, 8 * max(0, offset), size)
+        stream = InputSubStream(stream, 8 * max(0, offset), size=size)
 
     # Create field set
     if real_filename:

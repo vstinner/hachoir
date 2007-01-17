@@ -2,9 +2,10 @@ from hachoir_core.i18n import getTerminalCharset, _
 from hachoir_core.stream import InputIOStream, InputStreamError
 from cStringIO import StringIO
 
-def StringInputStream(content, source="<string>"):
+def StringInputStream(content, source="<string>", **args):
     inputio = StringIO(content)
-    return InputIOStream(inputio, source, size=len(content)*8)
+    args["size"] = len(content) * 8
+    return InputIOStream(inputio, source=source, **args)
 
 
 def FileInputStream(filename, real_filename=None):
@@ -26,6 +27,4 @@ def FileInputStream(filename, real_filename=None):
         errmsg = unicode(str(err), charset)
         raise InputStreamError(_("Unable to open file %s: %s")
             % (filename, errmsg))
-    stream = InputIOStream(inputio, "file:%s" % filename)
-    stream.tags.append(("filename", filename))
-    return stream
+    return InputIOStream(inputio, source="file:" + filename, tags=[ ("filename", filename) ])

@@ -6,7 +6,7 @@ Author: Victor Stinner
 
 from hachoir_parser import Parser
 from hachoir_core.field import (ParserError, String,
-    Character, UInt8, UInt32, SubFile, CompressedField)
+    Bytes, Character, UInt8, UInt32, CompressedField)
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.text_handler import hexadecimal
 
@@ -64,17 +64,19 @@ class Bzip2Parser(Parser):
 
         size = (self._size - self.current_size)/8
         if size:
-            try:
-                filename = self.stream.filename
-                if filename and filename.endswith(".bz2"):
+            for tag, filename in self.stream.tags:
+                if tag == "filename" and filename.endswith(".bz2"):
                     filename = filename[:-4]
-                else:
-                    filename = None
-            except AttributeError:
+                    break
+            else:
                 filename = None
-            data = SubFile(self, "file", size, filename=filename)
+            data = Bytes(self, "file", size)
             if has_deflate:
                 CompressedField(self, Bunzip2)
-                data._createInputStream = lambda: self._createInputStream()
+                def createInputStream(**args):
+                    if filename:
+                        args.setdefault("tags",[]).append(("filename", filename))
+                    return self._createInputStream(**args)
+                data._createInputStream = createInputStream
             yield data
 

@@ -88,17 +88,16 @@ class AttachedFile(Bytes):
         if filename:
             return 'File "%s"' % filename
         return "('Filename' entry not found)"
-    def _getIStreamTags(self):
+    def _createInputStream(self, **args):
+        tags = args.setdefault("tags",[])
         try:
-            mime = self["../../FileMimeType/string"]
+            tags.append(("mime", self["../../FileMimeType/string"].value))
         except MissingField:
-            tags = [ ]
-        else:
-            tags = [ ("mime", mime.value) ]
+            pass
         filename = self._getFilename()
         if filename:
             tags.append(("filename", filename))
-        return tags
+        return Bytes._createInputStream(self, **args)
 
 def UTF8(parent):
     return _String(parent,'unicode', parent['size'].value, charset='UTF-8')

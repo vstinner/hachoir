@@ -277,7 +277,11 @@ class InodeGen:
         self.path = path
         self.filesize = entry.target_size
         self.done = 0
-        self.tags = lambda: [ ("filename", entry.getFilename()) ]
+        def createInputStream(cis, **args):
+            args["size"] = self.filesize
+            args.setdefault("tags",[]).append(("filename", entry.getFilename()))
+            return cis(**args)
+        self.createInputStream = createInputStream
 
     def __call__(self, prev):
         name = self.path + "[]"
@@ -288,8 +292,8 @@ class InodeGen:
                 return
             field = File(self.root, name, size=size, first=prev.first)
             if prev.first is None:
-                field._getIStreamTags = self.tags
                 field._description = 'File size: %s' % humanFilesize(self.filesize//8)
+                field.setSubIStream(self.createInputStream)
             field.datasize = min(self.filesize - self.done, size)
             self.done += field.datasize
         else:

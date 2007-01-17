@@ -14,14 +14,16 @@ class SubFile(Bytes):
             if not description:
                 description = 'File "%s" (%s)' % (filename, humanFilesize(length))
         Bytes.__init__(self, parent, name, length, description)
-        tags = []
-        if parser is not None:
-            tags.append(( "id", parser.tags["id"]))
-        if mime_type:
-            tags.append(( "mime", mime_type ))
-        if filename:
-            tags.append(( "filename", filename ))
-        self._getIStreamTags = lambda: tags
+        def createInputStream(cis, **args):
+            tags = args.setdefault("tags",[])
+            if parser is not None:
+                tags.append(( "id", parser.tags["id"]))
+            if mime_type:
+                tags.append(( "mime", mime_type ))
+            if filename:
+                tags.append(( "filename", filename ))
+            return cis(**args)
+        self.setSubIStream(createInputStream)
 
 class CompressedStream:
     offset = 0
@@ -53,20 +55,16 @@ class CompressedStream:
         self._buffer = d[size+len(d):]
         return ''.join(data)
 
-def CompressedField(field, decompressor, size=None):
-    if field._parent:
-        cis = field._createInputStream
-    else:
-        cis = lambda: field.stream
-    def createInputStream(size=size):
-        stream = cis()
+def CompressedField(field, decompressor):
+    def createInputStream(cis, source=None, **args):
+        if field._parent:
+            stream = cis(source=source)
+            args.setdefault("tags", []).extend(stream.tags)
+        else:
+            stream = field.stream
         input = CompressedStream(stream, decompressor)
-        address = field.absolute_address
-        source = "Compressed source: '%s' (offset=%s)" % (stream.source, address)
-        if callable(size):
-            size = size()
-        stream = InputIOStream(input, source, size)
-        stream.address = address
-        return stream
-    field._createInputStream = createInputStream
+        if source is None:
+            source = "Compressed source: '%s' (offset=%s)" % (stream.source, field.absolute_address)
+        return InputIOStream(input, source=source, **args)
+    field.setSubIStream(createInputStream)
     return field

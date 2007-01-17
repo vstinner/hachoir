@@ -218,7 +218,6 @@ Method that can be replaced:
 * createValue(): create value of 'value' attribute
 * createDisplay(): create value of 'display' attribute
 * _createInputStream(): create an InputStream containing the field content
-* _getIStreamTags(): return tags for an InputStream containing the field content
 
 Aliases (method):
 
@@ -235,6 +234,8 @@ Other methods:
   if const is True the field set will not be changed
 * __contains__(key)
 * getSubIStream(): return a tagged InputStream containing the field content
+* setSubIStream(): helper to replace _createInputStream (the old one is passed
+  to the new one to allow chaining)
 
 
 Field set class

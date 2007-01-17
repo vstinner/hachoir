@@ -16,7 +16,7 @@ Creation date: 29 october 2006
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
     Bit, Bits, UInt8, UInt32, UInt16, CString, Enum,
-    Bytes, RawBytes, NullBits, String, SubFile, CompressedField)
+    Bytes, RawBytes, NullBits, String, CompressedField)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_core.text_handler import humanFilesize
 from hachoir_core.tools import paddingSize, humanFrequency
@@ -388,13 +388,13 @@ class SwfFile(Parser):
         else:
             size = (self.size - self.current_size) // 8
             if has_deflate:
-                data = CompressedField(SubFile(self, "compressed_data", size, parser=SwfFile), Gunzip)
-                cis = data._createInputStream
-                def createInputStream():
-                    stream = cis()
+                data = CompressedField(Bytes(self, "compressed_data", size), Gunzip)
+                def createInputStream(cis, source=None, **args):
+                    stream = cis(source=source)
                     header = StringInputStream("FWS" + self.stream.readBytes(3*8, 5))
-                    return ConcatStream((header, stream), stream.source)
-                data._createInputStream = createInputStream
+                    args.setdefault("tags",[]).append(("id", self.tags["id"]))
+                    return ConcatStream((header, stream), source=stream.source, **args)
+                data.setSubIStream(createInputStream)
                 yield data
             else:
                 yield Bytes(self, "compressed_data", size)

@@ -125,12 +125,12 @@ class InputStream:
     _set_size = None
     _current_size = 0
 
-    def __init__(self, source=None, size=None):
+    def __init__(self, source=None, size=None, **args):
         self.source = source
         self._size = size   # in bits
         if size == 0:
             raise NullStreamError(source)
-        self.tags = [ ]
+        self.tags = args.get("tags", [])
 
     def askSize(self, client):
         if self._size != self._current_size:
@@ -362,7 +362,7 @@ class InputPipe:
         return data
 
 class InputIOStream(InputStream):
-    def __init__(self, input, source=None, size=None):
+    def __init__(self, input, size=None, **args):
         if not hasattr(input, "seek"):
             if size is None:
                 input = InputPipe(input, self._setSize)
@@ -380,7 +380,7 @@ class InputIOStream(InputStream):
                     errmsg = unicode(str(err), charset)
                     raise InputStreamError(_("Unable to get size of %s: %s") % (source, errmsg))
         self._input = input
-        InputStream.__init__(self, source, size)
+        InputStream.__init__(self, size=size, **args)
 
     def __current_size(self):
         if self._size:
@@ -413,7 +413,7 @@ class InputIOStream(InputStream):
 
 
 class InputSubStream(InputStream):
-    def __init__(self, stream, offset, size=None, source=None):
+    def __init__(self, stream, offset, size=None, source=None, **args):
         if size is None and stream.size is not None:
             size = stream.size - offset
         if None < size <= 0:
@@ -421,9 +421,8 @@ class InputSubStream(InputStream):
         self.stream = stream
         self._offset = offset
         if source is None:
-            source = "<substream input=%s offset=%s size=%s>" % \
-                (stream.source, offset, size)
-        InputStream.__init__(self, source, size)
+            source = "<substream input=%s offset=%s size=%s>" % (stream.source, offset, size)
+        InputStream.__init__(self, source=source, size=size, **args)
         self.stream.askSize(self)
 
     _current_size = property(lambda self: min(self._size, max(0, self.stream._current_size - self._offset)))
@@ -431,20 +430,23 @@ class InputSubStream(InputStream):
     def read(self, address, size):
         return self.stream.read(self._offset + address, size)
 
-def InputFieldStream(field):
+def InputFieldStream(field, **args):
     if not field.parent:
         return field.stream
     stream = field.parent.stream
-    return InputSubStream(stream, field.absolute_address, field.size, stream.source + field.path)
+    args["size"] = field.size
+    args.setdefault("source", stream.source + field.path)
+    return InputSubStream(stream, field.absolute_address, **args)
 
 
 class FragmentedStream(InputStream):
-    def __init__(self, field, size=None):
+    def __init__(self, field, **args):
         self.stream = field.parent.stream
         data = field.getData()
         self.fragments = [ (0, data.absolute_address, data.size) ]
         self.next = field.next
-        InputStream.__init__(self, self.stream.source + field.path, size)
+        args.setdefault("source", "%s%s" % (self.stream.source, field.path))
+        InputStream.__init__(self, **args)
         if not self.next:
             self._current_size = data.size
             self._setSize()
@@ -509,15 +511,15 @@ class FragmentedStream(InputStream):
 
 class ConcatStream(InputStream):
     # TODO: concatene any number of any type of stream
-    def __init__(self, streams, source=None):
+    def __init__(self, streams, **args):
         if len(streams) > 2 or not streams[0].checked:
             raise NotImplementedError
         self.__size0 = streams[0].size
-        size = streams[1].askSize(self)
-        if size is not None:
-            size += self.__size0
+        size1 = streams[1].askSize(self)
+        if size1 is not None:
+            args["size"] = self.__size0 + size1
         self.__streams = streams
-        InputStream.__init__(self, source, size)
+        InputStream.__init__(self, **args)
 
     _current_size = property(lambda self: self.__size0 + self.__streams[1]._current_size)
 

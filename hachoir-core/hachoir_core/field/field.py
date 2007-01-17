@@ -207,20 +207,20 @@ class Field(object):
         except FieldError:
             return False
 
-    def _createInputStream(self):
+    def _createInputStream(self, **args):
         assert self._parent
-        return InputFieldStream(self)
-    def _getIStreamTags(self):
-        return []
+        return InputFieldStream(self, **args)
     def getSubIStream(self):
         stream = None
         if hasattr(self, "_sub_istream"):
             stream = self._sub_istream()
         if stream is None:
             stream = self._createInputStream()
-            stream.tags[:0] = self._getIStreamTags()
             self._sub_istream = weakref_ref(stream)
         return stream
+    def setSubIStream(self, createInputStream):
+        cis = self._createInputStream
+        self._createInputStream = lambda **args: createInputStream(cis, **args)
 
     def __nonzero__(self):
         """
