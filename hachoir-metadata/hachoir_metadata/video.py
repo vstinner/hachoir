@@ -4,6 +4,7 @@ from hachoir_metadata.metadata import Metadata, MultipleMetadata, registerExtrac
 from hachoir_parser.video import MovFile, AsfFile, FlvFile
 from hachoir_parser.container import MkvFile
 from hachoir_core.i18n import _
+from hachoir_core.tools import makePrintable
 
 class MkvMetadata(MultipleMetadata):
     tag_key = {
@@ -205,7 +206,13 @@ class AsfMetadata(MultipleMetadata):
 
         if "ext_desc/content" in header:
             for desc in header.array("ext_desc/content/descriptor"):
-                self.comment = "%s=%s" % (desc["name"].value, unicode(desc["value"].value))
+                value = desc["value"].value
+                if isinstance(value, str):
+                    value = makePrintable(value, "ISO-8859-1", to_unicode=True)
+                key = desc["name"].value
+                if isinstance(key, str):
+                    key = makePrintable(key, "ISO-8859-1", to_unicode=True)
+                self.comment = "%s=%s" % (key, value)
 
         if "codec_list/content" in header:
             for codec in header.array("codec_list/content/codec"):
