@@ -18,6 +18,7 @@ from hachoir_core.error import HachoirError
 from hachoir_core.stream import InputStreamError
 from hachoir_parser import createParser
 from hachoir_core.compatibility import all
+from locale import setlocale, LC_ALL
 import os
 import sys
 
@@ -375,6 +376,7 @@ def testFiles(directory):
     return True
 
 def main():
+    setlocale(LC_ALL, "C")
     if len(sys.argv) != 2:
         print >>sys.stderr, "usage: %s testcase_directory" % sys.argv[0]
         sys.exit(1)
