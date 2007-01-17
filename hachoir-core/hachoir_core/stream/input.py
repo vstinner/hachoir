@@ -17,21 +17,17 @@ class ReadStreamError(InputStreamError):
         self.size = size
         self.address = address
         self.got = got
-
-    def __str__(self):
-        msg = "Can't read %u bits at address %u" % (self.size, self.address)
         if self.got is not None:
-            msg += " (got %u bits)" % self.got
-        return msg
+            msg = _("Can't read %u bits at address %u (got %u bits)") % (self.size, self.address, self.got)
+        else:
+            msg = _("Can't read %u bits at address %u") % (self.size, self.address)
+        InputStreamError.__init__(self, msg)
 
 class NullStreamError(InputStreamError):
     def __init__(self, source):
         self.source = source
-
-    def __str__(self):
-        return "Input size is nul (source='%s')!" % self.source
-
-
+        msg = _("Input size is nul (source='%s')!") % self.source
+        InputStreamError.__init__(self, msg)
 
 class FileFromInputStream:
     _offset = 0

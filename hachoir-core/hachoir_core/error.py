@@ -32,7 +32,7 @@ class HachoirError(Exception):
     """
     def __init__(self, message):
         if not isinstance(message, unicode):
-            message = unicode(message)
+            message = makePrintable(message, "ISO-8859-1", to_unicode=True)
         self.message = message
 
     def __str__(self):
