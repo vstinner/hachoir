@@ -314,7 +314,6 @@ class XcfFile(Parser):
                 size = None
             padding = self.seekByte(offset, relative=False)
             if padding:
-                raise Exception("padding %s" % padding.size)
                 yield padding
             yield XcfLayer(self, "layer[]", size=size)
 
