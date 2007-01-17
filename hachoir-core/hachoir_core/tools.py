@@ -284,7 +284,7 @@ def makePrintable(data, charset, quote=None, to_unicode=False, smart=True):
 
     if data:
         if not isinstance(data, unicode):
-            data = unicode(data, "latin1")
+            data = unicode(data, "ISO-8859-1")
             charset = "ascii"
         data = regex_control_code.sub(
             lambda regs: controlchars[ord(regs.group(1))], data)
