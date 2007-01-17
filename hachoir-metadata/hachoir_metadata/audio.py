@@ -3,6 +3,7 @@ from hachoir_parser.audio import AuFile, MpegAudioFile, RealAudioFile, AiffFile
 from hachoir_parser.container import OggFile, RealMediaFile
 from hachoir_core.i18n import _
 from hachoir_core.error import warning
+from hachoir_core.tools import makePrintable
 
 class OggMetadata(MultipleMetadata):
     key_to_attr = {
@@ -174,6 +175,8 @@ class MpegAudioMetadata(Metadata):
         tag = field["tag"].value
         if tag not in self.tag_to_key:
             if tag:
+                if isinstance(tag, str):
+                    tag = makePrintable(tag, "ISO-8859-1", to_unicode=True)
                 warning("Skip ID3v2 tag %s: %s" % (tag, value))
             return
         setattr(self, self.tag_to_key[tag], value)

@@ -105,8 +105,10 @@ class MkvMetadata(MultipleMetadata):
         setattr(self, key, value)
 
     def processInfo(self, info):
-        if "Duration/float" in info and "TimecodeScale/unsigned" in info:
-            self.duration = (info["Duration/float"].value * info["TimecodeScale/unsigned"].value) / 1000000
+        if "Duration/float" in info \
+        and "TimecodeScale/unsigned" in info \
+        and 0 < info["Duration/float"].value:
+            self.duration = (info["Duration/float"].value * info["TimecodeScale/unsigned"].value) // 1000000
         if "DateUTC/date" in info:
             self.creation_date = info["DateUTC/date"].display
         if "WritingApp/unicode" in info:
