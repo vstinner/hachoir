@@ -4,6 +4,8 @@ import sys
 import os
 import re
 from stat import S_ISREG, ST_MODE
+import hachoir_core.i18n   # import it because it does change the locale
+from locale import setlocale, LC_ALL
 
 regex_doc_filename = re.compile("^[a-z0-9_-]+\.txt$")
 
@@ -31,6 +33,7 @@ def testModule(name):
     print "--- End of test"
 
 def main():
+    setlocale(LC_ALL, "C")
     hachoir_dir = os.path.dirname(__file__)
     sys.path.append(hachoir_dir)
 
