@@ -62,6 +62,7 @@ int main(int argc, char **argv) {
 
 	int fd;
 	char *p, *name;
+        unsigned int max_count;
 	unsigned char c;
 	unsigned int count, i, off, hsize;
 
@@ -87,7 +88,9 @@ int main(int argc, char **argv) {
 		exit(0);
 	}
 	srand(getseed());
-	count = (unsigned) rand() % (hsize / 10);
+        max_count = (hsize / 100);
+        if (max_count < 4) max_count = 4;
+	count = (unsigned) rand() % max_count;
 	for (i = 0; i < count; i++) {
 		off = rand() % hsize;
 		c = rand() % 256;

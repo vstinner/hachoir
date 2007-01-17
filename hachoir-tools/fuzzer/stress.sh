@@ -1,20 +1,21 @@
 #!/bin/bash
 
 TEST_FILES=/home/haypo/mytestcase/ExifTool/
-TEST_FILES=~/mytestcase
 TEST_FILES=~/waves
 TEST_FILES=~/mytestcase2/Metadata
 TEST_FILES=~/mytestcase2
 TEST_FILES=~/testcase
 GOTCHA=$PWD/error
 MANGLE=$PWD/mangle
-PROG="hachoir-grep --all --quiet"
 MAX_BLOCK=1000
 PROG="hachoir-metadata --quiet"
-MAX_BLOCK=100
+MAX_BLOCK=5000
+PROG="hachoir-grep --all --quiet"
 
 if [ ! -e $MANGLE ]; then
+    echo "compile mangle..."
     gcc mangle.c -o $MANGLE
+    echo "compile mangle... done"
 fi
 
 if [ ! -e $GOTCHA ]; then
@@ -30,25 +31,31 @@ fi
 # Nice
 snice 19
 
+if [ "x$PWD" = "x$TEST_FILES" ]; then
+    echo "ERROR: don't run $0 in $TEST_FILES directory (or your files will be removed)"
+fi
+
+FILE="/tmp/stres-hachoir"
 trap 'rm -f "$FILE" ; exit 0' INT
 
-i=0
+NBERROR=0
 while true
 do
 	while true
 	do
-		FILE=`(cd $TEST_FILES; find . -maxdepth 1 -type f) | perl -ne'rand($.)<=1&&($r=$_);END{print$r}'`
-                FILE=$(basename "$FILE")
-                echo "total: "$(ls $GOTCHA|wc -l)" error -- test file: $FILE"
-		dd if="$TEST_FILES/$FILE" of="$FILE" count=$MAX_BLOCK 2>/dev/null && \
+		#INFILE=`(find $TEST_FILES -maxdepth 1 -type f) | perl -ne'rand($.)<=1&&($r=$_);END{print$r}'`
+		INFILE=`find $HOME/mytestcase -type f -size -50000000 -size +1 | perl -ne'rand($.)<=1&&($r=$_);END{print$r}'`
+                echo "total: $NBERROR error -- test file: "$(basename "$INFILE")
+		dd if="$INFILE" of="$FILE" count=$MAX_BLOCK 2>/dev/null && \
 		$MANGLE "$FILE" $(wc -c "$FILE") && \
 		$PROG "$FILE" 2>&1 > /dev/null \
 		| grep -q Traceback && break
 		rm "$FILE"
 	done
-	((i=$i+1))
+        NBERROR=$(expr $NBERROR + 1)
 	SHA=`sha1sum "$FILE" | awk '{print $1}'`
-	mv "$FILE" "$GOTCHA/$SHA"
-	echo "=> ERROR: $FILE"
+        ERRNAME="$SHA-"$(basename "$INFILE")
+	mv "$FILE" "$GOTCHA/$ERRNAME"
+	echo "=> ERROR: $ERRNAME"
 done
 
