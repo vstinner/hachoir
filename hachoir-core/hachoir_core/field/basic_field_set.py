@@ -60,7 +60,8 @@ class BasicFieldSet(Field):
 
         # Sanity checks (post-conditions)
         assert self.endian in (BIG_ENDIAN, LITTLE_ENDIAN)
-        assert (self._size is None) or (0 < self._size)
+        if (self._size is not None) and (self._size <= 0):
+            raise ParserError("Invalid parser '%s' size: %s" % (self.path, self._size))
 
     def createFields(self):
         raise NotImplementedError()
