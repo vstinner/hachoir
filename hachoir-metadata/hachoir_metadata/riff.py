@@ -93,20 +93,19 @@ class RiffMetadata(MultipleMetadata):
         self.addGroup("video", meta, "Video stream")
 
     def extractAVIAudio(self, audio):
-        if "stream_fmt" not in audio:
-            return None
         meta = Metadata()
         format = audio["stream_fmt"]
         meta.nb_channel = format["channel"].value
         meta.sample_rate = format["sample_rate"].value
-        header = audio["stream_hdr"]
-        if header["rate"].value and header["scale"].value:
-            frame_rate = float(header["rate"].value) / header["scale"].value
-            meta.duration = header["length"].value * 1000 // frame_rate
-        if header["fourcc"].value != "":
-            meta.compression = "%s (fourcc:\"%s\")" \
-                % (format["codec"].display, header["fourcc"].value)
-        else:
+        if "stream_hdr" in audio:
+            header = audio["stream_hdr"]
+            if header["rate"].value and header["scale"].value:
+                frame_rate = float(header["rate"].value) / header["scale"].value
+                meta.duration = header["length"].value * 1000 // frame_rate
+            if header["fourcc"].value != "":
+                meta.compression = "%s (fourcc:\"%s\")" \
+                    % (format["codec"].display, header["fourcc"].value)
+        if not hasattr(meta, "compression"):
             meta.compression = format["codec"].display
         return meta
 
@@ -130,12 +129,14 @@ class RiffMetadata(MultipleMetadata):
                     continue
                 stream_type = stream["stream_hdr/stream_type"].value
                 if stream_type == "vids":
-                    self.extractAVIVideo(stream)
-                    have_video_info = True
+                    if "stream_hdr" in stream:
+                        self.extractAVIVideo(stream)
+                        have_video_info = True
                 elif stream_type == "auds":
-                    meta = self.extractAVIAudio(stream)
-                    self.addGroup("audio[%u]" % audio_index, meta, "Audio stream")
-                    audio_index += 1
+                    if "stream_fmt" in stream:
+                        meta = self.extractAVIAudio(stream)
+                        self.addGroup("audio[%u]" % audio_index, meta, "Audio stream")
+                        audio_index += 1
             if not have_video_info and "avi_hdr" in headers:
                 self.useAviHeader(headers["avi_hdr"])
 
