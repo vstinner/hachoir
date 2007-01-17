@@ -74,8 +74,10 @@ class RiffMetadata(MultipleMetadata):
         meta.compression = "%s (fourcc:\"%s\")" \
             % (header["fourcc"].display, header["fourcc"].value)
         if header["rate"].value and header["scale"].value:
-            meta.frame_rate = float(header["rate"].value) / header["scale"].value
-            self.duration = meta.duration = int(header["length"].value * 1000 // meta.frame_rate[0])
+            fps = float(header["rate"].value) / header["scale"].value
+            meta.frame_rate = fps
+            if 0 < fps:
+                self.duration = meta.duration = int(header["length"].value * 1000 // fps)
 
         if "stream_fmt/width" in video:
             format = video["stream_fmt"]

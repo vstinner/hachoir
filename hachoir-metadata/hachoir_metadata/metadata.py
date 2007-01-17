@@ -9,6 +9,7 @@ from hachoir_core.dict import Dict
 from hachoir_core.i18n import _
 from hachoir_core.error import warning
 from datetime import datetime
+from hachoir_metadata.filter import Filter, NumberFilter
 
 MAX_STR_LENGTH = 80*10
 MAX_SAMPLE_RATE = 192000
@@ -21,31 +22,9 @@ MAX_BITS_PER_PIXEL = 64
 MIN_YEAR = 1900
 MAX_YEAR = 2030
 MAX_FRAME_RATE = 150
+DATETIME_FILTER = Filter(datetime, datetime(MIN_YEAR, 1, 1), datetime(MAX_YEAR, 12, 31))
 
 extractors = {}
-
-class Filter:
-    def __init__(self, valid_types, min=None, max=None):
-        self.types = valid_types
-        self.min = min
-        self.max = max
-
-    def __call__(self, value):
-        if not isinstance(value, self.types):
-            return True
-        if self.min is not None and value < self.min:
-            return False
-        if self.max is not None and self.max < value:
-            return False
-        return True
-
-class NumberFilter(Filter):
-    def __init__(self, min=None, max=None):
-        Filter.__init__(self, (int, long, float), min, max)
-
-class DatetimeFilter(Filter):
-    def __init__(self, min=None, max=None):
-        Filter.__init__(self, datetime, min, max)
 
 class Data:
     def __init__(self, key, priority, description,  handler=None, filter=None):
@@ -114,11 +93,10 @@ class Metadata(object):
 
         self.register("subtitle_author", 400, _("Subtitle author"))
 
-        datetime_filter = DatetimeFilter( datetime(MIN_YEAR, 1, 1), datetime(MAX_YEAR, 12, 31))
         self.register("creation_date", 500, _("Creation date"),
-            filter=datetime_filter)
+            filter=DATETIME_FILTER)
         self.register("last_modification", 501, _("Last modification"),
-            filter=datetime_filter)
+            filter=DATETIME_FILTER)
         self.register("country", 502, _("Country"))
 
         self.register("camera_aperture", 520, _("Camera aperture"))
