@@ -39,7 +39,7 @@ class GzipParser(Parser):
         "min_size": 18*8,
         "magic": (
             # (magic, compression=deflate)
-            ('\x1F\x8B\x01', 0),
+            ('\x1F\x8B\x08', 0),
         ),
         "description": u"gzip archive"
     }
