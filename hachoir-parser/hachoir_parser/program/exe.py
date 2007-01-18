@@ -47,8 +47,8 @@ class MSDosHeader(StaticFieldSet):
             return "Invalid value of checksum"
 #        if not(0 < self["init_ss_sp"].value < 0x4fffffff):
 #            return "Invalid value of init_ss_sp"
-        if 1024 < self["pe_offset"].value:
-            return "Invalid value of pe_offset"
+#        if 1024 < self["pe_offset"].value:
+#            return "Invalid value of pe_offset"
         return ""
 
 class SectionHeader(FieldSet):
