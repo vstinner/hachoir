@@ -12,11 +12,11 @@ Creation date: 2006-08-13
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, StaticFieldSet,
     MatchError,
-    Bit, UInt16, UInt32,
+    Bit, Bits, UInt8, UInt16, UInt32,
     Bytes, String, Enum,
-    PaddingBytes, NullBits)
+    RawBytes, PaddingBytes, NullBytes, NullBits)
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.text_handler import timestampUNIX, hexadecimal
+from hachoir_core.text_handler import timestampUNIX, hexadecimal, humanFilesize
 
 class MSDosHeader(StaticFieldSet):
     format = (
@@ -45,20 +45,142 @@ class MSDosHeader(StaticFieldSet):
             return "Invalid code offset"
         if self["checksum"].value != 0:
             return "Invalid value of checksum"
-        if not(0 < self["init_ss_sp"].value < 0x1fffffff):
-            return "Invalid value of init_ss_sp"
+#        if not(0 < self["init_ss_sp"].value < 0x4fffffff):
+#            return "Invalid value of init_ss_sp"
         if 1024 < self["pe_offset"].value:
             return "Invalid value of pe_offset"
         return ""
+
+class Section(FieldSet):
+    static_size = 40 * 8
+    def createFields(self):
+        yield String(self, "name", 8, charset="ASCII", strip="\0")
+        yield UInt32(self, "mem_size", "Size in memory", text_handler=humanFilesize)
+        yield UInt32(self, "rva", "RVA (location) in memory", text_handler=hexadecimal)
+        yield UInt32(self, "phys_size", "Physical size (on disk)", text_handler=humanFilesize)
+        yield UInt32(self, "phys_off", "Physical location (on disk)", text_handler=humanFilesize)
+        yield PaddingBytes(self, "reserved", 12)
+        if False:
+            yield UInt32(self, "flags", text_handler=hexadecimal)
+        else:
+            # 0x0000000#
+            yield NullBits(self, "reserved[]", 4)
+            # 0x000000#0
+            yield NullBits(self, "reserved[]", 1)
+            yield Bit(self, "has_code", "Contains code")
+            yield Bit(self, "has_init_data", "Contains initialized data")
+            yield Bit(self, "has_uinit_data", "Contains uninitialized data")
+            # 0x00000#00
+            yield NullBits(self, "reserved[]", 1)
+            yield Bit(self, "has_comment", "Contains comments?")
+            yield NullBits(self, "reserved[]", 1)
+            yield Bit(self, "remove", "Contents will not become part of image")
+            # 0x0000#000
+            yield Bit(self, "has_comdata", "Contains comdat?")
+            yield NullBits(self, "reserved[]", 1)
+            yield Bit(self, "no_defer_spec_exc", "Reset speculative exceptions handling bits in the TLB entries")
+            yield Bit(self, "gp_rel", "Content can be accessed relative to GP")
+            # 0x000#0000
+            yield NullBits(self, "reserved[]", 4)
+            # 0x00#00000
+            yield NullBits(self, "reserved[]", 4)
+            # 0x0#000000
+            yield Bit(self, "ext_reloc", "Contains extended relocations?")
+            yield Bit(self, "discarded", "Can be discarded?")
+            yield Bit(self, "is_not_cached", "Is not cachable?")
+            yield Bit(self, "is_not_paged", "Is not pageable?")
+            # 0x#0000000
+            yield Bit(self, "is_shareable", "Is shareable?")
+            yield Bit(self, "is_executable", "Is executable?")
+            yield Bit(self, "is_readable", "Is readable?")
+            yield Bit(self, "is_writable", "Is writable?")
+
+    def createDescription(self):
+        info = [
+            "rva=%s" % self["rva"].display,
+            "size=%s" % self["mem_size"].display]
+        if self["is_executable"].value:
+            info.append("exec")
+        if self["is_readable"].value:
+            info.append("read")
+        if self["is_writable"].value:
+            info.append("write")
+        return 'Section "%s": %s' % (self["name"].value, ", ".join(info))
+
+class DataDirectory(FieldSet):
+    def createFields(self):
+        yield UInt32(self, "rva", "Virtual address", text_handler=hexadecimal)
+        yield UInt32(self, "size", text_handler=humanFilesize)
+
+    def createDescription(self):
+        if self["size"].value:
+            return "Directory at %s (%s)" % (
+                self["rva"].display, self["size"].display)
+        else:
+            return "(empty directory)"
+
+class PE_OptHeader(FieldSet):
+    SUBSYSTEM_NAME = {
+        1: "Native",
+        2: "Windows/GUI",
+        3: "Windows non-GUI",
+        5: "OS/2",
+        7: "POSIX",
+    }
+    DIRECTORY_NAME = {
+        0: "export",
+        1: "import",
+        2: "resource",
+        11: "bound_import",
+    }
+    def createFields(self):
+        yield UInt16(self, "signature", "PE optional header signature (267)")
+        if self["signature"].value != 267:
+            raise ParserError("Invalid PE optional header signature")
+        yield UInt8(self, "maj_lnk_ver", "Major linker version")
+        yield UInt8(self, "min_lnk_ver", "Minor linker version")
+        yield UInt32(self, "size_code", "Size of code", text_handler=humanFilesize)
+        yield UInt32(self, "size_init_data", "Size of initialized data", text_handler=humanFilesize)
+        yield UInt32(self, "size_uninit_data", "Size of uninitialized data", text_handler=humanFilesize)
+        yield UInt32(self, "entry_point", "Address (RVA) of the code entry point", text_handler=hexadecimal)
+        yield UInt32(self, "base_code", "Base (RVA) of code", text_handler=hexadecimal)
+        yield UInt32(self, "base_data", "Base (RVA) of data", text_handler=hexadecimal)
+        yield UInt32(self, "image_base", "Image base (RVA)", text_handler=hexadecimal)
+        yield UInt32(self, "sect_align", "Section alignment", text_handler=humanFilesize)
+        yield UInt32(self, "file_align", "File alignment", text_handler=humanFilesize)
+        yield UInt16(self, "maj_os_ver", "Major OS version")
+        yield UInt16(self, "min_os_ver", "Minor OS version")
+        yield UInt16(self, "maj_img_ver", "Major image version")
+        yield UInt16(self, "min_img_ver", "Minor image version")
+        yield UInt16(self, "maj_subsys_ver", "Major subsystem version")
+        yield UInt16(self, "min_subsys_ver", "Minor subsystem version")
+        yield NullBytes(self, "reserved", 4)
+        yield UInt32(self, "size_img", "Size of image", text_handler=humanFilesize)
+        yield UInt32(self, "size_hdr", "Size of headers", text_handler=humanFilesize)
+        yield UInt32(self, "checksum", text_handler=hexadecimal)
+        yield Enum(UInt16(self, "subsystem"), self.SUBSYSTEM_NAME)
+        yield UInt16(self, "dll_flags")
+        yield UInt32(self, "size_stack_reserve", text_handler=humanFilesize)
+        yield UInt32(self, "size_stack_commit", text_handler=humanFilesize)
+        yield UInt32(self, "size_heap_reserve", text_handler=humanFilesize)
+        yield UInt32(self, "size_heap_commit", text_handler=humanFilesize)
+        yield UInt32(self, "loader_flags")
+        yield UInt32(self, "nb_directory", "Number of RVA and sizes")
+        for index in xrange(self["nb_directory"].value):
+            try:
+                name = self.DIRECTORY_NAME[index]
+            except KeyError:
+                name = "data_dir[%u]" % index
+            yield DataDirectory(self, name)
 
 class PE_Header(FieldSet):
     static_size = 24*8
     cpu_name = {
         0x0184: "Alpha AXP",
         0x01c0: "ARM",
-        0x014C: "Intel 80386 or greater",
-        0x014D: "Intel 80486 or greater",
-        0x014E: "Intel Pentium or greader",
+        0x014C: "Intel 80386",
+        0x014D: "Intel 80486",
+        0x014E: "Intel Pentium",
         0x0200: "Intel IA64",
         0x0268: "Motorolla 68000",
         0x0266: "MIPS",
@@ -84,7 +206,7 @@ class PE_Header(FieldSet):
         if self["header"].value != "PE\0\0":
             raise MatchError("Invalid PE header signature")
         yield Enum(UInt16(self, "cpu", "CPU type"), self.cpu_name)
-        yield UInt16(self, "nb_sections", "Number of sections")
+        yield UInt16(self, "nb_section", "Number of sections")
         yield UInt32(self, "creation_date", "Creation date", text_handler=timestampUNIX)
         yield UInt32(self, "ptr_to_sym", "Pointer to symbol table")
         yield UInt32(self, "nb_symbols", "Number of symbols")
@@ -99,11 +221,11 @@ class PE_Header(FieldSet):
         yield NullBits(self, "reserved", 1)
         yield Bit(self, "reverse_lo", "Little endian: LSB precedes MSB in memory")
         yield Bit(self, "32bit", "Machine based on 32-bit-word architecture")
-        yield Bit(self, "debug_stripped", "Debugging information removed?")
+        yield Bit(self, "is_stripped", "Debugging information removed?")
         yield Bit(self, "swap", "If image is on removable media, copy and run from swap file")
         yield NullBits(self, "reserved2", 1)
-        yield Bit(self, "system", "It's a system file")
-        yield Bit(self, "dll", "It's a dynamic-link library (DLL)")
+        yield Bit(self, "is_system", "It's a system file")
+        yield Bit(self, "is_dll", "It's a dynamic-link library (DLL)")
         yield Bit(self, "up", "File should be run only on a UP machine")
         yield Bit(self, "reverse_hi", "Big endian: MSB precedes LSB in memory")
 
@@ -137,20 +259,45 @@ class ExeFile(Parser):
             if code:
                 yield code
             yield PE_Header(self, "pe_header")
+            size = self["pe_header/opt_hdr_size"].value
+            if size:
+                yield PE_OptHeader(self, "pe_opt_header", size=size*8)
+            for index in xrange(self["pe_header/nb_section"].value):
+                yield Section(self, "section[]")
         else:
             offset = self["msdos/code_offset"].value * 16
             raw = self.seekByte(offset, "raw[]", relative=False)
             if raw:
                 yield raw
-            size = (self.size - self.current_size) // 8
-            yield Bytes(self, "code", size)
+        size = (self.size - self.current_size) // 8
+        if size:
+            yield RawBytes(self, "raw", size)
 
     def isPE(self):
         return "pe_header" in self
 
     def createDescription(self):
         if self.isPE():
-            return "Microsoft Windows Portable Executable: %s" % self["pe_header/cpu"].display
+            if self["pe_header/is_dll"].value:
+                text = "Microsoft Windows DLL"
+            else:
+                text = "Microsoft Windows Portable Executable"
+            info = [self["pe_header/cpu"].display]
+            if "pe_opt_header" in self:
+                hdr = self["pe_opt_header"]
+                info.append(hdr["subsystem"].display)
+            if self["pe_header/is_stripped"].value:
+                info.append("stripped")
+            return "%s: %s" % (text, ", ".join(info))
         else:
             return "MS-DOS executable"
+
+    def createContentSize(self):
+        if self.isPE():
+            size = None
+        else:
+            size = self["msdos/size_mod_512"].value + (self["msdos/size_div_512"].value-1) * 512
+            if size < 0:
+                return None
+        return size*8
 
