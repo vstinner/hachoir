@@ -1,4 +1,4 @@
-from hachoir_core.field import MissingField, Field, Parser as GenericParser
+from hachoir_core.field import Field, Parser as GenericParser
 from hachoir_core.error import HACHOIR_ERRORS, error
 from hachoir_core.tools import makePrintable
 
@@ -78,7 +78,7 @@ class HachoirParser:
         if not hasattr(self, "_content_size"):
             try:
                 self._content_size = self.createContentSize()
-            except MissingField, err:
+            except HACHOIR_ERRORS, err:
                 error("Unable to compute %s content size: %s" % (self.__class__.__name__, err))
                 self._content_size = None
         return self._content_size
