@@ -51,7 +51,7 @@ class MSDosHeader(StaticFieldSet):
             return "Invalid value of pe_offset"
         return ""
 
-class Section(FieldSet):
+class SectionHeader(FieldSet):
     static_size = 40 * 8
     def createFields(self):
         yield String(self, "name", 8, charset="ASCII", strip="\0")
@@ -255,15 +255,41 @@ class ExeFile(Parser):
         if offset \
         and (offset+PE_Header.static_size) <= self.size \
         and self.stream.readBytes(offset, 4) == 'PE\0\0':
+            # Read MS-DOS code
             code = self.seekBit(offset, "msdos_code", relative=False)
             if code:
                 yield code
+
+            # Read PE header
             yield PE_Header(self, "pe_header")
+
+            # Read PE optional header
             size = self["pe_header/opt_hdr_size"].value
             if size:
                 yield PE_OptHeader(self, "pe_opt_header", size=size*8)
+
+            # Read section headers
+            sections = []
             for index in xrange(self["pe_header/nb_section"].value):
-                yield Section(self, "section[]")
+                section = SectionHeader(self, "section_hdr[]")
+                yield section
+                if section["phys_size"].value:
+                    sections.append(section)
+
+            # Read sections
+            sections.sort(key=lambda field: field["phys_off"].value)
+            for section in sections:
+                padding = self.seekByte(section["phys_off"].value, null=True)
+                if padding:
+                    yield padding
+                size = section["phys_size"].value
+                if size:
+                    name = str(section["name"].value.strip("."))
+                    if name:
+                        name = "section_%s" % name
+                    else:
+                        name =  "section[]"
+                    yield RawBytes(self, name, size)
         else:
             offset = self["msdos/code_offset"].value * 16
             raw = self.seekByte(offset, "raw[]", relative=False)
