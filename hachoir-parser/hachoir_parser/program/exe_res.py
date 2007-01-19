@@ -1,3 +1,10 @@
+"""
+Parser for resource of Microsoft Windows Portable Executable (PE).
+
+Author: Victor Stinner
+Creation date: 2007-01-19
+"""
+
 from hachoir_core.field import (FieldSet, RawBytes,
     Bit, Bits, UInt8, UInt16, UInt32, NullBytes, String)
 from hachoir_core.text_handler import timestampUNIX
