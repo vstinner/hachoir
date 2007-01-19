@@ -17,6 +17,7 @@ from hachoir_core.field import (FieldSet, StaticFieldSet,
     RawBytes, PaddingBytes, NullBytes, NullBits)
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.text_handler import timestampUNIX, hexadecimal, humanFilesize
+from hachoir_parser.program.exe_res import Resource
 
 class MSDosHeader(StaticFieldSet):
     format = (
@@ -285,11 +286,15 @@ class ExeFile(Parser):
                 size = section["phys_size"].value
                 if size:
                     name = str(section["name"].value.strip("."))
+                    is_res = name.lower() == "rsrc"
                     if name:
                         name = "section_%s" % name
                     else:
                         name =  "section[]"
-                    yield RawBytes(self, name, size)
+                    if is_res:
+                        yield Resource(self, name, size=size*8)
+                    else:
+                        yield RawBytes(self, name, size)
         else:
             offset = self["msdos/code_offset"].value * 16
             raw = self.seekByte(offset, "raw[]", relative=False)
