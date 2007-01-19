@@ -26,6 +26,12 @@ DATETIME_FILTER = Filter(datetime, datetime(MIN_YEAR, 1, 1), datetime(MAX_YEAR, 
 
 extractors = {}
 
+def formatFrameRate(value):
+    if isinstance(value, (int, long, float)):
+        return _("%.1f fps") % value
+    else:
+        return value
+
 class Data:
     def __init__(self, key, priority, description,  handler=None, filter=None):
         """
@@ -109,7 +115,7 @@ class Metadata(object):
         self.register("compression", 600, _("Compression"))
         self.register("copyright", 601, _("Copyright"))
         self.register("url", 602, _("URL"))
-        self.register("frame_rate", 603, _("Frame rate"),
+        self.register("frame_rate", 603, _("Frame rate"), handler=formatFrameRate,
             filter=NumberFilter(1, MAX_FRAME_RATE))
         self.register("bit_rate", 604, _("Bit rate"), handler=humanBitRate,
             filter=NumberFilter(1))
