@@ -121,19 +121,12 @@ class MarkerBlock(BaseBlock):
     The marker block is actually considered as a fixed byte
     sequence: 0x52 0x61 0x72 0x21 0x1a 0x07 0x00
     """
-
-    magic = "Rar!\x1A\x07\x00"
-
     def createFields(self):
         yield Bits(self, "flags_bits1", 8, "Unused flag bits", text_handler=hexadecimal)
         yield Bit(self, "has_extended_size", "Additional field indicating additional size")
         yield Bit(self, "is_ignorable", "Old versions of RAR should ignore this block when copying data")
         yield Bits(self, "flags_bits2", 6, "Unused flag bits", text_handler=hexadecimal)
         yield UInt16(self, "head_size", "Block size", text_handler=humanFilesize)
-    #def validate(self):
-    #    if self.stream.readBytes(0,7) != magic:
-    #        return "Invalid signature"
-    #    return True
 
 class EndBlock(BaseBlock):
     def createFields(self):
@@ -302,15 +295,15 @@ class BlockHead(FieldSet):
         return "Block entry: %s" % self["type"].display
 
 class RarFile(Parser):
-    MAGIC = MarkerBlock.magic
+    MAGIC = "Rar!\x1A\x07\x00"
     tags = {
         "id": "rar",
         "category": "archive",
         "file_ext": ("rar",),
         "mime": ("application/x-rar-compressed", ),
-        "min_size": 11*8,
+        "min_size": 7*8,
         "magic": ((MAGIC, 0),),
-        "description": "Compressed archive in RAR (Roshal ARchive) format"
+        "description": "Roshal archive (RAR)",
     }
     endian = LITTLE_ENDIAN
 
@@ -323,4 +316,10 @@ class RarFile(Parser):
     def createFields(self):
         while not self.eof:
             yield BlockHead(self, "block[]")
+
+    def createContentSize(self):
+        end = self.stream.searchBytes("\xC4\x3D\x7B\x00\x40\x07\x00", 0)
+        if end is not None:
+            return end + 7*8
+        return None
 
