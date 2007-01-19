@@ -2,13 +2,11 @@
 Functions to display an error (error, warning or information) message.
 """
 
-import hachoir_core.config as config
 from hachoir_core.log import log
 from hachoir_core.tools import makePrintable
-import sys
-import traceback
+import sys, traceback
 
-def getBacktrace():
+def getBacktrace(empty="Empty backtrace."):
     """
     Try to get backtrace as string.
     Returns "Error while trying to get backtrace" on failure.
@@ -19,12 +17,10 @@ def getBacktrace():
         sys.exc_clear()
         if trace[0] != "None\n":
             return "".join(trace)
-        else:
-            # No i18n here (imagine if i18n function calls error...)
-            return "Empty backtrace."
     except:
         # No i18n here (imagine if i18n function calls error...)
         return "Error while trying to get backtrace"
+    return empty
 
 class HachoirError(Exception):
     """
@@ -47,31 +43,6 @@ class HachoirError(Exception):
 HACHOIR_ERRORS = (HachoirError, LookupError, NameError, AttributeError,
     TypeError, ValueError, ArithmeticError, RuntimeError)
 
-def info(message):
-    """
-    Display information message. Skip it in config.quiet is set.
-    """
-    if config.quiet:
-        return
-    if config.verbose:
-        log.info(message)
-
-def warning(message):
-    """
-    Display warning message. Skip it in config.quiet is set.
-    """
-    if config.quiet:
-        return
-    if config.debug:
-        message += "\n\n" + getBacktrace()
-    log.warning(message)
-
-def error(message):
-    """
-    Display error message. If config.quiet or config.set is set, add
-    backtrace to the message
-    """
-    if config.verbose or config.debug:
-        message += "\n\n" + getBacktrace()
-    log.error(message)
-
+info    = log.info
+warning = log.warning
+error   = log.error

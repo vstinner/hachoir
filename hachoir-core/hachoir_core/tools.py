@@ -240,7 +240,7 @@ controlchars = tuple({
 def makePrintable(data, charset, quote=None, to_unicode=False, smart=True):
     r"""
     Prepare a string to make it printable in the specified charset.
-    It escappe control caracters. Caracter with code bigger than 127
+    It escapes control caracters. Caracter with code bigger than 127
     are escapped if: data type is 'str' or if charset is "ASCII".
 
     Examples with Unicode:

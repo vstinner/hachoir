@@ -2,7 +2,7 @@
 from hachoir_core.error import error
 from hachoir_core.cmd_line import (getHachoirOptions,
     configureHachoir, unicodeFilename)
-from hachoir_core.stream import InputStreamError, FileInputStream
+from hachoir_core.stream import InputStreamError, FileInputStream, InputSubStream
 from hachoir_core.i18n import _
 from hachoir_parser import createParser, parseStream, HachoirParserList
 from hachoir_urwid import exploreFieldSet
@@ -88,7 +88,13 @@ def openParser(parser_id, filename, offset, size):
                 error(_("No parser with identifier: %s") % parser_id)
                 sys.exit(1)
             stream = FileInputStream(filename, real_filename=realname)
-            # TODO: Use offset and size
+            # TODO: Shake up hachoir_parser/guess.py
+            if offset or size:
+                if offset:
+                    offset *= 8
+                if size:
+                    size *= 8
+                stream = InputSubStream(stream, offset, size=size)
             return parseStream(parser_cls, stream, False)
         else:
             parser = createParser(filename,

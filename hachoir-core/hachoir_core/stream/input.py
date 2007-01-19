@@ -1,5 +1,6 @@
 from hachoir_core.endian import BIG_ENDIAN, LITTLE_ENDIAN
 from hachoir_core.error import HachoirError, info
+from hachoir_core.log import Logger
 from hachoir_core.bits import str2long
 from hachoir_core.i18n import getTerminalCharset
 from hachoir_core.tools import lowerBound
@@ -117,7 +118,7 @@ class FileFromInputStream:
                         return ''.join(data)
 
 
-class InputStream:
+class InputStream(Logger):
     _set_size = None
     _current_size = 0
 

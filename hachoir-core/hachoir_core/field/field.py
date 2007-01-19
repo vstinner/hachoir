@@ -5,6 +5,7 @@ Parent of all (field) classes in Hachoir: Field.
 from hachoir_core.compatibility import reversed
 from hachoir_core.stream import InputFieldStream
 from hachoir_core.error import HachoirError, HACHOIR_ERRORS, error
+from hachoir_core.log import Logger
 from hachoir_core.tools import makePrintable
 from weakref import ref as weakref_ref
 
@@ -34,7 +35,7 @@ class MissingField(KeyError, FieldError):
     def __unicode__(self):
         return u'Can\'t get field "%s" from %s' % (self.key, self.field.path)
 
-class Field(object):
+class Field(Logger):
     # static size can have two differents value: None (no static size), an
     # integer (number of bits), or a function which returns an integer.
     #
@@ -74,6 +75,9 @@ class Field(object):
         self._address = parent._current_size
         self._size = size
         self._description = description
+
+    def _logger(self):
+        return self.path
 
     def createDescription(self):
         return ""

@@ -1,5 +1,5 @@
 from hachoir_core.i18n import getTerminalCharset
-from hachoir_core.field import MissingField, SubFile
+from hachoir_core.field import Field, MissingField, SubFile
 from hachoir_core.tools import humanFilesize, humanBitSize, makePrintable
 from hachoir_core.log import log as hachoir_log
 from hachoir_core.error import HachoirError, getBacktrace
@@ -8,6 +8,7 @@ from hachoir_core.stream import InputFieldStream
 from hachoir_parser import parseStream, guessParser
 from urwid import AttrWrap, Text, ListBox, CanvasJoin, BoxAdapter, Edit
 from shutil import copyfileobj
+from weakref import WeakKeyDictionary
 import os, urwid.curses_display
 
 def browse_completion(text):
@@ -525,7 +526,23 @@ def exploreFieldSet(field_set, args, options={}):
 
     msgs = [[],[],0]
     hachoir_log.use_print = False
-    hachoir_log.on_new_message = lambda level, prefix, text: msgs[0].append((level, prefix, makePrintable(text, charset, to_unicode=True)))
+    def logger(level, prefix, text, ctxt):
+        if ctxt is not None:
+            c = []
+            if hasattr(ctxt, "_logger"):
+                c[:0] = [ ctxt._logger() ]
+            if issubclass(ctxt.__class__, Field):
+                ctxt = ctxt["/"]
+            name = logger.objects.get(ctxt)
+            if name:
+                c[:0] = [ name ]
+            if c:
+                text = "[%s] %s" % ('|'.join(c), text)
+        if not isinstance(text, unicode):
+            text = unicode(text, charset)
+        msgs[0].append((level, prefix, text))
+    logger.objects = WeakKeyDictionary()
+    hachoir_log.on_new_message = logger
 
     preload_fields = 1 + max(0, args.preload)
 
@@ -534,7 +551,8 @@ def exploreFieldSet(field_set, args, options={}):
     sep.set_info(*tuple(log_count))
     body = Tabbed(sep)
     help = ('help', ListBox([ Text(getHelpMessage()) ]))
-    body.append((u'root', TreeBox(charset, Node(field_set, None), preload_fields, args.path, options)))
+    logger.objects[field_set] = logger.objects[field_set.stream] = name = u'root'
+    body.append((name, TreeBox(charset, Node(field_set, None), preload_fields, args.path, options)))
 
     log = BoxAdapter(ListBox(msgs[1]), 0)
     wrapped_sep = AttrWrap(sep, 'sep')
@@ -585,12 +603,13 @@ def exploreFieldSet(field_set, args, options={}):
                 #    hachoir_log.error(getBacktrace())
                 except NewTab_Stream, e:
                     stream = e.field.getSubIStream()
+                    logger.objects[stream] = e = "%u/%s" % (body.active, e.field.absolute_address)
                     parser = guessParser(stream)
                     if not parser:
                         hachoir_log.error(_("No parser found for %s") % stream.source)
                     else:
-                        body.append(("%u/%s" % (body.active, e.field.absolute_address),
-                            TreeBox(charset, Node(parser, None), preload_fields, options)))
+                        logger.objects[parser] = e
+                        body.append((e, TreeBox(charset, Node(parser, None), preload_fields, options)))
                         resize = log.height
                 except NeedInput, e:
                     input.do(*e.args)

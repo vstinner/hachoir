@@ -1,6 +1,5 @@
-import os
-import sys
-import time
+import os, sys, time
+import hachoir_core.config as config
 from hachoir_core.i18n import _
 
 class Log:
@@ -59,7 +58,7 @@ class Log:
         self.__file.write(u"%s - %s\n" % (timestamp, message))
         self.__file.flush()
 
-    def newMessage(self, level, text):
+    def newMessage(self, level, text, ctxt=None):
         """
         Write a new message : append it in the buffer,
         display it to the screen (if needed), and write
@@ -69,7 +68,21 @@ class Log:
         @type level: C{int}
         @param text: Message content.
         @type text: C{str}
+        @param ctxt: The caller instance.
         """
+
+        if level < self.LOG_ERROR and config.quiet or \
+           level <= self.LOG_INFO and not config.verbose:
+            return
+        if config.debug:
+            from hachoir_core.error import getBacktrace
+            backtrace = getBacktrace(None)
+            if backtrace:
+                text += "\n\n" + backtrace
+
+        _text = text
+        if hasattr(ctxt, "_logger"):
+            text = "[%s] %s" % (ctxt._logger(), text)
 
         # Add message to log buffer
         if self.use_buffer:
@@ -93,7 +106,7 @@ class Log:
 
         # Use callback (if used)
         if self.on_new_message:
-            self.on_new_message (level, prefix, text)
+            self.on_new_message (level, prefix, _text, ctxt)
 
     def info(self, text):
         """
@@ -117,3 +130,13 @@ class Log:
         self.newMessage(Log.LOG_ERROR, text)
 
 log = Log()
+
+class Logger(object):
+    def _logger(self):
+        return "<%s>" % self.__class__.__name__
+    def info(self, text):
+        log.newMessage(Log.LOG_INFO, text, self)
+    def warning(self, text):
+        log.newMessage(Log.LOG_WARN, text, self)
+    def error(self, text):
+        log.newMessage(Log.LOG_ERROR, text, self)

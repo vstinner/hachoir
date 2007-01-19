@@ -123,20 +123,14 @@ def createParser(filename, force_mime=None, offset=None, size=None, real_filenam
     - size (long): maximum size in bytes of the input file ;
     - real_filename (str|unicode): Real file name.
     """
-    # Create input stream
     stream = FileInputStream(filename, real_filename)
     if offset or size:
+        if offset:
+            offset *= 8
         if size:
             size *= 8
-        stream = InputSubStream(stream, 8 * max(0, offset), size=size)
-
-    # Create field set
-    if real_filename:
-        filename = real_filename
-    if offset:
-        filename = None
-    field_set = guessParser(stream, force_mime)
-    return field_set
+        stream = InputSubStream(stream, offset, size=size)
+    return guessParser(stream, force_mime)
 
 def createEditor(filename, force_mime=None, offset=None, size=None):
     """
