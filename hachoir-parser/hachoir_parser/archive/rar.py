@@ -46,30 +46,6 @@ class MSDOSFileAttr(FieldSet):
         yield Bit(self, "encrypted")
         yield NullBits(self, "reserved[]", 1+16)
 
-def MSDOSFileAttr2(n):
-    """
-    Decodes the MSDOS file attribute, as specified by the winddk.h header
-    and its FILE_ATTR_ defines:
-    http://www.cs.colorado.edu/~main/cs1300/include/ddk/winddk.h
-    """
-    n = n.value
-    attr = []
-    if n&0x0001: attr.append("Read-only")
-    if n&0x0002: attr.append("Hidden")
-    if n&0x0004: attr.append("System")
-    if n&0x0010: attr.append("Directory")
-    if n&0x0020: attr.append("Archive")
-    if n&0x0040: attr.append("Device")
-    if n&0x0080: attr.append("Normal")
-    if n&0x0100: attr.append("Temporary")
-    if n&0x0200: attr.append("Sparse file")
-    if n&0x0400: attr.append("Reparse point")
-    if n&0x0800: attr.append("Compressed")
-    if n&0x1000: attr.append("Offline")
-    if n&0x2000: attr.append("Not content indexex")
-    if n&0x4000: attr.append("Encrypted")
-    return ", ".join(attr)
-
 class BaseBlock(FieldSet):
     """
     Base class made for common functions collection, don't use directly
@@ -259,7 +235,6 @@ class FileBlock(BaseBlock):
         yield UInt16(self, "filename_length", "File name size", text_handler=humanFilesize)
         if self["host_os"].value in (0, 2):
             yield MSDOSFileAttr(self, "file_attr", "File attributes")
-#            yield UInt32(self, "file_attr", "File attributes", text_handler=MSDOSFileAttr2)
         else:
             yield UInt32(self, "file_attr", "File attributes", text_handler=hexadecimal)
 
@@ -274,7 +249,6 @@ class FileBlock(BaseBlock):
 
         size = self["filename_length"].value
         if size:
-            # FIXME: Charset of filename?
             yield String(self, "filename", size, "Filename", charset="ISO-8859-15", truncate="\0")
 
         # Raw unused data = difference between header_size and what was parsed
@@ -328,19 +302,21 @@ class BlockHead(FieldSet):
         return "Block entry: %s" % self["type"].display
 
 class RarFile(Parser):
+    MAGIC = MarkerBlock.magic
     tags = {
         "id": "rar",
         "category": "archive",
         "file_ext": ("rar",),
-        "mime": ("application/x-rar-compressed", "application/octet-stream"),
+        "mime": ("application/x-rar-compressed", ),
         "min_size": 11*8,
-        "magic": ((MarkerBlock.magic, 0),),
+        "magic": ((MAGIC, 0),),
         "description": "Compressed archive in RAR (Roshal ARchive) format"
     }
     endian = LITTLE_ENDIAN
 
     def validate(self):
-        if self.stream.readBytes(0, len(MarkerBlock.magic)) != MarkerBlock.magic:
+        magic = self.MAGIC
+        if self.stream.readBytes(0, len(magic)) != magic:
             return "Invalid magic"
         return True
 
@@ -348,15 +324,3 @@ class RarFile(Parser):
         while not self.eof:
             yield BlockHead(self, "block[]")
 
-    def createMimeType(self):
-        if self["file[0]/filename"].value == "mimetype":
-            return self["file[0]/compressed_data"].value
-        else:
-            return "application/rar"
-
-    def createFilenameSuffix(self):
-        if self["file[0]/filename"].value == "mimetype":
-            mime = self["file[0]/compressed_data"].value
-            if mime in self.MIME_TYPES:
-                return "." + self.MIME_TYPES[mime]
-        return ".rar"
