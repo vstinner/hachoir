@@ -146,6 +146,7 @@ Archive
    Unix archive
  * application/x-bzip2: bzip2 archive
  * application/x-gzip: gzip archive
+ * application/x-rar-compressed: Roshal archive (RAR)
  * application/x-rpm: RPM package
  * application/x-tar, application/x-gtar: TAR archive
  * application/zip, application/x-zip, application/vnd.sun.xml.writer,
