@@ -10,18 +10,43 @@ from hachoir_core.field import (FieldSet, ParserError,
     Bit, Bits, Enum,
     UInt8, UInt16, UInt32, UInt64,
     String,
-    NullBits, RawBytes)
+    NullBytes, NullBits, RawBytes)
 from hachoir_core.text_handler import humanFilesize, hexadecimal, timestampMSDOS
 from hachoir_core.endian import LITTLE_ENDIAN
 
-def RarVersion(n):
+def formatRARVersion(field):
     """
     Decodes the RAR version stored on 1 byte
     """
-    n = n.value
-    return "%i.%i" % (n/10,n%10)
+    version = field.value
+    return "%u.%u" % divmod(version, 10)
 
-def MSDOSFileAttr(n):
+class MSDOSFileAttr(FieldSet):
+    """
+    Decodes the MSDOS file attribute, as specified by the winddk.h header
+    and its FILE_ATTR_ defines:
+    http://www.cs.colorado.edu/~main/cs1300/include/ddk/winddk.h
+    """
+    static_size = 32
+    def createFields(self):
+        yield Bit(self, "read_only")
+        yield Bit(self, "hidden")
+        yield Bit(self, "system")
+        yield NullBits(self, "reserved[]", 1)
+        yield Bit(self, "directory")
+        yield Bit(self, "archive")
+        yield Bit(self, "device")
+        yield Bit(self, "normal")
+        yield Bit(self, "temporary")
+        yield Bit(self, "sparse_file")
+        yield Bit(self, "reparse_file")
+        yield Bit(self, "compressed")
+        yield Bit(self, "offline")
+        yield Bit(self, "dont_index_content")
+        yield Bit(self, "encrypted")
+        yield NullBits(self, "reserved[]", 1+16)
+
+def MSDOSFileAttr2(n):
     """
     Decodes the MSDOS file attribute, as specified by the winddk.h header
     and its FILE_ATTR_ defines:
@@ -49,7 +74,7 @@ class BaseBlock(FieldSet):
     """
     Base class made for common functions collection, don't use directly
     """
-    
+
     block_name = {
         0x72: "Marker",
         0x73: "Archive",
@@ -96,7 +121,7 @@ class BaseBlock(FieldSet):
         if size == None: size = self.getBaseSize()-7
         if size>0:
             yield RawBytes(self, name, size, comment)
-        
+
 class DefaultBlock(BaseBlock):
     def createFields(self):
         #self.parseBaseFlags()
@@ -120,7 +145,7 @@ class MarkerBlock(BaseBlock):
     The marker block is actually considered as a fixed byte
     sequence: 0x52 0x61 0x72 0x21 0x1a 0x07 0x00
     """
-    
+
     magic = "Rar!\x1A\x07\x00"
 
     def createFields(self):
@@ -149,7 +174,7 @@ class CommentBlock(BaseBlock):
         yield Bit(self, "has_extended_size", "Additional field indicating additional size")
         yield Bit(self, "is_ignorable", "Old versions of RAR should ignore this block when copying data")
         yield Bits(self, "flags_bits2", 6, "Unused flag bits", text_handler=hexadecimal)
-        
+
         size = UInt16(self, "total_size", "Comment header size + comment size", text_handler=humanFilesize)
         yield size
         size = size.value
@@ -184,30 +209,28 @@ class ArchiveBlock(BaseBlock):
         yield Bit(self, "is_solid", "Whether files can be extracted separately")
         yield Bit(self, "unused", "Unused bit")
         yield Bit(self, "has_authenticity_information", "The integrity/authenticity of the archive can be checked")
-        yield Bits(self, "internal", 10, "Reserved for 'internal use'")
+        yield NullBits(self, "internal", 10, "Reserved for 'internal use'")
         yield UInt16(self, "head_size", "Block size", text_handler=humanFilesize)
-        yield UInt16(self, "reserved1", "Reserved word", text_handler=hexadecimal)
-        yield UInt32(self, "reserved2", "Reserved dword", text_handler=hexadecimal)
+        yield NullBytes(self, "reserved[]", 2, "Reserved word")
+        yield NullBytes(self, "reserved[]", 4, "Reserved dword")
         if self["has_comment"].value==1:
             yield CommentBlock(self, "comment", "Archive compressed comment")
 
 class FileBlock(BaseBlock):
-    dictionary_size = {
-        0: "Dictionary size   64 Kb",
-        1: "Dictionary size  128 Kb",
-        2: "Dictionary size  256 Kb",
-        3: "Dictionary size  512 Kb",
+    DICTIONARY_SIZE = {
+        0: "Dictionary size 64 Kb",
+        1: "Dictionary size 128 Kb",
+        2: "Dictionary size 256 Kb",
+        3: "Dictionary size 512 Kb",
         4: "Dictionary size 1024 Kb",
-        5: "Reserved1",
-        6: "Reserved2",
-        7: "File is a directory"
+        7: "File is a directory",
     }
 
-    host_os = {
+    OS_NAME = {
         0: "MS DOS",
         1: "OS/2",
         2: "Win32",
-        3: "Unix"
+        3: "Unix",
     }
 
     def createFields(self):
@@ -216,7 +239,7 @@ class FileBlock(BaseBlock):
         yield Bit(self, "encrypted", "File encrypted with password")
         yield Bit(self, "has_comment", "File comment present")
         yield Bit(self, "is_solid", "Information from previous files is used (solid flag)")
-        yield Enum(Bits(self, "dictionary_size", 3, "Dictionary size"), self.dictionary_size)
+        yield Enum(Bits(self, "dictionary_size", 3, "Dictionary size"), self.DICTIONARY_SIZE)
         yield Bit(self, "has_extended_size", "Additional field indicating body size")
         yield Bit(self, "is_ignorable", "Old versions of RAR should ignore this block when copying data")
         yield Bit(self, "is_large", "file64 operations needed")
@@ -225,48 +248,41 @@ class FileBlock(BaseBlock):
         yield Bit(self, "uses_file_version", "File versioning is used")
         yield Bit(self, "bexttime", "Extra time ??")
         yield Bit(self, "bextflag", "Extra flag ??")
-        head_size = UInt16(self, "head_size", "File header full size including file name and comments", text_handler=humanFilesize)
-        yield head_size
-        head_size = head_size.value - (2+1+2+2)
-        
+        yield UInt16(self, "head_size", "File header full size including file name and comments", text_handler=humanFilesize)
         yield UInt32(self, "compressed_size", "Compressed size (bytes)", text_handler=humanFilesize)
         yield UInt32(self, "uncompressed_size", "Uncompressed size (bytes)", text_handler=humanFilesize)
-        os = UInt8(self, "host_os", "Operating system used for archiving")
-        yield Enum(os, self.host_os)
-        os = os.value
+        yield Enum(UInt8(self, "host_os", "Operating system used for archiving"), self.OS_NAME)
         yield UInt32(self, "file_crc", "File CRC32", text_handler=hexadecimal)
         yield UInt32(self, "ftime", "Date and time (MS DOS format)", text_handler=timestampMSDOS)
-        yield UInt8(self, "version", "RAR version needed to extract file", text_handler=RarVersion)
+        yield UInt8(self, "version", "RAR version needed to extract file", text_handler=formatRARVersion)
         yield Enum(UInt8(self, "method", "Packing method"), BaseBlock.compression_name)
-        size = UInt16(self, "filename_length", "File name size", text_handler=humanFilesize)
-        yield size
-        size = size.value
-        if os==0 or os==2:
-            yield UInt32(self, "file_attr", "File attributes", text_handler=MSDOSFileAttr)
+        yield UInt16(self, "filename_length", "File name size", text_handler=humanFilesize)
+        if self["host_os"].value in (0, 2):
+            yield MSDOSFileAttr(self, "file_attr", "File attributes")
+#            yield UInt32(self, "file_attr", "File attributes", text_handler=MSDOSFileAttr2)
         else:
-            yield UInt32(self, "attr", "File attributes", text_handler=hexadecimal)
-        head_size -= 4+4+1+4+4+1+1+2+4
-            
+            yield UInt32(self, "file_attr", "File attributes", text_handler=hexadecimal)
+
         if self["is_large"].value:
             yield UInt64(self, "large_size", "Extended 64bits filesize", text_handler=humanFilesize)
-            head_size -= 8
         if self["is_unicode"].value: ParserError("Can't handle unicode filenames.")
         if self["has_salt"].value:
             yield UInt8(self, "salt", "Encryption salt value")
-            head_size -= 1
         if self["bexttime"].value:
             yield UInt16(self, "time_flags", "Flags for extended time", text_handler=hexadecimal)
             # Needs to be decoded more
-            
-        if size > 0:
-            yield String(self, "filename", size, "Filename")
-            head_size -= size
+
+        size = self["filename_length"].value
+        if size:
+            # FIXME: Charset of filename?
+            yield String(self, "filename", size, "Filename", charset="ISO-8859-15", truncate="\0")
 
         # Raw unused data = difference between header_size and what was parsed
-        if head_size > 0:
-            yield RawBytes(self, "extra_data", head_size, "Extra header data")
+        size = self["head_size"].value - (self.current_size//8 + 3)
+        if 0 < size:
+            yield RawBytes(self, "extra_data", size, "Extra header data")
 
-        # File compressed data        
+        # File compressed data
         size = self["compressed_size"].value
         yield RawBytes(self, "compressed_data", size, "File compressed data")
         if self["has_comment"].value:
@@ -274,26 +290,23 @@ class FileBlock(BaseBlock):
 
     def createDescription(self):
         return "File entry: %s (%s)" % \
-            (self["filename"].value, self["compressed_size"].display)
+            (self["filename"].display, self["compressed_size"].display)
+
 
 class BlockHead(FieldSet):
     def createFields(self):
       yield UInt16(self, "crc16", "Block CRC16", text_handler=hexadecimal)
-
-      # Block type
-      type = Enum(UInt8(self, "type", "Block type"), DefaultBlock.block_name)
-      yield type
-      type = type.value
+      yield Enum(UInt8(self, "type", "Block type"), DefaultBlock.block_name)
+      type = self["type"].value
 
       # Parse now block
       if type == 0x72:
-          yield MarkerBlock(self, "marker", "Archive header") 
+          yield MarkerBlock(self, "marker", "Archive header")
       elif type == 0x73:
           yield ArchiveBlock(self, "archive", "Archive info")
       elif type == 0x74:
           yield FileBlock(self, "file[]")
       elif type == 0x75:
-          #raise ParserError("Error, stray comment block.")
           yield CommentBlock(self, "comment", "Comment associated to a previous block")
       elif type == 0x76:
           yield ExtraInfoBlock(self, "extra_info", "Extra information")
@@ -309,11 +322,10 @@ class BlockHead(FieldSet):
       elif type == 0x7B:
           yield EndBlock(self, "end", "End of archive block")
       else:
-          #raise ParserError("Error, unknown block type (0x%02X)." % type)
           yield DefaultBlock(self, "unknown", "Unknown block")
 
     def createDescription(self):
-        return "Block entry %u" % self["crc16"]
+        return "Block entry: %s" % self["type"].display
 
 class RarFile(Parser):
     tags = {
@@ -333,8 +345,6 @@ class RarFile(Parser):
         return True
 
     def createFields(self):
-        self.files = []
-
         while not self.eof:
             yield BlockHead(self, "block[]")
 
