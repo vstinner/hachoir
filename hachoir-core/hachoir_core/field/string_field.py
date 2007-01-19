@@ -83,7 +83,7 @@ class GenericString(Bytes):
     _raw_value = None
 
     def __init__(self, parent, name, format, description=None,
-    strip=None, charset=None, nbytes=None):
+    strip=None, charset=None, nbytes=None, truncate=None):
         Bytes.__init__(self, parent, name, 1, description)
 
         # Is format valid?
@@ -92,6 +92,7 @@ class GenericString(Bytes):
         # Store options
         self._format = format
         self._strip = strip
+        self._truncate = truncate
 
         # Check charset and compute character size in bytes
         # (or None when it's not possible to guess character size)
@@ -221,12 +222,19 @@ class GenericString(Bytes):
                     % (self.path, unicode(err)))
                 self._charset = None
 
-        # Strip string if needed
-        if human and self._strip:
-            if isinstance(self._strip, (str, unicode)):
-                text = text.strip(self._strip)
-            else:
-                text = text.strip()
+        if human:
+            # Truncate
+            if self._truncate:
+                pos = text.find(self._truncate)
+                if 0 <= pos:
+                    text = text[:pos]
+
+            # Strip string if needed
+            if self._strip:
+                if isinstance(self._strip, (str, unicode)):
+                    text = text.strip(self._strip)
+                else:
+                    text = text.strip()
         return text
 
     def createDisplay(self, human=True):
@@ -319,8 +327,8 @@ class String(GenericString):
     static_size = staticmethod(lambda *args, **kw: args[1]*8)
 
     def __init__(self, parent, name, nbytes, description=None,
-    strip=None, charset=None):
+    strip=None, charset=None, truncate=None):
         GenericString.__init__(self, parent, name, "fixed", description,
-            strip=strip, charset=charset, nbytes=nbytes)
+            strip=strip, charset=charset, nbytes=nbytes, truncate=truncate)
 String.__name__ = "FixedString"
 
