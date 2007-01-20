@@ -302,7 +302,7 @@ class ExeFile(Parser):
                 yield raw
         size = (self.size - self.current_size) // 8
         if size:
-            yield RawBytes(self, "raw", size)
+            yield RawBytes(self, "footer", size)
 
     def isPE(self):
         return "pe_header" in self
@@ -331,4 +331,8 @@ class ExeFile(Parser):
             if size < 0:
                 return None
         return size*8
+
+    def rva2file(self, offset):
+        # TODO: Write code
+        return offset-8192
 
