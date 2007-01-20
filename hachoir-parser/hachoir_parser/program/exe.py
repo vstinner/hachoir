@@ -325,7 +325,8 @@ class ExeFile(Parser):
 
     def createContentSize(self):
         if self.isPE():
-            size = None
+            # TODO: Guess PE size
+            return None
         else:
             size = self["msdos/size_mod_512"].value + (self["msdos/size_div_512"].value-1) * 512
             if size < 0:

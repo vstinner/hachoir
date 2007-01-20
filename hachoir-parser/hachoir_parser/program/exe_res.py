@@ -5,37 +5,46 @@ Author: Victor Stinner
 Creation date: 2007-01-19
 """
 
-from hachoir_core.field import (FieldSet, RawBytes,
-    Bit, Bits, UInt8, UInt16, UInt32, NullBytes, String)
+from hachoir_core.field import (FieldSet, Enum,
+    Bit, Bits,
+    UInt8, UInt16, UInt32,
+    RawBytes, NullBytes, String)
 from hachoir_core.text_handler import timestampUNIX, humanFilesize
+from hachoir_core.tools import createDict
+
+RESOURCE_TYPE = {
+    1: ("cursor[]", "Cursor", None),
+    2: ("bitmap[]", "Bitmap", None),
+    3: ("icon[]", "Icon", None),
+    4: ("menu[]", "Menu", None),
+    5: ("dialog[]", "Dialog", None),
+    6: ("string_table[]", "String table", None),
+    7: ("font_dir[]", "Font directory", None),
+    8: ("font[]", "Font", None),
+    9: ("accelerators[]", "Accelerators", None),
+    10: ("raw_res[]", "Unformatted resource data", None),
+    11: ("message_table[]", "Message table", None),
+    12: ("group_cursor[]", "Group cursor", None),
+    14: ("group_icon[]", "Group icon", None),
+    16: ("version_info", "Version information", None),
+}
 
 class Entry(FieldSet):
-    size = 16*8
+    static_size = 16*8
+
+    def __init__(self, parent, name, inode=None):
+        FieldSet.__init__(self, parent, name)
+        self.inode = inode
+
     def createFields(self):
-        yield UInt32(self, "offset")
+        yield UInt32(self, "rva")
         yield UInt32(self, "size", text_handler=humanFilesize)
         yield UInt32(self, "codepage")
         yield NullBytes(self, "reserved", 4)
 
     def createDescription(self):
-        return "Entry: offset=%s size=%s" % (
-            self["offset"].value, self["size"].display)
-
-class ResourceContent(FieldSet):
-    def createFields(self):
-        yield RawBytes(self, "content", size=self.size)
-
-#class Entry(FieldSet):
-#    def createFields(self):
-#        yield UInt8(self, "is_directory", "(boolean: 1 is True, 0 is False)")
-#        yield UInt8(self, "is_named", "Offset points to a name?")
-#        yield UInt16(self, "name_length", "Name length")
-#        yield UInt32(self, "name_off", "Name offset")
-#        if self["is_directory"].value:
-#            desc = "Offset of next level"
-#        else:
-#            desc = "Offset of resource header"
-#        yield UInt32(self, "offset", desc)
+        return "Entry #%u: offset=%s size=%s" % (
+            self.inode["offset"].value, self["rva"].value, self["size"].display)
 
 class NameOffset(FieldSet):
     def createFields(self):
@@ -44,10 +53,49 @@ class NameOffset(FieldSet):
         yield Bit(self, "is_name")
 
 class IndexOffset(FieldSet):
+    TYPE_DESC = createDict(RESOURCE_TYPE, 1)
+
+    def __init__(self, parent, name, res_type=None):
+        FieldSet.__init__(self, parent, name)
+        self.res_type = res_type
+
     def createFields(self):
-        yield UInt32(self, "name")
+        yield Enum(UInt32(self, "type"), self.TYPE_DESC)
         yield Bits(self, "offset", 31)
         yield Bit(self, "is_subdir")
+
+    def createDescription(self):
+        if self["is_subdir"].value:
+            return "Sub-directory: %s at %s" % (self["type"].display, self["offset"].value)
+        else:
+            return "Index: ID %s at %s" % (self["type"].display, self["offset"].value)
+
+class ResourceContent(FieldSet):
+    def __init__(self, parent, name, entry, size=None):
+        FieldSet.__init__(self, parent, name, size=entry["size"].value*8)
+        self.entry = entry
+        res_type = self.getResType()
+        if res_type in RESOURCE_TYPE:
+            self._name, description, self._parser = RESOURCE_TYPE[res_type]
+        else:
+            self._parser = None
+
+    def getResID(self):
+        return self.entry.inode["offset"].value
+
+    def getResType(self):
+        return self.entry.inode.res_type
+
+    def createFields(self):
+        if self._parser:
+            for field in self._parser(self):
+                yield field
+        else:
+            yield RawBytes(self, "content", self.size//8)
+
+    def createDescription(self):
+        return "Resource #%u content: type=%s" % (
+            self.getResID(), self.getResType())
 
 class Header(FieldSet):
     static_size = 16*8
@@ -80,10 +128,11 @@ class Name(FieldSet):
             yield String(self, "name", size, charset="UTF-16LE")
 
 class Directory(FieldSet):
-    def __init__(self, *args):
-        FieldSet.__init__(self, *args)
+    def __init__(self, parent, name, res_type=None):
+        FieldSet.__init__(self, parent, name)
         nb_entries = self["header/nb_name"].value + self["header/nb_index"].value
         self._size = Header.static_size + nb_entries * 64
+        self.res_type = res_type
 
     def createFields(self):
         yield Header(self, "header")
@@ -91,33 +140,37 @@ class Directory(FieldSet):
         for index in xrange(hdr["nb_name"].value):
             yield NameOffset(self, "name[]")
         for index in xrange(hdr["nb_index"].value):
-            yield IndexOffset(self, "index[]")
+            yield IndexOffset(self, "index[]", self.res_type)
 
     def createDescription(self):
         return self["header"].description
 
 class Resource(FieldSet):
-    def parseSub(self, directory, name):
-        subdirs = []
-        for subdir in directory.array("index"):
-            if subdir["is_subdir"].value:
-                subdirs.append(subdir)
+    def parseSub(self, directory, name, depth):
+        indexes = []
+        for index in directory.array("index"):
+            if index["is_subdir"].value:
+                indexes.append(index)
 
-        subdirs.sort(key=lambda subdir: subdir["offset"].value)
-        for subdir in subdirs:
+        indexes.sort(key=lambda index: index["offset"].value)
+        for index in indexes:
             try:
-                padding = self.seekByte(subdir["offset"].value)
+                padding = self.seekByte(index["offset"].value)
             except Exception, err:
-                self.error("ERROR: %s, subdir=%s" % (err, subdir))
+                self.error("ERROR: %s, index=%s" % (err, index))
                 raise
             if padding:
                 yield padding
-            yield Directory(self, name)
+            if depth == 1:
+                res_type = index["type"].value
+            else:
+                res_type = directory.res_type
+            yield Directory(self, name, res_type)
 
     def createFields(self):
         # Parse directories
         depth = 0
-        subdir = Directory(self, "directory[%u]" % depth)
+        subdir = Directory(self, "root")
         yield subdir
         subdirs = [subdir]
         alldirs = [subdir]
@@ -125,7 +178,8 @@ class Resource(FieldSet):
             depth += 1
             newsubdirs = []
             for index, subdir in enumerate(subdirs):
-                for field in self.parseSub(subdir, "directory[%u][%u][]" % (depth, index)):
+                name = "directory[%u][%u][]" % (depth, index)
+                for field in self.parseSub(subdir, name, depth):
                     newsubdirs.append(field)
                     yield field
             subdirs = newsubdirs
@@ -144,18 +198,18 @@ class Resource(FieldSet):
             padding = self.seekByte(resource["offset"].value)
             if padding:
                 yield padding
-            entry = Entry(self, "entry[]")
+            entry = Entry(self, "entry[]", inode=resource)
             yield entry
             entries.append(entry)
-        entries.sort(key=lambda entry: entry["offset"].value)
+        entries.sort(key=lambda entry: entry["rva"].value)
 
         # Parse resource content
         for entry in entries:
-            offset = self.root.rva2file(entry["offset"].value)
+            offset = self.root.rva2file(entry["rva"].value)
             padding = self.seekByte(offset, relative=False, null=True)
             if padding:
                 yield padding
-            yield ResourceContent(self, "content[]", "Content of %s" % entry.path, size=entry["size"].value*8)
+            yield ResourceContent(self, "content[]", entry)
 
         size = (self.size - self.current_size) // 8
         if size:

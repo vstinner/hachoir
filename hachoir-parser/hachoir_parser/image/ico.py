@@ -30,6 +30,8 @@ class IconHeader(FieldSet):
         if self["nb_color"].value == 0:
             if self["bpp"].value in (8, 24, 32) and self["planes"].value == 1:
                 return True
+            if self["planes"].value == 4 and self["bpp"].value == 0:
+                return True
         elif self["nb_color"].value == 16:
             if self["bpp"].value == 4 and self["planes"].value == 1:
                 return True
@@ -63,7 +65,7 @@ class IcoFile(Parser):
     tags = {
         "id": "ico",
         "category": "image",
-        "file_ext": ("ico",),
+        "file_ext": ("ico", "cur"),
         "mime": ["image/x-ico"],
         "min_size": (22 + 40)*8,
         "magic": (
