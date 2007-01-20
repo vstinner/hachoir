@@ -141,7 +141,7 @@ class AdobeChunk(FieldSet):
             yield RawBytes(self, "raw", self.size//8, "Raw data")
             return
         yield String(self, "adobe", 5, "\"Adobe\" string", charset="ASCII")
-        yield UInt16(self, "version", "DCT codec version")
+        yield UInt16(self, "version", "DCT encoder version")
         yield Enum(Bit(self, "flag00"),
             {False: "Chop down- or subsmapling", True: "Blend"})
         yield NullBits(self, "flags0_reserved", 15)
@@ -206,7 +206,7 @@ class JpegChunk(FieldSet):
         0xDD: ("restart_interval", "Define Restart Interval (DRI)", RestartInterval),
         0xE0: ("app0", "APP0", JpegChunkApp0),
         0xED: ("photoshop", "Photoshop", PhotoshopMetadata),
-        0xEE: ("adobe", "Adobe", AdobeChunk),
+        0xEE: ("adobe", "Image encoding information for DCT filters (Adobe)", AdobeChunk),
         0xFE: ("comment[]", "Comment", None),
     }
 
