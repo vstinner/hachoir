@@ -8,14 +8,83 @@ Creation date: 2007-01-19
 from hachoir_core.field import (FieldSet, Enum,
     Bit, Bits,
     UInt8, UInt16, UInt32,
-    RawBytes, NullBytes, String)
+    RawBytes, NullBytes, CString, String)
 from hachoir_core.text_handler import timestampUNIX, humanFilesize
-from hachoir_core.tools import createDict
+from hachoir_core.tools import createDict, paddingSize, alignValue
+from hachoir_parser.common.win32 import BitmapInfoHeader
+
+def parseVersionInfo(parent):
+    yield RawBytes(parent, "xxx[]", 6)
+    yield CString(parent, "xxx[]", 30, charset="UTF-16-LE")
+    yield RawBytes(parent, "xxx[]", 60)
+    yield CString(parent, "xxx[]", charset="UTF-16-LE")
+    yield RawBytes(parent, "xxx[]", 6)
+    yield CString(parent, "xxx[]", charset="UTF-16-LE")
+    yield RawBytes(parent, "xxx[]", 6)
+    yield CString(parent, "xxx[]", charset="UTF-16-LE")
+    yield RawBytes(parent, "xxx[]", 2)
+    yield CString(parent, "xxx[]", charset="UTF-16-LE")
+    yield RawBytes(parent, "xxx[]", 8)
+    yield CString(parent, "xxx[]", charset="UTF-16-LE")
+    yield RawBytes(parent, "xxx[]", 2)
+    yield CString(parent, "xxx[]", charset="UTF-16-LE")
+    size = (parent.size - parent.current_size) // 8
+    if size:
+        yield RawBytes(parent, "raw", size)
+
+class VersionInfoNode(FieldSet):
+    TYPE_STRING = 1
+    TYPE_NAME = {
+        0: "binary",
+        1: "string",
+    }
+
+    def __init__(self, *args):
+        FieldSet.__init__(self, *args)
+        self._size = alignValue(self["size"].value, 4) * 8
+
+    def createFields(self):
+        yield UInt16(self, "size", "Node size (in bytes)")
+        yield UInt16(self, "data_size")
+        yield Enum(UInt16(self, "type"), self.TYPE_NAME)
+        yield CString(self, "name", charset="UTF-16-LE")
+
+        size = paddingSize(self.current_size//8, 4)
+        if size:
+            yield NullBytes(self, "padding[]", size)
+
+        size = self["data_size"].value
+        if size:
+            if self["type"].value == self.TYPE_STRING:
+                yield String(self, "value", size*2, charset="UTF-16-LE", strip="\0")
+            else:
+                yield RawBytes(self, "value", size)
+        while 12 <= (self.size - self.current_size) // 8:
+            yield VersionInfoNode(self, "node[]")
+        size = paddingSize(self.current_size//8, 4)
+        if size:
+            yield NullBytes(self, "padding[]", size)
+
+
+    def createDescription(self):
+        text = "Version info node: %s" % self["name"].value
+        if self["type"].value == self.TYPE_STRING and "value" in self:
+            text += "=%s" % self["value"].value
+        return text
+
+def parseVersionInfo(parent):
+    yield VersionInfoNode(parent, "node[]")
+
+def parseIcon(parent):
+    yield BitmapInfoHeader(parent, "bmp_header")
+    size = (parent.size - parent.current_size) // 8
+    if size:
+        yield RawBytes(parent, "raw", size)
 
 RESOURCE_TYPE = {
     1: ("cursor[]", "Cursor", None),
     2: ("bitmap[]", "Bitmap", None),
-    3: ("icon[]", "Icon", None),
+    3: ("icon[]", "Icon", parseIcon),
     4: ("menu[]", "Menu", None),
     5: ("dialog[]", "Dialog", None),
     6: ("string_table[]", "String table", None),
@@ -26,7 +95,7 @@ RESOURCE_TYPE = {
     11: ("message_table[]", "Message table", None),
     12: ("group_cursor[]", "Group cursor", None),
     14: ("group_icon[]", "Group icon", None),
-    16: ("version_info", "Version information", None),
+    16: ("version_info", "Version information", parseVersionInfo),
 }
 
 class Entry(FieldSet):
