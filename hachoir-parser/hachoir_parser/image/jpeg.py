@@ -1,13 +1,20 @@
 """
 JPEG picture parser.
 
+Information:
+
+- APP14 documents
+  http://partners.adobe.com/public/developer/en/ps/sdk/5116.DCT_Filter.pdf
+  http://java.sun.com/j2se/1.5.0/docs/api/javax/imageio/metadata/doc-files/jpeg_metadata.html#color
+
 Author: Victor Stinner
 """
 
 from hachoir_core.error import HachoirError
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
-    UInt8, UInt16, Enum, Bits,
+    UInt8, UInt16, Enum,
+    Bit, Bits, NullBits, NullBytes,
     String, RawBytes)
 from hachoir_parser.image.common import PaletteRGB
 from hachoir_core.endian import BIG_ENDIAN
@@ -124,6 +131,23 @@ class StartOfFrame(FieldSet):
             yield UInt8(self, "high[]")
             yield UInt8(self, "low[]")
 
+class AdobeChunk(FieldSet):
+    COLORSPACE_TRANSFORMATION = {
+        1: "YCbCr (converted from RGB)",
+        2: "YCCK (converted from CMYK)",
+    }
+    def createFields(self):
+        if self.stream.readBytes(self.absolute_address, 5) != "Adobe":
+            yield RawBytes(self, "raw", self.size//8, "Raw data")
+            return
+        yield String(self, "adobe", 5, "\"Adobe\" string", charset="ASCII")
+        yield UInt16(self, "version", "DCT codec version")
+        yield Enum(Bit(self, "flag00"),
+            {False: "Chop down- or subsmapling", True: "Blend"})
+        yield NullBits(self, "flags0_reserved", 15)
+        yield NullBytes(self, "flags1", 2)
+        yield Enum(UInt8(self, "color_transform", "Colorspace transformation code"), self.COLORSPACE_TRANSFORMATION)
+
 class StartOfScan(FieldSet):
     def createFields(self):
         yield UInt8(self, "nr_components")
@@ -181,7 +205,8 @@ class JpegChunk(FieldSet):
         0xDC: ("nb_line", "Define number of Lines (DNL)", None),
         0xDD: ("restart_interval", "Define Restart Interval (DRI)", RestartInterval),
         0xE0: ("app0", "APP0", JpegChunkApp0),
-        0xED: ("photoshop", "Photoshop marker", PhotoshopMetadata),
+        0xED: ("photoshop", "Photoshop", PhotoshopMetadata),
+        0xEE: ("adobe", "Adobe", AdobeChunk),
         0xFE: ("comment[]", "Comment", None),
     }
 
