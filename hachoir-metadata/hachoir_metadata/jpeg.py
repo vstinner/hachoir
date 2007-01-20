@@ -5,7 +5,7 @@ from hachoir_parser.image.jpeg import (JpegFile,
     QUALITY_HASH_GRAY, QUALITY_SUM_GRAY)
 from hachoir_core.field import MissingField
 from hachoir_core.i18n import _
-from hachoir_core.error import warning, HACHOIR_ERRORS
+from hachoir_core.error import HACHOIR_ERRORS
 import types
 
 class JpegMetadata(Metadata):
@@ -177,7 +177,7 @@ class JpegMetadata(Metadata):
             tag = field["tag"].value
             if tag not in self.iptc_key:
                 if tag != 0:
-                    warning("Skip IPTC key %s: %s" % (tag, value))
+                    self.warning("Skip IPTC key %s: %s" % (tag, value))
                 continue
             setattr(self, self.iptc_key[tag], value)
 

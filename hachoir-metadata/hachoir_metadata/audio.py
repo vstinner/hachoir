@@ -2,7 +2,6 @@ from hachoir_metadata.metadata import Metadata, MultipleMetadata, registerExtrac
 from hachoir_parser.audio import AuFile, MpegAudioFile, RealAudioFile, AiffFile
 from hachoir_parser.container import OggFile, RealMediaFile
 from hachoir_core.i18n import _
-from hachoir_core.error import warning
 from hachoir_core.tools import makePrintable
 
 class OggMetadata(MultipleMetadata):
@@ -69,7 +68,7 @@ class OggMetadata(MultipleMetadata):
                 if key in self.key_to_attr:
                     setattr(self, self.key_to_attr[key], value)
                 elif value:
-                    warning("Skip Ogg comment %s: %s" % (key, value))
+                    self.warning("Skip Ogg comment %s: %s" % (key, value))
 
 class AuMetadata(Metadata):
     def extract(self, audio):
@@ -128,7 +127,7 @@ class RealMediaMetadata(MultipleMetadata):
                     if key in self.key_to_attr:
                         setattr(self, self.key_to_attr[key], value)
                     elif value:
-                        warning("Skip %s: %s" % (prop["name"].value, value))
+                        self.warning("Skip %s: %s" % (prop["name"].value, value))
             else:
                 meta.bit_rate = stream["avg_bit_rate"].value
                 meta.duration = stream["duration"].value
@@ -177,7 +176,7 @@ class MpegAudioMetadata(Metadata):
             if tag:
                 if isinstance(tag, str):
                     tag = makePrintable(tag, "ISO-8859-1", to_unicode=True)
-                warning("Skip ID3v2 tag %s: %s" % (tag, value))
+                self.warning("Skip ID3v2 tag %s: %s" % (tag, value))
             return
         setattr(self, self.tag_to_key[tag], value)
 

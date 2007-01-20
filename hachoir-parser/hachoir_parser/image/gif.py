@@ -10,7 +10,6 @@ from hachoir_core.field import (FieldSet, ParserError,
     Bit, Bits, NullBytes,
     String, PascalString8, Character,
     NullBits, RawBytes)
-from hachoir_core.error import error
 from hachoir_parser.image.common import PaletteRGB
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.text_handler import hexadecimal, humanDuration
@@ -190,7 +189,7 @@ class GifFile(Parser):
                 # GIF Terminator
                 break
             else:
-                error("Wrong GIF image separator: ASCII %02X." % ord(code))
+                self.error("Wrong GIF image separator: ASCII %02X." % ord(code))
                 break
 
     def createContentSize(self):

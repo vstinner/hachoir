@@ -3,7 +3,6 @@
 import wx
 from hex_view import get_page_size
 from stubs import clamp_range, byte_addr, bit_addr, safe_seek, get_page_num, calc_field_mark, get_page_offset
-from hachoir_core.error import warning
 
 MAX_SIZE = 10 * 1024
 

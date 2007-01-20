@@ -29,10 +29,8 @@ from hachoir_core.field import (FieldSet, ParserError,
     UInt8, UInt16, UInt32, Enum,
     Bit, NullBits, NullBytes,
     RawBytes, String, PaddingBytes)
-from hachoir_core.error import error
 from hachoir_core.tools import alignValue, humanFrequency, humanDuration
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.error import warning
 from hachoir_core.text_handler import humanFilesize
 from hachoir_parser.video.fourcc import audio_codec_name, video_fourcc_name
 
@@ -147,7 +145,7 @@ def parseCDDA(self):
 def parseWAVFormat(self):
     size = self["size"].value
     if size not in (16, 18):
-        warning("Format with size of %s bytes is not supported!" % size)
+        self.warning("Format with size of %s bytes is not supported!" % size)
     yield Enum(UInt16(self, "codec", "Audio codec"), audio_codec_name)
     yield UInt16(self, "nb_channel", "Number of audio channel")
     yield UInt32(self, "sample_per_sec", "Sample per second")

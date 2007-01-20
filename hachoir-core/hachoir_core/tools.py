@@ -47,30 +47,6 @@ def alignValue(value, align):
     else:
         return value
 
-def align_nearest(value, mul, dir):
-    """
-    Aligns value to the nearest multiple of mul using dir ("up" or "down")
-    to decide which direction to go in case 2 does not divide mul.
-
-    >>> align_nearest(4,9,'up')
-    9
-    >>> align_nearest(4,9,'down')
-    0
-    >>> align_nearest(20,8,'up')
-    24
-    >>> align_nearest(20,8,'down')
-    24
-    """
-
-    dir_map = {
-        'up' : floor,
-        'down' : ceil
-        }
-
-    q, r = divmod(value, mul)
-    h = int(dir_map[dir](mul / 2.0))
-    return mul * (q + ((r + h) / h) - 1)
-
 def humanDurationNanosec(nsec):
     """
     Convert a duration in nanosecond to human natural representation.

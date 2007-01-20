@@ -82,7 +82,9 @@ class Log:
 
         _text = text
         if hasattr(ctxt, "_logger"):
-            text = "[%s] %s" % (ctxt._logger(), text)
+            _ctxt = ctxt._logger()
+            if _ctxt is not None:
+                text = "[%s] %s" % (_ctxt, text)
 
         # Add message to log buffer
         if self.use_buffer:

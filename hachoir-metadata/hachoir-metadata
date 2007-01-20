@@ -92,7 +92,7 @@ display_filename=False, priority=None, human=True, display=True):
             error(unicode(err))
             metadata = None
         if not metadata:
-            error(_("Hachoir can't extract metadata, but is able to parse: %s") \
+            parser.error(_("Hachoir can't extract metadata, but is able to parse: %s")
                 % filename)
             return False
 

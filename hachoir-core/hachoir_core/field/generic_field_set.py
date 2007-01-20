@@ -1,7 +1,7 @@
 from hachoir_core.field import (BasicFieldSet, Field, ParserError,
     createRawField, createNullField, createPaddingField, FakeArray)
 from hachoir_core.dict import Dict, UniqKeyError
-from hachoir_core.error import error, warning, info, HACHOIR_ERRORS
+from hachoir_core.error import HACHOIR_ERRORS
 from hachoir_core.tools import lowerBound
 import hachoir_core.config as config
 
@@ -152,13 +152,13 @@ class GenericFieldSet(BasicFieldSet):
         May raise a StopIteration() on error
         """
         if config.debug:
-            info("[+] DBG: %s._addField(%s)" % (self.path, field.name))
+            self.info("[+] DBG: _addField(%s)" % field.name)
         assert issubclass(field.__class__, Field)
         assert isinstance(field._name, str)
         if field._name.endswith("[]"):
             self.setUniqueFieldName(field)
         if field._address != self._current_size:
-            error("assertion failed at GenericFieldSet._addField; fixing field._address...")
+            self.error("assertion failed at GenericFieldSet._addField; fixing field._address...")
             field._address = self._current_size
 
         # Compute field size and check that there is enough place for it
@@ -170,7 +170,7 @@ class GenericFieldSet(BasicFieldSet):
                 field._stopFeeding()
                 ask_stop = True
             else:
-                warning("Error when getting size of %s: delete it" % field.path)
+                self.warning("Error when getting size of '%s': delete it" % field.name)
                 raise
         dsize = self._checkSize(field._address + field.size, False)
 
@@ -185,7 +185,7 @@ class GenericFieldSet(BasicFieldSet):
         try:
             self._fields.append(field._name, field)
         except UniqKeyError, err:
-            warning("Duplicate field name %s in %s" % (unicode(err), self.path))
+            self.warning("Duplicate field name " + unicode(err))
             field._name += "[]"
             self.setUniqueFieldName(field)
             self._fields.append(field._name, field)
@@ -193,7 +193,7 @@ class GenericFieldSet(BasicFieldSet):
             raise StopIteration()
 
     def _fixFieldSize(self, field, new_size):
-        warning("[Autofix] Delete %s (too large)" % field.path)
+        self.warning("[Autofix] Delete '%s' (too large)" % field.name)
         if new_size > 0:
             if field.is_field_set and 0 < field.size:
                 field._truncate(new_size)
@@ -225,7 +225,7 @@ class GenericFieldSet(BasicFieldSet):
     def _truncate(self, size):
         assert size > 0
         if size < self._current_size:
-            error("Truncating %s recursively" % self.path)
+            self.error("Truncating recursively")
             self._size = size
             while True:
                 field = self._fields.values[-1]
@@ -282,7 +282,7 @@ class GenericFieldSet(BasicFieldSet):
         else:
             field = None
         message = ", ".join(message)
-        warning("[Autofix] Fix parser error in %s: %s" % (self.path, message))
+        self.warning("[Autofix] Fix parser error: " + message)
         assert self._current_size == self._size
         return field
 
@@ -306,7 +306,7 @@ class GenericFieldSet(BasicFieldSet):
         """
         if self._size is None or not config.autofix:
             return False
-        warning(unicode(exception))
+        self.warning(unicode(exception))
         return self._fixLastField()
 
     def _feedUntil(self, field_name):

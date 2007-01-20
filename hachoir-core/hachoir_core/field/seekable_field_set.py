@@ -1,5 +1,4 @@
 from hachoir_core.field import BasicFieldSet, FakeArray, Field
-from hachoir_core.error import error
 
 class SeekableFieldSet(BasicFieldSet):
     def __init__(self, parent, name, stream, description, size):
@@ -20,7 +19,7 @@ class SeekableFieldSet(BasicFieldSet):
         return FakeArray(self, key)
 
     def seekBit(self, address):
-        error("fieldset(%s).seekBit(%s) from %s" % (self.path, address, self._current_size))
+        self.error("%s.seekBit(%s) from %s" % (self.__class__.__name__, address, self._current_size))
         self._current_size = address
 
     def getFieldByAddress(self, address, feed=True):

@@ -1,6 +1,5 @@
 from hachoir_core.field import Bit, Bits, FieldSet
 from hachoir_core.endian import BIG_ENDIAN, LITTLE_ENDIAN
-from hachoir_core.error import error
 import struct
 
 # Make sure that we use right struct types
@@ -59,7 +58,7 @@ def floatFactory(name, format, mantissa_bits, exponent_bits, doc):
                     else:
                         return value
                 except OverflowError:
-                    error("%s overflow" % self.path)
+                    self.error("overflow")
                     return 0.0
 
         def createFields(self):

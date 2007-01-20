@@ -5,7 +5,7 @@ Parser list managment:
 """
 
 import os
-from hachoir_core.error import error, warning, info, HACHOIR_ERRORS
+from hachoir_core.error import warning, info, HACHOIR_ERRORS
 from hachoir_parser import Parser, HachoirParserList
 from hachoir_core.stream import FileInputStream, InputSubStream
 from hachoir_core.i18n import _

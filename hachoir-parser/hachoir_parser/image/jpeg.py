@@ -14,7 +14,6 @@ from hachoir_core.endian import BIG_ENDIAN
 from hachoir_core.text_handler import hexadecimal
 from hachoir_parser.image.exif import Exif
 from hachoir_parser.image.photoshop_metadata import PhotoshopMetadata
-from hachoir_core.error import warning
 
 # The four tables (hash/sum for color/grayscale JPEG) comes
 # from ImageMagick project
@@ -149,7 +148,7 @@ class QuantizationTable(FieldSet):
         yield Bits(self, "is_16bit", 4)
         yield Bits(self, "index", 4)
         if self["index"].value >= 4:
-            warning("Invalid quantification index (%s)" % self["index"].value)
+            self.warning("Invalid quantification index (%s)" % self["index"].value)
         if self["is_16bit"].value:
             coeff_type = UInt16
         else:

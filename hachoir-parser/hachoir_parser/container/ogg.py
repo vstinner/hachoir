@@ -10,7 +10,6 @@ from hachoir_core.field import (Field, FieldSet,
     UInt8, UInt16, UInt24, UInt32, UInt64,
     RawBytes, String, PascalString32)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
-from hachoir_core.error import warning
 
 class XiphInt(Field):
     """
@@ -138,7 +137,7 @@ class OggPage(FieldSet):
     def createFields(self):
         yield String(self, 'capture_pattern', 4, charset="ASCII")
         if self['capture_pattern'].value != 'OggS':
-            warning('Invalid signature. An Ogg page must start with "OggS".')
+            self.warning('Invalid signature. An Ogg page must start with "OggS".')
         yield UInt8(self, 'stream_structure_version')
         yield Bit(self, 'continued_packet')
         yield Bit(self, 'first_page')

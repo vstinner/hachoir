@@ -7,7 +7,7 @@ from hachoir_core.tools import (
     humanFrequency, humanBitSize)
 from hachoir_core.dict import Dict
 from hachoir_core.i18n import _
-from hachoir_core.error import warning
+from hachoir_core.log import Logger
 from datetime import datetime
 from hachoir_metadata.filter import Filter, NumberFilter
 
@@ -53,7 +53,7 @@ class Data:
     def __cmp__(self, other):
         return cmp(self.priority, other.priority)
 
-class Metadata(object):
+class Metadata(Logger):
     MIN_PRIORITY = 100
     MAX_PRIORITY = 999
     header = u"Metadata"
@@ -127,6 +127,9 @@ class Metadata(object):
         self.register("mime_type", 951, _("MIME type"))
         self.register("endian", 952, _("Endian"))
 
+    def _logger(self):
+        pass
+
     def __setattr__(self, key, value):
         """
         Add a new value to data with name 'key'. Skip duplicates.
@@ -158,7 +161,7 @@ class Metadata(object):
 
         # Use filter
         if data.filter and not data.filter(value):
-            warning("Skip value %s=%r (filter)" % (key, value))
+            self.warning("Skip value %s=%r (filter)" % (key, value))
             return
 
         # For string, if you have "verlongtext" and "verylo",

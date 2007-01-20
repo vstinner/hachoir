@@ -6,7 +6,6 @@ from hachoir_metadata.metadata import Metadata, MultipleMetadata, registerExtrac
 from hachoir_parser.container.riff import RiffFile
 from hachoir_parser.video.fourcc import AUDIO_MICROSOFT_PCM, AUDIO_IEEE_FLOAT32
 from hachoir_core.tools import humanFilesize
-from hachoir_core.error import warning
 from hachoir_core.i18n import _
 
 class RiffMetadata(MultipleMetadata):
@@ -26,7 +25,7 @@ class RiffMetadata(MultipleMetadata):
         value = chunk["text"].value
         tag = chunk["tag"].value
         if tag not in self.tag_to_key:
-            warning("Skip RIFF metadata %s: %s" % (tag, value))
+            self.warning("Skip RIFF metadata %s: %s" % (tag, value))
             return
         key = self.tag_to_key[tag]
         setattr(self, key, value)

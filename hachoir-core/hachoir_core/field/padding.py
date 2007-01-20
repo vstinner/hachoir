@@ -1,5 +1,4 @@
 from hachoir_core.field import Bits, Bytes
-from hachoir_core.error import info, warning
 from hachoir_core.tools import makePrintable, humanFilesize
 from hachoir_core import config
 
@@ -34,12 +33,10 @@ class PaddingBits(Bits):
         else:
             value = self.value
         if value != 0:
-            warning(
-                "Warning: padding %s content doesn't look normal"
-                " (invalid pattern)!" % self.path)
+            self.warning("padding contents doesn't look normal (invalid pattern)")
             return False
         if self.MAX_SIZE < self._size:
-            info("Notice: only check first %u bits of %s" % (self.MAX_SIZE, self.path))
+            self.info("only check first %u bits" % self.MAX_SIZE)
         return True
 
     def createDisplay(self):
@@ -78,8 +75,7 @@ class PaddingBytes(Bytes):
             return False
 
         if self.MAX_SIZE < self._size/8:
-            info("Notice: only check first %s of padding: %s"
-                % (humanFilesize(self.MAX_SIZE), self.path))
+            self.info("only check first %s of padding" % humanFilesize(self.MAX_SIZE))
             content = self._parent.stream.readBytes(
                 self.absolute_address, self.MAX_SIZE)
         else:
@@ -88,10 +84,10 @@ class PaddingBytes(Bytes):
         pattern_len = len(self.pattern)
         while index < len(content):
             if content[index:index+pattern_len] != self.pattern:
-                warning(
-                    "Warning: padding %s content doesn't look normal"
+                self.warning(
+                    "padding contents doesn't look normal"
                     " (invalid pattern at byte %u)!"
-                    % (self.path, index))
+                    % index)
                 return False
             index += pattern_len
         return True

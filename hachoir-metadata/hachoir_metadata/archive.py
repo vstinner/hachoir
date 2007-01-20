@@ -2,7 +2,6 @@ from hachoir_metadata.metadata import (
     Metadata, MultipleMetadata, registerExtractor)
 from hachoir_parser.archive import Bzip2Parser, GzipParser, TarFile, ZipFile
 from hachoir_core.tools import humanFilesize, humanUnixAttributes
-from hachoir_core.error import warning
 from hachoir_core.i18n import _
 
 MAX_NB_FILE = 5
@@ -53,7 +52,7 @@ class ZipMetadata(MultipleMetadata):
     def extract(self, zip):
         for index, field in enumerate(zip.array("file")):
             if MAX_NB_FILE <= index:
-                warning("ZIP archive contains many files, but only first %s files are processed" % MAX_NB_FILE)
+                self.warning("ZIP archive contains many files, but only first %s files are processed" % MAX_NB_FILE)
                 break
             meta = CompressedFileMetadata()
             meta.filename = field["filename"].value
@@ -69,7 +68,7 @@ class TarMetadata(MultipleMetadata):
     def extract(self, tar):
         for index, field in enumerate(tar.array("file")):
             if MAX_NB_FILE <= index:
-                warning("TAR archive contains many files, but only first %s files are processed" % MAX_NB_FILE)
+                self.warning("TAR archive contains many files, but only first %s files are processed" % MAX_NB_FILE)
                 break
             meta = FileMetadata()
             meta.filename = field["name"].value

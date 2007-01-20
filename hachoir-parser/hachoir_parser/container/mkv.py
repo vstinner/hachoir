@@ -12,7 +12,6 @@ from hachoir_core.field import (FieldSet, Link,
     NullBits, Bits, Bit, RawBytes, Bytes,
     Int16, GenericInteger)
 from hachoir_core.endian import BIG_ENDIAN
-from hachoir_core.error import error
 from hachoir_core.iso639 import ISO639_2
 from hachoir_core.tools import humanDatetime
 from hachoir_core.text_handler import hexadecimal
@@ -153,7 +152,7 @@ def CueTrackPositions(parent):
                                 return field
                         except MissingField:
                             pass
-            error('Cue point not found for %s' % parent.path)
+            parent.error('Cue point not found')
             return self
     return Block(parent, 'block')
 

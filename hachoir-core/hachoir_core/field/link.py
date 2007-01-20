@@ -1,6 +1,5 @@
 from hachoir_core.field import Field, FieldSet, Bytes, MissingField
 from hachoir_core.stream import FragmentedStream
-from hachoir_core.error import error
 
 class Link(Field):
     def __init__(self, parent, name, *args):
@@ -32,7 +31,7 @@ class Fragment(FieldSet):
         try:
             return self._getData()
         except MissingField, e:
-            error(str(e))
+            self.error(str(e))
         return None
 
     def _createInputStream(self, **args):

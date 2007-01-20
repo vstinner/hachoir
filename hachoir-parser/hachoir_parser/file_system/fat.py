@@ -237,7 +237,7 @@ class FileEntry(FieldSet):
                 target_size = size.value
                 if self["directory"].value:
                     if target_size:
-                        error("(FAT) %s must be zero" % size.path)
+                        size.error("(FAT) value must be zero")
                         target_size = 0
                 elif not target_size:
                     return

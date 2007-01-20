@@ -16,7 +16,6 @@ Note: For PascalStringXX, prefixed value is the number of bytes and not
 """
 
 from hachoir_core.field import FieldError, Bytes
-from hachoir_core.error import warning
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_core.tools import alignValue, makePrintable
 from hachoir_core.i18n import _
@@ -218,8 +217,7 @@ class GenericString(Bytes):
                 text = unicode(text, self._charset)
             except UnicodeDecodeError, err:
                 # On error, use 'str' type
-                warning("Unable to convert string %s to Unicode: %s"
-                    % (self.path, unicode(err)))
+                self.warning("Unable to convert string to Unicode: " + unicode(err))
                 self._charset = None
 
         if human:

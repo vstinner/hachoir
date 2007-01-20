@@ -18,7 +18,6 @@ from hachoir_core.field import (FieldSet, StaticFieldSet,
     RawBytes)
 from hachoir_core.field.integer import GenericInteger
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.error import warning
 from hachoir_core.tools import humanFilesize
 from hachoir_core.text_handler import hexadecimal
 
@@ -138,7 +137,7 @@ class PartitionHeader(FieldSet):
     def createFields(self):
         yield UInt8(self, "bootable", "Bootable flag (true if equals to 0x80)")
         if self["bootable"].value not in (0x00, 0x80):
-            warning("Stream doesn't look like master boot record (partition bootable error)!")
+            self.warning("Stream doesn't look like master boot record (partition bootable error)!")
         yield UInt8(self, "start_head", "Starting head number of the partition")
         yield GenericInteger(self, "start_sector", False, 6, "Starting sector number of the partition")
         yield CylinderNumber(self, "start_cylinder", "Starting cylinder number of the partition")

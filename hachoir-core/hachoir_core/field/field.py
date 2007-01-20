@@ -4,7 +4,7 @@ Parent of all (field) classes in Hachoir: Field.
 
 from hachoir_core.compatibility import reversed
 from hachoir_core.stream import InputFieldStream
-from hachoir_core.error import HachoirError, HACHOIR_ERRORS, error
+from hachoir_core.error import HachoirError, HACHOIR_ERRORS
 from hachoir_core.log import Logger
 from hachoir_core.tools import makePrintable
 from weakref import ref as weakref_ref
@@ -89,8 +89,7 @@ class Field(Logger):
                     self._description = makePrintable(
                         self._description, "ISO-8859-1", to_unicode=True)
             except HACHOIR_ERRORS, err:
-                error("Error getting description of %s: %s"
-                    % (self.path, unicode(err)))
+                self.error("Error getting description: " + unicode(err))
                 self._description = ""
         return self._description
     description = property(_getDescription,

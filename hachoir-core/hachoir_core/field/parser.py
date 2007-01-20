@@ -1,5 +1,6 @@
 from hachoir_core.endian import BIG_ENDIAN, LITTLE_ENDIAN
 from hachoir_core.field import GenericFieldSet
+from hachoir_core.log import Logger
 
 class Parser(GenericFieldSet):
     """
@@ -23,6 +24,9 @@ class Parser(GenericFieldSet):
 
         # Call parent constructor
         GenericFieldSet.__init__(self, None, "root", stream, description, stream.askSize(self))
+
+    def _logger(self):
+        return Logger._logger(self)
 
     def _setSize(self, size):
         self._truncate(size)
