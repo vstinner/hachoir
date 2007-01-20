@@ -5,17 +5,34 @@ Author: Victor Stinner
 """
 
 from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet, ParserError,
+from hachoir_core.field import (FieldSet, Fragment,
+    ParserError, MissingField,
     UInt8, UInt16, UInt32,
     String, CString,
     Bytes, RawBytes,
     Bit, RawBits,
-    Enum)
+    Enum, CompressedField)
 from hachoir_parser.image.common import RGB
 from hachoir_core.text_handler import hexadecimal
 from hachoir_core.endian import NETWORK_ENDIAN
 from hachoir_core.tools import humanFilesize, humanDatetime
 from datetime import datetime
+
+try:
+    from zlib import decompressobj
+
+    class Gunzip:
+        def __init__(self, stream):
+            self.gzip = decompressobj()
+
+        def __call__(self, size, data=None):
+            if data is None:
+                data = self.gzip.unconsumed_tail
+            return self.gzip.decompress(data, size)
+
+    has_deflate = True
+except ImportError:
+    has_deflate = False
 
 COMPRESSION_NAME = {
     0: "deflate" # with 32K sliding window
@@ -113,6 +130,25 @@ def backgroundColorDesc(parent):
     return "Background color: %s" % name
 
 
+class ImageData(Fragment):
+    def __init__(self, parent, name="compressed_data"):
+        try:
+            first = parent.getField("../data[0]/" + name)
+        except MissingField:
+            first = None
+        Fragment.__init__(self, parent, name, None, 8*parent["size"].value, first)
+        if has_deflate and first is None:
+            CompressedField(self, Gunzip)
+
+    def _createNext(self):
+        parent = self.parent
+        name = parent.name.split('[')
+        try:
+            return parent["../%s[%u]/%s" % (name[0], int(name[1][:-1]) + 1, self.name)]
+        except MissingField:
+            pass
+
+
 class Chunk(FieldSet):
     tag_info = {
         "tIME": ("time", timestampParse, "Timestamp", timestampValue),
@@ -123,7 +159,7 @@ class Chunk(FieldSet):
         "tEXt": ("text[]", textParse, textDescription, None),
 
         "bKGD": ("background", parseBackgroundColor, backgroundColorDesc, None),
-        "IDAT": ("data[]", None, "Image data", None),
+        "IDAT": ("data[]", lambda parent: (ImageData(parent),), "Image data", None),
         "iTXt": ("utf8_text[]", None, "International text (encoded in UTF-8)", None),
         "zTXt": ("comp_text[]", None, "Compressed text", None),
         "IEND": ("end", None, "End", None)
