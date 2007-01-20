@@ -254,9 +254,16 @@ class JpegFile(Parser):
         if self._size is None:
             raise NotImplementedError
 
+        has_end = False
         size = (self._size - self.current_size) // 8
         if size:
+            if 2 < size \
+            and self.stream.readBytes(self._size - 16, 2) == "\xff\xd9":
+                has_end = True
+                size -= 2
             yield RawBytes(self, "data", size, "JPEG data")
+        if has_end:
+            yield JpegChunk(self, "chunk[]")
 
     def createDescription(self):
         desc = "JPEG picture"
