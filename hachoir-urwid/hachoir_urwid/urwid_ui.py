@@ -181,10 +181,10 @@ class Walker:
         elif key == 't': self.flags ^= self.display_type
         elif key == 'v': self.flags ^= self.display_value
         elif key == 'd': self.flags ^= self.display_description
-        elif key == 'f2':
+        elif key in ('ctrl e', 'ctrl x'):
             if self.focus.field.size != 0:
-                raise NeedInput(self.save_field, 'save field to: ',
-                                os.getcwd() + os.sep, browse_completion)
+                raise NeedInput(lambda path: self.save_field(path, key == 'ctrl e'),
+                                'save field to: ', os.getcwd() + os.sep, browse_completion)
         elif key == 'enter':
             pos = self.focus
             if pos.field.is_field_set:
@@ -328,13 +328,18 @@ class Walker:
 #                    pos = next
         return pos
 
-    def save_field(self, path):
+    def save_field(self, path, raw):
         try:
             fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
         except OSError, err:
             hachoir_log.error(unicode(str(err), self.charset))
         else:
-            copyfileobj(InputFieldStream(self.focus.field).file(), os.fdopen(fd, 'w'))
+            field = self.focus.field
+            if raw:
+                stream = InputFieldStream(field)
+            else:
+                stream = field.getSubIStream()
+            copyfileobj(stream.file(), os.fdopen(fd, 'w'))
 
 
 class TreeBox(ListBox):
@@ -501,7 +506,8 @@ def getHelpMessage():
         ("s", _("field set size")),
         ("t", _("field type")),
         ("v", _("field value")),
-        ("F2", _("save field to a file")),
+        ("^E", _("save field to a file")),
+        ("^X", _("create a stream from the selected field and save it to a file")),
         ("enter", _("collapse/expand")),
         ("(page) up/down", _("move (1 page) up/down")),
         ("home", _("move to parent field")),
