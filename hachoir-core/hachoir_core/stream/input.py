@@ -411,6 +411,8 @@ class InputIOStream(InputStream):
 
 class InputSubStream(InputStream):
     def __init__(self, stream, offset, size=None, source=None, **args):
+        if offset is None:
+            offset = 0
         if size is None and stream.size is not None:
             size = stream.size - offset
         if None < size <= 0:
