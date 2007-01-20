@@ -80,10 +80,10 @@ JPEG_NATURAL_ORDER = (
     53, 60, 61, 54, 47, 55, 62, 63)
 
 class JpegChunkApp0(FieldSet):
-    unit_name = {
+    UNIT_NAME = {
         0: "pixels",
         1: "dots per inch",
-        2: "dots per cm"
+        2: "dots per cm",
     }
 
     def createFields(self):
@@ -93,7 +93,7 @@ class JpegChunkApp0(FieldSet):
                 "Stream doesn't look like JPEG chunk (wrong JFIF signature)")
         yield UInt8(self, "ver_maj", "Major version")
         yield UInt8(self, "ver_min", "Minor version")
-        yield Enum(UInt8(self, "units", "Units"), self.unit_name)
+        yield Enum(UInt8(self, "units", "Units"), self.UNIT_NAME)
         if self["units"].value == 0:
             yield UInt16(self, "aspect_x", "Aspect ratio (X)")
             yield UInt16(self, "aspect_y", "Aspect ratio (Y)")
@@ -171,74 +171,47 @@ class JpegChunk(FieldSet):
     TAG_SOS = 0xDA
     TAG_DQT = 0xDB
     TAG_DRI = 0xDD
-    type_description = {
-        0xC0: "Start Of Frame 0 (SOF0)",
-        0xC4: "Define Huffman Table (DHT)",
-        TAG_SOI: "Start of image (SOI)",
-        TAG_EOI: "End of image (EOI)",
-        TAG_SOS: "Start Of Scan (SOS)",
-        TAG_DQT: "Define Quantization Table (DQT)",
-        0xDC: "Define number of Lines (DNL)",
-        0xDD: "Define Restart Interval (DRI)",
-        0xE0: "APP0",
-        0xED: "Photoshop marker",
-        0xFE: "Comment"
-    }
-    type_name = {
-        0xC0: "sof",
-        0xC4: "dht[]",
-        TAG_SOI: "soi",
-        TAG_EOI: "eoi",
-        TAG_SOS: "sos",
-        TAG_DQT: "dqt[]",
-        0xDC: "dnl[]",
-        TAG_DRI: "dri[]",
-        0xE0: "app0",
-        0xED: "psd",
-        0xFE: "comment[]"
-    }
-    handler = {
-        0xE0: JpegChunkApp0,
-        0xC0: StartOfFrame,
-        TAG_SOS: StartOfScan,
-        TAG_DRI: RestartInterval,
-        TAG_DQT: DefineQuantizationTable,
-        0xED: PhotoshopMetadata
+    TAG_INFO = {
+        0xC0: ("start_frame", "Start Of Frame 0 (SOF0)", StartOfFrame),
+        0xC4: ("huffman[]", "Define Huffman Table (DHT)", None),
+        0xD8: ("start_image", "Start of image (SOI)", None),
+        0xD9: ("end_image", "End of image (EOI)", None),
+        0xDA: ("start_scan", "Start Of Scan (SOS)", StartOfScan),
+        0xDB: ("quantization[]", "Define Quantization Table (DQT)", DefineQuantizationTable),
+        0xDC: ("nb_line", "Define number of Lines (DNL)", None),
+        0xDD: ("restart_interval", "Define Restart Interval (DRI)", RestartInterval),
+        0xE0: ("app0", "APP0", JpegChunkApp0),
+        0xED: ("photoshop", "Photoshop marker", PhotoshopMetadata),
+        0xFE: ("comment[]", "Comment", None),
     }
 
     def __init__(self, parent, name, description=None):
         FieldSet.__init__(self, parent, name, description)
         tag = self["type"].value
-        if tag in self.type_name:
-            self._name = self.type_name[tag]
+        if tag in self.TAG_INFO:
+            self._name, self._description, self._parser = self.TAG_INFO[tag]
         elif tag == 0xE1:
             bytes = self.stream.readBytes(self.absolute_address + 32, 6)
             if bytes == "Exif\0\0":
                 self._name = "exif"
                 self._description = "EXIF"
-#            else:
-#                self._name = "adobe_metadata"
-#                self._description = "Adobe Metadata XML"
+            self._parser = Exif
+        else:
+            self._parser = None
 
     def createFields(self):
         yield UInt8(self, "header", "Header", text_handler=hexadecimal)
         if self["header"].value != 0xFF:
             raise ParserError("JPEG: Invalid chunk header!")
-        yield Enum(UInt8(self, "type", "Type", text_handler=hexadecimal), self.type_description)
+        yield UInt8(self, "type", "Type", text_handler=hexadecimal)
         tag = self["type"].value
         if tag in (self.TAG_SOI, self.TAG_EOI):
             return
         yield UInt16(self, "size", "Size")
         size = (self["size"].value - 2)
         if 0 < size:
-            if tag in JpegChunk.handler:
-                handler = JpegChunk.handler[tag]
-            elif self._name == "exif":
-                handler = Exif
-            else:
-                handler = None
-            if handler:
-                yield handler(self, "content", "Chunk content", size=size*8)
+            if self._parser:
+                yield self._parser(self, "content", "Chunk content", size=size*8)
             else:
                 yield RawBytes(self, "data", size, "Data")
 

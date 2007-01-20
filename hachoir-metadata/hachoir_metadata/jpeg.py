@@ -47,8 +47,8 @@ class JpegMetadata(Metadata):
     }
 
     def extract(self, jpeg):
-        if "sof/content" in jpeg:
-            sof = jpeg["sof/content"]
+        if "start_frame/content" in jpeg:
+            sof = jpeg["start_frame/content"]
             self.width = sof["width"].value
             self.height = sof["height"].value
             nb_components = sof["nr_components"].value
@@ -71,8 +71,8 @@ class JpegMetadata(Metadata):
                         self.processIfdEntry(ifd, entry)
                     except HACHOIR_ERRORS:
                         pass
-        if "psd/content" in jpeg:
-            psd = jpeg["psd/content"]
+        if "photoshop/content" in jpeg:
+            psd = jpeg["photoshop/content"]
             if "iptc" in psd:
                 self.parseIPTC(psd["iptc/content"])
         for comment in jpeg.array("comment"):
@@ -85,7 +85,7 @@ class JpegMetadata(Metadata):
 
         # Read quantization tables
         qtlist = []
-        for dqt in jpeg.array("dqt"):
+        for dqt in jpeg.array("quantization"):
             for qt in dqt.array("content/qt"):
                 # TODO: Take care of qt["index"].value?
                 qtlist.append(qt)
