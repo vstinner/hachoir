@@ -150,7 +150,7 @@ class ImageData(Fragment):
 
 
 class Chunk(FieldSet):
-    tag_info = {
+    TAG_INFO = {
         "tIME": ("time", timestampParse, "Timestamp", timestampValue),
         "pHYs": ("physical", physicalParse, physicalDescription, None),
         "IHDR": ("header", headerParse, headerDescription, None),
@@ -177,8 +177,8 @@ class Chunk(FieldSet):
         tag = self["tag"].value
         self.desc_func = None
         self.value_func = None
-        if tag in self.tag_info:
-            self._name, self.parse_func, desc, value_func = self.tag_info[tag]
+        if tag in self.TAG_INFO:
+            self._name, self.parse_func, desc, value_func = self.TAG_INFO[tag]
             if value_func:
                 self.value_func = value_func
                 self.createValue = self.createValueFunc
