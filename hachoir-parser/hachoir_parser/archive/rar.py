@@ -36,6 +36,8 @@ COMPRESSION_NAME = {
     0x35: "Best compression"
 }
 
+OS_MSDOS = 0
+OS_WIN32 = 2
 OS_NAME = {
     0: "MS DOS",
     1: "OS/2",
@@ -192,23 +194,24 @@ def specialHeader(self, is_file):
     yield UInt8(self, "version", "RAR version needed to extract file", text_handler=formatRARVersion)
     yield Enum(UInt8(self, "method", "Packing method"), COMPRESSION_NAME)
     yield UInt16(self, "filename_length", "File name size", text_handler=humanFilesize)
-    if self["host_os"].value in (0, 2):
+    if self["host_os"].value in (OS_MSDOS, OS_WIN32):
         yield MSDOSFileAttr(self, "file_attr", "File attributes")
     else:
         yield UInt32(self, "file_attr", "File attributes", text_handler=hexadecimal)
-    flags = self["flags"]
+
     # Start additional field from unrar
+    flags = self["flags"]
     if flags["is_large"].value:
         val = UInt64(self, "large_size", "Extended 64bits filesize", text_handler=humanFilesize)
+
     # End additional field
     size = self["filename_length"].value
     if size > 0:
         if flags["is_unicode"].value:
-            val = String(self, "utf8_filename", size, "UTF-8 filename", charset="UTF-8")
+            charset = "UTF-8"
         else:
-            val = String(self, "filename", size, "ISO-8859-15 filename", charset="ISO-8859-15")
-        yield val
-        #self._name = val.value.replace(" ", '_').replace('/','\\')
+            charset = "ISO-8859-15"
+        yield String(self, "filename", size, "Filename", charset=charset)
     # Start additional fields from unrar - file only
     if is_file:
         if flags["has_salt"].value:
@@ -281,7 +284,7 @@ class Block(FieldSet):
         0x79: ("signature", "Signature block", None, signatureHeader, None, None),
         0x7A: ("new_sub_block[]", "Stray new-format subblock", fileFlags,
                newSubHeader, fileBody, None),
-        0x7B: ("archive_end", "Archive end block", endFlags, None, None, None)
+        0x7B: ("archive_end", "Archive end block", endFlags, None, None, None),
     }
 
     def __init__(self, parent, name):
