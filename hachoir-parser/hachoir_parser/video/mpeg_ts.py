@@ -27,10 +27,11 @@ class Packet(FieldSet):
         0x0000: "Program Association Table (PAT)",
         0x0001: "Conditional Access Table (CAT)",
         # 0x0002..0x000f: reserved
-
+        # 0x0010..0x1FFE: network PID, program map PID, elementary PID, etc.
         # TODO: Check above values
-        0x0044: "video",
-        0x0045: "audio",
+        #0x0044: "video",
+        #0x0045: "audio",
+        0x1FFF: "Null packet",
     }
 
     def createFields(self):
