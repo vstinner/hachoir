@@ -217,8 +217,7 @@ def specialHeader(self, is_file):
             yield ExtTime(self, "extra_time", "Extra time info")
 
 def fileHeader(self):
-    for field in specialHeader(self, True):
-        yield field
+    return specialHeader(self, True)
 
 def fileBody(self):
     # File compressed data
@@ -242,8 +241,7 @@ def fileDescription(self):
            (self["filename"].display, self["compressed_size"].display)
 
 def newSubHeader(self):
-    for field in specialHeader(self, False):
-        yield field
+    return specialHeader(self, False)
 
 class EndFlags(FieldSet):
     static_size = 16
