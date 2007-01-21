@@ -45,6 +45,15 @@ OS_NAME = {
     3: "Unix",
 }
 
+DICTIONARY_SIZE = {
+    0: "Dictionary size 64 Kb",
+    1: "Dictionary size 128 Kb",
+    2: "Dictionary size 256 Kb",
+    3: "Dictionary size 512 Kb",
+    4: "Dictionary size 1024 Kb",
+    7: "File is a directory",
+}
+
 def formatRARVersion(field):
     """
     Decodes the RAR version stored on 1 byte
@@ -80,22 +89,23 @@ def commonFlags(self):
     yield Bit(self, "has_added_size", "Additional field indicating additional size")
     yield Bit(self, "is_ignorable", "Old versions of RAR should ignore this block when copying data")
 
+class ArchiveFlags(FieldSet):
+    static_size = 16
+    def createFields(self):
+        yield Bit(self, "vol", "Archive volume")
+        yield Bit(self, "has_comment", "Whether there is a comment")
+        yield Bit(self, "is_locked", "Archive volume")
+        yield Bit(self, "is_solid", "Whether files can be extracted separately")
+        yield Bit(self, "new_numbering", "New numbering, or compressed comment") # From unrar
+        yield Bit(self, "has_authenticity_information", "The integrity/authenticity of the archive can be checked")
+        yield Bit(self, "is_protected", "The integrity/authenticity of the archive can be checked")
+        yield Bit(self, "is_passworded", "Needs a password to be decrypted")
+        yield Bit(self, "is_first_vol", "Whether it is the first volume")
+        yield Bit(self, "is_encrypted", "Whether the encryption version is present")
+        yield NullBits(self, "internal", 6, "Reserved for 'internal use'")
+
 def archiveFlags(self):
-    class archive_flags(FieldSet):
-        static_size = 16
-        def createFields(self):
-            yield Bit(self, "vol", "Archive volume")
-            yield Bit(self, "has_comment", "Whether there is a comment")
-            yield Bit(self, "is_locked", "Archive volume")
-            yield Bit(self, "is_solid", "Whether files can be extracted separately")
-            yield Bit(self, "new_numbering", "New numbering, or compressed comment") # From unrar
-            yield Bit(self, "has_authenticity_information", "The integrity/authenticity of the archive can be checked")
-            yield Bit(self, "is_protected", "The integrity/authenticity of the archive can be checked")
-            yield Bit(self, "is_passworded", "Needs a password to be decrypted")
-            yield Bit(self, "is_first_vol", "Whether it is the first volume")
-            yield Bit(self, "is_encrypted", "Whether the encryption version is present")
-            yield NullBits(self, "internal", 6, "Reserved for 'internal use'")
-    yield archive_flags(self, "flags", "Archiver block flags")
+    yield ArchiveFlags(self, "flags", "Archiver block flags")
 
 def archiveHeader(self):
     yield NullBytes(self, "reserved[]", 2, "Reserved word")
@@ -103,10 +113,9 @@ def archiveHeader(self):
 
 def archiveSubBlocks(self):
     count = 0
-    flags = self["flags"]
-    if flags["has_comment"].value:
+    if self["flags/has_comment"].value:
         count += 1
-    if flags["is_protected"].value or flags["is_encrypted"].value:
+    if self["flags/is_protected"].value or self["flags/is_encrypted"].value:
         count += 1
     return count
 
@@ -146,32 +155,26 @@ def avInfoBody(self):
     if size > 0:
         yield RawBytes(self, "av_info_data", size, "AV info")
 
+class FileFlags(FieldSet):
+    static_size = 16
+    def createFields(self):
+        yield Bit(self, "continued_from", "File continued from previous volume")
+        yield Bit(self, "continued_in", "File continued in next volume")
+        yield Bit(self, "is_encrypted", "File encrypted with password")
+        yield Bit(self, "has_comment", "File comment present")
+        yield Bit(self, "is_solid", "Information from previous files is used (solid flag)")
+        yield Enum(Bits(self, "dictionary_size", 3, "Dictionary size"), DICTIONARY_SIZE)
+        for bit in commonFlags(self):
+            yield bit
+        yield Bit(self, "is_large", "file64 operations needed")
+        yield Bit(self, "is_unicode", "Filename also encoded using Unicode")
+        yield Bit(self, "has_salt", "Has salt for encryption")
+        yield Bit(self, "uses_file_version", "File versioning is used")
+        yield Bit(self, "has_ext_time", "Extra time ??")
+        yield Bit(self, "has_ext_flags", "Extra flag ??")
+
 def fileFlags(self):
-    class file_flags(FieldSet):
-        DICTIONARY_SIZE = {
-            0: "Dictionary size 64 Kb",
-            1: "Dictionary size 128 Kb",
-            2: "Dictionary size 256 Kb",
-            3: "Dictionary size 512 Kb",
-            4: "Dictionary size 1024 Kb",
-            7: "File is a directory",
-        }
-        static_size = 16
-        def createFields(self):
-            yield Bit(self, "continued_from", "File continued from previous volume")
-            yield Bit(self, "continued_in", "File continued in next volume")
-            yield Bit(self, "is_encrypted", "File encrypted with password")
-            yield Bit(self, "has_comment", "File comment present")
-            yield Bit(self, "is_solid", "Information from previous files is used (solid flag)")
-            yield Enum(Bits(self, "dictionary_size", 3, "Dictionary size"), self.DICTIONARY_SIZE)
-            for bit in commonFlags(self): yield bit
-            yield Bit(self, "is_large", "file64 operations needed")
-            yield Bit(self, "is_unicode", "Filename also encoded using Unicode")
-            yield Bit(self, "has_salt", "Has salt for encryption")
-            yield Bit(self, "uses_file_version", "File versioning is used")
-            yield Bit(self, "has_ext_time", "Extra time ??")
-            yield Bit(self, "has_ext_flags", "Extra flag ??")
-    yield file_flags(self, "flags", "File block flags")
+    yield FileFlags(self, "flags", "File block flags")
 
 class ExtTime(FieldSet):
     def createFields(self):
@@ -200,23 +203,22 @@ def specialHeader(self, is_file):
         yield UInt32(self, "file_attr", "File attributes", text_handler=hexadecimal)
 
     # Start additional field from unrar
-    flags = self["flags"]
-    if flags["is_large"].value:
-        val = UInt64(self, "large_size", "Extended 64bits filesize", text_handler=humanFilesize)
+    if self["flags/is_large"].value:
+        yield UInt64(self, "large_size", "Extended 64bits filesize", text_handler=humanFilesize)
 
     # End additional field
     size = self["filename_length"].value
     if size > 0:
-        if flags["is_unicode"].value:
+        if self["flags/is_unicode"].value:
             charset = "UTF-8"
         else:
             charset = "ISO-8859-15"
         yield String(self, "filename", size, "Filename", charset=charset)
     # Start additional fields from unrar - file only
     if is_file:
-        if flags["has_salt"].value:
+        if self["flags/has_salt"].value:
             yield UInt8(self, "salt", "Salt", text_handler=hexadecimal)
-        if flags["has_ext_time"].value:
+        if self["flags/has_ext_time"].value:
             yield ExtTime(self, "extra_time", "Extra time info")
 
 def fileHeader(self):
@@ -225,18 +227,16 @@ def fileHeader(self):
 def fileBody(self):
     # File compressed data
     size = self["compressed_size"].value
-    flags = self["flags"]
-    if flags["is_large"].value:
+    if self["flags/is_large"].value:
         size += self["large_size"].value
     if size > 0:
         yield RawBytes(self, "compressed_data", size, "File compressed data")
 
 def fileSubBlocks(self):
     count = 0
-    f1, f2 = self["flags"], self["/archive_start/flags"]
-    if f1["has_comment"].value:  count += 1
-    if f1["is_encrypted"].value: count += 1
-    if f2["is_protected"].value: count += 1
+    if self["flags/has_comment"].value:  count += 1
+    if self["flags/is_encrypted"].value: count += 1
+    if self["/archive_start/flags/is_protected"].value: count += 1
     return count
 
 def fileDescription(self):
@@ -256,6 +256,7 @@ class EndFlags(FieldSet):
         yield Bits(self, "unused[]", 4)
         for bit in commonFlags(self):
             yield bit
+        yield Bits(self, "unused[]", 16 - self.current_size, text_handler=hexadecimal)
 
 def endFlags(self):
     yield EndFlags(self, "flags", "End block flags")
@@ -266,6 +267,7 @@ class BlockFlags(FieldSet):
         yield Bits(self, "unused[]", 8, "Unused flag bits", text_handler=hexadecimal)
         for bit in commonFlags(self):
             yield bit
+        yield Bits(self, "unused[]", 16 - self.current_size, text_handler=hexadecimal)
 
 class Block(FieldSet):
     BLOCK_INFO = {
@@ -337,17 +339,17 @@ class Block(FieldSet):
         yield BlockFlags(self, "flags", "Block header flags")
 
     def parseHeader(self):
-        flags = self["flags"]
-        if "has_added_size" in flags and flags["has_added_size"].value:
-            yield UInt32(self, "added_size", "Supplementary block size", text_handler=humanFilesize)
+        if "has_added_size" in self["flags"] and \
+           self["flags/has_added_size"].value:
+            yield UInt32(self, "added_size", "Supplementary block size", \
+                         text_handler=humanFilesize)
 
     def parseBody(self):
         """
         Parse what is left of the block
         """
         size = self["block_size"].value - (self.current_size//8)
-        flags = self["flags"]
-        if "has_added_size" in flags and flags["has_added_size"].value:
+        if "has_added_size" in self["flags"] and self["flags/has_added_size"].value:
             size += self["added_size"].value
         if size > 0:
             yield RawBytes(self, "body", size, "Body data")
