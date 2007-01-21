@@ -9,7 +9,7 @@ Author: Christophe Gisquet <christophe.gisquet@free.fr>
 
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
-    String, RawBytes, hasValue)
+    String, RawBytes)
 from hachoir_core.text_handler import humanDatetime
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.tools import makePrintable, timestampUNIX, humanFilesize
@@ -100,7 +100,7 @@ class DictionaryItem(FieldSet):
 
         # TODO: Remove this because it's not lazy?
         key = self["key"]
-        if not hasValue(key):
+        if not key.hasValue():
             return
         key = key.value
         if key == "creation date":

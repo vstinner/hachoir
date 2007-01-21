@@ -268,10 +268,8 @@ class BlockFlags(FieldSet):
             yield bit
 
 class Block(FieldSet):
-    """
-    Default means 'use default function instead'
-    """
     BLOCK_INFO = {
+        # None means 'use default function'
         0x72: ("marker", "Archive header", None, None, None, None),
         0x73: ("archive_start", "Archive info", archiveFlags, archiveHeader,
                None, archiveSubBlocks),

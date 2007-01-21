@@ -18,7 +18,7 @@ from hachoir_core.field.padding import (PaddingBits, PaddingBytes,
 # Functions
 from hachoir_core.field.helper import (isString, isInteger,
     createPaddingField, createNullField, createRawField,
-    writeIntoFile, hasValue)
+    writeIntoFile)
 
 # FieldSet classes
 from hachoir_core.field.fake_array import FakeArray

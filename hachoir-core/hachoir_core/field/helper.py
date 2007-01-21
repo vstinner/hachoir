@@ -39,5 +39,3 @@ def writeIntoFile(fieldset, filename):
     output = FileOutputStream(filename)
     fieldset.writeInto(output)
 
-def hasValue(field):
-    return hasattr(field, "createValue")
