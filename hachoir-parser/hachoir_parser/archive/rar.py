@@ -27,6 +27,22 @@ BLOCK_NAME = {
     0x7B: "Archive end",
 }
 
+COMPRESSION_NAME = {
+    0x30: "Storing",
+    0x31: "Fastest compression",
+    0x32: "Fast compression",
+    0x33: "Normal compression",
+    0x34: "Good compression",
+    0x35: "Best compression"
+}
+
+OS_NAME = {
+    0: "MS DOS",
+    1: "OS/2",
+    2: "Win32",
+    3: "Unix",
+}
+
 def formatRARVersion(field):
     """
     Decodes the RAR version stored on 1 byte
@@ -105,16 +121,16 @@ def commentBody(self):
         yield RawBytes(self, "comment_data", size, "Compressed comment data")
 
 def signatureHeader(self):
-    yield UInt32(self, "creation_time", "??", text_handler=timestampMSDOS)
-    yield UInt16(self, "arc_name_size", "??", text_handler=humanFilesize)
-    yield UInt16(self, "user_name_size", "??", text_handler=humanFilesize)
+    yield UInt32(self, "creation_time", text_handler=timestampMSDOS)
+    yield UInt16(self, "arc_name_size", text_handler=humanFilesize)
+    yield UInt16(self, "user_name_size", text_handler=humanFilesize)
 
 def recoveryHeader(self):
-    yield UInt32(self, "total_size", "??", text_handler=humanFilesize)
-    yield UInt8(self, "version", "??", text_handler=hexadecimal)
-    yield UInt16(self, "rec_sectors", "??")
-    yield UInt32(self, "total_blocks", "??")
-    yield RawBytes(self, "mark", 8, "??")
+    yield UInt32(self, "total_size", text_handler=humanFilesize)
+    yield UInt8(self, "version", text_handler=hexadecimal)
+    yield UInt16(self, "rec_sectors")
+    yield UInt32(self, "total_blocks")
+    yield RawBytes(self, "mark", 8)
 
 def avInfoHeader(self):
     yield UInt16(self, "total_size", "Total block size", text_handler=humanFilesize)
@@ -154,34 +170,20 @@ def fileFlags(self):
             yield Bit(self, "has_ext_time", "Extra time ??")
             yield Bit(self, "has_ext_flags", "Extra flag ??")
     yield file_flags(self, "flags", "File block flags")
+
 class ExtTime(FieldSet):
     def createFields(self):
-        flags = UInt16(self, "time_flags", "Flags for extended time", text_handler=hexadecimal)
-        yield flags
-        flags = flags.value
-        for I in xrange(4):
-            rmode = flags >> ((3-I)*4)
+        yield UInt16(self, "time_flags", "Flags for extended time", text_handler=hexadecimal)
+        flags = self["time_flags"].value
+        for index in xrange(4):
+            rmode = flags >> ((3-index)*4)
             if rmode & 8:
-                if I:
+                if index:
                     yield UInt32(self, "dos_time[]", "DOS Time", text_handler=timestampMSDOS)
                 if rmode & 3:
                     yield RawBytes(self, "remainder[]", rmode & 3, "Time remainder")
 
 def specialHeader(self, is_file):
-    COMPRESSION_NAME = {
-        0x30: "Storing",
-        0x31: "Fastest compression",
-        0x32: "Fast compression",
-        0x33: "Normal compression",
-        0x34: "Good compression",
-        0x35: "Best compression"
-    }
-    OS_NAME = {
-        0: "MS DOS",
-        1: "OS/2",
-        2: "Win32",
-        3: "Unix",
-    }
     yield UInt32(self, "compressed_size", "Compressed size (bytes)", text_handler=humanFilesize)
     yield UInt32(self, "uncompressed_size", "Uncompressed size (bytes)", text_handler=humanFilesize)
     yield Enum(UInt8(self, "host_os", "Operating system used for archiving"), OS_NAME)
@@ -215,7 +217,8 @@ def specialHeader(self, is_file):
             yield ExtTime(self, "extra_time", "Extra time info")
 
 def fileHeader(self):
-    return specialHeader(self, True)
+    for field in specialHeader(self, True):
+        yield field
 
 def fileBody(self):
     # File compressed data
@@ -239,23 +242,35 @@ def fileDescription(self):
            (self["filename"].display, self["compressed_size"].display)
 
 def newSubHeader(self):
-    return specialHeader(self, False)
+    for field in specialHeader(self, False):
+        yield field
+
+class EndFlags(FieldSet):
+    static_size = 16
+    def createFields(self):
+        yield Bit(self, "has_next_vol", "Whether there is another next volume")
+        yield Bit(self, "has_data_crc", "Whether a CRC value is present")
+        yield Bit(self, "rev_space")
+        yield Bit(self, "has_vol_number", "Whether the volume number is present")
+        yield Bits(self, "unused[]", 4)
+        for bit in commonFlags(self):
+            yield bit
 
 def endFlags(self):
-    class end_flags(FieldSet):
-        static_size = 16
-        def createFields(self):
-            yield Bit(self, "has_next_vol", "Whether there is another next volume")
-            yield Bit(self, "has_data_crc", "Whether a CRC value is present")
-            yield Bit(self, "rev_space", "??")
-            yield Bit(self, "has_vol_number", "Whether the volume number is present")
-            yield Bits(self, "unused[]", 4, "??")
-            for bit in commonFlags(self):
-                yield bit
-    yield end_flags(self, "flags", "End block flags")
+    yield EndFlags(self, "flags", "End block flags")
+
+class BlockFlags(FieldSet):
+    static_size = 16
+    def createFields(self):
+        yield Bits(self, "unused[]", 8, "Unused flag bits", text_handler=hexadecimal)
+        for bit in commonFlags(self):
+            yield bit
 
 class Block(FieldSet):
-    block_info = {
+    """
+    Default means 'use default function instead'
+    """
+    BLOCK_INFO = {
         0x72: ("marker", "Archive header", None, None, None, None),
         0x73: ("archive_start", "Archive info", archiveFlags, archiveHeader,
                None, archiveSubBlocks),
@@ -273,10 +288,9 @@ class Block(FieldSet):
 
     def __init__(self, parent, name):
         FieldSet.__init__(self, parent, name)
-        #self.info("Members from type...")
         type = self["block_type"].value
-        if type in self.block_info:
-            self._name, desc, parseFlags, parseHeader, parseBody, countSubBlocks = self.block_info[type]
+        if type in self.BLOCK_INFO:
+            self._name, desc, parseFlags, parseHeader, parseBody, countSubBlocks = self.BLOCK_INFO[type]
             if callable(desc):
                 self.createDescription = lambda: desc(self)
             elif desc:
@@ -319,18 +333,15 @@ class Block(FieldSet):
 
     def createDescription(self):
         return "Block entry: %s" % self["type"].display
+
     def parseFlags(self):
-        class flags(FieldSet):
-            static_size = 16
-            def createFields(self):
-                yield Bits(self, "unused[]", 8, "Unused flag bits", text_handler=hexadecimal)
-                for bit in commonFlags(self):
-                    yield bit
-        yield flags(self, "flags", "Block header flags")
+        yield BlockFlags(self, "flags", "Block header flags")
+
     def parseHeader(self):
         flags = self["flags"]
         if "has_added_size" in flags and flags["has_added_size"].value:
             yield UInt32(self, "added_size", "Supplementary block size", text_handler=humanFilesize)
+
     def parseBody(self):
         """
         Parse what is left of the block
@@ -341,6 +352,7 @@ class Block(FieldSet):
             size += self["added_size"].value
         if size > 0:
             yield RawBytes(self, "body", size, "Body data")
+
     def countSubBlocks(self):
         return 0
 
