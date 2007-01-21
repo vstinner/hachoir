@@ -9,42 +9,47 @@ Author: Christophe Gisquet <christophe.gisquet@free.fr>
 
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
-    String, RawBytes)
-from hachoir_core.text_handler import (humanFilesize,
-    humanDatetime, doTimestampUNIX)
+    String, RawBytes, hasValue)
+from hachoir_core.text_handler import humanDatetime
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.tools import makePrintable
+from hachoir_core.tools import makePrintable, timestampUNIX, humanFilesize
 
 # Maximum number of bytes for string length
 MAX_STRING_LENGTH = 6   # length in 0..999999
 
 # Maximum number of bytes for integer value
-MAX_INTEGER_SIZE = 11    # value in -9999999999..99999999999
+MAX_INTEGER_SIZE = 21    # 21 decimal digits (or "-" sign and 20 digits)
 
-TAGS = {
-    # Means start of a byte string...
-    '1': "String",
-    '2': "String",
-    '3': "String",
-    '4': "String",
-    '5': "String",
-    '6': "String",
-    '7': "String",
-    '8': "String",
-    '9': "String",
-    'd': "Dictionary",
-    'i': "Integer",
-    'l': "List",
-}
+class Integer(FieldSet):
+    # i<integer encoded in base ten ASCII>e
+    def createFields(self):
+        yield String(self, "start", 1, "Integer start delimiter (i)", charset="ASCII")
 
-class Entry(FieldSet):
-    def parseString(self):
+        # Find integer end
+        addr = self.absolute_address+self.current_size
+        len = self.stream.searchBytesLength('e', False, addr, addr+(MAX_INTEGER_SIZE+1)*8)
+        if len is None:
+            raise ParserError("Torrent: Unable to find integer end delimiter (e)!")
+        if not len:
+            raise ParserError("Torrent: error, empty integer!")
+
+        yield String(self, "value", len, "Integer value", charset="ASCII")
+        yield String(self, "end", 1, "Integer end delimiter")
+
+    def createValue(self):
+        """Read integer value (may raise ValueError)"""
+        return int(self["value"].value)
+
+class TorrentString(FieldSet):
+    # <string length encoded in base ten ASCII>:<string data>
+
+    def createFields(self):
         addr = self.absolute_address
-#        self._name = "string[]"
-        # <string length encoded in base ten ASCII>:<string data>
         len = self.stream.searchBytesLength(':', False, addr, addr+(MAX_STRING_LENGTH+1)*8)
         if len is None:
             raise ParserError("Torrent: unable to find string separator (':')")
+        if not len:
+            raise ParserError("Torrent: error: no string length!")
         val = String(self, "length", len, "String length")
         yield val
         try:
@@ -57,91 +62,79 @@ class Entry(FieldSet):
         if not len:
             self.info("Empty string: len=%i" % len)
             return
-        if len<512: # Probably raw data
-            val = String(self, "value", len, "String value")
-            yield val
-            self.info("String '%s': len=%i" % (val.value, len))
-#            self._name = val.value.replace(" ", "_").replace("/", "_")
+        if len<512:
+            yield String(self, "value", len, "String value")
         else:
+            # Probably raw data
             yield RawBytes(self, "value", len, "Raw data")
-            self.info("Raw data: len=%i" % len)
-#            self._name = "raw_data"
 
-    def parseDictionary(self):
-        self._name = "dictionary[]"
-        # d<bencoded string><bencoded element>e
+    def createValue(self):
+        if "value" in self:
+            field = self["value"]
+            if field.__class__ != RawBytes:
+                return field.value
+            else:
+                return "raw_data"
+        else:
+            return None
+
+class Dictionary(FieldSet):
+    # d<bencoded string><bencoded element>e
+    def createFields(self):
         yield String(self, "start", 1, "Dictionary start delimiter (d)", charset="ASCII")
         while self.stream.readBytes(self.absolute_address+self.current_size, 1) != "e":
             yield DictionaryItem(self, "item[]")
         yield String(self, "end", 1, "Dictionary end delimiter")
 
-    def parseInteger(self):
-        # i<integer encoded in base ten ASCII>e
-        yield String(self, "start", 1, "Integer start delimiter (i)", charset="ASCII")
-        addr = self.absolute_address+self.current_size
-        len = self.stream.searchBytesLength('e', False, addr, addr+(MAX_INTEGER_SIZE+1)*8)
-        if len is None:
-            raise ParserError("Torrent: Unable to find integer end delimiter (e)!")
-        if not len:
-            raise ParserError("Torrent: error, empty integer!")
-        val = String(self, "value", len, "Integer value", charset="ASCII")
-        yield val
-        self.info("%i" % int(val.value))
-        yield String(self, "end", 1, "Integer end delimiter")
-
-    def parseList(self):
-        # l<bencoded values>e
-        self._name = "list[]"
+class List(FieldSet):
+    # l<bencoded values>e
+    def createFields(self):
         yield String(self, "start", 1, "List start delimiter")
         while self.stream.readBytes(self.absolute_address+self.current_size, 1) != "e":
-            yield Entry(self, "element[]")
+            yield Entry(self, "item[]")
         yield String(self, "end", 1, "List end delimiter")
 
-    def createFields(self):
-        type = self.stream.readBytes(self.absolute_address, 1)
-        name = TAGS.get(type, None)
-        if name == "String":
-            for field in self.parseString():
-                yield field
-        elif name == "Dictionary":
-            for field in self.parseDictionary():
-                yield field
-        elif name == "Integer":
-            for field in self.parseInteger():
-                yield field
-        elif name == "List":
-            for field in self.parseList():
-                yield field
-        else:
-            raise ParserError("Torrent: Entry of type %r not handled" % type)
+class DictionaryItem(FieldSet):
+    def __init__(self, *args):
+        FieldSet.__init__(self, *args)
 
-class DictionaryItem(Entry):
+        # TODO: Remove this because it's not lazy?
+        key = self["key"]
+        if not hasValue(key):
+            return
+        key = key.value
+        if key == "creation date":
+            self.createValue = self.createTimestampValue
+        elif key == "length":
+            self.createValue = self.createFilesizeValue
+
+    def createFields(self):
+        yield Entry(self, "key")
+        yield Entry(self, "value")
+
     def createDescription(self):
-        #return "%s=%s" % (self["key"].value, self["value"].display)
-        key = self[0]
-        if "value" in key:
-            key = key["value"].value
-        else:
-            key = key.path
-        value = self[1]
-        if "value" in value:
-            return "%s=%s" % (key, value["value"].value)
-        else:
-            return key
+        return self["key"].value
 
-    def createFields(self):
-        input = Entry(self, "key")
-        yield input
-        output = Entry(self, "value")
-        yield output
+    def createTimestampValue(self):
+        timestamp = timestampUNIX(self["value"].value)
+        return humanDatetime(timestamp)
 
-        # Postprocess names
-        if input._name == "creation_date":
-            timestamp = doTimestampUNIX(int(output._name))
-            output._name = humanDatetime(timestamp).replace(" ", "_")
-        #if input._name == "length":
-        #    output._name = humanFilesize(output._name)
-        #self.info("%s => %s" % (input._name, output._name))
+    def createFilesizeValue(self):
+        return humanFilesize(self["value"].value)
+
+# Map first chunk byte => type
+TAGS = {'d': Dictionary, 'i': Integer, 'l': List}
+for index in xrange(1, 9+1):
+    TAGS[str(index)] = TorrentString
+
+# Create an entry
+def Entry(parent, name):
+    addr = parent.absolute_address + parent.current_size
+    tag = parent.stream.readBytes(addr, 1)
+    if tag not in TAGS:
+        raise ParserError("Torrent: Entry of type %r not handled" % type)
+    cls = TAGS[tag]
+    return cls(parent, name)
 
 class TorrentFile(Parser):
     endian = LITTLE_ENDIAN
@@ -156,11 +149,10 @@ class TorrentFile(Parser):
     }
 
     def validate(self):
-        self.info(">>>>>>>>>>>>   THERE   <<<<<<<<<<<")
         if self.stream.readBytes(0, len(self.MAGIC)) != self.MAGIC:
             return "Invalid magic"
         return True
 
     def createFields(self):
-        yield Entry(self, "root", size=self.size)
+        yield Dictionary(self, "root", size=self.size)
 
