@@ -8,51 +8,94 @@ Author: Victor Stinner
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
     Bit, Bits, Enum,
-    UInt16, UInt32,
+    UInt8, UInt16, UInt32,
     String, PascalString16,
     NullBits, RawBytes)
 from hachoir_core.text_handler import humanFilesize, hexadecimal, timestampMSDOS
 from hachoir_core.endian import LITTLE_ENDIAN
+from hachoir_core.error import info
+
+def ZipRevision(field):
+    return "%u.%u" % divmod(field.value, 10)
 
 # TODO: Merge ZipCentralDirectory and FileEntry (looks very similar)
-
-class ZipCentralDirectory(FieldSet):
+class ZipVersion(FieldSet):
+    static_size = 16
+    HOST_OS = {
+        0: "FAT file system (DOS, OS/2, NT)",
+        1: "Amiga",
+        2: "VMS (VAX or Alpha AXP)",
+        3: "Unix",
+        4: "VM/CMS",
+        5: "Atari",
+        6: "HPFS file system (OS/2, NT 3.x)",
+        7: "Macintosh",
+        8: "Z-System",
+        9: "CP/M",
+        10: "TOPS-20",
+        11: "NTFS file system (NT)",
+        12: "SMS/QDOS",
+        13: "Acorn RISC OS",
+        14: "VFAT file system (Win95, NT)",
+        15: "MVS",
+        16: "BeOS (BeBox or PowerMac)",
+        17: "Tandem",
+        18: "unused",
+    }
     def createFields(self):
-        yield UInt16(self, "version_made_by", "Version made by")
-        yield UInt16(self, "version_needed", "Version needed")
-        yield UInt16(self, "flags", "General purpose flag")
-        yield Enum(UInt16(self, "compression", "Compression method"), FileEntry.compression_name)
-        yield UInt32(self, "last_mod", "Last moditication file time", text_handler=timestampMSDOS)
-        yield UInt32(self, "crc32", "CRC-32", text_handler=hexadecimal)
-        yield UInt32(self, "compressed_size", "Compressed size")
-        yield UInt32(self, "uncompressed_size", "Uncompressed size")
-        yield UInt16(self, "filename_length", "Filename length")
-        yield UInt16(self, "extra_length", "Extra fields length")
-        yield UInt16(self, "comment_length", "File comment length")
-        yield UInt16(self, "disk_number_start", "Disk number start")
-        yield UInt16(self, "internal_attr", "Internal file attributes")
-        yield UInt32(self, "external_attr", "External file attributes")
-        yield UInt32(self, "offset_header", "Relative offset of local header")
-        yield String(self, "filename", self["filename_length"].value, "Filename") # TODO: charset?
-        if 0 < self["extra_length"].value:
-            yield RawBytes(self, "extra", self["extra_length"].value, "Extra fields")
-        if 0 < self["comment_length"].value:
-            yield String(self, "comment", self["comment_length"].value, "Comment") # TODO: charset?
+        yield UInt8(self, "zip_version", "ZIP version", text_handler=ZipRevision)
+        yield Enum(UInt8(self, "host_os", "ZIP Host OS"), self.HOST_OS)
 
-    def createDescription(self):
-        return "Central directory: %s" % self["filename"].value
-
-class ZipEndCentralDirectory(FieldSet):
+class ZipGeneralFlags(FieldSet):
+    static_size = 16
     def createFields(self):
-        yield UInt16(self, "number_disk", "Number of this disk")
-        yield UInt16(self, "number_disk2", "Number of this disk2")
-        yield UInt16(self, "total_number_disk", "Total number of entries")
-        yield UInt16(self, "total_number_disk2", "Total number of entries2")
-        yield UInt32(self, "size", "Size of the central directory")
-        yield UInt32(self, "offset", "Offset of start of central directory")
-        yield PascalString16(self, "comment", "ZIP comment")
+        yield Bits(self, "unused[]", 8, "Unused")
+        yield Bits(self, "reserved", 2, "Reserved for internal state")
+        yield Bit(self, "is_patched", "File is compressed with patched data?")
+        yield Bit(self, "unused[]", "Unused")
+        yield Bit(self, "has_descriptor",
+                  "Compressed data followed by descriptor?")
+        # Need the compression info from the parent, and that is the byte following
+        yield Bits(self, "compression_info", 2, "Depends on method",
+                   text_handler=hexadecimal)
+        yield Bit(self, "is_encrypted", "File is encrypted?")
 
-class FileEntry(FieldSet):
+class ExtraField(FieldSet):
+    EXTRA_FIELD_ID = {
+        0x0007: "AV Info",
+        0x0009: "OS/2 extended attributes      (also Info-ZIP)",
+        0x000a: "PKWARE Win95/WinNT FileTimes  [undocumented!]",
+        0x000c: "PKWARE VAX/VMS                (also Info-ZIP)",
+        0x000d: "PKWARE Unix",
+        0x000f: "Patch Descriptor",
+        0x07c8: "Info-ZIP Macintosh (old, J. Lee)",
+        0x2605: "ZipIt Macintosh (first version)",
+        0x2705: "ZipIt Macintosh v 1.3.5 and newer (w/o full filename)",
+        0x334d: "Info-ZIP Macintosh (new, D. Haase Mac3 field)",
+        0x4341: "Acorn/SparkFS (David Pilling)",
+        0x4453: "Windows NT security descriptor (binary ACL)",
+        0x4704: "VM/CMS",
+        0x470f: "MVS",
+        0x4b46: "FWKCS MD5 (third party, see below)",
+        0x4c41: "OS/2 access control list (text ACL)",
+        0x4d49: "Info-ZIP VMS (VAX or Alpha)",
+        0x5356: "AOS/VS (binary ACL)",
+        0x5455: "extended timestamp",
+        0x5855: "Info-ZIP Unix (original; also OS/2, NT, etc.)",
+        0x6542: "BeOS (BeBox, PowerMac, etc.)",
+        0x756e: "ASi Unix",
+        0x7855: "Info-ZIP Unix (new)",
+        0xfb4a: "SMS/QDOS"
+    }
+    def createFields(self):
+        yield Enum(UInt16(self, "field_id", "Extra field ID"),
+                   self.EXTRA_FIELD_ID)
+        size = UInt16(self, "field_data_size", "Extra field data size")
+        yield size
+        if size.value > 0:
+            yield RawBytes(self, "field_data", size, "Unknown field data")
+
+def ZipStartCommonFields(self):
     compression_name = {
         0: "no compression",
         1: "Shrunk",
@@ -66,40 +109,145 @@ class FileEntry(FieldSet):
         9: "Deflate64",
         10: "PKWARE Imploding"
     }
+    yield ZipVersion(self, "version_needed", "Version needed")
+    yield ZipGeneralFlags(self, "flags", "General purpose flag")
+    yield Enum(UInt16(self, "compression", "Compression method"),
+               compression_name)
+    yield UInt32(self, "last_mod", "Last moditication file time",
+                 text_handler=timestampMSDOS)
+    yield UInt32(self, "crc32", "CRC-32", text_handler=hexadecimal)
+    yield UInt32(self, "compressed_size", "Compressed size")
+    yield UInt32(self, "uncompressed_size", "Uncompressed size")
+    yield UInt16(self, "filename_length", "Filename length")
+    yield UInt16(self, "extra_length", "Extra fields length")
 
+class ZipCentralDirectory(FieldSet):
+    HEADER = 0x02014b50
     def createFields(self):
-        yield UInt16(self, "version", "Version")
-        yield Bit(self, "is_encrypted", "File is encrypted?")
-        yield Bit(self, "use_8k_sliding", "Use 8K sliding dictionnary (instead of 4K)")
-        yield Bit(self, "use_3shannon", "Use a 3 Shannon-Fano tree (instead of 2 Shannon-Fano)")
-        yield Bit(self, "use_data_desc", "Use data descriptor?")
-        yield NullBits(self, "reserved", 1, "Reserved")
-        yield Bit(self, "is_patched", "File is compressed with patched data?")
-        yield NullBits(self, "unused", 6, "Unused bits")
-        yield Bits(self, "pkware", 4, "Reserved by PKWARE")
+        yield ZipVersion(self, "version_made_by", "Version made by")
+        for field in ZipStartCommonFields(self):
+            yield field
+        yield UInt16(self, "comment_length", "Comment length")
+        yield UInt16(self, "disk_number_start", "Disk number start")
+        yield UInt16(self, "internal_attr", "Internal file attributes")
+        yield UInt32(self, "external_attr", "External file attributes")
+        yield UInt32(self, "offset_header", "Relative offset of local header")
+        yield String(self, "filename", self["filename_length"].value,
+                     "Filename") # TODO: charset?
+        if 0 < self["extra_length"].value:
+            yield RawBytes(self, "extra", self["extra_length"].value,
+                           "Extra fields")
+        if 0 < self["comment_length"].value:
+            yield String(self, "comment", self["comment_length"].value,
+                         "Comment") # TODO: charset?
 
-        yield Enum(UInt16(self, "compression", "Compression method"), self.compression_name)
-        yield UInt32(self, "last_mod", "Last modification time", text_handler=timestampMSDOS)
-        yield UInt32(self, "crc32", "Checksum (CRC32)", text_handler=hexadecimal)
-        yield UInt32(self, "compressed_size", "Compressed size (bytes)", text_handler=humanFilesize)
-        yield UInt32(self, "uncompressed_size", "Uncompressed size (bytes)", text_handler=humanFilesize)
-        yield UInt16(self, "filename_length", "Filename length")
-        yield UInt16(self, "extra_length", "Extra length")
+    def createDescription(self):
+        return "Central directory: %s" % self["filename"].value
+
+class Zip64EndCentralDirectory(FieldSet):
+    HEADER = 0x06064b50
+    def createFields(self):
+        yield UInt64(self, "zip64_end_size",
+                     "Size of zip64 end of central directory record")
+        yield ZipVersion(self, "version_made_by", "Version made by")
+        yield ZipVersion(self, "version_needed", "Version needed to extract")
+        yield UInt32(self, "number_disk", "Number of this disk")
+        yield UInt32(self, "number_disk2",
+                     "Number of the disk with the start of the central directory")
+        yield UInt64(self, "number_entries",
+                     "Total number of entries in the central directory on this disk")
+        yield UInt64(self, "number_entrie2",
+                     "Total number of entries in the central directory")
+        yield UInt64(self, "size", "Size of the central directory")
+        yield UInt64(self, "offset", "Offset of start of central directory")
+        if 0 < self["zip64_end_size"].value:
+            yield RawBytes(self, "data_sector", self["zip64_end_size"].value,
+                           "zip64 extensible data sector")
+
+class ZipEndCentralDirectory(FieldSet):
+    HEADER = 0x06054b50
+    def createFields(self):
+        yield UInt16(self, "number_disk", "Number of this disk")
+        yield UInt16(self, "number_disk2", "Number in the central dir")
+        yield UInt16(self, "total_number_disk",
+                     "Total number of entries in this disk")
+        yield UInt16(self, "total_number_disk2",
+                     "Total number of entries in the central dir")
+        yield UInt32(self, "size", "Size of the central directory")
+        yield UInt32(self, "offset", "Offset of start of central directory")
+        yield PascalString16(self, "comment", "ZIP comment")
+
+class ZipDataDescriptor(FieldSet):
+    HEADER_STRING = "\x50\x4B\x07\x08"
+    HEADER = 0x08074B50
+    static_size = 96
+    def createFields(self):
+        yield UInt32(self, "file_crc32", "Checksum (CRC32)",
+                     text_handler=hexadecimal)
+        yield UInt32(self, "file_compressed_size", "Compressed size (bytes)",
+                     text_handler=humanFilesize)
+        yield UInt32(self, "file_uncompressed_size",
+                     "Uncompressed size (bytes)", text_handler=humanFilesize)
+
+class FileEntry(FieldSet):
+    HEADER = 0x04034B50
+    def Resynch(self):
+        info("Trying to resynch...")
+        # Non-seekable output, search the next data descriptor
+        len = self.stream.searchBytesLength(ZipDataDescriptor.HEADER_STRING, False,
+                                            self.absolute_address+self.current_size)
+        if len > 0:
+            yield RawBytes(self, "compressed_data", len, "Compressed data")
+            yield UInt32(self, "header[]", "Header", text_handler=hexadecimal)
+            data_desc = ZipDataDescriptor(self, "data_desc", "Data descriptor")
+            if data_desc["file_compressed_size"].value == len:
+                info("Resynched!")
+                yield data_desc
+                return
+            raise ParserError("Bad resynch: %i != %i" % \
+                              (len, data_desc["file_compressed_size"].value))
+        raise ParserError("Couldn't resynch to %s" %
+                          ZipDataDescriptor.HEADER_STRING)
+    def createFields(self):
+        for field in ZipStartCommonFields(self):
+            yield field
         if self["filename_length"].value:
-            yield String(self, "filename", self["filename_length"].value, "Filename") # TODO: charset?
+            yield String(self, "filename", self["filename_length"].value,
+                         "Filename") # TODO: charset?
         if self["extra_length"].value:
             yield RawBytes(self, "extra", self["extra_length"].value, "Extra")
         if self["compressed_size"].value:
             # TODO: Use SubFile field type with deflate stream
-            yield RawBytes(self, "compressed_data", self["compressed_size"].value, "Compressed data")
-        if self["use_data_desc"].value:
-            yield UInt32(self, "file_crc32", "Checksum (CRC32)", text_handler=hexadecimal)
-            yield UInt32(self, "file_compressed_size", "Compressed size (bytes)", text_handler=humanFilesize)
-            yield UInt32(self, "file_uncompressed_size", "Uncompressed size (bytes)", text_handler=humanFilesize)
+            if self["compression"].value == 0:
+                yield String(self, "data", self["compressed_size"].value,
+                             "Uncompressed data")
+            else:
+                yield RawBytes(self, "compressed_data",
+                               self["compressed_size"].value, "Compressed data")
+        elif not self["crc32"].value:
+            for field in self.Resynch():
+                yield field
+        if self["flags/has_descriptor"].value:
+            yield ZipDataDescriptor(self, "data_desc", "Data descriptor")
 
     def createDescription(self):
         return "File entry: %s (%s)" % \
             (self["filename"].value, self["compressed_size"].display)
+
+class ZipSignature(FieldSet):
+    HEADER = 0x05054B50
+    def createFields(self):
+        yield PascalString16(self, "signature", "Signature")
+
+class Zip64EndCentralDirectoryLocator(FieldSet):
+    HEADER = 0x07064b50
+    def createFields(self):
+        yield UInt32(self, "disk_number", \
+                     "Number of the disk with the start of the zip64 end of central directory")
+        yield UInt64(self, "relative_offset", \
+                     "Relative offset of the zip64 end of central directory record")
+        yield UInt32(self, "disk_total_number", "Total number of disks")
+
 
 class ZipFile(Parser):
     endian = LITTLE_ENDIAN
@@ -155,7 +303,7 @@ class ZipFile(Parser):
     }
 
     def validate(self):
-        if self["header[0]"].value != 0x04034B50:
+        if self["header[0]"].value != FileEntry.HEADER:
             return "Invalid magic"
         return True
 
@@ -167,14 +315,22 @@ class ZipFile(Parser):
             header = UInt32(self, "header[]", "Header", text_handler=hexadecimal)
             yield header
             header = header.value
-            if header == 0x04034B50:
+            if header == FileEntry.HEADER:
                 yield FileEntry(self, "file[]")
-            elif header == 0x02014b50:
+            elif header == ZipDataDescriptor.HEADER:
+                yield ZipDataDescriptor(self, "spanning[]")
+            elif header == 0x30304b50:
+                yield ZipDataDescriptor(self, "temporary_spanning[]")
+            elif header == ZipCentralDirectory.HEADER:
                 yield ZipCentralDirectory(self, "central_directory[]")
-            elif header == 0x06054b50:
+            elif header == ZipEndCentralDirectory.HEADER:
                 yield ZipEndCentralDirectory(self, "end_central_directory", "End of central directory")
-            elif header == 0x05054b50:
-                yield PascalString16(self, "signature", "Signature")
+            elif header == Zip64EndCentralDirectory.HEADER:
+                yield Zip64EndCentralDirectory(self, "end64_central_directory", "ZIP64 end of central directory")
+            elif header == ZipSignature.HEADER:
+                yield ZipSignature(self, "signature", "Signature")
+            elif header == Zip64EndCentralDirectoryLocator.HEADER:
+                yield Zip64EndCentralDirectoryLocator(self, "end_locator", "ZIP64 Enf of central directory locator")
             else:
                 raise ParserError("Error, unknown ZIP header (0x%08X)." % header)
 
