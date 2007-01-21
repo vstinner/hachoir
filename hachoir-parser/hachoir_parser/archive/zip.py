@@ -163,7 +163,6 @@ class ZipFile(Parser):
         # File data
         self.signature = None
         self.central_directory = []
-        self.files = []
         while not self.eof:
             header = UInt32(self, "header[]", "Header", text_handler=hexadecimal)
             yield header
