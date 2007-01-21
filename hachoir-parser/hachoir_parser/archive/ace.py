@@ -15,7 +15,7 @@ from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet,
     Bit, Bits, Enum,
     NullBits,
-    UInt8, UInt16, UInt32, UInt64,
+    UInt8, UInt16, UInt32, PascalString8, PascalString16,
     String,
     RawBytes)
 from hachoir_core.text_handler import humanFilesize, hexadecimal, timestampMSDOS
@@ -24,6 +24,8 @@ from hachoir_parser.archive.rar import MSDOSFileAttr
 
 MAGIC = "**ACE**"
 
+OS_MSDOS = 0
+OS_WIN32 = 2
 HOST_OS = {
     0: "MS-DOS",
     1: "OS/2",
@@ -82,15 +84,17 @@ def markerHeader(self):
     yield Enum(UInt8(self, "host_os", "OS where the files were compressed"), HOST_OS)
     yield UInt8(self, "vol_num", "Volume number")
     yield UInt32(self, "time", "Date and time (MS DOS format)", text_handler=timestampMSDOS)
-    yield UInt64(self, "reserved", "Reserved size for future extensions", text_handler=hexadecimal)
-    if self["flags/has_av_string"].value:
-        size = UInt8(self, "av_size", "Size of the AV string")
+    yield Bits(self, "reserved", 64, "Reserved size for future extensions")
+    flags = self["flags"]
+    if flags["has_av_string"].value:
+        yield PascalString8(self, "av_string", "AV String")
+    if flags["has_comment"].value:
+        size = UInt16(self, "comment_size", "Comment size", \
+                      text_handler=humanFilesize)
         yield size
-        if size.value>0: yield String(self, "av_string", size.value, "AV string")
-    if self["flags/has_comment"].value:
-        size = UInt16(self, "comment_size", "Size of the comment string")
-        yield size
-        if size.value>0: yield RawBytes(self, "comment", size.value, "Comment compressed data")
+        if size.value > 0:
+            yield RawBytes(self, "compressed_comment", size.value, \
+                           "Compressed comment")
 
 class FileFlags(FieldSet):
     static_size = 16
@@ -110,53 +114,46 @@ def fileHeader(self):
     yield UInt32(self, "compressed_size", "Size of the compressed file", text_handler=humanFilesize)
     yield UInt32(self, "uncompressed_size", "Uncompressed file size", text_handler=humanFilesize)
     yield UInt32(self, "ftime", "Date and time (MS DOS format)", text_handler=timestampMSDOS)
-    marker = self._parent["header"]
-    if marker["host_os"].value in (0, 2):
+    if self["/header/host_os"].value in (OS_MSDOS, OS_WIN32):
         yield MSDOSFileAttr(self, "file_attr", "File attributes")
     else:
-        yield UInt32(self, "attr", "File attributes", text_handler=hexadecimal)
+        yield UInt32(self, "file_attr", "File attributes", text_handler=hexadecimal)
     yield UInt32(self, "file_crc32", "CRC32 checksum over the compressed file)", text_handler=hexadecimal)
     yield Enum(UInt8(self, "compression_type", "Type of compression"), COMPRESSION_TYPE)
     yield Enum(UInt8(self, "compression_mode", "Quality of compression"), COMPRESSION_MODE)
     yield UInt16(self, "parameters", "Compression paramters", text_handler=hexadecimal)
     yield UInt16(self, "reserved", "Reserved data", text_handler=hexadecimal)
     # Filename
-    size = UInt16(self, "filename_size", "Size of the filename", text_handler=humanFilesize)
-    yield size
-    if size.value>0:
-        value = String(self, "filename", size.value, "Filename")
-        yield value
-        self._name = value.value.replace(' ', '\x80').replace('/','\\')
+    yield PascalString16(self, "filename", "Filename")
     # Comment
     if self["flags/has_comment"].value:
-        size = UInt16(self, "comment_size", "Size of the compressed comment", text_handler=humanFilesize)
-        yield size
-        if size.value>0: yield RawBytes(self, "comment_data", size.value, "Comment data")
+        yield UInt16(self, "comment_size", "Size of the compressed comment", text_handler=humanFilesize)
+        if self["comment_size"].value > 0:
+            yield RawBytes(self, "comment_data", self["comment_size"].value, "Comment data")
 
 def fileBody(self):
     size = self["compressed_size"].value
-    if size>0:
+    if size > 0:
         yield RawBytes(self, "compressed_data", size, "Compressed data")
 
 def fileDesc(self):
     return "File entry: %s (%s)" % (self["filename"].value, self["compressed_size"].display)
 
 def recoveryHeader(self):
-    size = UInt32(self, "rec_blk_size", "Size of recovery data", text_handler=humanFilesize)
-    yield size
-    self.body_size = size.value
+    yield UInt32(self, "rec_blk_size", "Size of recovery data", text_handler=humanFilesize)
+    self.body_size = self["rec_blk_size"].size
     yield String(self, "signature", 7, "Signature, normally '**ACE**'")
-    yield UInt32(self, "relative_start", "Relative start (to this block) of the data this block is mode of", text_handler=hexadecimal)
+    yield UInt32(self, "relative_start", \
+                 "Relative start (to this block) of the data this block is mode of", \
+                 text_handler=hexadecimal)
     yield UInt32(self, "num_blocks", "Number of blocks the data is splitten in")
     yield UInt32(self, "size_blocks", "Size of these blocks")
     yield UInt16(self, "crc16_blocks", "CRC16 over recovery data")
     # size_blocks blocks of size size_blocks follow
     # The ultimate data is the xor data of all those blocks
-    num = self["num_blocks"].value
     size = self["size_blocks"].value
-    while num:
-        yield RawBytes(self, "data[]", size, "Recovery block %i" % num)
-        num -= 1
+    for index in xrange(self["num_blocks"].value):
+        yield RawBytes(self, "data[]", size, "Recovery block %i" % index)
     yield RawBytes(self, "xor_data", size, "The XOR value of the above data blocks")
 
 def recoveryDesc(self):
@@ -166,34 +163,34 @@ def newRecoveryHeader(self):
     """
     This header is described nowhere
     """
-    self.body_size = 0
-    flags = self["flags"]
-    if flags["extend"].value:
+    if self["flags/extend"].value:
         yield UInt32(self, "body_size", "Size of the unknown body following")
         self.body_size = self["body_size"].value
-    yield UInt32(self, "unknown[]", "Unknown field, probably 0", text_handler=hexadecimal)
+    yield UInt32(self, "unknown[]", "Unknown field, probably 0", \
+                 text_handler=hexadecimal)
     yield String(self, "signature", 7, "Signature, normally '**ACE**'")
-    yield UInt32(self, "relative_start", "Offset (=crc16's) of this block in the file", text_handler=hexadecimal)
-    yield UInt32(self, "unknown[]", "Unknown field, probably 0", text_handler=hexadecimal)
+    yield UInt32(self, "relative_start", \
+                 "Offset (=crc16's) of this block in the file", \
+                 text_handler=hexadecimal)
+    yield UInt32(self, "unknown[]", "Unknown field, probably 0", \
+                 text_handler=hexadecimal)
 
 class BaseFlags(FieldSet):
     static_size = 16
     def createFields(self):
         yield Bit(self, "extend", "Whether the header is extended")
-        yield Bits(self, "unused", 15, "Unused bit flags")
+        yield NullBits(self, "unused", 15, "Unused bit flags")
 
 def parseFlags(self):
     yield BaseFlags(self, "flags", "Unknown flags")
 
 def parseHeader(self):
-    self.body_size = 0
-    flags = self["flags"]
-    if flags["extend"].value:
+    if self["flags/extend"].value:
         yield UInt32(self, "body_size", "Size of the unknown body following")
         self.body_size = self["body_size"].value
 
 def parseBody(self):
-    if self.body_size>0:
+    if self.body_size > 0:
         yield RawBytes(self, "body_data", self.body_size, "Body data, unhandled")
 
 class Block(FieldSet):
