@@ -74,7 +74,7 @@ class TorrentString(FieldSet):
             if field.__class__ != RawBytes:
                 return field.value
             else:
-                return "raw_data"
+                return None
         else:
             return None
 
@@ -103,17 +103,21 @@ class DictionaryItem(FieldSet):
         if not key.hasValue():
             return
         key = key.value
-        if key == "creation date":
-            self.createValue = self.createTimestampValue
-        elif key == "length":
-            self.createValue = self.createFilesizeValue
+        self._name = str(key)
+        if self["value"].hasValue() and self["value"].value != None:
+            if key == "creation date":
+                self.createValue = self.createTimestampValue
+            elif key == "length":
+                self.createValue = self.createFilesizeValue
+            else:
+                self.createValue = self.createDefaultValue
 
     def createFields(self):
         yield Entry(self, "key")
         yield Entry(self, "value")
 
-    def createDescription(self):
-        return self["key"].value
+    def createDefaultValue(self):
+        return self["value"].value
 
     def createTimestampValue(self):
         timestamp = timestampUNIX(self["value"].value)
