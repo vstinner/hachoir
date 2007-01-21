@@ -24,7 +24,7 @@ BLOCK_NAME = {
     0x78: "Recovery record",
     0x79: "Archive authenticity",
     0x7A: "New-format subblock",
-    0x7B: "Archive end"
+    0x7B: "Archive end",
 }
 
 def formatRARVersion(field):
@@ -78,9 +78,11 @@ def archiveFlags(self):
             yield Bit(self, "is_encrypted", "Whether the encryption version is present")
             yield NullBits(self, "internal", 6, "Reserved for 'internal use'")
     yield archive_flags(self, "flags", "Archiver block flags")
+
 def archiveHeader(self):
     yield NullBytes(self, "reserved[]", 2, "Reserved word")
     yield NullBytes(self, "reserved[]", 4, "Reserved dword")
+
 def archiveSubBlocks(self):
     count = 0
     flags = self["flags"]
@@ -93,9 +95,10 @@ def archiveSubBlocks(self):
 def commentHeader(self):
     yield UInt16(self, "total_size", "Comment header size + comment size", text_handler=humanFilesize)
     yield UInt16(self, "uncompressed_size", "Uncompressed comment size", text_handler=humanFilesize)
-    yield Byte(self, "required_version", "RAR version needed to extract comment")
-    yield Byte(self, "packing_method", "Comment packing method")
+    yield UInt8(self, "required_version", "RAR version needed to extract comment")
+    yield UInt8(self, "packing_method", "Comment packing method")
     yield UInt16(self, "comment_crc16", "Comment CRC")
+
 def commentBody(self):
     size = self["total_size"].value - self.current_size
     if size > 0:
@@ -119,6 +122,7 @@ def avInfoHeader(self):
     yield UInt8(self, "method", "Compression method", handler=hexadecimal)
     yield UInt8(self, "av_version", "Version for AV", handler=hexadecimal)
     yield UInt32(self, "av_crc", "AV info CRC32", handler=hexadecimal)
+
 def avInfoBody(self):
     size = self["total_size"].value - self.current_size
     if size > 0:
@@ -162,6 +166,7 @@ class ExtTime(FieldSet):
                     yield UInt32(self, "dos_time[]", "DOS Time", text_handler=timestampMSDOS)
                 if rmode & 3:
                     yield RawBytes(self, "remainder[]", rmode & 3, "Time remainder")
+
 def specialHeader(self, is_file):
     COMPRESSION_NAME = {
         0x30: "Storing",
@@ -208,8 +213,10 @@ def specialHeader(self, is_file):
             yield UInt8(self, "salt", "Salt", text_handler=hexadecimal)
         if flags["has_ext_time"].value:
             yield ExtTime(self, "extra_time", "Extra time info")
+
 def fileHeader(self):
     return specialHeader(self, True)
+
 def fileBody(self):
     # File compressed data
     size = self["compressed_size"].value
@@ -218,6 +225,7 @@ def fileBody(self):
         size += self["large_size"].value
     if size > 0:
         yield RawBytes(self, "compressed_data", size, "File compressed data")
+
 def fileSubBlocks(self):
     count = 0
     f1, f2 = self["flags"], self["/archive_start/flags"]
@@ -225,6 +233,7 @@ def fileSubBlocks(self):
     if f1["is_encrypted"].value: count += 1
     if f2["is_protected"].value: count += 1
     return count
+
 def fileDescription(self):
     return "File entry: %s (%s)" % \
            (self["filename"].display, self["compressed_size"].display)
@@ -282,24 +291,29 @@ class Block(FieldSet):
     def createFields(self):
         yield UInt16(self, "crc16", "Block CRC16", text_handler=hexadecimal)
         yield UInt8(self, "block_type", "Block type", text_handler=hexadecimal)
+
         # Parse flags
         for field in self.parseFlags():
             yield field
+
         # Get block size
         yield UInt16(self, "block_size", "Block size", text_handler=humanFilesize)
+
         # Parse remaining header
         for field in self.parseHeader():
             yield field
+
         # Finish header with stuff of unknow size
         size = self["block_size"].value - (self.current_size//8)
         if size > 0:
             yield RawBytes(self, "unknown", size, "Unknow data (UInt32 probably)")
+
         # Parse body
         for field in self.parseBody():
             yield field
+
         # Get sub blocks, if any
         count = self.countSubBlocks()
-        #self.info("%s has %i sub-blocks" % (self._name, count))
         for i in xrange(count):
             yield Block(self, "sub_block[]")
 
