@@ -2,7 +2,7 @@
 Zip splitter.
 
 Status: can read most important headers
-Author: Victor Stinner
+Authors: Christophe Gisquet and Victor Stinner
 """
 
 from hachoir_parser import Parser
@@ -18,7 +18,6 @@ from hachoir_core.error import info
 def ZipRevision(field):
     return "%u.%u" % divmod(field.value, 10)
 
-# TODO: Merge ZipCentralDirectory and FileEntry (looks very similar)
 class ZipVersion(FieldSet):
     static_size = 16
     HOST_OS = {
@@ -40,7 +39,6 @@ class ZipVersion(FieldSet):
         15: "MVS",
         16: "BeOS (BeBox or PowerMac)",
         17: "Tandem",
-        18: "unused",
     }
     def createFields(self):
         yield UInt8(self, "zip_version", "ZIP version", text_handler=ZipRevision)
@@ -63,9 +61,9 @@ class ZipGeneralFlags(FieldSet):
 class ExtraField(FieldSet):
     EXTRA_FIELD_ID = {
         0x0007: "AV Info",
-        0x0009: "OS/2 extended attributes      (also Info-ZIP)",
-        0x000a: "PKWARE Win95/WinNT FileTimes  [undocumented!]",
-        0x000c: "PKWARE VAX/VMS                (also Info-ZIP)",
+        0x0009: "OS/2 extended attributes (also Info-ZIP)",
+        0x000a: "PKWARE Win95/WinNT FileTimes", # undocumented!
+        0x000c: "PKWARE VAX/VMS (also Info-ZIP)",
         0x000d: "PKWARE Unix",
         0x000f: "Patch Descriptor",
         0x07c8: "Info-ZIP Macintosh (old, J. Lee)",
@@ -85,7 +83,7 @@ class ExtraField(FieldSet):
         0x6542: "BeOS (BeBox, PowerMac, etc.)",
         0x756e: "ASi Unix",
         0x7855: "Info-ZIP Unix (new)",
-        0xfb4a: "SMS/QDOS"
+        0xfb4a: "SMS/QDOS",
     }
     def createFields(self):
         yield Enum(UInt16(self, "field_id", "Extra field ID"),
@@ -191,7 +189,7 @@ class ZipDataDescriptor(FieldSet):
 
 class FileEntry(FieldSet):
     HEADER = 0x04034B50
-    def Resynch(self):
+    def resynch(self):
         info("Trying to resynch...")
         # Non-seekable output, search the next data descriptor
         len = self.stream.searchBytesLength(ZipDataDescriptor.HEADER_STRING, False,
@@ -208,6 +206,7 @@ class FileEntry(FieldSet):
                               (len, data_desc["file_compressed_size"].value))
         raise ParserError("Couldn't resynch to %s" %
                           ZipDataDescriptor.HEADER_STRING)
+
     def createFields(self):
         for field in ZipStartCommonFields(self):
             yield field
@@ -225,7 +224,7 @@ class FileEntry(FieldSet):
                 yield RawBytes(self, "compressed_data",
                                self["compressed_size"].value, "Compressed data")
         elif not self["crc32"].value:
-            for field in self.Resynch():
+            for field in self.resynch():
                 yield field
         if self["flags/has_descriptor"].value:
             yield ZipDataDescriptor(self, "data_desc", "Data descriptor")
