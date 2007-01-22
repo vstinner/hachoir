@@ -1,5 +1,4 @@
-__version__ = "0.8.0"
-
+from hachoir_parser.version import __version__, PACKAGE, WEBSITE
 from hachoir_parser.parser import HachoirParser, Parser
 from hachoir_parser.parser_list import ParserList, HachoirParserList
 from hachoir_parser.guess import (guessParser,

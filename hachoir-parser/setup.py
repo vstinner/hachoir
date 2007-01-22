@@ -6,7 +6,6 @@ except ImportError:
     from distutils.core import setup
     with_setuptools = False
 
-URL = 'http://hachoir.org/wiki/hachoir-parser'
 CLASSIFIERS = [
     'Intended Audience :: Developers',
     'Development Status :: 5 - Production/Stable',
@@ -20,7 +19,7 @@ MODULES = (
     "image", "misc", "network", "office", "program", "video")
 
 def main():
-    import hachoir_parser
+    from hachoir_parser.version import __version__, WEBSITE
 
     PACKAGES = {"hachoir_parser": "hachoir_parser"}
     for name in MODULES:
@@ -28,9 +27,9 @@ def main():
 
     install_options = {
         "name": 'hachoir-parser',
-        "version": hachoir_parser.__version__,
-        "url": URL,
-        "download_url": URL,
+        "version": __version__,
+        "url": WEBSITE,
+        "download_url": WEBSITE,
         "author": "Hachoir team (see AUTHORS file)",
         "description": "Package of Hachoir parsers used to open binary files",
         "long_description": open('README').read(),
