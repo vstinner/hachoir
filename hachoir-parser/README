@@ -142,6 +142,7 @@ Archive
 -------
 
  * application/x-7z-compressed: 7-zip archive
+ * application/x-archive: ACE archive
  * application/x-debian-package, application/x-archive, application/x-dpkg:
    Unix archive
  * application/x-bzip2: bzip2 archive
@@ -226,6 +227,7 @@ Misc
 
  * image/x-3do: renderdroid 3d model.
  * image/x-3ds: 3D Studio Max model
+ * BitTorrent .torrent file
 
 Network
 -------
