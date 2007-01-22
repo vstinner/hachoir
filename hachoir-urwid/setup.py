@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from imp import load_source
+from os import path
 try:
     from setuptools import setup
     with_setuptools = True
@@ -18,7 +20,7 @@ CLASSIFIERS = [
     'Programming Language :: Python']
 
 def main():
-    import hachoir_urwid
+    hachoir_urwid = load_source("version", path.join("hachoir_urwid", "version.py"))
     install_options = {
         "name": 'hachoir-urwid',
         "version": hachoir_urwid.__version__,
