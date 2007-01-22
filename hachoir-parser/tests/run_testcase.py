@@ -182,9 +182,9 @@ def checkRAR(parser): return (
 )
 
 def checkACE(parser): return (
-    checkValue(parser, "header/crc16", 0x6E2E),
-    checkValue(parser, "file[0]/reserveed", 0x4554),
-    checkValue(parser, "file[1]/filename", "hachoir_ciore\.svn\prop-base"),
+    checkValue(parser, "header/crc16", 0xA9BE),
+    checkValue(parser, "file[0]/reserved", 0x4554),
+    checkValue(parser, "file[1]/filename", "hachoir_core\.svn"),
     checkValue(parser, "file[2]/parameters", 0x000A),
     #End of archive, lots of work...
     #checkValue(parser, "new_recovery[0]/signature", "**ACE**"),
