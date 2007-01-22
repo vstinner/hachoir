@@ -13,7 +13,6 @@ from hachoir_core.field import (FieldSet, ParserError,
     NullBits, RawBytes)
 from hachoir_core.text_handler import humanFilesize, hexadecimal, timestampMSDOS
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.error import info
 
 def ZipRevision(field):
     return "%u.%u" % divmod(field.value, 10)
@@ -190,7 +189,6 @@ class ZipDataDescriptor(FieldSet):
 class FileEntry(FieldSet):
     HEADER = 0x04034B50
     def resynch(self):
-        info("Trying to resynch...")
         # Non-seekable output, search the next data descriptor
         len = self.stream.searchBytesLength(ZipDataDescriptor.HEADER_STRING, False,
                                             self.absolute_address+self.current_size)
@@ -198,12 +196,15 @@ class FileEntry(FieldSet):
             yield RawBytes(self, "compressed_data", len, "Compressed data")
             yield UInt32(self, "header[]", "Header", text_handler=hexadecimal)
             data_desc = ZipDataDescriptor(self, "data_desc", "Data descriptor")
-            if data_desc["file_compressed_size"].value == len:
-                info("Resynched!")
-                yield data_desc
-                return
-            raise ParserError("Bad resynch: %i != %i" % \
-                              (len, data_desc["file_compressed_size"].value))
+            #self.info("Resynched!")
+            yield data_desc
+            # The above could be checked anytime, but we prefer trying parsing
+            # than aborting
+            if self["crc32"].value == 0 and \
+                data_desc["file_compressed_size"].value != len:
+                raise ParserError("Bad resynch: %i != %i" %
+                                  (len, data_desc["file_compressed_size"].value))
+            return
         raise ParserError("Couldn't resynch to %s" %
                           ZipDataDescriptor.HEADER_STRING)
 
@@ -215,14 +216,13 @@ class FileEntry(FieldSet):
                          "Filename") # TODO: charset?
         if self["extra_length"].value:
             yield RawBytes(self, "extra", self["extra_length"].value, "Extra")
-        if self["compressed_size"].value:
+        size = self["compressed_size"].value
+        if size > 0:
             # TODO: Use SubFile field type with deflate stream
             if self["compression"].value == 0:
-                yield String(self, "data", self["compressed_size"].value,
-                             "Uncompressed data")
+                yield String(self, "data", size, "Uncompressed data")
             else:
-                yield RawBytes(self, "compressed_data",
-                               self["compressed_size"].value, "Compressed data")
+                yield RawBytes(self, "compressed_data", size, "Compressed data")
         elif not self["crc32"].value:
             for field in self.resynch():
                 yield field
