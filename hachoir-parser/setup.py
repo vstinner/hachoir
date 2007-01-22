@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from imp import load_source
+from os import path
 try:
     from setuptools import setup
     with_setuptools = True
@@ -19,7 +21,7 @@ MODULES = (
     "image", "misc", "network", "office", "program", "video")
 
 def main():
-    from hachoir_parser.version import __version__, WEBSITE
+    hachoir_parser = load_source("version", path.join("hachoir_parser", "version.py"))
 
     PACKAGES = {"hachoir_parser": "hachoir_parser"}
     for name in MODULES:
@@ -27,9 +29,9 @@ def main():
 
     install_options = {
         "name": 'hachoir-parser',
-        "version": __version__,
-        "url": WEBSITE,
-        "download_url": WEBSITE,
+        "version": hachoir_parser.__version__,
+        "url": hachoir_parser.WEBSITE,
+        "download_url": hachoir_parser.WEBSITE,
         "author": "Hachoir team (see AUTHORS file)",
         "description": "Package of Hachoir parsers used to open binary files",
         "long_description": open('README').read(),
