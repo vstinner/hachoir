@@ -56,12 +56,18 @@ class ZipMetadata(MultipleMetadata):
                 break
             meta = CompressedFileMetadata()
             meta.filename = field["filename"].value
-            meta.file_size = field["uncompressed_size"].value
             meta.creation_date = field["last_mod"].display
             meta.compression = field["compression"].display
-            if field["compressed_size"].value:
-                meta.compr_size = field["compressed_size"].value
-                meta.setCompressionRate(meta.file_size[0], meta.compr_size[0])
+            if "data_desc" in field:
+                meta.file_size = field["data_desc/file_uncompressed_size"].value
+                if field["data_desc/file_compressed_size"].value:
+                    meta.compr_size = field["data_desc/file_compressed_size"].value
+                    meta.setCompressionRate(meta.file_size[0], meta.compr_size[0])
+            else:
+                meta.file_size = field["uncompressed_size"].value
+                if field["compressed_size"].value:
+                    meta.compr_size = field["compressed_size"].value
+                    meta.setCompressionRate(meta.file_size[0], meta.compr_size[0])
             self.addGroup(field.name, meta, "File \"%s\"" % meta.filename[0])
 
 class TarMetadata(MultipleMetadata):
