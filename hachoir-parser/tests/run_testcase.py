@@ -172,6 +172,24 @@ def checkTAR(parser): return (
     checkDisplay(parser, "file[2]/devmajor", u'(empty)'),
 )
 
+def checkRAR(parser): return (
+    checkValue(parser, "archive_start/crc16", 0x77E1),
+    checkValue(parser, "file[0]/crc32", 0x4C6D13ED),
+    checkValue(parser, "file[1]/filename", ".svn\prop-base\README.svn-base"),
+    checkValue(parser, "file[2]/new_sub_block[0]/crc32", 0x34528E23),
+    #End of archive, lots of work...
+    #checkValue(parser, "archive_end/crc16", 0x3DC4"),
+)
+
+def checkACE(parser): return (
+    checkValue(parser, "header/crc16", 0x6E2E),
+    checkValue(parser, "file[0]/reserveed", 0x4554),
+    checkValue(parser, "file[1]/filename", "hachoir_ciore\.svn\prop-base"),
+    checkValue(parser, "file[2]/parameters", 0x000A),
+    #End of archive, lots of work...
+    #checkValue(parser, "new_recovery[0]/signature", "**ACE**"),
+)
+
 def checkCornerBMP(parser): return (
     checkValue(parser, "header/width", 189),
     checkValue(parser, "header/used_colors", 70),
@@ -319,6 +337,8 @@ testcase_files = (
     (u"ftp-0.17-537.i586.rpm", checkRPM),
     (u"jpeg.exif.photoshop.jpg", checkJPEG),
     (u"small_text.tar", checkTAR),
+    (u"hachoir-core.rar", checkRAR),
+    (u"hachoir-core.ace", checkACE),
     (u"cacert_class3.der", checkCACertClass3),
     (u"kde_haypo_corner.bmp", checkCornerBMP),
     (u"steganography.mp3", checkSteganography),
