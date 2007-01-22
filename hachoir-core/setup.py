@@ -2,9 +2,7 @@
 
 # Constants
 AUTHORS = 'Julien Muchembled, Victor Stinner'
-DOWNLOAD_URL = 'http://hachoir.org/wiki/hachoir-core'
 DESCRIPTION = "Core of Hachoir framework: parse and edit binary files"
-LICENSE = 'GNU GPL v2'
 CLASSIFIERS = [
     'Intended Audience :: Developers',
     'Development Status :: 5 - Production/Stable',
@@ -23,13 +21,7 @@ SETUPTOOLS_COMMANDS = ("rotate", "develop", "setopt",
 
 import os
 import sys
-
-# Import Hachoir
-try:
-    import hachoir_core
-except ImportError:
-    print "WTF? Where is Hachoir?"
-    sys.exit(1)
+import hachoir_core
 
 def getPackages(hachoir_dir):
     # TODO: Remove this ugly function to use __import__
@@ -92,14 +84,14 @@ def main():
     packages, package_dir = getPackages(hachoir_dir)
 
     install_options = {
-        "name": 'hachoir-core',
+        "name": hachoir_core.PACKAGE,
         "version": hachoir_core.__version__,
         "url": hachoir_core.WEBSITE,
-        "download_url": DOWNLOAD_URL,
+        "download_url": hachoir_core.WEBSITE,
         "author": AUTHORS,
         "description": DESCRIPTION,
         "classifiers": CLASSIFIERS,
-        "license": LICENSE,
+        "license": hachoir_core.LICENSE,
         "packages": packages,
         "package_dir": package_dir,
         "long_description": long_description,

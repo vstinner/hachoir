@@ -28,7 +28,7 @@ def main():
         PACKAGES["hachoir_parser." + name] = "hachoir_parser/" + name
 
     install_options = {
-        "name": 'hachoir-parser',
+        "name": hachoir_parser.PACKAGE,
         "version": hachoir_parser.__version__,
         "url": hachoir_parser.WEBSITE,
         "download_url": hachoir_parser.WEBSITE,
@@ -36,7 +36,7 @@ def main():
         "description": "Package of Hachoir parsers used to open binary files",
         "long_description": open('README').read(),
         "classifiers": CLASSIFIERS,
-        "license": 'GNU GPL v2',
+        "license": hachoir_parser.LICENSE,
         "packages": PACKAGES.keys(),
         "package_dir": PACKAGES,
     }

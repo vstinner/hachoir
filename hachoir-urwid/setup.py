@@ -9,7 +9,6 @@ except ImportError:
     from distutils.core import setup
     with_setuptools = False
 
-URL = 'http://hachoir.org/wiki/hachoir-urwid'
 CLASSIFIERS = [
     'Intended Audience :: Developers',
     'Development Status :: 5 - Production/Stable',
@@ -22,15 +21,15 @@ CLASSIFIERS = [
 def main():
     hachoir_urwid = load_source("version", path.join("hachoir_urwid", "version.py"))
     install_options = {
-        "name": 'hachoir-urwid',
+        "name": hachoir_urwid.PACKAGE,
         "version": hachoir_urwid.__version__,
-        "url": URL,
-        "download_url": URL,
+        "url": hachoir_urwid.WEBSITE,
+        "download_url": hachoir_urwid.WEBSITE,
+        "license": hachoir_urwid.LICENSE,
         "author": "Julien Muchembled and Victor Stinner",
         "description": "Binary file explorer using Hachoir and urwid libraries",
         "long_description": open('README').read(),
         "classifiers": CLASSIFIERS,
-        "license": 'GNU GPL v2',
         "scripts": ["hachoir-urwid"],
         "packages": ["hachoir_urwid"],
         "package_dir": {"hachoir_urwid": "hachoir_urwid"},
