@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from imp import load_source
+from os import path
 
 try:
     from setuptools import setup
@@ -19,17 +21,17 @@ CLASSIFIERS = [
     'Programming Language :: Python']
 
 def main():
-    import hachoir_metadata
+    hachoir_metadata = load_source("version", path.join("hachoir_metadata", "version.py"))
     install_options = {
-        "name": 'hachoir-metadata',
+        "name": hachoir_metadata.PACKAGE,
         "version": hachoir_metadata.__version__,
-        "url": URL,
-        "download_url": URL,
+        "url": hachoir_metadata.WEBSITE,
+        "download_url": hachoir_metadata.WEBSITE,
         "author": "Victor Stinner",
         "description": "Program to extract metadata using Hachoir library",
         "long_description": open('README').read(),
         "classifiers": CLASSIFIERS,
-        "license": 'GNU GPL v2',
+        "license": hachoir_metadata.LICENCE,
         "scripts": ["hachoir-metadata"],
         "packages": ["hachoir_metadata"],
         "package_dir": {"hachoir_metadata": "hachoir_metadata"},

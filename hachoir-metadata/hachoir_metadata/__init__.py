@@ -1,5 +1,3 @@
-__version__ = "0.8.1"
-
 from hachoir_metadata.metadata import extractMetadata
 
 # Just import the module,
