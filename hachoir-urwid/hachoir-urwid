@@ -2,9 +2,9 @@
 from hachoir_core.error import error
 from hachoir_core.cmd_line import (getHachoirOptions,
     configureHachoir, unicodeFilename)
-from hachoir_core.stream import InputStreamError, FileInputStream, InputSubStream
+from hachoir_core.stream import InputStreamError, FileInputStream
 from hachoir_core.i18n import _
-from hachoir_parser import createParser, parseStream, HachoirParserList
+from hachoir_parser import guessParser, HachoirParserList
 from hachoir_urwid import exploreFieldSet
 from hachoir_urwid.version import __version__, WEBSITE
 from optparse import OptionGroup, OptionParser
@@ -33,7 +33,7 @@ def parseOptions():
     common.add_option("--parser", help=_("Use the specified parser (use its identifier)"),
         type="str", action="store", default=None)
     common.add_option("--offset", help=_("Skip first bytes of input file"),
-        type="long", action="store", default=None)
+        type="long", action="store", default=0)
     common.add_option("--parser-list",help=_("List all parsers then exit"),
         action="callback", callback=displayParserList)
     common.add_option("--profiler", help=_("Run profiler"),
@@ -79,31 +79,18 @@ def runProfiler(*args):
         unlink(profile_filename)
 
 def openParser(parser_id, filename, offset, size):
+    tags = []
+    if parser_id:
+        tags += [ ("id", parser_id), None ]
     try:
-        filename, realname = unicodeFilename(filename), filename
-        if parser_id:
-            try:
-                parser_cls = HachoirParserList()[parser_id]
-            except KeyError:
-                error(_("No parser with identifier: %s") % parser_id)
-                sys.exit(1)
-            stream = FileInputStream(filename, real_filename=realname)
-            # TODO: Shake up hachoir_parser/guess.py
-            if offset or size:
-                if offset:
-                    offset *= 8
-                if size:
-                    size *= 8
-                stream = InputSubStream(stream, offset, size=size)
-            return parseStream(parser_cls, stream, False)
-        else:
-            parser = createParser(filename,
-                offset=offset, size=size, real_filename=realname)
+        stream = FileInputStream(unicodeFilename(filename), filename,
+                                 offset=offset, size=size, tags=tags)
     except InputStreamError, err:
         return None, _("Unable to open file: %s") % err
+    parser = guessParser(stream)
     if not parser:
         return None, _("Unable to parse file: %s") % filename
-    return parser, ""
+    return parser, None
 
 def main():
     # Parser options and initialize Hachoir

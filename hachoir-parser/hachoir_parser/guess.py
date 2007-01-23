@@ -1,149 +1,105 @@
 """
 Parser list managment:
-- getParsersByStream() find the best parser for a binary stream ;
 - createParser() find the best parser for a file.
 """
 
 import os
 from hachoir_core.error import warning, info, HACHOIR_ERRORS
-from hachoir_parser import Parser, HachoirParserList
-from hachoir_core.stream import FileInputStream, InputSubStream
+from hachoir_parser import ValidateError, HachoirParserList
+from hachoir_core.stream import FileInputStream
 from hachoir_core.i18n import _
-from hachoir_core.tools import makePrintable
-from hachoir_core import config
 from hachoir_core.editor import createEditor as createEditorFromParser
 
-### Parse a stream #############################################################
 
-def _doCreateParser(cls, stream, validate):
-    parser = cls(stream)
-    if not validate:
-        return (parser, None)
-    result = parser.validate()
-    if result is True:
-        return (parser, None)
-    if isinstance(result, str):
-        result = makePrintable(result, "ASCII", to_unicode=True)
-        message = _("validate() error: %s") % (result)
-    else:
-        message = _("validate() error")
-    return (None, message)
+class QueryParser(object):
+    fallback = None
+    other = None
 
-def parseStream(cls, stream, validate=True):
-    """
-    Run a parser on a stream.
+    def __init__(self, tags):
+        self.db = HachoirParserList()
+        self.parsers = set(self.db)
+        parsers = []
+        for tag in tags:
+            if not self.parsers:
+                break
+            parsers += self._getByTag(tag)
+            if self.fallback is None:
+                self.fallback = len(parsers) == 1
+        if self.parsers:
+            other = len(parsers)
+            parsers += list(self.parsers)
+            self.other = parsers[other]
+        self.parsers = parsers
 
-    Returns:
-     * (None, error) on error where error is an unicode string ;
-     * (parser, None) otherwise.
-    """
-    # Disable autofix during test
-    autofix = config.autofix
-    config.autofix = False
-    try:
-        parser, error_msg = _doCreateParser(cls, stream, validate)
-    except HACHOIR_ERRORS, err:
-        parser = None
-        error_msg = unicode(err)
-    config.autofix = autofix
-    return (parser, error_msg)
+    def __iter__(self):
+        return iter(self.parsers)
 
-### Guess parser for a stream ##################################################
-
-def _matchTag(valid, file_ext):
-    file_ext = file_ext.lower()
-    if isinstance(valid, (list, tuple)):
-        for item in valid:
-            if item.lower() == file_ext:
-                return True
-        return False
-    else:
-        return valid.lower() == file_ext
-
-def _guessParserByTag(stream, parser_list, tag_name, tag_value, validate=True):
-    next_try = []
-    for cls in parser_list:
-        if tag_name in cls.tags \
-        and _matchTag(cls.tags[tag_name], tag_value):
-            if config.debug:
-                info(_("Guess parser: %s") % cls.__name__)
-            parser, error_msg = parseStream(cls, stream, validate)
-            if parser:
-                return True, parser
-            else:
-                warning(_("Skip parser %s: %s") % (cls.__name__, error_msg))
-        else:
-            next_try.append(cls)
-    return False, next_try
-
-def guessParser(stream, force_mime=None):
-    # Filter by minimum size
-    parser_list = [ parser for parser in HachoirParserList()
-        if "min_size" not in parser.tags or stream.sizeGe(parser.tags["min_size"]) ]
-
-    # Guess by MIME type
-    if force_mime:
-        ok, result = _guessParserByTag(stream, parser_list, "mime", force_mime, False)
-        if ok:
-            return result
-        parser_list = result
-
-    # Guess using stream tags
-    for tag in stream.tags:
-        if tag[0] == "filename":
-            filename = os.path.basename(tag[1]).split(".")
+    def translate(self, name, value):
+        if name == "filename":
+            filename = os.path.basename(value).split(".")
             if len(filename) <= 1:
-                continue
-            tag = "file_ext", filename[-1]
-        ok, result = _guessParserByTag(stream, parser_list, *tag)
-        if ok:
-            return result
-        parser_list = result
+                value = ""
+            else:
+                value = filename[-1].lower()
+            name = "file_ext"
+        return name, value
 
-    # Guess other parser
-    for cls in parser_list:
-        if config.debug:
-            info(_("Guess parser: %s") % cls.__name__)
-        parser, error_msg = parseStream(cls, stream, True)
-        if parser:
-            return parser
-        info(_("Skip parser %s: %s") % (cls.__name__, error_msg))
-    return None
+    def _getByTag(self, tag):
+        if tag is None:
+            self.parsers.clear()
+            return []
+        elif callable(tag):
+            parsers = [ parser for parser in self.parsers if tag(parser) ]
+            for parser in parsers:
+                self.parsers.remove(parser)
+        else:
+            tag = self.translate(*tag)
+            parsers = []
+            if tag is not None:
+                byname = self.db.bytag.get(tag[0],{})
+                if tag[1] is None:
+                    values = byname.itervalues()
+                else:
+                    values = byname.get(tag[1],()),
+                for value in values:
+                    for parser in value:
+                        if parser in self.parsers:
+                            parsers.append(parser)
+                            self.parsers.remove(parser)
+        return parsers
 
-### Choose parser for a file ###################################################
+    def parse(self, stream, fallback=True):
+        fb = None
+        warn = warning
+        for parser in self.parsers:
+            try:
+                return parser(stream, validate=True)
+            except ValidateError, err:
+                res = unicode(err)
+                if fallback and self.fallback:
+                    fb = parser
+            except HACHOIR_ERRORS, err:
+                res = unicode(err)
+            if warn:
+                if parser == self.other:
+                    warn = info
+                warn(_("Skip parser '%s': %s") % (parser.__name__, res))
+            fallback = False
+        if fb:
+            warning(_("Force use of parser '%s'") % fb.__name__)
+            return fb(stream)
 
-def createParser(filename, force_mime=None, offset=None, size=None, real_filename=None):
+
+def guessParser(stream):
+    return QueryParser(stream.tags).parse(stream)
+
+
+def createParser(filename, real_filename=None):
     """
     Create a parser from a file or returns None on error.
 
     Options:
     - filename (unicode): Input file name ;
-    - force_mime (string, optionnal): force a specific parser using a MIME type ;
-    - offset (long, optionnal): offset in bytes of the input file ;
-    - size (long): maximum size in bytes of the input file ;
     - real_filename (str|unicode): Real file name.
     """
-    stream = FileInputStream(filename, real_filename)
-    if offset or size:
-        if offset:
-            offset *= 8
-        if size:
-            size *= 8
-        stream = InputSubStream(stream, offset, size=size)
-    return guessParser(stream, force_mime)
-
-def createEditor(filename, force_mime=None, offset=None, size=None):
-    """
-    Create a editor from a file or returns None on error.
-
-    Options:
-    - filename (unicode): Input file name ;
-    - force_mime (string, optionnal): force a specific parser using a MIME type ;
-    - offset (long, optionnal): offset in bytes of the input file  ;
-    - size (long): maximum size in bytes of the input file.
-    """
-    parser = createParser(filename, force_mime, offset, size)
-    if parser:
-        parser = createEditorFromParser(parser)
-    return parser
-
+    return guessParser(FileInputStream(filename, real_filename))

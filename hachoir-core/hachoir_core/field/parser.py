@@ -1,6 +1,7 @@
 from hachoir_core.endian import BIG_ENDIAN, LITTLE_ENDIAN
 from hachoir_core.field import GenericFieldSet
 from hachoir_core.log import Logger
+import hachoir_core.config as config
 
 class Parser(GenericFieldSet):
     """
@@ -35,3 +36,5 @@ class Parser(GenericFieldSet):
 
     path = property(lambda self: "/")
 
+    # dummy definition to prevent hachoir-core from depending on hachoir-parser
+    autofix = property(lambda self: config.autofix)

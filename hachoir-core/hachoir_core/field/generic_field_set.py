@@ -135,6 +135,8 @@ class GenericFieldSet(BasicFieldSet):
             field = field._parent
         return field._size - size
 
+    autofix = property(lambda self: self.root.autofix)
+
     def setUniqueFieldName(self, field):
         key = field._name[:-2]
         try:
@@ -176,7 +178,7 @@ class GenericFieldSet(BasicFieldSet):
 
         # No more place?
         if None < dsize < 0 or (field.is_field_set and field.size <= 0):
-            if config.autofix:
+            if self.autofix:
                 self._fixFieldSize(field, field.size + dsize)
             else:
                 raise ParserError("Field %s is too large!" % field.path)
@@ -292,7 +294,7 @@ class GenericFieldSet(BasicFieldSet):
             if self._parent:
                 self._size = self._current_size
         elif self._size != self._current_size:
-            if config.autofix:
+            if self.autofix:
                 new_field = self._fixLastField()
             else:
                 raise ParserError("Invalid parser \"%s\" size!" % self.path)
@@ -304,7 +306,7 @@ class GenericFieldSet(BasicFieldSet):
         Try to fix a feeding error. Returns False if error can't be fixed,
         otherwise returns new field if any, or None.
         """
-        if self._size is None or not config.autofix:
+        if self._size is None or not self.autofix:
             return False
         self.warning(unicode(exception))
         return self._fixLastField()

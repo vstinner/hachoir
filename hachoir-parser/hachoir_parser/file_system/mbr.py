@@ -209,10 +209,12 @@ class MSDos_HardDrive(Parser):
     def validate(self):
         if self.stream.readBytes(510*8, 2) != self.MAGIC:
             return "Invalid signature"
-        for i in xrange(446, 510, 16):
-            if self.stream.readInteger(8 * i, False, 7, self.endian):
+        used = False
+        for hdr in self["mbr"].headers:
+            if hdr["bootable"].value not in (0x00, 0x80):
                 return "Wrong boot flag"
-        return True
+            used |= hdr.isUsed()
+        return used or "No partition found"
 
     def createFields(self):
         mbr = MasterBootRecord(self, "mbr")

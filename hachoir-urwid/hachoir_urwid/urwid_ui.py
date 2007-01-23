@@ -5,7 +5,7 @@ from hachoir_core.log import log as hachoir_log
 from hachoir_core.error import HachoirError, getBacktrace
 from hachoir_core.i18n import _, ngettext
 from hachoir_core.stream import InputFieldStream
-from hachoir_parser import parseStream, guessParser
+from hachoir_parser import guessParser
 from urwid import AttrWrap, Text, ListBox, CanvasJoin, BoxAdapter, Edit
 from shutil import copyfileobj
 from weakref import WeakKeyDictionary

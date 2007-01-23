@@ -1,6 +1,13 @@
+import hachoir_core.config as config
 from hachoir_core.field import Field, Parser as GenericParser
-from hachoir_core.error import HACHOIR_ERRORS, error
+from hachoir_core.error import HACHOIR_ERRORS, HachoirError, error
 from hachoir_core.tools import makePrintable
+from hachoir_core.i18n import _
+from inspect import getmro
+
+
+class ValidateError(HachoirError):
+    pass
 
 class HachoirParser:
     """
@@ -99,8 +106,44 @@ class HachoirParser:
         return self._filename_extension
     filename_suffix = property(_getFilenameSuffix)
 
-class Parser(HachoirParser, GenericParser):
-    def __init__(self, stream):
-        GenericParser.__init__(self, stream, None)
-        HachoirParser.__init__(self)
+    @classmethod
+    def getTags(cls):
+        tags = {}
+        for cls in reversed(getmro(cls)):
+            if hasattr(cls,"tags"):
+                tags.update(cls.tags)
+        return tags
 
+    @classmethod
+    def print_(cls, verbose):
+        tags = cls.getTags()
+        print "- %s: %s" % (tags["id"], tags["description"])
+        if verbose:
+            if "mime" in tags:
+                print "  MIME type: %s" % (", ".join(tags["mime"]))
+            if "file_ext" in tags:
+                file_ext = ", ".join(
+                    ".%s" % file_ext for file_ext in tags["file_ext"])
+                print "  File extension: %s" % file_ext
+
+
+class Parser(HachoirParser, GenericParser):
+    _autofix = False
+
+    def __init__(self, stream, **args):
+        validate = args.pop("validate", False)
+        GenericParser.__init__(self, stream, **args)
+        HachoirParser.__init__(self)
+        while validate:
+            nbits = stream.sizeGe(self.getTags()["min_size"])
+            if stream.sizeGe(nbits):
+                res = self.validate()
+                if res is True:
+                    break
+                res = makePrintable(res, "ASCII", to_unicode=True)
+            else:
+                res = _("stream too small (< %u bits)" % nbits)
+            raise ValidateError(res)
+        self._autofix = True
+
+    autofix = property(lambda self: self._autofix and config.autofix)

@@ -3,10 +3,10 @@
 from hachoir_core.i18n import _
 from hachoir_core import config
 from hachoir_core.cmd_line import unicodeFilename
-from hachoir_core.error import HachoirError, error
+from hachoir_core.error import HACHOIR_ERRORS, HachoirError, error
 from hachoir_core.stream import FileInputStream, InputSubStream, FileOutputStream
 from hachoir_core.tools import humanFilesize, humanDuration, makePrintable
-from hachoir_parser.guess import HachoirParserList, parseStream
+from hachoir_parser import QueryParser
 from optparse import OptionGroup, OptionParser
 from hachoir_subfile_regex import createRegex
 import sys
@@ -184,31 +184,21 @@ class HachoirSubfile:
 
     def loadMagics(self, categories=None, parser_ids=None):
         # Choose parsers to use
-        hachoir_parser = HachoirParserList()
-        parser_list = set()
-        if parser_ids:
-            for parser_id in parser_ids:
-                try:
-                    parser_list |= set( (hachoir_parser[parser_id],) )
-                except KeyError:
-                    error("No parser with identifier: %s" % parser_id)
-                    sys.exit(1)
-        if categories:
-            for category in categories:
-                parser_list |= set( hachoir_parser.getByCategory(category) )
-        if not parser_list:
-            parser_list = hachoir_parser
+        tags = []
+        if categories: tags += [ ("category", cat) for cat in categories ]
+        if parser_ids: tags += [ ("id", parser_id) for parser_id in parser_ids ]
+        if tags      : tags += [ None ]
+        parser_list = QueryParser(tags)
 
         # Load parser magics
         magics = []
         for parser in parser_list:
-            if "magic" in parser.tags:
-                for (magic, offset) in parser.tags["magic"]:
-                    if self.slice_size < offset:
-                        self.slice_size = offset + 8
-                        error("Use slice size of %s because of '%s' parser magic offset" % (
-                            (self.slice_size//8), parser.__name__))
-                    magics.append((magic, offset, parser))
+            for (magic, offset) in parser.getTags().get("magic",()):
+                if self.slice_size < offset:
+                    self.slice_size = offset + 8
+                    error("Use slice size of %s because of '%s' parser magic offset" % (
+                        (self.slice_size//8), parser.__name__))
+                magics.append((magic, offset, parser))
 
         # Build regex
         self.max_magic_len = max( len(magic) for magic in magics )
@@ -351,8 +341,10 @@ class HachoirSubfile:
         if offset < 0:
             return None
         substream = InputSubStream(self.stream, offset)
-        (parser, error) = parseStream(parser_cls, substream)
-        return parser
+        try:
+            return parser_cls(substream, validate=True)
+        except HACHOIR_ERRORS, err:
+            return None
 
     def displayProgress(self):
         """

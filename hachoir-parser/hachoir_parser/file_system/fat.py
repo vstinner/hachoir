@@ -310,6 +310,10 @@ class InodeGen:
 
 class FAT_FS(Parser):
     endian = LITTLE_ENDIAN
+    tags = {
+        "category": "file_system",
+        "min_size": 512*8,
+    }
 
     def _validate(self, type_offset):
         return (self.stream.readBytes(510*8, 2) == "\x55\xAA"
@@ -379,40 +383,34 @@ class FAT_FS(Parser):
 class FAT12(FAT_FS):
     tags = {
         "id": "fat12",
-        "category": "file_system",
         "description": "FAT12 filesystem",
-        "min_size": 512*8,
         "magic": (("FAT12   ", 54*8),),
     }
     version = 12
 
     def validate(self):
-        return FAT_FS._validate(self, 0x36)
+        return FAT_FS._validate(self, 54)
 
 
 class FAT16(FAT_FS):
     tags = {
         "id": "fat16",
-        "category": "file_system",
         "description": "FAT16 filesystem",
-        "min_size": 512*8,
         "magic": (("FAT16   ", 54*8),),
     }
     version = 16
 
     def validate(self):
-        return FAT_FS._validate(self, 0x36)
+        return FAT_FS._validate(self, 54)
 
 
 class FAT32(FAT_FS):
     tags = {
         "id": "fat32",
-        "category": "file_system",
         "description": "FAT32 filesystem",
-        "min_size": 512*8,
-        "magic": (("FAT32   ", 54*8),),
+        "magic": (("FAT32   ", 82*8),),
     }
     version = 32
 
     def validate(self):
-        return FAT_FS._validate(self, 0x52)
+        return FAT_FS._validate(self, 82)

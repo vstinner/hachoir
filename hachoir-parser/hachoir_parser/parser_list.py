@@ -1,9 +1,8 @@
 import re
 import types
-from hachoir_core.error import HachoirError
+from hachoir_core.error import error
 from hachoir_core.i18n import _
-from hachoir_parser import HachoirParser
-from hachoir_core import config
+from hachoir_parser import Parser
 
 ### Parser list ################################################################
 
@@ -14,72 +13,59 @@ class ParserList(object):
 
     def __init__(self):
         self.parser_list = []
-        self.byid = {}
-        self.bycategory = {}
+        self.bytag = { "id": {}, "category": {} }
+
+    def translate(self, name, value):
+        if name in ("magic",):
+            return True
+        elif name == "min_size":
+            return - value < 0 or "Invalid minimum size (min_size)"
+        elif name == "description":
+            return isinstance(value, (str, unicode)) and bool(value) or "Invalid description"
+        elif name == "category":
+            if value not in self.VALID_CATEGORY:
+                return "Invalid category: %r" % value
+        elif name == "id":
+            if type(value) is not str or not self.ID_REGEX.match(value):
+                return "Invalid identifier: %r" % value
+            parser = self.bytag[name].get(value)
+            if parser:
+                return "Duplicate parser id: %s already used by %s" % \
+                    (value, parser[0].__name__)
+        # TODO: lists should be forbidden
+        if isinstance(value, list):
+            value = tuple(value)
+        elif not isinstance(value, tuple):
+            value = value,
+        return name, value
 
     def add(self, parser):
-        # Check parser
-        err = self.checkParser(parser)
-        if err:
-            raise HachoirError("Invalid parser %s: %s" % (parser.__name__, err))
+        tags = parser.getTags()
+        parser_id = tags.get("id")
+        if parser_id is None:
+            return
+        if "description" not in tags:
+            error("[%s] No description." % parser.__name__)
+            return
 
-        # Store parser in parser list
+        _tags = []
+        for tag in tags.iteritems():
+            tag = self.translate(*tag)
+            if isinstance(tag, tuple):
+                _tags.append(tag)
+            elif tag is not True:
+                error("[%s] %s" % (parser.__name__, tag))
+                return
+
         self.parser_list.append(parser)
 
-        # Store parser with its identifier
-        parser_id = parser.tags["id"]
-        if parser_id in self.byid:
-            raise HachoirError("Duplicate parser id: %s used by %s and %s" %
-                (parser_id, self.byid[parser_id].__name__, parser.__name__))
-        self.byid[parser_id] = parser
-
-        # Store parser by its category
-        category = parser.tags["category"]
-        if category in self.bycategory:
-            self.bycategory[category].append(parser)
-        else:
-            self.bycategory[category] = [parser]
+        for name, values in _tags:
+            byname = self.bytag.setdefault(name,{})
+            for value in values:
+                byname.setdefault(value,[]).append(parser)
 
     def __iter__(self):
         return iter(self.parser_list)
-
-    def getByCategory(self, category):
-        return self.bycategory[category]
-
-    def checkParser(self, parser):
-        """
-        Check 'tags' attribute of a parser.
-        Return a string describing the error, or "" if the parser is valid.
-        """
-        # Check tags attribute
-        if not hasattr(parser, "tags"):
-            return "No tags attribute (tags)"
-        tags = parser.tags
-        if not tags.get("description", ""):
-            return "Empty description (description)"
-        if not tags.get("min_size", 0):
-            return "Nul minimum size (min_size)"
-        if not self.ID_REGEX.match(tags.get("id", "")):
-            return "Invalid identifier ('%s'), have to be at least 3 alphanumeric characters (small case)" % tags.get("id", "")
-        if tags.get("category", "") not in self.VALID_CATEGORY:
-            return "Invalid category: %s" % tags.get("category", "")
-        if "mime" in tags and not isinstance(tags["mime"], (list, tuple)):
-            return "MIME type (mime) have to be a list or tuple"
-        if "file_ext" in tags and not isinstance(tags["file_ext"], (list, tuple)):
-            return "File extensions (file_ext) have to be a list or tuple"
-        return ""
-
-    def printParser(self, parser, verbose):
-        tags = parser.tags
-        print "- %s: %s" % (tags["id"], tags["description"])
-        if not verbose:
-            return
-        if "mime" in tags:
-            print "  MIME type: %s" % (", ".join(tags["mime"]))
-        if "file_ext" in tags:
-            file_ext = ", ".join(
-                ".%s" % file_ext for file_ext in tags["file_ext"])
-            print "  File extension: %s" % file_ext
 
     def print_(self, title=None, verbose=False):
         """Display a list of parser with its title
@@ -93,22 +79,21 @@ class ParserList(object):
         print
 
         # Create parser list sorted by module
-        for category in sorted(self.bycategory.iterkeys()):
+        bycategory = self.bytag["category"]
+        for category in sorted(bycategory.iterkeys()):
             if False:
-                parser_list = [ parser.tags["id"] for parser in self.bycategory[category] ]
+                parser_list = [ parser.tags["id"] for parser in bycategory[category] ]
                 parser_list.sort()
                 print "- %s: %s" % (category.title(), ", ".join(parser_list))
             else:
                 print "[%s]" % category
-                parser_list = sorted(self.bycategory[category],
+                parser_list = sorted(bycategory[category],
                     key=lambda parser: parser.tags["id"])
                 for parser in parser_list:
-                    self.printParser(parser, verbose)
+                    parser.print_(verbose)
                 print
         print "Total: %s parsers" % len(self.parser_list)
 
-    def __getitem__(self, key):
-        return self.byid[key]
 
 class HachoirParserList(ParserList):
     _instance = None
@@ -137,15 +122,12 @@ class HachoirParserList(ParserList):
         for attrname in dir(module):
             attr = getattr(module, attrname)
             if isinstance(attr, types.ModuleType):
-                parser = attr
                 todo.append(attr)
 
         for module in todo:
             attributes = ( getattr(module, name) for name in dir(module) )
-            parsers = list( attr for attr in attributes \
-                if isinstance(attr, type) \
-                   and issubclass(attr, HachoirParser) \
-                   and hasattr(attr, "tags"))
+            parsers = (attr for attr in attributes
+                if isinstance(attr, type) and issubclass(attr, Parser))
             for parser in parsers:
                 self.add(parser)
         assert 1 <= len(self.parser_list)

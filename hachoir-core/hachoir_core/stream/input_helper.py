@@ -8,7 +8,7 @@ def StringInputStream(content, source="<string>", **args):
     return InputIOStream(inputio, source=source, **args)
 
 
-def FileInputStream(filename, real_filename=None):
+def FileInputStream(filename, real_filename=None, **args):
     """
     Create an input stream of a file. filename must be unicode.
 
@@ -25,6 +25,15 @@ def FileInputStream(filename, real_filename=None):
     except IOError, err:
         charset = getTerminalCharset()
         errmsg = unicode(str(err), charset)
-        raise InputStreamError(_("Unable to open file %s: %s")
-            % (filename, errmsg))
-    return InputIOStream(inputio, source="file:" + filename, tags=[ ("filename", filename) ])
+        raise InputStreamError(_("Unable to open file %s: %s") % (filename, errmsg))
+    source = "file:" + filename
+    offset = args.pop("offset", 0)
+    size = args.pop("size", None)
+    if offset or size:
+        if size:
+            size = 8 * size
+        stream = InputIOStream(inputio, source, **args)
+        return InputSubStream(stream, 8 * offset, size, **args)
+    else:
+        args.setdefault("tags",[]).append(("filename", filename))
+        return InputIOStream(inputio, source=source, **args)
