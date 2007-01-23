@@ -88,7 +88,11 @@ class TarMetadata(MultipleMetadata):
             meta.author = "%s (uid=%s), group %s (gid=%s)" %\
                 (field["uname"].value, field.getOctal("uid"),
                  field["gname"].value, field.getOctal("gid"))
-            self.addGroup(field.name, meta, _("File \"%s\"") % meta.filename[0])
+            if hasattr(meta, "filename"):
+                title = _("File \"%s\"") % meta.filename[0]
+            else:
+                title = _("File")
+            self.addGroup(field.name, meta, title)
 
 registerExtractor(GzipParser, GzipMetadata)
 registerExtractor(Bzip2Parser, Bzip2Metadata)
