@@ -10,7 +10,7 @@ Creation date: 13 january 2007
 """
 
 from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet, ParserError,
+from hachoir_core.field import (FieldSet, ParserError, MissingField,
     UInt8, Enum, Bit, Bits, RawBytes)
 from hachoir_core.endian import BIG_ENDIAN
 from hachoir_core.text_handler import hexadecimal
@@ -41,7 +41,7 @@ class Packet(FieldSet):
         yield Bit(self, "has_error")
         yield Bit(self, "payload_unit_start")
         yield Bit(self, "priority")
-        yield Enum(Bits(self, "pid", 13, text_handler=hexadecimal), self.PID)
+        yield Enum(Bits(self, "pid", 13, "Program identifier", text_handler=hexadecimal), self.PID)
         yield Bits(self, "scrambling_control", 2)
         yield Bit(self, "has_adaptation")
         yield Bit(self, "has_payload")
@@ -59,6 +59,9 @@ class Packet(FieldSet):
     def isValid(self):
         if not self["has_payload"].value and not self["has_adaptation"].value:
             return u"No payload and no adaptation"
+        pid = self["pid"].value
+        if (0x0002 <= pid <= 0x000f) or (0x2000 <= pid):
+            return u"Invalid program identifier (%s)" % self["pid"].display
         return ""
 
 class MPEG_TS(Parser):
@@ -75,9 +78,17 @@ class MPEG_TS(Parser):
         sync = self.stream.searchBytes("\x47", 0, 204*8)
         if sync is None:
             return "Unable to find synchronization byte"
-        err = self["packet[0]"].isValid()
-        if err:
-            return "Packet #0 is invalid: %s" % err
+        for index in xrange(5):
+            try:
+                packet = self["packet[%u]" % index]
+            except MissingField:
+                if self.eof:
+                    return True
+                else:
+                    return "Unable to get packet #%u" % index
+            err = packet.isValid()
+            if err:
+                return "Packet #%u is invalid: %s" % (index, err)
         return True
 
     def createFields(self):
