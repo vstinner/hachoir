@@ -409,6 +409,22 @@ class InputIOStream(InputStream):
         return InputStream.file(self)
 
 
+class StringInputStream(InputStream):
+    def __init__(self, data, source="<string>", **args):
+        self.data = data
+        InputStream.__init__(self, source=source, size=8*len(data), **args)
+        self._current_size = self._size
+
+    def read(self, address, size):
+        address, shift = divmod(address, 8)
+        size = (size + shift + 7) >> 3
+        data = self.data[address:address+size]
+        got = len(data)
+        if got != size:
+            raise ReadStreamError(8 * size, 8 * address, 8 * got)
+        return shift, data, False
+
+
 class InputSubStream(InputStream):
     def __init__(self, stream, offset, size=None, source=None, **args):
         if offset is None:

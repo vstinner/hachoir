@@ -1,12 +1,5 @@
 from hachoir_core.i18n import getTerminalCharset, _
-from hachoir_core.stream import InputIOStream, InputStreamError
-from cStringIO import StringIO
-
-def StringInputStream(content, source="<string>", **args):
-    inputio = StringIO(content)
-    args["size"] = len(content) * 8
-    return InputIOStream(inputio, source=source, **args)
-
+from hachoir_core.stream import InputIOStream, InputSubStream, InputStreamError
 
 def FileInputStream(filename, real_filename=None, **args):
     """
@@ -32,7 +25,7 @@ def FileInputStream(filename, real_filename=None, **args):
     if offset or size:
         if size:
             size = 8 * size
-        stream = InputIOStream(inputio, source, **args)
+        stream = InputIOStream(inputio, source=source, **args)
         return InputSubStream(stream, 8 * offset, size, **args)
     else:
         args.setdefault("tags",[]).append(("filename", filename))

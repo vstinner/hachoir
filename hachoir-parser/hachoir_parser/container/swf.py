@@ -16,7 +16,7 @@ Creation date: 29 october 2006
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
     Bit, Bits, UInt8, UInt32, UInt16, CString, Enum,
-    Bytes, RawBytes, NullBits, String, CompressedField)
+    Bytes, RawBytes, NullBits, String, SubFile, CompressedField)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_core.text_handler import humanFilesize
 from hachoir_core.tools import paddingSize, humanFrequency
