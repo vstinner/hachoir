@@ -10,10 +10,10 @@ Creation date: 6 december 2006
 """
 
 from hachoir_parser import Parser
-from hachoir_core.field import (Field, FieldSet,
+from hachoir_core.field import (Field, FieldSet, ParserError,
     GenericVector,
     Enum, UInt8, UInt32, UInt64,
-    Bytes, RawBytes, String)
+    Bytes, RawBytes)
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.text_handler import hexadecimal, humanFilesize
 
@@ -80,16 +80,16 @@ class SkippedData(FieldSet):
         if size.value > 0:
             yield RawBytes(self, "data", size.value)
 
-def waitForID(self, wait_id, wait_name="waited_id[]"):
-    while not self.eof:
-        addr = self.absolute_address+self.current_size
-        id = self.stream.readBits(addr, 8, LITTLE_ENDIAN)
-        if id == wait_id:
-            yield Enum(UInt8(self, wait_name), ID_INFO)
-            self.info("Found ID %s (%u)" % (ID_INFO[id], id))
+def waitForID(s, wait_id, wait_name="waited_id[]"):
+    while not s.eof:
+        addr = s.absolute_address+s.current_size
+        uid = s.stream.readBits(addr, 8, LITTLE_ENDIAN)
+        if uid == wait_id:
+            yield Enum(UInt8(s, wait_name), ID_INFO)
+            s.info("Found ID %s (%u)" % (ID_INFO[uid], uid))
             return
-        self.info("Skipping ID %u!=%u" % (id, wait_id))
-        yield SkippedData(self, "skipped_id[]", "%u != %u" % (id, wait_id))
+        s.info("Skipping ID %u!=%u" % (uid, wait_id))
+        yield SkippedData(s, "skipped_id[]", "%u != %u" % (uid, wait_id))
 
 class HashDigest(FieldSet):
     def __init__(self, parent, name, num_digests, desc=None):
@@ -121,14 +121,14 @@ class PackInfo(FieldSet):
 
         while not self.eof:
             addr = self.absolute_address+self.current_size
-            id = self.stream.readBits(addr, 8, LITTLE_ENDIAN)
-            if id == ID_END:
+            uid = self.stream.readBits(addr, 8, LITTLE_ENDIAN)
+            if uid == ID_END:
                 yield Enum(UInt8(self, "end_marker"), ID_INFO)
                 break
-            elif id == ID_CRC:
+            elif uid == ID_CRC:
                 yield HashDigest(self, "hash_digest", size)
             else:
-                yield SkippedData(self)
+                yield SkippedData(self, "skipped_data")
 
 def lzmaParams(value):
     param = value.value
@@ -267,11 +267,11 @@ class UnpackInfo(FieldSet):
         # Extract digests
         while not self.eof:
             addr = self.absolute_address+self.current_size
-            id = self.stream.readBits(addr, 8, LITTLE_ENDIAN)
-            if id == ID_END:
+            uid = self.stream.readBits(addr, 8, LITTLE_ENDIAN)
+            if uid == ID_END:
                 yield Enum(UInt8(self, "end_marker"), ID_INFO)
                 break
-            elif id == ID_CRC:
+            elif uid == ID_CRC:
                 yield HashDigest(self, "hash_digest", num)
             else:
                 yield SkippedData(self, "skip_data")
@@ -279,25 +279,25 @@ class UnpackInfo(FieldSet):
 class SubStreamInfo(FieldSet):
     def createFields(self):
         yield Enum(UInt8(self, "id"), ID_INFO)
-        ParserError("SubStreamInfo not implemented yet")
+        raise ParserError("SubStreamInfo not implemented yet")
 
 class EncodedHeader(FieldSet):
     def createFields(self):
         yield Enum(UInt8(self, "id"), ID_INFO)
         while not self.eof:
             addr = self.absolute_address+self.current_size
-            id = self.stream.readBits(addr, 8, LITTLE_ENDIAN)
-            if id == ID_END:
+            uid = self.stream.readBits(addr, 8, LITTLE_ENDIAN)
+            if uid == ID_END:
                 yield Enum(UInt8(self, "end_marker"), ID_INFO)
                 break
-            elif id == ID_PACK_INFO:
+            elif uid == ID_PACK_INFO:
                 yield PackInfo(self, "pack_info", ID_INFO[ID_PACK_INFO])
-            elif id == ID_UNPACK_INFO:
+            elif uid == ID_UNPACK_INFO:
                 yield UnpackInfo(self, "unpack_info", ID_INFO[ID_UNPACK_INFO])
-            elif id == ID_SUBSTREAMS_INFO:
+            elif uid == ID_SUBSTREAMS_INFO:
                 yield SubStreamInfo(self, "substreams_info", ID_INFO[ID_SUBSTREAMS_INFO])
             else:
-                self.info("Unexpected ID (%i)" % id)
+                self.info("Unexpected ID (%i)" % uid)
                 break
 
 class IDHeader(FieldSet):
@@ -315,13 +315,13 @@ class NextHeader(FieldSet):
         yield Enum(UInt8(self, "header_type"), ID_INFO)
         yield RawBytes(self, "header_data", self.hdr_size-1)
     def createFields(self):
-        id = self.stream.readBits(self.absolute_address, 8, LITTLE_ENDIAN)
-        if id == ID_HEADER:
+        uid = self.stream.readBits(self.absolute_address, 8, LITTLE_ENDIAN)
+        if uid == ID_HEADER:
             yield IDHeader(self, "header", ID_INFO[ID_HEADER])
-        elif id == ID_ENCODED_HEADER:
+        elif uid == ID_ENCODED_HEADER:
             yield EncodedHeader(self, "encoded_hdr", ID_INFO[ID_ENCODED_HEADER])
         else:
-            ParserError("Unexpected ID %u" % id)
+            ParserError("Unexpected ID %u" % uid)
         size = self.hdr_size - (self.current_size//8)
         if size > 0:
             yield RawBytes(self, "next_hdr_data", size, "Next header's data")
