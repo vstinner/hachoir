@@ -14,11 +14,6 @@ CLASSIFIERS = [
     'Natural Language :: English',
     'Programming Language :: Python']
 
-# setup.py commands specific to setuptools library
-SETUPTOOLS_COMMANDS = ("rotate", "develop", "setopt",
-    "saveopts", "egg_info", "upload", "install_egg_info", "alias",
-    "easy_install", "bdist_egg", "test")
-
 import os
 import sys
 import hachoir_core
@@ -41,41 +36,19 @@ def get_long_description(root_dir):
     """Read the content of README file"""
     return open(os.path.join(root_dir, 'README'), 'r').read()
 
-def errorSetuptoolsNeeded(command):
-    print """Error: You need setuptools Python package for the command "%s"!
-
-Last version can be found at:
-   http://peak.telecommunity.com/dist/ez_setup.py
-(Hachoir has a backup copy, check setup.py directory)
-
-To install it, type as root:
-   python ez_setup.py""" % command
-
-def errorMSINeeded():
-    print """Error: You need bdist_msi extension to build MSI Windows package.
-Download it at:
-   http://www.dcl.hpi.uni-potsdam.de/home/loewis/bdist_msi/"""
-
 def main():
     # Check Python version!
     if sys.hexversion < 0x2040000:
         print "Sorry, you need Python 2.4 or greater to run (install) Hachoir!"
         sys.exit(1)
 
-    # Try to import setuptools (or use distutils fallback)
-    with_setuptools = True
-    try:
+    if "--setuptools" in sys.argv:
+        sys.argv.remove("--setuptools")
         from setuptools import setup
-    except ImportError:
-        # Is setuptools really needed?
-        for arg in sys.argv[1:]:
-            if arg in SETUPTOOLS_COMMANDS:
-                errorSetuptoolsNeeded(arg)
-                sys.exit(1)
-        with_setuptools = False
-
-        # Or use distutils
+        use_setuptools = True
+    else:
         from distutils.core import setup
+        use_setuptools = False
 
     # Set some variables
     root_dir = os.path.dirname(__file__)
@@ -97,20 +70,8 @@ def main():
         "long_description": long_description,
     }
 
-    if with_setuptools:
-        # Use MSI extension (to build clean Windows package)
-        cmdclass = {}
-        try:
-            import bdist_msi
-            cmdclass['bdist_msi'] = bdist_msi.bdist_msi
-        except ImportError:
-            for arg in sys.argv[1:]:
-                if "msi" in arg:
-                    errorMSINeeded()
-                    sys.exit(1)
-
+    if use_setuptools:
         install_options["zip_safe"] = True
-        install_options["cmdclass"] = cmdclass
 
     # Call main() setup function
     setup(**install_options)
