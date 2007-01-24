@@ -1,13 +1,15 @@
 #!/usr/bin/env python
-
 from imp import load_source
 from os import path
-try:
+import sys
+
+if "--setuptools" in sys.argv:
+    sys.argv.remove("--setuptools")
     from setuptools import setup
-    with_setuptools = True
-except ImportError:
+    use_setuptools = True
+else:
     from distutils.core import setup
-    with_setuptools = False
+    use_setuptools = False
 
 CLASSIFIERS = [
     'Intended Audience :: Developers',
@@ -22,7 +24,7 @@ def main():
     hachoir_urwid = load_source("version", path.join("hachoir_urwid", "version.py"))
     install_options = {
         "name": hachoir_urwid.PACKAGE,
-        "version": hachoir_urwid.__version__,
+        "version": hachoir_urwid.VERSION,
         "url": hachoir_urwid.WEBSITE,
         "download_url": hachoir_urwid.WEBSITE,
         "license": hachoir_urwid.LICENSE,
@@ -34,7 +36,7 @@ def main():
         "packages": ["hachoir_urwid"],
         "package_dir": {"hachoir_urwid": "hachoir_urwid"},
     }
-    if with_setuptools:
+    if use_setuptools:
         install_options["install_requires"] = ("hachoir-core>=0.7.0", "hachoir-parser>=0.7.0", "urwid>=0.9.4")
         install_options["zip_safe"] = True
     setup(**install_options)

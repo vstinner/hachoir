@@ -51,6 +51,12 @@ Command line options: use --help option.
 
 In hachoir-use, use F1 key to get help (keyboard keys).
 
+What's new in hachoir-urwid 0.7.1?
+==================================
+
+ * setup.py doesn't depdend on hachoir-core, nor hachoir-parser, not urwid
+ * setup.py uses distutils by default (and not setuptools)
+
 What's new in hachoir-urwid 0.7?
 ================================
 

@@ -6,13 +6,13 @@ from hachoir_core.stream import InputStreamError, FileInputStream
 from hachoir_core.i18n import _
 from hachoir_parser import guessParser, HachoirParserList
 from hachoir_urwid import exploreFieldSet
-from hachoir_urwid.version import __version__, WEBSITE
+from hachoir_urwid.version import VERSION, WEBSITE
 from optparse import OptionGroup, OptionParser
 import hachoir_core
 import sys
 
 def displayVersion(*args):
-    print _("Hachoir urwid version %s") % __version__
+    print _("Hachoir urwid version %s") % VERSION
     print _("Hachoir library version %s") % hachoir_core.__version__
     print
     print _("Website: %s") % WEBSITE
