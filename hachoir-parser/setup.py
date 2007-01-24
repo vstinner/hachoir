@@ -1,12 +1,7 @@
 #!/usr/bin/env python
 from imp import load_source
 from os import path
-try:
-    from setuptools import setup
-    with_setuptools = True
-except ImportError:
-    from distutils.core import setup
-    with_setuptools = False
+from sys import argv
 
 CLASSIFIERS = [
     'Intended Audience :: Developers',
@@ -21,8 +16,15 @@ MODULES = (
     "image", "misc", "network", "office", "program", "video")
 
 def main():
-    hachoir_parser = load_source("version", path.join("hachoir_parser", "version.py"))
+    if "--setuptools" in argv:
+        argv.remove("--setuptools")
+        from setuptools import setup
+        use_setuptools = True
+    else:
+        from distutils.core import setup
+        use_setuptools = False
 
+    hachoir_parser = load_source("version", path.join("hachoir_parser", "version.py"))
     PACKAGES = {"hachoir_parser": "hachoir_parser"}
     for name in MODULES:
         PACKAGES["hachoir_parser." + name] = "hachoir_parser/" + name
@@ -40,8 +42,8 @@ def main():
         "packages": PACKAGES.keys(),
         "package_dir": PACKAGES,
     }
-    if with_setuptools:
-        install_options["install_requires"] = "hachoir-core>=0.7.1"
+    if use_setuptools:
+        install_options["install_requires"] = "hachoir-core>=0.7.2"
         install_options["zip_safe"] = True
     setup(**install_options)
 

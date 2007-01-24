@@ -12,6 +12,24 @@ know *each* bit meaning. Some good (but not perfect ;-)) parsers:
 
 Website: http://hachoir.org/wiki/hachoir-parser
 
+What's new in hachoir-parser 0.8.1?
+===================================
+
+New features:
+ * Rewrite setup.py: uses distutils by default (instead of setuptools),
+   doesn't depend on hachoir-core
+ * ICO parser: fixes to support cursors
+ * Parser use new HACHOIR_ERRORS constant
+
+Bugfixes:
+ * gzip: fix magic string
+ * XCF: remove useless exceptions
+ * RIFF: fix fourcc handler (when fourcc is a string and not Unicode)
+ * FAT: catch ValueError when using string index() method
+ * ASF: don't create empty fields and validate() checks header minimum size
+ * EXE: validate() checks size_mod_512 in MSDOS header, add method to compute
+   content size of MSDOS executable (not PE)
+
 What's new in hachoir-parser 0.8?
 =================================
 
