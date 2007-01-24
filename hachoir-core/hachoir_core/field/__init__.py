@@ -14,6 +14,8 @@ from hachoir_core.field.string_field import (GenericString,
     PascalString8, PascalString16, PascalString32)
 from hachoir_core.field.padding import (PaddingBits, PaddingBytes,
     NullBits, NullBytes)
+from hachoir_core.field.timestamp import (GenericTimestamp,
+    TimestampUnix32, TimestampMac32, TimestampWin64)
 
 # Functions
 from hachoir_core.field.helper import (isString, isInteger,
@@ -47,6 +49,7 @@ available_types = (
     Float32, Float64,
     PaddingBits, PaddingBytes,
     NullBits, NullBytes,
+    TimestampUnix32, TimestampMac32, TimestampWin64,
 #    GenericInteger, GenericString,
 )
 

@@ -8,7 +8,7 @@ from hachoir_core.i18n import _, ngettext
 import re
 import stat
 from math import floor, ceil
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, MAXYEAR
 
 def paddingSize(value, align):
     """
@@ -408,6 +408,49 @@ def timestampUNIX(value):
     if not(0 <= value <= 2147483647):
         raise ValueError("timestampUNIX(): value have to be in 0..2147483647")
     return UNIX_TIMESTAMP_T0 + timedelta(seconds=value)
+
+# Start of Macintosh timestamp: 1st January 1904 at 00:00
+MAC_TIMESTAMP_T0 = datetime(1904, 1, 1)
+
+def timestampMac32(value):
+    """
+    Convert an Mac (32-bit) timestamp to string. The format is the number
+    of seconds since the 1st January 1904 (to 2040). Returns unicode string.
+
+    >>> timestampMac32(0)
+    datetime.datetime(1904, 1, 1, 0, 0)
+    >>> timestampMac32(2843043290)
+    datetime.datetime(1994, 2, 2, 14, 14, 50)
+    """
+    if not isinstance(value, (float, int, long)):
+        raise TypeError("an integer or float is required")
+    if not(0 <= value <= 4294967295):
+        return _("invalid Mac timestamp (%s)") % value
+    return MAC_TIMESTAMP_T0 + timedelta(seconds=value)
+
+# Start of 64-bit Windows timestamp: 1st January 1600 at 00:00
+WIN64_TIMESTAMP_T0 = datetime(1601, 1, 1, 0, 0, 0)
+
+def timestampWin64(value):
+    """
+    Convert Windows 64-bit timestamp to string. The timestamp format is
+    a 64-bit number which represents number of 100ns since the
+    1st January 1601 at 00:00. Result is an unicode string.
+    See also durationWin64(). Maximum date is 28 may 60056.
+
+    >>> timestampWin64(0)
+    datetime.datetime(1601, 1, 1, 0, 0)
+    >>> timestampWin64(127840491566710000)
+    datetime.datetime(2006, 2, 10, 12, 45, 56, 671000)
+    """
+    if not isinstance(value, (float, int, long)):
+        raise TypeError("an integer or float is required")
+    if value < 0:
+        raise ValueError("value have to be a positive or nul integer")
+    try:
+        return WIN64_TIMESTAMP_T0 + timedelta(microseconds=value/10)
+    except OverflowError:
+        raise ValueError(_("date newer than year %s (value=%s)") % (MAXYEAR, value))
 
 def humanDatetime(value):
     """
