@@ -69,6 +69,23 @@ UNIX "file" program)::
     sheep_on_drugs.mp3: MPEG v1 layer III, 128.0 Kbit/sec, 44.1 KHz, Joint stereo
     wormux_32x32_16c.ico: Microsoft Windows icon: 16x16x32
 
+What's new in hachoir-metadata 0.8.2?
+=====================================
+
+New features:
+ * Truncate very long string (more than 800 characters)
+ * setup.py uses distutils by default (and not setuptools) and doesn't depend
+   on hachoir-core nor hachoir-parser
+
+Bugfixes:
+ * AIFF: skip duration computation if rate is nul (to avoid division by zero)
+ * XCF: catch KeyError on bits_per_pixel
+ * JPEG (EXIF): only convert exposure to "1/%g" is value is a float
+ * WAVE: rewrite extractor. Fix bit rate, fix duration computation, support
+   wave with 6 channels and IEEE (32-bit float) codec
+ * AVI: avoid division by zero in duration computation
+ * Matroska: convert string to Unicode if needed
+
 What's new in hachoir-metadata 0.8.1?
 =====================================
 
