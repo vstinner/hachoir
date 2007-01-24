@@ -44,6 +44,7 @@ from hachoir_core.field import (FieldSet,
     Field, Enum, RawBytes)
 from hachoir_core.endian import BIG_ENDIAN
 from hachoir_core.tools import createDict, humanDatetime
+from hachoir_core.stream import InputStreamError
 
 # --- Field parser ---
 
@@ -242,7 +243,7 @@ class ASN1File(Parser):
     def validate(self):
         try:
             root = self[0]
-        except FieldError:
+        except (InputStreamError, FieldError):
             return "Unable to create root object"
         if root.size != self.size:
             return "Invalid root object size"

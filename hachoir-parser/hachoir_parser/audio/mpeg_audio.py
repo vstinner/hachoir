@@ -15,6 +15,7 @@ from hachoir_parser.audio.id3 import ID3v1, ID3v2
 from hachoir_core.endian import BIG_ENDIAN
 from hachoir_core.tools import humanFrequency, humanBitSize
 from hachoir_core.bits import long2raw
+from hachoir_core.stream import InputStreamError
 
 class Frame(FieldSet):
     VERSION_NAME = { 0: "2.5", 2: "2", 3: "1" }
@@ -268,7 +269,7 @@ class MpegAudioFile(Parser):
                 if self["frames"].done:
                     return True
                 return "Unable to get frame #%u" % index
-            except ParserError:
+            except (InputStreamError, ParserError):
                 return "Unable to create frame #%u" % index
 
             # Check first frame values

@@ -9,8 +9,6 @@ from hachoir_core.tools import (
     humanBitRate as doHumanBitRate,
     humanFrequency as doHumanFrequency,
     timestampUNIX as doTimestampUNIX,
-    timestampMac32 as doTimestampMac32,
-    timestampWin64 as doTimestampWin64,
     humanDatetime,
     alignValue,
 )
@@ -35,9 +33,11 @@ def timestampWin64(field):
     if field.value == 0:
         return _("(not set)")
     try:
-        return humanDatetime(doTimestampWin64(field.value))
-    except ValueError:
-        return _("invalid date (value=%s)") % field.value
+        date  = datetime(1601, 1, 1, 0, 0, 0)
+        date += timedelta(microseconds=field.value/10)
+        return humanDatetime(date)
+    except OverflowError:
+        return _("date newer than year %s (value=%s)" % (MAXYEAR, field.value))
 
 def durationWin64(field):
     """
@@ -120,11 +120,16 @@ def timestampUNIX(field):
     except ValueError:
         return u'invalid UNIX timestamp (%s)' % field.value
 
+# Start of Macintosh timestamp: 1st January 1904 at 00:00
+MAC_TIMESTAMP_T0 = datetime(1904, 1, 1)
+
 def timestampMac(field):
     """
     Convert an Mac (32-bit) timestamp to string. The format is the number
     of seconds since the 1st January 1904 (to 2040). Returns unicode string.
 
+    >>> timestampMac(type("", (), dict(value=0, size=32)))
+    u'1904-01-01 00:00:00'
     >>> timestampMac(type("", (), dict(value=2843043290, size=32)))
     u'1994-02-02 14:14:50'
     >>> timestampMac(type("", (), dict(value=-1, size=32)))
@@ -136,7 +141,7 @@ def timestampMac(field):
     assert field.size == 32
     if not(0 <= field.value <= 4294967295):
         return _("invalid Mac timestamp (%s)") % field.value
-    return humanDatetime(doTimestampMac32(field.value))
+    return humanDatetime(MAC_TIMESTAMP_T0 + timedelta(seconds=field.value))
 
 def hexadecimal(field):
     """

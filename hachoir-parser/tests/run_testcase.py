@@ -14,11 +14,13 @@ config.quiet = True      # Don't display warnings
 from hachoir_core.field import FieldError
 from hachoir_core.i18n import getTerminalCharset
 from hachoir_core.tools import humanFilesize
-from hachoir_core.error import HachoirError
-from hachoir_core.stream import InputStreamError
-from hachoir_parser import createParser
+from hachoir_core.error import HachoirError, HACHOIR_ERRORS, warning, error
+from hachoir_core.stream import InputStreamError, StringInputStream
+from hachoir_parser import createParser, HachoirParserList, ValidateError
 from hachoir_core.compatibility import all
 from locale import setlocale, LC_ALL
+from array import array
+import random
 import os
 import sys
 
@@ -395,6 +397,32 @@ def testFiles(directory):
             return False
     return True
 
+
+def testRandom(seed=0, tests=(1,8)):
+    random.seed(seed)
+    a = array('L')
+    parser_list = HachoirParserList()
+    n = max(tests) * max(parser.getTags()["min_size"] for parser in parser_list)
+    k = 8 * a.itemsize
+    for i in xrange((n - 1) // k + 1):
+        a.append(random.getrandbits(k))
+    a = StringInputStream(a.tostring(), source="<random data>")
+    ok = True
+    for parser in parser_list:
+        size = parser.getTags()["min_size"]
+        for test in tests:
+            a._size = a._current_size = size * test
+            try:
+                parser(a, validate=True)
+                error("[%s] Parser didn't reject random data" % parser.__name__)
+            except ValidateError:
+                continue
+            except HACHOIR_ERRORS, err:
+                error(u"[%s] %s" % (parser.__name__, err))
+            ok = False
+    return ok
+
+
 def main():
     setlocale(LC_ALL, "C")
     if len(sys.argv) != 2:
@@ -403,20 +431,27 @@ def main():
     charset = getTerminalCharset()
     directory = unicode(sys.argv[1], charset)
 
+    print "Test hachoir-parser using random data."
+    print
+    if not testRandom():
+        print
+        print "If you are really sure there is no error in your code," \
+              " increment the 'seed' parameter of testRandom."
+        sys.exit(1)
+    print "Result: ok"
+
+    print
     print "Test hachoir-parser using testcase."
     print
     print "Testcase is in directory: %s" % directory
-    ok = testFiles(directory)
-    if ok:
-        print
-        print "Result: ok for the %s files" % len(testcase_files)
-        sys.exit(0)
-    else:
+    if not testFiles(directory):
         print
         for index in xrange(3):
             print "!!! ERROR !!!"
         print
         sys.exit(1)
+    print
+    print "Result: ok for the %s files" % len(testcase_files)
 
 if __name__ == "__main__":
     main()

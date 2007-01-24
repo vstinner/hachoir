@@ -49,7 +49,7 @@ class LafFile(Parser):
     "id": "lucasarts_font",
     "category": "game",
     "file_ext" : ("laf",),
-    "min_size" : 8,
+    "min_size" : 32*8,
     "description" : "LucasArts Font"
     }
 

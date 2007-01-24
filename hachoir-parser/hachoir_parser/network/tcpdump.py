@@ -438,7 +438,7 @@ class TcpdumpFile(Parser):
     tags = {
         "id": "tcpdump",
         "category": "misc",
-        "min_size": 8,
+        "min_size": 24*8,
         "description": "Tcpdump file (network)",
         "magic": (("\xd4\xc3\xb2\xa1", 0),),
     }

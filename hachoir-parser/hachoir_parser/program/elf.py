@@ -133,8 +133,8 @@ class ElfFile(Parser):
     tags = {
         "id": "elf",
         "category": "program",
-        "file_ext": ("so",), # What about "no extension"?
-        "min_size": (4+32)*8,  # At least one program header
+        "file_ext": ("so", ""),
+        "min_size": ElfHeader.static_size,  # At least one program header
         "mime": (
             "application/x-executable",
             "application/x-object",

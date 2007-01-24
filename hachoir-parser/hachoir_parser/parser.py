@@ -140,7 +140,7 @@ class Parser(HachoirParser, GenericParser):
                 res = self.validate()
                 if res is True:
                     break
-                res = makePrintable(res, "ASCII", to_unicode=True)
+                res = unicode(res)
             else:
                 res = _("stream too small (< %u bits)" % nbits)
             raise ValidateError(res)

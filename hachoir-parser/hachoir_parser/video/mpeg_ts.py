@@ -81,8 +81,8 @@ class MPEG_TS(Parser):
         for index in xrange(5):
             try:
                 packet = self["packet[%u]" % index]
-            except MissingField:
-                if self.eof:
+            except (ParserError, MissingField):
+                if index and self.eof:
                     return True
                 else:
                     return "Unable to get packet #%u" % index
