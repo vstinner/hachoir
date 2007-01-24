@@ -145,8 +145,8 @@ def lzmaParams(value):
 class CoderID(FieldSet):
     CODECS = {
         # Only 2 methods ... and what about PPMD ?
-        "\0"     : "Copy",
-        "\3\1\1" : "LZMA",
+        "\0"    : "copy",
+        "\3\1\1": "lzma",
     }
     def createFields(self):
         byte = UInt8(self, "id_size")
@@ -161,8 +161,9 @@ class CoderID(FieldSet):
                 self.info("Codec is %s" % name)
             else:
                 self.info("Undetermined codec %s" % name)
-                name = None
-            yield RawBytes(self, "id", size, name)
+                name = "unknown"
+            yield RawBytes(self, name, size)
+            #yield Bytes(self, "id", size, text_handler=lambda: name)
         if byte & 0x10:
             yield SZUInt64(self, "num_stream_in")
             yield SZUInt64(self, "num_stream_out")
@@ -212,6 +213,7 @@ class FolderItem(FieldSet):
         FieldSet.__init__(self, parent, name, desc)
         self.in_streams = 0
         self.out_streams = 0
+
     def createFields(self):
         yield SZUInt64(self, "num_coders")
         num = self["num_coders"].value
@@ -321,6 +323,10 @@ class NextHeader(FieldSet):
             yield IDHeader(self, "header", ID_INFO[ID_HEADER])
         elif uid == ID_ENCODED_HEADER:
             yield EncodedHeader(self, "encoded_hdr", ID_INFO[ID_ENCODED_HEADER])
+            # Game Over: this is usually encoded using LZMA, not copy
+            # See SzReadAndDecodePackedStreams/SzDecode being called with the
+            # data position from "/next_hdr/encoded_hdr/pack_info/pack_pos"
+            # We should process further, yet we can't...
         else:
             ParserError("Unexpected ID %u" % uid)
         size = self._size - self.current_size
@@ -332,7 +338,19 @@ class Body(FieldSet):
         FieldSet.__init__(self, parent, name, desc)
         self._size = 8*self["/signature/start_hdr/next_hdr_offset"].value
     def createFields(self):
-        yield RawBytes(self, "compressed_data", self._size//8, "Compressed data")
+        if "encoded_hdr" in self["/next_hdr/"]:
+            pack_size = sum([s.value for s in self.array("/next_hdr/encoded_hdr/pack_info/pack_size")])
+            body_size = self["/next_hdr/encoded_hdr/pack_info/pack_pos"].value
+            yield RawBytes(self, "compressed_data", body_size, "Compressed data")
+            # Here we could check if copy method was used to "compress" it,
+            # but this never happens, so just output "compressed file info"
+            yield RawBytes(self, "compressed_file_info", pack_size,
+                           "Compressed file information")
+            size = (self._size//8) - pack_size - body_size
+            if size > 0:
+                yield RawBytes(self, "unknown_data", size)
+        elif "header" in self["/next_hdr"]:
+            yield RawBytes(self, "compressed_data", self._size//8, "Compressed data")
 
 class StartHeader(StaticFieldSet):
     format = (
