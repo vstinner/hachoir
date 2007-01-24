@@ -55,7 +55,7 @@ class MSDosHeader(StaticFieldSet):
 class SectionHeader(FieldSet):
     static_size = 40 * 8
     def createFields(self):
-        yield String(self, "name", 8, charset="ASCII", strip="\0")
+        yield String(self, "name", 8, charset="ASCII", strip="\0 ")
         yield UInt32(self, "mem_size", "Size in memory", text_handler=humanFilesize)
         yield UInt32(self, "rva", "RVA (location) in memory", text_handler=hexadecimal)
         yield UInt32(self, "phys_size", "Physical size (on disk)", text_handler=humanFilesize)
