@@ -12,7 +12,7 @@ Creation date: 19 january 2006
 """
 
 from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet,
+from hachoir_core.field import (StaticFieldSet, FieldSet,
     Bit, Bits, Enum,
     NullBits,
     UInt8, UInt16, UInt32, PascalString8, PascalString16,
@@ -60,19 +60,19 @@ COMPRESSION_MODE = {
 #    return not self["extend"].value and self["signature"].value == MAGIC and \
 #           self["host_os"].value<12
 
-class MarkerFlags(FieldSet):
-    static_size = 16
-    def createFields(self):
-        yield Bit(self, "extend", "Whether the header is extended")
-        yield Bit(self, "has_comment", "Whether the archive has a comment")
-        yield NullBits(self, "unused", 7, "Reserved bits")
-        yield Bit(self, "sfx", "SFX")
-        yield Bit(self, "limited_dict", "Junior SFX with 256K dictionary")
-        yield Bit(self, "multi_volume", "Part of a set of ACE archives")
-        yield Bit(self, "has_av_string", "This header holds an AV-string")
-        yield Bit(self, "recovery_record", "Recovery record preset")
-        yield Bit(self, "locked", "Archive is locked")
-        yield Bit(self, "solid", "Archive uses solid compression")
+class MarkerFlags(StaticFieldSet):
+    format = (
+        (Bit, "extend", "Whether the header is extended"),
+        (Bit, "has_comment", "Whether the archive has a comment"),
+        (NullBits, "unused", 7, "Reserved bits"),
+        (Bit, "sfx", "SFX"),
+        (Bit, "limited_dict", "Junior SFX with 256K dictionary"),
+        (Bit, "multi_volume", "Part of a set of ACE archives"),
+        (Bit, "has_av_string", "This header holds an AV-string"),
+        (Bit, "recovery_record", "Recovery record preset"),
+        (Bit, "locked", "Archive is locked"),
+        (Bit, "solid", "Archive uses solid compression")
+    )
 
 def markerFlags(self):
     yield MarkerFlags(self, "flags", "Marker flags")
@@ -96,16 +96,16 @@ def markerHeader(self):
             yield RawBytes(self, "compressed_comment", size.value, \
                            "Compressed comment")
 
-class FileFlags(FieldSet):
-    static_size = 16
-    def createFields(self):
-        yield Bit(self, "extend", "Whether the header is extended")
-        yield Bit(self, "has_comment", "Presence of file comment")
-        yield Bits(self, "unused", 10, "Unused bit flags")
-        yield Bit(self, "encrypted", "File encrypted with password")
-        yield Bit(self, "previous", "File continued from previous volume")
-        yield Bit(self, "next", "File continues on the next volume")
-        yield Bit(self, "solid", "File compressed using previously archived files")
+class FileFlags(StaticFieldSet):
+    format = (
+        (Bit, "extend", "Whether the header is extended"),
+        (Bit, "has_comment", "Presence of file comment"),
+        (Bits, "unused", 10, "Unused bit flags"),
+        (Bit, "encrypted", "File encrypted with password"),
+        (Bit, "previous", "File continued from previous volume"),
+        (Bit, "next", "File continues on the next volume"),
+        (Bit, "solid", "File compressed using previously archived files")
+    )
 
 def fileFlags(self):
     yield FileFlags(self, "flags", "File flags")
@@ -175,11 +175,11 @@ def newRecoveryHeader(self):
     yield UInt32(self, "unknown[]", "Unknown field, probably 0", \
                  text_handler=hexadecimal)
 
-class BaseFlags(FieldSet):
-    static_size = 16
-    def createFields(self):
-        yield Bit(self, "extend", "Whether the header is extended")
-        yield NullBits(self, "unused", 15, "Unused bit flags")
+class BaseFlags(StaticFieldSet):
+    format = (
+        (Bit, "extend", "Whether the header is extended"),
+        (NullBits, "unused", 15, "Unused bit flags")
+    )
 
 def parseFlags(self):
     yield BaseFlags(self, "flags", "Unknown flags")

@@ -6,7 +6,7 @@ Author: Christophe Gisquet
 """
 
 from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet, ParserError,
+from hachoir_core.field import (StaticFieldSet, FieldSet, ParserError,
     Bit, Bits, Enum,
     UInt8, UInt16, UInt32, UInt64,
     String,
@@ -60,49 +60,49 @@ def formatRARVersion(field):
     """
     return "%u.%u" % divmod(field.value, 10)
 
-class MSDOSFileAttr(FieldSet):
+class MSDOSFileAttr(StaticFieldSet):
     """
     Decodes the MSDOS file attribute, as specified by the winddk.h header
     and its FILE_ATTR_ defines:
     http://www.cs.colorado.edu/~main/cs1300/include/ddk/winddk.h
     """
-    static_size = 32
-    def createFields(self):
-        yield Bit(self, "read_only")
-        yield Bit(self, "hidden")
-        yield Bit(self, "system")
-        yield NullBits(self, "reserved[]", 1)
-        yield Bit(self, "directory")
-        yield Bit(self, "archive")
-        yield Bit(self, "device")
-        yield Bit(self, "normal")
-        yield Bit(self, "temporary")
-        yield Bit(self, "sparse_file")
-        yield Bit(self, "reparse_file")
-        yield Bit(self, "compressed")
-        yield Bit(self, "offline")
-        yield Bit(self, "dont_index_content")
-        yield Bit(self, "encrypted")
-        yield NullBits(self, "reserved[]", 1+16)
+    format = (
+        (Bit, "read_only"),
+        (Bit, "hidden"),
+        (Bit, "system"),
+        (NullBits, "reserved[]", 1),
+        (Bit, "directory"),
+        (Bit, "archive"),
+        (Bit, "device"),
+        (Bit, "normal"),
+        (Bit, "temporary"),
+        (Bit, "sparse_file"),
+        (Bit, "reparse_file"),
+        (Bit, "compressed"),
+        (Bit, "offline"),
+        (Bit, "dont_index_content"),
+        (Bit, "encrypted"),
+        (NullBits, "reserved[]", 1+16)
+    )
 
 def commonFlags(self):
     yield Bit(self, "has_added_size", "Additional field indicating additional size")
     yield Bit(self, "is_ignorable", "Old versions of RAR should ignore this block when copying data")
 
-class ArchiveFlags(FieldSet):
-    static_size = 16
-    def createFields(self):
-        yield Bit(self, "vol", "Archive volume")
-        yield Bit(self, "has_comment", "Whether there is a comment")
-        yield Bit(self, "is_locked", "Archive volume")
-        yield Bit(self, "is_solid", "Whether files can be extracted separately")
-        yield Bit(self, "new_numbering", "New numbering, or compressed comment") # From unrar
-        yield Bit(self, "has_authenticity_information", "The integrity/authenticity of the archive can be checked")
-        yield Bit(self, "is_protected", "The integrity/authenticity of the archive can be checked")
-        yield Bit(self, "is_passworded", "Needs a password to be decrypted")
-        yield Bit(self, "is_first_vol", "Whether it is the first volume")
-        yield Bit(self, "is_encrypted", "Whether the encryption version is present")
-        yield NullBits(self, "internal", 6, "Reserved for 'internal use'")
+class ArchiveFlags(StaticFieldSet):
+    format = (
+        (Bit, "vol", "Archive volume"),
+        (Bit, "has_comment", "Whether there is a comment"),
+        (Bit, "is_locked", "Archive volume"),
+        (Bit, "is_solid", "Whether files can be extracted separately"),
+        (Bit, "new_numbering", "New numbering, or compressed comment"), # From unrar
+        (Bit, "has_authenticity_information", "The integrity/authenticity of the archive can be checked"),
+        (Bit, "is_protected", "The integrity/authenticity of the archive can be checked"),
+        (Bit, "is_passworded", "Needs a password to be decrypted"),
+        (Bit, "is_first_vol", "Whether it is the first volume"),
+        (Bit, "is_encrypted", "Whether the encryption version is present"),
+        (NullBits, "internal", 6, "Reserved for 'internal use'")
+    )
 
 def archiveFlags(self):
     yield ArchiveFlags(self, "flags", "Archiver block flags")
@@ -163,6 +163,7 @@ class FileFlags(FieldSet):
         yield Bit(self, "is_encrypted", "File encrypted with password")
         yield Bit(self, "has_comment", "File comment present")
         yield Bit(self, "is_solid", "Information from previous files is used (solid flag)")
+        # The 3 following lines are what blocks more staticity
         yield Enum(Bits(self, "dictionary_size", 3, "Dictionary size"), DICTIONARY_SIZE)
         for bit in commonFlags(self):
             yield bit
@@ -246,28 +247,28 @@ def fileDescription(self):
 def newSubHeader(self):
     return specialHeader(self, False)
 
-class EndFlags(FieldSet):
-    static_size = 16
-    def createFields(self):
-        yield Bit(self, "has_next_vol", "Whether there is another next volume")
-        yield Bit(self, "has_data_crc", "Whether a CRC value is present")
-        yield Bit(self, "rev_space")
-        yield Bit(self, "has_vol_number", "Whether the volume number is present")
-        yield Bits(self, "unused[]", 4)
-        for bit in commonFlags(self):
-            yield bit
-        yield Bits(self, "unused[]", 16 - self.current_size, text_handler=hexadecimal)
+class EndFlags(StaticFieldSet):
+    format = (
+        (Bit, "has_next_vol", "Whether there is another next volume"),
+        (Bit, "has_data_crc", "Whether a CRC value is present"),
+        (Bit, "rev_space"),
+        (Bit, "has_vol_number", "Whether the volume number is present"),
+        (Bits, "unused[]", 4),
+        (Bit, "has_added_size", "Additional field indicating additional size"),
+        (Bit, "is_ignorable", "Old versions of RAR should ignore this block when copying data"),
+        (Bits, "unused[]", 6),
+    )
 
 def endFlags(self):
     yield EndFlags(self, "flags", "End block flags")
 
-class BlockFlags(FieldSet):
-    static_size = 16
-    def createFields(self):
-        yield Bits(self, "unused[]", 8, "Unused flag bits", text_handler=hexadecimal)
-        for bit in commonFlags(self):
-            yield bit
-        yield Bits(self, "unused[]", 16 - self.current_size, text_handler=hexadecimal)
+class BlockFlags(StaticFieldSet):
+    format = (
+        (Bits, "unused[]", 8, "Unused flag bits", hexadecimal),
+        (Bit, "has_added_size", "Additional field indicating additional size"),
+        (Bit, "is_ignorable", "Old versions of RAR should ignore this block when copying data"),
+        (Bits, "unused[]", 6)
+    )
 
 class Block(FieldSet):
     BLOCK_INFO = {
