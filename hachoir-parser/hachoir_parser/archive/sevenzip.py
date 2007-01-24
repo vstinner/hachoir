@@ -10,7 +10,7 @@ Creation date: 6 december 2006
 """
 
 from hachoir_parser import Parser
-from hachoir_core.field import (Field, FieldSet, ParserError,
+from hachoir_core.field import (Field, StaticFieldSet, FieldSet, ParserError,
     GenericVector,
     Enum, UInt8, UInt32, UInt64,
     Bytes, RawBytes)
@@ -29,13 +29,13 @@ class SZUInt64(Field):
         mask = 0x80
         firstByte = parent.stream.readBits(addr, 8, LITTLE_ENDIAN)
         for i in xrange(8):
+            addr += 8
             if not (firstByte & mask):
                 value += ((firstByte & (mask-1)) << (8*i))
                 break
-            value |= parent.stream.readBits(addr, 8, LITTLE_ENDIAN) << (8*i)
+            value |= (parent.stream.readBits(addr, 8, LITTLE_ENDIAN) << (8*i))
             mask >>= 1
             self._size += 8
-            addr += 8
         self.createValue = lambda: value
 
 ID_END, ID_HEADER, ID_ARCHIVE_PROPS, ID_ADD_STREAM_INFO, ID_MAIN_STREAM_INFO, \
@@ -108,7 +108,8 @@ class HashDigest(FieldSet):
 class PackInfo(FieldSet):
     def createFields(self):
         yield Enum(UInt8(self, "id"), ID_INFO)
-        yield SZUInt64(self, "pack_pos", "Positions of the packs")
+        # Very important, helps determine where the data is
+        yield SZUInt64(self, "pack_pos", "Position of the packs")
         num = SZUInt64(self, "num_pack_streams")
         yield num
         num = num.value
@@ -306,14 +307,14 @@ class IDHeader(FieldSet):
         ParserError("IDHeader not implemented")
 
 class NextHeader(FieldSet):
-    def __init__(self, parent, name, hdr_size):
-        FieldSet.__init__(self, parent, name, "Next header")
-        self.hdr_size = hdr_size
+    def __init__(self, parent, name, desc="Next header"):
+        FieldSet.__init__(self, parent, name, desc)
+        self._size = 8*self["/signature/start_hdr/next_hdr_size"].value
     # Less work, as much interpretable information as the other
     # version... what an obnoxious format
     def createFields2(self):
         yield Enum(UInt8(self, "header_type"), ID_INFO)
-        yield RawBytes(self, "header_data", self.hdr_size-1)
+        yield RawBytes(self, "header_data", self._size-1)
     def createFields(self):
         uid = self.stream.readBits(self.absolute_address, 8, LITTLE_ENDIAN)
         if uid == ID_HEADER:
@@ -322,27 +323,32 @@ class NextHeader(FieldSet):
             yield EncodedHeader(self, "encoded_hdr", ID_INFO[ID_ENCODED_HEADER])
         else:
             ParserError("Unexpected ID %u" % uid)
-        size = self.hdr_size - (self.current_size//8)
+        size = self._size - self.current_size
         if size > 0:
-            yield RawBytes(self, "next_hdr_data", size, "Next header's data")
+            yield RawBytes(self, "next_hdr_data", size//8, "Next header's data")
 
-class StartHeader(FieldSet):
-    #static_size = 20
+class Body(FieldSet):
+    def __init__(self, parent, name, desc="Body data"):
+        FieldSet.__init__(self, parent, name, desc)
+        self._size = 8*self["/signature/start_hdr/next_hdr_offset"].value
     def createFields(self):
-        yield UInt64(self, "next_hdr_offset", "NextHeaderOffset")
-        yield UInt64(self, "next_hdr_size", "NextHeaderSize")
-        yield UInt32(self, "next_hdr_crc", "Next header CRC",
-                     text_handler=hexadecimal)
+        yield RawBytes(self, "compressed_data", self._size//8, "Compressed data")
 
-class SignatureHeader(FieldSet):
-    #static_size = 32
-    def createFields(self):
-        yield Bytes(self, "signature", 6, "Signature Header")
-        yield UInt8(self, "major_ver", "Archive major version")
-        yield UInt8(self, "minor_ver", "Archive minor version")
-        yield UInt32(self, "start_hdr_crc", "Start header CRC",
-                     text_handler=hexadecimal)
-        yield StartHeader(self, "start_hdr", "Start header")
+class StartHeader(StaticFieldSet):
+    format = (
+        (UInt64, "next_hdr_offset", "Next header offset", hexadecimal),
+        (UInt64, "next_hdr_size", "Next header size"),
+        (UInt32, "next_hdr_crc", "Next header CRC", hexadecimal)
+    )
+
+class SignatureHeader(StaticFieldSet):
+    format = (
+        (Bytes, "signature", 6, "Signature Header"),
+        (UInt8, "major_ver", "Archive major version"),
+        (UInt8, "minor_ver", "Archive minor version"),
+        (UInt32, "start_hdr_crc", "Start header CRC", hexadecimal),
+        (StartHeader, "start_hdr", "Start header")
+    )
 
 class SevenZipParser(Parser):
     tags = {
@@ -358,11 +364,8 @@ class SevenZipParser(Parser):
 
     def createFields(self):
         yield SignatureHeader(self, "signature", "Signature Header")
-        size = self["/signature/start_hdr/next_hdr_offset"].value
-        if size > 0:
-            yield RawBytes(self, "data", size, "Compressed data")
-            yield NextHeader(self, "next_hdr",
-                             self["/signature/start_hdr/next_hdr_size"].value)
+        yield Body(self, "body_data")
+        yield NextHeader(self, "next_hdr")
 
     def validate(self):
         if self.stream.readBytes(0,6) != "7z\xbc\xaf'\x1c":
