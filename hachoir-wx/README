@@ -8,6 +8,15 @@ http://hachoir.org/wiki/hachoir-wx
 
 Everyone is very welcome to contribute code =)
 
+hachoir-wx 0.1.1
+================
+
+Bugfixes:
+ * Fix setup.py: install submodules!
+ * setup.py uses distutils by default (and not setuptools)
+ * Add some missing imports
+ * Fix few typo errors
+
 hachoir-wx 0.1 Initial Release (all platforms)
 ==============================================
 

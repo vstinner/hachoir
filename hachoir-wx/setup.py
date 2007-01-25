@@ -23,8 +23,15 @@ CLASSIFIERS = [
     'Natural Language :: English',
     'Programming Language :: Python']
 
+MODULES = ("field_view", "frame_view", "hex_view", "resource")
+
 def main():
     hachoir_wx = load_source("version", path.join("hachoir_wx", "version.py"))
+
+    PACKAGES = {"hachoir_wx": "hachoir_wx"}
+    for name in MODULES:
+        PACKAGES["hachoir_wx." + name] = path.join("hachoir_wx", name)
+
     install_options = {
         "name": hachoir_wx.PACKAGE,
         "version": hachoir_wx.VERSION,
@@ -36,9 +43,10 @@ def main():
         "long_description": open('README').read(),
         "classifiers": CLASSIFIERS,
         "scripts": ["hachoir-wx"],
-        "packages": ["hachoir_wx"],
-        "package_dir": {"hachoir_wx": "hachoir_wx"},
+        "packages": PACKAGES.keys(),
+        "package_dir": PACKAGES,
     }
+
     if use_setuptools:
         install_options["install_requires"] = (
             "hachoir-core>=0.7.0", "hachoir-parser>=0.7.0",
