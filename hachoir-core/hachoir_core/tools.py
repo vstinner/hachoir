@@ -7,7 +7,6 @@ Various utilities.
 from hachoir_core.i18n import _, ngettext
 import re
 import stat
-from math import floor, ceil
 from datetime import datetime, timedelta, MAXYEAR
 
 def paddingSize(value, align):

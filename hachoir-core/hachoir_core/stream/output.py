@@ -124,12 +124,12 @@ class OutputStream(object):
             raise NotImplementedError()
         self._output.write(bytes)
 
-def StringOutputStream(OutputStream):
+def StringOutputStream():
     """
-    Write data into a string (StringIO)
+    Create an output stream into a string.
     """
     data = StringIO()
-    return OutputStream(self, data)
+    return OutputStream(data)
 
 def FileOutputStream(filename, real_filename=None):
     """

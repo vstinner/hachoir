@@ -1,4 +1,5 @@
-from hachoir_core.field import BasicFieldSet, FakeArray, Field
+from hachoir_core.field import BasicFieldSet, FakeArray
+from hachoir_core.tools import lowerBound
 
 class SeekableFieldSet(BasicFieldSet):
     def __init__(self, parent, name, stream, description, size):
