@@ -1,5 +1,4 @@
 #!/usr/bin/env python2.4
-from hachoir_core.error import error
 from hachoir_core.cmd_line import (getHachoirOptions,
     configureHachoir, unicodeFilename)
 from hachoir_core.stream import InputStreamError, FileInputStream
@@ -56,17 +55,18 @@ def parseOptions():
     return values, arguments[0]
 
 def runProfiler(*args):
-    import hotshot, hotshot.stats
+    from hotshot import Profile
+    from hotshot.stats import load as load_hotshot_stats
     from os import unlink
     profile_filename = "/tmp/hachoir-urwid.hotshot"
-    prof = hotshot.Profile(profile_filename)
+    prof = Profile(profile_filename)
     try:
         print "[+] Run profiler"
         prof.runcall(*args)
         prof.close()
         print "[+] Stop profiler"
         print "[+] Process data..."
-        stat = hotshot.stats.load(profile_filename)
+        stat = load_hotshot_stats(profile_filename)
         print "[+] Strip..."
         stat.strip_dirs()
         print "[+] Sort data..."
