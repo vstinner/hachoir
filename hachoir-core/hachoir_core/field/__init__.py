@@ -14,8 +14,6 @@ from hachoir_core.field.string_field import (GenericString,
     PascalString8, PascalString16, PascalString32)
 from hachoir_core.field.padding import (PaddingBits, PaddingBytes,
     NullBits, NullBytes)
-from hachoir_core.field.timestamp import (GenericTimestamp,
-    TimestampUnix32, TimestampMac32, TimestampWin64)
 
 # Functions
 from hachoir_core.field.helper import (isString, isInteger,
@@ -29,10 +27,14 @@ from hachoir_core.field.basic_field_set import (BasicFieldSet,
 from hachoir_core.field.generic_field_set import GenericFieldSet
 from hachoir_core.field.seekable_field_set import SeekableFieldSet
 from hachoir_core.field.field_set import FieldSet
-from hachoir_core.field.float import Float32, Float64, Float80
 from hachoir_core.field.static_field_set import StaticFieldSet
-from hachoir_core.field.vector import GenericVector, UserVector
 from hachoir_core.field.parser import Parser
+from hachoir_core.field.vector import GenericVector, UserVector
+
+# Complex types
+from hachoir_core.field.float import Float32, Float64, Float80
+from hachoir_core.field.timestamp import (GenericTimestamp,
+    TimestampUnix32, TimestampMac32, TimestampMSDOS32, TimestampWin64)
 
 # Special Field classes
 from hachoir_core.field.link import Link, Fragment
@@ -49,7 +51,7 @@ available_types = (
     Float32, Float64,
     PaddingBits, PaddingBytes,
     NullBits, NullBytes,
-    TimestampUnix32, TimestampMac32, TimestampWin64,
+    TimestampUnix32, TimestampMac32, TimestampMSDOS32, TimestampWin64,
 #    GenericInteger, GenericString,
 )
 
