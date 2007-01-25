@@ -1,13 +1,15 @@
 #!/usr/bin/env python
-
-try:
+from imp import load_source
+from os import path
+from sys import argv
+if "--setuptools" in argv:
+    argv.remove("--setuptools")
     from setuptools import setup
-    with_setuptools = True
-except ImportError:
+    use_setuptools = True
+else:
     from distutils.core import setup
-    with_setuptools = False
+    use_setuptools = False
 
-URL = 'http://hachoir.org/wiki/hachoir-wx'
 CLASSIFIERS = [
     'Intended Audience :: Developers',
     'Development Status :: 4 - Beta',
@@ -22,22 +24,22 @@ CLASSIFIERS = [
     'Programming Language :: Python']
 
 def main():
-    import hachoir_wx
+    hachoir_wx = load_source("version", path.join("hachoir_wx", "version.py"))
     install_options = {
-        "name": 'hachoir-wx',
-        "version": hachoir_wx.__version__,
-        "url": URL,
-        "download_url": URL,
+        "name": hachoir_wx.PACKAGE,
+        "version": hachoir_wx.VERSION,
+        "url": hachoir_wx.WEBSITE,
+        "download_url": hachoir_wx.WEBSITE,
+        "license": hachoir_wx.LICENSE,
         "author": "Cyril Zorin",
         "description": "hachoir-wx is a wxWidgets GUI that's meant to provide a (more) user-friendly interface to the hachoir binary parsing engine",
         "long_description": open('README').read(),
         "classifiers": CLASSIFIERS,
-        "license": 'GNU GPL v2',
         "scripts": ["hachoir-wx"],
         "packages": ["hachoir_wx"],
         "package_dir": {"hachoir_wx": "hachoir_wx"},
     }
-    if with_setuptools:
+    if use_setuptools:
         install_options["install_requires"] = (
             "hachoir-core>=0.7.0", "hachoir-parser>=0.7.0",
             "wxPython>=2.6.3")

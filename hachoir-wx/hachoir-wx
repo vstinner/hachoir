@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from hachoir_wx.app import app_t
+from hachoir_wx.version import PACKAGE, VERSION, WEBSITE
 from hachoir_core.cmd_line import (getHachoirOptions,
     configureHachoir, unicodeFilename)
 from optparse import OptionParser
@@ -23,6 +24,9 @@ def parseOptions():
     return values, filename
 
 def main():
+    print "%s version %s" % (PACKAGE, VERSION)
+    print WEBSITE
+    print
     values, filename = parseOptions()
     configureHachoir(values)
     if filename:

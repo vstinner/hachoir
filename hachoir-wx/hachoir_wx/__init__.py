@@ -1,1 +1,1 @@
-__version__ = "0.1.0"
+from hachoir_wx.version import VERSION as __version__
