@@ -9,7 +9,7 @@ from inspect import getmro
 class ValidateError(HachoirError):
     pass
 
-class HachoirParser:
+class HachoirParser(object):
     """
     A parser is the root of all other fields. It create first level of fields
     and have special attributes and methods:

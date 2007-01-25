@@ -1,9 +1,9 @@
 #!/usr/bin/env python2.4
-TESTCASE_URL = "http://hachoir.tuxfamily.org/testcase/"
 """
 Download and check Hachoir testcase. Files are downloaded from:
-  %s
-""" % TESTCASE_URL
+  http://hachoir.tuxfamily.org/testcase/
+"""
+TESTCASE_URL = "http://hachoir.tuxfamily.org/testcase/"
 
 from urllib2 import Request, urlopen, URLError, HTTPError
 from hachoir_core.i18n import getTerminalCharset

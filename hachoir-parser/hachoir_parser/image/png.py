@@ -34,86 +34,82 @@ try:
 except ImportError:
     has_deflate = False
 
+UNIT_NAME = {1: "Meter"}
 COMPRESSION_NAME = {
     0: "deflate" # with 32K sliding window
 }
 MAX_CHUNK_SIZE = 500 * 1024 # Maximum chunk size (500 KB)
 
-def headerParse(self):
-    yield UInt32(self, "width", "Width (pixels)")
-    yield UInt32(self, "height", "Height (pixels)")
-    yield UInt8(self, "bpp", "Bits per pixel")
-    yield RawBits(self, "reserved", 5)
-    yield Bit(self, "alpha", "Alpha channel used?")
-    yield Bit(self, "color", "Color used?")
-    yield Bit(self, "palette", "Palette used?")
-    yield Enum(UInt8(self, "compression", "Compression method"), COMPRESSION_NAME)
-    yield UInt8(self, "filter", "Filter method")
-    yield UInt8(self, "interlace", "Interlace method")
+def headerParse(parent):
+    yield UInt32(parent, "width", "Width (pixels)")
+    yield UInt32(parent, "height", "Height (pixels)")
+    yield UInt8(parent, "bpp", "Bits per pixel")
+    yield RawBits(parent, "reserved", 5)
+    yield Bit(parent, "alpha", "Alpha channel used?")
+    yield Bit(parent, "color", "Color used?")
+    yield Bit(parent, "palette", "Palette used?")
+    yield Enum(UInt8(parent, "compression", "Compression method"), COMPRESSION_NAME)
+    yield UInt8(parent, "filter", "Filter method")
+    yield UInt8(parent, "interlace", "Interlace method")
 
-def headerDescription(self):
+def headerDescription(parent):
     return "Header: %ux%u pixels and %u bits/pixel" % \
-        (self["width"].value, self["height"].value, self["bpp"].value)
+        (parent["width"].value, parent["height"].value, parent["bpp"].value)
 
-def paletteParse(self):
-    size = self["size"].value
+def paletteParse(parent):
+    size = parent["size"].value
     if (size % 3) != 0:
         raise ParserError("Palette have invalid size (%s), should be 3*n!" % size)
     nb_colors = size // 3
     for index in xrange(nb_colors):
-        yield RGB(self, "color[]")
+        yield RGB(parent, "color[]")
 
-def paletteDescription(self):
-    return "Palette: %u colors" % (self["size"].value // 3)
+def paletteDescription(parent):
+    return "Palette: %u colors" % (parent["size"].value // 3)
 
-def gammaParse(self):
-    yield UInt32(self, "gamma", "Gamma (x10,000)")
-def gammaValue(self):
-    return float(self["gamma"].value) / 10000
-def gammaDescription(self):
-    return "Gamma: %.3f" % self.value
+def gammaParse(parent):
+    yield UInt32(parent, "gamma", "Gamma (x10,000)")
+def gammaValue(parent):
+    return float(parent["gamma"].value) / 10000
+def gammaDescription(parent):
+    return "Gamma: %.3f" % parent.value
 
-def textParse(self):
-    yield CString(self, "keyword", "Keyword", charset="ISO-8859-1")
-    length = self["size"].value - self["keyword"].size/8
+def textParse(parent):
+    yield CString(parent, "keyword", "Keyword", charset="ISO-8859-1")
+    length = parent["size"].value - parent["keyword"].size/8
     if length:
-        yield String(self, "text", length, "Text", charset="ISO-8859-1")
+        yield String(parent, "text", length, "Text", charset="ISO-8859-1")
 
-def textDescription(self):
-    if "text" in self:
-        return u'Text: %s' % self["text"].display
+def textDescription(parent):
+    if "text" in parent:
+        return u'Text: %s' % parent["text"].display
     else:
         return u'Text'
 
-def timestampParse(self):
-    yield UInt16(self, "year", "Year")
-    yield UInt8(self, "month", "Month")
-    yield UInt8(self, "day", "Day")
-    yield UInt8(self, "hour", "Hour")
-    yield UInt8(self, "minute", "Minute")
-    yield UInt8(self, "second", "Second")
+def timestampParse(parent):
+    yield UInt16(parent, "year", "Year")
+    yield UInt8(parent, "month", "Month")
+    yield UInt8(parent, "day", "Day")
+    yield UInt8(parent, "hour", "Hour")
+    yield UInt8(parent, "minute", "Minute")
+    yield UInt8(parent, "second", "Second")
 
-def timestampValue(self):
+def timestampValue(parent):
     value = datetime(
-        self["year"].value, self["month"].value, self["day"].value,
-        self["hour"].value, self["minute"].value, self["second"].value)
+        parent["year"].value, parent["month"].value, parent["day"].value,
+        parent["hour"].value, parent["minute"].value, parent["second"].value)
     return humanDatetime(value)
 
-unit_name = {
-    0: "Unknow",
-    1: "Meter"
-}
+def physicalParse(parent):
+    yield UInt32(parent, "pixel_per_unit_x", "Pixel per unit, X axis")
+    yield UInt32(parent, "pixel_per_unit_y", "Pixel per unit, Y axis")
+    yield Enum(UInt8(parent, "unit", "Unit type"), UNIT_NAME)
 
-def physicalParse(self):
-    yield UInt32(self, "pixel_per_unit_x", "Pixel per unit, X axis")
-    yield UInt32(self, "pixel_per_unit_y", "Pixel per unit, Y axis")
-    yield Enum(UInt8(self, "unit", "Unit type"), unit_name)
-
-def physicalDescription(self):
-    x = self["pixel_per_unit_x"].value
-    y = self["pixel_per_unit_y"].value
+def physicalDescription(parent):
+    x = parent["pixel_per_unit_x"].value
+    y = parent["pixel_per_unit_y"].value
     desc = "Physical: %ux%u pixels" % (x,y)
-    if self["unit"].value == 1:
+    if parent["unit"].value == 1:
         desc += " per meter"
     return desc
 
