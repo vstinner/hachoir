@@ -6,7 +6,7 @@ from hachoir_core.compatibility import reversed
 from hachoir_core.stream import InputFieldStream
 from hachoir_core.error import HachoirError, HACHOIR_ERRORS
 from hachoir_core.log import Logger
-from hachoir_core.tools import makePrintable
+from hachoir_core.tools import makePrintable, makeUnicode
 from weakref import ref as weakref_ref
 
 class FieldError(HachoirError):
@@ -122,9 +122,8 @@ class Field(Logger):
     doc="Short (unicode) string which represents field content")
 
     def createRawDisplay(self):
-        value = self.value
         if isinstance(value, str):
-            return makePrintable(value, "ISO-8859-1", to_unicode=True)
+            return makeUnicode(value)
         else:
             return unicode(value)
     raw_display = property(lambda self: self.createRawDisplay(),

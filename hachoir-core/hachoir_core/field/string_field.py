@@ -239,7 +239,7 @@ class GenericString(Bytes):
         if not human:
             if self._raw_value is None:
                 self._raw_value = GenericString.createValue(self, False)
-            value = makePrintable(self._raw_value, "ISO-8859-1", to_unicode=True)
+            value = makePrintable(self._raw_value, "ASCII", to_unicode=True)
         elif self._charset:
             value = makePrintable(self.value, "ISO-8859-1", to_unicode=True)
         else:

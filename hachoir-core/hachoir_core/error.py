@@ -3,7 +3,7 @@ Functions to display an error (error, warning or information) message.
 """
 
 from hachoir_core.log import log
-from hachoir_core.tools import makePrintable
+from hachoir_core.tools import makePrintable, makeUnicode
 import sys, traceback
 
 def getBacktrace(empty="Empty backtrace."):
@@ -27,9 +27,7 @@ class HachoirError(Exception):
     Parent of all errors in Hachoir library
     """
     def __init__(self, message):
-        if not isinstance(message, unicode):
-            message = makePrintable(message, "ISO-8859-1", to_unicode=True)
-        self.message = message
+        self.message = makeUnicode(message)
 
     def __str__(self):
         return makePrintable(self.message, "ASCII")
