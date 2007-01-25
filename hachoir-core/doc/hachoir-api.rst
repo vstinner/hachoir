@@ -164,31 +164,44 @@ fields.
 List of field types
 ===================
 
+Number:
+
 * Bit: one bit (True/False) ;
 * Bits: unsigned number with a size in bits ;
 * Bytes: vector of know bytes (eg. file signature) ;
 * UInt8, UInt16, UInt24, UInt32, UInt64: unsigned number (size: 8, 16, ... bits) ;
 * Int8, Int16, Int24, Int32, Int64: signed number (size: 8, 16, ... bits) ;
-* Float32, Float64: 32/64 bits float number (IEEE 754) ;
+* Float32, Float64, Float80: IEEE 754 floatting point number (32, 64, 80 bits) ;
+
+Text:
+
 * Character: 8 bits ASCII character ;
-* PaddingBits/PaddingBytes: padding with a size in bits/bytes ;
-* NullBits/NullBytes: null padding with a size in bits/bytes ;
 * String: fixed length string ;
 * CString: string ending with nul byte ("\\0") ;
 * UnixLine: string ending with new line character ("\\n") ;
 * PascalString8, PascalString16 and PascalString32: string prefixed with
   length in a unsigned 8 / 16 / 32 bits integer (use parent endian) ;
+
+Timestamp:
+
+* TimestampMSDOS32: 32-bit MS-DOS, since 1st january 1980 ;
+* TimestampUnix32: 32-bit UNIX, seconds since 1st january 1970 ;
+* TimestampMac32: 32-bit Mac, seconds since 1st january 1904 ;
+* TimestampWin64: 64-bit Windows, nanoseconds since 1st january 1600.
+
+Padding and raw bytes:
+
+* PaddingBits/PaddingBytes: padding with a size in bits/bytes ;
+* NullBits/NullBytes: null padding with a size in bits/bytes ;
+* RawBits/RawBytes: unknown content with a size in bits/bytes.
 * SubFile: a file contained in the stream ;
 
-Other special types/tools:
+To create your own type, you can use:
 
+* GenericInteger: integer ;
+* GenericString: string ;
 * FieldSet: Set of other fields ;
-* Parser: The main class to parse a stream ;
-* Enum: associate a string to a value (function needing another Field
-  as argument) ;
-* RawBits/RawBytes: unknown content with a size in bits/bytes.
-
-You can also write your own types using GenericInteger and GenericString.
+* Parser: The main class to parse a stream.
 
 
 Field class
