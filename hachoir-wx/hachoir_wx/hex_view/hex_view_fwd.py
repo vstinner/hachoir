@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import wx
+from wx import EVT_SIZE
 
 class hex_view_fwd_t:
     def __init__(self, imp):
@@ -9,7 +9,7 @@ class hex_view_fwd_t:
     def on_hex_view_ready(self, dispatcher, view):
         assert view is not None
 
-        view.Bind(wx.EVT_SIZE, self.on_resized)
+        view.Bind(EVT_SIZE, self.on_resized)
 
     def on_resized(self, event):
         self.imp.on_resized()

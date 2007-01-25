@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 
-import wx, wx.xrc
+from wx import TextCtrl, TextAttr, PreTextCtrl
 from stubs import to_hex, calc_char_range, clamp_range
 from hachoir_wx.hex_view import get_width_chars, get_height_chars
 
-class hex_view_t(wx.TextCtrl):
-    default_style = wx.TextAttr()
+class hex_view_t(TextCtrl):
+    default_style = TextAttr()
     default_style.SetTextColour((0, 0, 0))
 
-    highlight_style = wx.TextAttr()
+    highlight_style = TextAttr()
     highlight_style.SetTextColour((52, 95, 215))
 
     def __init__(self):
-        pre = wx.PreTextCtrl()
+        pre = PreTextCtrl()
         self.PostCreate(pre)
 
 	self.get_width_chars = lambda: max(get_width_chars(self), 1)
