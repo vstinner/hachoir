@@ -347,14 +347,14 @@ class MultipleMetadata(Metadata):
             metadata.setHeader(header)
         self.__groups.append(key, metadata)
 
-    def exportPlaintext(self, priority=None, human=True):
-        common = Metadata.exportPlaintext(self, priority, human)
+    def exportPlaintext(self, priority=None, human=True, line_prefix=u"- "):
+        common = Metadata.exportPlaintext(self, priority, human, line_prefix)
         if common:
             text = common
         else:
             text = []
         for metadata in self.__groups:
-            value = metadata.exportPlaintext(priority, human)
+            value = metadata.exportPlaintext(priority, human, line_prefix)
             if value:
                 text.extend(value)
         if len(text):

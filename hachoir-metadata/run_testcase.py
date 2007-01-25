@@ -1,10 +1,9 @@
 #!/usr/bin/env python2.4
 # -*- coding: utf-8 -*-
-DOWNLOAD_SCRIPT = "download_testcase.py"
 """
 Test hachoir-metadata using the testcase.
-Use script %s to download and check the testcase.
-""" % DOWNLOAD_SCRIPT
+"""
+DOWNLOAD_SCRIPT = "download_testcase.py"
 
 # Configure Hachoir
 from hachoir_core import config
@@ -13,7 +12,6 @@ config.quiet = True      # Don't display warnings
 
 from hachoir_core.i18n import getTerminalCharset
 from hachoir_core.error import HachoirError
-from hachoir_core.tools import humanFilesize
 from hachoir_core.stream import InputStreamError
 from hachoir_parser import createParser
 from hachoir_core.compatibility import all
