@@ -10,8 +10,12 @@ except ImportError:
 URL = 'http://hachoir.org/wiki/hachoir-wx'
 CLASSIFIERS = [
     'Intended Audience :: Developers',
-    'Development Status :: 5 - Production/Stable',
-    'Environment :: Console :: Curses',
+    'Development Status :: 4 - Beta',
+    'Environment :: X11 Applications',
+    'Environment :: Win32 (MS Windows)',
+    'Environment :: MacOS X',
+    'Topic :: Software Development :: Disassemblers',
+    'Topic :: Utilities',
     'License :: OSI Approved :: GNU General Public License (GPL)',
     'Operating System :: OS Independent',
     'Natural Language :: English',
@@ -24,7 +28,7 @@ def main():
         "version": hachoir_wx.__version__,
         "url": URL,
         "download_url": URL,
-        "author": "Julien Muchembled and Victor Stinner",
+        "author": "Cyril Zorin",
         "description": "hachoir-wx is a wxWidgets GUI that's meant to provide a (more) user-friendly interface to the hachoir binary parsing engine",
         "long_description": open('README').read(),
         "classifiers": CLASSIFIERS,
