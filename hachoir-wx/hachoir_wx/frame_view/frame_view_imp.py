@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import wx, os
+import os
 
 class frame_view_imp_t:
     def on_frame_view_ready(self, dispatcher, frame_view):

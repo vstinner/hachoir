@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import wx, wx.xrc
+from wx import Frame, PreFrame
 
-class frame_view_t(wx.Frame):
+class frame_view_t(Frame):
     def __init__(self):
-        pre = wx.PreFrame()
+        pre = PreFrame()
         self.PostCreate(pre)
 
     def ready(self):
