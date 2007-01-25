@@ -1,8 +1,8 @@
 from hachoir_core.i18n import getTerminalCharset
-from hachoir_core.field import Field, MissingField, SubFile
+from hachoir_core.field import Field, MissingField
 from hachoir_core.tools import humanFilesize, humanBitSize, makePrintable
 from hachoir_core.log import log as hachoir_log
-from hachoir_core.error import HachoirError, getBacktrace
+from hachoir_core.error import HachoirError
 from hachoir_core.i18n import _, ngettext
 from hachoir_core.stream import InputFieldStream
 from hachoir_parser import guessParser
