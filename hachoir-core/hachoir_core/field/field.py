@@ -122,8 +122,9 @@ class Field(Logger):
     doc="Short (unicode) string which represents field content")
 
     def createRawDisplay(self):
+        value = self.value
         if isinstance(value, str):
-            return makeUnicode(value)
+            return makePrintable(value, "ASCII", to_unicode=True)
         else:
             return unicode(value)
     raw_display = property(lambda self: self.createRawDisplay(),
