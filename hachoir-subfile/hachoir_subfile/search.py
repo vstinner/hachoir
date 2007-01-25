@@ -1,6 +1,6 @@
 from hachoir_core.cmd_line import unicodeFilename
 from hachoir_core.error import HACHOIR_ERRORS, error
-from hachoir_core.stream import FileInputStream, InputSubStream, FileOutputStream
+from hachoir_core.stream import FileInputStream, InputSubStream
 from hachoir_core.tools import humanFilesize, humanDuration, makePrintable
 from hachoir_parser import QueryParser
 from hachoir_subfile.create_regex import createRegex
@@ -9,7 +9,6 @@ from hachoir_subfile.data_rate import DataRate
 from sys import stderr
 from time import time
 from errno import EEXIST
-from os import mkdir, path
 import re
 
 FILE_MAX_SIZE = 100 * 1024 * 1024   # Max. file size in bytes (100 MB)
@@ -23,53 +22,12 @@ def inputStreamSearchRegex(stream, regex, start, end):
     return [ (match.group(0), start+match.start(0)*8)
         for match in regex.finditer(data) ]
 
-class Output:
-    """
-    Store files found by search tool.
-    """
-    def __init__(self, directory):
-        self.directory_raw = directory
-        self.directory_unicode = unicodeFilename(directory)
-        self.mkdir = False
-        self.file_id = 1
-
-    def createDirectory(self):
-        try:
-            mkdir(self.directory_raw)
-        except OSError, err:
-            if err.errno == EEXIST:
-                pass
-            else:
-                raise
-
-    def createFilename(self, file_ext=None):
-        filename = "file-%04u" % self.file_id
-        self.file_id += 1
-        if file_ext:
-            filename += file_ext
-        return filename
-
-    def writeFile(self, filename, stream, offset, size):
-        # Create directory (only on first call)
-        if not self.mkdir:
-            self.createDirectory()
-            self.mkdir = True
-
-        # Create output file
-        filename, real_filename = path.join(self.directory_unicode, filename), \
-                                  path.join(self.directory_raw, filename)
-        output = FileOutputStream(filename, real_filename=real_filename)
-
-        # Write output
-        output.copyBytesFrom(stream, offset, size//8)
-        return filename
-
-class HachoirSubfile:
+class SearchSubfile:
     """
     Tool to find file start and file size in any binary stream.
 
     To use it:
-    - instanciate the class: subfile = HachoirSubfile()
+    - instanciate the class: subfile = SearchSubfile()
     - (optional) choose magics with: subfile.loadMagics(categories, parser_ids)
     - run the search: subfile.main()
     """
