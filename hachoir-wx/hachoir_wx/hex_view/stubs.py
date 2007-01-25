@@ -2,6 +2,7 @@
 
 from hachoir_core.tools import alignValue
 from math import floor
+from hachoir_core.error import warning
 
 def byte_addr(bit):
     return bit / 8
@@ -21,7 +22,7 @@ def to_hex(data):
     hex_data = ''
     for byte in data:
         hex_data += "%02x " % ord(byte)
-    
+
     return hex_data.rstrip(' ')
 
 def calc_char_range(start, end):
@@ -43,9 +44,10 @@ def clamp_range(what, begin, end):
 
 def safe_seek(file, where):
     try:
-        file.seek(max(0, where))
+        where = max(0, where)
+        file.seek(where)
     except IOError, err:
-        warning("Cannot seek to %s: %s" % (pos, unicode(err)))
+        warning("Cannot seek to %s: %s" % (where, unicode(err)))
         return False
 
     return True
