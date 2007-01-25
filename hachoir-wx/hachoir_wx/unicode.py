@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import wx
+import locale
+import sys
 
 def get_charset():
     try:
         charset = locale.getdefaultlocale()[1]
-    except (locale.Error, NamError, AttributeError, IndexError):
+    except (locale.Error, NameError, AttributeError, IndexError):
         pass
 
     if charset is None:

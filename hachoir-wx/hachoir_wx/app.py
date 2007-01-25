@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import wx, wx.xrc, locale, sys
+from wx import App
+from wx.xrc import XRCID
 
 from hachoir_parser.guess import createParser
 from hachoir_wx.dispatcher import dispatcher_t
@@ -9,14 +10,14 @@ from hachoir_wx.dialogs import file_open_dialog
 from hachoir_wx.unicode import force_unicode
 from hachoir_wx import __version__ as VERSION
 
-class app_t(wx.App):
+class app_t(App):
     def __init__(self, filename=None, real_filename=None):
         print "[+] Run hachoir-wx version %s" % VERSION
         if filename:
             self.init_filename = (filename, real_filename)
         else:
             self.init_filename = None
-        wx.App.__init__(self, False)
+        App.__init__(self, False)
 
     def OnInit(self):
         self.bind_events()
@@ -28,9 +29,9 @@ class app_t(wx.App):
 
     def bind_events(self):
         self.Bind(wx.EVT_MENU, self.on_file_menu_open_file,
-                  id = wx.xrc.XRCID('file_menu_open_file'))
+                  id=XRCID('file_menu_open_file'))
         self.Bind(wx.EVT_MENU, self.on_file_menu_close_window,
-                  id = wx.xrc.XRCID('file_menu_close_window'))
+                  id=XRCID('file_menu_close_window'))
 
     def load_file(self, filename, realname):
         print '[+] Load file "%s"' % filename
