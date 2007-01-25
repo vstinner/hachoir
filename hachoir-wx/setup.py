@@ -45,6 +45,7 @@ def main():
         "scripts": ["hachoir-wx"],
         "packages": PACKAGES.keys(),
         "package_dir": PACKAGES,
+        "package_data": {"hachoir_wx.resource": ['hachoir_wx.xrc']},
     }
 
     if use_setuptools:
@@ -52,6 +53,7 @@ def main():
             "hachoir-core>=0.7.0", "hachoir-parser>=0.7.0",
             "wxPython>=2.6.3")
         install_options["zip_safe"] = True
+        install_options["include_package_data"] = True
     setup(**install_options)
 
 if __name__ == "__main__":
