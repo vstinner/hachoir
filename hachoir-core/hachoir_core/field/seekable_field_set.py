@@ -28,9 +28,9 @@ class SeekableFieldSet(BasicFieldSet):
         if feed and self._generator:
             raise NotImplementedError()
         if address < self._current_size:
-            i = lowerBound(self._fields.values, lambda x: x.address + x.size <= address)
+            i = lowerBound(self._field_array, lambda x: x.address + x.size <= address)
             if i is not None:
-                return self._fields.values[i]
+                return self._field_array[i]
         return None
 
     def _stopFeed(self):

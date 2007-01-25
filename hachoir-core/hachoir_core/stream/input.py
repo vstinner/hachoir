@@ -42,7 +42,7 @@ class FileFromInputStream:
         if size is None:
             self._size = size
         elif size % 8:
-            raise InputStream("Invalid size")
+            raise InputStreamError("Invalid size")
         else:
             self._size = size / 8
 
@@ -250,7 +250,7 @@ class InputStream(Logger):
         return FileFromInputStream(self)
 
 
-class InputPipe:
+class InputPipe(object):
     """
     InputPipe makes input streams seekable by caching a certain
     amount of data. The memory usage may be unlimited in worst cases.
@@ -375,6 +375,7 @@ class InputIOStream(InputStream):
                 else:
                     charset = getTerminalCharset()
                     errmsg = unicode(str(err), charset)
+                    source = args.get("source", "<inputio:%r>" % input)
                     raise InputStreamError(_("Unable to get size of %s: %s") % (source, errmsg))
         self._input = input
         InputStream.__init__(self, size=size, **args)

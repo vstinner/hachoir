@@ -28,8 +28,8 @@ def timestampWin64(field):
     >>> timestampWin64(type("", (), {"value": 0, "size": 64}))
     u'(not set)'
     >>> timestampWin64(type("", (), {"value": (1 << 64)-1, "size": 64}))
-    u'date newer than year %s (value=18446744073709551615)'
-    """ % MAXYEAR
+    u'date newer than year 9999 (value=18446744073709551615)'
+    """
     assert hasattr(field, "value") and hasattr(field, "size")
     assert field.size == 64
     if field.value == 0:
