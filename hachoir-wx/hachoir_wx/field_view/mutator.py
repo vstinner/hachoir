@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from hachoir_core.field import available_types
 from hachoir_core import field as field_module
-
 from hachoir_wx.field_view.stubs import has_static_size, convert_size
 
 def split_field(field, split_pos, split_name, split_t, size_func):

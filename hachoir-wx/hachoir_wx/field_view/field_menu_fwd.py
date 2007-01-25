@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import wx, wx.xrc
+from wx import EVT_MENU
+from wx.xrc import XRCID
 
 class field_menu_fwd_t:
     def __init__(self, imp):
@@ -9,16 +10,16 @@ class field_menu_fwd_t:
     def on_field_view_ready(self, dispatcher, view):
         assert view is not None
 
-        view.Bind(wx.EVT_MENU, self.on_addr_rel,
-          id = wx.xrc.XRCID('field_menu_address_relative'))
-        view.Bind(wx.EVT_MENU, self.on_addr_abs,
-          id = wx.xrc.XRCID('field_menu_address_absolute'))
-        view.Bind(wx.EVT_MENU, self.on_addr_hex,
-          id = wx.xrc.XRCID('field_menu_address_base_hex'))
-        view.Bind(wx.EVT_MENU, self.on_addr_dec,
-          id = wx.xrc.XRCID('field_menu_address_base_dec'))
-        view.Bind(wx.EVT_MENU, self.on_dump_to_disk,
-          id = wx.xrc.XRCID('field_menu_dump_to_disk'))
+        view.Bind(EVT_MENU, self.on_addr_rel,
+          id=XRCID('field_menu_address_relative'))
+        view.Bind(EVT_MENU, self.on_addr_abs,
+          id=XRCID('field_menu_address_absolute'))
+        view.Bind(EVT_MENU, self.on_addr_hex,
+          id=XRCID('field_menu_address_base_hex'))
+        view.Bind(EVT_MENU, self.on_addr_dec,
+          id=XRCID('field_menu_address_base_dec'))
+        view.Bind(EVT_MENU, self.on_dump_to_disk,
+          id=XRCID('field_menu_dump_to_disk'))
 
     def on_addr_rel(self, event):
         self.imp.on_addr_rel()

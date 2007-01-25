@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from hachoir_wx.field_view import stubs
-from hachoir_core.field import available_types
 from hachoir_wx.field_view.stubs import save_field_to_disk
 from hachoir_core.i18n import _
 
@@ -17,7 +15,7 @@ class field_menu_imp_t:
 
     def on_field_show_ops(self, dispatcher, field):
         self.view.show_opts()
-        
+
     def on_addr_rel(self):
         self.dispatcher.trigger('address_relative')
 
@@ -45,4 +43,4 @@ class field_menu_imp_t:
     def on_dump_to_disk(self):
         dump_path = self.view.ask_for_dump_file(_('Dump "' + self.selected._getPath() + '" To Disk...'))
         if dump_path is not None:
-            save_field_to_disk(self.selected, self.file, dump_path) 
+            save_field_to_disk(self.selected, self.file, dump_path)
