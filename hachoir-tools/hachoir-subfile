@@ -3,9 +3,10 @@
 from hachoir_core.i18n import _
 from hachoir_core import config
 from hachoir_core.cmd_line import unicodeFilename
-from hachoir_core.error import HACHOIR_ERRORS, HachoirError, error
+from hachoir_core.error import HACHOIR_ERRORS, error
 from hachoir_core.stream import FileInputStream, InputSubStream, FileOutputStream
 from hachoir_core.tools import humanFilesize, humanDuration, makePrintable
+import hachoir_core
 from hachoir_parser import QueryParser
 from optparse import OptionGroup, OptionParser
 from hachoir_subfile_regex import createRegex
@@ -54,21 +55,6 @@ def setMemoryLimit(max_mem):
         return False
     return True
 
-#from hachoir_metadata import extractMetadata
-#def metadataFilter(parser):
-#    try:
-#        metadata = extractMetadata(parser)
-#    except HachoirError, err:
-#        metadata = None
-#    if metadata:
-#        if hasattr(metadata, "width") and metadata.width[0] < 256:
-#            print >>sys.stderr, "Skip picture with width < 256 pixels"
-#            return False
-#        if hasattr(metadata, "height") and metadata.height[0] < 256:
-#            print >>sys.stderr, "Skip picture with height < 256 pixels"
-#            return False
-#    return True
-
 class Output:
     """
     Store files found by HachoirSubfile tool.
@@ -82,8 +68,8 @@ class Output:
     def createDirectory(self):
         try:
             os.mkdir(self.directory_raw)
-        except OSError, error:
-            if error.errno == EEXIST:
+        except OSError, err:
+            if err.errno == EEXIST:
                 pass
             else:
                 raise
@@ -237,7 +223,7 @@ class HachoirSubfile:
             if not self.total_mem:
                 raise
             setMemoryLimit(self.total_mem)   # Disable memory limit
-            print >>sys.stderr, "[!] Memory error: %s limit exceed!" % humanFilesize(max_mem)
+            print >>sys.stderr, "[!] Memory error: %s limit exceed!" % humanFilesize(self.total_mem)
         self.mainFooter()
         return not(main_error)
 
@@ -343,7 +329,7 @@ class HachoirSubfile:
         substream = InputSubStream(self.stream, offset)
         try:
             return parser_cls(substream, validate=True)
-        except HACHOIR_ERRORS, err:
+        except HACHOIR_ERRORS:
             return None
 
     def displayProgress(self):
@@ -371,7 +357,6 @@ class HachoirSubfile:
         print >>sys.stderr, message
 
 def displayVersion(*args):
-    import hachoir_core
     print _("Hachoir subfile version %s") % __version__
     print _("Hachoir library version %s") % hachoir_core.__version__
     print
@@ -426,9 +411,6 @@ def main():
     if parsers:
         parsers = parsers.split(",")
     subfile.loadMagics(categories=categories, parser_ids=parsers)
-
-    # Use filter?
-#    subfile.filter = metadataFilter
 
     # Search subfiles
     ok = subfile.main()
