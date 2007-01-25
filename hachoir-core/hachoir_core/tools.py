@@ -261,7 +261,7 @@ def makePrintable(data, charset, quote=None, to_unicode=False, smart=True):
     if data:
         if not isinstance(data, unicode):
             data = unicode(data, "ISO-8859-1")
-            charset = "ascii"
+            charset = "ASCII"
         data = regex_control_code.sub(
             lambda regs: controlchars[ord(regs.group(1))], data)
         if quote:
@@ -277,6 +277,25 @@ def makePrintable(data, charset, quote=None, to_unicode=False, smart=True):
     if to_unicode:
         data = unicode(data, charset)
     return data
+
+def makeUnicode(text):
+    r"""
+    Convert text to printable Unicode string. For byte string (type 'str'),
+    use charset ISO-8859-1 for the conversion to Unicode
+
+    >>> makeUnicode(u'abc\0d')
+    u'abc\\0d'
+    >>> makeUnicode('a\xe9')
+    u'a\xe9'
+    """
+    if isinstance(text, str):
+        text = unicode(text, "ISO-8859-1")
+    elif not isinstance(text, unicode):
+        text = unicode(text)
+    text = regex_control_code.sub(
+        lambda regs: controlchars[ord(regs.group(1))], text)
+    text = re.sub(r"\\x0([0-7])(?=[^0-7]|$)", r"\\\1", text)
+    return text
 
 def binarySearch(seq, cmp_func):
     """
