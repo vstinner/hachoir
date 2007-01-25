@@ -72,7 +72,13 @@ class HachoirParser:
 
     def _getMimeType(self):
         if not self._mime_type:
-            self._mime_type = self.createMimeType()
+            try:
+                self._mime_type = self.createMimeType()
+            except HACHOIR_ERRORS, err:
+                self.error("Error when creating MIME type: %s" % unicode(err))
+            if not self._mime_type \
+            and self.createMimeType != Parser.createMimeType:
+                self._mime_type = Parser.createMimeType(self)
             if not self._mime_type:
                 self._mime_type = "application/octet-stream"
         return self._mime_type

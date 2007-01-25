@@ -335,7 +335,7 @@ class ZipFile(Parser):
 
     def createMimeType(self):
         if self["file[0]/filename"].value == "mimetype":
-            return self["file[0]/compressed_data"].value
+            return self["file[0]/data"].value
         else:
             return "application/zip"
 
