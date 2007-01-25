@@ -11,7 +11,7 @@ from hachoir_core.field import (
     NullBits, Bytes, RawBytes)
 from hachoir_core.text_handler import hexadecimal, humanFilesize, timestampUNIX
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.tools import makePrintable
+from hachoir_core.tools import makeUnicode
 
 try:
     from zlib import decompressobj, MAX_WBITS
@@ -140,7 +140,7 @@ class GzipParser(Parser):
         desc = self.tags["description"]
         info = []
         if "filename" in self:
-            filename = makePrintable(self["filename"].value, "ISO-8859-1", to_unicode=True)
+            filename = makeUnicode(self["filename"].value)
             info.append('filename "%s"' % filename)
         if "size" in self:
             info.append("was %s" % humanFilesize(self["size"]))

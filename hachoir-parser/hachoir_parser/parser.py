@@ -1,7 +1,7 @@
 import hachoir_core.config as config
 from hachoir_core.field import Field, Parser as GenericParser
 from hachoir_core.error import HACHOIR_ERRORS, HachoirError, error
-from hachoir_core.tools import makePrintable
+from hachoir_core.tools import makeUnicode
 from hachoir_core.i18n import _
 from inspect import getmro
 
@@ -61,8 +61,7 @@ class HachoirParser:
             try:
                 self._description = self.createDescription()
                 if isinstance(self._description, str):
-                    self._description = makePrintable(
-                        self._description, "ISO-8859-1", to_unicode=True)
+                    self._description = makeUnicode(self._description)
             except HACHOIR_ERRORS, err:
                 error("Error getting description of %s: %s" \
                     % (self.path, unicode(err)))
@@ -140,7 +139,7 @@ class Parser(HachoirParser, GenericParser):
                 res = self.validate()
                 if res is True:
                     break
-                res = unicode(res)
+                res = makeUnicode(res)
             else:
                 res = _("stream too small (< %u bits)" % nbits)
             raise ValidateError(res)
