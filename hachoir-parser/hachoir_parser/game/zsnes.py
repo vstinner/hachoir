@@ -9,8 +9,7 @@ from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, StaticFieldSet,
     UInt8, UInt16, UInt32,
     String, PaddingBytes, Bytes, RawBytes)
-from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
-from hachoir_core.field.static_field_set import FieldSet
+from hachoir_core.endian import LITTLE_ENDIAN
 
 class ZSTHeader(StaticFieldSet):
     format = (

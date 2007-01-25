@@ -7,7 +7,7 @@ Creation date: 2007-01-19
 
 from hachoir_core.field import (FieldSet, Enum,
     Bit, Bits,
-    UInt8, UInt16, UInt32, TimestampUnix32,
+    UInt16, UInt32, TimestampUnix32,
     RawBytes, NullBytes, CString, String)
 from hachoir_core.text_handler import humanFilesize
 from hachoir_core.tools import createDict, paddingSize, alignValue

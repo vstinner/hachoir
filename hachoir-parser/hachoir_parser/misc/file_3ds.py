@@ -4,7 +4,7 @@ Author: Victor Stinner
 """
 
 from hachoir_parser import Parser
-from hachoir_core.field import (StaticFieldSet, FieldSet, ParserError,
+from hachoir_core.field import (StaticFieldSet, FieldSet,
     UInt16, UInt32, RawBytes, Enum, CString)
 from hachoir_parser.image.common import RGB
 from hachoir_core.endian import LITTLE_ENDIAN

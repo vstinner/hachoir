@@ -8,7 +8,6 @@ from hachoir_core.error import warning, info, HACHOIR_ERRORS
 from hachoir_parser import ValidateError, HachoirParserList
 from hachoir_core.stream import FileInputStream
 from hachoir_core.i18n import _
-from hachoir_core.editor import createEditor as createEditorFromParser
 
 
 class QueryParser(object):

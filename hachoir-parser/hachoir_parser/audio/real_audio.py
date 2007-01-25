@@ -12,8 +12,8 @@ from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet,
     UInt8, UInt16, UInt32,
     Bytes, RawBytes, String,
-    PascalString8, PascalString16)
-from hachoir_core.text_handler import hexadecimal, humanFrequency
+    PascalString8)
+from hachoir_core.text_handler import humanFrequency
 from hachoir_core.endian import BIG_ENDIAN
 
 class Metadata(FieldSet):

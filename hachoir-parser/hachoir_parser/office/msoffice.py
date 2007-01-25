@@ -21,9 +21,9 @@ Creation: 8 january 2005
 
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
-    UInt8, UInt16, UInt32, UInt64, TimestampWin64, Enum,
+    UInt8, UInt16, UInt32, TimestampWin64, Enum,
     Bytes, RawBytes, NullBytes,
-    String, PascalString32)
+    String)
 from hachoir_core.text_handler import hexadecimal
 from hachoir_core.tools import humanFilesize
 from hachoir_core.endian import LITTLE_ENDIAN

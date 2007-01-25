@@ -10,8 +10,7 @@ Creation date: 25 december 2006 (christmas ;-))
 """
 
 from hachoir_parser import Parser
-from hachoir_core.field import (ParserError,
-    UInt32, PaddingBytes, RawBytes, String)
+from hachoir_core.field import UInt32, PaddingBytes, RawBytes, String
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.tools import humanFilesize
 

@@ -6,7 +6,7 @@ Author: Christophe Gisquet
 """
 
 from hachoir_parser import Parser
-from hachoir_core.field import (StaticFieldSet, FieldSet, ParserError,
+from hachoir_core.field import (StaticFieldSet, FieldSet,
     Bit, Bits, Enum,
     UInt8, UInt16, UInt32, UInt64,
     String, TimestampMSDOS32,

@@ -13,8 +13,7 @@ config.quiet = True      # Don't display warnings
 
 from hachoir_core.field import FieldError
 from hachoir_core.i18n import getTerminalCharset
-from hachoir_core.tools import humanFilesize
-from hachoir_core.error import HachoirError, HACHOIR_ERRORS, warning, error
+from hachoir_core.error import HACHOIR_ERRORS, error
 from hachoir_core.stream import InputStreamError, StringInputStream
 from hachoir_parser import createParser, HachoirParserList, ValidateError
 from hachoir_core.compatibility import all

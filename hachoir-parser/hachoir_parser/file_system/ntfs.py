@@ -16,10 +16,8 @@ SECTOR_SIZE = 512
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, Enum,
     UInt8, UInt16, UInt32, UInt64,
-    String,
-    Bytes, NullBytes, RawBytes, PaddingBytes)
+    String, Bytes, NullBytes, RawBytes)
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_parser.file_system.mbr import MasterBootRecord
 from hachoir_core.text_handler import hexadecimal
 from hachoir_core.tools import humanFilesize
 

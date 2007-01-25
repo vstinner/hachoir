@@ -277,11 +277,11 @@ class MpegAudioFile(Parser):
                 return "Frame #%u is invalid" % index
 
             # Check that all frames are similar
-            if 0 < index:
+            if not index:
+                frame0 = frame
+            else:
                 if frame0["channel_mode"].value != frame["channel_mode"].value:
                     return "Frame #%u channel mode is different" % index
-            else:
-                frame0 = frame
         return True
 
     def createFields(self):

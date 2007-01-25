@@ -1,5 +1,5 @@
 import hachoir_core.config as config
-from hachoir_core.field import Field, Parser as GenericParser
+from hachoir_core.field import Parser as GenericParser
 from hachoir_core.error import HACHOIR_ERRORS, HachoirError, error
 from hachoir_core.tools import makeUnicode
 from hachoir_core.i18n import _

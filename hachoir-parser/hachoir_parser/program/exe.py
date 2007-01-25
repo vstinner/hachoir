@@ -10,9 +10,9 @@ Creation date: 2006-08-13
 """
 
 from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet, StaticFieldSet,
+from hachoir_core.field import (FieldSet, StaticFieldSet, ParserError,
     MatchError,
-    Bit, Bits, UInt8, UInt16, UInt32, TimestampUnix32,
+    Bit, UInt8, UInt16, UInt32, TimestampUnix32,
     Bytes, String, Enum,
     RawBytes, PaddingBytes, NullBytes, NullBits)
 from hachoir_core.endian import LITTLE_ENDIAN

@@ -29,7 +29,7 @@ from hachoir_core.field import (FieldSet, ParserError,
     UInt8, UInt16, UInt32, Enum,
     Bit, NullBits, NullBytes,
     RawBytes, String, PaddingBytes)
-from hachoir_core.tools import alignValue, humanFrequency, humanDuration
+from hachoir_core.tools import alignValue, humanDuration
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.text_handler import humanFilesize
 from hachoir_parser.video.fourcc import audio_codec_name, video_fourcc_name
