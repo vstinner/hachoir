@@ -15,11 +15,11 @@ Creation: 23 march 2006
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
     Enum, Bytes, NullBytes, RawBytes,
-    UInt8, UInt16, UInt32, Int32,
+    UInt8, UInt16, UInt32, Int32, TimestampUnix32,
     Bit, Bits, NullBits)
 from hachoir_core.endian import NETWORK_ENDIAN, LITTLE_ENDIAN
 from hachoir_core.tools import humanDuration
-from hachoir_core.text_handler import hexadecimal, timestampUNIX
+from hachoir_core.text_handler import hexadecimal
 from hachoir_core.tools import createDict
 
 def diff(field):
@@ -400,7 +400,7 @@ class Packet(FieldSet):
         self._first_name = first_name
 
     def createFields(self):
-        yield UInt32(self, "ts_epoch", "Timestamp (Epoch)", text_handler=timestampUNIX)
+        yield TimestampUnix32(self, "ts_epoch", "Timestamp (Epoch)")
         yield UInt32(self, "ts_nanosec", "Timestamp (nano second)")
         yield UInt32(self, "caplen", "length of portion present")
         yield UInt32(self, "len", "length this packet (off wire)")

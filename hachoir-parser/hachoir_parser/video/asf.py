@@ -13,12 +13,13 @@ Creation: 5 august 2006
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
     UInt16, UInt32, UInt64,
+    TimestampWin64,
     String, PascalString16, Enum,
     Bit, Bits, PaddingBits,
     PaddingBytes, NullBytes, RawBytes)
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.text_handler import (
-    humanFilesize, humanBitRate, timestampWin64, durationWin64)
+    humanFilesize, humanBitRate, durationWin64)
 from itertools import izip
 from hachoir_parser.video.fourcc import audio_codec_name, video_fourcc_name
 from hachoir_parser.common.win32 import BitmapInfoHeader, GUID
@@ -78,7 +79,7 @@ class FileProperty(FieldSet):
     def createFields(self):
         yield GUID(self, "guid")
         yield UInt64(self, "file_size", text_handler=humanFilesize)
-        yield UInt64(self, "creation_date", text_handler=timestampWin64)
+        yield TimestampWin64(self, "creation_date")
         yield UInt64(self, "pckt_count")
         yield UInt64(self, "play_duration", text_handler=durationWin64)
         yield UInt64(self, "send_duration", text_handler=durationWin64)

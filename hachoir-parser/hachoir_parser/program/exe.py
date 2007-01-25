@@ -12,11 +12,11 @@ Creation date: 2006-08-13
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, StaticFieldSet,
     MatchError,
-    Bit, Bits, UInt8, UInt16, UInt32,
+    Bit, Bits, UInt8, UInt16, UInt32, TimestampUnix32,
     Bytes, String, Enum,
     RawBytes, PaddingBytes, NullBytes, NullBits)
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.text_handler import timestampUNIX, hexadecimal, humanFilesize
+from hachoir_core.text_handler import hexadecimal, humanFilesize
 from hachoir_parser.program.exe_res import Resource
 
 class MSDosHeader(StaticFieldSet):
@@ -208,7 +208,7 @@ class PE_Header(FieldSet):
             raise MatchError("Invalid PE header signature")
         yield Enum(UInt16(self, "cpu", "CPU type"), self.cpu_name)
         yield UInt16(self, "nb_section", "Number of sections")
-        yield UInt32(self, "creation_date", "Creation date", text_handler=timestampUNIX)
+        yield TimestampUnix32(self, "creation_date", "Creation date")
         yield UInt32(self, "ptr_to_sym", "Pointer to symbol table")
         yield UInt32(self, "nb_symbols", "Number of symbols")
         yield UInt16(self, "opt_hdr_size", "Optional header size")

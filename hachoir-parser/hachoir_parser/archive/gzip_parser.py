@@ -6,10 +6,10 @@ Author: Victor Stinner
 
 from hachoir_parser import Parser
 from hachoir_core.field import (
-    UInt8, UInt16, UInt32, Enum,
+    UInt8, UInt16, UInt32, Enum, TimestampUnix32,
     Bit, CString, SubFile, CompressedField,
     NullBits, Bytes, RawBytes)
-from hachoir_core.text_handler import hexadecimal, humanFilesize, timestampUNIX
+from hachoir_core.text_handler import hexadecimal, humanFilesize
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.tools import makeUnicode
 
@@ -88,8 +88,7 @@ class GzipParser(Parser):
         yield Bit(self, "has_filename", "Contains filename?")
         yield Bit(self, "has_comment", "Contains comment?")
         yield NullBits(self, "reserved[]", 3)
-        yield UInt32(self, "mtime", "Modification time",
-            text_handler=timestampUNIX)
+        yield TimestampUnix32(self, "mtime", "Modification time")
 
         # Extra flags
         yield NullBits(self, "reserved[]", 1)

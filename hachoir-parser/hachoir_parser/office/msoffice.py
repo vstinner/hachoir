@@ -21,10 +21,10 @@ Creation: 8 january 2005
 
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
-    UInt8, UInt16, UInt32, UInt64, Enum,
+    UInt8, UInt16, UInt32, UInt64, TimestampWin64, Enum,
     Bytes, RawBytes, NullBytes,
     String, PascalString32)
-from hachoir_core.text_handler import hexadecimal, timestampWin64
+from hachoir_core.text_handler import hexadecimal
 from hachoir_core.tools import humanFilesize
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_parser.common.win32 import GUID
@@ -79,8 +79,8 @@ class Property(FieldSet):
         yield GUID(self, "clsid", "CLSID of this storage")
         yield RawBytes(self, "flags", 4, "User flags")
         # Timestamp format: Number of nanosecond since January 1, 1601
-        yield UInt64(self, "creation", "Creation timestamp", text_handler=timestampWin64)
-        yield UInt64(self, "lastmod", "Modify timestamp", text_handler=timestampWin64)
+        yield TimestampWin64(self, "creation", "Creation timestamp")
+        yield TimestampWin64(self, "lastmod", "Modify timestamp")
         yield SECT(self, "start", "Starting SECT of the stream")
 #        block = self["start"].value
 #        if block != SECT.UNUSED and block != 0:

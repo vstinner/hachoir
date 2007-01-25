@@ -15,11 +15,11 @@ Creation: 2 august 2006
 
 from hachoir_parser import Parser
 from hachoir_core.field import (ParserError, FieldSet,
-    UInt8, Int16, UInt16, UInt32,
+    UInt8, Int16, UInt16, UInt32, TimestampMac32,
     String, PascalString8, CString,
     RawBytes, PaddingBytes)
 from hachoir_core.endian import BIG_ENDIAN
-from hachoir_core.text_handler import hexadecimal, timestampMac
+from hachoir_core.text_handler import hexadecimal
 
 class QTFloat32(FieldSet):
     static_size = 32
@@ -47,8 +47,8 @@ class TrackHeader(FieldSet):
         # TrackInPoster = 8
         yield RawBytes(self, "flags", 3)
 
-        yield UInt32(self, "creat_date", text_handler=timestampMac)
-        yield UInt32(self, "lastmod_date", text_handler=timestampMac)
+        yield TimestampMac32(self, "creat_date")
+        yield TimestampMac32(self, "lastmod_date")
         yield UInt32(self, "track_id")
         yield PaddingBytes(self, "reserved[]", 8)
         yield UInt32(self, "duration")
@@ -84,8 +84,8 @@ class MediaHeader(FieldSet):
     def createFields(self):
         yield UInt8(self, "version", text_handler=hexadecimal)
         yield RawBytes(self, "flags", 3)
-        yield UInt32(self, "creat_date", text_handler=timestampMac)
-        yield UInt32(self, "lastmod_date", text_handler=timestampMac)
+        yield TimestampMac32(self, "creat_date")
+        yield TimestampMac32(self, "lastmod_date")
         yield UInt32(self, "time_scale")
         yield UInt32(self, "duration")
         yield UInt16(self, "mac_lang")
@@ -111,8 +111,8 @@ class MovieHeader(FieldSet):
     def createFields(self):
         yield UInt8(self, "version", text_handler=hexadecimal)
         yield RawBytes(self, "flags", 3)
-        yield UInt32(self, "creat_date", text_handler=timestampMac)
-        yield UInt32(self, "lastmod_date", text_handler=timestampMac)
+        yield TimestampMac32(self, "creat_date")
+        yield TimestampMac32(self, "lastmod_date")
         yield UInt32(self, "time_scale")
         yield UInt32(self, "duration")
         yield QTFloat32(self, "play_speed")

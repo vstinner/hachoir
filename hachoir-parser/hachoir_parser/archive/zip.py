@@ -8,10 +8,11 @@ Authors: Christophe Gisquet and Victor Stinner
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
     Bit, Bits, Enum,
-    UInt8, UInt16, UInt32,
+    TimestampMSDOS32,
+    UInt8, UInt16, UInt32, UInt64,
     String, PascalString16,
-    NullBits, RawBytes)
-from hachoir_core.text_handler import humanFilesize, hexadecimal, timestampMSDOS
+    RawBytes)
+from hachoir_core.text_handler import humanFilesize, hexadecimal
 from hachoir_core.endian import LITTLE_ENDIAN
 
 def ZipRevision(field):
@@ -110,8 +111,7 @@ def ZipStartCommonFields(self):
     yield ZipGeneralFlags(self, "flags", "General purpose flag")
     yield Enum(UInt16(self, "compression", "Compression method"),
                compression_name)
-    yield UInt32(self, "last_mod", "Last moditication file time",
-                 text_handler=timestampMSDOS)
+    yield TimestampMSDOS32(self, "last_mod", "Last moditication file time")
     yield UInt32(self, "crc32", "CRC-32", text_handler=hexadecimal)
     yield UInt32(self, "compressed_size", "Compressed size")
     yield UInt32(self, "uncompressed_size", "Uncompressed size")

@@ -10,11 +10,10 @@ Creation date: 19 august 2006
 
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet,
-    UInt8, UInt16, UInt32, UInt64,
+    UInt8, UInt16, UInt32, UInt64, TimestampMac32,
     String, Float32, NullBytes, Enum)
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.text_handler import (timestampMac,
-    humanFilesize, humanDuration)
+from hachoir_core.text_handler import humanFilesize, humanDuration
 
 list_order={
         1 : "playlist order (manual sort order)",
@@ -142,7 +141,7 @@ class TrackItem(FieldSet):
         yield Enum(UInt8(self, "x2_type", "Extended type 2"),self.x2_type_name)
         yield UInt8(self, "compilation_flag", "Compilation Flag")
         yield UInt8(self, "rating", "Rating")
-        yield UInt32(self, "added_date", "Date when the item was added", text_handler=timestampMac)
+        yield TimestampMac32(self, "added_date", "Date when the item was added")
         yield UInt32(self, "size", "Track size in bytes", text_handler=humanFilesize)
         yield UInt32(self, "length", "Track length in milliseconds", text_handler=humanDuration)
         yield UInt32(self, "track_number", "Number of this track")
@@ -160,7 +159,7 @@ class TrackItem(FieldSet):
         yield UInt32(self, "disc_number", "disc number in multi disc sets")
         yield UInt32(self, "total_discs", "Total number of discs in the disc set")
         yield UInt32(self, "userid", "User ID in the DRM scheme")
-        yield UInt32(self, "last_modified", "Time of the last modification of the track", text_handler=timestampMac)
+        yield TimestampMac32(self, "last_modified", "Time of the last modification of the track")
         yield UInt32(self, "bookmark_time", "Bookmark time for AudioBook")
         yield UInt64(self, "dbid", "Unique DataBase ID for the song (identical in mhit and in mhii)")
         yield UInt8(self, "checked", "song is checked")

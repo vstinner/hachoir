@@ -7,9 +7,11 @@ Creation: 27 december 2006
 
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet,
-    UInt16, UInt32, RawBytes, String, Enum, PascalString32, NullBytes, Float80)
+    UInt16, UInt32, Float80, TimestampMac32,
+    RawBytes, NullBytes,
+    String, Enum, PascalString32)
 from hachoir_core.endian import BIG_ENDIAN
-from hachoir_core.text_handler import humanFilesize, timestampMac
+from hachoir_core.text_handler import humanFilesize
 from hachoir_core.tools import alignValue
 from hachoir_parser.audio.id3 import ID3v2
 
@@ -24,7 +26,7 @@ CODEC_NAME = {
 
 class Comment(FieldSet):
     def createFields(self):
-        yield UInt32(self, "timestamp", text_handler=timestampMac)
+        yield TimestampMac32(self, "timestamp")
         yield PascalString32(self, "text")
 
 def parseText(self):
@@ -46,7 +48,7 @@ def parseCommon(self):
     yield Enum(String(self, "codec", 4, strip="\0", charset="ASCII"), CODEC_NAME)
 
 def parseVersion(self):
-    yield UInt32(self, "timestamp", text_handler=timestampMac)
+    yield TimestampMac32(self, "timestamp")
 
 def parseSound(self):
     yield UInt32(self, "offset")

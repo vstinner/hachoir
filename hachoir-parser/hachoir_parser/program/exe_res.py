@@ -7,9 +7,9 @@ Creation date: 2007-01-19
 
 from hachoir_core.field import (FieldSet, Enum,
     Bit, Bits,
-    UInt8, UInt16, UInt32,
+    UInt8, UInt16, UInt32, TimestampUnix32,
     RawBytes, NullBytes, CString, String)
-from hachoir_core.text_handler import timestampUNIX, humanFilesize
+from hachoir_core.text_handler import humanFilesize
 from hachoir_core.tools import createDict, paddingSize, alignValue
 from hachoir_parser.common.win32 import BitmapInfoHeader
 
@@ -170,7 +170,7 @@ class Header(FieldSet):
     static_size = 16*8
     def createFields(self):
         yield NullBytes(self, "options", 4)
-        yield UInt32(self, "creation_date", text_handler=timestampUNIX)
+        yield TimestampUnix32(self, "creation_date")
         yield UInt16(self, "maj_ver", "Major version")
         yield UInt16(self, "min_ver", "Minor version")
         yield UInt16(self, "nb_name", "Number of named entries")

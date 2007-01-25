@@ -10,11 +10,10 @@ Sources:
   http://www.nondot.org/sabre/os/files/FileSystems/ext2fs/
 """
 
-from hachoir_core.text_handler import timestampUNIX
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
     Bit, Bits, UInt8, UInt16, UInt32,
-    Enum, String, RawBytes, NullBytes)
+    Enum, String, TimestampUnix32, RawBytes, NullBytes)
 from hachoir_core.tools import (alignValue,
     humanDuration, humanFilesize)
 from hachoir_core.endian import LITTLE_ENDIAN
@@ -139,10 +138,10 @@ class Inode(FieldSet):
 
         yield UInt16(self, "uid", "User ID")
         yield UInt32(self, "size", "File size (in bytes)")
-        yield UInt32(self, "atime", "Last access time", text_handler=timestampUNIX)
-        yield UInt32(self, "ctime", "Creation time", text_handler=timestampUNIX)
-        yield UInt32(self, "mtime", "Last modification time", text_handler=timestampUNIX)
-        yield UInt32(self, "dtime", "Delete time", text_handler=timestampUNIX)
+        yield TimestampUnix32(self, "atime", "Last access time")
+        yield TimestampUnix32(self, "ctime", "Creation time")
+        yield TimestampUnix32(self, "mtime", "Last modification time")
+        yield TimestampUnix32(self, "dtime", "Delete time")
         yield UInt16(self, "gid", "Group ID")
         yield UInt16(self, "links_count", "Links count")
         yield UInt32(self, "blocks", "Number of blocks")
@@ -252,15 +251,15 @@ class SuperBlock(FieldSet):
         yield UInt32(self, "blocks_per_group", "Blocks per group")
         yield UInt32(self, "frags_per_group", "Fragments per group")
         yield UInt32(self, "inodes_per_group", "Inodes per group")
-        yield UInt32(self, "mtime", "Mount time", text_handler=timestampUNIX)
-        yield UInt32(self, "wtime", "Write time", text_handler=timestampUNIX)
+        yield TimestampUnix32(self, "mtime", "Mount time")
+        yield TimestampUnix32(self, "wtime", "Write time")
         yield UInt16(self, "mnt_count", "Mount count")
         yield UInt16(self, "max_mnt_count", "Max mount count")
         yield String(self, "magic", 2, "Magic number (0x53EF)")
         yield Enum(UInt16(self, "state", "File system state"), self.state_desc)
         yield Enum(UInt16(self, "errors", "Behaviour when detecting errors"), self.error_handling_desc)
         yield UInt16(self, "minor_rev_level", "Minor revision level")
-        yield UInt32(self, "last_check", "Time of last check", text_handler=timestampUNIX)
+        yield TimestampUnix32(self, "last_check", "Time of last check")
         yield UInt32(self, "check_interval", "Maximum time between checks", text_handler=self.postMaxTime)
         yield Enum(UInt32(self, "creator_os", "Creator OS"), self.os_name)
         yield UInt32(self, "rev_level", "Revision level")
