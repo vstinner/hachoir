@@ -4,15 +4,11 @@
 from hachoir_wx.app import app_t
 from hachoir_core.cmd_line import (getHachoirOptions,
     configureHachoir, unicodeFilename)
-from optparse import OptionGroup, OptionParser
+from optparse import OptionParser
+import sys
 
 def parseOptions():
     parser = OptionParser(usage="%prog [options] [filename]")
-
-#    common = OptionGroup(parser, "Urwid", _("Option of hachoir-wx"))
-#    common.add_option(...)
-#    parser.add_option_group(common)
-
     hachoir = getHachoirOptions(parser)
     parser.add_option_group(hachoir)
 
