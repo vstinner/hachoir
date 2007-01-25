@@ -9,14 +9,15 @@ from hachoir_core.tools import humanFilesize, humanDuration, makePrintable
 import hachoir_core
 from hachoir_parser import QueryParser
 from optparse import OptionGroup, OptionParser
-from hachoir_subfile_regex import createRegex
+from create_regex import createRegex
 import sys
 from time import time
 from errno import EEXIST
 import os
 import re
 
-__version__ = "0.0.0"
+WEBSITE = "http://hachoir.org/wiki/hachoir-subfile"
+__version__ = "0.0.1"
 
 FILE_MAX_SIZE = 100 * 1024 * 1024   # Max. file size in bytes (100 MB)
 SLICE_SIZE = 64*1024                # Slice size in bytes (64 KB)
@@ -360,7 +361,7 @@ def displayVersion(*args):
     print _("Hachoir subfile version %s") % __version__
     print _("Hachoir library version %s") % hachoir_core.__version__
     print
-    print _("Website: %s/wiki/hachoir-grep") % hachoir_core.WEBSITE
+    print _("Website: %s") % WEBSITE
     sys.exit(0)
 
 def parseOptions():
