@@ -13,7 +13,7 @@ class field_view_fwd_t:
         field_view.Bind(wx.EVT_RIGHT_UP, self.on_item_right_clicked)
         field_view.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.on_item_activated)
         field_view.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_item_selected)
-        
+
     def on_item_activated(self, event):
         self.imp.on_item_activated()
 

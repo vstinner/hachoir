@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 
-import wx, wx.xrc
+from wx import ListCtrl, PreListCtrl, EVT_WINDOW_CREATE, CallAfter
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
 from sys import maxint
 from hachoir_core.i18n import _
 
-class field_view_t(wx.ListCtrl, ListCtrlAutoWidthMixin):
+class field_view_t(ListCtrl, ListCtrlAutoWidthMixin):
     def __init__(self):
         self.cols = {}
 
-        pre = wx.PreListCtrl()
+        pre = PreListCtrl()
         self.PostCreate(pre)
-        self.Bind(wx.EVT_WINDOW_CREATE, self.on_create)
+        self.Bind(EVT_WINDOW_CREATE, self.on_create)
 
     def post_init(self):
         ListCtrlAutoWidthMixin.__init__(self)
@@ -23,10 +23,10 @@ class field_view_t(wx.ListCtrl, ListCtrlAutoWidthMixin):
         self.Layout()
         self.Fit()
         self.dispatcher.trigger('field_view_ready', self)
-        
+
     def on_create(self, event):
-        self.Unbind(wx.EVT_WINDOW_CREATE)
-        wx.CallAfter(self.post_init)
+        self.Unbind(EVT_WINDOW_CREATE)
+        CallAfter(self.post_init)
 
     def append_column(self, name):
         index = self.GetColumnCount()

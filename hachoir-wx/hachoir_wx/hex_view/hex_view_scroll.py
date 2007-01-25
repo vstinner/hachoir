@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import wx, wx.xrc
+from wx import ScrollBar, PreScrollBar
 
-class hex_view_scroll_t(wx.ScrollBar):
+class hex_view_scroll_t(ScrollBar):
     def __init__(self):
-        pre = wx.PreScrollBar()
+        pre = PreScrollBar()
         self.PostCreate(pre)
-        
+
     def ready(self):
         self.dispatcher.trigger('hex_view_scroll_ready', self)
-        
+
