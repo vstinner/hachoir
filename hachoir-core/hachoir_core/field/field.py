@@ -118,7 +118,15 @@ class Field(Logger):
 
     def createDisplay(self):
         return unicode(self.value)
-    display = property(lambda self: self.createDisplay(),
+    def _getDisplay(self):
+        if not hasattr(self, "__display"):
+            try:
+                self.__display = self.createDisplay()
+            except HACHOIR_ERRORS, err:
+                self.error("Unable to create display: %s" % err)
+                self.__display = u""
+        return self.__display
+    display = property(lambda self: self._getDisplay(),
     doc="Short (unicode) string which represents field content")
 
     def createRawDisplay(self):
