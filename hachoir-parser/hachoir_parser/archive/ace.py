@@ -20,7 +20,7 @@ from hachoir_core.field import (StaticFieldSet, FieldSet,
     RawBytes)
 from hachoir_core.text_handler import humanFilesize, hexadecimal
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_parser.archive.rar import MSDOSFileAttr
+from hachoir_parser.common.msdos import MSDOSFileAttr
 
 MAGIC = "**ACE**"
 

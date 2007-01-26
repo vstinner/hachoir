@@ -13,6 +13,7 @@ from hachoir_core.field import (StaticFieldSet, FieldSet,
     NullBytes, NullBits, RawBytes)
 from hachoir_core.text_handler import humanFilesize, hexadecimal
 from hachoir_core.endian import LITTLE_ENDIAN
+from hachoir_parser.common.msdos import MSDOSFileAttr
 
 BLOCK_NAME = {
     0x72: "Marker",
@@ -59,31 +60,6 @@ def formatRARVersion(field):
     Decodes the RAR version stored on 1 byte
     """
     return "%u.%u" % divmod(field.value, 10)
-
-class MSDOSFileAttr(StaticFieldSet):
-    """
-    Decodes the MSDOS file attribute, as specified by the winddk.h header
-    and its FILE_ATTR_ defines:
-    http://www.cs.colorado.edu/~main/cs1300/include/ddk/winddk.h
-    """
-    format = (
-        (Bit, "read_only"),
-        (Bit, "hidden"),
-        (Bit, "system"),
-        (NullBits, "reserved[]", 1),
-        (Bit, "directory"),
-        (Bit, "archive"),
-        (Bit, "device"),
-        (Bit, "normal"),
-        (Bit, "temporary"),
-        (Bit, "sparse_file"),
-        (Bit, "reparse_file"),
-        (Bit, "compressed"),
-        (Bit, "offline"),
-        (Bit, "dont_index_content"),
-        (Bit, "encrypted"),
-        (NullBits, "reserved[]", 1+16)
-    )
 
 def commonFlags(self):
     yield Bit(self, "has_added_size", "Additional field indicating additional size")
