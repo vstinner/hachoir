@@ -84,6 +84,8 @@ class Command(FieldSet):
     COMMAND_DESC = createDict(COMMAND, 0)
     COMMAND_PARSER = createDict(COMMAND, 1)
 
+    META_COMMAND_TEXT = 1
+    META_COMMAND_NAME = 3
     META_COMMAND = {
         0x00: ("Sets the track's sequence number", None),
         0x01: ("Text event", parseText),
@@ -152,8 +154,10 @@ class Track(FieldSet):
 
     def createDescription(self):
         command = self["command[0]"]
-        if "meta_command" in command and command["meta_command"].value == 3:
-            return command["text"].value
+        if "meta_command" in command \
+        and command["meta_command"].value in (Command.META_COMMAND_TEXT, Command.META_COMMAND_NAME) \
+        and "text" in command:
+            return command["text"].value.strip("\r\n")
         else:
             return ""
 
