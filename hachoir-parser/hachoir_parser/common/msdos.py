@@ -31,4 +31,13 @@ class MSDOSFileAttr(StaticFieldSet):
         (Bit, "encrypted"),
         (NullBits, "reserved[]", 17),
     )
+    _text_keys = ("directory", "read_only", "compressed", "hidden", "system",
+        "normal", "device", "temporary")
+
+    def createText(self):
+        mode = []
+        for name in self._text_keys:
+            if self[name].value:
+                mode.append(name)
+        return ", ".join(mode)
 

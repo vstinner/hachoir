@@ -95,7 +95,8 @@ class Attribute(FieldSet):
         self._size = self["size"].value * 8
         type = self["type"].value
         if type in self.ATTR_INFO:
-            self._parser = self.ATTR_INFO[type][1]
+            self._name = self.ATTR_INFO[type][0]
+            self._parser = self.ATTR_INFO[type][2]
 
     def createFields(self):
         yield Enum(UInt32(self, "type", text_handler=hexadecimal), self.ATTR_NAME)
@@ -109,12 +110,12 @@ class Attribute(FieldSet):
         yield UInt16(self, "offset_attr", "Offset of the Attribute")
         yield UInt8(self, "indexed_flag")
         yield NullBytes(self, "padding", 1)
-        size = self["length_attr"].value
-        if size:
-            if self._parser:
-                for field in self._parser(self):
-                    yield field
-            else:
+        if self._parser:
+            for field in self._parser(self):
+                yield field
+        else:
+            size = self["length_attr"].value
+            if size:
                 yield RawBytes(self, "data", size)
         size = (self.size - self.current_size) // 8
         if size:
@@ -160,31 +161,45 @@ class Attribute(FieldSet):
         if size:
             yield String(self, "filename", size, charset="UTF-16-LE")
 
+    def parseData(self):
+        size = (self.size - self.current_size) // 8
+        if size:
+            yield Bytes(self, "data", size)
+
+    def parseBitmap(self):
+        size = (self.size - self.current_size)
+        for index in xrange(size):
+            yield Bit(self, "bit[]")
+
     # --- Type information ---
     ATTR_INFO = {
-         0x10: ('STANDARD_INFORMATION ', parseStandardInfo),
-         0x20: ('ATTRIBUTE_LIST ', None),
-         0x30: ('FILE_NAME ', parseFilename),
-         0x40: ('VOLUME_VERSION', None),
-         0x40: ('OBJECT_ID ', None),
-         0x50: ('SECURITY_DESCRIPTOR ', None),
-         0x60: ('VOLUME_NAME ', None),
-         0x70: ('VOLUME_INFORMATION ', None),
-         0x80: ('DATA ', None),
-         0x90: ('INDEX_ROOT ', None),
-         0xA0: ('INDEX_ALLOCATION ', None),
-         0xB0: ('BITMAP ', None),
-         0xC0: ('SYMBOLIC_LINK', None),
-         0xC0: ('REPARSE_POINT ', None),
-         0xD0: ('EA_INFORMATION ', None),
-         0xE0: ('EA ', None),
-         0xF0: ('PROPERTY_SET', None),
-        0x100: ('LOGGED_UTILITY_STREAM', None),
+         0x10: ('standard_info', 'STANDARD_INFORMATION ', parseStandardInfo),
+         0x20: ('attr_list', 'ATTRIBUTE_LIST ', None),
+         0x30: ('filename', 'FILE_NAME ', parseFilename),
+         0x40: ('vol_ver', 'VOLUME_VERSION', None),
+         0x40: ('obj_id', 'OBJECT_ID ', None),
+         0x50: ('security', 'SECURITY_DESCRIPTOR ', None),
+         0x60: ('vol_name', 'VOLUME_NAME ', None),
+         0x70: ('vol_info', 'VOLUME_INFORMATION ', None),
+         0x80: ('data', 'DATA ', parseData),
+         0x90: ('index_root', 'INDEX_ROOT ', None),
+         0xA0: ('index_alloc', 'INDEX_ALLOCATION ', None),
+         0xB0: ('bitmap', 'BITMAP ', parseBitmap),
+         0xC0: ('sym_link', 'SYMBOLIC_LINK', None),
+         0xC0: ('reparse', 'REPARSE_POINT ', None),
+         0xD0: ('ea_info', 'EA_INFORMATION ', None),
+         0xE0: ('ea', 'EA ', None),
+         0xF0: ('prop_set', 'PROPERTY_SET', None),
+        0x100: ('log_util', 'LOGGED_UTILITY_STREAM', None),
     }
-    ATTR_NAME = createDict(ATTR_INFO, 0)
+    ATTR_NAME = createDict(ATTR_INFO, 1)
 
-class MFT(FieldSet):
+class File(FieldSet):
 #    static_size = 48*8
+    def __init__(self, *args):
+        FieldSet.__init__(self, *args)
+        self._size = self["bytes_allocated"].value * 8
+
     def createFields(self):
         yield Bytes(self, "signature", 4, "Usually the magic is 'FILE'")
         yield UInt16(self, "usa_ofs", "Update Sequence Array offset")
@@ -206,8 +221,31 @@ class MFT(FieldSet):
         padding = self.seekByte(self["attrs_offset"].value, relative=True)
         if padding:
             yield padding
-        for index in xrange(4):
+
+        while not self.eof:
+            addr = self.absolute_address + self.current_size
+            if self.stream.readBytes(addr, 4) == "\xFF\xFF\xFF\xFF":
+                yield Bytes(self, "attr_end_marker", 8)
+                break
             yield Attribute(self, "attr[]")
+
+        size = self["bytes_in_use"].value - self.current_size//8
+        if size:
+            yield RawBytes(self, "end_rawdata", size)
+
+        size = (self.size - self.current_size) // 8
+        if size:
+            yield RawBytes(self, "end_padding", size, "Unused but allocated bytes")
+
+    def createDescription(self):
+        text = "File"
+        if "filename/filename" in self:
+            text += ' "%s"' % self["filename/filename"].value
+        if "filename/real_size" in self:
+            text += ' (%s)' % self["filename/real_size"].display
+        if "standard_info/file_attr" in self:
+            text += ', %s' % self["standard_info/file_attr"].createText()
+        return text
 
 class NTFS(Parser):
     MAGIC = "\xEB\x52\x90NTFS    "
@@ -238,7 +276,8 @@ class NTFS(Parser):
         padding = self.seekByte(offset, relative=False)
         if padding:
             yield padding
-        yield MFT(self, "mft")
+        for index in xrange(1000):
+            yield File(self, "file[]")
 
         size = (self.size - self.current_size) // 8
         if size:
