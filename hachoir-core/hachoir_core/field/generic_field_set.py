@@ -159,8 +159,10 @@ class GenericFieldSet(BasicFieldSet):
         assert isinstance(field._name, str)
         if field._name.endswith("[]"):
             self.setUniqueFieldName(field)
+
+        # required for the msoffice parser
         if field._address != self._current_size:
-            self.error("assertion failed at GenericFieldSet._addField; fixing field._address...")
+            self.warn("assertion failed at GenericFieldSet._addField; fixing field._address...")
             field._address = self._current_size
 
         # Compute field size and check that there is enough place for it
