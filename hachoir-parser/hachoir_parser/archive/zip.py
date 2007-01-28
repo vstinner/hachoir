@@ -29,6 +29,16 @@ COMPRESSION_METHOD = {
     8: "Deflate",
     9: "Deflate64",
     10: "PKWARE Imploding",
+    11: "Reserved by PKWARE",
+    12: "File is compressed using BZIP2 algorithm",
+    13: "Reserved by PKWARE",
+    14: "LZMA (EFS)",
+    15: "Reserved by PKWARE",
+    16: "Reserved by PKWARE",
+    17: "Reserved by PKWARE",
+    18: "File is compressed using IBM TERSE (new)",
+    19: "IBM LZ77 z Architecture (PFS)",
+    98: "PPMd version I, Rev 1",
 }
 
 def ZipRevision(field):
@@ -63,6 +73,9 @@ class ZipVersion(FieldSet):
 class ZipGeneralFlags(FieldSet):
     static_size = 16
     def createFields(self):
+        # Need the compression info from the parent, and that is the byte following
+        method = self.stream.readBits(self.absolute_address+16, 16, LITTLE_ENDIAN)
+
         yield Bits(self, "unused[]", 2, "Unused")
         yield Bit(self, "encrypted_central_dir", "Selected data values in the Local Header are masked")
         yield Bit(self, "incomplete", "Reserved by PKWARE for enhanced compression.")
@@ -74,9 +87,22 @@ class ZipGeneralFlags(FieldSet):
         yield Bit(self, "enhanced_deflate", "Reserved for use with method 8")
         yield Bit(self, "has_descriptor",
                   "Compressed data followed by descriptor?")
-        # Need the compression info from the parent, and that is the byte following
-        yield Bits(self, "compression_info", 2, "Depends on method",
-                   text_handler=hexadecimal)
+        if method == 6:
+            yield Bit(self, "use_8k_sliding", "Use 8K sliding dictionnary (instead of 4K)")
+            yield Bit(self, "use_3shannon", "Use a 3 Shannon-Fano tree (instead of 2 Shannon-Fano)")
+        elif method in (8, 9):
+            NAME = {
+                0: "Normal compression",
+                1: "Maximum compression",
+                2: "Fast compression",
+                3: "Super Fast compression"
+            }
+            yield Enum(Bits(self, "method", 2), NAME)
+        elif method == 14: #LZMA
+            yield Bit(self, "lzma_eos", "LZMA stream is ended with a EndOfStream marker")
+            yield Bit(self, "unused[]")
+        else:
+            yield Bits(self, "compression_info", 2)
         yield Bit(self, "is_encrypted", "File is encrypted?")
 
 class ExtraField(FieldSet):
