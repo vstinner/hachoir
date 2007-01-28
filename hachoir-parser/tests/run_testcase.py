@@ -320,6 +320,12 @@ def checkGrassLogo(parser): return (
     checkValue(parser, "/emf_header/description", "Adobe Illustrator EMF 8.0"),
 )
 
+def checkIndiaMap(parser): return (
+    checkValue(parser, "/screen/global_map", True),
+    checkDesc(parser, "/color_map/color[0]", u"RGB color: Black"),
+    checkValue(parser, "/image[0]/height", 794),
+)
+
 testcase_files = (
     (u"yellowdude.3ds", checkYellowdude),
     (u"logo-Kubuntu.png", checkLogoUbuntu),
@@ -356,6 +362,7 @@ testcase_files = (
     (u"globe.wmf", checkGlobe),
     (u"indiana.mid", checkIndiana),
     (u"grasslogo_vector.emf", checkGrassLogo),
+    (u"india_map.gif", checkIndiaMap),
 )
 
 def checkFile(filename, check_parser):

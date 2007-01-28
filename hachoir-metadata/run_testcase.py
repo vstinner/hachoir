@@ -213,6 +213,12 @@ def checkLadouce(meta): return (
     checkAttr(meta, "bit_rate", 8467200),
 )
 
+def checkLaraCroft(meta): return (
+    checkAttr(meta, "width", 320),
+    checkAttr(meta, "nb_colors", 256),
+    checkAttr(meta, "compression", "Run-length encoding (RLE)"),
+)
+
 testcase_files = (
     (u"logo-Kubuntu.png", checkLogoUbuntuMeta),
     (u"KDE_Click.wav", checkClickMeta),
@@ -237,6 +243,7 @@ testcase_files = (
     (u"firstrun.rm", checkFirstrun),
     (u"25min.aifc", check25min),
     (u"ladouce_1h15.wav", checkLadouce),
+    (u"lara_croft.pcx", checkLaraCroft),
 )
 
 def checkFile(filename, check_metadata):

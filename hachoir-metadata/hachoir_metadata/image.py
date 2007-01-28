@@ -83,6 +83,8 @@ class PcxMetadata(Metadata):
         self.width = 1 + pcx["xmax"].value
         self.height = 1 + pcx["ymax"].value
         self.bits_per_pixel = pcx["bpp"].value
+        if 1 <= pcx["bpp"].value <= 8:
+            self.nb_colors = 2 ** pcx["bpp"].value
         self.compression = _("Run-length encoding (RLE)")
         self.format_version = "PCX: %s" % pcx["version"].display
 
