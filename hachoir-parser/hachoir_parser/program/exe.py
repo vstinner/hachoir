@@ -96,6 +96,9 @@ class SectionHeader(FieldSet):
             yield Bit(self, "is_readable", "Is readable?")
             yield Bit(self, "is_writable", "Is writable?")
 
+    def rva2file(self, rva):
+        return self["phys_off"].value + (rva - self["rva"].value)
+
     def createDescription(self):
         info = [
             "rva=%s" % self["rva"].display,
@@ -292,7 +295,7 @@ class ExeFile(Parser):
                     else:
                         name =  "section[]"
                     if is_res:
-                        yield Resource(self, name, size=size*8)
+                        yield Resource(self, name, section, size=size*8)
                     else:
                         yield RawBytes(self, name, size)
         else:
@@ -332,8 +335,4 @@ class ExeFile(Parser):
             if size < 0:
                 return None
         return size*8
-
-    def rva2file(self, offset):
-        # TODO: Write code
-        return offset-8192
 

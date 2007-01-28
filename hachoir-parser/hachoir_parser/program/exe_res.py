@@ -9,28 +9,9 @@ from hachoir_core.field import (FieldSet, Enum,
     Bit, Bits,
     UInt16, UInt32, TimestampUnix32,
     RawBytes, NullBytes, CString, String)
-from hachoir_core.text_handler import humanFilesize
+from hachoir_core.text_handler import humanFilesize, hexadecimal
 from hachoir_core.tools import createDict, paddingSize, alignValue
 from hachoir_parser.common.win32 import BitmapInfoHeader
-
-def parseVersionInfo(parent):
-    yield RawBytes(parent, "xxx[]", 6)
-    yield CString(parent, "xxx[]", 30, charset="UTF-16-LE")
-    yield RawBytes(parent, "xxx[]", 60)
-    yield CString(parent, "xxx[]", charset="UTF-16-LE")
-    yield RawBytes(parent, "xxx[]", 6)
-    yield CString(parent, "xxx[]", charset="UTF-16-LE")
-    yield RawBytes(parent, "xxx[]", 6)
-    yield CString(parent, "xxx[]", charset="UTF-16-LE")
-    yield RawBytes(parent, "xxx[]", 2)
-    yield CString(parent, "xxx[]", charset="UTF-16-LE")
-    yield RawBytes(parent, "xxx[]", 8)
-    yield CString(parent, "xxx[]", charset="UTF-16-LE")
-    yield RawBytes(parent, "xxx[]", 2)
-    yield CString(parent, "xxx[]", charset="UTF-16-LE")
-    size = (parent.size - parent.current_size) // 8
-    if size:
-        yield RawBytes(parent, "raw", size)
 
 class VersionInfoNode(FieldSet):
     TYPE_STRING = 1
@@ -39,28 +20,34 @@ class VersionInfoNode(FieldSet):
         1: "string",
     }
 
-    def __init__(self, *args):
-        FieldSet.__init__(self, *args)
+    def __init__(self, parent, name, version=None):
+        FieldSet.__init__(self, parent, name)
         self._size = alignValue(self["size"].value, 4) * 8
+        self.version = version
 
     def createFields(self):
         yield UInt16(self, "size", "Node size (in bytes)")
         yield UInt16(self, "data_size")
         yield Enum(UInt16(self, "type"), self.TYPE_NAME)
         yield CString(self, "name", charset="UTF-16-LE")
+        if self["name"].value in ("040904b0", "040904B0"):
+            self.version = self["name"].value
 
         size = paddingSize(self.current_size//8, 4)
         if size:
             yield NullBytes(self, "padding[]", size)
-
         size = self["data_size"].value
         if size:
             if self["type"].value == self.TYPE_STRING:
-                yield String(self, "value", size*2, charset="UTF-16-LE", strip="\0")
+                # FIXME: Read documentation to know when data_size is the
+                # number of byte and when it's the number of UTF-16 characters
+                if self.version != "040904B0":
+                    size *= 2
+                yield String(self, "value", size, charset="UTF-16-LE", strip="\0")
             else:
                 yield RawBytes(self, "value", size)
         while 12 <= (self.size - self.current_size) // 8:
-            yield VersionInfoNode(self, "node[]")
+            yield VersionInfoNode(self, "node[]", self.version)
         size = paddingSize(self.current_size//8, 4)
         if size:
             yield NullBytes(self, "padding[]", size)
@@ -106,14 +93,14 @@ class Entry(FieldSet):
         self.inode = inode
 
     def createFields(self):
-        yield UInt32(self, "rva")
+        yield UInt32(self, "rva", text_handler=hexadecimal)
         yield UInt32(self, "size", text_handler=humanFilesize)
         yield UInt32(self, "codepage")
         yield NullBytes(self, "reserved", 4)
 
     def createDescription(self):
         return "Entry #%u: offset=%s size=%s" % (
-            self.inode["offset"].value, self["rva"].value, self["size"].display)
+            self.inode["offset"].value, self["rva"].display, self["size"].display)
 
 class NameOffset(FieldSet):
     def createFields(self):
@@ -215,6 +202,10 @@ class Directory(FieldSet):
         return self["header"].description
 
 class Resource(FieldSet):
+    def __init__(self, parent, name, section, size):
+        FieldSet.__init__(self, parent, name, size=size)
+        self.section = section
+
     def parseSub(self, directory, name, depth):
         indexes = []
         for index in directory.array("index"):
@@ -274,7 +265,7 @@ class Resource(FieldSet):
 
         # Parse resource content
         for entry in entries:
-            offset = self.root.rva2file(entry["rva"].value)
+            offset = self.section.rva2file(entry["rva"].value)
             padding = self.seekByte(offset, relative=False, null=True)
             if padding:
                 yield padding
