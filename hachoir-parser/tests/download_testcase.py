@@ -70,6 +70,7 @@ testcase_files = (
     (u"india_map.gif", 35019, "026f17c987c0e61d486963157a230114"),
     (u"cercle.exe", 17056, "cc4227ac437e4a7f04ccd61d3738cbb9"),
     (u"eula.exe", 45056, "5d758e2df701ce642fef3c8d8b4f51f6"),
+    (u"free-software-song.midi.bz2", 463, "1ab6ceaf0cd7d8ada4b85ad65d7ffcf0"),
 )
 
 def stringMD5(text):

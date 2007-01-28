@@ -356,6 +356,11 @@ def checkKino14(parser): return (
     checkValue(parser, "/char_data/char_bitmap[3]/line[1]/pixel[0]", 128),
 )
 
+def checkFreeSoftwareSong(parser): return (
+    checkDisplay(parser, "blocksize", u"'9'"),
+    checkDisplay(parser, "crc32", u"0x7b1b3c8c"),
+)
+
 testcase_files = (
     (u"yellowdude.3ds", checkYellowdude),
     (u"logo-Kubuntu.png", checkLogoUbuntu),
@@ -397,6 +402,7 @@ testcase_files = (
     (u"eula.exe", checkEula),
     (u"ocr10.laf", checkOCR10),
     (u"kino14s.laf", checkKino14),
+    (u"free-software-song.midi.bz2", checkFreeSoftwareSong),
 )
 
 def checkFile(filename, check_parser):
