@@ -8,16 +8,28 @@ Authors: Christophe Gisquet and Victor Stinner
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
     Bit, Bits, Enum,
-    TimestampMSDOS32,
+    TimestampMSDOS32, SubFile,
     UInt8, UInt16, UInt32, UInt64,
     String, PascalString16,
     RawBytes, SubFile, CompressedField)
 from hachoir_core.text_handler import humanFilesize, hexadecimal
 from hachoir_core.endian import LITTLE_ENDIAN
+from hachoir_parser.common.deflate import Deflate
 
-from hachoir_parser.archive.gzip_parser import has_deflate
-if has_deflate:
-    from hachoir_parser.archive.gzip_parser import Gunzip
+COMPRESSION_DEFLATE = 8
+COMPRESSION_METHOD = {
+    0: "no compression",
+    1: "Shrunk",
+    2: "Reduced (factor 1)",
+    3: "Reduced (factor 2)",
+    4: "Reduced (factor 3)",
+    5: "Reduced (factor 4)",
+    6: "Imploded",
+    7: "Tokenizing",
+    8: "Deflate",
+    9: "Deflate64",
+    10: "PKWARE Imploding",
+}
 
 def ZipRevision(field):
     return "%u.%u" % divmod(field.value, 10)
@@ -98,23 +110,10 @@ class ExtraField(FieldSet):
             yield RawBytes(self, "field_data", size, "Unknown field data")
 
 def ZipStartCommonFields(self):
-    compression_name = {
-        0: "no compression",
-        1: "Shrunk",
-        2: "Reduced (factor 1)",
-        3: "Reduced (factor 2)",
-        4: "Reduced (factor 3)",
-        5: "Reduced (factor 4)",
-        6: "Imploded",
-        7: "Tokenizing",
-        8: "Deflate",
-        9: "Deflate64",
-        10: "PKWARE Imploding"
-    }
     yield ZipVersion(self, "version_needed", "Version needed")
     yield ZipGeneralFlags(self, "flags", "General purpose flag")
     yield Enum(UInt16(self, "compression", "Compression method"),
-               compression_name)
+               COMPRESSION_METHOD)
     yield TimestampMSDOS32(self, "last_mod", "Last moditication file time")
     yield UInt32(self, "crc32", "CRC-32", text_handler=hexadecimal)
     yield UInt32(self, "compressed_size", "Compressed size")
@@ -199,9 +198,10 @@ class FileEntry(FieldSet):
         if compression == 0:
             return SubFile(self, "data", size, filename=self.filename)
         compressed = SubFile(self, "compressed_data", size, filename=self.filename)
-        if compression == 8 and has_deflate:
-            return CompressedField(compressed, Gunzip)
-        return compressed
+        if compression == COMPRESSION_DEFLATE:
+            return Deflate(compressed)
+        else:
+            return compressed
 
     def resync(self):
         # Non-seekable output, search the next data descriptor
@@ -225,9 +225,9 @@ class FileEntry(FieldSet):
     def createFields(self):
         for field in ZipStartCommonFields(self):
             yield field
-        filename = self["filename_length"].value
-        if filename:
-            filename = String(self, "filename", filename, "Filename") # TODO: charset?
+        length = self["filename_length"].value
+        if length:
+            filename = String(self, "filename", length, "Filename") # TODO: charset?
             yield filename
             self.filename = filename.value
         if self["extra_length"].value:

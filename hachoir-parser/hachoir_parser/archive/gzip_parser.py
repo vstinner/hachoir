@@ -7,27 +7,12 @@ Author: Victor Stinner
 from hachoir_parser import Parser
 from hachoir_core.field import (
     UInt8, UInt16, UInt32, Enum, TimestampUnix32,
-    Bit, CString, SubFile, CompressedField,
+    Bit, CString, SubFile,
     NullBits, Bytes, RawBytes)
 from hachoir_core.text_handler import hexadecimal, humanFilesize
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.tools import makeUnicode
-
-try:
-    from zlib import decompressobj, MAX_WBITS
-
-    class Gunzip:
-        def __init__(self, stream):
-            self.gzip = decompressobj(-MAX_WBITS)
-
-        def __call__(self, size, data=None):
-            if data is None:
-                data = self.gzip.unconsumed_tail
-            return self.gzip.decompress(data, size)
-
-    has_deflate = True
-except ImportError:
-    has_deflate = False
+from hachoir_parser.common.deflate import Deflate
 
 class GzipParser(Parser):
     endian = LITTLE_ENDIAN
@@ -124,10 +109,7 @@ class GzipParser(Parser):
                         break
                 else:
                     filename = None
-            data = SubFile(self, "file", size, filename=filename)
-            if has_deflate:
-                CompressedField(data, Gunzip)
-            yield data
+            yield Deflate(SubFile(self, "file", size, filename=filename))
 
         # Footer
         yield UInt32(self, "crc32", "Uncompressed data content CRC32",
