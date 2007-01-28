@@ -343,6 +343,19 @@ def checkEula(parser): return (
     checkDesc(parser, "/section_rsrc/icon[1]", "Resource #296 content: type=3"),
 )
 
+def checkOCR10(parser): return (
+    checkValue(parser, "/chars/char[3]/data_offset", 201),
+    checkValue(parser, "/chars/char[8]/width_pixels", 10),
+)
+
+def checkKino14(parser): return (
+    checkValue(parser, "/max_char_width", 26),
+    checkValue(parser, "/char_codes/char[5]", 5),
+    checkValue(parser, "/chars/char[1]/data_offset", 1),
+    checkValue(parser, "/chars/char[1]/height_pixels", 13),
+    checkValue(parser, "/char_data/char_bitmap[3]/line[1]/pixel[0]", 128),
+)
+
 testcase_files = (
     (u"yellowdude.3ds", checkYellowdude),
     (u"logo-Kubuntu.png", checkLogoUbuntu),
@@ -382,6 +395,8 @@ testcase_files = (
     (u"india_map.gif", checkIndiaMap),
     (u"cercle.exe", checkCercle),
     (u"eula.exe", checkEula),
+    (u"ocr10.laf", checkOCR10),
+    (u"kino14s.laf", checkKino14),
 )
 
 def checkFile(filename, check_parser):
