@@ -303,9 +303,8 @@ class ExeFile(Parser):
             raw = self.seekByte(offset, "raw[]", relative=False)
             if raw:
                 yield raw
-        size = (self.size - self.current_size) // 8
-        if size:
-            yield RawBytes(self, "footer", size)
+        if self.current_size < self._size:
+            yield self.seekBit(self._size, "footer")
 
     def isPE(self):
         return "pe_header" in self

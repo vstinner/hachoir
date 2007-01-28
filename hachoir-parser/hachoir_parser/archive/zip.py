@@ -11,9 +11,13 @@ from hachoir_core.field import (FieldSet, ParserError,
     TimestampMSDOS32,
     UInt8, UInt16, UInt32, UInt64,
     String, PascalString16,
-    RawBytes)
+    RawBytes, SubFile, CompressedField)
 from hachoir_core.text_handler import humanFilesize, hexadecimal
 from hachoir_core.endian import LITTLE_ENDIAN
+
+from hachoir_parser.archive.gzip_parser import has_deflate
+if has_deflate:
+    from hachoir_parser.archive.gzip_parser import Gunzip
 
 def ZipRevision(field):
     return "%u.%u" % divmod(field.value, 10)
@@ -188,43 +192,51 @@ class ZipDataDescriptor(FieldSet):
 
 class FileEntry(FieldSet):
     HEADER = 0x04034B50
-    def resynch(self):
+    filename = None
+
+    def data(self, size):
+        compression = self["compression"].value
+        if compression == 0:
+            return SubFile(self, "data", size, filename=self.filename)
+        compressed = SubFile(self, "compressed_data", size, filename=self.filename)
+        if compression == 8 and has_deflate:
+            return CompressedField(compressed, Gunzip)
+        return compressed
+
+    def resync(self):
         # Non-seekable output, search the next data descriptor
-        len = self.stream.searchBytesLength(ZipDataDescriptor.HEADER_STRING, False,
+        size = self.stream.searchBytesLength(ZipDataDescriptor.HEADER_STRING, False,
                                             self.absolute_address+self.current_size)
-        if len > 0:
-            yield RawBytes(self, "compressed_data", len, "Compressed data")
-            yield UInt32(self, "header[]", "Header", text_handler=hexadecimal)
-            data_desc = ZipDataDescriptor(self, "data_desc", "Data descriptor")
-            #self.info("Resynched!")
-            yield data_desc
-            # The above could be checked anytime, but we prefer trying parsing
-            # than aborting
-            if self["crc32"].value == 0 and \
-                data_desc["file_compressed_size"].value != len:
-                raise ParserError("Bad resynch: %i != %i" %
-                                  (len, data_desc["file_compressed_size"].value))
-            return
-        raise ParserError("Couldn't resynch to %s" %
-                          ZipDataDescriptor.HEADER_STRING)
+        if size <= 0:
+            raise ParserError("Couldn't resync to %s" %
+                              ZipDataDescriptor.HEADER_STRING)
+        yield self.data(size)
+        yield UInt32(self, "header[]", "Header", text_handler=hexadecimal)
+        data_desc = ZipDataDescriptor(self, "data_desc", "Data descriptor")
+        #self.info("Resynced!")
+        yield data_desc
+        # The above could be checked anytime, but we prefer trying parsing
+        # than aborting
+        if self["crc32"].value == 0 and \
+            data_desc["file_compressed_size"].value != size:
+            raise ParserError("Bad resync: %i != %i" %
+                              (len, data_desc["file_compressed_size"].value))
 
     def createFields(self):
         for field in ZipStartCommonFields(self):
             yield field
-        if self["filename_length"].value:
-            yield String(self, "filename", self["filename_length"].value,
-                         "Filename") # TODO: charset?
+        filename = self["filename_length"].value
+        if filename:
+            filename = String(self, "filename", filename, "Filename") # TODO: charset?
+            yield filename
+            self.filename = filename.value
         if self["extra_length"].value:
             yield RawBytes(self, "extra", self["extra_length"].value, "Extra")
         size = self["compressed_size"].value
         if size > 0:
-            # TODO: Use SubFile field type with deflate stream
-            if self["compression"].value == 0:
-                yield String(self, "data", size, "Uncompressed data")
-            else:
-                yield RawBytes(self, "compressed_data", size, "Compressed data")
+            yield self.data(size)
         elif not self["crc32"].value:
-            for field in self.resynch():
+            for field in self.resync():
                 yield field
         if self["flags/has_descriptor"].value:
             yield ZipDataDescriptor(self, "data_desc", "Data descriptor")
@@ -293,8 +305,8 @@ class ZipFile(Parser):
     tags = {
         "id": "zip",
         "category": "archive",
-        "file_ext": list(set(MIME_TYPES.values())),
-        "mime": MIME_TYPES.keys(),
+        "file_ext": tuple(MIME_TYPES.itervalues()),
+        "mime": tuple(MIME_TYPES.iterkeys()),
 # FIXME: Re-enable magic
 #        "magic": (("PK\3\4", 0),),
         "min_size": (4 + 26)*8, # header + file entry
