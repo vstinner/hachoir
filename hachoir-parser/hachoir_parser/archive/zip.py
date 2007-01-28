@@ -63,7 +63,9 @@ class ZipVersion(FieldSet):
 class ZipGeneralFlags(FieldSet):
     static_size = 16
     def createFields(self):
-        yield Bits(self, "unused[]", 8, "Unused")
+        yield Bits(self, "unused[]", 3, "Unused")
+        yield Bit(self, "incomplete", "Another case of compressed data followed by descriptor")
+        yield Bits(self, "unused[]", 4, "Unused")
         yield Bits(self, "reserved", 2, "Reserved for internal state")
         yield Bit(self, "is_patched", "File is compressed with patched data?")
         yield Bit(self, "unused[]", "Unused")
@@ -219,8 +221,8 @@ class FileEntry(FieldSet):
         # than aborting
         if self["crc32"].value == 0 and \
             data_desc["file_compressed_size"].value != size:
-            raise ParserError("Bad resync: %i != %i" %
-                              (len, data_desc["file_compressed_size"].value))
+            raise ParserError("Bad resync: position=>%i but data_desc=>%i" %
+                              (size, data_desc["file_compressed_size"].value))
 
     def createFields(self):
         for field in ZipStartCommonFields(self):
@@ -235,7 +237,7 @@ class FileEntry(FieldSet):
         size = self["compressed_size"].value
         if size > 0:
             yield self.data(size)
-        elif not self["crc32"].value:
+        elif self["flags/incomplete"].value:
             for field in self.resync():
                 yield field
         if self["flags/has_descriptor"].value:
