@@ -326,6 +326,23 @@ def checkIndiaMap(parser): return (
     checkValue(parser, "/image[0]/height", 794),
 )
 
+def checkCercle(parser): return (
+    checkValue(parser, "/msdos/reloc_offset", 28),
+    checkDisplay(parser, "/msdos/init_cs_ip", "0x00000315"),
+)
+
+def checkEula(parser): return (
+    checkDisplay(parser, "/pe_header/cpu", "Intel 80386"),
+    checkDisplay(parser, "/pe_opt_header/subsystem", "Windows/GUI"),
+    checkDisplay(parser, "/pe_opt_header/import/rva", "0x00008314"),
+    checkDisplay(parser, "/section_hdr[1]/mem_size", "4632 bytes"),
+    checkValue(parser, "/section_hdr[1]/is_readable", True),
+    checkValue(parser, "/section_hdr[1]/is_executable", False),
+    checkValue(parser, "/section_rsrc/version_info/node[0]/node[1]/node[0]/node[0]/value", u"Dell Inc"),
+    checkDesc(parser, "/section_rsrc/icon[0]/bmp_header", "Bitmap info header: 16x32 pixels, 4 bits/pixel"),
+    checkDesc(parser, "/section_rsrc/icon[1]", "Resource #296 content: type=3"),
+)
+
 testcase_files = (
     (u"yellowdude.3ds", checkYellowdude),
     (u"logo-Kubuntu.png", checkLogoUbuntu),
@@ -363,6 +380,8 @@ testcase_files = (
     (u"indiana.mid", checkIndiana),
     (u"grasslogo_vector.emf", checkGrassLogo),
     (u"india_map.gif", checkIndiaMap),
+    (u"cercle.exe", checkCercle),
+    (u"eula.exe", checkEula),
 )
 
 def checkFile(filename, check_parser):

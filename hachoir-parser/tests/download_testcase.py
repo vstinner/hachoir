@@ -68,6 +68,8 @@ testcase_files = (
     (u"hachoir-core.rar", 184109, "049e3c0702a7ae42cf4469280a32be93"),
     (u"debian-31r4-i386-binary-1.iso.torrent", 25793, "b68ed9799168d10854e9d10e45d51516"),
     (u"india_map.gif", 35019, "026f17c987c0e61d486963157a230114"),
+    (u"cercle.exe", 17056, "cc4227ac437e4a7f04ccd61d3738cbb9"),
+    (u"eula.exe", 45056, "5d758e2df701ce642fef3c8d8b4f51f6"),
 )
 
 def stringMD5(text):
