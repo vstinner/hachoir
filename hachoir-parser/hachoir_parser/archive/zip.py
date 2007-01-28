@@ -63,12 +63,15 @@ class ZipVersion(FieldSet):
 class ZipGeneralFlags(FieldSet):
     static_size = 16
     def createFields(self):
-        yield Bits(self, "unused[]", 3, "Unused")
-        yield Bit(self, "incomplete", "Another case of compressed data followed by descriptor")
+        yield Bits(self, "unused[]", 2, "Unused")
+        yield Bit(self, "encrypted_central_dir", "Selected data values in the Local Header are masked")
+        yield Bit(self, "incomplete", "Reserved by PKWARE for enhanced compression.")
+        yield Bit(self, "strong_encrypt", "Strong encryption (version >= 50)")
+        yield Bit(self, "uses_unicode", "Filename and comments are in UTF-8")
         yield Bits(self, "unused[]", 4, "Unused")
-        yield Bits(self, "reserved", 2, "Reserved for internal state")
+        yield Bit(self, "strong_encrypt", "Strong encryption (version >= 50)")
         yield Bit(self, "is_patched", "File is compressed with patched data?")
-        yield Bit(self, "unused[]", "Unused")
+        yield Bit(self, "enhanced_deflate", "Reserved for use with method 8")
         yield Bit(self, "has_descriptor",
                   "Compressed data followed by descriptor?")
         # Need the compression info from the parent, and that is the byte following
@@ -123,28 +126,38 @@ def ZipStartCommonFields(self):
     yield UInt16(self, "filename_length", "Filename length")
     yield UInt16(self, "extra_length", "Extra fields length")
 
+def zipGetCharset(self):
+    if self["flags/uses_unicode"].value:
+        return "UTF-8"
+    else:
+        return "ISO-8859-15"
+
 class ZipCentralDirectory(FieldSet):
     HEADER = 0x02014b50
     def createFields(self):
         yield ZipVersion(self, "version_made_by", "Version made by")
         for field in ZipStartCommonFields(self):
             yield field
+
+        # Check unicode status
+        charset = zipGetCharset(self)
+
         yield UInt16(self, "comment_length", "Comment length")
         yield UInt16(self, "disk_number_start", "Disk number start")
         yield UInt16(self, "internal_attr", "Internal file attributes")
         yield UInt32(self, "external_attr", "External file attributes")
         yield UInt32(self, "offset_header", "Relative offset of local header")
         yield String(self, "filename", self["filename_length"].value,
-                     "Filename") # TODO: charset?
+                     "Filename", charset=charset)
         if 0 < self["extra_length"].value:
             yield RawBytes(self, "extra", self["extra_length"].value,
                            "Extra fields")
         if 0 < self["comment_length"].value:
             yield String(self, "comment", self["comment_length"].value,
-                         "Comment") # TODO: charset?
+                         "Comment", charset=charset)
 
     def createDescription(self):
-        return "Central directory: %s" % self["filename"].value
+        return "Central directory: %s" % self["filename"].display
 
 class Zip64EndCentralDirectory(FieldSet):
     HEADER = 0x06064b50
@@ -228,8 +241,11 @@ class FileEntry(FieldSet):
         for field in ZipStartCommonFields(self):
             yield field
         length = self["filename_length"].value
+
+
         if length:
-            filename = String(self, "filename", length, "Filename") # TODO: charset?
+            filename = String(self, "filename", length, "Filename",
+                              charset=zipGetCharset(self))
             yield filename
             self.filename = filename.value
         if self["extra_length"].value:
