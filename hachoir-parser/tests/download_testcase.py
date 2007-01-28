@@ -71,6 +71,7 @@ testcase_files = (
     (u"cercle.exe", 17056, "cc4227ac437e4a7f04ccd61d3738cbb9"),
     (u"eula.exe", 45056, "5d758e2df701ce642fef3c8d8b4f51f6"),
     (u"free-software-song.midi.bz2", 463, "1ab6ceaf0cd7d8ada4b85ad65d7ffcf0"),
+    (u"ping_20020927-3ubuntu2", 30804, "7c856de09bbed6c51eb6dfb20f311f9b"),
 )
 
 def stringMD5(text):

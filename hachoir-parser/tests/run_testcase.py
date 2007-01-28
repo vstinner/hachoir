@@ -361,6 +361,15 @@ def checkFreeSoftwareSong(parser): return (
     checkDisplay(parser, "crc32", u"0x7b1b3c8c"),
 )
 
+def checkPing(parser): return (
+    checkDisplay(parser, "/header/class", u"32 bits"),
+    checkDisplay(parser, "/header/encoding", u"Little endian"),
+    checkDisplay(parser, "/header/type", u"Executable file"),
+    checkDisplay(parser, "/header/machine", u"Intel 80386"),
+    checkValue(parser, "/header/phentsize", 32),
+    checkDisplay(parser, "/prg_header[1]/type", u"Dynamic library"),
+)
+
 testcase_files = (
     (u"yellowdude.3ds", checkYellowdude),
     (u"logo-Kubuntu.png", checkLogoUbuntu),
@@ -403,6 +412,7 @@ testcase_files = (
     (u"ocr10.laf", checkOCR10),
     (u"kino14s.laf", checkKino14),
     (u"free-software-song.midi.bz2", checkFreeSoftwareSong),
+    (u"ping_20020927-3ubuntu2", checkPing),
 )
 
 def checkFile(filename, check_parser):

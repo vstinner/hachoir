@@ -15,26 +15,26 @@ from hachoir_core.endian import LITTLE_ENDIAN
 class ElfHeader(FieldSet):
     static_size = 52*8
     MACHINE_NAME = {
-        1: "AT&T WE 32100",
-        2: "SPARC",
-        3: "Intel 80386",
-        4: "Motorolla 68000",
-        5: "Motorolla 88000",
-        7: "Intel 80860",
-        8: "MIPS RS3000"
+        1: u"AT&T WE 32100",
+        2: u"SPARC",
+        3: u"Intel 80386",
+        4: u"Motorolla 68000",
+        5: u"Motorolla 88000",
+        7: u"Intel 80860",
+        8: u"MIPS RS3000"
     }
     CLASS_NAME = {
-        1: "32 bits",
-        2: "64 bits"
+        1: u"32 bits",
+        2: u"64 bits"
     }
     TYPE_NAME = {
-        0: "No file type",
-        1: "Relocable file",
-        2: "Executable file",
-        3: "Shared object file",
-        4: "Core file",
-        0xFF00: "Processor-specific (0xFF00)",
-        0xFFFF: "Processor-specific (0xFFFF)"
+             0: u"No file type",
+             1: u"Relocable file",
+             2: u"Executable file",
+             3: u"Shared object file",
+             4: u"Core file",
+        0xFF00: u"Processor-specific (0xFF00)",
+        0xFFFF: u"Processor-specific (0xFFFF)"
     }
     ENCODING_NAME = {
         1: "Little endian",
