@@ -6,9 +6,11 @@ import os
 import imp
 
 def main():
-    home = os.getenv("HOME")
-    assert home
-    os.path.join(home, "testcase")
+    directory = os.getenv("TESTCASE")
+    if not directory:
+        home = os.getenv("HOME")
+        assert home
+        directory = os.path.join(home, "testcase")
 
     parser = imp.load_source("parser", "hachoir-parser/tests/run_testcase.py")
     parser.testRandom()
