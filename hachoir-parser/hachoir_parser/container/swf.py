@@ -16,35 +16,20 @@ Creation date: 29 october 2006
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
     Bit, Bits, UInt8, UInt32, UInt16, CString, Enum,
-    Bytes, RawBytes, NullBits, String, SubFile, CompressedField)
+    Bytes, RawBytes, NullBits, String, SubFile)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_core.text_handler import humanFilesize
 from hachoir_core.tools import paddingSize, humanFrequency
 from hachoir_parser.image.common import RGB
 from hachoir_parser.image.jpeg import JpegChunk, JpegFile
 from hachoir_core.stream import StringInputStream, ConcatStream
+from hachoir_parser.common.deflate import Deflate, has_deflate
 import math
 
 # Maximum file size (50 MB)
 MAX_FILE_SIZE = 50 * 1024 * 1024
 
 TWIPS = 20
-
-try:
-    from zlib import decompressobj
-
-    class Gunzip:
-        def __init__(self, stream):
-            self.gzip = decompressobj()
-
-        def __call__(self, size, data=None):
-            if data is None:
-                data = self.gzip.unconsumed_tail
-            return self.gzip.decompress(data, size)
-
-    has_deflate = True
-except ImportError:
-    has_deflate = False
 
 class RECT(FieldSet):
     endian = BIG_ENDIAN
@@ -388,7 +373,7 @@ class SwfFile(Parser):
         else:
             size = (self.size - self.current_size) // 8
             if has_deflate:
-                data = CompressedField(Bytes(self, "compressed_data", size), Gunzip)
+                data = Deflate(Bytes(self, "compressed_data", size), False)
                 def createInputStream(cis, source=None, **args):
                     stream = cis(source=source)
                     header = StringInputStream("FWS" + self.stream.readBytes(3*8, 5))
