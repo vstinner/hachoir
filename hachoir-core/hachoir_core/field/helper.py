@@ -39,3 +39,17 @@ def writeIntoFile(fieldset, filename):
     output = FileOutputStream(filename)
     fieldset.writeInto(output)
 
+def createOrphanField(fieldset, address, field_cls, *args, **kw):
+    """
+    Create an orphan field at specified address:
+      field_cls(fieldset, *args, **kw)
+
+    The field uses the fieldset properties but it isn't added to the
+    field set.
+    """
+    save_size = fieldset._current_size
+    fieldset._current_size = address
+    field = field_cls(fieldset, *args, **kw)
+    fieldset._current_size = save_size
+    return field
+
