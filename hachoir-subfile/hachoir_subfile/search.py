@@ -11,6 +11,9 @@ from time import time
 from errno import EEXIST
 import re
 
+def skipSubfile(parser):
+    return ("subfile" in parser.tags) and (parser.tags["subfile"] == "skip")
+
 FILE_MAX_SIZE = 100 * 1024 * 1024   # Max. file size in bytes (100 MB)
 SLICE_SIZE = 64*1024                # Slice size in bytes (64 KB)
 HARD_MEMORY_LIMIT = 100*1024*1024
@@ -150,6 +153,7 @@ class SearchSubfile:
         """
         Search all subfiles in the stream, call processParser() for each parser.
         """
+        self.next_offset = None
         self.next_progress = time() + PROGRESS_UPDATE
         while self.current_offset < self.size:
             self.datarate.update(self.current_offset)
@@ -160,7 +164,9 @@ class SearchSubfile:
                 found.append(parser)
             for offset, parser in sorted(found):
                 self.processParser(offset, parser)
-            self.current_offset = min(self.current_offset + self.slice_size, self.size)
+            self.current_offset += self.slice_size
+            if self.next_offset:
+                self.current_offset = max(self.current_offset, self.next_offset)
 
     def processParser(self, offset, parser):
         """
@@ -201,14 +207,36 @@ class SearchSubfile:
         max_offset = offset + self.slice_size + 8 * (self.max_magic_len-1)
         max_offset = min(max_offset, self.size)
         for magic, offset in inputStreamSearchRegex(self.stream, self.magic_regex, offset, max_offset):
+            # Compute file offset start
             magic_offset, parser_cls = self.magics[magic]
-            parser = self.guess(offset-magic_offset, parser_cls)
+            offset -= magic_offset
+
+            # Skip invalid offset
+            if offset < 0:
+                continue
+            if offset < self.next_offset:
+                continue
+
+            # Create parser at found offset
+            parser = self.guess(offset, parser_cls)
+
+            # Update statistics
             if parser_cls not in self.stats:
                 self.stats[parser_cls] = [0, 0]
             self.stats[parser_cls][0] += 1
-            if parser:
-                self.stats[parser_cls][1] += 1
-                yield (offset-magic_offset, parser)
+            if not parser:
+                continue
+
+            # Parser is valid, yield it with the offset
+            self.stats[parser_cls][1] += 1
+            yield (offset, parser)
+
+            # Set next offset
+            if parser.content_size is not None\
+            and skipSubfile(parser):
+                self.next_offset = offset + parser.content_size
+                if max_offset < self.next_offset:
+                    break
 
     def guess(self, offset, parser_cls):
         """
@@ -216,8 +244,6 @@ class SearchSubfile:
 
         Return the parser object, or None on failure.
         """
-        if offset < 0:
-            return None
         substream = InputSubStream(self.stream, offset)
         try:
             return parser_cls(substream, validate=True)
