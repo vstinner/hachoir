@@ -13,6 +13,49 @@ from hachoir_core.text_handler import humanFilesize, hexadecimal
 from hachoir_core.tools import createDict, paddingSize, alignValue
 from hachoir_parser.common.win32 import BitmapInfoHeader
 
+class Version(FieldSet):
+    static_size = 32
+    def createFields(self):
+        yield UInt16(self, "minor", "Minor version number", text_handler=hexadecimal)
+        yield UInt16(self, "major", "Major version number", text_handler=hexadecimal)
+    def createValue(self):
+        return self["major"].value + float(self["minor"].value) / 10000
+
+OS_NAME = {
+    1: "DOS",
+    2: "OS/2 16-bit",
+    3: "OS/2 32-bit",
+    4: "Windows NT",
+}
+
+FILETYPE_NAME = {
+    1: "Application",
+    2: "DLL",
+    3: "Driver",
+    4: "Font",
+    5: "VXD",
+    7: "Static library",
+}
+
+class VersionInfoBinary(FieldSet):
+    # See VS_FIXEDFILEINFO structure, file include/winver.h, of Wine project
+    def createFields(self):
+        yield UInt32(self, "magic", "File information magic (0xFEEF04BD)", text_handler=hexadecimal)
+        if self["magic"].value != 0xFEEF04BD:
+            raise ParserError("EXE resource: invalid file info magic")
+        yield Version(self, "struct_ver", "Structure version (1.0)")
+        yield Version(self, "file_ver_ms", "File version MS")
+        yield Version(self, "file_ver_ls", "File version LS")
+        yield Version(self, "product_ver_ms", "Product version MS")
+        yield Version(self, "product_ver_ls", "Product version LS")
+        yield UInt32(self, "file_flags_mask", text_handler=hexadecimal)
+        yield UInt32(self, "file_flags", text_handler=hexadecimal)
+        yield Enum(UInt32(self, "file_os", text_handler=hexadecimal), OS_NAME)
+        yield Enum(UInt32(self, "file_type", text_handler=hexadecimal), FILETYPE_NAME)
+        yield UInt32(self, "file_subfile", text_handler=hexadecimal)
+        yield TimestampUnix32(self, "date_ms")
+        yield TimestampUnix32(self, "date_ls")
+
 class VersionInfoNode(FieldSet):
     TYPE_STRING = 1
     TYPE_NAME = {
@@ -41,9 +84,11 @@ class VersionInfoNode(FieldSet):
             if self["type"].value == self.TYPE_STRING:
                 # FIXME: Read documentation to know when data_size is the
                 # number of byte and when it's the number of UTF-16 characters
-                if self.version != "040904B0":
+                if True: #self.version != "040904B0":
                     size *= 2
                 yield String(self, "value", size, charset="UTF-16-LE", strip="\0")
+            elif self["name"].value == "VS_VERSION_INFO":
+                yield VersionInfoBinary(self, "value", size=size*8)
             else:
                 yield RawBytes(self, "value", size)
         while 12 <= (self.size - self.current_size) // 8:
