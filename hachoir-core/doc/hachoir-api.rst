@@ -242,7 +242,7 @@ Other methods:
 
 * static_size: helper to compute field size. If the value is an integer, the
   type has contant size. If it's a function, the size depends of the arguments.
-* hasValue(): check if the field has a value or not <~~~ hasattr(self, "createvalue")
+* hasValue(): check if the field has a value or not (default: self.value is not None)
 * getField(key, const=True): get the field with specified key,
   if const is True the field set will not be changed
 * __contains__(key)

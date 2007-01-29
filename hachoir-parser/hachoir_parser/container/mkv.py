@@ -35,6 +35,8 @@ class Unsigned(RawInt):
     def __init__(self, parent, name, description=None, text_handler=None):
         RawInt.__init__(self, parent, name, description, text_handler)
 
+    def hasValue(self):
+        return True
     def createValue(self):
         header = 1 << self._size / 8 * 7
         value = RawInt.createValue(self) - header

@@ -63,6 +63,9 @@ class BasicFieldSet(Field):
         if (self._size is not None) and (self._size <= 0):
             raise ParserError("Invalid parser '%s' size: %s" % (self.path, self._size))
 
+    def createValue(self):
+        return None
+
     def createFields(self):
         raise NotImplementedError()
     def __iter__(self):

@@ -103,14 +103,14 @@ class Field(Logger):
         return self.raw_display
 
     def hasValue(self):
-        return hasattr(self, "createValue")
+        return self._getValue() is not None
+    def createValue(self):
+        raise NotImplementedError()
     def _getValue(self):
-        if self._value is None:
-            if not hasattr(self, "createValue"):
-                raise AttributeError("Field %s has no attribute 'value'" % self.path)
-            self._value = self.createValue()
-        return self._value
-    value = property(_getValue, "Value of field")
+        value = self.createValue()
+        self._getValue = lambda: value
+        return value
+    value = property(lambda self: self._getValue(), "Value of field")
 
     def _getParent(self):
         return self._parent
