@@ -351,8 +351,8 @@ class ZipFile(Parser):
         "category": "archive",
         "file_ext": tuple(MIME_TYPES.itervalues()),
         "mime": tuple(MIME_TYPES.iterkeys()),
-# FIXME: Re-enable magic
-#        "magic": (("PK\3\4", 0),),
+        "magic": (("PK\3\4", 0),),
+        "subfile": "skip",
         "min_size": (4 + 26)*8, # header + file entry
         "description": "ZIP archive"
     }

@@ -5,7 +5,7 @@
 #
 
 from hachoir_parser import Parser
-from hachoir_core.field import (Field, FieldSet,
+from hachoir_core.field import (Field, FieldSet, createOrphanField,
     NullBits, Bit, Bits, Enum,
     UInt8, UInt16, UInt24, UInt32, UInt64,
     RawBytes, String, PascalString32)
@@ -166,7 +166,8 @@ class OggFile(Parser):
             "video/ogg", "video/x-ogg",
             "video/theora", "video/x-theora",
          ),
-#        "magic": ((MAGIC, 0),),
+        "magic": ((MAGIC, 0),),
+        "subfile": "skip",
         "min_size": 28*8,
         "description": "Ogg multimedia container"
     }
@@ -194,8 +195,15 @@ class OggFile(Parser):
         else:
             return u"Ogg multimedia container"
 
-
     def createFields(self):
         while not self.eof:
             yield OggPage(self, "page[]")
+
+    def createContentSize(self):
+        offset = self.stream.searchBytes("OggS\0\5", 0)
+        if offset is not None:
+            page = createOrphanField(self, offset, OggPage, "page")
+            return offset + page.size
+        else:
+            return None
 
