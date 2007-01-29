@@ -203,6 +203,7 @@ class MSDos_HardDrive(Parser):
         "category": "file_system",
         "description": "MS-DOS hard drive with Master Boot Record (MBR)",
         "min_size": 512*8,
+        "file_ext": "",
 #        "magic": ((MAGIC, 510*8),),
     }
 

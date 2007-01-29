@@ -20,17 +20,17 @@ class Integer(Bits):
         Bits.__init__(self, parent, name, 8, description)
         stream = parent.stream
         addr = self.absolute_address
-        bits = stream.readBits(addr, 8, parent.endian)
-        self._value = 0
+        value = 0
         while True:
-            self._value = (self._value << 7) + (bits & 127)
+            bits = stream.readBits(addr, 8, parent.endian)
+            value = (value << 7) + (bits & 127)
             if not(bits & 128):
                 break
             addr += 8
             self._size += 8
             if 32 < self._size:
                 raise ParserError("Integer size is bigger than 32-bit")
-            bits = stream.readBits(addr, 8, parent.endian)
+        self.createValue = lambda: value
 
 NOTE_NAME = {}
 NOTES = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "G#", "A", "A#", "B")

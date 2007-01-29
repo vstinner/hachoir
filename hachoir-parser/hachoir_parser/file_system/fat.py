@@ -313,6 +313,7 @@ class FAT_FS(Parser):
     tags = {
         "category": "file_system",
         "min_size": 512*8,
+        "file_ext": "",
     }
 
     def _validate(self, type_offset):

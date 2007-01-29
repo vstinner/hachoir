@@ -51,12 +51,12 @@ class Fragment(FieldSet):
     def _createFields(self, field_generator):
         if self.first != self:
             link = Link(self, "first", None)
-            link._value = self.first
+            link._getValue = lambda: self.first
             yield link
         next = self.next
         if next:
             link = Link(self, "next", None)
-            link._value = next
+            link._getValue = lambda: next
             yield link
         for field in field_generator:
             yield field

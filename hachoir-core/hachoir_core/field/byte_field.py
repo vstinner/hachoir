@@ -26,14 +26,14 @@ class RawBytes(Field):
 
     def createDisplay(self, human=True):
         max_bytes = config.max_byte_length
-        if self._value is None:
+        if type(self._getValue) is type(lambda: None):
+            display = self.value[:max_bytes]
+        else:
             if self._display is None:
                 address = self.absolute_address
                 length = min(self._size / 8, max_bytes)
                 self._display = self._parent.stream.readBytes(address, length)
             display = self._display
-        else:
-            display = self._value[:max_bytes]
         if human:
             if 8 * len(display) < self._size:
                 display += "(...)"

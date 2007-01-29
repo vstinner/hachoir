@@ -47,8 +47,6 @@ class Field(Logger):
     # Indicate if this field contains other fields (is a field set) or not
     is_field_set = False
 
-    _value = None
-
     def __init__(self, parent, name, size=None, description=None):
         """
         Set default class attributes, set right address if None address is
