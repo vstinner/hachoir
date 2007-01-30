@@ -5,6 +5,7 @@ video, but also archives. It supports most common file formats:
  * Audio: MPEG audio ("MP3"), WAV, Sun/NeXT audio, Ogg/Vorbis (OGG), MIDI,
    AIFF, AIFC, Real audio (RA)
  * Image: BMP, CUR, EMF, ICO, GIF, JPEG, PCX, PNG, TGA, TIFF, WMF, XCF
+ * Program: EXE
  * Video: ASF format (WMV video), AVI, Matroska (MKV), Quicktime (MOV),
    Ogg/Theora, Real media (RM)
 
