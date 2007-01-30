@@ -84,7 +84,7 @@ class VersionInfoNode(FieldSet):
             if self["type"].value == self.TYPE_STRING:
                 # FIXME: Read documentation to know when data_size is the
                 # number of byte and when it's the number of UTF-16 characters
-                if True: #self.version != "040904B0":
+                if self.version != "040904B0":
                     size *= 2
                 yield String(self, "value", size, charset="UTF-16-LE", strip="\0")
             elif self["name"].value == "VS_VERSION_INFO":
