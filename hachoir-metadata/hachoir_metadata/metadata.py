@@ -78,6 +78,7 @@ class Metadata(Logger):
         self.register("track_number", 204, _("Track number"),
             filter=NumberFilter(1, 99))
         self.register("organization", 205, _("Organization"))
+        self.register("version", 206, _("Version"))
 
         self.register("nb_channel", 300, _("Channel"),
             handler=humanAudioChannel, filter=NumberFilter(1, MAX_NB_CHANNEL))

@@ -309,6 +309,19 @@ class ExeFile(Parser):
     def isPE(self):
         return "pe_header" in self
 
+    def getRessource(self):
+        # MS-DOS program: no resource
+        if not self.isPE():
+            return None
+
+        # Check if PE has resource or not
+        if "pe_opt_header/resource" in self:
+            if not self["pe_opt_header/resource/size"].value:
+                return None
+        if "section_rsrc" in self:
+            return self["section_rsrc"]
+        return None
+
     def createDescription(self):
         if self.isPE():
             if self["pe_header/is_dll"].value:
