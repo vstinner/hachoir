@@ -285,7 +285,8 @@ class Resource(FieldSet):
             for index, subdir in enumerate(subdirs):
                 name = "directory[%u][%u][]" % (depth, index)
                 for field in self.parseSub(subdir, name, depth):
-                    newsubdirs.append(field)
+                    if field.__class__ == Directory:
+                        newsubdirs.append(field)
                     yield field
             subdirs = newsubdirs
             alldirs.extend(subdirs)
@@ -311,7 +312,7 @@ class Resource(FieldSet):
         # Parse resource content
         for entry in entries:
             offset = self.section.rva2file(entry["rva"].value)
-            padding = self.seekByte(offset, relative=False, null=True)
+            padding = self.seekByte(offset, relative=False)
             if padding:
                 yield padding
             yield ResourceContent(self, "content[]", entry)
