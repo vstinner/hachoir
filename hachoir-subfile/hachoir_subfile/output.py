@@ -1,5 +1,6 @@
 from hachoir_core.cmd_line import unicodeFilename
 from hachoir_core.stream import FileOutputStream
+from errno import EEXIST
 from os import mkdir, path
 
 class Output:

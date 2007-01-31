@@ -6,9 +6,9 @@ from hachoir_parser import QueryParser
 from hachoir_subfile.create_regex import createRegex
 from hachoir_subfile.memory import getTotalMemory, setMemoryLimit
 from hachoir_subfile.data_rate import DataRate
+from hachoir_subfile.output import Output
 from sys import stderr
 from time import time
-from errno import EEXIST
 import re
 
 def skipSubfile(parser):
