@@ -12,9 +12,10 @@ Creation date: 2007-01-19
 from hachoir_core.field import (FieldSet, Enum,
     Bit, Bits,
     UInt16, UInt32, TimestampUnix32,
-    RawBytes, PaddingBytes, NullBytes, CString, String)
+    RawBytes, PaddingBytes, NullBytes,
+    CString, String, PascalString16)
 from hachoir_core.text_handler import humanFilesize, hexadecimal
-from hachoir_core.tools import createDict, paddingSize, alignValue
+from hachoir_core.tools import createDict, paddingSize, alignValue, makePrintable
 from hachoir_parser.common.win32 import BitmapInfoHeader
 
 class Version(FieldSet):
@@ -123,13 +124,33 @@ def parseIcon(parent):
     if size:
         yield RawBytes(parent, "raw", size)
 
+class WindowsString(FieldSet):
+    def createFields(self):
+        yield UInt16(self, "length", "Number of 16-bit characters")
+        size = self["length"].value * 2
+        if size:
+            yield String(self, "text", size, charset="UTF-16-LE")
+
+    def createValue(self):
+        if "text" in self:
+            return self["text"].value
+        else:
+            return u""
+
+    def createDisplay(self):
+        return makePrintable(self.value, "UTF-8", to_unicode=True, quote='"')
+
+def parseStringTable(parent):
+    while not parent.eof:
+        yield WindowsString(parent, "string[]")
+
 RESOURCE_TYPE = {
     1: ("cursor[]", "Cursor", None),
     2: ("bitmap[]", "Bitmap", None),
     3: ("icon[]", "Icon", parseIcon),
     4: ("menu[]", "Menu", None),
     5: ("dialog[]", "Dialog", None),
-    6: ("string_table[]", "String table", None),
+    6: ("string_table[]", "String table", parseStringTable),
     7: ("font_dir[]", "Font directory", None),
     8: ("font[]", "Font", None),
     9: ("accelerators[]", "Accelerators", None),
