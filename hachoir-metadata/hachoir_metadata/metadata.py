@@ -277,7 +277,7 @@ class Metadata(Logger):
 
         return "\n".join(self.exportPlaintext())
 
-    def exportPlaintext(self, priority=None, human=True, line_prefix=u"- "):
+    def exportPlaintext(self, priority=None, human=True, line_prefix=u"- ", title=None):
         r"""
         Convert metadata to multi-line Unicode string and skip datas
         with priority lower than specified priority.
@@ -302,7 +302,9 @@ class Metadata(Logger):
             priority = min(priority, self.MAX_PRIORITY)
         else:
             priority = self.MAX_PRIORITY
-        text = ["%s:" % self.header]
+        if not title:
+            title = self.header
+        text = ["%s:" % title]
         for data in sorted(self):
             if priority < data.priority:
                 break
@@ -354,8 +356,12 @@ class MultipleMetadata(Metadata):
             text = common
         else:
             text = []
-        for metadata in self.__groups:
-            value = metadata.exportPlaintext(priority, human, line_prefix)
+        for key, metadata in self.__groups.iteritems():
+            if not human:
+                title = key
+            else:
+                title = None
+            value = metadata.exportPlaintext(priority, human, line_prefix, title=title)
             if value:
                 text.extend(value)
         if len(text):

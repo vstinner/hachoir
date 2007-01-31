@@ -47,7 +47,7 @@ def parseOptions():
         help=_("Quantify of information to display from 1 to 9 (9 is the maximum)"),
         action="store", default="9", type="choice",
         choices=[ str(choice) for choice in xrange(1,9+1) ])
-    common.add_option("--no-human", help=_("Disable human display"),
+    common.add_option("--raw", help=_("Raw output"),
         action="store_true", default=False)
     common.add_option("--bench", help=_("Run benchmark"),
         action="store_true", default=False)
@@ -120,7 +120,7 @@ display_filename=False, priority=None, human=True, display=True):
     return True
 
 def processFiles(values, filenames, display=True):
-    human = not(values.no_human)
+    human = not(values.raw)
     ok = True
     priority = int(values.level)*100 + 99
     display_filename = (1 < len(filenames))
