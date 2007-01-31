@@ -80,7 +80,6 @@ class ZipGeneralFlags(FieldSet):
         yield Bits(self, "unused[]", 2, "Unused")
         yield Bit(self, "encrypted_central_dir", "Selected data values in the Local Header are masked")
         yield Bit(self, "incomplete", "Reserved by PKWARE for enhanced compression.")
-        yield Bit(self, "strong_encrypt", "Strong encryption (version >= 50)")
         yield Bit(self, "uses_unicode", "Filename and comments are in UTF-8")
         yield Bits(self, "unused[]", 4, "Unused")
         yield Bit(self, "strong_encrypt", "Strong encryption (version >= 50)")
