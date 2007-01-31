@@ -29,9 +29,9 @@ class Image(FieldSet):
         yield Bits(self, "bpp", 3, "Bits / pixel minus one")
         yield NullBits(self, "nul", 3)
         yield Bit(self, "interlaced", "Interlaced?")
-        yield Bit(self, "local_map", "Use local color map?")
+        yield Bit(self, "has_local_map", "Use local color map?")
 
-        if self["local_map"].value:
+        if self["has_local_map"].value:
             nb_color = 1 << (1 + self["bpp"].value)
             yield PaletteRGB(self, "local_map", nb_color, "Local color map")
 
@@ -121,7 +121,7 @@ class ScreenDescriptor(FieldSet):
         yield UInt16(self, "width", "Width")
         yield UInt16(self, "height", "Height")
         yield Bits(self, "bpp", 3, "Bits per pixel minus one")
-        yield NullBits(self, "nul", 1, "(reserved)")
+        yield Bit(self, "reserved", "(reserved)")
         yield Bits(self, "color_res", 3, "Color resolution minus one")
         yield Bit(self, "global_map", "Has global map?")
         yield UInt8(self, "background", "Background color")
