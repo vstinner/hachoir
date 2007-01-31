@@ -111,7 +111,7 @@ class ParserList(object):
                 if format == "rest":
                     for parser in parser_list:
                         tags = parser.getTags()
-                        print " * %s: %s" % (tags["id"], tags["description"])
+                        print "* %s: %s" % (tags["id"], tags["description"])
                 else:
                     for parser in parser_list:
                         parser.print_(verbose)

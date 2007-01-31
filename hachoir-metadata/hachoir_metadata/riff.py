@@ -5,7 +5,7 @@ Extract metadata from RIFF file format: AVI video and WAV sound.
 from hachoir_metadata.metadata import Metadata, MultipleMetadata, registerExtractor
 from hachoir_parser.container.riff import RiffFile
 from hachoir_parser.video.fourcc import AUDIO_MICROSOFT_PCM, AUDIO_IEEE_FLOAT32
-from hachoir_core.tools import humanFilesize
+from hachoir_core.tools import humanFilesize, makeUnicode
 from hachoir_core.i18n import _
 
 class RiffMetadata(MultipleMetadata):
@@ -74,7 +74,7 @@ class RiffMetadata(MultipleMetadata):
         header = video["stream_hdr"]
 
         meta.compression = "%s (fourcc:\"%s\")" \
-            % (header["fourcc"].display, header["fourcc"].value)
+            % (header["fourcc"].display, makeUnicode(header["fourcc"].value))
         if header["rate"].value and header["scale"].value:
             fps = float(header["rate"].value) / header["scale"].value
             meta.frame_rate = fps
