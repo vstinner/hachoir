@@ -79,30 +79,42 @@ class ParserList(object):
     def __iter__(self):
         return iter(self.parser_list)
 
-    def print_(self, title=None, verbose=False):
+    def print_(self, title=None, verbose=False, format="default"):
         """Display a list of parser with its title
          * title : title of the list to display
+         * format: "rest", "one_line" or "default"
         """
 
-        if title:
-            print title
-        else:
-            print _("List of Hachoir parsers.")
-        print
+        if format != "rest":
+            if title:
+                print title
+            else:
+                print _("List of Hachoir parsers.")
+            print
 
         # Create parser list sorted by module
         bycategory = self.bytag["category"]
         for category in sorted(bycategory.iterkeys()):
-            if False:
+            if format == "one_line":
                 parser_list = [ parser.tags["id"] for parser in bycategory[category] ]
                 parser_list.sort()
                 print "- %s: %s" % (category.title(), ", ".join(parser_list))
             else:
-                print "[%s]" % category
+                if format == "rest":
+                    print category.replace("_", " ").title()
+                    print "-" * len(category)
+                    print
+                else:
+                    print "[%s]" % category
                 parser_list = sorted(bycategory[category],
                     key=lambda parser: parser.tags["id"])
-                for parser in parser_list:
-                    parser.print_(verbose)
+                if format == "rest":
+                    for parser in parser_list:
+                        tags = parser.getTags()
+                        print " * %s: %s" % (tags["id"], tags["description"])
+                else:
+                    for parser in parser_list:
+                        parser.print_(verbose)
                 print
         print "Total: %s parsers" % len(self.parser_list)
 

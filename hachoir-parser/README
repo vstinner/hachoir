@@ -159,122 +159,98 @@ Parser list
 Archive
 -------
 
- * application/x-7z-compressed: 7-zip archive
- * application/x-archive: ACE archive
- * application/x-debian-package, application/x-archive, application/x-dpkg:
-   Unix archive
- * application/x-bzip2: bzip2 archive
- * application/x-gzip: gzip archive
- * application/x-rar-compressed: Roshal archive (RAR)
- * application/x-rpm: RPM package
- * application/x-tar, application/x-gtar: TAR archive
- * application/zip, application/x-zip, application/vnd.sun.xml.writer,
-   application/vnd.sun.xml.writer.template,
-   application/vnd.sun.xml.writer.global, application/vnd.sun.xml.calc,
-   application/vnd.sun.xml.calc.template, application/vnd.sun.xml.impress,
-   application/vnd.sun.xml.impress.template, application/vnd.sun.xml.draw,
-   application/vnd.sun.xml.draw.template, application/vnd.sun.xml.math,
-   application/x-jar, application/java-archive: ZIP archive
+ * 7zip: Compressed archive in 7z format
+ * ace: ACE archive
+ * bzip2: bzip2 archive
+ * cab: Microsoft Cabinet archive
+ * gzip: gzip archive
+ * rar: Roshal archive (RAR)
+ * rpm: RPM package
+ * tar: TAR archive
+ * unix_archive: Unix archive
+ * zip: ZIP archive
 
 Audio
 -----
 
- * audio/x-aiff: Audio Interchange Format File (AIFF)
- * audio/basic: Sun/NeXT audio
- * iPod iTunesDB file
- * audio/midi: MIDI audio
- * audio/mpeg: MPEG audio version 1, 2, 2.5
- * audio/vorbis: OGG/Vorbis audio
- * audio/x-realaudio: Real audio
+ * aiff: Audio Interchange File Format (AIFF)
+ * itunesdb: iPod iTunesDB file
+ * midi: MIDI audio
+ * mpeg_audio: MPEG audio version 1, 2, 2.5
+ * real_audio: Real audio (.ra)
+ * sun_next_snd: Sun/NeXT audio
 
 Container
 ---------
 
- * Abstract Syntax Notation One (ASN.1)
- * application/x-shockwave-flash: Flash SWF animation
- * video/x-matroska, audio/x-matroska: Matroska multimedia container
- * application/ogg: Ogg multimedia container, with Vorbis and Theora parser
- * video/x-msvideo, audio/x-wav: Microsoft RIFF container
- * video/x-pn-realvideo, audio/x-pn-realaudio: Real media
+ * asn1: Abstract Syntax Notation One (ASN.1)
+ * matroska: Matroska multimedia container
+ * ogg: Ogg multimedia container
+ * real_media: RealMedia (rm) Container File
+ * riff: Microsoft RIFF container
+ * swf: Macromedia Flash data
 
-
-File system
+File System
 -----------
 
- * EXT2/EXT3 file system
- * FAT12 filesystem
- * FAT16 filesystem
- * FAT32 filesystem
- * Linux swap file
- * ISO 9660 file system
- * MS-DOS hard drive with Master Boot Record (MBR)
- * ReiserFS version 3
+ * ext2: EXT2/EXT3 file system
+ * fat12: FAT12 filesystem
+ * fat16: FAT16 filesystem
+ * fat32: FAT32 filesystem
+ * iso9660: ISO 9660 file system
+ * linux_swap: Linux swap file
+ * msdos_harddrive: MS-DOS hard drive with Master Boot Record (MBR)
+ * ntfs: NTFS file system
+ * reiserfs: ReiserFS file system
 
 Game
 ----
 
- * The Amazing Spider-Man vs. The Kingpin (Sega CD) FMV video
- * ZSNES Save State File (only version 143)
+ * lucasarts_font: LucasArts Font
+ * spiderman_video: The Amazing Spider-Man vs. The Kingpin (Sega CD) FMV video
+ * zsnes: ZSNES Save State File (only version 143)
 
 Image
 -----
 
- * image/x-ms-bmp, image/x-bmp: Microsoft bitmap (BMP) picture
- * image/gif: GIF picture
- * image/x-ico: Microsoft icon or cursor
- * image/jpeg: JPEG picture
- * image/x-pcx: PC Paintbrush (PCX) picture
- * image/png, image/x-png: Portable Network Graphics (PNG) picture
- * image/image/x-photoshop: Photoshop (PSD) picture
- * image/tiff: TIFF picture
- * image/targa, image/tga: Truevision Targa Graphic (TGA)
- * image/x-xcf, application/x-gimp-image: Gimp (XCF) picture
- * image/wmf, application/x-msmetafile: Microsoft Windows Metafile (WMF)
-
-Metadata
---------
-
- * 8BIM: Photoshop metadata, used in JPEG picture
- * AMF, used in FLV video
- * EXIF, used in JPEG picture
- * ID3 version 1.0, 1.1, 2.2, 2.3 and 2.4, used in MPEG audio
- * IPTC, used in 8BIM metadata (JPEG picture)
+ * bmp: Microsoft bitmap (BMP) picture
+ * gif: GIF picture
+ * ico: Microsoft Windows icon or cursor
+ * jpeg: JPEG picture
+ * pcx: PC Paintbrush (PCX) picture
+ * png: Portable Network Graphics (PNG) picture
+ * psd: Photoshop (PSD) picture
+ * targa: Truevision Targa Graphic (TGA)
+ * tiff: TIFF picture
+ * wmf: Microsoft Windows Metafile (WMF)
+ * xcf: Gimp (XCF) picture
 
 Misc
 ----
 
- * image/x-3do: renderdroid 3d model.
- * image/x-3ds: 3D Studio Max model
- * BitTorrent .torrent file
-
-Network
--------
-
- * Tcpdump file (network)
-
-Office
-------
-
- * application/msword, application/msexcel, application/mspowerpoint:
-   Microsoft Office document
+ * 3do: renderdroid 3d model.
+ * 3ds: 3D Studio Max model
+ * ole2: Microsoft Office document
+ * pdf: Portable Document Format (PDF) document
+ * tcpdump: Tcpdump file (network)
+ * torrent: Torrent metainfo file
 
 Program
 -------
 
- * application/x-executable, application/x-object, application/x-sharedlib,
-   application/x-executable-file, application/x-coredump: ELF Unix/BSD
-   program/library
- * application/x-dosexec: Microsoft Windows Portable Executable
- * Compiled Python script (.pyc/.pyo files)
- * application/java-vm: Java classes (file.class)
+ * elf: ELF Unix/BSD program/library
+ * exe: Microsoft Windows Portable Executable
+ * java_class: Compiled Java class
+ * python: Compiled Python script (.pyc/.pyo files)
 
 Video
 -----
 
- * video/x-ms-asf, video/x-ms-wmv, audio/x-ms-wma: ASF container (WMV video,
-   WMA audio)
- * video/mpeg, video/mp2p: MPEG video, version 1 or 2
- * video/quicktime: Apple QuickTime movie
- * video/theora: Ogg/Theora video
- * video/x-flv: Flash FLV video
+ * asf: Advanced Streaming Format (ASF), used for WMV (video) and WMA (audio)
+ * flv: Macromedia Flash video
+ * mov: Apple QuickTime movie
+ * mpeg_ts: MPEG-2 Transport Stream
+ * mpeg_video: MPEG video, version 1 or 2
+
+Total: 60 parsers
 
