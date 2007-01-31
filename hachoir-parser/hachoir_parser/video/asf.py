@@ -24,6 +24,8 @@ from itertools import izip
 from hachoir_parser.video.fourcc import audio_codec_name, video_fourcc_name
 from hachoir_parser.common.win32 import BitmapInfoHeader, GUID
 
+MAX_HEADER_SIZE = 100 * 1024  # bytes
+
 class AudioHeader(FieldSet):
     guid = "F8699E40-5B4D-11CF-A8FD-00805F5C442B"
     def createFields(self):
@@ -306,14 +308,20 @@ class AsfFile(Parser):
         "description": "Advanced Streaming Format (ASF), used for WMV (video) and WMA (audio)",
         "magic": ((MAGIC, 0),),
     }
+    FILE_TYPE = {
+        "video/x-ms-wmv": (".wmv", u"Window Media Video (wmv)"),
+        "video/x-ms-asf": (".asf", u"ASF container"),
+        "audio/x-ms-wma": (".wma", u"Window Media Audio (wma)"),
+    }
     endian = LITTLE_ENDIAN
 
     def validate(self):
         magic = self.MAGIC
         if self.stream.readBytes(0, len(magic)) != magic:
             return "Invalid magic"
-        if self[0]["size"].value < 30:
-            return "Invalid header size"
+        header = self[0]
+        if not(30 <= header["size"].value  <= MAX_HEADER_SIZE):
+            return "Invalid header size (%u)" % header["size"].value
         return True
 
     def createMimeType(self):
@@ -329,17 +337,15 @@ class AsfFile(Parser):
         else:
             return "video/x-ms-asf"
 
-    def createDescription(self):
-        if self.mime_type == "video/x-ms-wmv":
-            return u"Window Media Video (wmv)"
-        elif self.mime_type == "audio/x-ms-wma":
-            return u"Window Media Audio (wma)"
-        else:
-            return u"ASF container"
-
     def createFields(self):
         while not self.eof:
             yield Object(self, "object[]")
+
+    def createDescription(self):
+        return self.FILE_TYPE[self.mime_type][1]
+
+    def createFilenameSuffix(self):
+        return self.FILE_TYPE[self.mime_type][0]
 
     def createContentSize(self):
         if self[0].name != "header":
