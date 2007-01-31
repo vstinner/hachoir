@@ -87,6 +87,8 @@ class VersionInfoNode(FieldSet):
         yield UInt16(self, "data_size")
         yield Enum(UInt16(self, "type"), self.TYPE_NAME)
         yield CString(self, "name", charset="UTF-16-LE")
+        if self["name"].value == "040904b0":
+            self.is_32bit = True
 
         size = paddingSize(self.current_size//8, 4)
         if size:

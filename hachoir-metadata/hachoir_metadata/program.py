@@ -10,7 +10,7 @@ class ExeMetadata(Metadata):
         u"LegalTrademarks2": "copyright",
         u"CompanyName": "author",
         u"BuildDate": "creation_date",
-        u"FileDescription": "comment",
+        u"FileDescription": "title",
         u"ProductVersion": "version",
     }
     SKIP_KEY = set((u"InternalName", u"OriginalFilename", u"FileVersion", u"BuildVersion"))
