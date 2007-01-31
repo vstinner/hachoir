@@ -219,31 +219,12 @@ def checkLaraCroft(meta): return (
     checkAttr(meta, "compression", "Run-length encoding (RLE)"),
 )
 
-testcase_files = (
-    (u"logo-Kubuntu.png", checkLogoUbuntuMeta),
-    (u"KDE_Click.wav", checkClickMeta),
-    (u"test.txt.gz", checkGzipMeta),
-    (u"flashmob.mkv", checkFlashMobInfo),
-    (u"10min.mkv", True),
-    (u"wormux_32x32_16c.ico", True),
-    (u"audio_8khz_8bit_ulaw_4s39.au", True),
-    (u"sheep_on_drugs.mp3", checkSheepMeta),
-    (u"cross.xcf", checkCrossXCF),
-    (u"small_text.tar", checkTARMeta),
-    (u"kde_haypo_corner.bmp", checkCornerBMPMeta),
-    (u"png_331x90x8_truncated.png", checkPng331_90_8Meta),
-    (u"smallville.s03e02.avi", checkSmallville),
-    (u"08lechat_hq_fr.mp3", checkLechat),
-    (u"jpeg.exif.photoshop.jpg", checkJpegExifPSD),
-    (u"interlude_david_aubrun.ogg", checkInterludeDavid),
-    (u"breakdance.flv", checkBreakdance),
-    (u"matrix_ping_pong.wmv", checkMatrixPingPong),
-    (u"usa_railroad.jpg", checkUSARailroad),
-    (u"hero.tga", checkHero),
-    (u"firstrun.rm", checkFirstrun),
-    (u"25min.aifc", check25min),
-    (u"ladouce_1h15.wav", checkLadouce),
-    (u"lara_croft.pcx", checkLaraCroft),
+def checkHachoirOrgSXW(meta): return (
+    checkAttr(meta, "mime_type", "application/vnd.sun.xml.writer"),
+    checkAttr(meta, "file[0]/file_size", 30),
+    checkAttr(meta, "file[1]/creation_date", u"2007-01-22 19:08:14"),
+    checkAttr(meta, "file[2]/filename", u"Configurations2/accelerator/current.xml"),
+    checkAttr(meta, "file[2]/compression", u"Deflate"),
 )
 
 def checkFile(filename, check_metadata):
@@ -321,6 +302,34 @@ def main():
             print "!!! ERROR !!!"
         print
         sys.exit(1)
+
+testcase_files = (
+    (u"logo-Kubuntu.png", checkLogoUbuntuMeta),
+    (u"KDE_Click.wav", checkClickMeta),
+    (u"test.txt.gz", checkGzipMeta),
+    (u"flashmob.mkv", checkFlashMobInfo),
+    (u"10min.mkv", True),
+    (u"wormux_32x32_16c.ico", True),
+    (u"audio_8khz_8bit_ulaw_4s39.au", True),
+    (u"sheep_on_drugs.mp3", checkSheepMeta),
+    (u"cross.xcf", checkCrossXCF),
+    (u"small_text.tar", checkTARMeta),
+    (u"kde_haypo_corner.bmp", checkCornerBMPMeta),
+    (u"png_331x90x8_truncated.png", checkPng331_90_8Meta),
+    (u"smallville.s03e02.avi", checkSmallville),
+    (u"08lechat_hq_fr.mp3", checkLechat),
+    (u"jpeg.exif.photoshop.jpg", checkJpegExifPSD),
+    (u"interlude_david_aubrun.ogg", checkInterludeDavid),
+    (u"breakdance.flv", checkBreakdance),
+    (u"matrix_ping_pong.wmv", checkMatrixPingPong),
+    (u"usa_railroad.jpg", checkUSARailroad),
+    (u"hero.tga", checkHero),
+    (u"firstrun.rm", checkFirstrun),
+    (u"25min.aifc", check25min),
+    (u"ladouce_1h15.wav", checkLadouce),
+    (u"lara_croft.pcx", checkLaraCroft),
+    (u"hachoir.org.sxw", checkHachoirOrgSXW),
+)
 
 if __name__ == "__main__":
     main()

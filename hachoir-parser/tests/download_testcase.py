@@ -73,6 +73,7 @@ testcase_files = (
     (u"free-software-song.midi.bz2", 463, "1ab6ceaf0cd7d8ada4b85ad65d7ffcf0"),
     (u"ping_20020927-3ubuntu2", 30804, "7c856de09bbed6c51eb6dfb20f311f9b"),
     (u"georgia.cab", 311069, "28a1530d591b35c5c9485b4cb6f778da"),
+    (u"hachoir.org.sxw", 14781, "26ce99711c8c17a3c6bba299a3cfa68b"),
 )
 
 def stringMD5(text):
