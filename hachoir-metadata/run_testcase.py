@@ -227,6 +227,18 @@ def checkHachoirOrgSXW(meta): return (
     checkAttr(meta, "file[2]/compression", u"Deflate"),
 )
 
+def checkFirstRun(meta): return (
+    checkAttr(meta, "mime_type", u"audio/x-pn-realaudio"),
+    checkAttr(meta, "duration", 17066),
+    checkAttr(meta, "creation_date", u"6/14/2000 10:03:18"),
+    checkAttr(meta, "copyright", u"©2000 RealNetworks"),
+    checkAttr(meta, "bit_rate", 32348),
+    checkAttr(meta, "producer", u"RealProducer Plus 6.1.0.153 Windows"),
+    checkAttr(meta, "stream[1]/title", u"Audio Stream"),
+    checkAttr(meta, "stream[1]/mime_type", u"audio/x-pn-realaudio"),
+    checkAttr(meta, "stream[2]/bit_rate", 200),
+)
+
 def checkFile(filename, check_metadata):
     sys.stdout.write("  - Create parser: ")
     sys.stdout.flush()
@@ -329,6 +341,7 @@ testcase_files = (
     (u"ladouce_1h15.wav", checkLadouce),
     (u"lara_croft.pcx", checkLaraCroft),
     (u"hachoir.org.sxw", checkHachoirOrgSXW),
+    (u"firstrun.rm", checkFirstRun),
 )
 
 if __name__ == "__main__":

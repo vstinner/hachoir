@@ -74,6 +74,7 @@ testcase_files = (
     (u"ping_20020927-3ubuntu2", 30804, "7c856de09bbed6c51eb6dfb20f311f9b"),
     (u"georgia.cab", 311069, "28a1530d591b35c5c9485b4cb6f778da"),
     (u"hachoir.org.sxw", 14781, "26ce99711c8c17a3c6bba299a3cfa68b"),
+    (u"firstrun.rm", 75534, "5aa56f5de2723294136fadb90fc5b2ce"),
 )
 
 def stringMD5(text):
