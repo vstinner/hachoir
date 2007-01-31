@@ -49,7 +49,10 @@ class MSDOSFileAttr16(StaticFieldSet):
                     break
                 else:
                     mode.append(name)
-        return ", ".join(mode)
+        if mode:
+            return ", ".join(mode)
+        else:
+            return "(none)"
 
 class MSDOSFileAttr32(MSDOSFileAttr16):
     """

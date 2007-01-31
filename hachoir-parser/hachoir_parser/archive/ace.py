@@ -16,7 +16,7 @@ from hachoir_core.field import (StaticFieldSet, FieldSet,
     Bit, Bits, Enum,
     NullBits,
     UInt8, UInt16, UInt32, PascalString8, PascalString16,
-    String, TimestampMSDOS32,
+    String, TimeDateMSDOS32,
     RawBytes)
 from hachoir_core.text_handler import humanFilesize, hexadecimal
 from hachoir_core.endian import LITTLE_ENDIAN
@@ -83,7 +83,7 @@ def markerHeader(self):
     yield UInt8(self, "ver_created", "Version used to create archive")
     yield Enum(UInt8(self, "host_os", "OS where the files were compressed"), HOST_OS)
     yield UInt8(self, "vol_num", "Volume number")
-    yield TimestampMSDOS32(self, "time", "Date and time (MS DOS format)")
+    yield TimeDateMSDOS32(self, "time", "Date and time (MS DOS format)")
     yield Bits(self, "reserved", 64, "Reserved size for future extensions")
     flags = self["flags"]
     if flags["has_av_string"].value:
@@ -113,7 +113,7 @@ def fileFlags(self):
 def fileHeader(self):
     yield UInt32(self, "compressed_size", "Size of the compressed file", text_handler=humanFilesize)
     yield UInt32(self, "uncompressed_size", "Uncompressed file size", text_handler=humanFilesize)
-    yield TimestampMSDOS32(self, "ftime", "Date and time (MS DOS format)")
+    yield TimeDateMSDOS32(self, "ftime", "Date and time (MS DOS format)")
     if self["/header/host_os"].value in (OS_MSDOS, OS_WIN32):
         yield MSDOSFileAttr32(self, "file_attr", "File attributes")
     else:

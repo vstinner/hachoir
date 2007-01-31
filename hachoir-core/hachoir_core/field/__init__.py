@@ -34,7 +34,8 @@ from hachoir_core.field.vector import GenericVector, UserVector
 # Complex types
 from hachoir_core.field.float import Float32, Float64, Float80
 from hachoir_core.field.timestamp import (GenericTimestamp,
-    TimestampUnix32, TimestampMac32, TimestampMSDOS32, TimestampWin64)
+    TimestampUnix32, TimestampMac32, TimestampWin64,
+    DateTimeMSDOS32, TimeDateMSDOS32)
 
 # Special Field classes
 from hachoir_core.field.link import Link, Fragment
@@ -51,7 +52,8 @@ available_types = (
     Float32, Float64,
     PaddingBits, PaddingBytes,
     NullBits, NullBytes,
-    TimestampUnix32, TimestampMac32, TimestampMSDOS32, TimestampWin64,
+    TimestampUnix32, TimestampMac32, TimestampWin64,
+    DateTimeMSDOS32, TimeDateMSDOS32,
 #    GenericInteger, GenericString,
 )
 

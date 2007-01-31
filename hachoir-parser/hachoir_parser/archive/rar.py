@@ -9,7 +9,7 @@ from hachoir_parser import Parser
 from hachoir_core.field import (StaticFieldSet, FieldSet,
     Bit, Bits, Enum,
     UInt8, UInt16, UInt32, UInt64,
-    String, TimestampMSDOS32,
+    String, TimeDateMSDOS32,
     NullBytes, NullBits, RawBytes)
 from hachoir_core.text_handler import humanFilesize, hexadecimal
 from hachoir_core.endian import LITTLE_ENDIAN
@@ -108,7 +108,7 @@ def commentBody(self):
         yield RawBytes(self, "comment_data", size, "Compressed comment data")
 
 def signatureHeader(self):
-    yield TimestampMSDOS32(self, "creation_time")
+    yield TimeDateMSDOS32(self, "creation_time")
     yield UInt16(self, "arc_name_size", text_handler=humanFilesize)
     yield UInt16(self, "user_name_size", text_handler=humanFilesize)
 
@@ -161,7 +161,7 @@ class ExtTime(FieldSet):
             rmode = flags >> ((3-index)*4)
             if rmode & 8:
                 if index:
-                    yield TimestampMSDOS32(self, "dos_time[]", "DOS Time")
+                    yield TimeDateMSDOS32(self, "dos_time[]", "DOS Time")
                 if rmode & 3:
                     yield RawBytes(self, "remainder[]", rmode & 3, "Time remainder")
 
@@ -170,7 +170,7 @@ def specialHeader(self, is_file):
     yield UInt32(self, "uncompressed_size", "Uncompressed size (bytes)", text_handler=humanFilesize)
     yield Enum(UInt8(self, "host_os", "Operating system used for archiving"), OS_NAME)
     yield UInt32(self, "crc32", "File CRC32", text_handler=hexadecimal)
-    yield TimestampMSDOS32(self, "ftime", "Date and time (MS DOS format)")
+    yield TimeDateMSDOS32(self, "ftime", "Date and time (MS DOS format)")
     yield UInt8(self, "version", "RAR version needed to extract file", text_handler=formatRARVersion)
     yield Enum(UInt8(self, "method", "Packing method"), COMPRESSION_NAME)
     yield UInt16(self, "filename_length", "File name size", text_handler=humanFilesize)

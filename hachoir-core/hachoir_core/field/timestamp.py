@@ -30,7 +30,10 @@ TimestampUnix32 = timestampFactory("TimestampUnix32", timestampUNIX, 32)
 TimestampMac32 = timestampFactory("TimestampUnix32", timestampMac32, 32)
 TimestampWin64 = timestampFactory("TimestampWin64", timestampWin64, 64)
 
-class TimestampMSDOS32(FieldSet):
+class TimeDateMSDOS32(FieldSet):
+    """
+    32-bit MS-DOS timestamp (16-bit time, 16-bit date)
+    """
     static_size = 32
 
     def createFields(self):
@@ -38,6 +41,7 @@ class TimestampMSDOS32(FieldSet):
         yield Bits(self, "second", 5, "Second/2")
         yield Bits(self, "minute", 6)
         yield Bits(self, "hour", 5)
+
         yield Bits(self, "day", 5)
         yield Bits(self, "month", 4)
         # TODO: Create type "MSDOS_Year" : value+1980
@@ -50,4 +54,16 @@ class TimestampMSDOS32(FieldSet):
 
     def createDisplay(self):
         return humanDatetime(self.value)
+
+class DateTimeMSDOS32(TimeDateMSDOS32):
+    """
+    32-bit MS-DOS timestamp (16-bit date, 16-bit time)
+    """
+    def createFields(self):
+        yield Bits(self, "day", 5)
+        yield Bits(self, "month", 4)
+        yield Bits(self, "year", 7, "Number of year after 1980")
+        yield Bits(self, "second", 5, "Second/2")
+        yield Bits(self, "minute", 6)
+        yield Bits(self, "hour", 5)
 
