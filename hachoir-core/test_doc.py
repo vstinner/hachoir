@@ -54,6 +54,7 @@ def main():
     # Test documentation of some functions/classes
     testModule("hachoir_core.bits")
     testModule("hachoir_core.compatibility")
+    testModule("hachoir_core.dict")
     testModule("hachoir_core.text_handler")
     testModule("hachoir_core.tools")
 
