@@ -20,7 +20,7 @@ from hachoir_core.field import (StaticFieldSet, FieldSet,
     RawBytes)
 from hachoir_core.text_handler import humanFilesize, hexadecimal
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_parser.common.msdos import MSDOSFileAttr
+from hachoir_parser.common.msdos import MSDOSFileAttr32
 
 MAGIC = "**ACE**"
 
@@ -115,7 +115,7 @@ def fileHeader(self):
     yield UInt32(self, "uncompressed_size", "Uncompressed file size", text_handler=humanFilesize)
     yield TimestampMSDOS32(self, "ftime", "Date and time (MS DOS format)")
     if self["/header/host_os"].value in (OS_MSDOS, OS_WIN32):
-        yield MSDOSFileAttr(self, "file_attr", "File attributes")
+        yield MSDOSFileAttr32(self, "file_attr", "File attributes")
     else:
         yield UInt32(self, "file_attr", "File attributes", text_handler=hexadecimal)
     yield UInt32(self, "file_crc32", "CRC32 checksum over the compressed file)", text_handler=hexadecimal)

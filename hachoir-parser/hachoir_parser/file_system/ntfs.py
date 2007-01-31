@@ -21,7 +21,7 @@ from hachoir_core.field import (FieldSet, Enum,
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.text_handler import hexadecimal, humanFilesize
 from hachoir_core.tools import humanFilesize as doHumanFilesize, createDict
-from hachoir_parser.common.msdos import MSDOSFileAttr
+from hachoir_parser.common.msdos import MSDOSFileAttr32
 
 class BiosParameterBlock(FieldSet):
     """
@@ -136,7 +136,7 @@ class Attribute(FieldSet):
         yield TimestampWin64(self, "atime", "File Altered")
         yield TimestampWin64(self, "mtime", "MFT Changed")
         yield TimestampWin64(self, "rtime", "File Read")
-        yield MSDOSFileAttr(self, "file_attr", "DOS File Permissions")
+        yield MSDOSFileAttr32(self, "file_attr", "DOS File Permissions")
         yield UInt32(self, "max_version", "Maximum Number of Versions")
         yield UInt32(self, "version", "Version Number")
         yield UInt32(self, "class_id")
@@ -244,7 +244,7 @@ class File(FieldSet):
         if "filename/real_size" in self:
             text += ' (%s)' % self["filename/real_size"].display
         if "standard_info/file_attr" in self:
-            text += ', %s' % self["standard_info/file_attr"].createText()
+            text += ', %s' % self["standard_info/file_attr"].display
         return text
 
 class NTFS(Parser):

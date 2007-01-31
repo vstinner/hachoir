@@ -13,7 +13,7 @@ from hachoir_core.field import (StaticFieldSet, FieldSet,
     NullBytes, NullBits, RawBytes)
 from hachoir_core.text_handler import humanFilesize, hexadecimal
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_parser.common.msdos import MSDOSFileAttr
+from hachoir_parser.common.msdos import MSDOSFileAttr32
 
 BLOCK_NAME = {
     0x72: "Marker",
@@ -175,7 +175,7 @@ def specialHeader(self, is_file):
     yield Enum(UInt8(self, "method", "Packing method"), COMPRESSION_NAME)
     yield UInt16(self, "filename_length", "File name size", text_handler=humanFilesize)
     if self["host_os"].value in (OS_MSDOS, OS_WIN32):
-        yield MSDOSFileAttr(self, "file_attr", "File attributes")
+        yield MSDOSFileAttr32(self, "file_attr", "File attributes")
     else:
         yield UInt32(self, "file_attr", "File attributes", text_handler=hexadecimal)
 

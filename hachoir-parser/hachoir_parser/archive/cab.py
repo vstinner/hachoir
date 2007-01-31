@@ -10,6 +10,7 @@ from hachoir_core.field import (FieldSet, Enum,
     CString, String,
     UInt16, UInt32, Bit, NullBits,
     TimestampMSDOS32, RawBytes)
+from hachoir_parser.common.msdos import MSDOSFileAttr16
 from hachoir_core.text_handler import hexadecimal, humanFilesize
 from hachoir_core.endian import LITTLE_ENDIAN
 
@@ -33,7 +34,7 @@ class File(FieldSet):
             yield UInt16(self, "time")
         else:
             yield TimestampMSDOS32(self, "timestamp")
-        yield UInt16(self, "attribute")
+        yield MSDOSFileAttr16(self, "attribute")
         yield CString(self, "filename", charset="ASCII")
     def createDescription(self):
         return "File %s (%s)" % (
