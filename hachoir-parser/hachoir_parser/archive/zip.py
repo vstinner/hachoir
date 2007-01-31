@@ -13,6 +13,7 @@ from hachoir_core.field import (FieldSet, ParserError,
     String, PascalString16,
     RawBytes, SubFile, CompressedField)
 from hachoir_core.text_handler import humanFilesize, hexadecimal
+from hachoir_core.error import HACHOIR_ERRORS
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_parser.common.deflate import Deflate
 
@@ -289,6 +290,11 @@ class FileEntry(FieldSet):
         return "File entry: %s (%s)" % \
             (self["filename"].value, self["compressed_size"].display)
 
+    def validate(self):
+        if self["compression"].value not in COMPRESSION_METHOD:
+            return "Unknown compression method (%u)" % self["compression"].value
+        return ""
+
 class ZipSignature(FieldSet):
     HEADER = 0x05054B50
     def createFields(self):
@@ -360,6 +366,13 @@ class ZipFile(Parser):
     def validate(self):
         if self["header[0]"].value != FileEntry.HEADER:
             return "Invalid magic"
+        try:
+            file0 = self["file[0]"]
+        except HACHOIR_ERRORS, err:
+            return "Unable to get file #0"
+        err = file0.validate()
+        if err:
+            return "File #0: %s" % err
         return True
 
     def createFields(self):
