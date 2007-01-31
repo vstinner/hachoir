@@ -103,11 +103,11 @@ class DictionaryItem(FieldSet):
         if not key.hasValue():
             return
         key = key.value
-        self._name = str(key)
+        self._name = str(key).replace(" ", "_")
         if self["value"].hasValue() and self["value"].value != None:
             if key == "creation date":
                 self.createValue = self.createTimestampValue
-            elif key == "length":
+            elif key in ("length", "piece length"):
                 self.createValue = self.createFilesizeValue
             else:
                 self.createValue = self.createDefaultValue

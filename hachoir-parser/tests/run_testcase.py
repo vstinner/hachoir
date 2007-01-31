@@ -376,6 +376,14 @@ def checkGeorgia(parser): return (
     checkValue(parser, "/file[1]/filename", u"Georgiaz.TTF"),
 )
 
+def checkDebianTorrent(parser): return (
+    checkValue(parser, "/root/announce", u"http://bttracker.acc.umu.se:6969/announce"),
+    checkValue(parser, "/root/comment", u'"Debian CD from cdimage.debian.org"'),
+    checkDisplay(parser, "/root/creation_date", u'2006-11-16 21:44:37'),
+    checkDisplay(parser, "/root/info/value/length", u"638.7 MB"),
+    checkDisplay(parser, "/root/info/value/piece_length", u"512.0 KB"),
+)
+
 testcase_files = (
     (u"yellowdude.3ds", checkYellowdude),
     (u"logo-Kubuntu.png", checkLogoUbuntu),
@@ -420,6 +428,7 @@ testcase_files = (
     (u"free-software-song.midi.bz2", checkFreeSoftwareSong),
     (u"ping_20020927-3ubuntu2", checkPing),
     (u"georgia.cab", checkGeorgia),
+    (u"debian-31r4-i386-binary-1.iso.torrent", checkDebianTorrent),
 )
 
 def checkFile(filename, check_parser):
