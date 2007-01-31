@@ -370,6 +370,12 @@ def checkPing(parser): return (
     checkDisplay(parser, "/prg_header[1]/type", u"Dynamic library"),
 )
 
+def checkGeorgia(parser): return (
+    checkDisplay(parser, "/cab_version", "0x0103"),
+    checkDesc(parser, "/file[0]", u'File "fontinst.inf" (64 bytes)'),
+    checkValue(parser, "/file[1]/filename", u"Georgiaz.TTF"),
+)
+
 testcase_files = (
     (u"yellowdude.3ds", checkYellowdude),
     (u"logo-Kubuntu.png", checkLogoUbuntu),
@@ -413,6 +419,7 @@ testcase_files = (
     (u"kino14s.laf", checkKino14),
     (u"free-software-song.midi.bz2", checkFreeSoftwareSong),
     (u"ping_20020927-3ubuntu2", checkPing),
+    (u"georgia.cab", checkGeorgia),
 )
 
 def checkFile(filename, check_parser):

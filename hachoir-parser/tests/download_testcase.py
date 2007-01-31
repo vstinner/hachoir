@@ -72,6 +72,7 @@ testcase_files = (
     (u"eula.exe", 45056, "5d758e2df701ce642fef3c8d8b4f51f6"),
     (u"free-software-song.midi.bz2", 463, "1ab6ceaf0cd7d8ada4b85ad65d7ffcf0"),
     (u"ping_20020927-3ubuntu2", 30804, "7c856de09bbed6c51eb6dfb20f311f9b"),
+    (u"georgia.cab", 311069, "28a1530d591b35c5c9485b4cb6f778da"),
 )
 
 def stringMD5(text):
