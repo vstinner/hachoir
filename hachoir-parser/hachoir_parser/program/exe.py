@@ -283,7 +283,7 @@ class ExeFile(Parser):
             # Read sections
             sections.sort(key=lambda field: field["phys_off"].value)
             for section in sections:
-                padding = self.seekByte(section["phys_off"].value, null=True)
+                padding = self.seekByte(section["phys_off"].value)
                 if padding:
                     yield padding
                 size = section["phys_size"].value

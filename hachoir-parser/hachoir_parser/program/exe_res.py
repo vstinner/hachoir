@@ -1,6 +1,10 @@
 """
 Parser for resource of Microsoft Windows Portable Executable (PE).
 
+Documentation:
+- Wine project
+  VS_FIXEDFILEINFO structure, file include/winver.h
+
 Author: Victor Stinner
 Creation date: 2007-01-19
 """
@@ -8,7 +12,7 @@ Creation date: 2007-01-19
 from hachoir_core.field import (FieldSet, Enum,
     Bit, Bits,
     UInt16, UInt32, TimestampUnix32,
-    RawBytes, NullBytes, CString, String)
+    RawBytes, PaddingBytes, NullBytes, CString, String)
 from hachoir_core.text_handler import humanFilesize, hexadecimal
 from hachoir_core.tools import createDict, paddingSize, alignValue
 from hachoir_parser.common.win32 import BitmapInfoHeader
@@ -21,11 +25,20 @@ class Version(FieldSet):
     def createValue(self):
         return self["major"].value + float(self["minor"].value) / 10000
 
-OS_NAME = {
+MAJOR_OS_NAME = {
     1: "DOS",
     2: "OS/2 16-bit",
     3: "OS/2 32-bit",
     4: "Windows NT",
+}
+
+MINOR_OS_32BIT = 4
+MINOR_OS_NAME = {
+    0: "Base",
+    1: "Windows 16-bit",
+    2: "PM 16",
+    3: "PM 32",
+    4: "Windows 32-bit",
 }
 
 FILETYPE_NAME = {
@@ -38,7 +51,6 @@ FILETYPE_NAME = {
 }
 
 class VersionInfoBinary(FieldSet):
-    # See VS_FIXEDFILEINFO structure, file include/winver.h, of Wine project
     def createFields(self):
         yield UInt32(self, "magic", "File information magic (0xFEEF04BD)", text_handler=hexadecimal)
         if self["magic"].value != 0xFEEF04BD:
@@ -50,7 +62,8 @@ class VersionInfoBinary(FieldSet):
         yield Version(self, "product_ver_ls", "Product version LS")
         yield UInt32(self, "file_flags_mask", text_handler=hexadecimal)
         yield UInt32(self, "file_flags", text_handler=hexadecimal)
-        yield Enum(UInt32(self, "file_os", text_handler=hexadecimal), OS_NAME)
+        yield Enum(UInt16(self, "file_os_major", text_handler=hexadecimal), MAJOR_OS_NAME)
+        yield Enum(UInt16(self, "file_os_minor", text_handler=hexadecimal), MINOR_OS_NAME)
         yield Enum(UInt32(self, "file_type", text_handler=hexadecimal), FILETYPE_NAME)
         yield UInt32(self, "file_subfile", text_handler=hexadecimal)
         yield TimestampUnix32(self, "date_ms")
@@ -63,18 +76,16 @@ class VersionInfoNode(FieldSet):
         1: "string",
     }
 
-    def __init__(self, parent, name, version=None):
+    def __init__(self, parent, name, is_32bit=True):
         FieldSet.__init__(self, parent, name)
         self._size = alignValue(self["size"].value, 4) * 8
-        self.version = version
+        self.is_32bit = is_32bit
 
     def createFields(self):
         yield UInt16(self, "size", "Node size (in bytes)")
         yield UInt16(self, "data_size")
         yield Enum(UInt16(self, "type"), self.TYPE_NAME)
         yield CString(self, "name", charset="UTF-16-LE")
-        if self["name"].value in ("040904b0", "040904B0"):
-            self.version = self["name"].value
 
         size = paddingSize(self.current_size//8, 4)
         if size:
@@ -82,17 +93,16 @@ class VersionInfoNode(FieldSet):
         size = self["data_size"].value
         if size:
             if self["type"].value == self.TYPE_STRING:
-                # FIXME: Read documentation to know when data_size is the
-                # number of byte and when it's the number of UTF-16 characters
-                if self.version != "040904B0":
+                if self.is_32bit:
                     size *= 2
                 yield String(self, "value", size, charset="UTF-16-LE", strip="\0")
             elif self["name"].value == "VS_VERSION_INFO":
                 yield VersionInfoBinary(self, "value", size=size*8)
+                self.is_32bit = self["value/file_os_minor"].value == MINOR_OS_32BIT
             else:
                 yield RawBytes(self, "value", size)
         while 12 <= (self.size - self.current_size) // 8:
-            yield VersionInfoNode(self, "node[]", self.version)
+            yield VersionInfoNode(self, "node[]", self.is_32bit)
         size = paddingSize(self.current_size//8, 4)
         if size:
             yield NullBytes(self, "padding[]", size)
@@ -319,5 +329,5 @@ class Resource(FieldSet):
 
         size = (self.size - self.current_size) // 8
         if size:
-            yield NullBytes(self, "padding_end", size)
+            yield PaddingBytes(self, "padding_end", size)
 
