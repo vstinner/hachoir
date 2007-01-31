@@ -8,33 +8,41 @@ Creation date: 31 january 2007
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, Enum,
     CString, String,
-    UInt16, UInt32, Bit, NullBits,
-    TimestampMSDOS32, RawBytes)
+    UInt16, UInt32, Bit, Bits, PaddingBits, NullBits,
+    DateTimeMSDOS32, RawBytes)
 from hachoir_parser.common.msdos import MSDOSFileAttr16
 from hachoir_core.text_handler import hexadecimal, humanFilesize
 from hachoir_core.endian import LITTLE_ENDIAN
 
+COMPRESSION_NONE = 0
 COMPRESSION_NAME = {
-    # TODO: Find compression method names
+    0: "Uncompressed",
+    1: "Deflate",
+    2: "Quantum",
+    3: "LZX",
 }
 
 class Folder(FieldSet):
     def createFields(self):
         yield UInt32(self, "off_data", "Offset of data")
         yield UInt16(self, "cf_data")
-        yield Enum(UInt16(self, "compression", "Compression method"), COMPRESSION_NAME)
+        yield Enum(Bits(self, "compr_method", 4, "Compression method"), COMPRESSION_NAME)
+        yield Bits(self, "compr_level", 5, "Compression level")
+        yield PaddingBits(self, "padding", 7)
+
+    def createDescription(self):
+        text= "Folder: compression %s" % self["compr_method"].display
+        if self["compr_method"].value != COMPRESSION_NONE:
+            text += " (level %u)" % self["compr_level"].value
+        return text
 
 class File(FieldSet):
     def createFields(self):
         yield UInt32(self, "filesize", "Uncompressed file size", text_handler=humanFilesize)
         yield UInt32(self, "offset", "File offset after decompression")
         yield UInt16(self, "iFolder", "file control id")
-        if True:
-            yield UInt16(self, "date")
-            yield UInt16(self, "time")
-        else:
-            yield TimestampMSDOS32(self, "timestamp")
-        yield MSDOSFileAttr16(self, "attribute")
+        yield DateTimeMSDOS32(self, "timestamp")
+        yield MSDOSFileAttr16(self, "attributes")
         yield CString(self, "filename", charset="ASCII")
     def createDescription(self):
         return "File %s (%s)" % (
