@@ -345,12 +345,7 @@ class CrossReferenceTable(FieldSet):
     def createFields(self):
         yield RawBytes(self, "marker", len(self.MAGIC))
         yield LineEnd(self, "line_end[]")
-        # FIXME: should be "sub_section[]"
-        # However:
-        # 1) So far, PDFs tested only have 1 instance
-        # 2) Produces "TypeError: unsubscriptable object" when using
-        #   ::array() on it
-        while self.current_size < self._size and not self.eof:
+        while not self.eof:
             yield SubSection(self, "sub_section[]")
 
 class Catalog(FieldSet):
