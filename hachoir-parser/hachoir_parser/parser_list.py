@@ -39,13 +39,25 @@ class ParserList(object):
             value = value,
         return name, value
 
-    def add(self, parser):
-        tags = parser.getTags()
+    def validParser(self, parser, tags):
         parser_id = tags.get("id")
         if parser_id is None:
-            return
+            return "No identifier"
         if "description" not in tags:
-            error("[%s] No description." % parser.__name__)
+            return "No description"
+        file_ext = tags.get("file_ext", tuple())
+        if not isinstance(file_ext, (tuple, list)):
+            return "File extension is not a tuple or list"
+        mime = tags.get("mime", tuple())
+        if not isinstance(mime, (tuple, list)):
+            return "MIME type is not a tuple or list"
+        return ""
+
+    def add(self, parser):
+        tags = parser.getTags()
+        err = self.validParser(parser, tags)
+        if err:
+            error("Skip parser %s: %s" % (parser.__name__, err))
             return
 
         _tags = []
@@ -125,11 +137,10 @@ class HachoirParserList(ParserList):
                 todo.append(attr)
 
         for module in todo:
-            attributes = ( getattr(module, name) for name in dir(module) )
-            parsers = (attr for attr in attributes
-                if isinstance(attr, type) and issubclass(attr, Parser))
-            for parser in parsers:
-                self.add(parser)
+            for name in dir(module):
+                attr = getattr(module, name)
+                if isinstance(attr, type) and issubclass(attr, Parser) and attr != Parser:
+                    self.add(attr)
         assert 1 <= len(self.parser_list)
         return self.parser_list
 

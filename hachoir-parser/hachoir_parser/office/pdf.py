@@ -54,7 +54,7 @@ class PDFNumber(Field):
                 other_size -= 1
                 if size == None or other_size < size:
                     size = other_size
-        
+
         self._size = 8*size
 
         # Get value
@@ -315,12 +315,12 @@ class SubSection(FieldSet):
         self.info("Got entry count: '%s'" % self["entry_count"].value)
         self._size = self.current_size + 8*20*int(self["entry_count"].value) \
                      + self["line_end"].size
-                                                  
+
     def createFields(self):
         yield PDFNumber(self, "start_number",
                         "Object number of first entry in subsection")
         self.info("start_number = %i" % self["start_number"].value)
-        
+
         yield PDFNumber(self, "entry_count", "Number of entries in subsection")
         self.info("entry_count = %i" % self["entry_count"].value)
         yield LineEnd(self, "line_end")
@@ -423,7 +423,7 @@ class PDFDocument(Parser):
         "id": "pdf",
         "category": "misc",
         "file_ext": ("pdf",),
-        "mime": "application/pdf",
+        "mime": ("application/pdf",),
         "min_size": (5+4)*8,
         "magic": ((MAGIC, 5),),
         "description": "Portable Document Format (PDF) document"
@@ -444,3 +444,4 @@ class PDFDocument(Parser):
         yield Body(self, "body")
         yield CrossReferenceTable(self, "cross_ref_table")
         yield Trailer(self, "trailer")
+

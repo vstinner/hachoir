@@ -62,7 +62,7 @@ class CabFile(Parser):
         "id": "cab",
         "category": "archive",
         "file_ext": ("cab",),
-        "mime": "application/vnd.ms-cab-compressed",
+        "mime": ("application/vnd.ms-cab-compressed",),
         "magic": ((MAGIC, 0),),
         "min_size": 1*8, # header + file entry
         "description": "Microsoft Cabinet archive"
