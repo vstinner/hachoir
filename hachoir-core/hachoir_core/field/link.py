@@ -5,6 +5,9 @@ class Link(Field):
     def __init__(self, parent, name, *args, **kw):
         Field.__init__(self, parent, name, 0, *args, **kw)
 
+    def hasValue(self):
+        return True
+
     def createValue(self):
         return self._parent[self.display]
 

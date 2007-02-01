@@ -27,7 +27,6 @@ class RawBits(Field):
                 or isinstance(text_handler, types.MethodType)
             self.createDisplay = lambda: text_handler(self)
 
-
     def hasValue(self):
         return True
 

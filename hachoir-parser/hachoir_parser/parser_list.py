@@ -40,15 +40,16 @@ class ParserList(object):
         return name, value
 
     def validParser(self, parser, tags):
-        parser_id = tags.get("id")
-        if parser_id is None:
+        if "id" not in tags:
             return "No identifier"
         if "description" not in tags:
             return "No description"
-        file_ext = tags.get("file_ext", tuple())
+        # TODO: Allow simple strings for file_ext/mime ?
+        # (see also HachoirParser.createFilenameSuffix)
+        file_ext = tags.get("file_ext", ())
         if not isinstance(file_ext, (tuple, list)):
             return "File extension is not a tuple or list"
-        mime = tags.get("mime", tuple())
+        mime = tags.get("mime", ())
         if not isinstance(mime, (tuple, list)):
             return "MIME type is not a tuple or list"
         return ""
