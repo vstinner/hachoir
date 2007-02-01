@@ -46,20 +46,23 @@ def floatFactory(name, format, mantissa_bits, exponent_bits, doc):
                 self.struct_format = None
 
         def createValue(self):
+            """
+            Create float value: use struct.unpack() when it's possible
+            (32 and 64-bit float) or compute it with :
+               mantissa * (2.0 ** exponent)
+
+            This computation may raise an OverflowError.
+            """
             if self.struct_format:
                 raw = self._parent.stream.readBytes(
                     self.absolute_address, self._size/8)
                 return struct.unpack(self.struct_format, raw)[0]
             else:
-                try:
-                    value = self["mantissa"].value * (2.0 ** float(self["exponent"].value))
-                    if self["negative"].value:
-                        return -(value)
-                    else:
-                        return value
-                except OverflowError:
-                    self.error("overflow")
-                    return 0.0
+                value = self["mantissa"].value * (2.0 ** float(self["exponent"].value))
+                if self["negative"].value:
+                    return -(value)
+                else:
+                    return value
 
         def createFields(self):
             yield Bit(self, "negative")
