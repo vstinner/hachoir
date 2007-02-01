@@ -290,20 +290,23 @@ class InodeGen:
             if self.done >= self.filesize:
                 error("(FAT) bad metadata for " + self.path)
                 return
-            field = File(self.root, name, size=size, first=prev.first)
+            field = File(self.root, name, size=size)
             if prev.first is None:
                 field._description = 'File size: %s' % humanFilesize(self.filesize//8)
                 field.setSubIStream(self.createInputStream)
             field.datasize = min(self.filesize - self.done, size)
             self.done += field.datasize
         else:
-            field = Directory(self.root, name, size=size, first=prev.first)
+            field = Directory(self.root, name, size=size)
         padding = self.root.getFieldByAddress(address, feed=False)
         if not isinstance(padding, (PaddingBytes, RawBytes)):
             error("(FAT) address %u doesn't point to a padding field" % address)
             return
-        if not last:
-            field._createNext = lambda: self(field)
+        if last:
+            next = None
+        else:
+            next = lambda: self(field)
+        field.setLinks(prev.first, next)
         self.root.writeFieldsIn(padding, address, (field,))
         return field
 
