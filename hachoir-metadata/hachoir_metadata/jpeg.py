@@ -73,7 +73,7 @@ class JpegMetadata(Metadata):
                         pass
         if "photoshop/content" in jpeg:
             psd = jpeg["photoshop/content"]
-            if "iptc" in psd:
+            if "iptc/content" in psd:
                 self.parseIPTC(psd["iptc/content"])
         for comment in jpeg.array("comment"):
             self.comment = comment["data"].value
