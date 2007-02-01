@@ -59,6 +59,7 @@ class SearchSubfile:
         else:
             self.output = None
         self.total_mem = getTotalMemory()
+        self.mem_limit = None
         self.main_start = time()
         self.filter = None
         self.magics = []
@@ -118,7 +119,7 @@ class SearchSubfile:
             if not self.total_mem:
                 raise
             setMemoryLimit(self.total_mem)   # Disable memory limit
-            print >>stderr, "[!] Memory error: %s limit exceed!" % humanFilesize(self.total_mem)
+            print >>stderr, "[!] Memory error: %s limit exceed!" % humanFilesize(self.mem_limit)
         self.mainFooter()
         return not(main_error)
 
@@ -133,9 +134,9 @@ class SearchSubfile:
     def limitMemory(self):
         if not self.total_mem:
             return
-        max_mem = min(int(0.25 * self.total_mem), HARD_MEMORY_LIMIT)
-        if setMemoryLimit(max_mem):
-            print >>stderr, "Set maximum memory to %s" % humanFilesize(max_mem)
+        self.mem_limit = min(int(0.25 * self.total_mem), HARD_MEMORY_LIMIT)
+        if setMemoryLimit(self.mem_limit):
+            print >>stderr, "Set maximum memory to %s" % humanFilesize(self.mem_limit)
         else:
             print >>stderr, "(unable to set memory limit)"
 
