@@ -101,10 +101,10 @@ class HachoirParser(object):
         Create filename suffix: "." + first value of self.tags["file_ext"],
         or None if self.tags["file_ext"] doesn't exist.
         """
-        try:
-            return "." + self.tags["file_ext"][0]
-        except KeyError:
-            return None
+        file_ext = self.getTags().get("file_ext")
+        if isinstance(file_ext, (tuple, list)):
+            file_ext = file_ext[0]
+        return file_ext and '.' + file_ext
     def _getFilenameSuffix(self):
         if not hasattr(self, "_filename_suffix"):
             self._filename_extension = self.createFilenameSuffix()
@@ -148,7 +148,7 @@ class Parser(HachoirParser, GenericParser):
                 res = makeUnicode(res)
             else:
                 res = _("stream too small (< %u bits)" % nbits)
-            raise ValidateError(res)
+            raise ValidateError(res or _("no reason given"))
         self._autofix = True
 
     autofix = property(lambda self: self._autofix and config.autofix)

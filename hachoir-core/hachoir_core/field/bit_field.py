@@ -27,6 +27,10 @@ class RawBits(Field):
                 or isinstance(text_handler, types.MethodType)
             self.createDisplay = lambda: text_handler(self)
 
+
+    def hasValue(self):
+        return True
+
     def createValue(self):
         return self._parent.stream.readBits(
             self.absolute_address, self._size, self._parent.endian)

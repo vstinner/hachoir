@@ -48,6 +48,9 @@ class RawBytes(Field):
     def createRawDisplay(self):
         return self.createDisplay(human=False)
 
+    def hasValue(self):
+        return True
+
     def createValue(self):
         assert (self._size % 8) == 0
         if self._display:
