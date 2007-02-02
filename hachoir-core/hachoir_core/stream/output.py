@@ -1,5 +1,4 @@
 from cStringIO import StringIO
-from hachoir_core.bits import countBits
 from hachoir_core.endian import BIG_ENDIAN
 from hachoir_core.bits import long2raw
 
@@ -36,7 +35,7 @@ class OutputStream(object):
             self._bit_pos += 1
 
     def writeBits(self, count, value, endian):
-        assert countBits(value) <= count
+        assert 0 <= value < 2**count
 
         # Feed bits to align to byte address
         if self._bit_pos != 0:
@@ -75,7 +74,7 @@ class OutputStream(object):
         assert 0 <= count < 8
         self._bit_pos = count
         if 0 < count:
-            assert countBits(value) <= count
+            assert 0 <= value < 2**count
             if endian is BIG_ENDIAN:
                 self._byte = value << (8-count)
             else:
