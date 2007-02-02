@@ -1,9 +1,9 @@
-from hachoir_core.editor import FakeField
 from hachoir_core.field import (
     RawBits, Bit, Bits, PaddingBits,
     RawBytes, Bytes, PaddingBytes,
     GenericString, Character,
     isInteger, isString)
+from hachoir_editor import FakeField
 
 class EditableField(FakeField):
     """

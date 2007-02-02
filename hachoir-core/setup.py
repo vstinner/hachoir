@@ -24,7 +24,6 @@ def getPackages(hachoir_dir):
         'hachoir_core': [],
         'hachoir_core.field': ['field'],
         'hachoir_core.stream': ['stream'],
-        'hachoir_core.editor': ['editor'],
     }
     old_packages_dir = packages_dir
     packages_dir = {}

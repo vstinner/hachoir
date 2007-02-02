@@ -9,7 +9,7 @@ Creation: 17 september 2006
 
 from hachoir_core.field import MissingField
 from hachoir_core.cmd_line import unicodeFilename
-from hachoir_core.editor import (createEditor,
+from hachoir_editor import (createEditor,
     NewFieldSet, EditableInteger, EditableBytes)
 from hachoir_core.stream import FileOutputStream
 from hachoir_core.tools import humanFilesize, makePrintable

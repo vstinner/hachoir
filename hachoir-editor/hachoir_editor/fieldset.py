@@ -1,8 +1,8 @@
 from hachoir_core.dict import UniqKeyError
-from hachoir_core.editor import createEditableField, EditorError
 from hachoir_core.field import MissingField, Float32, Float64
 from hachoir_core.compatibility import any
 from hachoir_core.i18n import _
+from hachoir_editor import createEditableField, EditorError
 from collections import deque # Python 2.4
 import weakref # Python 2.1
 import struct
