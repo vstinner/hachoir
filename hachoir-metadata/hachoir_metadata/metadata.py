@@ -4,7 +4,7 @@ from hachoir_core.compatibility import sorted
 from hachoir_core.endian import endian_name
 from hachoir_core.tools import (
     humanDuration, makePrintable, humanBitRate,
-    humanFrequency, humanBitSize)
+    humanFrequency, humanBitSize, humanFilesize)
 from hachoir_core.dict import Dict
 from hachoir_core.i18n import _
 from hachoir_core.log import Logger
@@ -80,25 +80,25 @@ class Metadata(Logger):
         self.register("organization", 205, _("Organization"))
         self.register("version", 206, _("Version"))
 
-        self.register("nb_channel", 300, _("Channel"),
-            handler=humanAudioChannel, filter=NumberFilter(1, MAX_NB_CHANNEL))
-        self.register("sample_rate", 301, _("Sample rate"),
-            handler=humanFrequency, filter=NumberFilter(1, MAX_SAMPLE_RATE))
-        self.register("bits_per_sample", 302, _("Bits/sample"),
-            handler=humanBitSize, filter=NumberFilter(1, 64))
-        self.register("artist", 303, _("Artist"))
-        self.register("width", 304, _("Image width"),
-            filter=NumberFilter(1, MAX_WIDTH))
-        self.register("height", 305, _("Image height"),
-            filter=NumberFilter(1, MAX_HEIGHT))
-        self.register("image_orientation", 306, _("Image orientation"))
-        self.register("nb_colors", 315, _("Number of colors"),
-            filter=NumberFilter(1, MAX_NB_COLOR))
-        self.register("bits_per_pixel", 316, _("Bits/pixel"),
-            filter=NumberFilter(1, MAX_BITS_PER_PIXEL))
-        self.register("pixel_format", 317, _("Pixel format"))
 
-        self.register("subtitle_author", 400, _("Subtitle author"))
+        self.register("artist", 300, _("Artist"))
+        self.register("width", 301, _("Image width"), filter=NumberFilter(1, MAX_WIDTH))
+        self.register("height", 302, _("Image height"), filter=NumberFilter(1, MAX_HEIGHT))
+        self.register("nb_channel", 303, _("Channel"), handler=humanAudioChannel, filter=NumberFilter(1, MAX_NB_CHANNEL))
+        self.register("sample_rate", 304, _("Sample rate"), handler=humanFrequency, filter=NumberFilter(1, MAX_SAMPLE_RATE))
+        self.register("bits_per_sample", 305, _("Bits/sample"), handler=humanBitSize, filter=NumberFilter(1, 64))
+        self.register("image_orientation", 306, _("Image orientation"))
+        self.register("nb_colors", 307, _("Number of colors"), filter=NumberFilter(1, MAX_NB_COLOR))
+        self.register("bits_per_pixel", 308, _("Bits/pixel"), filter=NumberFilter(1, MAX_BITS_PER_PIXEL))
+        self.register("filename", 309, _("File name"))
+        self.register("file_size", 310, _("File size"), handler=humanFilesize)
+        self.register("pixel_format", 311, _("Pixel format"))
+        self.register("compr_size", 312, _("Compressed file size"), handler=humanFilesize)
+        self.register("compr_rate", 313, _("Compression rate"))
+
+        self.register("file_attr", 400, _("File attributes"))
+        self.register("file_type", 401, _("File type"))
+        self.register("subtitle_author", 402, _("Subtitle author"))
 
         self.register("creation_date", 500, _("Creation date"),
             filter=DATETIME_FILTER)
