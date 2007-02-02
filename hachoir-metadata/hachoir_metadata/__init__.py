@@ -7,6 +7,7 @@ import hachoir_metadata.archive
 import hachoir_metadata.audio
 import hachoir_metadata.image
 import hachoir_metadata.jpeg
+import hachoir_metadata.misc
 import hachoir_metadata.program
 import hachoir_metadata.riff
 import hachoir_metadata.video
