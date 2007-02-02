@@ -138,8 +138,9 @@ class Benchmark:
         if count == 1:
             return stat
         estimate = diff * count
-        print _("Run benchmark: %s calls (estimate: %s)") \
-            % (count, self.formatTime(estimate))
+        if self.verbose:
+            print _("Run benchmark: %s calls (estimate: %s)") \
+                % (count, self.formatTime(estimate))
 
         display_progress = self.verbose and (1.0 <= estimate)
         total_count = 1
