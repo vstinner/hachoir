@@ -78,39 +78,35 @@ def str2hex(value, prefix="", glue=u"", format="%02X"):
         text.append(format % ord(character))
     return glue.join(text)
 
-def _countBits(value):
-    assert 0 <= value
-    bits = 0
-    if value < 0:
-        bits += 1
-        value = -value
-    while value >= 1:
-        bits += 1
-        value >>= 1
-    return bits
-
 def countBits(value):
     """
     Count number of bits needed to store a (positive) integer number.
-    It uses a precomputed table of 256 entries to speed up computing.
 
     >>> countBits(0)
-    0
-    >>> countBits(1)
     1
-    >>> countBits(4)
-    3
+    >>> countBits(1000)
+    10
+    >>> countBits(44100)
+    16
+    >>> countBits(18446744073709551615)
+    64
     """
     assert 0 <= value
-    try:
-        bits = 0
-        while value >= 1:
-            bits += countBits.cache[value & 0xFF]
-            value >>= 8
-        return bits
-    except AttributeError:
-        countBits.cache = [ _countBits(x) for x in xrange(256) ]
-        return countBits(value)
+    count = 1
+    bits = 1
+    while (1 << bits) <= value:
+        count  += bits
+        value >>= bits
+        bits <<= 1
+    while 2 <= value:
+        if bits != 1:
+            bits >>= 1
+        else:
+            bits -= 1
+        while (1 << bits) <= value:
+            count  += bits
+            value >>= bits
+    return count
 
 def byte2bin(number, classic_mode=True):
     """
