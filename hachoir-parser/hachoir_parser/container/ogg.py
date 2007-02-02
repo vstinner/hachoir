@@ -6,7 +6,7 @@
 
 from hachoir_parser import Parser
 from hachoir_core.field import (Field, FieldSet, createOrphanField,
-    NullBits, Bit, Bits, Enum,
+    NullBits, Bit, Bits, Enum, Fragment, MissingField,
     UInt8, UInt16, UInt24, UInt32, UInt64,
     RawBytes, String, PascalString32)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
@@ -122,6 +122,38 @@ class Chunk(FieldSet):
             if size:
                 yield RawBytes(self, "raw", size)
 
+class Packets(Fragment):
+    def __init__(self, parent, *args, **kw):
+        Fragment.__init__(self, parent, *args, **kw)
+        if parent['last_page'].value:
+            next = None
+        else:
+            next = self.createNext
+        self.setLinks(parent.parent.streams.setdefault(parent['serial'].value, self), next)
+
+    def _getData(self):
+        return self
+
+    def createNext(self):
+        parent = self.parent
+        name = parent.name.split('[')
+        name, index = name[0] + '[%u]/packets', int(name[1][:-1])
+        parent = parent.parent
+        first = self.first
+        try:
+            while True:
+                index += 1
+                next = parent[name % index]
+                if next.first is first:
+                    return next
+        except MissingField:
+            pass
+
+    def createFields(self):
+        for packet_size in self.parent.packet_size:
+            if packet_size:
+                yield Chunk(self, "chunk[]", size=packet_size*8)
+
 class OggPage(FieldSet):
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
@@ -150,9 +182,7 @@ class OggPage(FieldSet):
         yield UInt8(self, 'lacing_size')
         if self.lacing_size:
             yield Lacing(self, "lacing", size=self.lacing_size*8)
-            for packet_size in self.array("lacing/size"):
-                if packet_size.value:
-                    yield Chunk(self, "chunk[]", size=packet_size.value*8)
+            yield Packets(self, "packets", size=self._size-self._current_size)
 
 class OggFile(Parser):
     MAGIC = "OggS"
@@ -196,6 +226,7 @@ class OggFile(Parser):
             return u"Ogg multimedia container"
 
     def createFields(self):
+        self.streams = {}
         while not self.eof:
             yield OggPage(self, "page[]")
 

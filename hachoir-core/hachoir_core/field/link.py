@@ -76,10 +76,9 @@ class Fragment(FieldSet):
             link = Link(self, "first", None)
             link._getValue = lambda: self._first
             yield link
-        next = self.next
-        if next:
+        if self._next:
             link = Link(self, "next", None)
-            link._getValue = lambda: next
+            link.createValue = self._getNext
             yield link
         if field:
             yield field

@@ -43,7 +43,7 @@ class Dict(object):
         >>> d.index("three") is None
         True
         """
-        return self._index.get(key, None)
+        return self._index.get(key)
 
     def __getitem__(self, key):
         """
