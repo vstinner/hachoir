@@ -71,6 +71,8 @@ class QueryParser(object):
         fb = None
         warn = warning
         for parser in self.parsers:
+            if stream.size < parser.getTags()['min_size']:
+                continue
             try:
                 return parser(stream, validate=True)
             except ValidateError, err:
