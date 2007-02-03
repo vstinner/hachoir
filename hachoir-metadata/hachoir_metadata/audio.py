@@ -27,9 +27,9 @@ class OggMetadata(MultipleMetadata):
     def extract(self, ogg):
         granule_quotient = None
         for index, page in enumerate(ogg.array("page")):
-            if "packets" not in page:
+            if "segments" not in page:
                 continue
-            page = page["packets"]
+            page = page["segments"]
             if "vorbis_hdr" in page:
                 meta = Metadata()
                 self.vorbisHeader(page["vorbis_hdr"], meta)
