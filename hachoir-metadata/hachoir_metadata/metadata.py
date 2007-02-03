@@ -75,10 +75,10 @@ class Metadata(Logger):
             handler=humanDuration, filter=NumberFilter(1, MAX_DURATION))
         self.register("music_genre", 202, _("Music genre"))
         self.register("language", 203, _("Language"))
-        self.register("track_number", 204, _("Track number"),
-            filter=NumberFilter(1, 99))
-        self.register("organization", 205, _("Organization"))
-        self.register("version", 206, _("Version"))
+        self.register("track_number", 204, _("Track number"), filter=NumberFilter(1, 99))
+        self.register("track_total", 205, _("Track total"), filter=NumberFilter(1, 99))
+        self.register("organization", 210, _("Organization"))
+        self.register("version", 220, _("Version"))
 
 
         self.register("artist", 300, _("Artist"))

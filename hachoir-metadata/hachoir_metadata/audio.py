@@ -9,6 +9,8 @@ class OggMetadata(MultipleMetadata):
         "ARTIST": "artist",
         "ALBUM": "album",
         "TRACKNUMBER": "track_number",
+        "TRACKTOTAL": "track_total",
+        "ENCODER": "producer",
         "TITLE": "title",
         "DATE": "creation_date",
         "ORGANIZATION": "organization",
