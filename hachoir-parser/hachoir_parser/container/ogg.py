@@ -136,14 +136,13 @@ class Packets(Fragment):
 
     def createNext(self):
         parent = self.parent
-        name = parent.name.split('[')
-        name, index = name[0] + '[%u]/packets', int(name[1][:-1])
+        index = parent.index
         parent = parent.parent
         first = self.first
         try:
             while True:
                 index += 1
-                next = parent[name % index]
+                next = parent[index][self.name]
                 if next.first is first:
                     return next
         except MissingField:

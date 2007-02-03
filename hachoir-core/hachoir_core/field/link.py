@@ -1,6 +1,7 @@
 from hachoir_core.field import Field, FieldSet, Bytes, MissingField
 from hachoir_core.stream import FragmentedStream
 
+
 class Link(Field):
     def __init__(self, parent, name, *args, **kw):
         Field.__init__(self, parent, name, 0, *args, **kw)
@@ -12,12 +13,16 @@ class Link(Field):
         return self._parent[self.display]
 
     def createDisplay(self):
-        return self.value.path
+        value = self.value
+        if value is None:
+            return "<%s>" % MissingField.__name__
+        return value.path
 
     def _getField(self, name, const):
         target = self.value
         assert self != target
         return target._getField(name, const)
+
 
 class Fragment(FieldSet):
     _first = None

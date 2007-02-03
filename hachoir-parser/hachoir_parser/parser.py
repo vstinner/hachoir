@@ -140,7 +140,7 @@ class Parser(HachoirParser, GenericParser):
         GenericParser.__init__(self, stream, **args)
         HachoirParser.__init__(self)
         while validate:
-            nbits = stream.sizeGe(self.getTags()["min_size"])
+            nbits = self.getTags()["min_size"]
             if stream.sizeGe(nbits):
                 res = self.validate()
                 if res is True:
