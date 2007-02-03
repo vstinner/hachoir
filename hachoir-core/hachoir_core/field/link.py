@@ -24,6 +24,18 @@ class Link(Field):
         return target._getField(name, const)
 
 
+class Fragments:
+    def __init__(self, first):
+        self.first = first
+
+    def __iter__(self):
+        fragment = self.first
+        while fragment is not None:
+            data = fragment.getData()
+            yield data and data.size
+            fragment = fragment.next
+
+
 class Fragment(FieldSet):
     _first = None
 
@@ -64,7 +76,7 @@ class Fragment(FieldSet):
     def _createInputStream(self, **args):
         first = self.first
         if first is self and hasattr(first, "_getData"):
-            return FragmentedStream(first, **args)
+            return FragmentedStream(first, packets=Fragments(first), **args)
         return FieldSet._createInputStream(self, **args)
 
     def _createFields(self, field_generator):

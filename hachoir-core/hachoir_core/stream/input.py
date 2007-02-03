@@ -122,12 +122,13 @@ class InputStream(Logger):
     _set_size = None
     _current_size = 0
 
-    def __init__(self, source=None, size=None, **args):
+    def __init__(self, source=None, size=None, packets=None, **args):
         self.source = source
         self._size = size   # in bits
         if size == 0:
             raise NullStreamError(source)
         self.tags = args.get("tags", [])
+        self.packets = packets
 
     def askSize(self, client):
         if self._size != self._current_size:

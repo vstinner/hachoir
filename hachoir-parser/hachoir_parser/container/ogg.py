@@ -9,6 +9,7 @@ from hachoir_core.field import (Field, FieldSet, createOrphanField,
     NullBits, Bit, Bits, Enum, Fragment, MissingField,
     UInt8, UInt16, UInt24, UInt32, UInt64,
     RawBytes, String, PascalString32)
+from hachoir_core.stream import FragmentedStream
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 
 class XiphInt(Field):
@@ -122,7 +123,29 @@ class Chunk(FieldSet):
             if size:
                 yield RawBytes(self, "raw", size)
 
-class Packets(Fragment):
+class Packets:
+    def __init__(self, first):
+        self.first = first
+
+    def __iter__(self):
+        fragment = self.first
+        size = None
+        while fragment is not None:
+            page = fragment.parent
+            continued_packet = page["continued_packet"].value
+            for segment_size in page.segment_size:
+                if continued_packet:
+                    size += segment_size
+                    continued_packet = False
+                else:
+                    if size:
+                        yield size * 8
+                    size = segment_size
+            fragment = fragment.next
+        if size:
+            yield size * 8
+
+class Segments(Fragment):
     def __init__(self, parent, *args, **kw):
         Fragment.__init__(self, parent, *args, **kw)
         if parent['last_page'].value:
@@ -130,6 +153,11 @@ class Packets(Fragment):
         else:
             next = self.createNext
         self.setLinks(parent.parent.streams.setdefault(parent['serial'].value, self), next)
+
+    def _createInputStream(self, **args):
+        if self.first is self:
+            return FragmentedStream(self, packets=Packets(self), tags=[("id","ogg_stream")], **args)
+        return Fragment._createInputStream(self, **args)
 
     def _getData(self):
         return self
@@ -149,9 +177,9 @@ class Packets(Fragment):
             pass
 
     def createFields(self):
-        for packet_size in self.parent.packet_size:
-            if packet_size:
-                yield Chunk(self, "chunk[]", size=packet_size*8)
+        for segment_size in self.parent.segment_size:
+            if segment_size:
+                yield Chunk(self, "chunk[]", size=segment_size*8)
 
 class OggPage(FieldSet):
     def __init__(self, *args):
@@ -161,8 +189,8 @@ class OggPage(FieldSet):
         if self.lacing_size:
             size += self.lacing_size
             lacing = self['lacing']
-            self.packet_size = [ field.value for field in lacing ]
-            size += sum(self.packet_size)
+            self.segment_size = [ field.value for field in lacing ]
+            size += sum(self.segment_size)
         self._size = size * 8
 
     def createFields(self):
@@ -181,7 +209,7 @@ class OggPage(FieldSet):
         yield UInt8(self, 'lacing_size')
         if self.lacing_size:
             yield Lacing(self, "lacing", size=self.lacing_size*8)
-            yield Packets(self, "packets", size=self._size-self._current_size)
+            yield Segments(self, "segments", size=self._size-self._current_size)
 
 class OggFile(Parser):
     MAGIC = "OggS"
@@ -244,3 +272,20 @@ class OggFile(Parser):
         else:
             return None
 
+
+class OggStream(Parser):
+    tags = {
+        "id": "ogg_stream",
+        "category": "container",
+        "subfile": "skip",
+        "min_size": 7*8,
+        "description": "Ogg logical stream"
+    }
+    endian = LITTLE_ENDIAN
+
+    def validate(self):
+        return False
+
+    def createFields(self):
+        for size in self.stream.packets:
+            yield RawBytes(self, "packet[]", size//8)
