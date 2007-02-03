@@ -232,10 +232,11 @@ class OggFile(Parser):
 
     def createLastPage(self):
         offset = self.stream.searchBytes("OggS\0\5", 0)
-        if offset is not None:
-            return createOrphanField(self, offset, OggPage, "page")
-        else:
+        if offset is None:
+            offset = self.stream.searchBytes("OggS\0\4", 0)
+        if offset is None:
             return None
+        return createOrphanField(self, offset, OggPage, "page")
 
     def createContentSize(self):
         page = self.createLastPage()

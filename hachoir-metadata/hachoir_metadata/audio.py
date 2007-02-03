@@ -45,9 +45,10 @@ class OggMetadata(MultipleMetadata):
                 break
 
         # Compute duration
-        page = ogg.createLastPage()
-        if page and "abs_granule_pos" in page:
-            self.duration = page["abs_granule_pos"].value * 1000 / granule_quotient
+        if granule_quotient:
+            page = ogg.createLastPage()
+            if page and "abs_granule_pos" in page:
+                self.duration = page["abs_granule_pos"].value * 1000 / granule_quotient
 
     def theoraHeader(self, header, meta):
         meta.compression = "Theora"
