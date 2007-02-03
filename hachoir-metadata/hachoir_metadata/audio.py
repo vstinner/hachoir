@@ -18,10 +18,12 @@ class OggMetadata(MultipleMetadata):
         "DESCRIPTION": "comment",
         "COMMENT": "comment",
         "WWW": "url",
+        "WOAF": "url",
         "LICENSE": "copyright",
     }
 
     def extract(self, ogg):
+        granule_quotient = None
         for index, page in enumerate(ogg.array("page")):
             if "packets" not in page:
                 continue
@@ -30,6 +32,8 @@ class OggMetadata(MultipleMetadata):
                 meta = Metadata()
                 self.vorbisHeader(page["vorbis_hdr"], meta)
                 self.addGroup("audio[]", meta, "Audio")
+                if not granule_quotient and hasattr(meta, "sample_rate"):
+                    granule_quotient = meta.sample_rate[0]
             if "theora_hdr" in page:
                 meta = Metadata()
                 self.theoraHeader(page["theora_hdr"], meta)
@@ -39,6 +43,11 @@ class OggMetadata(MultipleMetadata):
             if 3 <= index:
                 # Only process pages 0..3
                 break
+
+        # Compute duration
+        page = ogg.createLastPage()
+        if page and "abs_granule_pos" in page:
+            self.duration = page["abs_granule_pos"].value * 1000 / granule_quotient
 
     def theoraHeader(self, header, meta):
         meta.compression = "Theora"
