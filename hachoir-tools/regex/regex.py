@@ -97,6 +97,62 @@ class RegexString(Regex):
     def __str__(self):
         return escapeRegex(self._text)
 
+    def _or(self, regex):
+        """
+        Remove duplicate:
+        >>> RegexString("color") | RegexString("color")
+        <RegexString 'color'>
+
+        Group prefix:
+
+        >>> RegexString("moot") | RegexString("boot")
+        <RegexAnd '[mb]oot'>
+        >>> RegexString("color red") | RegexString("color blue")
+        <RegexAnd 'color (red|blue)'>
+        >>> RegexString("color red") | RegexString("color")
+        <RegexAnd 'color( red|)'>
+
+        Group suffix:
+
+        >>> RegexString("good thing") | RegexString("blue thing")
+        <RegexAnd '(good|blue) thing'>
+        """
+        # (a|[bc]) => [abc]
+        if regex.__class__ == RegexRange and len(self._text) == 1:
+            return RegexRange(self._text) | regex
+
+        if regex.__class__ != RegexString:
+            return None
+        texta = self._text
+        textb = regex._text
+        if texta == textb:
+            return self
+
+        # Find common prefix
+        common = None
+        for length in xrange(1, min(len(texta),len(textb))+1):
+            if textb.startswith(texta[:length]):
+                common = length
+            else:
+                break
+        if common:
+            return RegexString(texta[:common]) + (RegexString(texta[common:]) | RegexString(textb[common:]))
+
+        # Find common suffix
+        common = None
+        for length in xrange(1, min(len(texta),len(textb))+1):
+            if textb.endswith(texta[-length:]):
+                common = length
+            else:
+                break
+        if common:
+            return ((RegexString(texta[:-common]) | RegexString(textb[:-common]))) + RegexString(texta[-common:])
+
+        # (a|b) => [ab]
+        if len(texta) == len(textb) == 1:
+            return RegexRange(texta+textb)
+        return None
+
 class RegexRange(Regex):
     def __init__(self, char_range, exclude=False):
         self.range = char_range
@@ -113,13 +169,18 @@ class RegexRange(Regex):
         >>> RegexRange("^ab") | RegexRange("^ac")
         <RegexRange '[^abc]'>
         """
-        if regex.__class__ != RegexRange or self.exclude != regex.exclude:
-            return None
-        crange = self.range
-        for character in regex.range:
-            if character not in crange:
-                crange += character
-        return RegexRange(crange, self.exclude)
+        new_range = None
+        if not self.exclude and regex.__class__ == RegexString and len(regex._text) == 1:
+            new_range = regex._text
+        elif regex.__class__ == RegexRange and self.exclude == regex.exclude:
+            new_range = regex.range
+        if new_range:
+            crange = self.range
+            for character in new_range:
+                if character not in crange:
+                    crange += character
+            return RegexRange(crange, self.exclude)
+        return None
 
     def __str__(self):
         if self.exclude:
@@ -254,7 +315,7 @@ class RegexOr(RegexAndOr):
     def join(cls, regex):
         """
         >>> RegexOr.join( (RegexString('a'), RegexString('b'), RegexString('a')) )
-        <RegexOr '(a|b)'>
+        <RegexRange '[ab]'>
         """
         return _join(operator.__or__, regex)
 

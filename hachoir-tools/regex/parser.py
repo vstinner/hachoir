@@ -10,7 +10,7 @@ def parse(text):
     >>> parse('[bc]d')
     <RegexAnd '[bc]d'>
     >>> parse('a(b|[cd]|(e|f))g')
-    <RegexAnd 'a(b|[cd]|e|f)g'>
+    <RegexAnd 'a[bcdef]g'>
     """
     regex, index = _parse(text)
     assert index == len(text)
@@ -84,9 +84,9 @@ def parseOr(text, start):
     >>> parseOr('(a)', 1)
     (<RegexString 'a'>, 3)
     >>> parseOr('(a|b)', 1)
-    (<RegexOr '(a|b)'>, 5)
+    (<RegexRange '[ab]'>, 5)
     >>> parseOr(' (a|[bc]|d)', 2)
-    (<RegexOr '(a|[bc]|d)'>, 11)
+    (<RegexRange '[abcd]'>, 11)
     """
     index = start
     regex = None
