@@ -9,7 +9,6 @@ def test(modname):
 
 def main():
     test("regex")
-    test("op_regex")
     test("parser")
 
 if __name__ == "__main__":
