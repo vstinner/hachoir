@@ -22,9 +22,6 @@ Operation:
 TODO:
  - Repeat: a? a+ a* a{n} a{n,p}
  - Support Unicode regex (avoid mixing str and unicode types)
-
-Complex TODO:
- - (chien.|chat[0]) => ch(ien.|at[0])
 """
 
 import re
@@ -44,6 +41,18 @@ def _join(func, regex_list):
     for item in regex_list[1:]:
         regex = func(regex, item)
     return regex
+
+def createString(text):
+    """
+    >>> createString('')
+    <RegexEmpty ''>
+    >>> createString('abc')
+    <RegexString 'abc'>
+    """
+    if text:
+        return RegexString(text)
+    else:
+        return RegexEmpty()
 
 def createRange(*text, **kw):
     """
@@ -170,6 +179,7 @@ class RegexString(Regex):
     def __init__(self, text=""):
         assert isinstance(text, str)
         self._text = text
+        assert 1 <= len(self._text)
 
     def minLength(self):
         return len(self._text)
@@ -185,6 +195,52 @@ class RegexString(Regex):
 
     def __str__(self):
         return escapeRegex(self._text)
+
+    def findSuffix(self, regex):
+        """
+        Try to find a common prefix of two string regex, returns:
+         - None if there is no common prefix
+         - (regexa, regexb, suffix) otherwise => (regexa|regexb) + suffix
+
+        >>> RegexString('red color').findSuffix(RegexString('blue color'))
+        (<RegexString 'red'>, <RegexString 'blue'>, <RegexString ' color'>)
+        """
+        if regex.__class__ != RegexString:
+            return None
+        texta = self._text
+        textb = regex._text
+        common = None
+        for length in xrange(1, min(len(texta),len(textb))+1):
+            if textb.endswith(texta[-length:]):
+                common = length
+            else:
+                break
+        if not common:
+            return None
+        return (createString(texta[:-common]), createString(textb[:-common]), createString(texta[-common:]))
+
+    def findPrefix(self, regex):
+        """
+        Try to find a common prefix of two string regex, returns:
+         - None if there is no common prefix
+         - (prefix, regexa, regexb) otherwise => prefix + (regexa|regexb)
+
+        >>> RegexString('color red').findPrefix(RegexString('color blue'))
+        (<RegexString 'color '>, <RegexString 'red'>, <RegexString 'blue'>)
+        """
+        if regex.__class__ != RegexString:
+            return None
+        texta = self._text
+        textb = regex._text
+        common = None
+        for length in xrange(1, min(len(texta),len(textb))+1):
+            if textb.startswith(texta[:length]):
+                common = length
+            else:
+                break
+        if not common:
+            return None
+        return (RegexString(texta[:common]), createString(texta[common:]), createString(textb[common:]))
 
     def _or(self, regex):
         """
@@ -226,24 +282,14 @@ class RegexString(Regex):
             return RegexRange(ranges)
 
         # Find common prefix
-        common = None
-        for length in xrange(1, min(len(texta),len(textb))+1):
-            if textb.startswith(texta[:length]):
-                common = length
-            else:
-                break
+        common = self.findPrefix(regex)
         if common:
-            return RegexString(texta[:common]) + (RegexString(texta[common:]) | RegexString(textb[common:]))
+            return common[0] + (common[1] | common[2])
 
         # Find common suffix
-        common = None
-        for length in xrange(1, min(len(texta),len(textb))+1):
-            if textb.endswith(texta[-length:]):
-                common = length
-            else:
-                break
+        common = self.findSuffix(regex)
         if common:
-            return ((RegexString(texta[:-common]) | RegexString(textb[:-common]))) + RegexString(texta[-common:])
+            return (common[0] | common[1]) + common[2]
         return None
 
 class RegexRangeItem:
@@ -370,6 +416,33 @@ class RegexAnd(Regex):
         4
         """
         return self._minmaxLength( regex.maxLength() for regex in self.content )
+
+    def _or(self, regex):
+        if regex.__class__ == RegexString:
+            contentb = [regex]
+        elif regex.__class__ == RegexAnd:
+            contentb = regex.content
+        else:
+            return None
+
+        contenta = self.content
+
+        # Find common prefix: (abc|aef) => a(bc|ef)
+        if contentb[0].__class__ == RegexString:
+            common = contenta[0].findPrefix(contentb[0])
+            if common:
+                regexa = common[1] & RegexAnd.join( contenta[1:] )
+                regexb = common[2] & RegexAnd.join( contentb[1:] )
+                return common[0] + (regexa | regexb)
+
+        # Find common suffix: (abc|dec) => (ab|de)c
+        if contentb[-1].__class__ == RegexString:
+            common = contenta[-1].findSuffix(contentb[-1])
+            if common:
+                regexa = RegexAnd.join( contenta[:-1] ) & common[0]
+                regexb = RegexAnd.join( contentb[:-1] ) & common[1]
+                return (regexa | regexb) + common[2]
+        return None
 
     def _and(self, regex):
         """
