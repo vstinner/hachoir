@@ -234,24 +234,9 @@ class RegexRange(Regex):
         else:
             return "[%s]" % self.range
 
-class RegexAndOr(Regex):
-    def __contains__(self, regex):
-        for item in self.content:
-            if item == regex:
-                return True
-        return False
-
-class RegexAnd(RegexAndOr):
+class RegexAnd(Regex):
     def __init__(self, items):
-        self.content = []
-        for item in items:
-            if item.__class__ == RegexEmpty:
-                continue
-            if self.content \
-            and self.content[-1].__class__ == item.__class__ == RegexString:
-                self.content[-1] = RegexString(self.content[-1]._text + item._text)
-            else:
-                self.content.append(item)
+        self.content = list(items)
         assert 2 <= len(self.content)
 
     def _minmaxLength(self, lengths):
@@ -278,25 +263,6 @@ class RegexAnd(RegexAndOr):
         """
         return self._minmaxLength( regex.maxLength() for regex in self.content )
 
-    def _or(self, regex):
-        if regex.__class__ == RegexAnd:
-            contentb = regex.content
-        else:
-            contentb = [regex]
-        contenta = self.content
-        total = RegexEmpty()
-        read = 0
-        for itema, itemb in itertools.izip(contenta, contentb):
-            item = itema | itemb
-            if item:
-                total = total & item
-                read += 1
-            else:
-                break
-        if read:
-            return total & (RegexAnd.join(contenta[read:]) | RegexAnd.join(contentb[read:]))
-        return None
-
     def _and(self, regex):
         """
         >>> RegexRange('ab') + RegexRange('01')
@@ -310,8 +276,6 @@ class RegexAnd(RegexAndOr):
             for item in regex.content:
                 total = total + item
             return total
-        if regex in self:
-            return self
         new_item = self.content[-1]._and(regex)
         if new_item:
             self.content[-1] = new_item
@@ -329,7 +293,7 @@ class RegexAnd(RegexAndOr):
         """
         return _join(operator.__and__, regex)
 
-class RegexOr(RegexAndOr):
+class RegexOr(Regex):
     def __init__(self, items):
         self.content = []
         for item in items:
@@ -337,6 +301,12 @@ class RegexOr(RegexAndOr):
                 continue
             self.content.append(item)
         assert 2 <= len(self.content)
+
+    def __contains__(self, regex):
+        for item in self.content:
+            if item == regex:
+                return True
+        return False
 
     def _or(self, regex):
         """

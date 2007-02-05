@@ -21,8 +21,8 @@ def parse(text):
     <RegexAnd '[bc]d'>
     >>> parse('a(b|[cd]|(e|f))g')
     <RegexAnd 'a[bcdef]g'>
-    >>> parse('(chien.|chat.)')
-    <RegexAnd 'ch(ien|at).'>
+    >>> parse('.')
+    <RegexDot '.'>
     """
     regex, index = _parse(text)
     assert index == len(text)
@@ -39,7 +39,7 @@ def _parse(text, start=0, until=None):
         if until and char in until:
             done = True
             break
-        if char in '.^$[({+?*\\':
+        if char in '.^$[](){}|+?*\\':
             if start != index:
                 subtext = text[start:index]
                 regex = regex + RegexString(subtext)
