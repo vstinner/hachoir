@@ -10,6 +10,7 @@ TODO:
 from regex import (RegexString, RegexEmpty, RegexRepeat,
     RegexDot, RegexStart, RegexEnd,
     RegexRange, RegexRangeItem, RegexRangeCharacter)
+import re
 
 def parseRange(text, start):
     r"""
@@ -79,10 +80,29 @@ def parseOr(text, start):
         regex = RegexEmpty()
     return regex, index
 
+REPEAT_REGEX = re.compile("([0-9]+)(?:,([0-9]+))?}")
 
-CHAR_TO_FUNC = {'[': parseRange, '(': parseOr}
+def parseRepeat(text, start):
+    """
+    >>> parseRepeat('a{0,1}b', 2)
+    (0, 1, 6)
+    >>> parseRepeat('a{12}', 2)
+    (12, 12, 5)
+    """
+    match = REPEAT_REGEX.match(text, start)
+    if not match:
+        raise SyntaxError('Unable to parse repetition '+text[start:])
+    rmin = int(match.group(1))
+    if match.group(2):
+        rmax = int(match.group(2))
+    else:
+        rmax = rmin
+    return (rmin, rmax, match.end(0))
+
+CHAR_TO_FUNC = {'[': parseRange, '(': parseOr, '{': parseRepeat}
 CHAR_TO_CLASS = {'.': RegexDot, '^': RegexStart, '$': RegexEnd}
 CHAR_TO_REPEAT = {'*': (0, None), '?': (0, 1), '+': (1, None)}
+
 def _parse(text, start=0, until=None):
     if len(text) == start:
         return RegexEmpty(), 0
@@ -108,6 +128,8 @@ def _parse(text, start=0, until=None):
                 index += 1
             elif char in CHAR_TO_REPEAT:
                 rmin, rmax = CHAR_TO_REPEAT[char]
+                if last is None:
+                    raise SyntaxError('Repeatition character (%s) without previous expression' % text[index])
                 new_regex = RegexRepeat(last, rmin, rmax)
                 last = None
                 index += 1
