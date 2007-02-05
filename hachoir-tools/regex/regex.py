@@ -25,7 +25,7 @@ TODO:
 import re
 
 def escapeRegex(text):
-    # Escape "^.+*?{}[]|()\\$": add "\"
+    # Escape >> ^.+*?{}[]|()\$ <<, prefix them wth >> \ <<
     return re.sub(r"([][^.+*?{}|()\\$])", r"\\\1", text)
 
 class Regex:

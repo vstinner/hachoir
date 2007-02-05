@@ -2,10 +2,14 @@
 Parse string to create Regex object.
 
 TODO:
- - Support \[, \(, ...
+ - Support dot: "."
+ - Support ^ and $
+ - Support \: \001, \x00, \0, \ \[, \(, \{, etc.
+ - Support Python extensions: (?:...), (?P<name>...), etc.
+ - Support \<, \>, \s, \S, \w, \W, \Z <=> $, \d, \D, \A <=> ^, \b, \B, [[:space:]], etc.
 """
 
-from regex import RegexAnd, RegexString, RegexRange, RegexEmpty, RegexOr
+from regex import RegexString, RegexRange, RegexEmpty
 import re
 
 def parse(text):
@@ -43,7 +47,7 @@ def _parse(text, start=0, until=None):
             elif char == '[':
                 new_regex, index = parseRange(text, index+1)
             else:
-                raise NotImplementedError("Operator '%s' is not supported" % character)
+                raise NotImplementedError("Operator '%s' is not supported" % char)
             start = index
             regex = regex + new_regex
         else:
@@ -78,10 +82,9 @@ def parseRange(text, start):
     if text[index] == ']':
         char_range.append(']')
         index += 1
-    #match = re.match("^([^]-]+-?)\]", text, index)
     match = RANGE_REGEX.match(text, index)
     if not match:
-        raise ValueError("Unable to parse regex range: %r" % text[index:])
+        raise SyntaxError("Unable to parse regex range: %r" % text[index:])
     char_range.append( match.group(2) )
     index += len(match.group(1))
     return RegexRange(''.join(char_range), exclude), index
@@ -96,6 +99,8 @@ def parseOr(text, start):
     (<RegexRange '[abcd]'>, 11)
     """
     index = start
+    if text[index] == '?':
+        raise NotImplementedError("Doesn't support Python extension (?...)")
     regex = None
     while True:
         new_regex, index = _parse(text, index, "|)")
