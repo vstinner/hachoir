@@ -89,14 +89,19 @@ def parseOr(text, start):
     (<RegexOr '(a|[bc]|d)'>, 11)
     """
     index = start
-    regex = RegexEmpty()
+    regex = None
     while True:
         new_regex, index = _parse(text, index, "|)")
-        regex = regex | new_regex
+        if regex:
+            regex = regex | new_regex
+        else:
+            regex = new_regex
         if text[index] == ')':
             break
         index += 1
     index += 1
+    if regex is None:
+        regex = RegexEmpty()
     return regex, index
 
 if __name__ == "__main__":

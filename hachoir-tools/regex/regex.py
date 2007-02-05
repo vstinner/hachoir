@@ -49,14 +49,21 @@ class Regex:
     def __and__(self, regex):
         return RegexAnd( (self, regex) )
 
+    def _or(self, regex):
+        return None
+
     def __or__(self, regex):
-        return RegexOr( (self, regex) )
+        new_regex = self._or(regex)
+        if new_regex:
+            return new_regex
+        else:
+            return RegexOr( (self, regex) )
 
     def __eq__(self, regex):
         # TODO: Write better code...
         return str(self) == str(regex)
 
-class RegexEmpty:
+class RegexEmpty(Regex):
     def minLength(self):
         return 0
 
@@ -67,9 +74,6 @@ class RegexEmpty:
         return "<RegexEmpty>"
 
     def __add__(self, regex):
-        return regex
-
-    def __or__(self, regex):
         return regex
 
 class RegexString(Regex):
@@ -102,21 +106,20 @@ class RegexRange(Regex):
         # FIXME: len('a-z') is 1
         return len(self.range)
 
-    def __or__(self, regex):
+    def _or(self, regex):
         """
         >>> RegexRange("a") | RegexRange("b")
         <RegexRange '[ab]'>
         >>> RegexRange("^ab") | RegexRange("^ac")
         <RegexRange '[^abc]'>
         """
-        if regex.__class__ == RegexRange and self.exclude == regex.exclude:
-            crange = self.range
-            for character in regex.range:
-                if character not in crange:
-                    crange += character
-            return RegexRange(crange, self.exclude)
-        else:
-            return Regex.__or__(self, regex)
+        if regex.__class__ != RegexRange or self.exclude != regex.exclude:
+            return None
+        crange = self.range
+        for character in regex.range:
+            if character not in crange:
+                crange += character
+        return RegexRange(crange, self.exclude)
 
     def __str__(self):
         if self.exclude:
@@ -197,14 +200,12 @@ class RegexOr(RegexAndOr):
     def __init__(self, items):
         self.content = []
         for item in items:
-            if item.__class__ == RegexEmpty:
-                continue
             if item in self:
                 continue
             self.content.append(item)
         assert 2 <= len(self.content)
 
-    def __or__(self, regex):
+    def _or(self, regex):
         """
         >>> RegexOr((RegexString("a"), RegexString("b"))) | RegexOr((RegexString("c"), RegexString("d")))
         <RegexOr '(a|b|c|d)'>
@@ -220,10 +221,10 @@ class RegexOr(RegexAndOr):
             return self
         if regex.__class__ == RegexRange:
             for index, item in enumerate(self.content):
-                if item.__class__ == RegexRange:
-                    if item.exclude == regex.exclude:
-                        self.content[index] = item | regex
-                        return self
+                new_item = item._or(regex)
+                if new_item:
+                    self.content[index] = new_item
+                    return self
         return RegexOr( self.content + [regex] )
 
     def __str__(self):
