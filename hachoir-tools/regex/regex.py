@@ -550,6 +550,68 @@ class RegexOr(Regex):
         """
         return _join(operator.__or__, regex)
 
+class RegexRepeat(Regex):
+    """
+    >>> a=createString('a')
+    >>> RegexRepeat(a, 0, None)
+    <RegexRepeat 'a*'>
+    >>> RegexRepeat(a, 1, None)
+    <RegexRepeat 'a+'>
+    >>> RegexRepeat(a, 0, 1)
+    <RegexRepeat 'a?'>
+    >>> RegexRepeat(a, 0, 1)
+    <RegexRepeat 'a?'>
+    >>> RegexRepeat(a, 1, 3)
+    <RegexRepeat 'a{1,3}'>
+    """
+
+    def __init__(self, regex, min, max):
+        self.regex = regex
+        assert 0 <= min
+        self.min = min
+        self.max = max
+        if self.max is not None:
+            if self.max < self.min:
+                raise ValueError("RegexRepeat: minimum (%s) is bigger than maximum (%s)!" % (self.min, self.max))
+            if (self.max == 0) \
+            or (self.min == self.max == 1):
+                raise ValueError("RegexRepeat: invalid values (min=%s, max=%s)!" % (self.min, self.max))
+
+    def minLength(self):
+        """
+        >>> r=RegexRepeat(createString("abc") | createString("01"), 1, 3)
+        >>> r.minLength(), r.maxLength()
+        (2, 9)
+        >>> r=RegexRepeat(createString("abc") | createString("01"), 4, None)
+        >>> r.minLength(), r.maxLength()
+        (8, None)
+        """
+        if self.min is not None:
+            return self.regex.minLength() * self.min
+        else:
+            return None
+
+    def maxLength(self):
+        if self.max is not None:
+            return self.regex.maxLength() * self.max
+        else:
+            return None
+
+    def __str__(self):
+        text = str(self.regex)
+        if self.min == 0 and self.max == 1:
+            return "%s?" % text
+        if self.min == self.max:
+            return "%s{%u}" % (text, self.min)
+        if self.max is None:
+            if self.min == 0:
+                return "%s*" % text
+            elif self.min == 1:
+                return "%s+" % text
+            else:
+                return "%s{%u,}" % (text, self.min)
+        return "%s{%u,%u}" % (text, self.min, self.max)
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()

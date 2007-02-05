@@ -22,6 +22,10 @@ Create regex with string
 <RegexAnd '^..$'>
 >>> parse('(chien blanc|chat blanc)')
 <RegexAnd 'ch(ien|at) blanc'>
+>>> parse('chats?')
+<RegexRepeat 'chats?'>
+>>> parse(' +abc')
+<RegexAnd ' +abc'>
 
 Create regex with the API
 -------------------------
