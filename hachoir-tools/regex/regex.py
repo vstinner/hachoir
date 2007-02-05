@@ -23,10 +23,22 @@ TODO:
 """
 
 import re
+import itertools
+import operator
 
 def escapeRegex(text):
     # Escape >> ^.+*?{}[]|()\$ <<, prefix them wth >> \ <<
     return re.sub(r"([][^.+*?{}|()\\$])", r"\\\1", text)
+
+def _join(func, regex_list):
+    if not isinstance(regex_list, (tuple, list)):
+        regex_list = list(regex_list)
+    if len(regex_list) == 0:
+        return RegexEmpty()
+    regex = regex_list[0]
+    for item in regex_list[1:]:
+        regex = func(regex, item)
+    return regex
 
 class Regex:
     def minLength(self):
@@ -77,6 +89,8 @@ class Regex:
         Create new optimized version of a|b.
         Returns None if there is no interesting optimization.
         """
+        if self == regex:
+            return self
         return None
 
     def __or__(self, regex):
@@ -102,6 +116,13 @@ class RegexEmpty(Regex):
 
     def _and(self, regex):
         return regex
+
+class RegexDot(Regex):
+    def minLength(self):
+        return 1
+
+    def __str__(self):
+        return '.'
 
 class RegexString(Regex):
     def __init__(self, text=""):
@@ -257,6 +278,25 @@ class RegexAnd(RegexAndOr):
         """
         return self._minmaxLength( regex.maxLength() for regex in self.content )
 
+    def _or(self, regex):
+        if regex.__class__ == RegexAnd:
+            contentb = regex.content
+        else:
+            contentb = [regex]
+        contenta = self.content
+        total = RegexEmpty()
+        read = 0
+        for itema, itemb in itertools.izip(contenta, contentb):
+            item = itema | itemb
+            if item:
+                total = total & item
+                read += 1
+            else:
+                break
+        if read:
+            return total & (RegexAnd.join(contenta[read:]) | RegexAnd.join(contentb[read:]))
+        return None
+
     def _and(self, regex):
         """
         >>> RegexRange('ab') + RegexRange('01')
@@ -280,6 +320,14 @@ class RegexAnd(RegexAndOr):
 
     def __str__(self):
         return ''.join( str(item) for item in self.content )
+
+    @classmethod
+    def join(cls, regex):
+        """
+        >>> RegexAnd.join( (RegexString('Big '), RegexString('fish')) )
+        <RegexString 'Big fish'>
+        """
+        return _join(operator.__and__, regex)
 
 class RegexOr(RegexAndOr):
     def __init__(self, items):
@@ -333,6 +381,14 @@ class RegexOr(RegexAndOr):
     def maxLength(self):
         lengths = ( regex.maxLength() for regex in self.content )
         return self._minmaxLength(lengths, max)
+
+    @classmethod
+    def join(cls, regex):
+        """
+        >>> RegexOr.join( (RegexString('a'), RegexString('b'), RegexString('a')) )
+        <RegexRange '[ab]'>
+        """
+        return _join(operator.__or__, regex)
 
 if __name__ == "__main__":
     import doctest

@@ -2,14 +2,13 @@
 Parse string to create Regex object.
 
 TODO:
- - Support dot: "."
  - Support ^ and $
  - Support \: \001, \x00, \0, \ \[, \(, \{, etc.
  - Support Python extensions: (?:...), (?P<name>...), etc.
  - Support \<, \>, \s, \S, \w, \W, \Z <=> $, \d, \D, \A <=> ^, \b, \B, [[:space:]], etc.
 """
 
-from regex import RegexString, RegexRange, RegexEmpty
+from regex import RegexString, RegexRange, RegexEmpty, RegexDot
 import re
 
 def parse(text):
@@ -22,6 +21,8 @@ def parse(text):
     <RegexAnd '[bc]d'>
     >>> parse('a(b|[cd]|(e|f))g')
     <RegexAnd 'a[bcdef]g'>
+    >>> parse('(chien.|chat.)')
+    <RegexAnd 'ch(ien|at).'>
     """
     regex, index = _parse(text)
     assert index == len(text)
@@ -38,7 +39,7 @@ def _parse(text, start=0, until=None):
         if until and char in until:
             done = True
             break
-        if char in '[({+?*':
+        if char in '.^$[({+?*\\':
             if start != index:
                 subtext = text[start:index]
                 regex = regex + RegexString(subtext)
@@ -46,6 +47,9 @@ def _parse(text, start=0, until=None):
                 new_regex, index = parseOr(text, index+1)
             elif char == '[':
                 new_regex, index = parseRange(text, index+1)
+            elif char == '.':
+                new_regex = RegexDot()
+                index += 1
             else:
                 raise NotImplementedError("Operator '%s' is not supported" % char)
             start = index
@@ -84,7 +88,7 @@ def parseRange(text, start):
         index += 1
     match = RANGE_REGEX.match(text, index)
     if not match:
-        raise SyntaxError("Unable to parse regex range: %r" % text[index:])
+        raise SyntaxError("Unable to parse regex range: %r" % text[start-1:])
     char_range.append( match.group(2) )
     index += len(match.group(1))
     return RegexRange(''.join(char_range), exclude), index
