@@ -32,7 +32,7 @@ import itertools
 import operator
 
 def escapeRegex(text):
-    # Escape >> ^.+*?{}[]|()\$ <<, prefix them wth >> \ <<
+    # Escape >> ^.+*?{}[]|()\$ <<, prefix them with >> \ <<
     return re.sub(r"([][^.+*?{}|()\\$])", r"\\\1", text)
 
 def _join(func, regex_list):
@@ -90,7 +90,10 @@ class Regex:
 
     def __and__(self, regex):
         """
-        >>> RegexEmpty() + RegexString('a')
+        Create new optimized version of a & b.
+        Returns None if there is no interesting optimization.
+
+        >>> RegexEmpty() & RegexString('a')
         <RegexString 'a'>
         """
         new_regex = self._and(regex)
@@ -98,6 +101,7 @@ class Regex:
             return new_regex
         else:
             return RegexAnd( (self, regex) )
+
     def __add__(self, regex):
         return self.__and__(regex)
 
@@ -118,8 +122,11 @@ class Regex:
             return RegexOr( (self, regex) )
 
     def __eq__(self, regex):
-        # TODO: Write better code...
+        # TODO: Write better/faster code...
         return str(self) == str(regex)
+
+    def compile(self):
+        return re.compile(str(self))
 
 class RegexEmpty(Regex):
     def minLength(self):
@@ -181,16 +188,24 @@ class RegexString(Regex):
         >>> RegexString("good thing") | RegexString("blue thing")
         <RegexAnd '(good|blue) thing'>
         """
-        # (a|[bc]) => [abc]
+        # (a|[b-c]) => [a-c]
         if regex.__class__ == RegexRange and len(self._text) == 1:
             return createRange(self._text) | regex
 
+        # Don't know any other optimization for str|other
         if regex.__class__ != RegexString:
             return None
+
+        # text|text => text
         texta = self._text
         textb = regex._text
         if texta == textb:
             return self
+
+        # (a|b) => [ab]
+        if len(texta) == len(textb) == 1:
+            ranges = (RegexRangeCharacter(texta), RegexRangeCharacter(textb))
+            return RegexRange(ranges)
 
         # Find common prefix
         common = None
@@ -211,11 +226,6 @@ class RegexString(Regex):
                 break
         if common:
             return ((RegexString(texta[:-common]) | RegexString(textb[:-common]))) + RegexString(texta[-common:])
-
-        # (a|b) => [ab]
-        if len(texta) == len(textb) == 1:
-            ranges = (RegexRangeCharacter(texta), RegexRangeCharacter(textb))
-            return RegexRange(ranges)
         return None
 
 class RegexRangeItem:
@@ -242,7 +252,7 @@ class RegexRangeItem:
             return chr(self.cmin)
 
     def __repr__(self):
-        return "<RegexRangeItem %c-%c>" % (self.cmin, self.cmax)
+        return "<RegexRangeItem %u-%u>" % (self.cmin, self.cmax)
 
 class RegexRangeCharacter(RegexRangeItem):
     def __init__(self, char):
@@ -257,6 +267,10 @@ class RegexRange(Regex):
 
     @staticmethod
     def rangeAdd(ranges, itemb):
+        """
+        Add a value in a RegexRangeItem() list:
+        remove duplicates and merge ranges when it's possible.
+        """
         for index, itema in enumerate(ranges):
             if itema in itemb:
                 ranges[index] = itemb
