@@ -93,8 +93,6 @@ class Regex:
         Create new optimized version of a+b.
         Returns None if there is no interesting optimization.
         """
-        if self.__class__ == RegexEmpty:
-            return regex
         return None
 
     def __and__(self, regex):
@@ -105,6 +103,8 @@ class Regex:
         >>> RegexEmpty() & RegexString('a')
         <RegexString 'a'>
         """
+        if regex.__class__ == RegexEmpty:
+            return self
         new_regex = self._and(regex)
         if new_regex:
             return new_regex
@@ -119,11 +119,11 @@ class Regex:
         Create new optimized version of a|b.
         Returns None if there is no interesting optimization.
         """
-        if self == regex:
-            return self
         return None
 
     def __or__(self, regex):
+        if self == regex:
+            return self
         new_regex = self._or(regex)
         if new_regex:
             return new_regex
@@ -136,6 +136,16 @@ class Regex:
 
     def compile(self):
         return re.compile(str(self))
+
+    def findPrefix(self, regex):
+        if self == regex:
+            return (self, RegexEmpty(), RegexEmpty())
+        return None
+
+    def findSuffix(self, regex):
+        if self == regex:
+            return (RegexEmpty(), RegexEmpty(), self)
+        return None
 
 class RegexEmpty(Regex):
     def minLength(self):
@@ -428,20 +438,19 @@ class RegexAnd(Regex):
         contenta = self.content
 
         # Find common prefix: (abc|aef) => a(bc|ef)
-        if contentb[0].__class__ == RegexString:
-            common = contenta[0].findPrefix(contentb[0])
-            if common:
-                regexa = common[1] & RegexAnd.join( contenta[1:] )
-                regexb = common[2] & RegexAnd.join( contentb[1:] )
-                return common[0] + (regexa | regexb)
+        common = contenta[0].findPrefix(contentb[0])
+        if common:
+            regexa = common[1] & RegexAnd.join( contenta[1:] )
+            regexb = common[2] & RegexAnd.join( contentb[1:] )
+            return common[0] + (regexa | regexb)
 
         # Find common suffix: (abc|dec) => (ab|de)c
-        if contentb[-1].__class__ == RegexString:
-            common = contenta[-1].findSuffix(contentb[-1])
-            if common:
-                regexa = RegexAnd.join( contenta[:-1] ) & common[0]
-                regexb = RegexAnd.join( contentb[:-1] ) & common[1]
-                return (regexa | regexb) + common[2]
+        common = contenta[-1].findSuffix(contentb[-1])
+        if common:
+            regexa = RegexAnd.join( contenta[:-1] ) & common[0]
+            regexb = RegexAnd.join( contentb[:-1] ) & common[1]
+            regex = (regexa | regexb)
+            return RegexAnd( (regex, common[2]) )
         return None
 
     def _and(self, regex):

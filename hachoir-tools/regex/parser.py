@@ -25,10 +25,8 @@ def parse(text):
     <RegexRange '[a-z-]'>
     >>> parse('^^..$$')
     <RegexAnd '^..$'>
-    >>> parse('(chien.|chat[0])')
-    <RegexAnd 'ch(ien.|at[0])'>
-    >>> parse('(blue.color|red.color)')
-    <RegexAnd '(blue.|red.)color'>
+    >>> parse('(chien blanc|chat blanc)')
+    <RegexAnd 'ch(ien|at) blanc'>
     """
     regex, index = _parse(text)
     assert index == len(text)
