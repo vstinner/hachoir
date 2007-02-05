@@ -10,7 +10,6 @@ TODO:
 
 from regex import (RegexString, RegexEmpty, RegexDot,
     RegexRange, RegexRangeItem, RegexRangeCharacter)
-import re
 
 def parse(text):
     r"""
@@ -64,11 +63,6 @@ def _parse(text, start=0, until=None):
         regex = regex + RegexString(subtext)
     return regex, index
 
-# Match: a, a-z, a-z0-9, abc-d9
-RANGE_REGEX = r"(?:[^]-]|.-[^]])+"
-# Match: a], a-], a-z], a-z-], -]
-RANGE_REGEX = r"(%s-?|-)]" % RANGE_REGEX
-RANGE_REGEX = re.compile(r"(%s).*" % RANGE_REGEX)
 def parseRange(text, start):
     r"""
     >>> parseRange('[a]b', 1)
