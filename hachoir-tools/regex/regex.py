@@ -135,11 +135,29 @@ class RegexEmpty(Regex):
     def __str__(self):
         return ''
 
-    def __repr__(self):
-        return "<RegexEmpty>"
-
     def _and(self, regex):
         return regex
+
+class RegexStart(Regex):
+    def minLength(self):
+        return 0
+
+    def _and(self, regex):
+        if regex.__class__ == RegexStart:
+            return self
+        return None
+
+    def __str__(self):
+        return '^'
+
+class RegexEnd(RegexStart):
+    def _and(self, regex):
+        if regex.__class__ == RegexEnd:
+            return self
+        return None
+
+    def __str__(self):
+        return '$'
 
 class RegexDot(Regex):
     def minLength(self):

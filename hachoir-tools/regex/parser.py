@@ -2,29 +2,29 @@
 Parse string to create Regex object.
 
 TODO:
- - Support ^ and $
  - Support \: \001, \x00, \0, \ \[, \(, \{, etc.
  - Support Python extensions: (?:...), (?P<name>...), etc.
  - Support \<, \>, \s, \S, \w, \W, \Z <=> $, \d, \D, \A <=> ^, \b, \B, [[:space:]], etc.
 """
 
-from regex import (RegexString, RegexEmpty, RegexDot,
+from regex import (RegexString, RegexEmpty,
+    RegexDot, RegexStart, RegexEnd,
     RegexRange, RegexRangeItem, RegexRangeCharacter)
 
 def parse(text):
     r"""
     >>> parse('')
-    <RegexEmpty>
+    <RegexEmpty ''>
     >>> parse('abc')
     <RegexString 'abc'>
     >>> parse('[bc]d')
     <RegexAnd '[b-c]d'>
     >>> parse('a(b|[cd]|(e|f))g')
     <RegexAnd 'a[b-f]g'>
-    >>> parse('.')
-    <RegexDot '.'>
     >>> parse('([a-z]|[b-])')
     <RegexRange '[a-z-]'>
+    >>> parse('^^..$$')
+    <RegexAnd '^..$'>
     """
     regex, index = _parse(text)
     assert index == len(text)
@@ -51,6 +51,12 @@ def _parse(text, start=0, until=None):
                 new_regex, index = parseRange(text, index+1)
             elif char == '.':
                 new_regex = RegexDot()
+                index += 1
+            elif char == '^':
+                new_regex = RegexStart()
+                index += 1
+            elif char == '$':
+                new_regex = RegexEnd()
                 index += 1
             else:
                 raise NotImplementedError("Operator '%s' is not supported" % char)
