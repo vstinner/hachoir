@@ -10,7 +10,7 @@ def parse(text):
     >>> parse('[bc]d')
     <RegexAnd '[bc]d'>
     >>> parse('a(b|[cd]|(e|f))g')
-    <RegexAnd 'a(b|[cd]|(e|f))g'>
+    <RegexAnd 'a(b|[cd]|e|f)g'>
     """
     regex, index = _parse(text)
     assert index == len(text)

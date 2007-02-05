@@ -102,6 +102,22 @@ class RegexRange(Regex):
         # FIXME: len('a-z') is 1
         return len(self.range)
 
+    def __or__(self, regex):
+        """
+        >>> RegexRange("a") | RegexRange("b")
+        <RegexRange '[ab]'>
+        >>> RegexRange("^ab") | RegexRange("^ac")
+        <RegexRange '[^abc]'>
+        """
+        if regex.__class__ == RegexRange and self.exclude == regex.exclude:
+            crange = self.range
+            for character in regex.range:
+                if character not in crange:
+                    crange += character
+            return RegexRange(crange, self.exclude)
+        else:
+            return Regex.__or__(self, regex)
+
     def __str__(self):
         if self.exclude:
             return "[^%s]" % self.range
@@ -189,8 +205,25 @@ class RegexOr(RegexAndOr):
         assert 2 <= len(self.content)
 
     def __or__(self, regex):
+        """
+        >>> RegexOr((RegexString("a"), RegexString("b"))) | RegexOr((RegexString("c"), RegexString("d")))
+        <RegexOr '(a|b|c|d)'>
+        >>> RegexOr((RegexString("ab"), RegexRange("c"))) | RegexOr((RegexString("de"), RegexRange("f")))
+        <RegexOr '(ab|[cf]|de)'>
+        """
+        if regex.__class__ == RegexOr:
+            total = self
+            for item in regex.content:
+                total = total | item
+            return total
         if regex in self:
             return self
+        if regex.__class__ == RegexRange:
+            for index, item in enumerate(self.content):
+                if item.__class__ == RegexRange:
+                    if item.exclude == regex.exclude:
+                        self.content[index] = item | regex
+                        return self
         return RegexOr( self.content + [regex] )
 
     def __str__(self):
