@@ -8,7 +8,8 @@ TODO:
  - Support \<, \>, \s, \S, \w, \W, \Z <=> $, \d, \D, \A <=> ^, \b, \B, [[:space:]], etc.
 """
 
-from regex import RegexString, RegexRange, RegexEmpty, RegexDot
+from regex import (RegexString, RegexEmpty, RegexDot,
+    RegexRange, RegexRangeItem, RegexRangeCharacter)
 import re
 
 def parse(text):
@@ -18,11 +19,13 @@ def parse(text):
     >>> parse('abc')
     <RegexString 'abc'>
     >>> parse('[bc]d')
-    <RegexAnd '[bc]d'>
+    <RegexAnd '[b-c]d'>
     >>> parse('a(b|[cd]|(e|f))g')
-    <RegexAnd 'a[bcdef]g'>
+    <RegexAnd 'a[b-f]g'>
     >>> parse('.')
     <RegexDot '.'>
+    >>> parse('([a-z]|[b-])')
+    <RegexRange '[a-z-]'>
     """
     regex, index = _parse(text)
     assert index == len(text)
@@ -84,23 +87,31 @@ def parseRange(text, start):
         exclude = True
         index += 1
     if text[index] == ']':
-        char_range.append(']')
+        char_range.append(RegexRangeCharacter(']'))
         index += 1
-    match = RANGE_REGEX.match(text, index)
-    if not match:
-        raise SyntaxError("Unable to parse regex range: %r" % text[start-1:])
-    char_range.append( match.group(2) )
-    index += len(match.group(1))
-    return RegexRange(''.join(char_range), exclude), index
+    while text[index] not in '-]':
+        if index+3 < len(text) \
+        and text[index+1] == '-' \
+        and text[index+2] != ']':
+            char_range.append(RegexRangeItem(text[index], text[index+2]))
+            index += 3
+        else:
+            char_range.append(RegexRangeCharacter(text[index]))
+            index += 1
+    if text[index] == '-':
+        char_range.append(RegexRangeCharacter('-'))
+        index += 1
+    assert text[index] == ']', "%s != ']'" % text[index]
+    return RegexRange(char_range, exclude), index+1
 
 def parseOr(text, start):
     """
     >>> parseOr('(a)', 1)
     (<RegexString 'a'>, 3)
-    >>> parseOr('(a|b)', 1)
-    (<RegexRange '[ab]'>, 5)
+    >>> parseOr('(a|c)', 1)
+    (<RegexRange '[ac]'>, 5)
     >>> parseOr(' (a|[bc]|d)', 2)
-    (<RegexRange '[abcd]'>, 11)
+    (<RegexRange '[a-d]'>, 11)
     """
     index = start
     if text[index] == '?':

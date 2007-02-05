@@ -5,6 +5,10 @@ Object to manage regular expressions, try to optimize the result:
  - '(red color|blue color)' => '(red|blue) color'
  - '([ab]|c)' => '[abc]'
  - 'ab' + 'cd' => 'abcd' (one long string)
+ - [a-z]|[b] => [a-z]
+ - [a-c]|[a-e] => [a-z]
+ - [a-c]|[d] => [a-d]
+ - [a-c]|[d-f] => [a-f]
 
 Operation:
  - str(): convert to string
@@ -16,10 +20,11 @@ Operation:
  - maxLength(): maximum length of matching pattern, "(cat|horse)".maxLength() => 5
 
 TODO:
- - RegexRange() doesn't support 'a-z' (see it as a, -, z)
- - Optimize exclusion range ([^a-z]|[^a]) => [^a-z]
  - Repeat: a? a+ a* a{n} a{n,p}
  - Support Unicode regex (avoid mixing str and unicode types)
+
+Complex TODO:
+ - (chien.|chat[0]) => ch(ien.|at[0])
 """
 
 import re
@@ -39,6 +44,18 @@ def _join(func, regex_list):
     for item in regex_list[1:]:
         regex = func(regex, item)
     return regex
+
+def createRange(*text, **kw):
+    """
+    Create a regex range using character list.
+
+    >>> createRange("a", "d", "b")
+    <RegexRange '[a-bd]'>
+    >>> createRange("-", "9", "4", "3", "0")
+    <RegexRange '[93-40-]'>
+    """
+    ranges = ( RegexRangeCharacter(item) for item in text )
+    return RegexRange(ranges, kw.get('exclude', False))
 
 class Regex:
     def minLength(self):
@@ -166,7 +183,7 @@ class RegexString(Regex):
         """
         # (a|[bc]) => [abc]
         if regex.__class__ == RegexRange and len(self._text) == 1:
-            return RegexRange(self._text) | regex
+            return createRange(self._text) | regex
 
         if regex.__class__ != RegexString:
             return None
@@ -197,42 +214,101 @@ class RegexString(Regex):
 
         # (a|b) => [ab]
         if len(texta) == len(textb) == 1:
-            return RegexRange(texta+textb)
+            ranges = (RegexRangeCharacter(texta), RegexRangeCharacter(textb))
+            return RegexRange(ranges)
         return None
 
+class RegexRangeItem:
+    def __init__(self, cmin, cmax):
+        try:
+            self.cmin = ord(cmin)
+            if cmax is not None:
+                self.cmax = ord(cmax)
+            else:
+                self.cmax = cmin
+        except TypeError:
+            raise TypeError("RegexRangeItem: two characters expected (%s, %s) found" % (type(cmin), type(cmax)))
+        if self.cmax < self.cmin:
+            raise TypeError("RegexRangeItem: minimum (%u) is bigger than maximum (%u)" %
+                (self.cmin, self.cmax))
+
+    def __contains__(self, value):
+        return (self.cmin <= value.cmin) and (value.cmax <= self.cmax)
+
+    def __str__(self):
+        if self.cmin != self.cmax:
+            return "%c-%c" % (self.cmin, self.cmax)
+        else:
+            return chr(self.cmin)
+
+    def __repr__(self):
+        return "<RegexRangeItem %c-%c>" % (self.cmin, self.cmax)
+
+class RegexRangeCharacter(RegexRangeItem):
+    def __init__(self, char):
+        RegexRangeItem.__init__(self, char, char)
+
 class RegexRange(Regex):
-    def __init__(self, char_range, exclude=False):
-        self.range = char_range
+    def __init__(self, ranges, exclude=False):
+        self.ranges = []
+        for item in ranges:
+            RegexRange.rangeAdd(self.ranges, item)
         self.exclude = exclude
+
+    @staticmethod
+    def rangeAdd(ranges, itemb):
+        for index, itema in enumerate(ranges):
+            if itema in itemb:
+                ranges[index] = itemb
+                return
+            elif itemb in itema:
+                return
+            elif (itemb.cmax+1) == itema.cmin:
+                ranges[index] = RegexRangeItem(chr(itemb.cmin),chr(itema.cmax))
+                return
+            elif (itema.cmax+1) == itemb.cmin:
+                ranges[index] = RegexRangeItem(chr(itema.cmin),chr(itemb.cmax))
+                return
+        ranges.append(itemb)
 
     def minLength(self):
         return 1
 
     def _or(self, regex):
         """
-        >>> RegexRange("a") | RegexRange("b")
-        <RegexRange '[ab]'>
-        >>> RegexRange("^ab") | RegexRange("^ac")
-        <RegexRange '[^abc]'>
+        >>> createRange("a") | createRange("b")
+        <RegexRange '[a-b]'>
+        >>> createRange("a", "b", exclude=True) | createRange("a", "c", exclude=True)
+        <RegexRange '[^a-c]'>
         """
-        new_range = None
         if not self.exclude and regex.__class__ == RegexString and len(regex._text) == 1:
-            new_range = regex._text
+            branges = (RegexRangeCharacter(regex._text),)
         elif regex.__class__ == RegexRange and self.exclude == regex.exclude:
-            new_range = regex.range
-        if not new_range:
+            branges = regex.ranges
+        else:
             return None
-        crange = self.range
-        for character in new_range:
-            if character not in crange:
-                crange += character
-        return RegexRange(crange, self.exclude)
+        ranges = list(self.ranges)
+        for itemb in branges:
+            RegexRange.rangeAdd(ranges, itemb)
+        return RegexRange(ranges, self.exclude)
 
     def __str__(self):
-        if self.exclude:
-            return "[^%s]" % self.range
+        content = [str(item) for item in self.ranges]
+        if "-" in content:
+            content.remove("-")
+            suffix = "-"
         else:
-            return "[%s]" % self.range
+            suffix = ""
+        if "]" in content:
+            content.remove("]")
+            prefix = "]"
+        else:
+            prefix = ""
+        text = prefix + (''.join(content)) + suffix
+        if self.exclude:
+            return "[^%s]" % text
+        else:
+            return "[%s]" % text
 
 class RegexAnd(Regex):
     def __init__(self, items):
@@ -265,10 +341,10 @@ class RegexAnd(Regex):
 
     def _and(self, regex):
         """
-        >>> RegexRange('ab') + RegexRange('01')
-        <RegexAnd '[ab][01]'>
-        >>> RegexRange('01') + RegexString('a') + RegexString('b')
-        <RegexAnd '[01]ab'>
+        >>> RegexDot() + RegexDot()
+        <RegexAnd '..'>
+        >>> RegexDot() + RegexString('a') + RegexString('b')
+        <RegexAnd '.ab'>
         """
 
         if regex.__class__ == RegexAnd:
@@ -312,7 +388,7 @@ class RegexOr(Regex):
         """
         >>> (RegexString("abc") | RegexString("123")) | (RegexString("plop") | RegexString("456"))
         <RegexOr '(abc|123|plop|456)'>
-        >>> RegexString("mouse") | RegexRange("a") | RegexString("2006") | RegexRange("z")
+        >>> RegexString("mouse") | createRange('a') | RegexString("2006") | createRange('z')
         <RegexOr '(mouse|[az]|2006)'>
         """
         if regex.__class__ == RegexOr:
@@ -355,8 +431,8 @@ class RegexOr(Regex):
     @classmethod
     def join(cls, regex):
         """
-        >>> RegexOr.join( (RegexString('a'), RegexString('b'), RegexString('a')) )
-        <RegexRange '[ab]'>
+        >>> RegexOr.join( (RegexString('a'), RegexString('b'), RegexString('c')) )
+        <RegexRange '[a-c]'>
         """
         return _join(operator.__or__, regex)
 
