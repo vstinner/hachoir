@@ -83,7 +83,10 @@ def parseRange(text, start):
     if text[index] == ']':
         char_range.append(RegexRangeCharacter(']'))
         index += 1
-    while text[index] not in '-]':
+    while index < len(text) and text[index] != ']':
+        if index+1 < len(text) \
+        and text[index] == '-' and text[index+1] == ']':
+            break
         if index+3 < len(text) \
         and text[index+1] == '-' \
         and text[index+2] != ']':
@@ -92,10 +95,11 @@ def parseRange(text, start):
         else:
             char_range.append(RegexRangeCharacter(text[index]))
             index += 1
-    if text[index] == '-':
+    if index < len(text) and text[index] == '-':
         char_range.append(RegexRangeCharacter('-'))
         index += 1
-    assert text[index] == ']', "%s != ']'" % text[index]
+    if index == len(text) or text[index] != ']':
+        raise SyntaxError('Invalid range: %s' % text[start-1:index])
     return RegexRange(char_range, exclude), index+1
 
 def parseOr(text, start):
@@ -117,6 +121,8 @@ def parseOr(text, start):
             regex = regex | new_regex
         else:
             regex = new_regex
+        if len(text) <= index:
+            raise SyntaxError('Missing closing parenthesis')
         if text[index] == ')':
             break
         index += 1
