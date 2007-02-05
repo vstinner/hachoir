@@ -20,7 +20,6 @@ Operation:
  - maxLength(): maximum length of matching pattern, "(cat|horse)".maxLength() => 5
 
 TODO:
- - Repeat: a? a+ a* a{n} a{n,p}
  - Support Unicode regex (avoid mixing str and unicode types)
 """
 
