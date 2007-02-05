@@ -1,3 +1,27 @@
+"""
+Object to manage regular expressions, try to optimize the result:
+ - '(a|b)' => '[ab]'
+ - '(color red|color blue)' => 'color (red|blue)'
+ - '(red color|blue color)' => '(red|blue) color'
+ - '([ab]|c)' => '[abc]'
+ - 'ab' + 'cd' => 'abcd' (one long string)
+
+Operation:
+ - str(): convert to string
+ - repr(): debug string
+ - a & b: concatenation, eg. "big " & "car" => "big car"
+ - a + b: alias to a & b
+ - a | b: a or b, eg. "dog" | "cat" => "dog|cat"
+ - minLength(): minimum length of matching pattern, "(cat|horse)".minLength() => 3
+ - maxLength(): maximum length of matching pattern, "(cat|horse)".maxLength() => 5
+
+TODO:
+ - RegexRange() doesn't support 'a-z' (see it as a, -, z)
+ - Optimize exclusion range ([^a-z]|[^a]) => [^a-z]
+ - Repeat: a? a+ a* a{n} a{n,p}
+ - Support Unicode regex (avoid mixing str and unicode types)
+"""
+
 import re
 
 def escapeRegex(text):
@@ -35,7 +59,7 @@ class Regex:
             return regex
         return None
 
-    def __add__(self, regex):
+    def __and__(self, regex):
         """
         >>> RegexEmpty() + RegexString('a')
         <RegexString 'a'>
@@ -45,6 +69,8 @@ class Regex:
             return new_regex
         else:
             return RegexAnd( (self, regex) )
+    def __add__(self, regex):
+        return self.__and__(regex)
 
     def _or(self, regex):
         """
@@ -268,8 +294,8 @@ class RegexOr(RegexAndOr):
         """
         >>> (RegexString("abc") | RegexString("123")) | (RegexString("plop") | RegexString("456"))
         <RegexOr '(abc|123|plop|456)'>
-        >>> RegexOr((RegexString("ab"), RegexRange("c"))) | RegexOr((RegexString("de"), RegexRange("f")))
-        <RegexOr '(ab|[cf]|de)'>
+        >>> RegexString("mouse") | RegexRange("a") | RegexString("2006") | RegexRange("z")
+        <RegexOr '(mouse|[az]|2006)'>
         """
         if regex.__class__ == RegexOr:
             total = self

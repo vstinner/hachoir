@@ -1,3 +1,10 @@
+"""
+Parse string to create Regex object.
+
+TODO:
+ - Support \[, \(, ...
+"""
+
 from regex import RegexAnd, RegexString, RegexRange, RegexEmpty, RegexOr
 import re
 
