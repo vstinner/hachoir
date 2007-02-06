@@ -96,8 +96,7 @@ class AiffFile(Parser):
         "category": "audio",
         "file_ext": ("aif", "aiff", ".aifc"),
         "mime": ("audio/x-aiff",),
-        # FIXME: Use magic regex "FORM.{4}AIF[CF]"
-        "magic": [("FORM", 0)],
+        "magic_regex": (("FORM.{4}AIF[CF]", 0),),
         "min_size": 12*8,
         "description": "Audio Interchange File Format (AIFF)"
     }
