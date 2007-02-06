@@ -3,10 +3,11 @@ from hachoir_core.error import HACHOIR_ERRORS, error
 from hachoir_core.stream import FileInputStream, InputSubStream
 from hachoir_core.tools import humanFilesize, humanDuration, makePrintable
 from hachoir_parser import QueryParser
-from hachoir_subfile.create_regex import createRegex
+from hachoir_subfile.create_regex import createRegex, dumpRegex
 from hachoir_subfile.memory import getTotalMemory, setMemoryLimit
 from hachoir_subfile.data_rate import DataRate
 from hachoir_subfile.output import Output
+from hachoir_core.regex import parse as parseRegex, createString as regexFromString, RegexOr
 from sys import stderr
 from time import time
 import re
@@ -63,6 +64,7 @@ class SearchSubfile:
         self.main_start = time()
         self.filter = None
         self.magics = []
+        self.magic_regex = []
 
     def loadMagics(self, categories=None, parser_ids=None):
         # Choose parsers to use
@@ -83,16 +85,35 @@ class SearchSubfile:
                 magics.append((magic, offset, parser))
 
         # Build regex
-        self.max_magic_len = max( len(magic) for magic in magics )
+        if magics:
+            self.max_magic_len = max( len(magic) for magic in magics )
+        else:
+            self.max_magic_len = 0
         self.magics = {}
         magic_strings = []
         for magic, offset, parser in magics:
             magic_strings.append(magic)
             self.magics[magic] = (offset, parser)
-        regex = createRegex(magic_strings)
+        if magic_strings:
+            regex = createRegex(magic_strings)
+        else:
+            regex = None
+        self.magics_regex = []
+        for parser in parser_list:
+            for (magic_regex, offset) in parser.getTags().get("magic_regex",()):
+                new_regex = parseRegex(magic_regex)
+                self.magics_regex.append( (new_regex, new_regex.compile(python=True), offset, parser) )
+                max_length = new_regex.maxLength()
+                if max_length is None:
+                    raise RuntimeError("Infinite regex")
+                self.max_magic_len = max(self.max_magic_len, max_length)
+                if regex:
+                    regex = regex | new_regex
+                else:
+                    regex = new_regex
         if self.debug:
-            print "Use regex >>>%s<<<" % makePrintable(regex, "ASCII")
-        self.magic_regex = re.compile(regex)
+            print "Use regex: %s" % makePrintable(str(regex), 'ASCII')
+        self.magic_regex = regex.compile(python=True)
 
     def main(self):
         """
@@ -101,7 +122,7 @@ class SearchSubfile:
         """
 
         # Initialize
-        if not self.magics:
+        if not self.magics and not self.magic_regex:
             self.loadMagics()
         self.limitMemory()
         self.mainHeader()
@@ -209,7 +230,17 @@ class SearchSubfile:
         max_offset = min(max_offset, self.size)
         for magic, offset in inputStreamSearchRegex(self.stream, self.magic_regex, offset, max_offset):
             # Compute file offset start
-            magic_offset, parser_cls = self.magics[magic]
+            try:
+                magic_offset, parser_cls = self.magics[magic]
+            except KeyError:
+                parser_cls = None
+                # TODO: Write faster code (?)
+                found = False
+                for regex, compiled_regex, magic_offset, parser_cls in self.magics_regex:
+                    if compiled_regex.match(magic):
+                        found = True
+                        break
+                assert found
             offset -= magic_offset
 
             # Skip invalid offset
