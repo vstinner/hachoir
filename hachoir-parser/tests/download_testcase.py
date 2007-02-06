@@ -63,7 +63,6 @@ testcase_files = (
     (u"ocr10.laf", 17264, "4f0a15d2abe84c5e4bd1eca11195dc87"),
     (u"kino14s.laf", 30957, "9fbb52a92ff9db88b85a57cf4359acd8"),
     (u"ladouce_1h15.wav", 5112, "964250e59d1967ab86d60e635a298bbe"),
-    (u"DicOOo.sxw", 113037, "f246d8e18559d496144c63b9d4f370ef"),
     (u"hachoir-core.ace", 156483, "00ecf6575dbc2fc4fb90afd4146d0cb3"),
     (u"hachoir-core.rar", 184109, "049e3c0702a7ae42cf4469280a32be93"),
     (u"debian-31r4-i386-binary-1.iso.torrent", 25793, "b68ed9799168d10854e9d10e45d51516"),
