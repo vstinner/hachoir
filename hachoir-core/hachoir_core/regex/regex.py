@@ -22,6 +22,8 @@ Operation:
 TODO:
  - Support Unicode regex (avoid mixing str and unicode types)
  - createString("__tax") | parse("__[12]") => group '__'
+ - Make sure that all RegexXXX() classes are inmutable
+ - Use singleton for dot, start and end
 """
 
 import re
@@ -122,11 +124,21 @@ class Regex:
         return None
 
     def __or__(self, regex):
+        # (a|a) => a
         if self == regex:
             return self
+
+        # Try to optimize (a|b)
         new_regex = self._or(regex)
         if new_regex:
             return new_regex
+
+        # Try to optimize (b|a)
+        new_regex = regex._or(self)
+        if new_regex:
+            return new_regex
+
+        # Else use (a|b)
         return RegexOr( (self, regex) )
 
     def __eq__(self, regex):
@@ -281,10 +293,6 @@ class RegexString(Regex):
         >>> RegexString("moot") | RegexString("boot")
         <RegexAnd '[mb]oot'>
         """
-        # (a|[b-c]) => [a-c]
-        if regex.__class__ == RegexRange and len(self._text) == 1:
-            return createRange(self._text) | regex
-
         # Don't know any other optimization for str|other
         if regex.__class__ != RegexString:
             return None
@@ -322,13 +330,15 @@ class RegexRangeItem:
         return (self.cmin <= value.cmin) and (value.cmax <= self.cmax)
 
     def __str__(self, **kw):
+        cmin = chr(self.cmin)
         if self.cmin != self.cmax:
+            cmax = chr(self.cmax)
             if (self.cmin+1) == self.cmax:
-                return "%c%c" % (self.cmin, self.cmax)
+                return "%s%s" % (cmin, cmax)
             else:
-                return "%c-%c" % (self.cmin, self.cmax)
+                return "%s-%s" % (cmin, cmax)
         else:
-            return chr(self.cmin)
+            return cmin
 
     def __repr__(self):
         return "<RegexRangeItem %u-%u>" % (self.cmin, self.cmax)
@@ -522,6 +532,8 @@ class RegexOr(Regex):
             return self
         for index, item in enumerate(self.content):
             new_item = item._or(regex)
+            if not new_item:
+                new_item = regex._or(item)
             if new_item:
                 self.content[index] = new_item
                 return self

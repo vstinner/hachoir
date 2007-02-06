@@ -80,6 +80,8 @@ Group prefix/suffix:
 <RegexAnd 'b(lue|rown)'>
 >>> createString("mot") | createString("pot")
 <RegexAnd '[mp]ot'>
+>>> createString("moto") | parse("mot.")
+<RegexAnd 'mot(.|o)'>
 
 Merge ranges:
 
@@ -88,7 +90,7 @@ Merge ranges:
 <RegexRange '[13]'>
 >>> regex = regex | createRange("2"); regex
 <RegexRange '[1-3]'>
->>> regex = regex | createRange("0"); regex
+>>> regex = regex | createString("0"); regex
 <RegexRange '[0-3]'>
 >>> regex = regex | createRange("5", "6"); regex
 <RegexRange '[0-356]'>
