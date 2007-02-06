@@ -7,7 +7,7 @@ use the API.
 Create regex with string
 ------------------------
 
->>> from parser import parse
+>>> from hachoir_core.regex import parse
 >>> parse('')
 <RegexEmpty ''>
 >>> parse('abc')
@@ -28,7 +28,7 @@ Create regex with string
 Create regex with the API
 -------------------------
 
->>> from regex import createString, createRange
+>>> from hachoir_core.regex import createString, createRange
 >>> createString('')
 <RegexEmpty ''>
 >>> createString('abc')
@@ -44,7 +44,7 @@ Manipulate regular expressions
 
 Convert to string:
 
->>> from regex import createRange, createString
+>>> from hachoir_core.regex import createRange, createString
 >>> str(createString('abc'))
 'abc'
 >>> repr(createString('abc'))
@@ -83,7 +83,7 @@ Group prefix/suffix:
 
 Merge ranges:
 
->>> from regex import createRange
+>>> from hachoir_core.regex import createRange
 >>> regex = createString("1") | createString("3"); regex
 <RegexRange '[13]'>
 >>> regex = regex | createRange("2"); regex

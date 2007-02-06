@@ -41,15 +41,10 @@ def main():
     import hachoir_core.config as config
     config.use_i18n = False
 
-    # Test documentation in "doc/" subdirectory
-    doc_dir = 'doc'
-    documents = os.listdir(doc_dir)
-    documents.sort()
-    for doc in documents:
-        filename = os.path.join(doc_dir, doc)
-        if S_ISREG(os.stat(filename)[ST_MODE]) \
-        and regex_doc_filename.match(doc) != None:
-            testDoc(filename)
+    # Test documentation in doc/*.rst files
+    testDoc('doc/hachoir-api.rst')
+    testDoc('doc/internals.rst')
+    testDoc('doc/regex.rst')
 
     # Test documentation of some functions/classes
     testModule("hachoir_core.bits")
@@ -57,6 +52,8 @@ def main():
     testModule("hachoir_core.dict")
     testModule("hachoir_core.text_handler")
     testModule("hachoir_core.tools")
+    testModule("hachoir_core.regex.parser")
+    testModule("hachoir_core.regex.regex")
 
 if __name__ == "__main__":
     main()
