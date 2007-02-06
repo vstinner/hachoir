@@ -110,8 +110,11 @@ class BmpFile(Parser):
         "file_ext": ("bmp",),
         "mime": ("image/x-ms-bmp", "image/x-bmp"),
         "min_size": 30*8,
-        # FIXME: Use magic regex "BM.{4}\0{4}"
         "magic": (("BM", 0),),
+#        "magic_regex": ((
+#            # "BM", <filesize>, reserved='\0{4}', header_size=(12|40|108)
+#            "BM.{4}\0{4}.{4}[\x0C\x28\x6C]\0{3}",
+#        0),),
         "description": "Microsoft bitmap (BMP) picture"
     }
     endian = LITTLE_ENDIAN
