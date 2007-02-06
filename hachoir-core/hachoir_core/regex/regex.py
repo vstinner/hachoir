@@ -21,6 +21,7 @@ Operation:
 
 TODO:
  - Support Unicode regex (avoid mixing str and unicode types)
+ - createString("__tax") | parse("__[12]") => group '__'
 """
 
 import re
@@ -126,8 +127,7 @@ class Regex:
         new_regex = self._or(regex)
         if new_regex:
             return new_regex
-        else:
-            return RegexOr( (self, regex) )
+        return RegexOr( (self, regex) )
 
     def __eq__(self, regex):
         # TODO: Write better/faster code...
@@ -241,6 +241,18 @@ class RegexString(Regex):
             return None
         texta = self._text
         textb = regex._text
+
+        # text|text => text
+        texta = self._text
+        textb = regex._text
+        if texta == textb:
+            return (self, RegexEmpty(), RegexEmpty())
+
+        # (a|b) => [ab]
+        if len(texta) == len(textb) == 1:
+            ranges = (RegexRangeCharacter(texta), RegexRangeCharacter(textb))
+            return (RegexRange(ranges),  RegexEmpty(), RegexEmpty())
+
         common = None
         for length in xrange(1, min(len(texta),len(textb))+1):
             if textb.startswith(texta[:length]):
@@ -276,17 +288,6 @@ class RegexString(Regex):
         # Don't know any other optimization for str|other
         if regex.__class__ != RegexString:
             return None
-
-        # text|text => text
-        texta = self._text
-        textb = regex._text
-        if texta == textb:
-            return self
-
-        # (a|b) => [ab]
-        if len(texta) == len(textb) == 1:
-            ranges = (RegexRangeCharacter(texta), RegexRangeCharacter(textb))
-            return RegexRange(ranges)
 
         # Find common prefix
         common = self.findPrefix(regex)

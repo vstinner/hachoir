@@ -2,12 +2,8 @@
 import doctest
 import sys
 import os
-import re
-from stat import S_ISREG, ST_MODE
 import hachoir_core.i18n   # import it because it does change the locale
 from locale import setlocale, LC_ALL
-
-regex_doc_filename = re.compile("^[a-z0-9_-]+\.txt$")
 
 def testDoc(filename, name=None):
     print "--- %s: Run tests" % filename

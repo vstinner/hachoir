@@ -99,7 +99,7 @@ def parseRepeat(text, start):
         rmax = rmin
     return (rmin, rmax, match.end(0))
 
-CHAR_TO_FUNC = {'[': parseRange, '(': parseOr, '{': parseRepeat}
+CHAR_TO_FUNC = {'[': parseRange, '(': parseOr}
 CHAR_TO_CLASS = {'.': RegexDot, '^': RegexStart, '$': RegexEnd}
 CHAR_TO_REPEAT = {'*': (0, None), '?': (0, 1), '+': (1, None)}
 
@@ -126,6 +126,10 @@ def _parse(text, start=0, until=None):
             elif char in CHAR_TO_CLASS:
                 new_regex = CHAR_TO_CLASS[char]()
                 index += 1
+            elif char == '{':
+                rmin, rmax, index = parseRepeat(text, index+1)
+                new_regex = RegexRepeat(last, rmin, rmax)
+                last = None
             elif char in CHAR_TO_REPEAT:
                 rmin, rmax = CHAR_TO_REPEAT[char]
                 if last is None:
