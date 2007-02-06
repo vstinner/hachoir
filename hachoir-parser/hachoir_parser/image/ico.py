@@ -68,18 +68,18 @@ class IcoFile(Parser):
         "file_ext": ("ico", "cur"),
         "mime": ["image/x-ico"],
         "min_size": (22 + 40)*8,
-        "magic": (
-            ("\0\0\1\0", 0), # Icon
-            ("\0\0\2\0", 0), # Cursor
-        ),
-#        "magic_regex": ((
-#            # signature=0, type=(1|2), count in 1..20,
-#            "\0\0[\1\2]\0[\x01-\x14]."
-#            # size=(16x16|32x32|48x48|64x64),
-#            "(\x10\x10|\x20\x20|\x30\x30|\x40\x40)"
-#            # nb_color=0 or 16; nb_plane=(0|1|4), bpp=(0|8|24|32)
-#            "[\x00\x10]\0[\0\1\4][\0\x08\x18\x20]\0",
-#        0),),
+#        "magic": (
+#            ("\0\0\1\0", 0), # Icon
+#            ("\0\0\2\0", 0), # Cursor
+#        ),
+        "magic_regex": ((
+            # signature=0, type=(1|2), count in 1..20,
+            "\0\0[\1\2]\0[\x01-\x14]."
+            # size=(16x16|32x32|48x48|64x64),
+            "(\x10\x10|\x20\x20|\x30\x30|\x40\x40)"
+            # nb_color=0 or 16; nb_plane=(0|1|4), bpp=(0|8|24|32)
+            "[\x00\x10]\0[\0\1\4][\0\x08\x18\x20]\0",
+        0),),
         "description": "Microsoft Windows icon or cursor",
     }
     TYPE_NAME = {
