@@ -157,15 +157,7 @@ def parse(text):
     >>> parse('abc')
     <RegexString 'abc'>
     >>> parse('[bc]d')
-    <RegexAnd '[b-c]d'>
-    >>> parse('a(b|[cd]|(e|f))g')
-    <RegexAnd 'a[b-f]g'>
-    >>> parse('([a-z]|[b-])')
-    <RegexRange '[a-z-]'>
-    >>> parse('^^..$$')
-    <RegexAnd '^..$'>
-    >>> parse('(chien blanc|chat blanc)')
-    <RegexAnd 'ch(ien|at) blanc'>
+    <RegexAnd '[bc]d'>
     """
     regex, index = _parse(text)
     assert index == len(text)

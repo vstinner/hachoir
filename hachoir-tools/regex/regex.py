@@ -58,9 +58,9 @@ def createRange(*text, **kw):
     Create a regex range using character list.
 
     >>> createRange("a", "d", "b")
-    <RegexRange '[a-bd]'>
+    <RegexRange '[abd]'>
     >>> createRange("-", "9", "4", "3", "0")
-    <RegexRange '[93-40-]'>
+    <RegexRange '[9340-]'>
     """
     ranges = ( RegexRangeCharacter(item) for item in text )
     return RegexRange(ranges, kw.get('exclude', False))
@@ -80,7 +80,7 @@ class Regex:
         """
         return self.minLength()
 
-    def __str__(self):
+    def __str__(self, **kw):
         raise NotImplementedError()
 
     def __repr__(self):
@@ -133,8 +133,8 @@ class Regex:
         # TODO: Write better/faster code...
         return str(self) == str(regex)
 
-    def compile(self):
-        return re.compile(str(self))
+    def compile(self, **kw):
+        return re.compile(self.__str__(**kw))
 
     def findPrefix(self, regex):
         if self == regex:
@@ -150,7 +150,7 @@ class RegexEmpty(Regex):
     def minLength(self):
         return 0
 
-    def __str__(self):
+    def __str__(self, **kw):
         return ''
 
     def _and(self, regex):
@@ -165,7 +165,7 @@ class RegexStart(Regex):
             return self
         return None
 
-    def __str__(self):
+    def __str__(self, **kw):
         return '^'
 
 class RegexEnd(RegexStart):
@@ -174,14 +174,14 @@ class RegexEnd(RegexStart):
             return self
         return None
 
-    def __str__(self):
+    def __str__(self, **kw):
         return '$'
 
 class RegexDot(Regex):
     def minLength(self):
         return 1
 
-    def __str__(self):
+    def __str__(self, **kw):
         return '.'
 
 class RegexString(Regex):
@@ -202,7 +202,7 @@ class RegexString(Regex):
             return RegexString(self._text + regex._text)
         return None
 
-    def __str__(self):
+    def __str__(self, **kw):
         return escapeRegex(self._text)
 
     def findSuffix(self, regex):
@@ -259,8 +259,6 @@ class RegexString(Regex):
 
         Group prefix:
 
-        >>> RegexString("moot") | RegexString("boot")
-        <RegexAnd '[mb]oot'>
         >>> RegexString("color red") | RegexString("color blue")
         <RegexAnd 'color (red|blue)'>
         >>> RegexString("color red") | RegexString("color")
@@ -268,8 +266,8 @@ class RegexString(Regex):
 
         Group suffix:
 
-        >>> RegexString("good thing") | RegexString("blue thing")
-        <RegexAnd '(good|blue) thing'>
+        >>> RegexString("moot") | RegexString("boot")
+        <RegexAnd '[mb]oot'>
         """
         # (a|[b-c]) => [a-c]
         if regex.__class__ == RegexRange and len(self._text) == 1:
@@ -298,7 +296,11 @@ class RegexString(Regex):
         # Find common suffix
         common = self.findSuffix(regex)
         if common:
-            return (common[0] | common[1]) + common[2]
+            regex = (common[0] | common[1])
+
+            # Keep suffix if beginning part is not like (a|b)
+            if regex.__class__ != RegexOr:
+                return regex + common[2]
         return None
 
 class RegexRangeItem:
@@ -318,9 +320,12 @@ class RegexRangeItem:
     def __contains__(self, value):
         return (self.cmin <= value.cmin) and (value.cmax <= self.cmax)
 
-    def __str__(self):
+    def __str__(self, **kw):
         if self.cmin != self.cmax:
-            return "%c-%c" % (self.cmin, self.cmax)
+            if (self.cmin+1) == self.cmax:
+                return "%c%c" % (self.cmin, self.cmax)
+            else:
+                return "%c-%c" % (self.cmin, self.cmax)
         else:
             return chr(self.cmin)
 
@@ -364,7 +369,7 @@ class RegexRange(Regex):
     def _or(self, regex):
         """
         >>> createRange("a") | createRange("b")
-        <RegexRange '[a-b]'>
+        <RegexRange '[ab]'>
         >>> createRange("a", "b", exclude=True) | createRange("a", "c", exclude=True)
         <RegexRange '[^a-c]'>
         """
@@ -379,7 +384,7 @@ class RegexRange(Regex):
             RegexRange.rangeAdd(ranges, itemb)
         return RegexRange(ranges, self.exclude)
 
-    def __str__(self):
+    def __str__(self, **kw):
         content = [str(item) for item in self.ranges]
         if "-" in content:
             content.remove("-")
@@ -449,7 +454,10 @@ class RegexAnd(Regex):
             regexa = RegexAnd.join( contenta[:-1] ) & common[0]
             regexb = RegexAnd.join( contentb[:-1] ) & common[1]
             regex = (regexa | regexb)
-            return RegexAnd( (regex, common[2]) )
+
+            # Keep suffix if beginning part is not like (a|b)
+            if regex.__class__ != RegexOr:
+                return regex + common[2]
         return None
 
     def _and(self, regex):
@@ -471,8 +479,8 @@ class RegexAnd(Regex):
             return self
         return RegexAnd( self.content + [regex] )
 
-    def __str__(self):
-        return ''.join( str(item) for item in self.content )
+    def __str__(self, **kw):
+        return ''.join( item.__str__(**kw) for item in self.content )
 
     @classmethod
     def join(cls, regex):
@@ -518,9 +526,12 @@ class RegexOr(Regex):
                 return self
         return RegexOr( self.content + [regex] )
 
-    def __str__(self):
-        content = '|'.join( str(item) for item in self.content )
-        return "(%s)" % content
+    def __str__(self, **kw):
+        content = '|'.join( item.__str__(**kw) for item in self.content )
+        if kw.get('python', False):
+            return "(?:%s)" % content
+        else:
+            return "(%s)" % content
 
     def _minmaxLength(self, lengths, func):
         value = None
@@ -596,7 +607,7 @@ class RegexRepeat(Regex):
         else:
             return None
 
-    def __str__(self):
+    def __str__(self, **kw):
         text = str(self.regex)
         if self.min == 0 and self.max == 1:
             return "%s?" % text

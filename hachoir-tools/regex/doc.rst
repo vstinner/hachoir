@@ -13,15 +13,13 @@ Create regex with string
 >>> parse('abc')
 <RegexString 'abc'>
 >>> parse('[bc]d')
-<RegexAnd '[b-c]d'>
+<RegexAnd '[bc]d'>
 >>> parse('a(b|[cd]|(e|f))g')
 <RegexAnd 'a[b-f]g'>
 >>> parse('([a-z]|[b-])')
 <RegexRange '[a-z-]'>
 >>> parse('^^..$$')
 <RegexAnd '^..$'>
->>> parse('(chien blanc|chat blanc)')
-<RegexAnd 'ch(ien|at) blanc'>
 >>> parse('chats?')
 <RegexRepeat 'chats?'>
 >>> parse(' +abc')
@@ -76,14 +74,12 @@ Optimizations
 
 The library includes many optimization to keep small and fast expressions.
 
-Group prefix and/or suffix:
+Group prefix/suffix:
 
 >>> createString("blue") | createString("brown")
 <RegexAnd 'b(lue|rown)'>
 >>> createString("mot") | createString("pot")
 <RegexAnd '[mp]ot'>
->>> createString("petit velo") | createString("petite moto")
-<RegexAnd 'petit( vel|e mot)o'>
 
 Merge ranges:
 
@@ -95,7 +91,7 @@ Merge ranges:
 >>> regex = regex | createRange("0"); regex
 <RegexRange '[0-3]'>
 >>> regex = regex | createRange("5", "6"); regex
-<RegexRange '[0-35-6]'>
+<RegexRange '[0-356]'>
 >>> regex = regex | createRange("4"); regex
 <RegexRange '[0-6]'>
 
