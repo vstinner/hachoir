@@ -2,6 +2,7 @@ from hachoir_core.field import MissingField
 from hachoir_core.error import HachoirError
 from hachoir_metadata.metadata import Metadata, MultipleMetadata, registerExtractor
 from hachoir_parser.video import MovFile, AsfFile, FlvFile
+from hachoir_parser.video.asf import Descriptor as ASF_Descriptor
 from hachoir_parser.container import MkvFile
 from hachoir_core.i18n import _
 from hachoir_core.tools import makePrintable
@@ -192,7 +193,12 @@ class AsfMetadata(MultipleMetadata):
         "Encoder": "producer",
         "ToolName": "producer",
     }
-    SKIP_EXT_DESC = set(("ASFLeakyBucketPairs",))
+    SKIP_EXT_DESC = set((
+        # Useless informations
+        "WMFSDKNeeded", "WMFSDKVersion",
+        "Buffer Average", "VBR Peak",
+    ))
+
     def extract(self, asf):
         if "header/content" in asf:
             self.processHeader(asf["header/content"])
@@ -200,32 +206,37 @@ class AsfMetadata(MultipleMetadata):
     def processHeader(self, header):
         compression = []
         bit_rates = []
-
-        if "file_prop/content" in header:
-            prop = header["file_prop/content"]
-            self.creation_date = prop["creation_date"].display
-            self.duration = prop["play_duration"].display
-            if prop["seekable"]:
-                self.comment = "Is seekable"
-            self.bit_rate = "%s (max)" % prop["max_bitrate"].display
+        is_vbr = None
 
         if "ext_desc/content" in header:
             # Extract all data from ext_desc
             data = {}
             for desc in header.array("ext_desc/content/descriptor"):
+                if desc["type"].value == ASF_Descriptor.TYPE_BYTE_ARRAY:
+                    # Skip binary data
+                    continue
                 key = desc["name"].value
                 if key in self.SKIP_EXT_DESC:
+                    # Skip some keys
                     continue
                 value = desc["value"].value
                 if isinstance(value, str):
                     value = makePrintable(value, "ISO-8859-1", to_unicode=True)
+                if "/" in key:
+                    # Replace "WM/ToolName" with "ToolName"
+                    key = key.split("/", 1)[1]
                 data[key] = value
 
             # Have ToolName and ToolVersion? If yes, group them to producer key
             if "ToolName" in data and "ToolVersion" in data:
-                self.producer = "%s %s" % (data["ToolName"], data["ToolVersion"])
+                self.producer = "%s (version %s)" % (data["ToolName"], data["ToolVersion"])
                 del data["ToolName"]
                 del data["ToolVersion"]
+
+            # "IsVBR" key
+            if "IsVBR" in data:
+                is_vbr = (data["IsVBR"] == 1)
+                del data["IsVBR"]
 
             # Store data
             for key, value in data.iteritems():
@@ -237,6 +248,21 @@ class AsfMetadata(MultipleMetadata):
                     value = "%s=%s" % (key, value)
                     key = "comment"
                 setattr(self, key, value)
+
+        if "file_prop/content" in header:
+            prop = header["file_prop/content"]
+            self.creation_date = prop["creation_date"].display
+            self.duration = prop["play_duration"].display
+            if prop["seekable"]:
+                self.comment = "Is seekable"
+            value = prop["max_bitrate"].display
+            if is_vbr is True:
+                text = "VBR (%s max)" % value
+            elif is_vbr is False:
+                text = "%s (CBR)" % value
+            else:
+                text = "%s (max)" % value
+            self.bit_rate = text
 
         if "codec_list/content" in header:
             for codec in header.array("codec_list/content/codec"):

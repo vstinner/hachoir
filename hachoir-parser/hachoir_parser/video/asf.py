@@ -124,7 +124,8 @@ class Descriptor(FieldSet):
     """
     See ExtendedContentDescription class.
     """
-    type_name = {
+    TYPE_BYTE_ARRAY = 1
+    TYPE_NAME = {
         0: "Unicode",
         1: "Byte array",
         2: "BOOL (32 bits)",
@@ -134,7 +135,7 @@ class Descriptor(FieldSet):
     }
     def createFields(self):
         yield PascalString16(self, "name", "Name", charset="UTF-16-LE", strip="\0")
-        yield Enum(UInt16(self, "type"), self.type_name)
+        yield Enum(UInt16(self, "type"), self.TYPE_NAME)
         yield UInt16(self, "value_length")
         type = self["type"].value
         size = self["value_length"].value
