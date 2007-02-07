@@ -33,7 +33,7 @@ class IconHeader(FieldSet):
             if self["planes"].value == 4 and self["bpp"].value == 0:
                 return True
         elif self["nb_color"].value == 16:
-            if self["bpp"].value == 4 and self["planes"].value == 1:
+            if self["bpp"].value in (4, 16) and self["planes"].value == 1:
                 return True
         else:
             return False
