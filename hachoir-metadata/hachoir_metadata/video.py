@@ -188,6 +188,11 @@ class MovMetadata(Metadata):
                 self.processMovieHeader(field["movie_hdr"])
 
 class AsfMetadata(MultipleMetadata):
+    EXT_DESC_TO_ATTR = {
+        "Encoder": "producer",
+        "ToolName": "producer",
+    }
+    SKIP_EXT_DESC = set(("ASFLeakyBucketPairs",))
     def extract(self, asf):
         if "header/content" in asf:
             self.processHeader(asf["header/content"])
@@ -202,17 +207,36 @@ class AsfMetadata(MultipleMetadata):
             self.duration = prop["play_duration"].display
             if prop["seekable"]:
                 self.comment = "Is seekable"
-            self.comment = "Max bit rate: %s" % prop["max_bitrate"].display
+            self.bit_rate = "%s (max)" % prop["max_bitrate"].display
 
         if "ext_desc/content" in header:
+            # Extract all data from ext_desc
+            data = {}
             for desc in header.array("ext_desc/content/descriptor"):
+                key = desc["name"].value
+                if key in self.SKIP_EXT_DESC:
+                    continue
                 value = desc["value"].value
                 if isinstance(value, str):
                     value = makePrintable(value, "ISO-8859-1", to_unicode=True)
-                key = desc["name"].value
-                if isinstance(key, str):
-                    key = makePrintable(key, "ISO-8859-1", to_unicode=True)
-                self.comment = "%s=%s" % (key, value)
+                data[key] = value
+
+            # Have ToolName and ToolVersion? If yes, group them to producer key
+            if "ToolName" in data and "ToolVersion" in data:
+                self.producer = "%s %s" % (data["ToolName"], data["ToolVersion"])
+                del data["ToolName"]
+                del data["ToolVersion"]
+
+            # Store data
+            for key, value in data.iteritems():
+                if key in self.EXT_DESC_TO_ATTR:
+                    key = self.EXT_DESC_TO_ATTR[key]
+                else:
+                    if isinstance(key, str):
+                        key = makePrintable(key, "ISO-8859-1", to_unicode=True)
+                    value = "%s=%s" % (key, value)
+                    key = "comment"
+                setattr(self, key, value)
 
         if "codec_list/content" in header:
             for codec in header.array("codec_list/content/codec"):
