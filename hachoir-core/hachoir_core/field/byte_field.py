@@ -8,6 +8,8 @@ from hachoir_core.tools import makePrintable
 from hachoir_core.bits import str2hex
 from hachoir_core import config
 
+MAX_LENGTH = (2**64)
+
 class RawBytes(Field):
     """
     Byte vector of unknown content
@@ -18,9 +20,8 @@ class RawBytes(Field):
 
     def __init__(self, parent, name, length, description="Raw data"):
         assert issubclass(parent.__class__, Field)
-        if not(0 < length):
+        if not(0 < length <= MAX_LENGTH):
             raise FieldError("Invalid RawBytes length (%s)!" % length)
-        assert length < (1 << 64) # arbitrary limit
         Field.__init__(self, parent, name, length*8, description)
         self._display = None
 
