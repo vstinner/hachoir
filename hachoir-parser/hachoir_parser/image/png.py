@@ -129,21 +129,21 @@ def backgroundColorDesc(parent):
 class ImageData(Fragment):
     def __init__(self, parent, name="compressed_data"):
         Fragment.__init__(self, parent, name, None, 8*parent["size"].value)
-        try:
-            self.error('first: %s' % first.path)
-        except MissingField:
+        data = parent.name.split('[')
+        data, next = "../%s[%%u]" % data[0], int(data[1][:-1]) + 1
+        first = parent.getField(data % 0)
+        if first is parent:
             first = None
             if has_deflate:
                 CompressedField(self, Gunzip)
-        self.setLinks(first, self.createNext)
-
-    def createNext(self):
-        parent = self.parent
-        name = parent.name.split('[')
+        else:
+            first = first[name]
         try:
-            return parent["../%s[%u]/%s" % (name[0], int(name[1][:-1]) + 1, self.name)]
+            _next = parent[data % next]
+            next = lambda: _next[name]
         except MissingField:
-            pass
+            next = None
+        self.setLinks(first, next)
 
 
 class Chunk(FieldSet):

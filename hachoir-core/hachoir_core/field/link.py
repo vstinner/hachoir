@@ -1,4 +1,4 @@
-from hachoir_core.field import Field, FieldSet, Bytes, MissingField
+from hachoir_core.field import Field, FieldSet, ParserError, Bytes, MissingField
 from hachoir_core.stream import FragmentedStream
 
 
@@ -86,7 +86,7 @@ class Fragment(FieldSet):
                     break
                 yield field
             else:
-                raise ParserError()
+                raise ParserError("Fragment.setLinks not called")
         else:
             field = None
         if self._first is not self:
