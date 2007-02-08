@@ -384,6 +384,22 @@ def checkDebianTorrent(parser): return (
     checkDisplay(parser, "/root/info/value/piece_length", u"512.0 KB"),
 )
 
+def checkDell8FAT16(parser): return (
+    checkValue(parser, "/boot/oem_name", u"Dell 8.0"),
+    checkDisplay(parser, "/boot/serial", u"0x07d6090d"),
+    checkValue(parser, "/boot/label", u"DellUtility"),
+    checkValue(parser, "/boot/fs_type", u"FAT16"),
+    checkValue(parser, "/fat[1]/group[0]/entry[2]", 3),
+    checkDisplay(parser, "/fat[0]/group[4]/entry[8]", u"free cluster"),
+    checkDesc(parser, "/root[0]/entry[0]", u"Long filename part: 'command.com' [65]"),
+    checkDesc(parser, "/root[0]/entry[1]", u"File: 'COMMAND.COM'"),
+    checkValue(parser, "/root[0]/entry[2]/hidden", True),
+    checkDesc(parser, "/root[0]/entry[2]/create", u"2006-09-13 15:01:16"),
+    checkDesc(parser, "/root[0]/entry[2]/access", u"2006-09-13"),
+    checkDesc(parser, "/root[0]/entry[2]/modify", u"2005-07-26 00:48:26"),
+    checkValue(parser, "/root[0]/entry[2]/size", 29690),
+)
+
 testcase_files = (
     (u"yellowdude.3ds", checkYellowdude),
     (u"logo-Kubuntu.png", checkLogoUbuntu),
@@ -429,6 +445,7 @@ testcase_files = (
     (u"ping_20020927-3ubuntu2", checkPing),
     (u"georgia.cab", checkGeorgia),
     (u"debian-31r4-i386-binary-1.iso.torrent", checkDebianTorrent),
+    (u"dell8.fat16", checkDell8FAT16),
 )
 
 def checkFile(filename, check_parser):

@@ -320,8 +320,11 @@ class FAT_FS(Parser):
     }
 
     def _validate(self, type_offset):
-        return (self.stream.readBytes(510*8, 2) == "\x55\xAA"
-            and self.stream.readBytes(type_offset*8, 8) == "FAT%-5u" % self.version)
+        if self.stream.readBytes(type_offset*8, 8) != ("FAT%-5u" % self.version):
+            return "Invalid FAT%u signature" % self.version
+        if self.stream.readBytes(510*8, 2) != "\x55\xAA":
+            return "Invalid BIOS signature"
+        return True
 
     def clusters(self, cluster_func):
         max_entry = (1 << min(28, self.version)) - 16
@@ -342,6 +345,7 @@ class FAT_FS(Parser):
             yield self.data_start + cluster * self.cluster_size, clus_nb * self.cluster_size, True
 
     def createFields(self):
+        # Read boot seector
         boot = Boot(self, "boot", "Boot sector")
         yield boot
         self.sector_size = boot["sector_size"].value
@@ -360,6 +364,7 @@ class FAT_FS(Parser):
         if padding:
             yield padding
 
+        # Read the two FAT
         fat_size = boot["fat_size"].value
         if fat_size == 0:
             fat_size = boot["fat32_size"].value
@@ -367,6 +372,7 @@ class FAT_FS(Parser):
         for i in xrange(boot["fat_nb"].value):
             yield FAT(self, "fat[]", "File Allocation Table", size=fat_size)
 
+        # Read inode table (Directory)
         self.cluster_size = boot["cluster_size"].value * self.sector_size * 8
         self.fat = self["fat[0]"]
         if "root_start" in boot:
@@ -379,7 +385,12 @@ class FAT_FS(Parser):
         sectors = boot["sectors1"].value
         if not sectors:
             sectors = boot["sectors2"].value
-        padding = self.seekByte(sectors * self.sector_size)
+
+        # Create one big padding field for the end
+        size = sectors * self.sector_size
+        if self._size:
+            size = min(size, self.size//8)
+        padding = self.seekByte(size)
         if padding:
             yield padding
 
