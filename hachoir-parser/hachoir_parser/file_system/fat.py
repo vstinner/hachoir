@@ -8,7 +8,7 @@ from hachoir_core.field.integer import GenericInteger
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.text_handler import hexadecimal
 from hachoir_core.error import error
-from hachoir_core.tools import humanFilesize
+from hachoir_core.tools import humanFilesize, makePrintable
 import datetime
 import re
 
@@ -176,6 +176,8 @@ class FileEntry(FieldSet):
 
     def getFilename(self):
         name = self["name"].value
+        if isinstance(name, str):
+            name = makePrintable(name, "ASCII", to_unicode=True)
         ext = self["ext"].value
         if ext:
             name += "." + ext
