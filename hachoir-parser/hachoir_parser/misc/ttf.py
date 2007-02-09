@@ -11,6 +11,9 @@ from hachoir_core.field import (FieldSet,
 from hachoir_core.endian import BIG_ENDIAN
 from hachoir_core.text_handler import hexadecimal, humanFilesize
 
+MIN_NB_TABLE = 3
+MAX_NB_TABLE = 30
+
 class TableEntry(FieldSet):
     def createFields(self):
         yield String(self, "tag", 4)
@@ -43,6 +46,12 @@ class TrueTypeFontFile(Parser):
     }
 
     def validate(self):
+        if self["maj_ver"].value != 1:
+            return "Invalid major version (%u)" % self["maj_ver"].value
+        if self["min_ver"].value != 0:
+            return "Invalid minor version (%u)" % self["min_ver"].value
+        if not (MIN_NB_TABLE <= self["nb_table"].value <= MAX_NB_TABLE):
+            return "Invalid number of table (%u)" % self["nb_table"].value
         return True
 
     def createFields(self):
