@@ -82,10 +82,21 @@ class InstrumentSecondHeader(FieldSet):
         yield GenericVector(self, "reserved", 11, UInt16, "word")
     
 class Instrument(FieldSet):
-    # For some reason, does not work
-##    def __init__(self, parent, name):
-##        FieldSet.__init__(self, parent, name)
-##        self._size = 8*self["size"].value
+    # TODO Be more lazy, check sample sizes:
+    # for header in self.array("sample_header"): size += header["length"].value
+    def __init__(self, parent, name):
+        FieldSet.__init__(self, parent, name)
+
+        if self["samples"].value == 0:
+            self._size = 8*self["size"].value
+
+        self.info(self.createDescription())
+
+    # Seems to fix things...
+    def fixInstrumentHeader(self):
+        size = self["size"].value - self.current_size//8
+        if size > 0:
+            yield RawBytes(self, "unknown_data", size)
 
     def createFields(self):
         yield UInt32(self, "size")
@@ -93,12 +104,13 @@ class Instrument(FieldSet):
         yield UInt8(self, "type")
         yield UInt16(self, "samples")
         num = self["samples"].value
-        self.info("Instrument '%s': %i samples, %i bytes" % \
-                  (self["name"].display, self["samples"].value, self["size"].value))
-
+        self.info(self.createDescription())
 
         if num > 0:
             yield InstrumentSecondHeader(self, "second_header")
+
+            for field in self.fixInstrumentHeader():
+                yield field
 
             # This part probably wrong
             sample_size = [ ]
@@ -111,16 +123,12 @@ class Instrument(FieldSet):
                 if size > 0:
                     yield RawBytes(self, "sample_data[]", size, "Deltas")
         else:
-            # yield UInt32(self, "empty_marker", r"(\0\0\0")
-            pass
-
-        # Seems to fix things...
-        size = self["size"].value - self.current_size//8
-        if size > 0:
-            yield RawBytes(self, "unknown_data", size)
+            for field in self.fixInstrumentHeader():
+                yield field
 
     def createDescription(self):
-        return "%s, %u samples" % (self["name"].display, self["samples"].value)
+        return "Instrument '%s': %i samples, header %i bytes" % \
+               (self["name"].display, self["samples"].value, self["size"].value)
 
 VOLUME_NAME = [ "Volume slide down", "Volume slide up", "Fine volume slide down",
                 "Fine volume slide up", "Set vibrato speed", "Vibrato",
