@@ -161,25 +161,6 @@ class PartitionHeader(FieldSet):
             desc += "(unused)"
         return desc
 
-class Partition(FieldSet):
-    def __init__(self, parent, name, header, **kw):
-        FieldSet.__init__(self, parent, name, **kw)
-        self.header = header
-        self.is_extended = header["system"].value == 0x05
-        if self.is_extended:
-            header = self["mbr/header[0]"]
-        blocks = header["size"].value
-        self._size = BLOCK_SIZE * blocks * 8
-        self._description = "Partition: %s (%s)" % \
-            (header["system"].display, humanFilesize(self._size/8))
-
-    def createFields(self):
-        if self.is_extended:
-            yield MasterBootRecord(self, "mbr")
-
-        size = (self._size - self.current_size)/8
-        if 0 < size:
-            yield RawBytes(self, "content", size)
 
 class MasterBootRecord(StaticFieldSet):
     format = (
@@ -192,10 +173,41 @@ class MasterBootRecord(StaticFieldSet):
     )
 
     def _getPartitions(self):
-        return [ self[index] for index in xrange(1,5) ]
+        return ( self[index] for index in xrange(1,5) )
     headers = property(_getPartitions)
 
-class MSDos_HardDrive(Parser):
+
+class Partition(FieldSet):
+    def createFields(self):
+        mbr = MasterBootRecord(self, "mbr")
+        yield mbr
+
+        # No error if we only want to analyse a backup of a mbr
+        if self.eof:
+            return
+
+        for start, index, header in sorted((hdr["LBA"].value, index, hdr)
+                for index, hdr in enumerate(mbr.headers) if hdr.isUsed()):
+            # Seek to the beginning of the partition
+            padding = self.seekByte(start * BLOCK_SIZE, "padding[]")
+            if padding:
+                yield padding
+
+            # Content of the partition
+            name = "partition[%u]" % index
+            size = BLOCK_SIZE * header["size"].value
+            desc = header["system"].display
+            if header["system"].value == 5:
+                yield Partition(self, name, desc, size * 8)
+            else:
+                yield RawBytes(self, name, size, desc)
+
+        # Padding at the end
+        if self.current_size < self._size:
+            yield self.seekBit(self._size, "end")
+
+
+class MSDos_HardDrive(Parser, Partition):
     endian = LITTLE_ENDIAN
     MAGIC = "\x55\xAA"
     tags = {
@@ -216,37 +228,3 @@ class MSDos_HardDrive(Parser):
                 return "Wrong boot flag"
             used |= hdr.isUsed()
         return used or "No partition found"
-
-    def createFields(self):
-        mbr = MasterBootRecord(self, "mbr")
-        yield mbr
-
-        # Temporary hack until Hachoir handles more errors;
-        #  we may want to analyse a backup of a mbr.
-        if self._size == mbr.size:
-            return
-
-        # Read partitions
-        headers = [ (0, header) for header in mbr.headers ]
-        while 1 <= len(headers):
-            offset, header = headers[0]
-            del headers[0]
-            if header["system"].value != 0:
-                # Seek to the beginning of the partition
-                start = offset + BLOCK_SIZE * header["LBA"].value
-                padding = self.seekByte(start, "padding[]")
-                if padding:
-                    yield padding
-
-                # Content of the partition
-                partition = Partition(self, "partition[]", header)
-                yield partition
-                if partition.is_extended:
-                    for header in reversed(partition["mbr"].headers):
-                        if header["system"].value == 0x05:
-                            headers.insert(0, (63*512, header) ) # TODO: Why this magic value!? Offset of 1st extended partiton?
-
-        # Padding at the end
-        if self.current_size < self._size:
-            yield self.seekBit(self._size, "end")
-
