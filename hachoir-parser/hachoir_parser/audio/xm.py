@@ -12,7 +12,7 @@ Creation: 8th February 2007
 from hachoir_parser import Parser
 from hachoir_core.field import (StaticFieldSet, FieldSet,
     Bit, RawBits, Bits,
-    UInt32, UInt16, UInt8, Float32, Enum,
+    UInt32, UInt16, UInt8, Int8, Float32, Enum,
     RawBytes, String, GenericVector, ParserError)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_core.text_handler import humanFilesize, hexadecimal
@@ -20,6 +20,7 @@ from hachoir_core.text_handler import humanFilesize, hexadecimal
 def parseSigned(val):
     return "%i" % (val.value-128)
 
+MAX_ENVPOINTS = 32
 SAMPLE_LOOP_MODE = [ "No loop", "Forward loop", "Ping-pong loop", "Undef" ]
 
 class SampleType(FieldSet):
@@ -297,7 +298,7 @@ class Command(FieldSet):
     static_size = 32*8
     def createFields(self):
         start = self.absolute_address
-        size = self.stream.searchBytesLength("z", True, start)
+        size = self.stream.searchBytesLength("\0", False, start)
         if size > 0:
             self.info("Command: %s" % self.stream.readBytes(start, size))
             yield String(self, "command", size, strip='\0')
@@ -313,7 +314,7 @@ class MidiZXXExt(FieldSet):
     static_size = 128*32*8
     def createFields(self):
         for idx in xrange(128):
-            yield Comamnd(self, "command[]")
+            yield Command(self, "command[]")
 
 def parseMidiConfig(s):
     yield MidiOut(s, "midi_out")
@@ -359,9 +360,9 @@ class XPlugData(FieldSet):
         yield UInt32(self, "size")
         while not self.eof:
             yield UInt32(self, "marker")
-            if marker == 'DWRT':
+            if self["marker"].value == 'DWRT':
                 yield Float32(self, "dry_ratio")
-            elif marker == 'PORG':
+            elif self["marker"].value == 'PORG':
                 yield UInt32(self, "default_program")
         
 def parsePlugin(s):
@@ -377,63 +378,123 @@ def parsePlugin(s):
     if size > 0 and size < s.current_size + s._size:
         yield XPlugData(s, "xplug_data")
 
-EXTENSION_NAMES = {
+# Format: "XXXX": (type, count, name)
+EXTENSIONS = {
+    # WriteInstrumentHeaderStruct@Sndfile.cpp
     "XTPM": {
-         "..RV": "Reverb ?",
-         ".PiM": "?",
-         "..CM": "?",
-         "..PM": "?",
-         "..BM": "?",
-         "...P": "?",
-         "..VG": "?",
-         "..OF": "?",
-         "...R": "?",
-                    "..SC": "?",
-         "..SR": "?",
-         "..MF": "?",
-         "..[K": "Keyboard mapping",
+         "..Fd": (UInt32, 1, "Flags"),
+         "..OF": (UInt32, 1, "Fade out"),
+         "..VG": (UInt32, 1, "Global Volume"),
+         "...P": (UInt32, 1, "Paning"),
+         "..EV": (UInt32, 1, "Volument Enveloppe"),
+         "..EP": (UInt32, 1, "Panning Envelopped"),
+         ".EiP": (UInt32, 1, "Pitch envelopped"),
+         ".SLV": (UInt8, 1, "Volume Loop Start"),
+         ".ELV": (UInt8, 1, "Volume Loop End"),
+         ".BSV": (UInt8, 1, "Volume Sustain Begin"),
+         ".ESV": (UInt8, 1, "Volume Sustain End"),
+         ".SLP": (UInt8, 1, "Panning Loop Start"),
+         ".ELP": (UInt8, 1, "Panning Loop End"),
+         ".BSP": (UInt8, 1, "Panning Substain Begin"),
+         ".ESP": (UInt8, 1, "Padding Substain End"),
+         "SLiP": (UInt8, 1, "Pitch Loop Start"),
+         "ELiP": (UInt8, 1, "Pitch Loop End"),
+         "BSiP": (UInt8, 1, "Pitch Substain Begin"),
+         "ESiP": (UInt8, 1, "Pitch Substain End"),
+         ".ANN": (UInt8, 1, "NNA"),
+         ".TCD": (UInt8, 1, "DCT"),
+         ".AND": (UInt8, 1, "DNA"),
+         "..SP": (UInt8, 1, "Pannning Swing"),
+         "..SV": (UInt8, 1, "Volume Swing"),
+         ".CFI": (UInt8, 1, "IFC"),
+         ".RFI": (UInt8, 1, "IFR"),
+         "..BM": (UInt32, 1, "Midi Bank"),
+         "..PM": (UInt8, 1, "Midi Program"),
+         "..CM": (UInt8, 1, "Midi Channel"),
+         ".KDM": (UInt8, 1, "Midi Drum Key"),
+         ".SPP": (Int8, 1, "PPS"),
+         ".CPP": (UInt8, 1, "PPC"),
+         ".[PV": (UInt32, MAX_ENVPOINTS, "Volume Points"),
+         ".[PP": (UInt32, MAX_ENVPOINTS, "Panning Points"),
+         "[PiP": (UInt32, MAX_ENVPOINTS, "Pitch Points"),
+         ".[EV": (UInt8, MAX_ENVPOINTS, "Volume Enveloppe"),
+         ".[EP": (UInt8, MAX_ENVPOINTS, "Panning Enveloppe"),
+         "[EiP": (UInt8, MAX_ENVPOINTS, "Pitch Enveloppe"),
+         ".[MN": (UInt8, 128, "Note Mapping"),
+         "..[K": (UInt32, 128, "Keyboard"),
+         "..[n": (String, 32, "Name"),
+         ".[nf": (String, 12, "Filename"),
+         ".PiM": (UInt8, 1, "MixPlug"),
+         "..RV": (UInt16, 1, "Volume ramping"),
+         "...R": (UInt16, 1, "Resampling"),
+         "..SC": (UInt8, 1, "Cut Swing"),
+         "..SR": (UInt8, 1, "Res Swing"),
+         "..MF": (UInt8, 1, "Filter Mode"),
     },
+
+    # See after "CODE tag dictionnary", same place, elements with [EXT]
     "STPM": {
-         "..TD": "Default tempo",
-         ".BPR": "Rows per beat",
-         ".MPR": "Rows per measure",
-         "..MT": "Tempo mode",
-         ".MMP": "Plugin Mix mode",
-         ".VWC": "CreatedWith version",
-         "VWSL": "LastSavedWith version",
-         ".APS": "Song Pre-amplification",
-         "VTSV": "VSTi volume",
-         ".VGD": "Default global volume",
-         "...C": "?"
+         "...C": (UInt32, 1, "Channels"),
+         ".VWC": (None, 0, "CreatedWith version"),
+         ".VGD": (None, 0, "Default global volume"),
+         "..TD": (None, 0, "Default tempo"),
+         "HIBE": (None, 0, "Embedded instrument header"),
+         "VWSL": (None, 0, "LastSavedWith version"),
+         ".MMP": (None, 0, "Plugin Mix mode"),
+         ".BPR": (None, 0, "Rows per beat"),
+         ".MPR": (None, 0, "Rows per measure"),
+         "@PES": (None, 0, "Chunk separaror"),
+         ".APS": (None, 0, "Song Pre-amplification"),
+         "..MT": (None, 0, "Tempo mode"),
+         "VTSV": (None, 0, "VSTi volume"),
     }
 }
 
 class MPField(FieldSet):
-    def __init__(self, parent, name, field_names, desc=None):
+    def __init__(self, parent, name, ext, desc=None):
         FieldSet.__init__(self, parent, name, desc)
-        self.field_names = field_names
-        self.info("Data size: %u" % self["data_size"].value)
+        self.ext = ext
+        self.info(self.createDescription())
         self._size = (6+self["data_size"].value)*8
+
     def createFields(self):
-        yield Enum(String(self, "code", 4), self.field_names)
-        self.info("Code: '%s'" % self["code"].value)
+        # Identify tag
+        code = self.stream.readBytes(self.absolute_address, 4)
+        Type, Count, Comment = RawBytes, 1, "Unknown tag"
+        if code in self.ext:
+            Type, Count, Comment = self.ext[code]
+
+        # Header
+        yield String(self, "code", 4, Comment)
         yield UInt16(self, "data_size")
-        size = self["data_size"].value
-        if size == 4:
-            yield UInt32(self, "value")
-        elif size > 0:
-            yield RawBytes(self, "data[]", size)
+
+        # Data
+        if Type == None:
+            size = self["data_size"].value
+            if size > 0:
+                yield RawBytes(self, "data", size)
+        elif Type == String or Type == RawBytes:
+            yield Type(self, "value", Count)
+        else:
+            if Count > 1:
+                yield GenericVector(self, "values", Count, Type, "item")
+            else:
+                yield Type(self, "value")
+
+    def createDescription(self):
+        return "Element '%s', size %i" % \
+               (self["code"]._description, self["data_size"].value)
 
 def parseFields(s):
     # Determine field names
-    field_names = EXTENSION_NAMES[s["block_type"].value]
-    if field_names == None:
-        raise ParserError("Unknown parent '%s'" % name)
+    ext = EXTENSIONS[s["block_type"].value]
+    if ext == None:
+        raise ParserError("Unknown parent '%s'" % s["block_type"].value)
 
     # Parse fields
     addr = s.absolute_address + s.current_size
-    while not s.eof and s.stream.readBytes(addr, 4) in field_names:
-        field = MPField(s, "field[]", field_names)
+    while not s.eof and s.stream.readBytes(addr, 4) in ext:
+        field = MPField(s, "field[]", ext)
         yield field
         addr += field._size
 
