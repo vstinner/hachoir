@@ -280,6 +280,8 @@ class Block(FieldSet):
         else:
             self.info("Processing as unknown block block of type %u" % type)
 
+        self._size = self["block_size"].value*8
+
     def createFields(self):
         yield UInt16(self, "crc16", "Block CRC16", text_handler=hexadecimal)
         yield UInt8(self, "block_type", "Block type", text_handler=hexadecimal)
