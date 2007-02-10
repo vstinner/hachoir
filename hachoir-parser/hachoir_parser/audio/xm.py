@@ -82,30 +82,42 @@ class InstrumentSecondHeader(FieldSet):
         yield GenericVector(self, "reserved", 11, UInt16, "word")
     
 class Instrument(FieldSet):
+    # For some reason, does not work
+##    def __init__(self, parent, name):
+##        FieldSet.__init__(self, parent, name)
+##        self._size = 8*self["size"].value
+
     def createFields(self):
-        yield UInt32(self, "size", text_handler=humanFilesize)
+        yield UInt32(self, "size")
         yield String(self, "name", 22, charset="ASCII", strip=" \0")
         yield UInt8(self, "type")
         yield UInt16(self, "samples")
         num = self["samples"].value
-        self.info("Instrument '%s' has %i samples" % (self["name"].display, self["samples"].value))
-        # ValueError: generator already executing
-        if num == 1:
-            yield InstrumentSecondHeader(self, "second_header")
-            yield SampleHeader(self, "sample_header")
-            size = self["sample_header/length"].value
-            if size > 0:
-                yield RawBytes(self, "sample_data", size, r"Deltas")
-        if num > 1:
+        self.info("Instrument '%s': %i samples, %i bytes" % \
+                  (self["name"].display, self["samples"].value, self["size"].value))
+
+
+        if num > 0:
             yield InstrumentSecondHeader(self, "second_header")
 
+            # This part probably wrong
+            sample_size = [ ]
             for idx in xrange(num):
-                yield SampleHeader(self, "sample_header[]")
+                sample = SampleHeader(self, "sample_header[]")
+                yield sample
+                sample_size.append(sample["length"].value)
                 
-            for header in self.array("sample_header"):
-                size = header["length"].value
+            for size in sample_size:
                 if size > 0:
                     yield RawBytes(self, "sample_data[]", size, "Deltas")
+        else:
+            # yield UInt32(self, "empty_marker", r"(\0\0\0")
+            pass
+
+        # Seems to fix things...
+        size = self["size"].value - self.current_size//8
+        if size > 0:
+            yield RawBytes(self, "unknown_data", size)
 
     def createDescription(self):
         return "%s, %u samples" % (self["name"].display, self["samples"].value)
@@ -165,7 +177,9 @@ EFFECT_E_NAME = [ "Unknown", "Fine porta up", "Fine porta down",
 
 class Effect(RawBits):
     def __init__(self, parent, name):
-        RawBits.__init__(self, parent, name, 8)
+        FieldSet.__init__(self, parent, name)
+        self._size = 8*self["size"].value
+
     def createValue(self):
         t = self.parent.stream.readBits(self.absolute_address, 8, LITTLE_ENDIAN)
         param = self.parent.stream.readBits(self.absolute_address+8, 8, LITTLE_ENDIAN)
