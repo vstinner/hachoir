@@ -82,13 +82,23 @@ class InstrumentSecondHeader(FieldSet):
         yield GenericVector(self, "reserved", 11, UInt16, "word")
     
 class Instrument(FieldSet):
-    # TODO Be more lazy, check sample sizes:
-    # for header in self.array("sample_header"): size += header["length"].value
     def __init__(self, parent, name):
         FieldSet.__init__(self, parent, name)
 
-        if self["samples"].value == 0:
-            self._size = 8*self["size"].value
+        addr = self.absolute_address
+        samples = self.parent.stream.readBits(addr+27*8, 16, LITTLE_ENDIAN)
+        # Seek to end of header (1st + 2nd part)
+        addr += 8*self.parent.stream.readBits(addr, 32, LITTLE_ENDIAN)
+
+        sample_size = 0
+        if samples > 0:
+            for idx in xrange(samples):
+                # Read the sample size from the header
+                sample_size += self.parent.stream.readBits(addr, 32, LITTLE_ENDIAN)
+                # Seek to next sample header
+                addr += SampleHeader.static_size
+
+        self._size = addr - self.absolute_address + 8*sample_size
 
         self.info(self.createDescription())
 
