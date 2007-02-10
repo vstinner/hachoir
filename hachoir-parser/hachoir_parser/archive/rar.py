@@ -87,14 +87,6 @@ def archiveHeader(s):
     yield NullBytes(s, "reserved[]", 2, "Reserved word")
     yield NullBytes(s, "reserved[]", 4, "Reserved dword")
 
-def archiveSubBlocks(s):
-    count = 0
-    if s["flags/has_comment"].value:
-        count += 1
-    if s["flags/is_protected"].value or s["flags/is_encrypted"].value:
-        count += 1
-    return count
-
 def commentHeader(s):
     yield UInt16(s, "total_size", "Comment header size + comment size", text_handler=humanFilesize)
     yield UInt16(s, "uncompressed_size", "Uncompressed comment size", text_handler=humanFilesize)
@@ -209,13 +201,6 @@ def fileBody(s):
     if size > 0:
         yield RawBytes(s, "compressed_data", size, "File compressed data")
 
-def fileSubBlocks(s):
-    count = 0
-    if s["flags/has_comment"].value:  count += 1
-    if s["flags/is_encrypted"].value: count += 1
-    if s["/archive_start/flags/is_protected"].value: count += 1
-    return count
-
 def fileDescription(s):
     return "File entry: %s (%s)" % \
            (s["filename"].display, s["compressed_size"].display)
@@ -249,26 +234,24 @@ class BlockFlags(StaticFieldSet):
 class Block(FieldSet):
     BLOCK_INFO = {
         # None means 'use default function'
-        0x72: ("marker", "Archive header", None, None, None, None),
-        0x73: ("archive_start", "Archive info", archiveFlags, archiveHeader,
-               None, archiveSubBlocks),
-        0x74: ("file[]", fileDescription, fileFlags, fileHeader, fileBody,
-               fileSubBlocks),
-        0x75: ("comment[]", "Stray comment", None, commentHeader, commentBody, None),
-        0x76: ("av_info[]", "Extra information", None, avInfoHeader, avInfoBody, None),
-        0x77: ("sub_block[]", "Stray subblock", None, newSubHeader, fileBody, None),
-        0x78: ("recovery[]", "Recovery block", None, recoveryHeader, None, None),
-        0x79: ("signature", "Signature block", None, signatureHeader, None, None),
+        0x72: ("marker", "Archive header", None, None, None),
+        0x73: ("archive_start", "Archive info", archiveFlags, archiveHeader, None),
+        0x74: ("file[]", fileDescription, fileFlags, fileHeader, fileBody),
+        0x75: ("comment[]", "Stray comment", None, commentHeader, commentBody),
+        0x76: ("av_info[]", "Extra information", None, avInfoHeader, avInfoBody),
+        0x77: ("sub_block[]", "Stray subblock", None, newSubHeader, fileBody),
+        0x78: ("recovery[]", "Recovery block", None, recoveryHeader, None),
+        0x79: ("signature", "Signature block", None, signatureHeader, None),
         0x7A: ("new_sub_block[]", "Stray new-format subblock", fileFlags,
-               newSubHeader, fileBody, None),
-        0x7B: ("archive_end", "Archive end block", endFlags, None, None, None),
+               newSubHeader, fileBody),
+        0x7B: ("archive_end", "Archive end block", endFlags, None, None),
     }
 
     def __init__(self, parent, name):
         FieldSet.__init__(self, parent, name)
         t = self["block_type"].value
         if t in self.BLOCK_INFO:
-            self._name, desc, parseFlags, parseHeader, parseBody, countSubBlocks = self.BLOCK_INFO[t]
+            self._name, desc, parseFlags, parseHeader, parseBody = self.BLOCK_INFO[t]
             if callable(desc):
                 self.createDescription = lambda: desc(self)
             elif desc:
@@ -276,12 +259,18 @@ class Block(FieldSet):
             if parseFlags    : self.parseFlags     = lambda: parseFlags(self)
             if parseHeader   : self.parseHeader    = lambda: parseHeader(self)
             if parseBody     : self.parseBody      = lambda: parseBody(self)
-            if countSubBlocks: self.countSubBlocks = lambda: countSubBlocks(self)
-
-            #if t == 0x7A:
-            #    self._size = 
         else:
             self.info("Processing as unknown block block of type %u" % type)
+
+        self._size = 8*self["block_size"].value
+        if t == 0x74 or t == 0x7A:
+            self._size += 8*self["compressed_size"].value
+            flags = self["flags"]
+            if "is_large" in self["flags"] and self["flags/is_large"].value:
+                self._size += 8*self["large_size"].value
+        elif "has_added_size" in self:
+            self._size += 8*self["added_size"].value
+        # TODO: check if any other member is needed here
 
     def createFields(self):
         yield UInt16(self, "crc16", "Block CRC16", text_handler=hexadecimal)
@@ -307,11 +296,6 @@ class Block(FieldSet):
         for field in self.parseBody():
             yield field
 
-        # Get sub blocks, if any
-        count = self.countSubBlocks()
-        for i in xrange(count):
-            yield Block(self, "sub_block[]")
-
     def createDescription(self):
         return "Block entry: %s" % self["type"].display
 
@@ -333,9 +317,6 @@ class Block(FieldSet):
             size += self["added_size"].value
         if size > 0:
             yield RawBytes(self, "body", size, "Body data")
-
-    def countSubBlocks(self):
-        return 0
 
 class RarFile(Parser):
     MAGIC = "Rar!\x1A\x07\x00"
