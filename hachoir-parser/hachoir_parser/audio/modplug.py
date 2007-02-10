@@ -8,13 +8,11 @@ Author: Christophe GISQUET <christophe.gisquet@free.fr>
 Creation: 10th February 2007
 """
 
-from hachoir_parser import Parser
-from hachoir_core.field import (StaticFieldSet, FieldSet,
-    Bit, RawBits, Bits,
-    UInt32, UInt16, UInt8, Int8, Float32, Enum,
+from hachoir_core.field import (FieldSet,
+    UInt32, UInt16, UInt8, Int8, Float32,
     RawBytes, String, GenericVector, ParserError)
-from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
-from hachoir_core.text_handler import humanFilesize, hexadecimal
+from hachoir_core.endian import LITTLE_ENDIAN
+from hachoir_core.text_handler import hexadecimal
 
 MAX_ENVPOINTS = 32
 
