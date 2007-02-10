@@ -61,9 +61,9 @@ def formatRARVersion(field):
     """
     return "%u.%u" % divmod(field.value, 10)
 
-def commonFlags(self):
-    yield Bit(self, "has_added_size", "Additional field indicating additional size")
-    yield Bit(self, "is_ignorable", "Old versions of RAR should ignore this block when copying data")
+def commonFlags(s):
+    yield Bit(s, "has_added_size", "Additional field indicating additional size")
+    yield Bit(s, "is_ignorable", "Old versions of RAR should ignore this block when copying data")
 
 class ArchiveFlags(StaticFieldSet):
     format = (
@@ -80,56 +80,56 @@ class ArchiveFlags(StaticFieldSet):
         (NullBits, "internal", 6, "Reserved for 'internal use'")
     )
 
-def archiveFlags(self):
-    yield ArchiveFlags(self, "flags", "Archiver block flags")
+def archiveFlags(s):
+    yield ArchiveFlags(s, "flags", "Archiver block flags")
 
-def archiveHeader(self):
-    yield NullBytes(self, "reserved[]", 2, "Reserved word")
-    yield NullBytes(self, "reserved[]", 4, "Reserved dword")
+def archiveHeader(s):
+    yield NullBytes(s, "reserved[]", 2, "Reserved word")
+    yield NullBytes(s, "reserved[]", 4, "Reserved dword")
 
-def archiveSubBlocks(self):
+def archiveSubBlocks(s):
     count = 0
-    if self["flags/has_comment"].value:
+    if s["flags/has_comment"].value:
         count += 1
-    if self["flags/is_protected"].value or self["flags/is_encrypted"].value:
+    if s["flags/is_protected"].value or s["flags/is_encrypted"].value:
         count += 1
     return count
 
-def commentHeader(self):
-    yield UInt16(self, "total_size", "Comment header size + comment size", text_handler=humanFilesize)
-    yield UInt16(self, "uncompressed_size", "Uncompressed comment size", text_handler=humanFilesize)
-    yield UInt8(self, "required_version", "RAR version needed to extract comment")
-    yield UInt8(self, "packing_method", "Comment packing method")
-    yield UInt16(self, "comment_crc16", "Comment CRC")
+def commentHeader(s):
+    yield UInt16(s, "total_size", "Comment header size + comment size", text_handler=humanFilesize)
+    yield UInt16(s, "uncompressed_size", "Uncompressed comment size", text_handler=humanFilesize)
+    yield UInt8(s, "required_version", "RAR version needed to extract comment")
+    yield UInt8(s, "packing_method", "Comment packing method")
+    yield UInt16(s, "comment_crc16", "Comment CRC")
 
-def commentBody(self):
-    size = self["total_size"].value - self.current_size
+def commentBody(s):
+    size = s["total_size"].value - s.current_size
     if size > 0:
-        yield RawBytes(self, "comment_data", size, "Compressed comment data")
+        yield RawBytes(s, "comment_data", size, "Compressed comment data")
 
-def signatureHeader(self):
-    yield TimeDateMSDOS32(self, "creation_time")
-    yield UInt16(self, "arc_name_size", text_handler=humanFilesize)
-    yield UInt16(self, "user_name_size", text_handler=humanFilesize)
+def signatureHeader(s):
+    yield TimeDateMSDOS32(s, "creation_time")
+    yield UInt16(s, "arc_name_size", text_handler=humanFilesize)
+    yield UInt16(s, "user_name_size", text_handler=humanFilesize)
 
-def recoveryHeader(self):
-    yield UInt32(self, "total_size", text_handler=humanFilesize)
-    yield UInt8(self, "version", text_handler=hexadecimal)
-    yield UInt16(self, "rec_sectors")
-    yield UInt32(self, "total_blocks")
-    yield RawBytes(self, "mark", 8)
+def recoveryHeader(s):
+    yield UInt32(s, "total_size", text_handler=humanFilesize)
+    yield UInt8(s, "version", text_handler=hexadecimal)
+    yield UInt16(s, "rec_sectors")
+    yield UInt32(s, "total_blocks")
+    yield RawBytes(s, "mark", 8)
 
-def avInfoHeader(self):
-    yield UInt16(self, "total_size", "Total block size", text_handler=humanFilesize)
-    yield UInt8(self, "version", "Version needed to decompress", handler=hexadecimal)
-    yield UInt8(self, "method", "Compression method", handler=hexadecimal)
-    yield UInt8(self, "av_version", "Version for AV", handler=hexadecimal)
-    yield UInt32(self, "av_crc", "AV info CRC32", handler=hexadecimal)
+def avInfoHeader(s):
+    yield UInt16(s, "total_size", "Total block size", text_handler=humanFilesize)
+    yield UInt8(s, "version", "Version needed to decompress", handler=hexadecimal)
+    yield UInt8(s, "method", "Compression method", handler=hexadecimal)
+    yield UInt8(s, "av_version", "Version for AV", handler=hexadecimal)
+    yield UInt32(s, "av_crc", "AV info CRC32", handler=hexadecimal)
 
-def avInfoBody(self):
-    size = self["total_size"].value - self.current_size
+def avInfoBody(s):
+    size = s["total_size"].value - s.current_size
     if size > 0:
-        yield RawBytes(self, "av_info_data", size, "AV info")
+        yield RawBytes(s, "av_info_data", size, "AV info")
 
 class FileFlags(FieldSet):
     static_size = 16
@@ -150,8 +150,8 @@ class FileFlags(FieldSet):
         yield Bit(self, "has_ext_time", "Extra time ??")
         yield Bit(self, "has_ext_flags", "Extra flag ??")
 
-def fileFlags(self):
-    yield FileFlags(self, "flags", "File block flags")
+def fileFlags(s):
+    yield FileFlags(s, "flags", "File block flags")
 
 class ExtTime(FieldSet):
     def createFields(self):
@@ -165,63 +165,63 @@ class ExtTime(FieldSet):
                 if rmode & 3:
                     yield RawBytes(self, "remainder[]", rmode & 3, "Time remainder")
 
-def specialHeader(self, is_file):
-    yield UInt32(self, "compressed_size", "Compressed size (bytes)", text_handler=humanFilesize)
-    yield UInt32(self, "uncompressed_size", "Uncompressed size (bytes)", text_handler=humanFilesize)
-    yield Enum(UInt8(self, "host_os", "Operating system used for archiving"), OS_NAME)
-    yield UInt32(self, "crc32", "File CRC32", text_handler=hexadecimal)
-    yield TimeDateMSDOS32(self, "ftime", "Date and time (MS DOS format)")
-    yield UInt8(self, "version", "RAR version needed to extract file", text_handler=formatRARVersion)
-    yield Enum(UInt8(self, "method", "Packing method"), COMPRESSION_NAME)
-    yield UInt16(self, "filename_length", "File name size", text_handler=humanFilesize)
-    if self["host_os"].value in (OS_MSDOS, OS_WIN32):
-        yield MSDOSFileAttr32(self, "file_attr", "File attributes")
+def specialHeader(s, is_file):
+    yield UInt32(s, "compressed_size", "Compressed size (bytes)", text_handler=humanFilesize)
+    yield UInt32(s, "uncompressed_size", "Uncompressed size (bytes)", text_handler=humanFilesize)
+    yield Enum(UInt8(s, "host_os", "Operating system used for archiving"), OS_NAME)
+    yield UInt32(s, "crc32", "File CRC32", text_handler=hexadecimal)
+    yield TimeDateMSDOS32(s, "ftime", "Date and time (MS DOS format)")
+    yield UInt8(s, "version", "RAR version needed to extract file", text_handler=formatRARVersion)
+    yield Enum(UInt8(s, "method", "Packing method"), COMPRESSION_NAME)
+    yield UInt16(s, "filename_length", "File name size", text_handler=humanFilesize)
+    if s["host_os"].value in (OS_MSDOS, OS_WIN32):
+        yield MSDOSFileAttr32(s, "file_attr", "File attributes")
     else:
-        yield UInt32(self, "file_attr", "File attributes", text_handler=hexadecimal)
+        yield UInt32(s, "file_attr", "File attributes", text_handler=hexadecimal)
 
     # Start additional field from unrar
-    if self["flags/is_large"].value:
-        yield UInt64(self, "large_size", "Extended 64bits filesize", text_handler=humanFilesize)
+    if s["flags/is_large"].value:
+        yield UInt64(s, "large_size", "Extended 64bits filesize", text_handler=humanFilesize)
 
     # End additional field
-    size = self["filename_length"].value
+    size = s["filename_length"].value
     if size > 0:
-        if self["flags/is_unicode"].value:
+        if s["flags/is_unicode"].value:
             charset = "UTF-8"
         else:
             charset = "ISO-8859-15"
-        yield String(self, "filename", size, "Filename", charset=charset)
+        yield String(s, "filename", size, "Filename", charset=charset)
     # Start additional fields from unrar - file only
     if is_file:
-        if self["flags/has_salt"].value:
-            yield UInt8(self, "salt", "Salt", text_handler=hexadecimal)
-        if self["flags/has_ext_time"].value:
-            yield ExtTime(self, "extra_time", "Extra time info")
+        if s["flags/has_salt"].value:
+            yield UInt8(s, "salt", "Salt", text_handler=hexadecimal)
+        if s["flags/has_ext_time"].value:
+            yield ExtTime(s, "extra_time", "Extra time info")
 
-def fileHeader(self):
-    return specialHeader(self, True)
+def fileHeader(s):
+    return specialHeader(s, True)
 
-def fileBody(self):
+def fileBody(s):
     # File compressed data
-    size = self["compressed_size"].value
-    if self["flags/is_large"].value:
-        size += self["large_size"].value
+    size = s["compressed_size"].value
+    if s["flags/is_large"].value:
+        size += s["large_size"].value
     if size > 0:
-        yield RawBytes(self, "compressed_data", size, "File compressed data")
+        yield RawBytes(s, "compressed_data", size, "File compressed data")
 
-def fileSubBlocks(self):
+def fileSubBlocks(s):
     count = 0
-    if self["flags/has_comment"].value:  count += 1
-    if self["flags/is_encrypted"].value: count += 1
-    if self["/archive_start/flags/is_protected"].value: count += 1
+    if s["flags/has_comment"].value:  count += 1
+    if s["flags/is_encrypted"].value: count += 1
+    if s["/archive_start/flags/is_protected"].value: count += 1
     return count
 
-def fileDescription(self):
+def fileDescription(s):
     return "File entry: %s (%s)" % \
-           (self["filename"].display, self["compressed_size"].display)
+           (s["filename"].display, s["compressed_size"].display)
 
-def newSubHeader(self):
-    return specialHeader(self, False)
+def newSubHeader(s):
+    return specialHeader(s, False)
 
 class EndFlags(StaticFieldSet):
     format = (
@@ -235,8 +235,8 @@ class EndFlags(StaticFieldSet):
         (Bits, "unused[]", 6),
     )
 
-def endFlags(self):
-    yield EndFlags(self, "flags", "End block flags")
+def endFlags(s):
+    yield EndFlags(s, "flags", "End block flags")
 
 class BlockFlags(StaticFieldSet):
     format = (
@@ -266,9 +266,9 @@ class Block(FieldSet):
 
     def __init__(self, parent, name):
         FieldSet.__init__(self, parent, name)
-        type = self["block_type"].value
-        if type in self.BLOCK_INFO:
-            self._name, desc, parseFlags, parseHeader, parseBody, countSubBlocks = self.BLOCK_INFO[type]
+        t = self["block_type"].value
+        if t in self.BLOCK_INFO:
+            self._name, desc, parseFlags, parseHeader, parseBody, countSubBlocks = self.BLOCK_INFO[t]
             if callable(desc):
                 self.createDescription = lambda: desc(self)
             elif desc:
@@ -277,10 +277,11 @@ class Block(FieldSet):
             if parseHeader   : self.parseHeader    = lambda: parseHeader(self)
             if parseBody     : self.parseBody      = lambda: parseBody(self)
             if countSubBlocks: self.countSubBlocks = lambda: countSubBlocks(self)
+
+            #if t == 0x7A:
+            #    self._size = 
         else:
             self.info("Processing as unknown block block of type %u" % type)
-
-        self._size = self["block_size"].value*8
 
     def createFields(self):
         yield UInt16(self, "crc16", "Block CRC16", text_handler=hexadecimal)
