@@ -175,11 +175,13 @@ def checkTAR(parser): return (
 
 def checkRAR(parser): return (
     checkValue(parser, "archive_start/crc16", 0x77E1),
+    checkValue(parser, "new_sub_block[0]/crc16", 0x2994),
     checkValue(parser, "file[0]/crc32", 0x4C6D13ED),
+    checkValue(parser, "new_sub_block[1]/crc32", 0x34528E23),
     checkValue(parser, "file[1]/filename", ".svn\prop-base\README.svn-base"),
-    checkValue(parser, "file[2]/new_sub_block[0]/crc32", 0x34528E23),
-    #End of archive, lots of work...
-    #checkValue(parser, "archive_end/crc16", 0x3DC4"),
+    checkValue(parser, "new_sub_block[1]/filename", u'"ACL"'),
+    #archive_end bad candidate for checking
+    checkValue(parser, "new_sub_block[362]/crc32", 0x6C84C95E),
 )
 
 def checkACE(parser): return (
