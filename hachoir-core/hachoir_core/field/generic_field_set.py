@@ -162,7 +162,7 @@ class GenericFieldSet(BasicFieldSet):
 
         # required for the msoffice parser
         if field._address != self._current_size:
-            self.warn("assertion failed at GenericFieldSet._addField; fixing field._address...")
+            self.warning("assertion failed at GenericFieldSet._addField; fixing field._address...")
             field._address = self._current_size
 
         # Compute field size and check that there is enough place for it

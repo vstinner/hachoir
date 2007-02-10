@@ -62,7 +62,7 @@ class Fragment(FieldSet):
         while self._first is None and self.readMoreFields(1):
             pass
         if self._first is None:
-            raise ParseError()
+            raise ParserError("first is None")
         return self
     first = property(lambda self: self._feedLinks()._first)
 
