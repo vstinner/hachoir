@@ -179,7 +179,7 @@ def checkRAR(parser): return (
     checkValue(parser, "file[0]/crc32", 0x4C6D13ED),
     checkValue(parser, "new_sub_block[1]/crc32", 0x34528E23),
     checkValue(parser, "file[1]/filename", ".svn\prop-base\README.svn-base"),
-    checkValue(parser, "new_sub_block[1]/filename", u'"ACL"'),
+    checkValue(parser, "new_sub_block[1]/filename", u'ACL'),
     #archive_end bad candidate for checking
     checkValue(parser, "new_sub_block[362]/crc32", 0x6C84C95E),
 )
