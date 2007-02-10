@@ -75,6 +75,7 @@ testcase_files = (
     (u"hachoir.org.sxw", 14781, "26ce99711c8c17a3c6bba299a3cfa68b"),
     (u"firstrun.rm", 75534, "5aa56f5de2723294136fadb90fc5b2ce"),
     (u"dell8.fat16", 113152, "bcef23dc13307ebd464562c6afbf01d3"),
+    (u"dontyou.xm", 150672, "ff20196d9f1be3fb4bdae0a952f244c9"),
 )
 
 def stringMD5(text):

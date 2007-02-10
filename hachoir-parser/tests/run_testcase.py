@@ -402,6 +402,17 @@ def checkDell8FAT16(parser): return (
     checkValue(parser, "/root[0]/entry[2]/size", 29690),
 )
 
+def checkXM(parser): return (
+    checkValue(parser, "/header/title", u"Dont you... voguemix"),
+    checkValue(parser, "/header/bpm", 128),
+    checkValue(parser, "/pattern[0]/data_size", 708),
+    checkValue(parser, "/pattern[20]/data_size", 1129),
+    checkValue(parser, "/instrument[3]/name", u"Vogue of Triton"),
+    checkValue(parser, "/instrument[4]/second_header/panning_points", 6),
+    checkValue(parser, "/instrument[20]/name", u"808-hi5.smp"),
+)
+    
+
 testcase_files = (
     (u"yellowdude.3ds", checkYellowdude),
     (u"logo-Kubuntu.png", checkLogoUbuntu),
@@ -448,6 +459,7 @@ testcase_files = (
     (u"georgia.cab", checkGeorgia),
     (u"debian-31r4-i386-binary-1.iso.torrent", checkDebianTorrent),
     (u"dell8.fat16", checkDell8FAT16),
+    (u"dontyou.xm", checkXM),
 )
 
 def checkFile(filename, check_parser):
