@@ -80,26 +80,27 @@ class InstrumentSecondHeader(FieldSet):
         yield UInt8(self, "vibrato_rate")
         yield UInt16(self, "volume_fadeout")
         yield GenericVector(self, "reserved", 11, UInt16, "word")
-    
+
+def createInstrumentContentSize(s, addr):
+    start = addr
+    samples = s.stream.readBits(addr+27*8, 16, LITTLE_ENDIAN)
+    # Seek to end of header (1st + 2nd part)
+    addr += 8*s.stream.readBits(addr, 32, LITTLE_ENDIAN)
+
+    sample_size = 0
+    if samples > 0:
+        for idx in xrange(samples):
+            # Read the sample size from the header
+            sample_size += s.stream.readBits(addr, 32, LITTLE_ENDIAN)
+            # Seek to next sample header
+            addr += SampleHeader.static_size
+
+    return addr - start + 8*sample_size
+
 class Instrument(FieldSet):
     def __init__(self, parent, name):
         FieldSet.__init__(self, parent, name)
-
-        addr = self.absolute_address
-        samples = self.parent.stream.readBits(addr+27*8, 16, LITTLE_ENDIAN)
-        # Seek to end of header (1st + 2nd part)
-        addr += 8*self.parent.stream.readBits(addr, 32, LITTLE_ENDIAN)
-
-        sample_size = 0
-        if samples > 0:
-            for idx in xrange(samples):
-                # Read the sample size from the header
-                sample_size += self.parent.stream.readBits(addr, 32, LITTLE_ENDIAN)
-                # Seek to next sample header
-                addr += SampleHeader.static_size
-
-        self._size = addr - self.absolute_address + 8*sample_size
-
+        self._size = createInstrumentContentSize(self, self.absolute_address)
         self.info(self.createDescription())
 
     # Seems to fix things...
@@ -268,10 +269,14 @@ class Row(FieldSet):
         for idx in xrange(self["/header/channels"].value):
             yield Note(self, "note[]")
 
+def createPatternContentSize(s, addr):
+    return 8*(s.stream.readBits(addr, 32, LITTLE_ENDIAN) +
+              s.stream.readBits(addr+7*8, 16, LITTLE_ENDIAN))
+
 class Pattern(FieldSet):
     def __init__(self, parent, name, desc=None):
         FieldSet.__init__(self, parent, name, desc)
-        self._size = 8*(self["data_size"].value + 9)
+        self._size = createPatternContentSize(self, self.absolute_address)
 
     def createFields(self):
         yield UInt32(self, "header_size", r"Header length (9)")
@@ -345,3 +350,26 @@ class XMFile(Parser):
         
     def createDescription(self):
         return self["header"].createDescription()
+
+    def createContentSize(self):
+        start = self.absolute_address
+        addr = start
+        patterns = self.stream.readBits(addr+70*8, 16, LITTLE_ENDIAN)
+        instr = self.stream.readBits(addr+72*8, 16, LITTLE_ENDIAN)
+        self.info("XM file has %u patterns and %u instruments" % \
+                  (patterns, instr))
+
+        # Get pattern sizes
+        addr += 336*8
+        for idx in xrange(patterns):
+            size = createPatternContentSize(self, addr)
+            addr += size
+            self.info("Pattern %u/%u: %uB" % (idx+1, patterns, size//8))
+
+        # Get instrument sizes
+        for idx in xrange(instr):
+            size = createInstrumentContentSize(self, addr)
+            addr += size
+            self.info("Instrument %u/%u: %uB" % (idx+1, instr, size//8))
+
+        return addr-start
