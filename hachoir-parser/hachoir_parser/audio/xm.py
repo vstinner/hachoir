@@ -360,7 +360,7 @@ class XMFile(Parser):
                   (patterns, instr))
 
         # Get pattern sizes
-        addr += 336*8
+        addr += Header.static_size
         for idx in xrange(patterns):
             size = createPatternContentSize(self, addr)
             addr += size
