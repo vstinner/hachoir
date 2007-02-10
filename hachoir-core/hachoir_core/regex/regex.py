@@ -24,6 +24,9 @@ TODO:
  - createString("__tax") | parse("__[12]") => group '__'
  - Make sure that all RegexXXX() classes are inmutable
  - Use singleton for dot, start and end
+
+See also CPAN Regexp::Assemble (Perl module):
+   http://search.cpan.org/~dland/Regexp-Assemble-0.28/Assemble.pm
 """
 
 import re
