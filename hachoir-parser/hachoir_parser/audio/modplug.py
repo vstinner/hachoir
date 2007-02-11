@@ -41,13 +41,13 @@ class Command(FieldSet):
 class MidiSFXExt(FieldSet):
     static_size = 16*32*8
     def createFields(self):
-        for idx in xrange(16):
+        for index in xrange(16):
             yield Command(self, "command[]")
 
 class MidiZXXExt(FieldSet):
     static_size = 128*32*8
     def createFields(self):
-        for idx in xrange(128):
+        for index in xrange(128):
             yield Command(self, "command[]")
 
 def parseMidiConfig(s):
@@ -66,7 +66,7 @@ def parseEQBands(s):
         yield GenericVector(s, "gains", size, UInt32, "band")
 
 class SoundMixPluginInfo(FieldSet):
-    static_size = (4+4+4+4+16+32+64)*8
+    static_size = 128*8
     def createFields(self):
         yield UInt32(self, "plugin_id1", text_handler=hexadecimal)
         yield UInt32(self, "plugin_id2", text_handler=hexadecimal)
@@ -104,12 +104,12 @@ def parsePlugin(s):
 
     # Check if VST setchunk present
     size = s.stream.readBits(s.absolute_address+s.current_size, 32, LITTLE_ENDIAN)
-    if size > 0 and size < s.current_size + s._size:
+    if 0 < size < s.current_size + s._size:
         yield ExtraData(s, "extra_data")
 
     # Check if XPlugData is present
     size = s.stream.readBits(s.absolute_address+s.current_size, 32, LITTLE_ENDIAN)
-    if size > 0 and size < s.current_size + s._size:
+    if 0 < size < s.current_size + s._size:
         yield XPlugData(s, "xplug_data")
 
 # Format: "XXXX": (type, count, name)
@@ -194,26 +194,27 @@ class MPField(FieldSet):
     def createFields(self):
         # Identify tag
         code = self.stream.readBytes(self.absolute_address, 4)
-        Type, Count, Comment = RawBytes, 1, "Unknown tag"
         if code in self.ext:
-            Type, Count, Comment = self.ext[code]
+            cls, count, comment = self.ext[code]
+        else:
+            cls, count, comment = RawBytes, 1, "Unknown tag"
 
         # Header
-        yield String(self, "code", 4, Comment)
+        yield String(self, "code", 4, comment)
         yield UInt16(self, "data_size")
 
         # Data
-        if Type == None:
+        if not cls:
             size = self["data_size"].value
             if size > 0:
                 yield RawBytes(self, "data", size)
-        elif Type == String or Type == RawBytes:
-            yield Type(self, "value", Count)
+        elif cls in (String, RawBytes):
+            yield cls(self, "value", count)
         else:
-            if Count > 1:
-                yield GenericVector(self, "values", Count, Type, "item")
+            if count > 1:
+                yield GenericVector(self, "values", count, cls, "item")
             else:
-                yield Type(self, "value")
+                yield cls(self, "value")
 
     def createDescription(self):
         return "Element '%s', size %i" % \
