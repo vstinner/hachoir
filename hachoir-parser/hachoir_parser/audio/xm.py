@@ -320,7 +320,7 @@ class Header(FieldSet):
 
 class XMModule(Parser):
     tags = {
-        "id": "fasttracke2",
+        "id": "fasttracker2",
         "category": "audio",
         "file_ext": ["xm", ],
         "mime": ('audio/xm', 'audio/x-xm', 'audio/module-xm', 'audio/mod', 'audio/x-mod', ),
