@@ -58,7 +58,7 @@ class StuffType(StaticFieldSet):
 
 # Unable to get static size of field type: GenericVector
 class InstrumentSecondHeader(FieldSet):
-    static_size = (263-29)*8
+    static_size = 234*8
     def createFields(self):
         yield UInt32(self, "sample_header_size")
         yield GenericVector(self, "notes", 96, UInt8, "sample")
@@ -139,7 +139,7 @@ class Instrument(FieldSet):
 
     def createDescription(self):
         return "Instrument '%s': %i samples, header %i bytes" % \
-               (self["name"].display, self["samples"].value, self["size"].value)
+               (self["name"].value, self["samples"].value, self["size"].value)
 
 VOLUME_NAME = [ "Volume slide down", "Volume slide up", "Fine volume slide down",
                 "Fine volume slide up", "Set vibrato speed", "Vibrato",
@@ -264,7 +264,6 @@ class Note(FieldSet):
 
 class Row(FieldSet):
     def createFields(self):
-        # Speed-up by removing "/header/channels" look-up ?
         for idx in xrange(self["/header/channels"].value):
             yield Note(self, "note[]")
 
@@ -316,7 +315,7 @@ class Header(FieldSet):
 
     def createDescription(self):
         return "'%s' by '%s'" % (
-            self["title"].display, self["tracker_name"].value)
+            self["title"].value, self["tracker_name"].value)
 
 class XMModule(Parser):
     tags = {
@@ -348,7 +347,7 @@ class XMModule(Parser):
             yield field
 
     def createDescription(self):
-        return self["header"].createDescription()
+        return self["header"].value
 
     def createContentSize(self):
         start = self.absolute_address
