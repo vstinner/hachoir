@@ -129,7 +129,7 @@ class Instrument(FieldSet):
                 sample = SampleHeader(self, "sample_header[]")
                 yield sample
                 sample_size.append(sample["length"].value)
-                
+
             for size in sample_size:
                 if size > 0:
                     yield RawBytes(self, "sample_data[]", size, "Deltas")
@@ -346,7 +346,7 @@ class XMModule(Parser):
         # Metadata added by ModPlug - can be discarded
         for field in ParseModplugMetadata(self):
             yield field
-        
+
     def createDescription(self):
         return self["header"].createDescription()
 
@@ -372,3 +372,4 @@ class XMModule(Parser):
             self.info("Instrument %u/%u: %uB" % (idx+1, instr, size//8))
 
         return addr-start
+

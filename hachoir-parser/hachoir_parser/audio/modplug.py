@@ -98,7 +98,7 @@ class XPlugData(FieldSet):
                 yield Float32(self, "dry_ratio")
             elif self["marker"].value == 'PORG':
                 yield UInt32(self, "default_program")
-        
+
 def parsePlugin(s):
     yield SoundMixPluginInfo(s, "info")
 
@@ -232,7 +232,7 @@ def parseFields(s):
         yield field
         addr += field._size
 
-    # Abort on unknown codes, 
+    # Abort on unknown codes
     s.info("End of extension '%s' when finding '%s'" %
            (s["block_type"].value, s.stream.readBytes(addr, 4)))
 
@@ -247,7 +247,7 @@ class ModplugBlock(FieldSet):
     def __init__(self, parent, name, desc=None):
         FieldSet.__init__(self, parent, name, desc)
         self.parseBlock = parsePlugin
-        
+
         t = self["block_type"].value
         self.has_size = False
         if t in self.BLOCK_INFO:
@@ -259,7 +259,7 @@ class ModplugBlock(FieldSet):
 
         if self.has_size:
             self._size = 8*(self["block_size"].value + 8)
-            
+
     def createFields(self):
         yield String(self, "block_type", 4)
         if self.has_size:
@@ -285,3 +285,4 @@ def ParseModplugMetadata(s):
     size = (s._size - s.absolute_address - s.current_size)//8
     if size > 0:
         yield RawBytes(s, "info", size)
+
