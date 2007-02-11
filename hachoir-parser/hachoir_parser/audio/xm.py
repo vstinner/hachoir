@@ -321,10 +321,10 @@ class XMModule(Parser):
     tags = {
         "id": "fasttracker2",
         "category": "audio",
-        "file_ext": ["xm", ],
-        "mime": ('audio/xm', 'audio/x-xm', 'audio/module-xm', 'audio/mod', 'audio/x-mod', ),
+        "file_ext": ("xm",),
+        "mime": ('audio/xm', 'audio/x-xm', 'audio/module-xm', 'audio/mod', 'audio/x-mod'),
         "magic": ((Header.MAGIC, 0),),
-        "min_size": (336+29)*8, # Header + 1 empty instrument
+        "min_size": Header.static_size +29*8, # Header + 1 empty instrument
         "description": "FastTracker2 module"
     }
     endian = LITTLE_ENDIAN
@@ -346,29 +346,19 @@ class XMModule(Parser):
         for field in ParseModplugMetadata(self):
             yield field
 
-    def createDescription(self):
-        return self["header"].value
-
     def createContentSize(self):
-        start = self.absolute_address
-        addr = start
-        patterns = self.stream.readBits(addr+70*8, 16, LITTLE_ENDIAN)
-        instr = self.stream.readBits(addr+72*8, 16, LITTLE_ENDIAN)
-        self.info("XM file has %u patterns and %u instruments" % \
-                  (patterns, instr))
+        # Header size
+        size = Header.static_size
 
-        # Get pattern sizes
-        addr += Header.static_size
-        for index in xrange(patterns):
-            size = createPatternContentSize(self, addr)
-            addr += size
-            self.info("Pattern %u/%u: %uB" % (index+1, patterns, size//8))
+        # Add patterns size
+        for index in xrange(self["/header/patterns"].value):
+            size += createPatternContentSize(self, size)
 
-        # Get instrument sizes
-        for index in xrange(instr):
-            size = createInstrumentContentSize(self, addr)
-            addr += size
-            self.info("Instrument %u/%u: %uB" % (index+1, instr, size//8))
+        # Add instruments size
+        for index in xrange(self["/header/instruments"].value):
+            size += createInstrumentContentSize(self, size)
+        return size
 
-        return addr-start
+    def createDescription(self):
+        return self["header"].description
 
