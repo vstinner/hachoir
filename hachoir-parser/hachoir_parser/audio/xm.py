@@ -1,9 +1,11 @@
 """
-The XM module format description for XM files version $0104.
+Parser of FastTrackerII Extended Module (XM) version 1.4
 
-Doc:
-- http://modplug.svn.sourceforge.net/viewvc/modplug/trunk/modplug/soundlib/Load_xm.cpp?view=markup
-- Wotsit.org
+Documents:
+- Modplug source code (file modplug/soundlib/Load_xm.cpp)
+  http://sourceforge.net/projects/modplug
+- Documents of "XM" format on Wotsit
+  http://www.wotsit.org
 
 Author: Christophe GISQUET <christophe.gisquet@free.fr>
 Creation: 8th February 2007
@@ -17,11 +19,12 @@ from hachoir_core.field import (StaticFieldSet, FieldSet,
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_core.text_handler import humanFilesize, hexadecimal
 from hachoir_parser.audio.modplug import ParseModplugMetadata
+from hachoir_parser.common.tracker import NOTE_NAME
 
 def parseSigned(val):
     return "%i" % (val.value-128)
 
-SAMPLE_LOOP_MODE = [ "No loop", "Forward loop", "Ping-pong loop", "Undef" ]
+SAMPLE_LOOP_MODE = ("No loop", "Forward loop", "Ping-pong loop", "Undef")
 
 class SampleType(FieldSet):
     static_size = 8
@@ -56,7 +59,6 @@ class StuffType(StaticFieldSet):
         (Bit, "on")
     )
 
-# Unable to get static size of field type: GenericVector
 class InstrumentSecondHeader(FieldSet):
     static_size = 234*8
     def createFields(self):
@@ -141,10 +143,11 @@ class Instrument(FieldSet):
         return "Instrument '%s': %i samples, header %i bytes" % \
                (self["name"].value, self["samples"].value, self["size"].value)
 
-VOLUME_NAME = [ "Volume slide down", "Volume slide up", "Fine volume slide down",
-                "Fine volume slide up", "Set vibrato speed", "Vibrato",
-                "Set panning", "Panning slide left", "Panning slide right",
-                "Tone porta", "Unhandled" ]
+VOLUME_NAME = (
+    "Volume slide down", "Volume slide up", "Fine volume slide down",
+    "Fine volume slide up", "Set vibrato speed", "Vibrato",
+    "Set panning", "Panning slide left", "Panning slide right",
+    "Tone porta", "Unhandled")
 
 def parseVolume(val):
     val = val.value
@@ -152,13 +155,6 @@ def parseVolume(val):
         return "Volume %i" % val-16
     else:
         return VOLUME_NAME[val/16 - 6]
-
-# Taken from midi.py from V. STINNER
-NOTE_NAME = {}
-NOTES = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "G#", "A", "A#", "B")
-for octave in xrange(10):
-    for it, note in enumerate(NOTES):
-        NOTE_NAME[octave*12+it] = "%s (octave %s)" % (note, octave)
 
 class RealBit(RawBits):
     static_size = 1
@@ -294,23 +290,23 @@ class Header(FieldSet):
     static_size = 336*8
 
     def createFields(self):
-        yield String(self, "signature", 17, r"XM signature", charset="ASCII")
-        yield String(self, "title", 20, r"XM title", charset="ASCII", strip=' ')
-        yield UInt8(self, "marker", r"Marker (0x1A)")
-        yield String(self, "tracker_name", 20, r"XM tracker name", charset="ASCII", strip=' ')
+        yield String(self, "signature", 17, "XM signature", charset="ASCII")
+        yield String(self, "title", 20, "XM title", charset="ASCII", strip=' ')
+        yield UInt8(self, "marker", "Marker (0x1A)")
+        yield String(self, "tracker_name", 20, "XM tracker name", charset="ASCII", strip=' ')
         yield UInt8(self, "format_minor")
         yield UInt8(self, "format_major")
-        yield UInt32(self, "header_size", r"File header size (0x114)", text_handler=humanFilesize)
-        yield UInt16(self, "song_length", r"Length in patten order table")
-        yield UInt16(self, "restart", r"Restart position")
-        yield UInt16(self, "channels", r"Number of channels (2,4,6,8,10,...,32)")
-        yield UInt16(self, "patterns", r"Number of patterns (max 256)")
-        yield UInt16(self, "instruments", r"Number of instruments (max 128)")
-        yield Bit(self, "amiga_ftable", r"Amiga frequency table")
-        yield Bit(self, "linear_ftable", r"Linear frequency table")
+        yield UInt32(self, "header_size", "Header size (276)", text_handler=humanFilesize)
+        yield UInt16(self, "song_length", "Length in patten order table")
+        yield UInt16(self, "restart", "Restart position")
+        yield UInt16(self, "channels", "Number of channels (2,4,6,8,10,...,32)")
+        yield UInt16(self, "patterns", "Number of patterns (max 256)")
+        yield UInt16(self, "instruments", "Number of instruments (max 128)")
+        yield Bit(self, "amiga_ftable", "Amiga frequency table")
+        yield Bit(self, "linear_ftable", "Linear frequency table")
         yield Bits(self, "unused", 14)
-        yield UInt16(self, "tempo", r"Default tempo")
-        yield UInt16(self, "bpm", r"Default BPM")
+        yield UInt16(self, "tempo", "Default tempo")
+        yield UInt16(self, "bpm", "Default BPM")
         yield GenericVector(self, "pattern_order", 256, UInt8, "order")
 
     def createDescription(self):
@@ -333,6 +329,8 @@ class XMModule(Parser):
         header = self.stream.readBytes(0, 17)
         if header != Header.MAGIC:
             return "Invalid signature '%s'" % header
+        if self["/header/header_size"].value != 276:
+            return "Unknown header size (%u)" % self["/header/header_size"].value
         return True
 
     def createFields(self):

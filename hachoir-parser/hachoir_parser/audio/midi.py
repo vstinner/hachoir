@@ -14,6 +14,7 @@ from hachoir_core.field import (FieldSet, Bits, ParserError,
 from hachoir_core.endian import BIG_ENDIAN
 from hachoir_core.text_handler import hexadecimal
 from hachoir_core.tools import createDict, humanDurationNanosec
+from hachoir_parser.common.tracker import NOTE_NAME
 
 class Integer(Bits):
     def __init__(self, parent, name, description=None):
@@ -31,12 +32,6 @@ class Integer(Bits):
             if 32 < self._size:
                 raise ParserError("Integer size is bigger than 32-bit")
         self.createValue = lambda: value
-
-NOTE_NAME = {}
-NOTES = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "G#", "A", "A#", "B")
-for octave in xrange(10):
-    for index, note in enumerate(NOTES):
-        NOTE_NAME[octave*12+index] = "%s (octave %s)" % (note, octave)
 
 def parseNote(parser):
     yield Enum(UInt8(parser, "note", "Note number"), NOTE_NAME)
