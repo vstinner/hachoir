@@ -175,20 +175,22 @@ class NoteInfo(StaticFieldSet):
         (RealBit, "has_note")
     )
 
-EFFECT_NAME = [ "Appregio", "Porta up", "Porta down", "Tone porta", "Vibrato",
-                "Tone porta+Volume slide", "Vibrato+Volume slide", "Tremolo",
-                "Set panning", "Sample offset", "Volume slide", "Position jump",
-                "Set volume", "Pattern break", None, "Set tempo/BPM",
-                "Set global volume", "Global volume slide", "Unused", "Unused",
-                "Unused", "Set envelope position", "Unused""Unused",
-                "Panning slide", "Unused", "Multi retrig note", "Unused",
-                "Tremor", "Unused", "Unused", "Unused", None ]
+EFFECT_NAME = (
+    "Appregio", "Porta up", "Porta down", "Tone porta", "Vibrato",
+    "Tone porta+Volume slide", "Vibrato+Volume slide", "Tremolo",
+    "Set panning", "Sample offset", "Volume slide", "Position jump",
+    "Set volume", "Pattern break", None, "Set tempo/BPM",
+    "Set global volume", "Global volume slide", "Unused", "Unused",
+    "Unused", "Set envelope position", "Unused""Unused",
+    "Panning slide", "Unused", "Multi retrig note", "Unused",
+    "Tremor", "Unused", "Unused", "Unused", None)
 
-EFFECT_E_NAME = [ "Unknown", "Fine porta up", "Fine porta down",
-                  "Set gliss control", "Set vibrato control", "Set finetune",
-                  "Set loop begin/loop", "Set tremolo control", "Retrig note",
-                  "Fine volume slide up", "Fine volume slide down", "Note cut",
-                  "Note delay", "Pattern delay" ]
+EFFECT_E_NAME = (
+    "Unknown", "Fine porta up", "Fine porta down",
+    "Set gliss control", "Set vibrato control", "Set finetune",
+    "Set loop begin/loop", "Set tremolo control", "Retrig note",
+    "Fine volume slide up", "Fine volume slide down", "Note cut",
+    "Note delay", "Pattern delay")
 
 class Effect(RawBits):
     def __init__(self, parent, name):
@@ -204,13 +206,13 @@ class Effect(RawBits):
         else:
             return EFFECT_NAME[t]
 
-# TODO: optimize bitcounting with a table:
-# http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetTable
 class Note(FieldSet):
     def __init__(self, parent, name, desc=None):
         FieldSet.__init__(self, parent, name, desc)
         self.flags = self.stream.readBits(self.absolute_address, 8, LITTLE_ENDIAN)
         if self.flags&0x80:
+            # TODO: optimize bitcounting with a table:
+            # http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetTable
             self._size = 8
             if self.flags&0x01: self._size += 8
             if self.flags&0x02: self._size += 8
@@ -225,38 +227,48 @@ class Note(FieldSet):
         self.info("Note info: 0x%02X" %
                   self.stream.readBits(self.absolute_address, 8, LITTLE_ENDIAN))
         yield RealBit(self, "is_extended")
-        info = None
         if self["is_extended"].value:
             info = NoteInfo(self, "info")
             yield info
             if info["has_note"].value:
                 yield Enum(UInt8(self, "note"), NOTE_NAME)
+            if info["has_instrument"].value:
+                yield UInt8(self, "instrument")
+            if info["has_volume"].value:
+                yield UInt8(self, "volume", text_handler=parseVolume)
+            if info["has_type"].value:
+                yield Effect(self, "effect_type")
+            if info["has_parameter"].value:
+                yield UInt8(self, "effect_parameter", text_handler=hexadecimal)
         else:
             yield Enum(Bits(self, "note", 7), NOTE_NAME)
-
-        if not info or info["has_instrument"].value:
             yield UInt8(self, "instrument")
-        if not info or info["has_volume"].value:
             yield UInt8(self, "volume", text_handler=parseVolume)
-        if not info or info["has_type"].value:
-            #yield UInt8(self, "effect_type")
             yield Effect(self, "effect_type")
-        if not info or info["has_parameter"].value:
             yield UInt8(self, "effect_parameter", text_handler=hexadecimal)
 
     def createDescription(self):
-        desc = []
-        info = self["info"]
-        if not info or info["has_note"].value:
-            desc += self["note"].display
-        if not info or info["has_instrument"].value:
-            desc += "instrument %i" % self["instrument"].value
-        if not info or info["has_volume"].value:
-            desc += self["has_volume"].display
-        if not info or info["has_type"].value:
-            desc += "effect %i" % self["effect_type"].value
-        if not info or info["has_parameter"].value:
-            desc += "parameter %i" % self["effect_parameter"].value
+        if "info" in self:
+            info = self["info"]
+            desc = []
+            if info["has_note"].value:
+                desc.append(self["note"].display)
+            if info["has_instrument"].value:
+                desc.append("instrument %i" % self["instrument"].value)
+            if info["has_volume"].value:
+                desc.append(self["has_volume"].display)
+            if info["has_type"].value:
+                desc.append("effect %s" % self["effect_type"].value)
+            if info["has_parameter"].value:
+                desc.append("parameter %i" % self["effect_parameter"].value)
+        else:
+            desc = (self["note"].display, "instrument %i" % self["instrument"].value,
+                self["has_volume"].display, "effect %s" % self["effect_type"].value,
+                "parameter %i" % self["effect_parameter"].value)
+        if desc:
+            return "Note %s" % ", ".join(desc)
+        else:
+            return "Note"
 
 class Row(FieldSet):
     def createFields(self):
@@ -276,8 +288,8 @@ class Pattern(FieldSet):
         yield UInt32(self, "header_size", r"Header length (9)")
         yield UInt8(self, "packing_type", r"Packing type (always 0)")
         yield UInt16(self, "rows", r"Number of rows in pattern (1..256)")
-        rows = self["rows"].value
         yield UInt16(self, "data_size", r"Packed patterndata size")
+        rows = self["rows"].value
         self.info("Pattern: %i rows" % rows)
         for index in xrange(rows):
             yield Row(self, "row[]")
