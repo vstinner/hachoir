@@ -89,7 +89,7 @@ def createInstrumentContentSize(s, addr):
 
     sample_size = 0
     if samples > 0:
-        for idx in xrange(samples):
+        for index in xrange(samples):
             # Read the sample size from the header
             sample_size += s.stream.readBits(addr, 32, LITTLE_ENDIAN)
             # Seek to next sample header
@@ -125,7 +125,7 @@ class Instrument(FieldSet):
 
             # This part probably wrong
             sample_size = [ ]
-            for idx in xrange(num):
+            for index in xrange(num):
                 sample = SampleHeader(self, "sample_header[]")
                 yield sample
                 sample_size.append(sample["length"].value)
@@ -264,7 +264,7 @@ class Note(FieldSet):
 
 class Row(FieldSet):
     def createFields(self):
-        for idx in xrange(self["/header/channels"].value):
+        for index in xrange(self["/header/channels"].value):
             yield Note(self, "note[]")
 
 def createPatternContentSize(s, addr):
@@ -283,7 +283,7 @@ class Pattern(FieldSet):
         rows = self["rows"].value
         yield UInt16(self, "data_size", r"Packed patterndata size")
         self.info("Pattern: %i rows" % rows)
-        for idx in xrange(rows):
+        for index in xrange(rows):
             yield Row(self, "row[]")
 
     def createDescription(self):
@@ -337,9 +337,9 @@ class XMModule(Parser):
 
     def createFields(self):
         yield Header(self, "header")
-        for idx in xrange(self["/header/patterns"].value):
+        for index in xrange(self["/header/patterns"].value):
             yield Pattern(self, "pattern[]")
-        for idx in xrange(self["/header/instruments"].value):
+        for index in xrange(self["/header/instruments"].value):
             yield Instrument(self, "instrument[]")
 
         # Metadata added by ModPlug - can be discarded
@@ -359,16 +359,16 @@ class XMModule(Parser):
 
         # Get pattern sizes
         addr += Header.static_size
-        for idx in xrange(patterns):
+        for index in xrange(patterns):
             size = createPatternContentSize(self, addr)
             addr += size
-            self.info("Pattern %u/%u: %uB" % (idx+1, patterns, size//8))
+            self.info("Pattern %u/%u: %uB" % (index+1, patterns, size//8))
 
         # Get instrument sizes
-        for idx in xrange(instr):
+        for index in xrange(instr):
             size = createInstrumentContentSize(self, addr)
             addr += size
-            self.info("Instrument %u/%u: %uB" % (idx+1, instr, size//8))
+            self.info("Instrument %u/%u: %uB" % (index+1, instr, size//8))
 
         return addr-start
 

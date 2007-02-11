@@ -16,10 +16,10 @@ from hachoir_core.text_handler import hexadecimal
 
 MAX_ENVPOINTS = 32
 
-def parseComments(s):
-    size = s["block_size"].value
+def parseComments(parser):
+    size = parser["block_size"].value
     if size > 0:
-        yield String(s, "comment", size)
+        yield String(parser, "comment", size)
 
 class MidiOut(FieldSet):
     static_size = 9*32*8
@@ -50,20 +50,20 @@ class MidiZXXExt(FieldSet):
         for index in xrange(128):
             yield Command(self, "command[]")
 
-def parseMidiConfig(s):
-    yield MidiOut(s, "midi_out")
-    yield MidiSFXExt(s, "sfx_ext")
-    yield MidiZXXExt(s, "zxx_ext")
+def parseMidiConfig(parser):
+    yield MidiOut(parser, "midi_out")
+    yield MidiSFXExt(parser, "sfx_ext")
+    yield MidiZXXExt(parser, "zxx_ext")
 
-def parseChannelSettings(s):
-    size = s["block_size"].value//4
+def parseChannelSettings(parser):
+    size = parser["block_size"].value//4
     if size > 0:
-        yield GenericVector(s, "settings", size, UInt32, "mix_plugin")
+        yield GenericVector(parser, "settings", size, UInt32, "mix_plugin")
 
-def parseEQBands(s):
-    size = s["block_size"].value//4
+def parseEQBands(parser):
+    size = parser["block_size"].value//4
     if size > 0:
-        yield GenericVector(s, "gains", size, UInt32, "band")
+        yield GenericVector(parser, "gains", size, UInt32, "band")
 
 class SoundMixPluginInfo(FieldSet):
     static_size = 128*8
@@ -79,17 +79,19 @@ class SoundMixPluginInfo(FieldSet):
 class ExtraData(FieldSet):
     def __init__(self, parent, name, desc=None):
         FieldSet.__init__(self, parent, name, desc)
-        self._size = (4+self["size"])*8
+        self._size = (4+self["size"].value)*8
+
     def createFields(self):
         yield UInt32(self, "size")
         size = self["size"].value
-        if size > 0:
+        if size:
             yield RawBytes(self, "data", size)
 
 class XPlugData(FieldSet):
     def __init__(self, parent, name, desc=None):
         FieldSet.__init__(self, parent, name, desc)
-        self._size = (4+self["size"])*8
+        self._size = (4+self["size"].value)*8
+
     def createFields(self):
         yield UInt32(self, "size")
         while not self.eof:
@@ -99,18 +101,18 @@ class XPlugData(FieldSet):
             elif self["marker"].value == 'PORG':
                 yield UInt32(self, "default_program")
 
-def parsePlugin(s):
-    yield SoundMixPluginInfo(s, "info")
+def parsePlugin(parser):
+    yield SoundMixPluginInfo(parser, "info")
 
     # Check if VST setchunk present
-    size = s.stream.readBits(s.absolute_address+s.current_size, 32, LITTLE_ENDIAN)
-    if 0 < size < s.current_size + s._size:
-        yield ExtraData(s, "extra_data")
+    size = parser.stream.readBits(parser.absolute_address+parser.current_size, 32, LITTLE_ENDIAN)
+    if 0 < size < parser.current_size + parser._size:
+        yield ExtraData(parser, "extra_data")
 
     # Check if XPlugData is present
-    size = s.stream.readBits(s.absolute_address+s.current_size, 32, LITTLE_ENDIAN)
-    if 0 < size < s.current_size + s._size:
-        yield XPlugData(s, "xplug_data")
+    size = parser.stream.readBits(parser.absolute_address+parser.current_size, 32, LITTLE_ENDIAN)
+    if 0 < size < parser.current_size + parser._size:
+        yield XPlugData(parser, "xplug_data")
 
 # Format: "XXXX": (type, count, name)
 EXTENSIONS = {
@@ -220,22 +222,22 @@ class MPField(FieldSet):
         return "Element '%s', size %i" % \
                (self["code"]._description, self["data_size"].value)
 
-def parseFields(s):
+def parseFields(parser):
     # Determine field names
-    ext = EXTENSIONS[s["block_type"].value]
+    ext = EXTENSIONS[parser["block_type"].value]
     if ext == None:
-        raise ParserError("Unknown parent '%s'" % s["block_type"].value)
+        raise ParserError("Unknown parent '%s'" % parser["block_type"].value)
 
     # Parse fields
-    addr = s.absolute_address + s.current_size
-    while not s.eof and s.stream.readBytes(addr, 4) in ext:
-        field = MPField(s, "field[]", ext)
+    addr = parser.absolute_address + parser.current_size
+    while not parser.eof and parser.stream.readBytes(addr, 4) in ext:
+        field = MPField(parser, "field[]", ext)
         yield field
         addr += field._size
 
     # Abort on unknown codes
-    s.info("End of extension '%s' when finding '%s'" %
-           (s["block_type"].value, s.stream.readBytes(addr, 4)))
+    parser.info("End of extension '%s' when finding '%s'" %
+           (parser["block_type"].value, parser.stream.readBytes(addr, 4)))
 
 class ModplugBlock(FieldSet):
     BLOCK_INFO = {
@@ -275,15 +277,15 @@ class ModplugBlock(FieldSet):
             if size > 0:
                 yield RawBytes(self, "data", size, "Unknow data")
 
-def ParseModplugMetadata(s):
-    while not s.eof:
-        block = ModplugBlock(s, "block[]")
+def ParseModplugMetadata(parser):
+    while not parser.eof:
+        block = ModplugBlock(parser, "block[]")
         yield block
         if block["block_type"].value == "STPM":
             break
 
     # More undocumented stuff: date ?
-    size = (s._size - s.absolute_address - s.current_size)//8
+    size = (parser._size - parser.absolute_address - parser.current_size)//8
     if size > 0:
-        yield RawBytes(s, "info", size)
+        yield RawBytes(parser, "info", size)
 
