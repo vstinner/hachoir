@@ -189,6 +189,7 @@ class SearchSubfile:
             self.current_offset += self.slice_size
             if self.next_offset:
                 self.current_offset = max(self.current_offset, self.next_offset)
+            self.current_offset = max(self.current_offset, self.size)
 
     def processParser(self, offset, parser):
         """
