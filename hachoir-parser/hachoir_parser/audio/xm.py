@@ -196,8 +196,7 @@ EFFECT_E_NAME = [ "Unknown", "Fine porta up", "Fine porta down",
 
 class Effect(RawBits):
     def __init__(self, parent, name):
-        FieldSet.__init__(self, parent, name)
-        self._size = 8*self["size"].value
+        RawBits.__init__(self, parent, name, 8)
 
     def createValue(self):
         t = self.parent.stream.readBits(self.absolute_address, 8, LITTLE_ENDIAN)
@@ -319,7 +318,7 @@ class Header(FieldSet):
         return "'%s' by '%s'" % (
             self["title"].display, self["tracker_name"].value)
 
-class XMFile(Parser):
+class XMModule(Parser):
     tags = {
         "id": "fasttracke2",
         "category": "audio",
