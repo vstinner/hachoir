@@ -15,18 +15,13 @@ from hachoir_core.field import (StaticFieldSet, FieldSet, Field,
     RawBytes, String, GenericVector)
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.text_handler import hexadecimal
-from hachoir_parser.audio.modplug import ParseModplugMetadata
-
-def roundUp(val, rnd):
-    n = val%rnd
-    if n: return val+rnd-n
-    else: return val
+from hachoir_core.tools import alignValue
 
 class Chunk:
     def __init__(self, Class, offset, size, *args):
+        assert size != None
         self.Class = Class
         self.offset = offset
-        assert size != None
         self.size = size
         self.args = args
 
@@ -104,14 +99,14 @@ class ChunkIndexer:
             if obj._size != None and \
                    obj.absolute_address + obj.current_size + 8*size > obj._size:
                 size = (obj._size-obj.absolute_address-obj.current_size)//8
-                
+
             # Padd as required
             if size > 0:
                 obj.info("Warning: chunk too small, %u padding bytes added" % size)
                 yield RawBytes(obj, "padding[]", size)
             elif size < 0 and chunk.size > 0:
                 obj.info("Warning: chunk too big: %u additional bytes" % -size)
-            
+
 
 class Flags(StaticFieldSet):
     format = (
@@ -199,7 +194,7 @@ class Header(FieldSet):
         size = 0x60+ordnum+2*insnum+2*patnum
         if s.stream.readBits(start+0x35*8, 8, LITTLE_ENDIAN) == 252:
             size += 32
-        size = roundUp(size, 16)
+        size = alignValue(size, 16)
         return (ordnum, insnum, patnum, 8*size)
 
     def createDescription(self):
@@ -215,7 +210,7 @@ class Header(FieldSet):
         yield UInt8(self, "marker[]", text_handler=hexadecimal)
         yield UInt8(self, "type")
         yield RawBytes(self, "reserved[]", 2)
-        
+
         yield UInt16(self, "num_orders")
         orders = self["num_orders"].value
         yield UInt16(self, "num_instruments")
@@ -265,7 +260,7 @@ class Header(FieldSet):
         size = self._size - self.current_size
         if size > 0:
             yield RawBytes(self, "padding", size//8)
-            
+
 class OldInstrument(FieldSet):
     """
     Probably used in older ST3 version. Description follows:
@@ -283,7 +278,7 @@ class OldInstrument(FieldSet):
   0040: | ...sample name...                             |'S'|'C'|'R'|'I'|
         +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
     """
-    
+
     TYPES = {2:"amel", 3:"abd", 4:"asnare", 5:"atom", 6:"acym", 7:"ahihat" }
     MAGIC = "SCRI"
     static_size = 0x50*8
@@ -381,7 +376,7 @@ class NewInstrument(FieldSet):
         real_size = self["data_length"].value
         if self["flags/stereo"].value: real_size *= 2
         if self["flags/16bits"].value: real_size *= 2
-        padded_size = roundUp(real_size, 16)
+        padded_size = alignValue(real_size, 16)
         return Chunk(SampleData, self["data_position"].value, padded_size,
                      "sample_data[]", padded_size, real_size)
 
@@ -440,7 +435,7 @@ class Row(FieldSet):
             # Check empty note
             if note.header == 0:
                 break
-    
+
 class Pattern(FieldSet):
     def __init__(self, parent, name, desc=None):
         FieldSet.__init__(self, parent, name, desc)
@@ -451,7 +446,7 @@ class Pattern(FieldSet):
 
         # But patterns are aligned on 16B<->128b boundaries, it seems
         addr += self.real_size
-        addr = roundUp(addr, 128)
+        addr = alignValue(addr, 128)
         self._size = addr - self.absolute_address
         self.info("Pattern: real=%u aligned=%u" % (self.real_size//8, self._size//8))
 
