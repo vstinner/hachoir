@@ -4,6 +4,8 @@ Parser of FastTrackerII Extended Module (XM) version 1.4
 Documents:
 - Modplug source code (file modplug/soundlib/Load_xm.cpp)
   http://sourceforge.net/projects/modplug
+- Dumb source code (files include/dumb.h and src/it/readxm.c
+  http://dumb.sf.net/
 - Documents of "XM" format on Wotsit
   http://www.wotsit.org
 
@@ -14,7 +16,7 @@ Creation: 8th February 2007
 from hachoir_parser import Parser
 from hachoir_core.field import (StaticFieldSet, FieldSet,
     Bit, RawBits, Bits,
-    UInt32, UInt16, UInt8, Enum,
+    UInt32, UInt16, UInt8, Int8, Enum,
     RawBytes, String, GenericVector)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_core.text_handler import humanFilesize, hexadecimal
@@ -23,6 +25,10 @@ from hachoir_parser.common.tracker import NOTE_NAME
 
 def parseSigned(val):
     return "%i" % (val.value-128)
+
+# From dumb
+SEMITONE_BASE = 1.059463094359295309843105314939748495817
+PITCH_BASE = 1.000225659305069791926712241547647863626
 
 SAMPLE_LOOP_MODE = ("No loop", "Forward loop", "Ping-pong loop", "Undef")
 
@@ -41,15 +47,19 @@ class SampleHeader(FieldSet):
         yield UInt32(self, "loop_start")
         yield UInt32(self, "loop_end")
         yield UInt8(self, "volume")
-        yield UInt8(self, "fine_tune", text_handler=parseSigned)
+        yield Int8(self, "fine_tune")
         yield SampleType(self, "type")
         yield UInt8(self, "panning")
-        yield UInt8(self, "relative_note", text_handler=parseSigned)
+        yield Int8(self, "relative_note")
         yield UInt8(self, "reserved")
         yield String(self, "name", 22, charset="ASCII", strip=' \0')
 
-    def createDescription(self):
-        return "%s, %s" % (self["name"].display, self["type/loop_mode"].display)
+    def createValue(self):
+        bytes = 1+self["type/16bits"].value
+        C5_speed = int(16726.0*pow(SEMITONE_BASE, self["relative_note"].value)
+                       *pow(PITCH_BASE, self["fine_tune"].value*2))
+        return "%s, %ubits, %u samples, %uHz" % \
+               (self["name"].display, 8*bytes, self["length"].value/bytes, C5_speed)
 
 class StuffType(StaticFieldSet):
     format = (
@@ -90,7 +100,7 @@ def createInstrumentContentSize(s, addr):
     addr += 8*s.stream.readBits(addr, 32, LITTLE_ENDIAN)
 
     sample_size = 0
-    if samples > 0:
+    if samples:
         for index in xrange(samples):
             # Read the sample size from the header
             sample_size += s.stream.readBits(addr, 32, LITTLE_ENDIAN)
@@ -108,18 +118,20 @@ class Instrument(FieldSet):
     # Seems to fix things...
     def fixInstrumentHeader(self):
         size = self["size"].value - self.current_size//8
-        if size > 0:
+        if size:
             yield RawBytes(self, "unknown_data", size)
 
     def createFields(self):
         yield UInt32(self, "size")
         yield String(self, "name", 22, charset="ASCII", strip=" \0")
+        # Doc says type is always 0, but I've found values of 24 and 96 for
+        # the _same_ song here, just different download sources for the file
         yield UInt8(self, "type")
         yield UInt16(self, "samples")
         num = self["samples"].value
         self.info(self.createDescription())
 
-        if num > 0:
+        if num:
             yield InstrumentSecondHeader(self, "second_header")
 
             for field in self.fixInstrumentHeader():
@@ -133,7 +145,7 @@ class Instrument(FieldSet):
                 sample_size.append(sample["length"].value)
 
             for size in sample_size:
-                if size > 0:
+                if size:
                     yield RawBytes(self, "sample_data[]", size, "Deltas")
         else:
             for field in self.fixInstrumentHeader():
@@ -367,6 +379,8 @@ class XMModule(Parser):
         # Add instruments size
         for index in xrange(self["/header/instruments"].value):
             size += createInstrumentContentSize(self, size)
+
+        # Not reporting Modplug metadata
         return size
 
     def createDescription(self):
