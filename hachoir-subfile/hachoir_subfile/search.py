@@ -1,13 +1,12 @@
 from hachoir_core.error import HACHOIR_ERRORS, error
 from hachoir_core.stream import InputSubStream
-from hachoir_core.tools import humanFilesize, humanDuration, makePrintable
+from hachoir_core.tools import humanFilesize, humanDuration
 from hachoir_subfile.memory import getTotalMemory, setMemoryLimit
 from hachoir_subfile.data_rate import DataRate
 from hachoir_subfile.output import Output
-from hachoir_subfile.pattern import Patterns
+from hachoir_subfile.pattern import PatternMatching
 from sys import stderr
 from time import time
-import re
 
 def skipSubfile(parser):
     return ("subfile" in parser.tags) and (parser.tags["subfile"] == "skip")
@@ -59,7 +58,7 @@ class SearchSubfile:
         self.mem_limit = None
 
         # Other flags and attributes
-        self.patterns = Patterns()
+        self.patterns = PatternMatching()
         self.verbose = True
         self.debug = False
         self.output = None
@@ -69,7 +68,7 @@ class SearchSubfile:
         self.output = Output(directory)
 
     def loadParsers(self, categories=None, parser_ids=None):
-        self.patterns = Patterns(categories, parser_ids)
+        self.patterns = PatternMatching(categories, parser_ids)
 
     def main(self):
         """
@@ -181,9 +180,12 @@ class SearchSubfile:
         offset is beginning of a file (relative to stream begin), and not the
         position of the magic.
         """
-        max_offset = offset + self.slice_size + 8 * (self.patterns.max_length-1)
-        max_offset = min(max_offset, self.size)
-        for parser_cls, offset in self.patterns.search(self.stream, offset, max_offset):
+        start = offset
+        end = start + self.slice_size + 8 * (self.patterns.max_length-1)
+        end = min(end, self.size)
+        data = self.stream.readBytes(start, (end-start)//8)
+        for parser_cls, offset in self.patterns.search(data):
+            offset -= start
             # Skip invalid offset
             if offset < 0:
                 continue
