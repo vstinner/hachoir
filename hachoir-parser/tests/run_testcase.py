@@ -417,7 +417,15 @@ def checkXM(parser): return (
     checkValue(parser, "/instrument[4]/second_header/panning_points", 6),
     checkValue(parser, "/instrument[20]/name", u"808-hi5.smp"),
 )
-    
+
+def checkS3M(parser): return (
+    checkValue(parser, "/header/title", "Satellite one."),
+    checkValue(parser, "/instrument[0]/data_position", 27024),
+    checkDisplay(parser, "/instrument[0]/c2_speed", "8.4 KHz"),
+    checkValue(parser, "/instrument[0]/name", "By Purple Motion of"),
+    checkValue(parser, "/instrument[1]/name", "Future Crew - 1993"),
+    checkValue(parser, "/pattern[0]/row[0]/note[0]/volume", 54),
+)
 
 testcase_files = (
     (u"yellowdude.3ds", checkYellowdude),
@@ -466,6 +474,7 @@ testcase_files = (
     (u"debian-31r4-i386-binary-1.iso.torrent", checkDebianTorrent),
     (u"dell8.fat16", checkDell8FAT16),
     (u"dontyou.xm", checkXM),
+    (u"SatelliteOne.s3m", checkS3M),
 )
 
 def checkFile(filename, check_parser):
