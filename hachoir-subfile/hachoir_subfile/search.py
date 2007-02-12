@@ -4,7 +4,7 @@ from hachoir_core.tools import humanFilesize, humanDuration
 from hachoir_subfile.memory import getTotalMemory, setMemoryLimit
 from hachoir_subfile.data_rate import DataRate
 from hachoir_subfile.output import Output
-from hachoir_subfile.pattern import PatternMatching
+from hachoir_subfile.pattern import HachoirPatternMatching as PatternMatching
 from sys import stderr
 from time import time
 

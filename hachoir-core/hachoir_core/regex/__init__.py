@@ -3,4 +3,5 @@ from hachoir_core.regex.regex import (RegexEmpty,
     RegexRange, createRange,
     RegexAnd, RegexOr, RegexRepeat)
 from hachoir_core.regex.parser import parse
+from hachoir_core.regex.pattern import PatternMatching
 
