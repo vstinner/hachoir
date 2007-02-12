@@ -1,10 +1,12 @@
 #!/usr/bin/env python2.4
-from hachoir_subfile.search import SearchSubfile
-from optparse import OptionGroup, OptionParser
+from hachoir_core.cmd_line import unicodeFilename
+from hachoir_core.stream import FileInputStream
 from hachoir_core.i18n import _
 from hachoir_core import config
+from hachoir_subfile.search import SearchSubfile
 import hachoir_core
 from sys import exit
+from optparse import OptionGroup, OptionParser
 
 WEBSITE = "http://hachoir.org/wiki/hachoir-subfile"
 __version__ = "0.0.1"
@@ -69,11 +71,12 @@ def main():
     # Initialize
     values, filename, output = parseOptions()
     config.quiet = True
-    subfile = SearchSubfile(filename, output,
-        offset=values.offset,
-        size=values.size,
-        verbose=not(values.quiet),
-        debug=values.debug)
+    stream = FileInputStream(unicodeFilename(filename), real_filename=filename)
+    subfile = SearchSubfile(stream, values.offset, values.size)
+    subfile.verbose = not(values.quiet)
+    subfile.debug = values.debug
+    if output:
+        subfile.setOutput(output)
 
     # Select and load parsers
     categories = values.category
@@ -82,7 +85,7 @@ def main():
     parsers = values.parser
     if parsers:
         parsers = parsers.split(",")
-    subfile.loadMagics(categories=categories, parser_ids=parsers)
+    subfile.loadParsers(categories=categories, parser_ids=parsers)
 
     # Search subfiles
     ok = subfile.main()

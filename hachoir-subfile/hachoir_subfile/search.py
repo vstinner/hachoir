@@ -1,13 +1,10 @@
-from hachoir_core.cmd_line import unicodeFilename
 from hachoir_core.error import HACHOIR_ERRORS, error
-from hachoir_core.stream import FileInputStream, InputSubStream
+from hachoir_core.stream import InputSubStream
 from hachoir_core.tools import humanFilesize, humanDuration, makePrintable
-from hachoir_parser import QueryParser
-from hachoir_subfile.create_regex import createRegex, dumpRegex
 from hachoir_subfile.memory import getTotalMemory, setMemoryLimit
 from hachoir_subfile.data_rate import DataRate
 from hachoir_subfile.output import Output
-from hachoir_core.regex import parse as parseRegex, createString as regexFromString, RegexOr
+from hachoir_subfile.pattern import Patterns
 from sys import stderr
 from time import time
 import re
@@ -20,12 +17,6 @@ SLICE_SIZE = 64*1024                # Slice size in bytes (64 KB)
 HARD_MEMORY_LIMIT = 100*1024*1024
 PROGRESS_UPDATE = 1.5   # Minimum number of second between two progress messages
 
-
-def inputStreamSearchRegex(stream, regex, start, end):
-    data = stream.readBytes(start, (end-start)//8)
-    return [ (match.group(0), start+match.start(0)*8)
-        for match in regex.finditer(data) ]
-
 class SearchSubfile:
     """
     Tool to find file start and file size in any binary stream.
@@ -35,7 +26,8 @@ class SearchSubfile:
     - (optional) choose magics with: subfile.loadMagics(categories, parser_ids)
     - run the search: subfile.main()
     """
-    def __init__(self, filename, directory, offset=0, size=None, verbose=True, debug=True):
+
+    def __init__(self, stream, offset=0, size=None):
         """
         Setup search tool, parameter:
          - filename: Input filename in locale charset
@@ -45,75 +37,39 @@ class SearchSubfile:
          - size: Limit size (in bytes) of input file (None: no limit)
          - debug: Debug mode flag (display debug information)
         """
-        self.verbose = verbose
-        self.debug = debug
-        self.stream = FileInputStream(unicodeFilename(filename), real_filename=filename)
+
+        # Size
+        self.stream = stream
         if size is not None:
             self.size = min(self.stream.size, (offset+size)*8)
         else:
             self.size = self.stream.size
-        self.slice_size = SLICE_SIZE*8   # 64 KB (in bits)
+
+        # Offset
         self.start_offset = offset*8
+        self.current_offset = self.start_offset
+        self.slice_size = SLICE_SIZE*8   # 64 KB (in bits)
+
+        # Statistics
         self.datarate = DataRate(self.start_offset)
-        if directory:
-            self.output = Output(directory)
-        else:
-            self.output = None
+        self.main_start = time()
+
+        # Memory
         self.total_mem = getTotalMemory()
         self.mem_limit = None
-        self.main_start = time()
+
+        # Other flags and attributes
+        self.patterns = Patterns()
+        self.verbose = True
+        self.debug = False
+        self.output = None
         self.filter = None
-        self.magics = []
-        self.magic_regex = []
 
-    def loadMagics(self, categories=None, parser_ids=None):
-        # Choose parsers to use
-        tags = []
-        if categories: tags += [ ("category", cat) for cat in categories ]
-        if parser_ids: tags += [ ("id", parser_id) for parser_id in parser_ids ]
-        if tags      : tags += [ None ]
-        parser_list = QueryParser(tags)
+    def setOutput(self, directory):
+        self.output = Output(directory)
 
-        # Load parser magics
-        magics = []
-        for parser in parser_list:
-            for (magic, offset) in parser.getTags().get("magic",()):
-                if self.slice_size < offset:
-                    self.slice_size = offset + 8
-                    error("Use slice size of %s because of '%s' parser magic offset" % (
-                        (self.slice_size//8), parser.__name__))
-                magics.append((magic, offset, parser))
-
-        # Build regex
-        if magics:
-            self.max_magic_len = max( len(magic) for magic in magics )
-        else:
-            self.max_magic_len = 0
-        self.magics = {}
-        magic_strings = []
-        for magic, offset, parser in magics:
-            magic_strings.append(magic)
-            self.magics[magic] = (offset, parser)
-        if magic_strings:
-            regex = createRegex(magic_strings)
-        else:
-            regex = None
-        self.magics_regex = []
-        for parser in parser_list:
-            for (magic_regex, offset) in parser.getTags().get("magic_regex",()):
-                new_regex = parseRegex(magic_regex)
-                self.magics_regex.append( (new_regex, new_regex.compile(python=True), offset, parser) )
-                max_length = new_regex.maxLength()
-                if max_length is None:
-                    raise RuntimeError("Infinite regex")
-                self.max_magic_len = max(self.max_magic_len, max_length)
-                if regex:
-                    regex = regex | new_regex
-                else:
-                    regex = new_regex
-        if self.debug:
-            print "Use regex: %s" % makePrintable(str(regex), 'ASCII')
-        self.magic_regex = regex.compile(python=True)
+    def loadParsers(self, categories=None, parser_ids=None):
+        self.patterns = Patterns(categories, parser_ids)
 
     def main(self):
         """
@@ -122,8 +78,6 @@ class SearchSubfile:
         """
 
         # Initialize
-        if not self.magics and not self.magic_regex:
-            self.loadMagics()
         self.limitMemory()
         self.mainHeader()
 
@@ -227,23 +181,9 @@ class SearchSubfile:
         offset is beginning of a file (relative to stream begin), and not the
         position of the magic.
         """
-        max_offset = offset + self.slice_size + 8 * (self.max_magic_len-1)
+        max_offset = offset + self.slice_size + 8 * (self.patterns.max_length-1)
         max_offset = min(max_offset, self.size)
-        for magic, offset in inputStreamSearchRegex(self.stream, self.magic_regex, offset, max_offset):
-            # Compute file offset start
-            try:
-                magic_offset, parser_cls = self.magics[magic]
-            except KeyError:
-                parser_cls = None
-                # TODO: Write faster code (?)
-                found = False
-                for regex, compiled_regex, magic_offset, parser_cls in self.magics_regex:
-                    if compiled_regex.match(magic):
-                        found = True
-                        break
-                assert found
-            offset -= magic_offset
-
+        for parser_cls, offset in self.patterns.search(self.stream, offset, max_offset):
             # Skip invalid offset
             if offset < 0:
                 continue
