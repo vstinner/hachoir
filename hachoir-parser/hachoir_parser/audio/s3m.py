@@ -1,8 +1,9 @@
 """
 The ScreamTracker 3.0x module format description for .s3m files.
 
-Doc: http://www.wotsit.org/download.asp?f=s3m-form
-     Modplug
+Documents:
+- Search s3m on Wotsit
+  http://www.wotsit.org/
 
 Author: Christophe GISQUET <christophe.gisquet@free.fr>
 Creation: 11th February 2007
@@ -183,11 +184,11 @@ class Header(FieldSet):
     def __init__(self, parent, name, desc=None):
         FieldSet.__init__(self, parent, name, desc)
         start = self.absolute_address
-        ordnum = s.stream.readBits(start+0x20*8, 16, LITTLE_ENDIAN)
-        insnum = s.stream.readBits(start+0x22*8, 16, LITTLE_ENDIAN)
-        patnum = s.stream.readBits(start+0x24*8, 16, LITTLE_ENDIAN)
+        ordnum = self.stream.readBits(start+0x20*8, 16, LITTLE_ENDIAN)
+        insnum = self.stream.readBits(start+0x22*8, 16, LITTLE_ENDIAN)
+        patnum = self.stream.readBits(start+0x24*8, 16, LITTLE_ENDIAN)
         size = 0x60+ordnum+2*insnum+2*patnum
-        if s.stream.readBits(start+0x35*8, 8, LITTLE_ENDIAN) == 252:
+        if self.stream.readBits(start+0x35*8, 8, LITTLE_ENDIAN) == 252:
             size += 32
         self._size = alignValue(size, 16) * 8
 
