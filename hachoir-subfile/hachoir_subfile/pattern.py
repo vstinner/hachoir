@@ -29,7 +29,27 @@ class RegexPattern(Pattern):
 
 class PatternMatching:
     def __init__(self, categories=None, parser_ids=None):
-        self._load(categories, parser_ids)
+        self.string_patterns = []
+        self.string_dict = {}
+        self.regex_patterns = []
+
+        # Load parser list
+        tags = []
+        if categories: tags += [ ("category", cat) for cat in categories ]
+        if parser_ids: tags += [ ("id", parser_id) for parser_id in parser_ids ]
+        if tags      : tags += [ None ]
+        parser_list = QueryParser(tags)
+
+        # Create string patterns
+        for parser in parser_list:
+            for (magic, offset) in parser.getTags().get("magic",()):
+                self._addString(magic, offset, parser)
+
+        # Create regex patterns
+        for parser in parser_list:
+            for (regex, offset) in parser.getTags().get("magic_regex",()):
+                self._addRegex(regex, offset, parser)
+
         self._update()
         assert self.string_patterns or self.regex_patterns
 
@@ -51,44 +71,24 @@ class PatternMatching:
         self.regex = regex.compile(python=True)
         self.max_length = length
 
-    def _load(self, categories, parser_ids):
-        # Load parser list
-        tags = []
-        if categories: tags += [ ("category", cat) for cat in categories ]
-        if parser_ids: tags += [ ("id", parser_id) for parser_id in parser_ids ]
-        if tags      : tags += [ None ]
-        parser_list = QueryParser(tags)
+    def _addString(self, magic, offset, parser):
+        item = StringPattern(magic, offset, parser)
+        if item.text not in self.string_dict:
+            self.string_patterns.append(item)
+            self.string_dict[item.text] = item
+        else:
+            text = makePrintable(item.text, "ASCII", to_unicode=True)
+            warning("Skip parser %s: duplicate pattern (%s)" % (
+                item.parser.__name__, text))
 
-        # Create string patterns
-        self.string_patterns = []
-        self.string_dict = {}
-        for parser in parser_list:
-            for (magic, offset) in parser.getTags().get("magic",()):
-                # FIXME: Re-enable this code
-#                if self.slice_size < offset:
-#                    self.slice_size = offset + 8
-#                    error("Use slice size of %s because of '%s' parser magic offset" % (
-#                        (self.slice_size//8), parser.__name__))
-                item = StringPattern(magic, offset, parser)
-                if item.text not in self.string_dict:
-                    self.string_patterns.append(item)
-                    self.string_dict[item.text] = item
-                else:
-                    text = makePrintable(item.text, "ASCII", to_unicode=True)
-                    warning("Skip parser %s: duplicate pattern (%s)" % (
-                        item.parser.__name__, text))
-
-        # Create regex patterns
-        self.regex_patterns = []
-        for parser in parser_list:
-            for (regex, offset) in parser.getTags().get("magic_regex",()):
-                item = RegexPattern(regex, offset, parser)
-                if item.regex.maxLength() is not None:
-                    self.regex_patterns.append(item)
-                else:
-                    regex = makePrintable(str(item.regex), 'ASCII', to_unicode=True)
-                    warning("Skip parser %s: invalid regex (%s)" % (
-                        item.parser.__name__, regex))
+    def _addRegex(self, regex, offset, parser):
+        item = RegexPattern(regex, offset, parser)
+        if item.regex.maxLength() is not None:
+            self.regex_patterns.append(item)
+        else:
+            regex = makePrintable(str(item.regex), 'ASCII', to_unicode=True)
+            warning("Skip parser %s: invalid regex (%s)" % (
+                item.parser.__name__, regex))
 
     def getPattern(self, data):
         # Try in string patterns
