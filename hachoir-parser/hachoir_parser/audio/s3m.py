@@ -38,15 +38,15 @@ class ChunkIndexer:
             while index < len(self.chunks):
                 offset = self.chunks[index].offset
                 if offset < new_chunk.offset:
-                    print "Added element %u: size=%u position=%u>%u" % \
-                          (index, new_chunk.size, new_chunk.offset, offset)
+##                    print "Added element %u: size=%u position=%u>%u" % \
+##                          (index, new_chunk.size, new_chunk.offset, offset)
                     self.chunks.insert(index, new_chunk)
                     return
                 index += 1
 
         # Not found or empty
-        print "Appended element %u of size %u at position %u" % \
-              (len(self.chunks)+1, new_chunk.size, new_chunk.offset)
+##        print "Appended element %u of size %u at position %u" % \
+##              (len(self.chunks)+1, new_chunk.size, new_chunk.offset)
         self.chunks.append(new_chunk)
 
     def yieldChunks(self, obj):
