@@ -58,7 +58,7 @@ class SearchSubfile:
         self.mem_limit = None
 
         # Other flags and attributes
-        self.patterns = PatternMatching()
+        self.patterns = None
         self.verbose = True
         self.debug = False
         self.output = None
@@ -98,6 +98,13 @@ class SearchSubfile:
         return not(main_error)
 
     def mainHeader(self):
+        # Fix slice size if needed
+        self.slice_size = max(self.slice_size, self.patterns.max_length * 8)
+
+        # Load parsers if none has been choosen
+        if not self.patterns:
+            self.loadParsers()
+
         print >>stderr, "[+] Start search (%s)" % \
             humanFilesize((self.size-self.start_offset)//8)
         print >>stderr
@@ -142,7 +149,7 @@ class SearchSubfile:
             self.current_offset += self.slice_size
             if self.next_offset:
                 self.current_offset = max(self.current_offset, self.next_offset)
-            self.current_offset = max(self.current_offset, self.size)
+            self.current_offset = min(self.current_offset, self.size)
 
     def processParser(self, offset, parser):
         """
@@ -181,11 +188,11 @@ class SearchSubfile:
         position of the magic.
         """
         start = offset
-        end = start + self.slice_size + 8 * (self.patterns.max_length-1)
+        end = start + self.slice_size
         end = min(end, self.size)
         data = self.stream.readBytes(start, (end-start)//8)
         for parser_cls, offset in self.patterns.search(data):
-            offset -= start
+            offset += start
             # Skip invalid offset
             if offset < 0:
                 continue
@@ -210,7 +217,7 @@ class SearchSubfile:
             if parser.content_size is not None\
             and skipSubfile(parser):
                 self.next_offset = offset + parser.content_size
-                if max_offset < self.next_offset:
+                if end <= self.next_offset:
                     break
 
     def guess(self, offset, parser_cls):
