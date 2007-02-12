@@ -14,13 +14,13 @@ from hachoir_core.field import (StaticFieldSet, FieldSet, Field,
     UInt32, UInt16, UInt8, Enum,
     RawBytes, String, GenericVector)
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import hexadecimal, humanFrequency
 from hachoir_core.tools import alignValue
 
 class Chunk:
-    def __init__(self, Class, offset, size, *args):
+    def __init__(self, cls, offset, size, *args):
         assert size != None
-        self.Class = Class
+        self.cls = cls
         self.offset = offset
         self.size = size
         self.args = args
@@ -33,15 +33,15 @@ class ChunkIndexer:
     def addChunk(self, new_chunk):
         if len(self.chunks) > 0:
             # Find first chunk whose value is bigger
-            idx = 0
-            while idx < len(self.chunks):
-                offset = self.chunks[idx].offset
+            index = 0
+            while index < len(self.chunks):
+                offset = self.chunks[index].offset
                 if offset < new_chunk.offset:
                     print "Added element %u: size=%u position=%u>%u" % \
-                          (idx, new_chunk.size, new_chunk.offset, offset)
-                    self.chunks.insert(idx, new_chunk)
+                          (index, new_chunk.size, new_chunk.offset, offset)
+                    self.chunks.insert(index, new_chunk)
                     return
-                idx += 1
+                index += 1
 
         # Not found or empty
         print "Appended element %u of size %u at position %u" % \
@@ -83,7 +83,7 @@ class ChunkIndexer:
             # Yield
             obj.info("Yielding element of size %u at offset %u" % \
                      (chunk.size, chunk.offset))
-            field = chunk.Class(obj, *chunk.args)
+            field = chunk.cls(obj, *chunk.args)
             # Not tested, probably wrong:
             #if chunk.size: field.static_size = 8*chunk.size
             yield field
@@ -182,20 +182,14 @@ class Header(FieldSet):
     """
     def __init__(self, parent, name, desc=None):
         FieldSet.__init__(self, parent, name, desc)
-        self.orders, self.instruments, self.patterns, self._size = \
-                     self.createContentSize(self.absolute_address)
-        self.info("Header: orders=%u instruments=%u patterns=%u size=%u" %
-                  (self.orders, self.instruments, self.patterns, self._size))
-
-    def createContentSize(s, start):
+        start = self.absolute_address
         ordnum = s.stream.readBits(start+0x20*8, 16, LITTLE_ENDIAN)
         insnum = s.stream.readBits(start+0x22*8, 16, LITTLE_ENDIAN)
         patnum = s.stream.readBits(start+0x24*8, 16, LITTLE_ENDIAN)
         size = 0x60+ordnum+2*insnum+2*patnum
         if s.stream.readBits(start+0x35*8, 8, LITTLE_ENDIAN) == 252:
             size += 32
-        size = alignValue(size, 16)
-        return (ordnum, insnum, patnum, 8*size)
+        self._size = alignValue(size, 16) * 8
 
     def createDescription(self):
         return "%s (%u patterns, %u instruments)" % \
@@ -212,13 +206,8 @@ class Header(FieldSet):
         yield RawBytes(self, "reserved[]", 2)
 
         yield UInt16(self, "num_orders")
-        orders = self["num_orders"].value
         yield UInt16(self, "num_instruments")
-        instr = self["num_instruments"].value
         yield UInt16(self, "num_patterns")
-        patterns = self["num_patterns"].value
-        self.info("Header: orders=%u instruments=%u patterns=%u" %
-                  (orders, instr, patterns))
 
         yield Flags(self, "flags")
         yield Enum(UInt16(self, "creation_version"), SCREAMTRACKER_VERSION)
@@ -239,6 +228,11 @@ class Header(FieldSet):
         yield GenericVector(self, "channel_settings", 32, ChannelSettings, "channel")
 
         # Orders
+        orders = self["num_orders"].value
+        instr = self["num_instruments"].value
+        patterns = self["num_patterns"].value
+        self.info("Header: orders=%u instruments=%u patterns=%u" %
+                  (orders, instr, patterns))
         if orders == 0:
             orders = 2
         yield GenericVector(self, "orders", orders, UInt8, "order")
@@ -291,7 +285,7 @@ class OldInstrument(FieldSet):
         yield UInt8(self, "volume")
         yield UInt8(self, "disk")
         yield RawBytes(self, "reserved[]", 2)
-        yield UInt32(self, "c2_speed", "Frequency for middle C note")
+        yield UInt32(self, "c2_speed", "Frequency for middle C note", text_handler=humanFrequency)
         yield RawBytes(self, "reserved[]", 12)
         yield String(self, "name", 28, strip='\0')
         yield String(self, "marker", 4, "Either 'SCRI' or '(empty)'", strip='\0')
@@ -364,7 +358,7 @@ class NewInstrument(FieldSet):
         yield UInt8(self, "reserved[]")
         yield Enum(UInt8(self, "packing"), self.PACKING)
         yield SampleFlags(self, "flags")
-        yield UInt32(self, "c2_speed", "Frequency for middle C note")
+        yield UInt32(self, "c2_speed", "Frequency for middle C note", text_handler=humanFrequency)
         yield UInt32(self, "reserved[]", 4)
         yield UInt16(self, "internal[]", "Sample addresss in GUS memory")
         yield UInt16(self, "internal[]", "Flags for SoundBlaster loop expansion")
@@ -381,7 +375,7 @@ class NewInstrument(FieldSet):
                      "sample_data[]", padded_size, real_size)
 
     def createDescription(self):
-        info = "%uHz, " % self["c2_speed"].value
+        info = "%s, " % self["c2_speed"].display
         size = self["data_length"].value
 
         if self["flags/stereo"].value:
@@ -456,17 +450,17 @@ class Pattern(FieldSet):
             yield Row(self, "row[]")
             count += 1
 
-        size = self._size-self.current_size
-        if size > 0:
-            yield RawBytes(self, "padding", size//8)
+        size = (self.size - self.current_size) // 8
+        if size:
+            yield RawBytes(self, "padding", size)
 
 class S3MModule(Parser):
     tags = {
         "id": "s3m",
         "category": "audio",
-        "file_ext": ["s3m", ],
-        "mime": ('audio/s3m', 'audio/x-s3m', ),
-        "min_size": 64*8, # Header
+        "file_ext": ("s3m",),
+        "mime": ('audio/s3m', 'audio/x-s3m'),
+        "min_size": 64*8,
         "description": "ScreamTracker3 module"
     }
     endian = LITTLE_ENDIAN
@@ -478,9 +472,9 @@ class S3MModule(Parser):
         marker = self.stream.readBits(0x1D*8, 8, LITTLE_ENDIAN)
         if marker != 16:
             return "Invalid type %u" % marker
-        marker = self.stream.readBits(0x2A*8, 16, LITTLE_ENDIAN)
-        if marker != 1 and marker != 2:
-            return "Invalid file version %u" % marker
+        version = self.stream.readBits(0x2A*8, 16, LITTLE_ENDIAN)
+        if version not in (1, 2):
+            return "Invalid file version %u" % version
         marker = self.stream.readBytes(0x2C*8, 4)
         if marker != "SCRM":
             return "Invalid s3m marker %s" % marker
@@ -492,16 +486,17 @@ class S3MModule(Parser):
 
         # Index chunks
         indexer = ChunkIndexer()
-        for idx in xrange(hdr.instruments):
-            offset = 16*hdr["instr_pptr/offset[%u]" % idx].value
+        for index in xrange(self["header/num_instruments"].value):
+            offset = 16*hdr["instr_pptr/offset[%u]" % index].value
             self.info("Adding instrument chunk at offset %u" % offset)
             indexer.addChunk(Chunk(NewInstrument, offset, 0x50, "instrument[]"))
 
-        for idx in xrange(hdr.patterns):
-            offset = 16*hdr["pattern_pptr/offset[%u]" % idx].value
+        for index in xrange(self["header/num_patterns"].value):
+            offset = 16*hdr["pattern_pptr/offset[%u]" % index].value
             self.info("Adding pattern chunk at offset %u" % offset)
             indexer.addChunk(Chunk(Pattern, offset, 0, "pattern[]"))
 
         if len(indexer.chunks) > 0:
             for field in indexer.yieldChunks(self):
                 yield field
+
