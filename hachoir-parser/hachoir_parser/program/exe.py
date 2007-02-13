@@ -240,7 +240,8 @@ class ExeFile(Parser):
         "file_ext": ("exe",),
         "mime": ("application/x-dosexec",),
         "min_size": 64*8,
-        "magic": (("MZ", 0),),
+        #"magic": (("MZ", 0),),
+        "magic_regex": (("MZ.[\0\1].{4}[^\0\1\2\3]", 0),),
         "description": "Microsoft Windows Portable Executable"
     }
     endian = LITTLE_ENDIAN
