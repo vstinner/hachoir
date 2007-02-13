@@ -65,7 +65,6 @@ def displaySearchStat(subfile):
     else:
         print "(no match)"
     print "Total: %u hit/%u valid" % (total_hit, total_valid)
-    print "(using %u parsers)" % len(subfile.magics)
 
 def main():
     # Initialize

@@ -69,6 +69,8 @@ class SearchSubfile:
 
     def loadParsers(self, categories=None, parser_ids=None):
         self.patterns = PatternMatching(categories, parser_ids)
+        if self.debug:
+            print "Use regex: %s" % self.patterns
 
     def main(self):
         """
