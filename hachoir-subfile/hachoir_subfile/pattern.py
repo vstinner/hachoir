@@ -21,9 +21,8 @@ class HachoirPatternMatching(PatternMatching):
         for parser in parser_list:
             for (regex, offset) in parser.getTags().get("magic_regex",()):
                 self.addRegex(regex, (offset, parser))
-        self.commit()
 
     def search(self, data):
-        for offset, item in PatternMatching.search(self, data):
-            yield (item.user[1], offset*8 - item.user[0])
+        for start, stop, item in PatternMatching.search(self, data):
+            yield (item.user[1], start*8 - item.user[0])
 

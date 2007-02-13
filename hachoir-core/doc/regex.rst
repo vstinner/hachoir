@@ -97,3 +97,45 @@ Merge ranges:
 >>> regex = regex | createRange("4"); regex
 <RegexRange '[0-6]'>
 
+
+PatternMaching class
+====================
+
+Use PatternMaching if you would like to find many strings or regex in a string.
+
+Use addString() and addRegex() to add your patterns and then don't forget
+to call commit().
+
+    >>> from hachoir_core.regex import PatternMatching
+    >>> p = PatternMatching()
+    >>> p.addString("a")
+    >>> p.addString("b")
+    >>> p.addRegex("[cd]")
+
+And then use search() to find all patterns:
+
+    >>> for start, end, item in p.search("a b c d"):
+    ...    print "%s..%s: %s" % (start, end, item)
+    ...
+    0..1: a
+    2..3: b
+    4..5: [cd]
+    6..7: [cd]
+
+Item is a Pattern object, not the matched string. To be exact, it's a
+StringPattern for string and a RegexPattern for regex. You can associate an
+"user" value to each Pattern object.
+
+    >>> p2 = PatternMatching()
+    >>> p2.addString("un", 1)
+    >>> p2.addString("deux", 2)
+    >>> p2.addRegex("(trois|three)", 3)
+    >>> for start, end, item in p2.search("un deux trois"):
+    ...    print "%r at %s: user=%r" % (item, start, item.user)
+    ...
+    <StringPattern 'un'> at 0: user=1
+    <StringPattern 'deux'> at 3: user=2
+    <RegexPattern 't(rois|hree)'> at 8: user=3
+
+You can associate any Python object to an item, not only an integer!
+

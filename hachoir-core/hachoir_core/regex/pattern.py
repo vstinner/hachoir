@@ -11,8 +11,11 @@ class StringPattern(Pattern):
         Pattern.__init__(self, user)
         self.text = text
 
+    def __str__(self):
+        return makePrintable(self.text, 'ASCII', to_unicode=True)
+
     def __repr__(self):
-        return "<StringPattern '%s'>" % makePrintable(self.text, 'ASCII', to_unicode=True)
+        return "<StringPattern '%s'>" % self
 
 class RegexPattern(Pattern):
     def __init__(self, regex, user=None):
@@ -20,8 +23,11 @@ class RegexPattern(Pattern):
         self.regex = parse(regex)
         self.compiled_regex = self.regex.compile(python=True)
 
+    def __str__(self):
+        return makePrintable(str(self.regex), 'ASCII', to_unicode=True)
+
     def __repr__(self):
-        return "<RegexPattern '%s'>" % self.regex
+        return "<RegexPattern '%s'>" % self
 
     def match(self, data):
         return self.compiled_regex.match(data)
@@ -36,7 +42,6 @@ class PatternMatching:
     >>> p.addString("a")
     >>> p.addString("b")
     >>> p.addRegex("[cd]")
-    >>> p.commit()
 
     Search patterns:
 
@@ -47,8 +52,10 @@ class PatternMatching:
         self.string_patterns = []
         self.string_dict = {}
         self.regex_patterns = []
+        self._need_commit = True
 
-    def commit(self):
+    def _commit(self):
+        self._need_commit = False
         length = 0
         regex = None
         for item in self.string_patterns:
@@ -65,7 +72,8 @@ class PatternMatching:
             length = max(length, item.regex.maxLength())
         if not regex:
             regex = RegexEmpty()
-        self.regex = regex.compile(python=True)
+        self.regex = regex
+        self.compiled_regex = regex.compile(python=True)
         self.max_length = length
 
     def addString(self, magic, user=None):
@@ -73,6 +81,7 @@ class PatternMatching:
         if item.text not in self.string_dict:
             self.string_patterns.append(item)
             self.string_dict[item.text] = item
+            self._need_commit = True
         else:
             text = makePrintable(item.text, "ASCII", to_unicode=True)
             warning("Skip duplicate string pattern (%s)" % text)
@@ -81,6 +90,7 @@ class PatternMatching:
         item = RegexPattern(regex, user)
         if item.regex.maxLength() is not None:
             self.regex_patterns.append(item)
+            self._need_commit = True
         else:
             regex = makePrintable(str(item.regex), 'ASCII', to_unicode=True)
             warning("Skip invalid regex pattern (%s)" % regex)
@@ -105,11 +115,16 @@ class PatternMatching:
     def search(self, data):
         """
         Search patterns in data.
-        Return a generator (offset, item)
+        Return a generator of tuples: (start, end, item)
         """
-        for match in self.regex.finditer(data):
+        if self._need_commit:
+            self._commit()
+        for match in self.compiled_regex.finditer(data):
             item = self.getPattern(match.group(0))
-            yield (match.start(0), item)
+            yield (match.start(0), match.end(0), item)
+
+    def __str__(self):
+        return makePrintable(str(self.regex), 'ASCII', to_unicode=True)
 
 if __name__ == "__main__":
     import doctest, sys
