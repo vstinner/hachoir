@@ -66,7 +66,7 @@ def createRange(*text, **kw):
     >>> createRange("a", "d", "b")
     <RegexRange '[abd]'>
     >>> createRange("-", "9", "4", "3", "0")
-    <RegexRange '[9340-]'>
+    <RegexRange '[0349-]'>
     """
     ranges = ( RegexRangeCharacter(item) for item in text )
     return RegexRange(ranges, kw.get('exclude', False))
@@ -92,6 +92,9 @@ class Regex:
     def __repr__(self):
         return "<%s '%s'>" % (
             self.__class__.__name__, self)
+
+    def __contains__(self, item):
+        raise NotImplementedError()
 
     def _and(self, regex):
         """
@@ -241,7 +244,10 @@ class RegexString(Regex):
                 break
         if not common:
             return None
-        return (createString(texta[:-common]), createString(textb[:-common]), createString(texta[-common:]))
+        return (
+            createString(texta[:-common]),
+            createString(textb[:-common]),
+            createString(texta[-common:]))
 
     def findPrefix(self, regex):
         """
@@ -294,7 +300,7 @@ class RegexString(Regex):
         Group suffix:
 
         >>> RegexString("moot") | RegexString("boot")
-        <RegexAnd '[mb]oot'>
+        <RegexAnd '[bm]oot'>
         """
         # Don't know any other optimization for str|other
         if regex.__class__ != RegexString:
@@ -330,6 +336,7 @@ class RegexRangeItem:
                 (self.cmin, self.cmax))
 
     def __contains__(self, value):
+        assert issubclass(value.__class__, RegexRangeItem)
         return (self.cmin <= value.cmin) and (value.cmax <= self.cmax)
 
     def __str__(self, **kw):
@@ -355,6 +362,7 @@ class RegexRange(Regex):
         self.ranges = []
         for item in ranges:
             RegexRange.rangeAdd(self.ranges, item)
+        self.ranges.sort(key=lambda item: item.cmin)
         self.exclude = exclude
 
     @staticmethod
@@ -538,6 +546,9 @@ class RegexOr(Regex):
             if not new_item:
                 new_item = regex._or(item)
             if new_item:
+#                # FIXME: Is this code valid? (don't break mutable assertion)
+#                content = self.content[:index] + self.content[index+1:] + [new_item]
+#                return RegexOr.join(content)
                 self.content[index] = new_item
                 return self
         return RegexOr( self.content + [regex] )
