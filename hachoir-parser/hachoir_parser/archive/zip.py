@@ -17,6 +17,8 @@ from hachoir_core.error import HACHOIR_ERRORS
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_parser.common.deflate import Deflate
 
+MAX_FILESIZE = 1000 * 1024 * 1024
+
 COMPRESSION_DEFLATE = 8
 COMPRESSION_METHOD = {
     0: "no compression",
@@ -415,7 +417,9 @@ class ZipFile(Parser):
         return ".zip"
 
     def createContentSize(self):
-        end = self.stream.searchBytes("PK\5\6", 0)
+        start = 0
+        end = MAX_FILESIZE * 8
+        end = self.stream.searchBytes("PK\5\6", start, end)
         if end is not None:
             return end + 22*8
         return None
