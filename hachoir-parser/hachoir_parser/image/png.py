@@ -18,6 +18,8 @@ from hachoir_core.endian import NETWORK_ENDIAN
 from hachoir_core.tools import humanFilesize, humanDatetime
 from datetime import datetime
 
+MAX_FILESIZE = 500 * 1024 * 1024
+
 try:
     from zlib import decompressobj
 
@@ -242,8 +244,9 @@ class PngFile(Parser):
     def createContentSize(self):
         field = self["header"]
         start = field.absolute_address + field.size
-        end = self.stream.searchBytes("\0\0\0\0IEND\xae\x42\x60\x82", start)
-        if end is not None:
-            return end + 12*8
+        end = MAX_FILESIZE * 8
+        pos = self.stream.searchBytes("\0\0\0\0IEND\xae\x42\x60\x82", start, end)
+        if pos is not None:
+            return pos + 12*8
         return None
 

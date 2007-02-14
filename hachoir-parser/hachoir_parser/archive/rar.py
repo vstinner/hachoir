@@ -15,6 +15,8 @@ from hachoir_core.text_handler import humanFilesize, hexadecimal
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_parser.common.msdos import MSDOSFileAttr32
 
+MAX_FILESIZE = 1000 * 1024 * 1024
+
 BLOCK_NAME = {
     0x72: "Marker",
     0x73: "Archive",
@@ -342,8 +344,10 @@ class RarFile(Parser):
             yield Block(self, "block[]")
 
     def createContentSize(self):
-        end = self.stream.searchBytes("\xC4\x3D\x7B\x00\x40\x07\x00", 0)
-        if end is not None:
-            return end + 7*8
+        start = 0
+        end = MAX_FILESIZE * 8
+        pos = self.stream.searchBytes("\xC4\x3D\x7B\x00\x40\x07\x00", start, end)
+        if pos is not None:
+            return pos + 7*8
         return None
 

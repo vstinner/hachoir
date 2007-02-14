@@ -16,6 +16,8 @@ from hachoir_core.text_handler import hexadecimal
 from hachoir_core.tools import createDict, humanDurationNanosec
 from hachoir_parser.common.tracker import NOTE_NAME
 
+MAX_FILESIZE = 10 * 1024 * 1024
+
 class Integer(Bits):
     def __init__(self, parent, name, description=None):
         Bits.__init__(self, parent, name, 8, description)
@@ -207,7 +209,7 @@ class MidiFile(Parser):
         count = self["/header/nb_track"].value - 1
         start = self["track[%u]" % count].absolute_address
         # Search "End of track" of last track
-        end = self.stream.searchBytes("\xff\x2f\x00", start)
+        end = self.stream.searchBytes("\xff\x2f\x00", start, MAX_FILESIZE*8)
         if end is not None:
             return end + 3*8
         return None

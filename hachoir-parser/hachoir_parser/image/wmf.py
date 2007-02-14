@@ -14,6 +14,8 @@ Author: Victor Stinner
 Creation date: 26 december 2006
 """
 
+MAX_FILESIZE = 50 * 1024 * 1024
+
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, StaticFieldSet, Enum,
     MissingField, ParserError,
@@ -604,7 +606,7 @@ class WMF_File(Parser):
         if self.isEMF():
             return None
         start = self["func[0]"].absolute_address
-        end = self.stream.searchBytes("\3\0\0\0\0\0", start)
+        end = self.stream.searchBytes("\3\0\0\0\0\0", start, MAX_FILESIZE * 8)
         if end is not None:
             return end + 6*8
         return None

@@ -22,6 +22,8 @@ from hachoir_core.text_handler import hexadecimal
 from hachoir_parser.image.exif import Exif
 from hachoir_parser.image.photoshop_metadata import PhotoshopMetadata
 
+MAX_FILESIZE = 100 * 1024 * 1024
+
 # The four tables (hash/sum for color/grayscale JPEG) comes
 # from ImageMagick project
 QUALITY_HASH_COLOR = (
@@ -303,7 +305,7 @@ class JpegFile(Parser):
         if "data" not in self:
             return None
         start = self["data"].absolute_address
-        end = self.stream.searchBytes("\xff\xd9", start)
+        end = self.stream.searchBytes("\xff\xd9", start, MAX_FILESIZE*8)
         if end is not None:
             return end + 16
         return None
