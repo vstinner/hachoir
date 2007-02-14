@@ -157,16 +157,13 @@ class SearchSubfile:
         """
         Process a valid parser.
         """
-        format = parser.__class__.__name__
-        if self.debug:
-            print >>stderr, "Found %s at offset %s" % (format, offset//8)
-        text = "[+] Found file at %s" % (offset//8)
+        text = "[+] File at %s" % (offset//8)
         if parser.content_size is not None:
             text += " size=%s (%s)" % (parser.content_size//8, humanFilesize(parser.content_size//8))
         if not(parser.content_size) or parser.content_size//8 < FILE_MAX_SIZE:
             text += ": " + parser.description
         else:
-            text += ": " + format
+            text += ": " + parser.__class__.__name__
 
         if self.output and parser.content_size:
             if (offset == 0 and parser.content_size == self.size):
@@ -213,6 +210,10 @@ class SearchSubfile:
 
             # Parser is valid, yield it with the offset
             self.stats[parser_cls][1] += 1
+
+            if self.debug:
+                print >>stderr, "Found %s at offset %s" % (
+                    parser.__class__.__name__, offset//8)
             yield (offset, parser)
 
             # Set next offset
