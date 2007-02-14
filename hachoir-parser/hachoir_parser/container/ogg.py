@@ -12,6 +12,8 @@ from hachoir_core.field import (Field, FieldSet, createOrphanField,
 from hachoir_core.stream import FragmentedStream
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 
+MAX_FILESIZE = 1000 * 1024 * 1024
+
 class XiphInt(Field):
     """
     Positive integer with variable size. Values bigger than 254 are stored as
@@ -258,9 +260,11 @@ class OggFile(Parser):
             yield OggPage(self, "page[]")
 
     def createLastPage(self):
-        offset = self.stream.searchBytes("OggS\0\5", 0)
+        start = 0
+        end = MAX_FILESIZE * 8
+        offset = self.stream.searchBytes("OggS\0\5", start, end)
         if offset is None:
-            offset = self.stream.searchBytes("OggS\0\4", 0)
+            offset = self.stream.searchBytes("OggS\0\4", start, end)
         if offset is None:
             return None
         return createOrphanField(self, offset, OggPage, "page")
