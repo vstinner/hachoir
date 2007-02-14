@@ -204,13 +204,9 @@ class Regex:
         return re.compile(self.__str__(**kw))
 
     def findPrefix(self, regex):
-        if self == regex:
-            return (self, RegexEmpty(), RegexEmpty())
         return None
 
     def findSuffix(self, regex):
-        if self == regex:
-            return (RegexEmpty(), RegexEmpty(), self)
         return None
 
     def __iter__(self):
@@ -288,13 +284,17 @@ class RegexString(Regex):
          - None if there is no common prefix
          - (regexa, regexb, suffix) otherwise => (regexa|regexb) + suffix
 
-        >>> RegexString('red color').findSuffix(RegexString('blue color'))
-        (<RegexString 'red'>, <RegexString 'blue'>, <RegexString ' color'>)
+        Don't extract suffix for string with different length.
+
+        >>> RegexString('dark color').findSuffix(RegexString('deep color'))
+        (<RegexString 'dark'>, <RegexString 'deep'>, <RegexString ' color'>)
         """
         if regex.__class__ != RegexString:
             return None
         texta = self._text
         textb = regex._text
+        if len(texta) != len(textb):
+            return None
         common = None
         for length in xrange(1, min(len(texta),len(textb))+1):
             if textb.endswith(texta[-length:]):
@@ -367,11 +367,7 @@ class RegexString(Regex):
         # Find common suffix
         common = self.findSuffix(regex)
         if common:
-            regex = (common[0] | common[1])
-
-            # Keep suffix if beginning part is not like (a|b)
-            if regex.__class__ != RegexOr:
-                return regex + common[2]
+            return (common[0] | common[1]) + common[2]
         return None
 
 class RegexRangeItem:
@@ -536,6 +532,16 @@ class RegexAnd(Regex):
             return None
 
         contenta = self.content
+
+        # Find common prefix
+        # eg. (ab|ac) => a(b|c) and (abc|abd) => ab(c|d)
+        index = 0
+        last_index = min(len(contenta), len(contentb))
+        while index < last_index and contenta[index] == contentb[index]:
+            index += 1
+        if index:
+            regex = RegexAnd.join(contenta[index:]) | RegexAnd.join(contentb[index:])
+            return RegexAnd.join(contenta[:index]) + regex
 
         # Find common prefix: (abc|aef) => a(bc|ef)
         common = contenta[0].findPrefix(contentb[0])
