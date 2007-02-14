@@ -113,6 +113,14 @@ class Regex:
         return self.minLength()
 
     def __str__(self, **kw):
+        if not hasattr(self, "_str_value"):
+            self._str_value = {}
+        key = kw.get('python', False)
+        if key not in self._str_value:
+            self._str_value[key] = self._str(**kw)
+        return self._str_value[key]
+
+    def _str(self, **kw):
         raise NotImplementedError()
 
     def __repr__(self):
@@ -218,7 +226,7 @@ class RegexEmpty(Regex):
     def minLength(self):
         return 0
 
-    def __str__(self, **kw):
+    def _str(self, **kw):
         return ''
 
     def _and(self, regex):
@@ -233,7 +241,7 @@ class RegexStart(Regex):
             return self
         return None
 
-    def __str__(self, **kw):
+    def _str(self, **kw):
         return '^'
 
 class RegexEnd(RegexStart):
@@ -242,14 +250,14 @@ class RegexEnd(RegexStart):
             return self
         return None
 
-    def __str__(self, **kw):
+    def _str(self, **kw):
         return '$'
 
 class RegexDot(Regex):
     def minLength(self):
         return 1
 
-    def __str__(self, **kw):
+    def _str(self, **kw):
         return '.'
 
     def _match(self, regex):
@@ -277,7 +285,7 @@ class RegexString(Regex):
             return RegexString(self._text + regex._text)
         return None
 
-    def __str__(self, **kw):
+    def _str(self, **kw):
         return escapeRegex(self._text)
 
     def findSuffix(self, regex):
@@ -373,7 +381,8 @@ class RegexString(Regex):
                 regex = common[0] | common[1]
             else:
                 regex = common[1] | common[0]
-            if regex.__class__ != RegexOr and regex.minLength() == regex.maxLength():
+
+            if matchSingleValue(regex) or regex.__class__ == RegexRange:
                 return regex + common[2]
         return None
 
@@ -483,7 +492,7 @@ class RegexRange(Regex):
             RegexRange.rangeAdd(ranges, itemb)
         return RegexRange(ranges, self.exclude)
 
-    def __str__(self, **kw):
+    def _str(self, **kw):
         content = [str(item) for item in self.ranges]
         if "-" in content:
             content.remove("-")
@@ -567,7 +576,7 @@ class RegexAnd(Regex):
             regexa = RegexAnd.join( contenta[:-1] ) & common[0]
             regexb = RegexAnd.join( contentb[:-1] ) & common[1]
             regex = (regexa | regexb)
-            if matchSingleValue(common[2]) or matchSingleValue(regex):
+            if matchSingleValue(common[2]) and matchSingleValue(regex):
                 return regex + common[2]
         return None
 
@@ -590,7 +599,7 @@ class RegexAnd(Regex):
             return self
         return RegexAnd( self.content + [regex] )
 
-    def __str__(self, **kw):
+    def _str(self, **kw):
         return ''.join( item.__str__(**kw) for item in self.content )
 
     @classmethod
@@ -645,7 +654,7 @@ class RegexOr(Regex):
             content = [regex] + self.content
         return RegexOr(content)
 
-    def __str__(self, **kw):
+    def _str(self, **kw):
         content = '|'.join( item.__str__(**kw) for item in self.content )
         if kw.get('python', False):
             return "(?:%s)" % content
@@ -678,6 +687,9 @@ class RegexOr(Regex):
         <RegexRange '[a-c]'>
         """
         return _join(operator.__or__, regex)
+
+    def __iter__(self):
+        return iter(self.content)
 
 class RegexRepeat(Regex):
     """
@@ -726,7 +738,7 @@ class RegexRepeat(Regex):
         else:
             return None
 
-    def __str__(self, **kw):
+    def _str(self, **kw):
         text = str(self.regex)
         if self.min == 0 and self.max == 1:
             return "%s?" % text

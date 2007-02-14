@@ -21,7 +21,7 @@ class RegexPattern(Pattern):
     def __init__(self, regex, user=None):
         Pattern.__init__(self, user)
         self.regex = parse(regex)
-        self.compiled_regex = self.regex.compile(python=True)
+        self._compiled_regex = None
 
     def __str__(self):
         return makePrintable(str(self.regex), 'ASCII', to_unicode=True)
@@ -31,6 +31,12 @@ class RegexPattern(Pattern):
 
     def match(self, data):
         return self.compiled_regex.match(data)
+
+    def _getCompiledRegex(self):
+        if self._compiled_regex is None:
+            self._compiled_regex = self.regex.compile(python=True)
+        return self._compiled_regex
+    compiled_regex = property(_getCompiledRegex)
 
 class PatternMatching:
     """
