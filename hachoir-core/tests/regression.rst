@@ -15,6 +15,8 @@ Old bug => '([BM](SCF|Thd|MP4|Zh))'
 
 It wasn't optimized: <RegexOr '([CF]WS1|[CF]WS2)'>
 
+>>> parse("(abc9|__.9)")
+<RegexAnd '(abc|__.)9'>
 >>> parse("(abcdeZ|abZ)")
 <RegexAnd 'ab(cdeZ|Z)'>
 

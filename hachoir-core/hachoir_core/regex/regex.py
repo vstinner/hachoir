@@ -174,17 +174,17 @@ class Regex:
             return regex
 
         # Try to optimize (a|b)
-        new_regex = self._or_(regex)
+        new_regex = self._or_(regex, False)
         if new_regex:
             return new_regex
 
         # Try to optimize (b|a)
-        new_regex = regex._or_(self)
+        new_regex = regex._or_(self, True)
         if new_regex:
             return new_regex
         return None
 
-    def _or_(self, regex):
+    def _or_(self, regex, reverse):
         return None
 
     def __or__(self, regex):
@@ -284,8 +284,6 @@ class RegexString(Regex):
          - None if there is no common prefix
          - (regexa, regexb, suffix) otherwise => (regexa|regexb) + suffix
 
-        Don't extract suffix for string with different length.
-
         >>> RegexString('dark color').findSuffix(RegexString('deep color'))
         (<RegexString 'dark'>, <RegexString 'deep'>, <RegexString ' color'>)
         """
@@ -293,8 +291,6 @@ class RegexString(Regex):
             return None
         texta = self._text
         textb = regex._text
-        if len(texta) != len(textb):
-            return None
         common = None
         for length in xrange(1, min(len(texta),len(textb))+1):
             if textb.endswith(texta[-length:]):
@@ -337,7 +333,7 @@ class RegexString(Regex):
             return None
         return (RegexString(texta[:common]), createString(texta[common:]), createString(textb[common:]))
 
-    def _or_(self, regex):
+    def _or_(self, regex, reverse):
         """
         Remove duplicate:
         >>> RegexString("color") | RegexString("color")
@@ -362,12 +358,21 @@ class RegexString(Regex):
         # Find common prefix
         common = self.findPrefix(regex)
         if common:
-            return common[0] + (common[1] | common[2])
+            if not reverse:
+                regex = common[1] | common[2]
+            else:
+                regex = common[2] | common[1]
+            return common[0] + regex
 
         # Find common suffix
         common = self.findSuffix(regex)
         if common:
-            return (common[0] | common[1]) + common[2]
+            if not reverse:
+                regex = common[0] | common[1]
+            else:
+                regex = common[1] | common[0]
+            if regex.minLength() == regex.maxLength():
+                return regex + common[2]
         return None
 
 class RegexRangeItem:
@@ -458,7 +463,7 @@ class RegexRange(Regex):
                 return False
         return True
 
-    def _or_(self, regex):
+    def _or_(self, regex, reverse):
         """
         >>> createRange("a") | createRange("b")
         <RegexRange '[ab]'>
@@ -523,7 +528,7 @@ class RegexAnd(Regex):
         """
         return self._minmaxLength( regex.maxLength() for regex in self.content )
 
-    def _or_(self, regex):
+    def _or_(self, regex, reverse):
         if regex.__class__ == RegexString:
             contentb = [regex]
         elif regex.__class__ == RegexAnd:
@@ -532,6 +537,8 @@ class RegexAnd(Regex):
             return None
 
         contenta = self.content
+        if reverse:
+            contenta, contentb = contentb, contenta
 
         # Find common prefix
         # eg. (ab|ac) => a(b|c) and (abc|abd) => ab(c|d)
@@ -610,7 +617,7 @@ class RegexOr(Regex):
                 return True
         return False
 
-    def _or_(self, regex):
+    def _or_(self, regex, reverse):
         """
         >>> (RegexString("abc") | RegexString("123")) | (RegexString("plop") | RegexString("456"))
         <RegexOr '(abc|123|plop|456)'>
@@ -630,8 +637,11 @@ class RegexOr(Regex):
                 content = self.content[:index] + [new_item] \
                     + self.content[index+1:]
                 return RegexOr.join(content)
-
-        return RegexOr( self.content + [regex] )
+        if not reverse:
+            content = self.content + [regex]
+        else:
+            content = [regex] + self.content
+        return RegexOr(content)
 
     def __str__(self, **kw):
         content = '|'.join( item.__str__(**kw) for item in self.content )
