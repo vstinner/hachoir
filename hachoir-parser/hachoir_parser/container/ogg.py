@@ -235,8 +235,29 @@ class OggFile(Parser):
     def validate(self):
         if self.stream.readBytes(0, 4) != self.MAGIC:
             return "Wrong signature"
-        else:
-            return True
+
+        # Validate first 5 pages
+        previous = None
+        for index in xrange(5):
+            try:
+                page = self["page[%u]" % index]
+            except MissingField:
+                if self.done:
+                    return True
+                return "Unable to get page #%u" % index
+            except (InputStreamError, ParserError):
+                return "Unable to create page #%u" % index
+
+            # Check that all pages are similar
+            if previous:
+                if previous["serial"].value != page["serial"].value:
+                    return "Frame #%u serial number is different" % index
+                if page["abs_granule_pos"].value < previous["abs_granule_pos"].value:
+                    return "Frame #%u 'abs_granule_pos' is smaller than previous page" % index
+                if (previous["page"].value + 1) != page["page"].value:
+                    return "Frame #%u page number is invalid" % index
+            previous = page
+        return True
 
     def createMimeType(self):
         if "theora_hdr" in self["page[0]"]:
