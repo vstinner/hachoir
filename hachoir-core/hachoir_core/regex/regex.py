@@ -373,7 +373,7 @@ class RegexString(Regex):
                 regex = common[0] | common[1]
             else:
                 regex = common[1] | common[0]
-            if regex.minLength() == regex.maxLength():
+            if regex.__class__ != RegexOr and regex.minLength() == regex.maxLength():
                 return regex + common[2]
         return None
 
