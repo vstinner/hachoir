@@ -29,9 +29,34 @@ See also CPAN Regexp::Assemble (Perl module):
    http://search.cpan.org/~dland/Regexp-Assemble-0.28/Assemble.pm
 """
 
+from hachoir_core.compatibility import all
 import re
 import itertools
 import operator
+
+def matchSingleValue(regex):
+    """
+    Regex only match one exact string.
+
+    >>> matchSingleValue(RegexEmpty())
+    True
+    >>> matchSingleValue(createString("abc"))
+    True
+    >>> matchSingleValue(createRange("a", "b"))
+    False
+    >>> matchSingleValue(createRange("a"))
+    True
+    >>> matchSingleValue(RegexAnd((RegexStart(), createString("abc"))))
+    True
+    """
+    cls = regex.__class__
+    if cls in (RegexEmpty, RegexString, RegexStart, RegexEnd):
+        return True
+    if cls == RegexAnd:
+        return all( matchSingleValue(item) for item in regex )
+    if cls == RegexRange:
+        return len(regex.ranges) == 1 and len(regex.ranges[0]) == 1
+    return False
 
 def escapeRegex(text):
     # Escape >> ^.+*?{}[]|()\$ <<, prefix them with >> \ <<
@@ -163,6 +188,9 @@ class Regex:
         if self == regex:
             return (RegexEmpty(), RegexEmpty(), self)
         return None
+
+    def __iter__(self):
+        raise NotImplementedError()
 
 class RegexEmpty(Regex):
     def minLength(self):
@@ -342,6 +370,9 @@ class RegexRangeItem:
             raise TypeError("RegexRangeItem: minimum (%u) is bigger than maximum (%u)" %
                 (self.cmin, self.cmax))
 
+    def __len__(self):
+        return (self.cmax - self.cmin + 1)
+
     def __contains__(self, value):
         assert issubclass(value.__class__, RegexRangeItem)
         return (self.cmin <= value.cmin) and (value.cmax <= self.cmax)
@@ -476,7 +507,7 @@ class RegexAnd(Regex):
             regexa = common[1] & RegexAnd.join( contenta[1:] )
             regexb = common[2] & RegexAnd.join( contentb[1:] )
             regex = (regexa | regexb)
-            if regex.__class__ != RegexOr:
+            if matchSingleValue(common[0]) or matchSingleValue(regex):
                 return common[0] + regex
 
         # Find common suffix: (abc|dec) => (ab|de)c
@@ -487,7 +518,7 @@ class RegexAnd(Regex):
             regex = (regexa | regexb)
 
             # Keep suffix if beginning part is not like (a|b)
-            if regex.__class__ != RegexOr:
+            if matchSingleValue(common[2]) or matchSingleValue(regex):
                 return regex + common[2]
         return None
 
@@ -520,6 +551,9 @@ class RegexAnd(Regex):
         <RegexString 'Big fish'>
         """
         return _join(operator.__and__, regex)
+
+    def __iter__(self):
+        return iter(self.content)
 
 class RegexOr(Regex):
     def __init__(self, items):

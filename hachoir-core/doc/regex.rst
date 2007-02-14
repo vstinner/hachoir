@@ -82,6 +82,10 @@ Group prefix/suffix:
 <RegexAnd '[mp]ot'>
 >>> createString("moto") | parse("mot.")
 <RegexAnd 'mot.'>
+>>> parse("(ma|mb|mc)")
+<RegexAnd 'm[a-c]'>
+>>> parse("(maa|mbb|mcc)")
+<RegexAnd 'm(aa|bb|cc)'>
 
 Merge ranges:
 
