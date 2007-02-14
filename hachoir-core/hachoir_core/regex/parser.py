@@ -137,6 +137,12 @@ def _parse(text, start=0, until=None):
                 new_regex = RegexRepeat(last, rmin, rmax)
                 last = None
                 index += 1
+            elif char == "\\":
+                index += 1
+                if index == len(text):
+                    raise SyntaxError("Antislash (\\) without escaped character")
+                new_regex = RegexString(text[index])
+                index += 1
             else:
                 raise NotImplementedError("Operator '%s' is not supported" % char)
             start = index
@@ -162,6 +168,8 @@ def parse(text):
     <RegexString 'abc'>
     >>> parse('[bc]d')
     <RegexAnd '[bc]d'>
+    >>> parse("\\.")
+    <RegexString '\.'>
     """
     regex, index = _parse(text)
     assert index == len(text)

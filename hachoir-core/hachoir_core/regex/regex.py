@@ -613,6 +613,17 @@ class RegexAnd(Regex):
     def __iter__(self):
         return iter(self.content)
 
+# TODO: Remove this code or use it
+#def firstCharacter(regex):
+#    cls = regex.__class__
+#    if cls == RegexString:
+#        return regex._text[0]
+#    if cls == RegexRange:
+#        return chr(regex.ranges[0].cmin)
+#    if cls in (RegexOr, RegexAnd):
+#        return firstCharacter(regex.content[0])
+#    return str(regex)[0]
+
 class RegexOr(Regex):
     def __init__(self, items):
         self.content = []
@@ -621,6 +632,7 @@ class RegexOr(Regex):
                 continue
             self.content.append(item)
         assert 2 <= len(self.content)
+#        self.content.sort(key=firstCharacter)
 
     def __contains__(self, regex):
         for item in self.content:
