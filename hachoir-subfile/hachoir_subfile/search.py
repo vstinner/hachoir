@@ -143,10 +143,7 @@ class SearchSubfile:
             self.datarate.update(self.current_offset)
             if self.verbose and self.next_progress <= time():
                 self.displayProgress()
-            found = []
-            for parser in self.findMagic(self.current_offset):
-                found.append(parser)
-            for offset, parser in sorted(found):
+            for offset, parser in self.findMagic(self.current_offset):
                 self.processParser(offset, parser)
             self.current_offset += self.slice_size
             if self.next_offset:
