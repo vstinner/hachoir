@@ -81,7 +81,7 @@ Group prefix/suffix:
 >>> createString("mot") | createString("pot")
 <RegexAnd '[mp]ot'>
 >>> createString("moto") | parse("mot.")
-<RegexAnd 'mot(.|o)'>
+<RegexAnd 'mot.'>
 
 Merge ranges:
 

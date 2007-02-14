@@ -202,6 +202,13 @@ class RegexDot(Regex):
     def __str__(self, **kw):
         return '.'
 
+    def _or(self, regex):
+        if regex.__class__ == RegexRange:
+            return self
+        if regex.__class__ == RegexString and len(regex._text) == 1:
+            return self
+        return None
+
 class RegexString(Regex):
     def __init__(self, text=""):
         assert isinstance(text, str)
@@ -468,7 +475,9 @@ class RegexAnd(Regex):
         if common:
             regexa = common[1] & RegexAnd.join( contenta[1:] )
             regexb = common[2] & RegexAnd.join( contentb[1:] )
-            return common[0] + (regexa | regexb)
+            regex = (regexa | regexb)
+            if regex.__class__ != RegexOr:
+                return common[0] + regex
 
         # Find common suffix: (abc|dec) => (ab|de)c
         common = contenta[-1].findSuffix(contentb[-1])
@@ -546,11 +555,10 @@ class RegexOr(Regex):
             if not new_item:
                 new_item = regex._or(item)
             if new_item:
-#                # FIXME: Is this code valid? (don't break mutable assertion)
-#                content = self.content[:index] + self.content[index+1:] + [new_item]
-#                return RegexOr.join(content)
-                self.content[index] = new_item
-                return self
+                content = self.content[:index] + [new_item] \
+                    + self.content[index+1:]
+                return RegexOr.join(content)
+
         return RegexOr( self.content + [regex] )
 
     def __str__(self, **kw):

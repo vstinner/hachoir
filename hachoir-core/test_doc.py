@@ -41,6 +41,7 @@ def main():
     testDoc('doc/hachoir-api.rst')
     testDoc('doc/internals.rst')
     testDoc('doc/regex.rst')
+    testDoc('tests/regression.rst')
 
     # Test documentation of some functions/classes
     testModule("hachoir_core.bits")
