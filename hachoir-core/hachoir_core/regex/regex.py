@@ -29,7 +29,7 @@ See also CPAN Regexp::Assemble (Perl module):
    http://search.cpan.org/~dland/Regexp-Assemble-0.28/Assemble.pm
 """
 
-from hachoir_core.compatibility import all
+from hachoir_core.compatibility import all, any
 import re
 import itertools
 import operator
@@ -121,6 +121,18 @@ class Regex:
     def __contains__(self, item):
         raise NotImplementedError()
 
+    def match(self, regex):
+        """
+        Guess if self may matchs regex.
+        May returns False even if self does match regex.
+        """
+        if str(self) == str(regex):
+            return True
+        return self._match(regex)
+
+    def _match(self, regex):
+        return False
+
     def _and(self, regex):
         """
         Create new optimized version of a+b.
@@ -147,25 +159,37 @@ class Regex:
     def __add__(self, regex):
         return self.__and__(regex)
 
-    def _or(self, regex):
+    def or_(self, regex):
         """
         Create new optimized version of a|b.
         Returns None if there is no interesting optimization.
         """
-        return None
-
-    def __or__(self, regex):
-        # (a|a) => a
-        if self == regex:
+        # (a|b) where a match b => a
+        # eg. ([a-z|[a-b]) => [a-z]
+        if self.match(regex):
             return self
 
+        # (b|a) where b match a => a
+        if regex.match(self):
+            return regex
+
         # Try to optimize (a|b)
-        new_regex = self._or(regex)
+        new_regex = self._or_(regex)
         if new_regex:
             return new_regex
 
         # Try to optimize (b|a)
-        new_regex = regex._or(self)
+        new_regex = regex._or_(self)
+        if new_regex:
+            return new_regex
+        return None
+
+    def _or_(self, regex):
+        return None
+
+    def __or__(self, regex):
+        # Try to optimize (a|b)
+        new_regex = self.or_(regex)
         if new_regex:
             return new_regex
 
@@ -230,12 +254,12 @@ class RegexDot(Regex):
     def __str__(self, **kw):
         return '.'
 
-    def _or(self, regex):
+    def _match(self, regex):
         if regex.__class__ == RegexRange:
-            return self
+            return True
         if regex.__class__ == RegexString and len(regex._text) == 1:
-            return self
-        return None
+            return True
+        return False
 
 class RegexString(Regex):
     def __init__(self, text=""):
@@ -298,17 +322,11 @@ class RegexString(Regex):
         texta = self._text
         textb = regex._text
 
-        # text|text => text
-        texta = self._text
-        textb = regex._text
-        if texta == textb:
-            return (self, RegexEmpty(), RegexEmpty())
-
-        # (a|b) => [ab]
+        # '(a|b)' => '[ab]'
         if len(texta) == len(textb) == 1:
-            ranges = (RegexRangeCharacter(texta), RegexRangeCharacter(textb))
-            return (RegexRange(ranges),  RegexEmpty(), RegexEmpty())
+            return (createRange(texta, textb),  RegexEmpty(), RegexEmpty())
 
+        # '(text abc|text def)' => 'text (abc|def)'
         common = None
         for length in xrange(1, min(len(texta),len(textb))+1):
             if textb.startswith(texta[:length]):
@@ -319,7 +337,7 @@ class RegexString(Regex):
             return None
         return (RegexString(texta[:common]), createString(texta[common:]), createString(textb[common:]))
 
-    def _or(self, regex):
+    def _or_(self, regex):
         """
         Remove duplicate:
         >>> RegexString("color") | RegexString("color")
@@ -426,7 +444,25 @@ class RegexRange(Regex):
     def minLength(self):
         return 1
 
-    def _or(self, regex):
+    def _match(self, regex):
+        """
+        >>> createRange("a") | createRange("b")
+        <RegexRange '[ab]'>
+        >>> createRange("a", "b", exclude=True) | createRange("a", "c", exclude=True)
+        <RegexRange '[^a-c]'>
+        """
+        if not self.exclude and regex.__class__ == RegexString and len(regex._text) == 1:
+            branges = (RegexRangeCharacter(regex._text),)
+        elif regex.__class__ == RegexRange and self.exclude == regex.exclude:
+            branges = regex.ranges
+        else:
+            return None
+        for itemb in branges:
+            if not any( itemb in itema for itema in self.ranges ):
+                return False
+        return True
+
+    def _or_(self, regex):
         """
         >>> createRange("a") | createRange("b")
         <RegexRange '[ab]'>
@@ -491,7 +527,7 @@ class RegexAnd(Regex):
         """
         return self._minmaxLength( regex.maxLength() for regex in self.content )
 
-    def _or(self, regex):
+    def _or_(self, regex):
         if regex.__class__ == RegexString:
             contentb = [regex]
         elif regex.__class__ == RegexAnd:
@@ -516,8 +552,6 @@ class RegexAnd(Regex):
             regexa = RegexAnd.join( contenta[:-1] ) & common[0]
             regexb = RegexAnd.join( contentb[:-1] ) & common[1]
             regex = (regexa | regexb)
-
-            # Keep suffix if beginning part is not like (a|b)
             if matchSingleValue(common[2]) or matchSingleValue(regex):
                 return regex + common[2]
         return None
@@ -570,7 +604,7 @@ class RegexOr(Regex):
                 return True
         return False
 
-    def _or(self, regex):
+    def _or_(self, regex):
         """
         >>> (RegexString("abc") | RegexString("123")) | (RegexString("plop") | RegexString("456"))
         <RegexOr '(abc|123|plop|456)'>
@@ -582,12 +616,10 @@ class RegexOr(Regex):
             for item in regex.content:
                 total = total | item
             return total
-        if regex in self:
-            return self
         for index, item in enumerate(self.content):
-            new_item = item._or(regex)
+            new_item = item.or_(regex)
             if not new_item:
-                new_item = regex._or(item)
+                new_item = regex.or_(item)
             if new_item:
                 content = self.content[:index] + [new_item] \
                     + self.content[index+1:]
