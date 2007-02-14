@@ -76,10 +76,11 @@ The library includes many optimization to keep small and fast expressions.
 
 Group prefix/suffix:
 
+#>>> createString("mot") | createString("pot")
+#<RegexAnd '[mp]ot'>
+
 >>> createString("blue") | createString("brown")
 <RegexAnd 'b(lue|rown)'>
->>> createString("mot") | createString("pot")
-<RegexAnd '[mp]ot'>
 >>> createString("moto") | parse("mot.")
 <RegexAnd 'mot.'>
 >>> parse("(ma|mb|mc)")

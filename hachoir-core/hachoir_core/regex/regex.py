@@ -216,9 +216,6 @@ class Regex:
     def findPrefix(self, regex):
         return None
 
-    def findSuffix(self, regex):
-        return None
-
     def __iter__(self):
         raise NotImplementedError()
 
@@ -288,32 +285,6 @@ class RegexString(Regex):
     def _str(self, **kw):
         return escapeRegex(self._text)
 
-    def findSuffix(self, regex):
-        """
-        Try to find a common prefix of two string regex, returns:
-         - None if there is no common prefix
-         - (regexa, regexb, suffix) otherwise => (regexa|regexb) + suffix
-
-        >>> RegexString('dark color').findSuffix(RegexString('deep color'))
-        (<RegexString 'dark'>, <RegexString 'deep'>, <RegexString ' color'>)
-        """
-        if regex.__class__ != RegexString:
-            return None
-        texta = self._text
-        textb = regex._text
-        common = None
-        for length in xrange(1, min(len(texta),len(textb))+1):
-            if textb.endswith(texta[-length:]):
-                common = length
-            else:
-                break
-        if not common:
-            return None
-        return (
-            createString(texta[:-common]),
-            createString(textb[:-common]),
-            createString(texta[-common:]))
-
     def findPrefix(self, regex):
         """
         Try to find a common prefix of two string regex, returns:
@@ -356,11 +327,8 @@ class RegexString(Regex):
         >>> RegexString("color red") | RegexString("color")
         <RegexAnd 'color( red|)'>
 
-        Group suffix:
-
-        >>> RegexString("moot") | RegexString("boot")
-        <RegexAnd '[bm]oot'>
         """
+
         # Don't know any other optimization for str|other
         if regex.__class__ != RegexString:
             return None
@@ -373,17 +341,6 @@ class RegexString(Regex):
             else:
                 regex = common[2] | common[1]
             return common[0] + regex
-
-        # Find common suffix
-        common = self.findSuffix(regex)
-        if common:
-            if not reverse:
-                regex = common[0] | common[1]
-            else:
-                regex = common[1] | common[0]
-
-            if matchSingleValue(regex) or regex.__class__ == RegexRange:
-                return regex + common[2]
         return None
 
 class RegexRangeItem:
@@ -569,15 +526,6 @@ class RegexAnd(Regex):
             regex = (regexa | regexb)
             if matchSingleValue(common[0]) or matchSingleValue(regex):
                 return common[0] + regex
-
-        # Find common suffix: (abc|dec) => (ab|de)c
-        common = contenta[-1].findSuffix(contentb[-1])
-        if common:
-            regexa = RegexAnd.join( contenta[:-1] ) & common[0]
-            regexb = RegexAnd.join( contentb[:-1] ) & common[1]
-            regex = (regexa | regexb)
-            if matchSingleValue(common[2]) and matchSingleValue(regex):
-                return regex + common[2]
         return None
 
     def _and(self, regex):
@@ -614,15 +562,19 @@ class RegexAnd(Regex):
         return iter(self.content)
 
 # TODO: Remove this code or use it
-#def firstCharacter(regex):
-#    cls = regex.__class__
-#    if cls == RegexString:
-#        return regex._text[0]
-#    if cls == RegexRange:
-#        return chr(regex.ranges[0].cmin)
-#    if cls in (RegexOr, RegexAnd):
-#        return firstCharacter(regex.content[0])
-#    return str(regex)[0]
+def firstCharacter(regex):
+    cls = regex.__class__
+    if cls == RegexString:
+        return regex._text[0]
+    if cls == RegexRange:
+        return chr(regex.ranges[0].cmin)
+    if cls in (RegexOr, RegexAnd):
+        return firstCharacter(regex.content[0])
+    x = str(regex)
+    if x:
+        return x[0]
+    else:
+        return "\0"
 
 class RegexOr(Regex):
     def __init__(self, items):
