@@ -30,6 +30,7 @@ See also CPAN Regexp::Assemble (Perl module):
 """
 
 from hachoir_core.compatibility import all, any
+from hachoir_core.tools import makePrintable
 import re
 import itertools
 import operator
@@ -115,8 +116,9 @@ class Regex:
         raise NotImplementedError()
 
     def __repr__(self):
+        regex = makePrintable(str(self), 'ASCII', to_unicode=True)
         return "<%s '%s'>" % (
-            self.__class__.__name__, self)
+            self.__class__.__name__, regex)
 
     def __contains__(self, item):
         raise NotImplementedError()

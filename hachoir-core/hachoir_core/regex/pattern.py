@@ -54,7 +54,7 @@ class PatternMatching:
         self.regex_patterns = []
         self._need_commit = True
 
-    def _commit(self):
+    def commit(self):
         self._need_commit = False
         length = 0
         regex = None
@@ -118,7 +118,7 @@ class PatternMatching:
         Return a generator of tuples: (start, end, item)
         """
         if self._need_commit:
-            self._commit()
+            self.commit()
         for match in self.compiled_regex.finditer(data):
             item = self.getPattern(match.group(0))
             yield (match.start(0), match.end(0), item)
