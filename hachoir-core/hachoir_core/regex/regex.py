@@ -260,18 +260,18 @@ class RegexDot(Regex):
     def _match(self, regex):
         if regex.__class__ == RegexRange:
             return True
-        if regex.__class__ == RegexString and len(regex._text) == 1:
+        if regex.__class__ == RegexString and len(regex.text) == 1:
             return True
         return False
 
 class RegexString(Regex):
     def __init__(self, text=""):
         assert isinstance(text, str)
-        self._text = text
-        assert 1 <= len(self._text)
+        self.text = text
+        assert 1 <= len(self.text)
 
     def minLength(self):
-        return len(self._text)
+        return len(self.text)
 
     def _and(self, regex):
         """
@@ -279,11 +279,11 @@ class RegexString(Regex):
         <RegexString 'ab'>
         """
         if regex.__class__ == RegexString:
-            return RegexString(self._text + regex._text)
+            return RegexString(self.text + regex.text)
         return None
 
     def _str(self, **kw):
-        return escapeRegex(self._text)
+        return escapeRegex(self.text)
 
     def findPrefix(self, regex):
         """
@@ -296,8 +296,8 @@ class RegexString(Regex):
         """
         if regex.__class__ != RegexString:
             return None
-        texta = self._text
-        textb = regex._text
+        texta = self.text
+        textb = regex.text
 
         # '(a|b)' => '[ab]'
         if len(texta) == len(textb) == 1:
@@ -420,8 +420,8 @@ class RegexRange(Regex):
         >>> createRange("a", "b", exclude=True) | createRange("a", "c", exclude=True)
         <RegexRange '[^a-c]'>
         """
-        if not self.exclude and regex.__class__ == RegexString and len(regex._text) == 1:
-            branges = (RegexRangeCharacter(regex._text),)
+        if not self.exclude and regex.__class__ == RegexString and len(regex.text) == 1:
+            branges = (RegexRangeCharacter(regex.text),)
         elif regex.__class__ == RegexRange and self.exclude == regex.exclude:
             branges = regex.ranges
         else:
@@ -438,8 +438,8 @@ class RegexRange(Regex):
         >>> createRange("a", "b", exclude=True) | createRange("a", "c", exclude=True)
         <RegexRange '[^a-c]'>
         """
-        if not self.exclude and regex.__class__ == RegexString and len(regex._text) == 1:
-            branges = (RegexRangeCharacter(regex._text),)
+        if not self.exclude and regex.__class__ == RegexString and len(regex.text) == 1:
+            branges = (RegexRangeCharacter(regex.text),)
         elif regex.__class__ == RegexRange and self.exclude == regex.exclude:
             branges = regex.ranges
         else:
@@ -565,7 +565,7 @@ class RegexAnd(Regex):
 def firstCharacter(regex):
     cls = regex.__class__
     if cls == RegexString:
-        return regex._text[0]
+        return regex.text[0]
     if cls == RegexRange:
         return chr(regex.ranges[0].cmin)
     if cls in (RegexOr, RegexAnd):
