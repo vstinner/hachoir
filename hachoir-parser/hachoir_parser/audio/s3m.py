@@ -425,7 +425,7 @@ class Instrument(SizeFieldSet):
         for field in self.getInstrumentFields():
             yield field
 
-        yield String(self, "name", self.NAME_SIZE, strip='\0')
+        yield String(self, "name", 28, strip='\0')
         yield String(self, "marker", 4, "Either 'SCRS' or '(empty)'", strip='\0')
 
     def createValue(self):
@@ -450,7 +450,6 @@ class S3MInstrument(Instrument):
   xxxx: sampledata
     """
     MAGIC = "SCRS"
-    NAME_SIZE = 28
     PACKING = {0: "Unpacked", 1: "DP30ADPCM" }
     TYPE = {0: "Unknown", 1: "Sample", 2: "adlib melody", 3: "adlib drum2" }
 
@@ -506,7 +505,6 @@ class PTMType(FieldSet):
 
 class PTMInstrument(Instrument):
     MAGIC = "PTMI"
-    NAME_SIZE = 25
     ALIGN = 0
 
     def getType(self):
@@ -527,7 +525,7 @@ class PTMInstrument(Instrument):
         yield UInt32(self, "gus_begin")
         yield UInt32(self, "gus_loop_start")
         yield UInt32(self, "gus_loop_end")
-        yield UInt32(self, "gus_loop_flags", text_handler=hexadecimal)
+        yield UInt8(self, "gus_loop_flags", text_handler=hexadecimal)
         yield UInt8(self, "reserved[]") # Should be 0
 
     def getSubChunks(self):
