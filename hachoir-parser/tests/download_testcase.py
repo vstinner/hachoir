@@ -76,6 +76,7 @@ testcase_files = (
     (u"firstrun.rm", 75534, "5aa56f5de2723294136fadb90fc5b2ce"),
     (u"dell8.fat16", 113152, "bcef23dc13307ebd464562c6afbf01d3"),
     (u"dontyou.xm", 150672, "2b6077fae78930e804bf3541f8700cf2"),
+    (u"SatelliteOne.s3m", 39778, "4993611aca1474535d6396e01f86cca8"),
 )
 
 def stringMD5(text):
