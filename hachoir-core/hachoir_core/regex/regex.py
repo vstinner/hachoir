@@ -655,6 +655,46 @@ class RegexOr(Regex):
     def __iter__(self):
         return iter(self.content)
 
+def optimizeRepeatOr(rmin, rmax, regex):
+    # Fix rmin/rmax
+    for item in regex:
+        cls = item.__class__
+        if cls == RegexEmpty:
+            # (a|b|){x,y} => (a|b){0,y}
+            rmin = 0
+        elif cls == RegexRepeat:
+            # (a{0,n}|b){x,y} => (a{1,n}|b){0,y}
+            if item.min == 0 and rmin == 1:
+                rmin = 0
+
+    # Create new (optimized) RegexOr expression
+    content = []
+    for item in regex:
+        cls = item.__class__
+        if cls == RegexEmpty:
+            # (a|){x,y} => a{0,y}
+            continue
+        if cls == RegexRepeat:
+            if item.min == 0:
+                if rmin in (0, 1):
+                    if rmax == item.max == None:
+                        # (a*|b){x,} => (a|b){x,}
+                        item = item.regex
+                    else:
+                        # (a{0,p}|b){x,} => (a{1,p}|b){x,}
+                        item = RegexRepeat(item.regex, 1, item.max)
+            elif item.min == 1:
+                if rmax == item.max == None:
+                    # (a+|b){x,} => (a|b){x,}
+                    item = item.regex
+            else:
+                if rmax == item.max == None:
+                    # (a{n,}|b){x,} => (a{n}|b){x,}
+                    item = RegexRepeat(item.regex, item.min, item.min)
+        content.append(item)
+    regex = RegexOr.join(content)
+    return (rmin, rmax, regex)
+
 class RegexRepeat(Regex):
     """
     >>> a=createString('a')
@@ -670,11 +710,27 @@ class RegexRepeat(Regex):
     <RegexRepeat 'a{1,3}'>
     """
 
-    def __init__(self, regex, min, max):
+    def __init__(self, regex, rmin, rmax):
+        # Optimisations
+        cls = regex.__class__
+        if cls == RegexRepeat:
+            # (a{n,p}){x,y) => a{n*x,p*y}
+            rmin *= regex.min
+            if regex.max and rmax:
+                rmax *= regex.max
+            else:
+                rmax = None
+            regex = regex.regex
+        elif cls == RegexOr:
+            rmin, rmax, regex = optimizeRepeatOr(rmin, rmax, regex)
+
+        # Store attributes
         self.regex = regex
-        assert 0 <= min
-        self.min = min
-        self.max = max
+        self.min = rmin
+        self.max = rmax
+
+        # Post-conditions
+        assert 0 <= rmin
         if self.max is not None:
             if self.max < self.min:
                 raise ValueError("RegexRepeat: minimum (%s) is bigger than maximum (%s)!" % (self.min, self.max))

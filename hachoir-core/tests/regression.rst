@@ -1,8 +1,80 @@
-Regression tests
-================
+Regex regression (repeat)
+=========================
 
-Regex
------
+Factorisation of (a{n,p}){x,y}:
+-------------------------------
+
+>>> from hachoir_core.regex import parse
+>>> parse("(a{1,2}){2,3}")
+<RegexRepeat 'a{2,6}'>
+>>> parse("(a{1,}){3,4}")
+<RegexRepeat 'a{3,}'>
+>>> parse("(a{2,3})?")
+<RegexRepeat 'a{0,3}'>
+>>> parse("(a{2,3})+")
+<RegexRepeat 'a{2,}'>
+
+Factorisation of (a|b)*:
+------------------------
+
+>>> parse("(a*|b)*")
+<RegexRepeat '[ab]*'>
+>>> parse("(a+|b)*")
+<RegexRepeat '[ab]*'>
+>>> parse("(a{2,}|b)*")
+<RegexRepeat '(a{2}|b)*'>
+
+Factorisation of (a|b)+:
+------------------------
+
+>>> parse("(a*|b)+")
+<RegexRepeat '[ab]*'>
+>>> parse("(a+|b|)+")
+<RegexRepeat '[ab]*'>
+>>> parse("(a+|b)+")
+<RegexRepeat '[ab]+'>
+>>> parse("(a{5,}|b)+")
+<RegexRepeat '(a{5}|b)+'>
+
+Factorisation of (a|b){x,}:
+---------------------------
+
+>>> parse("(a+|b){3,}")
+<RegexRepeat '[ab]{3,}'>
+>>> parse("(a{2,}|b){3,}")
+<RegexRepeat '(a{2}|b){3,}'>
+
+Factorisation of (a|b){x,y}:
+---------------------------
+
+>>> parse("(a*|b|){4,5}")
+<RegexRepeat '(a+|b){0,5}'>
+>>> parse("(a+|b|){4,5}")
+<RegexRepeat '(a+|b){0,5}'>
+>>> parse("(a*|b){4,5}")
+<RegexRepeat '(a*|b){4,5}'>
+
+Do not optimize:
+----------------
+
+>>> parse('(a*|b){3,}')
+<RegexRepeat '(a*|b){3,}'>
+>>> parse("(a{2,3}|b){3,}")
+<RegexRepeat '(a{2,3}|b){3,}'>
+>>> parse("(a{2,3}|b)*")
+<RegexRepeat '(a{2,3}|b)*'>
+>>> parse("(a{2,3}|b)+")
+<RegexRepeat '(a{2,3}|b)+'>
+>>> parse("(a+|b){4,5}")
+<RegexRepeat '(a+|b){4,5}'>
+>>> parse("(a{2,}|b){4,5}")
+<RegexRepeat '(a{2,}|b){4,5}'>
+>>> parse("(a{2,3}|b){4,5}")
+<RegexRepeat '(a{2,3}|b){4,5}'>
+
+
+Regex regression (b)
+====================
 
 >>> from hachoir_core.regex import parse
 >>> parse("(M(SCF|Thd)|B(MP4|Zh))")
