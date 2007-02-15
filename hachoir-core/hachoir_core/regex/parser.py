@@ -80,7 +80,7 @@ def parseOr(text, start):
         regex = RegexEmpty()
     return regex, index
 
-REPEAT_REGEX = re.compile("([0-9]+)(?:,([0-9]+))?}")
+REPEAT_REGEX = re.compile("([0-9]+)(,[0-9]*)?}")
 
 def parseRepeat(text, start):
     """
@@ -94,7 +94,11 @@ def parseRepeat(text, start):
         raise SyntaxError('Unable to parse repetition '+text[start:])
     rmin = int(match.group(1))
     if match.group(2):
-        rmax = int(match.group(2))
+        text = match.group(2)[1:]
+        if text:
+            rmax = int(text)
+        else:
+            rmax = None
     else:
         rmax = rmin
     return (rmin, rmax, match.end(0))
