@@ -6,4 +6,5 @@ from hachoir_parser.audio.mpeg_audio import MpegAudioFile
 from hachoir_parser.audio.real_audio import RealAudioFile
 from hachoir_parser.audio.xm import XMModule
 from hachoir_parser.audio.s3m import S3MModule
+from hachoir_parser.audio.s3m import PTMModule
 
