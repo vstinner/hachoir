@@ -21,7 +21,7 @@ Create regex with string
 >>> parse('^^..$$')
 <RegexAnd '^..$'>
 >>> parse('chats?')
-<RegexRepeat 'chats?'>
+<RegexAnd 'chats?'>
 >>> parse(' +abc')
 <RegexAnd ' +abc'>
 
@@ -74,10 +74,7 @@ Optimizations
 
 The library includes many optimization to keep small and fast expressions.
 
-Group prefix/suffix:
-
-#>>> createString("mot") | createString("pot")
-#<RegexAnd '[mp]ot'>
+Group prefix:
 
 >>> createString("blue") | createString("brown")
 <RegexAnd 'b(lue|rown)'>
