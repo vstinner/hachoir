@@ -433,6 +433,7 @@ def checkPTM(parser): return (
     checkValue(parser, "/instrument[0]/c4_speed", 8363),
     checkValue(parser, "/instrument[0]/name", "Yep guess wat...."),
     checkValue(parser, "/instrument[1]/name", "Mag ik even mijn ongenoegen"),
+    checkValue(parser, "/instrument[1]/gus_loop_flags", 0),
     checkValue(parser, "/pattern[0]/row[0]/note[0]/effect", 15),
 )
 
