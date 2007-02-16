@@ -6,10 +6,10 @@
 
 from hachoir_parser import Parser
 from hachoir_core.field import (Field, FieldSet, createOrphanField,
-    NullBits, Bit, Bits, Enum, Fragment, MissingField,
+    NullBits, Bit, Bits, Enum, Fragment, MissingField, ParserError,
     UInt8, UInt16, UInt24, UInt32, UInt64,
     RawBytes, String, PascalString32)
-from hachoir_core.stream import FragmentedStream
+from hachoir_core.stream import FragmentedStream, InputStreamError
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 
 MAX_FILESIZE = 1000 * 1024 * 1024
@@ -184,6 +184,8 @@ class Segments(Fragment):
                 yield Chunk(self, "chunk[]", size=segment_size*8)
 
 class OggPage(FieldSet):
+    MAGIC = "OggS"
+
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
         size = 27
@@ -197,8 +199,8 @@ class OggPage(FieldSet):
 
     def createFields(self):
         yield String(self, 'capture_pattern', 4, charset="ASCII")
-        if self['capture_pattern'].value != 'OggS':
-            self.warning('Invalid signature. An Ogg page must start with "OggS".')
+        if self['capture_pattern'].value != self.MAGIC:
+            self.warning('Invalid signature. An Ogg page must start with "%s".' % self.MAGIC)
         yield UInt8(self, 'stream_structure_version')
         yield Bit(self, 'continued_packet')
         yield Bit(self, 'first_page')
@@ -214,7 +216,6 @@ class OggPage(FieldSet):
             yield Segments(self, "segments", size=self._size-self._current_size)
 
 class OggFile(Parser):
-    MAGIC = "OggS"
     tags = {
         "id": "ogg",
         "category": "container",
@@ -225,7 +226,7 @@ class OggFile(Parser):
             "video/ogg", "video/x-ogg",
             "video/theora", "video/x-theora",
          ),
-        "magic": ((MAGIC, 0),),
+        "magic": ((OggPage.MAGIC, 0),),
         "subfile": "skip",
         "min_size": 28*8,
         "description": "Ogg multimedia container"
@@ -233,30 +234,18 @@ class OggFile(Parser):
     endian = LITTLE_ENDIAN
 
     def validate(self):
-        if self.stream.readBytes(0, 4) != self.MAGIC:
-            return "Wrong signature"
-
         # Validate first 5 pages
-        previous = None
         for index in xrange(5):
             try:
-                page = self["page[%u]" % index]
+                page = self[index]
             except MissingField:
                 if self.done:
                     return True
                 return "Unable to get page #%u" % index
             except (InputStreamError, ParserError):
                 return "Unable to create page #%u" % index
-
-            # Check that all pages are similar
-            if previous:
-                if previous["serial"].value != page["serial"].value:
-                    return "Frame #%u serial number is different" % index
-                if page["abs_granule_pos"].value < previous["abs_granule_pos"].value:
-                    return "Frame #%u 'abs_granule_pos' is smaller than previous page" % index
-                if (previous["page"].value + 1) != page["page"].value:
-                    return "Frame #%u page number is invalid" % index
-            previous = page
+            if page['capture_pattern'].value != OggPage.MAGIC:
+                return "Wrong signature"
         return True
 
     def createMimeType(self):

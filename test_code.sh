@@ -9,7 +9,7 @@ ROOT=$(cd $(dirname $0); pwd)
 
 echo "=== hachoir-core: test doc ==="
 cd $ROOT/hachoir-core
-$PYTHON test_doc.py && set $? || set $?
+$PYTHON test_doc.py && set $? || set $?
 
 echo "=== download and check testcase ==="
 $PYTHON $ROOT/hachoir-parser/tests/download_testcase.py $TESTCASE
