@@ -5,13 +5,15 @@ Factorisation of (a{n,p}){x,y}:
 -------------------------------
 
 >>> from hachoir_core.regex import parse
->>> parse("(a{1,2}){2,3}")
-<RegexRepeat 'a{2,6}'>
->>> parse("(a{1,}){3,4}")
-<RegexRepeat 'a{3,}'>
->>> parse("(a{2,3})?")
-<RegexRepeat 'a{0,3}'>
+>>> parse("(a{2,3}){4,5}")
+<RegexRepeat 'a{8,15}'>
+>>> parse("(a{2,}){3,4}")
+<RegexRepeat 'a{6,}'>
 >>> parse("(a{2,3})+")
+<RegexRepeat 'a{2,}'>
+>>> parse("(a*){2,3}")
+<RegexRepeat 'a*'>
+>>> parse("(a+){2,3}")
 <RegexRepeat 'a{2,}'>
 
 Factorisation of (a|b)*:
