@@ -120,11 +120,6 @@ def _parse(text, start=0, until=None):
             done = True
             break
         if char in '.^$[](){}|+?*\\':
-            if start != index:
-                subtext = text[start:index]
-                if last:
-                    regex = regex + last
-                last = RegexString(subtext)
             if char in CHAR_TO_FUNC:
                 new_regex, index = CHAR_TO_FUNC[char] (text, index+1)
             elif char in CHAR_TO_CLASS:
@@ -149,17 +144,15 @@ def _parse(text, start=0, until=None):
                 index += 1
             else:
                 raise NotImplementedError("Operator '%s' is not supported" % char)
-            start = index
             if last:
                 regex = regex + last
             last = new_regex
         else:
+            subtext = text[index]
             index += 1
-    if start != index:
-        subtext = text[start:index]
-        if last:
-            regex = regex + last
-        last = RegexString(subtext)
+            if last:
+                regex = regex + last
+            last = RegexString(subtext)
     if last:
         regex = regex + last
     return regex, index
@@ -170,6 +163,8 @@ def parse(text):
     <RegexEmpty ''>
     >>> parse('abc')
     <RegexString 'abc'>
+    >>> parse("chats?")
+    <RegexAnd 'chats?'>
     >>> parse('[bc]d')
     <RegexAnd '[bc]d'>
     >>> parse("\\.")
