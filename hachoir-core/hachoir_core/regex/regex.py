@@ -762,7 +762,7 @@ class RegexRepeat(Regex):
     def _str(self, **kw):
         text = str(self.regex)
         if self.regex.__class__ == RegexAnd \
-        or (self.regex.__class__ == RegexString and 1 < len(regex.text)):
+        or (self.regex.__class__ == RegexString and 1 < len(self.regex.text)):
             text = "(%s)" % text
         if self.min == 0 and self.max == 1:
             return "%s?" % text
