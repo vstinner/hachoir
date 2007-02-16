@@ -8,9 +8,10 @@ from hachoir_parser import Parser
 from hachoir_core.field import (Field, FieldSet, createOrphanField,
     NullBits, Bit, Bits, Enum, Fragment, MissingField, ParserError,
     UInt8, UInt16, UInt24, UInt32, UInt64,
-    RawBytes, String, PascalString32)
+    RawBytes, String, PascalString32, NullBytes)
 from hachoir_core.stream import FragmentedStream, InputStreamError
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
+from hachoir_core.tools import humanDurationNanosec
 
 MAX_FILESIZE = 1000 * 1024 * 1024
 
@@ -56,6 +57,23 @@ PIXEL_FORMATS = {
     3: "4:4:4",
 }
 
+def formatTimeUnit(field):
+    return humanDurationNanosec(field.value * 100)
+
+def parseVideoHeader(parent):
+    yield NullBytes(parent, "padding[]", 2)
+    yield String(parent, "fourcc", 4)
+    yield UInt32(parent, "size")
+    yield UInt64(parent, "time_unit", "Frame duration", text_handler=formatTimeUnit)
+    yield UInt64(parent, "sample_per_unit")
+    yield UInt32(parent, "default_len")
+    yield UInt32(parent, "buffer_size")
+    yield UInt16(parent, "bits_per_sample")
+    yield NullBytes(parent, "padding[]", 2)
+    yield UInt32(parent, "width")
+    yield UInt32(parent, "height")
+    yield NullBytes(parent, "padding[]", 4)
+
 def parseTheoraHeader(parent):
     yield UInt8(parent, "version_major")
     yield UInt8(parent, "version_minor")
@@ -99,7 +117,9 @@ class Chunk(FieldSet):
         }, "theora": {
             128: ("theora_hdr", parseTheoraHeader),
             129: ("comment", parseMetadata),
-        }
+        }, "video\0": {
+            1: ("video_hdr", parseVideoHeader),
+        },
     }
     def __init__(self, *args, **kw):
         FieldSet.__init__(self, *args, **kw)
