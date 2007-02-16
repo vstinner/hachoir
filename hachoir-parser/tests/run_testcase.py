@@ -484,7 +484,7 @@ testcase_files = (
     (u"dell8.fat16", checkDell8FAT16),
     (u"dontyou.xm", checkXM),
     (u"SatelliteOne.s3m", checkS3M),
-    (u"Anti-arpeggio tune!.ptm", checkPTM),
+    (u"Anti-arpeggio_tune!.ptm", checkPTM),
 )
 
 def checkFile(filename, check_parser):

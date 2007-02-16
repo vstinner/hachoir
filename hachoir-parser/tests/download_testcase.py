@@ -77,7 +77,7 @@ testcase_files = (
     (u"dell8.fat16", 113152, "bcef23dc13307ebd464562c6afbf01d3"),
     (u"dontyou.xm", 150672, "2b6077fae78930e804bf3541f8700cf2"),
     (u"SatelliteOne.s3m", 39778, "4993611aca1474535d6396e01f86cca8"),
-    (u"Anti-arpeggio tune!.ptm", 175557, "34e39f476f48abe5e41d6e9a88af515e"),
+    (u"Anti-arpeggio_tune!.ptm", 175557, "34e39f476f48abe5e41d6e9a88af515e"),
 )
 
 def stringMD5(text):
