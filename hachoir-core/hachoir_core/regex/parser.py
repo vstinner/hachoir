@@ -61,6 +61,9 @@ def parseOr(text, start):
     (<RegexRange '[a-d]'>, 11)
     """
     index = start
+    # (?:...): Skip Python prefix '?:'
+    if text[index:index+2] == '?:':
+        index += 2
     if text[index] == '?':
         raise NotImplementedError("Doesn't support Python extension (?...)")
     regex = None
