@@ -12,6 +12,7 @@ from hachoir_core.field import (Field, FieldSet, createOrphanField,
 from hachoir_core.stream import FragmentedStream, InputStreamError
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_core.tools import humanDurationNanosec
+from hachoir_core.text_handler import hexadecimal
 
 MAX_FILESIZE = 1000 * 1024 * 1024
 
@@ -227,7 +228,7 @@ class OggPage(FieldSet):
         yield Bit(self, 'last_page')
         yield NullBits(self, 'unused', 5)
         yield UInt64(self, 'abs_granule_pos')
-        yield UInt32(self, 'serial')
+        yield UInt32(self, 'serial', text_handler=hexadecimal)
         yield UInt32(self, 'page')
         yield UInt32(self, 'checksum')
         yield UInt8(self, 'lacing_size')
@@ -290,7 +291,8 @@ class OggFile(Parser):
             yield OggPage(self, "page[]")
 
     def createLastPage(self):
-        start = 0
+        # FIXME: This doesn't work on all files (eg. some Ogg/Theora)
+        start = self[0].size
         end = MAX_FILESIZE * 8
         offset = self.stream.searchBytes("OggS\0\5", start, end)
         if offset is None:
