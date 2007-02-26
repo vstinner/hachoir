@@ -96,6 +96,7 @@ class RiffMetadata(MultipleMetadata):
         format = audio["stream_fmt"]
         meta.nb_channel = format["channel"].value
         meta.sample_rate = format["sample_rate"].value
+        meta.bit_rate = format["bit_rate"].value
         if "stream_hdr" in audio:
             header = audio["stream_hdr"]
             if header["rate"].value and header["scale"].value:
