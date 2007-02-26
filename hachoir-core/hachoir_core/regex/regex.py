@@ -123,8 +123,9 @@ class Regex:
     def _str(self, **kw):
         raise NotImplementedError()
 
-    def __repr__(self):
-        regex = makePrintable(str(self), 'ASCII', to_unicode=True)
+    def __repr__(self, **kw):
+        regex = self.__str__(**kw)
+        regex = makePrintable(regex, 'ASCII', to_unicode=True)
         return "<%s '%s'>" % (
             self.__class__.__name__, regex)
 
