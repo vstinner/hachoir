@@ -6,6 +6,11 @@ import os
 import imp
 
 def main():
+    import doctest, pdb
+    if doctest._OutputRedirectingPdb.set_trace == pdb.Pdb.set_trace:
+        raise ImportError("Your doctest version is too old")
+    print doctest._OutputRedirectingPdb.set_trace
+
     directory = os.getenv("TESTCASE")
     if not directory:
         home = os.getenv("HOME")
@@ -19,14 +24,8 @@ def main():
     metadata = imp.load_source("metadata", "hachoir-metadata/run_testcase.py")
     metadata.testFiles(directory)
 
-#    core_doc = imp.load_source("parser", "hachoir-core/test_doc.py")
-#    print "CORE=================================="
-#    core_doc.testDoc("doc/hachoir-api.rst")
-#    core_doc.testModule("hachoir_core.bits")
-#    core_doc.testModule("hachoir_core.compatibility")
-#    core_doc.testModule("hachoir_core.text_handler")
-#    core_doc.importModule("hachoir_core.tools")
-#    print "END CORE=================================="
+    core_doc = imp.load_source("parser", "hachoir-core/test_doc.py")
+    core_doc.main()
 
 if __name__ == "__main__":
     main()
