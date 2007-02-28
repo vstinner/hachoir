@@ -316,8 +316,8 @@ def main():
         sys.exit(1)
 
 testcase_files = (
-    (u"logo-Kubuntu.png", checkLogoUbuntuMeta),
-    (u"KDE_Click.wav", checkClickMeta),
+    (u"logo-kubuntu.png", checkLogoUbuntuMeta),
+    (u"kde_click.wav", checkClickMeta),
     (u"test.txt.gz", checkGzipMeta),
     (u"flashmob.mkv", checkFlashMobInfo),
     (u"10min.mkv", True),

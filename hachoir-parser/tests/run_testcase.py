@@ -439,13 +439,13 @@ def checkPTM(parser): return (
 
 testcase_files = (
     (u"yellowdude.3ds", checkYellowdude),
-    (u"logo-Kubuntu.png", checkLogoUbuntu),
+    (u"logo-kubuntu.png", checkLogoUbuntu),
     (u"mbr_linux_and_ext", checkMBR),
-    (u"KDE_Click.wav", checkClick),
+    (u"kde_click.wav", checkClick),
     (u"test.txt.gz", checkGzip),
     (u"flashmob.mkv", checkFlashMob),
     (u"10min.mkv", check10min),
-    (u"CD_0008_5C48_1m53s.cda", checkCDA),
+    (u"cd_0008_5C48_1m53s.cda", checkCDA),
     (u"wormux_32x32_16c.ico", checkWormuxICO),
     (u"audio_8khz_8bit_ulaw_4s39.au", checkAU),
     (u"sheep_on_drugs.mp3", checkSheepMP3),
@@ -484,8 +484,8 @@ testcase_files = (
     (u"debian-31r4-i386-binary-1.iso.torrent", checkDebianTorrent),
     (u"dell8.fat16", checkDell8FAT16),
     (u"dontyou.xm", checkXM),
-    (u"SatelliteOne.s3m", checkS3M),
-    (u"Anti-arpeggio_tune!.ptm", checkPTM),
+    (u"satellite_one.s3m", checkS3M),
+    (u"anti-arpeggio_tune.ptm", checkPTM),
 )
 
 def checkFile(filename, check_parser):

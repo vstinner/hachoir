@@ -18,13 +18,13 @@ import stat
 
 testcase_files = (
     (u"yellowdude.3ds", 48116, "2e1301e23518fbed06dd0a739e110c9e"),
-    (u"logo-Kubuntu.png", 10022, "336368f689952e18e9197aaa1caf8ebb"),
+    (u"logo-kubuntu.png", 10022, "336368f689952e18e9197aaa1caf8ebb"),
     (u"mbr_linux_and_ext", 512, "18730e496f263cb639b0a07152e49444"),
-    (u"KDE_Click.wav", 1824, "02bee988149cc7c21f4b56176f2c7a2f"),
+    (u"kde_click.wav", 1824, "02bee988149cc7c21f4b56176f2c7a2f"),
     (u"test.txt.gz", 117, "037e1908f6e081d8178811107c196239"),
     (u"flashmob.mkv", 1326518, "52ad0e32fc368d80107727f8d470579f"),
     (u"10min.mkv", 120697, "0bd4adc27cc95effc960ab85b5737d48"),
-    (u"CD_0008_5C48_1m53s.cda", 44, "f219b3083b2ebacbd9728fd198e2a459"),
+    (u"cd_0008_5C48_1m53s.cda", 44, "f219b3083b2ebacbd9728fd198e2a459"),
     (u"wormux_32x32_16c.ico", 1150, "278e578b6b9c404f921107876a7fbf9e"),
     (u"audio_8khz_8bit_ulaw_4s39.au", 35224, "87458dca42f2e027ca86e592172eea74"),
     (u"sheep_on_drugs.mp3", 21038, "7740bf3a7908bddcfff2c2ba2347d3d9"),
@@ -73,11 +73,11 @@ testcase_files = (
     (u"ping_20020927-3ubuntu2", 30804, "7c856de09bbed6c51eb6dfb20f311f9b"),
     (u"georgia.cab", 311069, "28a1530d591b35c5c9485b4cb6f778da"),
     (u"hachoir.org.sxw", 14781, "26ce99711c8c17a3c6bba299a3cfa68b"),
-    (u"firstrun.rm", 75534, "5aa56f5de2723294136fadb90fc5b2ce"),
     (u"dell8.fat16", 113152, "bcef23dc13307ebd464562c6afbf01d3"),
     (u"dontyou.xm", 150672, "2b6077fae78930e804bf3541f8700cf2"),
-    (u"SatelliteOne.s3m", 39778, "4993611aca1474535d6396e01f86cca8"),
-    (u"Anti-arpeggio_tune!.ptm", 175557, "34e39f476f48abe5e41d6e9a88af515e"),
+    (u"satellite_one.s3m", 39778, "4993611aca1474535d6396e01f86cca8"),
+    (u"anti-arpeggio_tune.ptm", 175557, "34e39f476f48abe5e41d6e9a88af515e"),
+    (u"deja_vu_serif-2.7.ttf", 205708, "a1d6d07d9be2ced64cf9b7e3ddadd399"),
 )
 
 def stringMD5(text):
