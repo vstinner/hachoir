@@ -7,7 +7,7 @@ Creation date: 2007-02-08
 
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
-    UInt16, UInt32, Bit, Bits, NullBits,
+    UInt16, UInt32, Bit, Bits, NullBits, NullBytes,
     String, RawBytes, Bytes, Enum,
     TimestampMac32)
 from hachoir_core.endian import BIG_ENDIAN
@@ -78,7 +78,7 @@ class NameHeader(FieldSet):
         if self["platformID"].value == 3 and self["encodingID"].value == 1:
             return "UTF-16-BE"
         else:
-            return "ASCII"
+            return "ISO-8859-1"
 
     def createDescription(self):
         platform = self["platformID"].display
@@ -174,7 +174,7 @@ def parseNames(self):
             continue
 
         # Add padding if any
-        padding = self.seekByte(offset, relative=True)
+        padding = self.seekByte(offset, relative=True, null=True)
         if padding:
             yield padding
 
@@ -182,6 +182,10 @@ def parseNames(self):
         size = entry["length"].value
         if size:
             yield String(self, "value[]", size, entry.description, charset=entry.getCharset())
+
+    padding = (self.size - self.current_size) // 8
+    if padding:
+        yield NullBytes(self, "padding_end", padding)
 
 class Table(FieldSet):
     TAG_INFO = {
