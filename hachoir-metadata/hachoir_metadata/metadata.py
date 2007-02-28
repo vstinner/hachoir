@@ -4,14 +4,16 @@ from hachoir_core.compatibility import sorted
 from hachoir_core.endian import endian_name
 from hachoir_core.tools import (
     humanDuration, makePrintable, humanBitRate,
-    humanFrequency, humanBitSize, humanFilesize)
+    humanFrequency, humanBitSize, humanFilesize,
+    normalizeNewline)
 from hachoir_core.dict import Dict
 from hachoir_core.i18n import _
 from hachoir_core.log import Logger
 from datetime import datetime
 from hachoir_metadata.filter import Filter, NumberFilter
+import re
 
-MAX_STR_LENGTH = 80*10            # 800 characters
+MAX_STR_LENGTH = 300              # 300 characters
 MAX_SAMPLE_RATE = 192000          # 192 kHz
 MAX_DURATION = 366*24*60*60*1000  # 1 year
 MAX_NB_CHANNEL = 8                # 8 channels
@@ -152,6 +154,7 @@ class Metadata(Logger):
             value = value.strip(" \t\v\n\r\0")
             if not value:
                 return
+            value = normalizeNewline(value)
             if MAX_STR_LENGTH < len(value):
                 value = value[:MAX_STR_LENGTH] + "(...)"
 

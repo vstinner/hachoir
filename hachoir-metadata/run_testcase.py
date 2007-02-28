@@ -242,7 +242,7 @@ def checkFirstRun(meta): return (
 def checkDejaVu(meta): return (
     checkAttr(meta, "title", u"DejaVu Serif"),
     checkAttr(meta, "author", u"DejaVu fonts team"),
-    checkAttr(meta, "version", u"Version 2.7"),
+    checkAttr(meta, "version", u"2.7"),
     checkAttr(meta, "creation_date", datetime.datetime(2006, 7, 6, 17, 29, 52)),
     checkAttr(meta, "last_modification", datetime.datetime(2006, 7, 6, 17, 29, 52)),
     checkAttr(meta, "copyright", [

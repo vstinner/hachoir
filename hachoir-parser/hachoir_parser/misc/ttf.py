@@ -1,13 +1,19 @@
 """
 TrueType Font parser.
 
+Documents:
+ - "An Introduction to TrueType Fonts: A look inside the TTF format"
+   written by "NRSI: Computers & Writing Systems"
+   http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&item_id=IWS-Chapter08
+
 Author: Victor Stinner
 Creation date: 2007-02-08
 """
 
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
-    UInt16, UInt32, Bit, Bits, NullBits, NullBytes,
+    UInt16, UInt32, Bit, Bits,
+    PaddingBits, NullBits, NullBytes,
     String, RawBytes, Bytes, Enum,
     TimestampMac32)
 from hachoir_core.endian import BIG_ENDIAN
@@ -55,6 +61,13 @@ PLATFORM_NAME = {
     4: "Custom",
 }
 
+CHARSET_MAP = {
+    # (platform, encoding) => charset
+    0: {3: "UTF-16-BE"},
+    1: {0: "MacRoman"},
+    3: {1: "UTF-16-BE"},
+}
+
 class TableHeader(FieldSet):
     def createFields(self):
         yield String(self, "tag", 4)
@@ -75,9 +88,12 @@ class NameHeader(FieldSet):
         yield UInt16(self, "offset")
 
     def getCharset(self):
-        if self["platformID"].value == 3 and self["encodingID"].value == 1:
-            return "UTF-16-BE"
-        else:
+        platform = self["platformID"].value
+        encoding = self["encodingID"].value
+        try:
+            return CHARSET_MAP[platform][encoding]
+        except KeyError:
+            self.warning("TTF: Unknown charset (%s,%s)" % (platform, encoding))
             return "ISO-8859-1"
 
     def createDescription(self):
@@ -102,7 +118,7 @@ def parseFontHeader(self):
     yield Bit(self, "ppem", "Force PPEM to integer values for all")
     yield Bit(self, "instr_width", "Instructions may alter advance width")
     yield Bit(self, "vertical", "e laid out vertically?")
-    yield NullBits(self, "reserved[]", 1)
+    yield PaddingBits(self, "reserved[]", 1)
     yield Bit(self, "linguistic", "Requires layout for correct linguistic rendering?")
     yield Bit(self, "gx", "Metamorphosis effects?")
     yield Bit(self, "strong", "Contains strong right-to-left glyphs?")
@@ -132,7 +148,7 @@ def parseFontHeader(self):
     yield Bit(self, "shadow")
     yield Bit(self, "condensed", "(narrow)")
     yield Bit(self, "extensed")
-    yield NullBits(self, "reserved[]", 9)
+    yield PaddingBits(self, "reserved[]", 9)
 
     yield UInt16(self, "lowest", "Smallest readable size in pixels")
     yield Enum(UInt16(self, "font_dir", "Font direction hint"), DIRECTION_NAME)
@@ -163,14 +179,14 @@ def parseNames(self):
         # Skip duplicates values
         new = (entry["offset"].value, entry["length"].value)
         if last and last == new:
-            self.error("Skip duplicate %s %s" % (entry.name, new))
+            self.warning("Skip duplicate %s %s" % (entry.name, new))
             continue
         last = (entry["offset"].value, entry["length"].value)
 
         # Skip negative offset
         offset = entry["offset"].value + self["offset"].value
         if offset < self.current_size//8:
-            self.error("Skip value %s (negative offset)" % entry.name)
+            self.warning("Skip value %s (negative offset)" % entry.name)
             continue
 
         # Add padding if any

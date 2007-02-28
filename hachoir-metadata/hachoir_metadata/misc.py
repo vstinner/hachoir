@@ -32,9 +32,7 @@ class TorrentMetadata(Metadata):
 class TTF_Metadata(Metadata):
     NAMEID_TO_ATTR = {
         0: "copyright",   # Copyright notice
-        1: "title",       # Font family name
         3: "title",       # Unique font identifier
-        4: "title",       # Full font name
         5: "version",     # Version string
         8: "author",      # Manufacturer name
         11: "url",        # URL Vendor
@@ -65,6 +63,9 @@ class TTF_Metadata(Metadata):
             if key not in self.NAMEID_TO_ATTR:
                 continue
             key = self.NAMEID_TO_ATTR[key]
+            if key == "version" and value.startswith(u"Version "):
+                # "Version 1.2" => "1.2"
+                value = value[8:]
             setattr(self, key, value)
 
 registerExtractor(TorrentFile, TorrentMetadata)
