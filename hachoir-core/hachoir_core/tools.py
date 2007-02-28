@@ -481,3 +481,21 @@ def humanDatetime(value):
     """
     return unicode(value.isoformat().replace('T', ' '))
 
+NEWLINES_REGEX = re.compile("\n+")
+
+def normalizeNewline(text):
+    r"""
+    Replace Windows and Mac newlines with Unix newlines.
+    Replace multiple consecutive newlines with one newline.
+
+    >>> normalizeNewline('a\r\nb')
+    'a\nb'
+    >>> normalizeNewline('a\r\rb')
+    'a\nb'
+    >>> normalizeNewline('a\n\nb')
+    'a\nb'
+    """
+    text = text.replace("\r\n", "\n")
+    text = text.replace("\r", "\n")
+    return NEWLINES_REGEX.sub("\n", text)
+
