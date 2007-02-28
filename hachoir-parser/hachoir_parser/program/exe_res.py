@@ -33,7 +33,7 @@ MAJOR_OS_NAME = {
     4: "Windows NT",
 }
 
-MINOR_OS_32BIT = 4
+MINOR_OS_BASE = 0
 MINOR_OS_NAME = {
     0: "Base",
     1: "Windows 16-bit",
@@ -101,7 +101,7 @@ class VersionInfoNode(FieldSet):
                 yield String(self, "value", size, charset="UTF-16-LE", strip="\0")
             elif self["name"].value == "VS_VERSION_INFO":
                 yield VersionInfoBinary(self, "value", size=size*8)
-                self.is_32bit = self["value/file_os_minor"].value == MINOR_OS_32BIT
+                self.is_32bit = self["value/file_os_minor"].value != MINOR_OS_BASE
             else:
                 yield RawBytes(self, "value", size)
         while 12 <= (self.size - self.current_size) // 8:

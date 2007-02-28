@@ -44,12 +44,12 @@ class MSDosHeader(StaticFieldSet):
             return "Invalid field 'size_mod_512' value"
         if self["code_offset"].value < 4:
             return "Invalid code offset"
-        if self["checksum"].value != 0:
-            return "Invalid value of checksum"
-#        if not(0 < self["init_ss_sp"].value < 0x4fffffff):
-#            return "Invalid value of init_ss_sp"
-#        if 1024 < self["pe_offset"].value:
-#            return "Invalid value of pe_offset"
+        looks_pe = self["size_div_512"].value < 4
+        if looks_pe:
+            if self["checksum"].value != 0:
+                return "Invalid value of checksum"
+            if not (80 <= self["pe_offset"].value <= 1024):
+                return "Invalid value of pe_offset"
         return ""
 
 class SectionHeader(FieldSet):
