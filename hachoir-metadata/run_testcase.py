@@ -239,6 +239,21 @@ def checkFirstRun(meta): return (
     checkAttr(meta, "stream[2]/bit_rate", 200),
 )
 
+def checkDejaVu(meta): return (
+    checkAttr(meta, "title", u"DejaVu Serif"),
+    checkAttr(meta, "author", u"DejaVu fonts team"),
+    checkAttr(meta, "version", u"Version 2.7"),
+    checkAttr(meta, "creation_date", datetime.datetime(2006, 7, 6, 17, 29, 52)),
+    checkAttr(meta, "last_modification", datetime.datetime(2006, 7, 6, 17, 29, 52)),
+    checkAttr(meta, "copyright", [
+        u"Copyright (c) 2003 by Bitstream, Inc. All Rights Reserved.\nDejaVu changes are in public domain",
+        u"http://dejavu.sourceforge.net/wiki/index.php/License"]),
+    checkAttr(meta, "url", "http://dejavu.sourceforge.net"),
+    checkAttr(meta, "comment", [
+        u"Smallest readable size in pixels: 8 pixels",
+        u"Font direction: Mixed directional"]),
+)
+
 def checkFile(filename, check_metadata):
     sys.stdout.write("  - Create parser: ")
     sys.stdout.flush()
@@ -342,6 +357,7 @@ testcase_files = (
     (u"lara_croft.pcx", checkLaraCroft),
     (u"hachoir.org.sxw", checkHachoirOrgSXW),
     (u"firstrun.rm", checkFirstRun),
+    (u"deja_vu_serif-2.7.ttf", checkDejaVu),
 )
 
 if __name__ == "__main__":
