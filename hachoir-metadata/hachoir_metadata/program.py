@@ -17,24 +17,33 @@ class ExeMetadata(Metadata):
 
     def extract(self, exe):
         if exe.isPE():
-            # Read information from headers
-            if "pe_header" in exe:
-                self.usePE_Header(exe["pe_header"])
-            if "pe_opt_header" in exe:
-                self.usePE_OptHeader(exe["pe_opt_header"])
+            self.extractPE(exe)
+        elif exe.isNE():
+            self.extractNE(exe)
 
-            # Sections name
-#            names = [ "%s (%s)" % (section["name"].value.strip("."), section["phys_size"].display) \
-#                for section in exe.array("section_hdr") if section["phys_size"].value ]
-#            names.sort()
-#            self.comment = "Sections: %s" % ", ".join(names)
+    def extractNE(self, exe):
+        if "ne_header" in exe:
+            self.useNE_Header(exe["ne_header"])
 
-            # Use PE ressource
-            ressource = exe.getRessource()
-            if ressource and "version_info/node[0]" in ressource:
-                for node in ressource.array("version_info/node[0]/node"):
-                    if node["name"].value == "StringFileInfo":
-                        self.readVersionInfo(node["node[0]"])
+    def extractPE(self, exe):
+        # Read information from headers
+        if "pe_header" in exe:
+            self.usePE_Header(exe["pe_header"])
+        if "pe_opt_header" in exe:
+            self.usePE_OptHeader(exe["pe_opt_header"])
+
+        # Use PE ressource
+        ressource = exe.getRessource()
+        if ressource and "version_info/node[0]" in ressource:
+            for node in ressource.array("version_info/node[0]/node"):
+                if node["name"].value == "StringFileInfo":
+                    self.readVersionInfo(node["node[0]"])
+
+    def useNE_Header(self, hdr):
+        if hdr["is_dll"].value:
+            self.comment = "Is a dynamic-link library (DLL)"
+        if hdr["is_win_app"].value:
+            self.comment = "Is a Windows application"
 
     def usePE_Header(self, hdr):
         self.creation_date = hdr["creation_date"].value

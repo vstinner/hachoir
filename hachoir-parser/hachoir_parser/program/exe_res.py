@@ -279,7 +279,7 @@ class Directory(FieldSet):
     def createDescription(self):
         return self["header"].description
 
-class Resource(FieldSet):
+class PE_Resource(FieldSet):
     def __init__(self, parent, name, section, size):
         FieldSet.__init__(self, parent, name, size=size)
         self.section = section
