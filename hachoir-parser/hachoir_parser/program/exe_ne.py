@@ -1,7 +1,6 @@
 from hachoir_core.field import (FieldSet,
-    UInt8, UInt16, UInt32, Bytes,
-    PaddingBits, NullBits, NullBytes,
-    Bit)
+    Bit, UInt8, UInt16, UInt32, Bytes,
+    PaddingBits, PaddingBytes, NullBits, NullBytes)
 from hachoir_core.text_handler import hexadecimal, humanFilesize
 
 class NE_Header(FieldSet):
@@ -12,7 +11,7 @@ class NE_Header(FieldSet):
         yield UInt8(self, "link_rev", "Linker revision number")
         yield UInt16(self, "entry_table_ofst", "Offset to the entry table")
         yield UInt16(self, "entry_table_size", "Length (in bytes) of the entry table")
-        yield NullBytes(self, "reserved[]", 4)
+        yield PaddingBytes(self, "reserved[]", 4)
 
         yield Bit(self, "is_dll", "Is a dynamic-link library (DLL)?")
         yield Bit(self, "is_win_app", "Is a Windows application?")

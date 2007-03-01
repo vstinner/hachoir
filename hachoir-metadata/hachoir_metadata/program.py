@@ -41,17 +41,19 @@ class ExeMetadata(Metadata):
 
     def useNE_Header(self, hdr):
         if hdr["is_dll"].value:
-            self.comment = "Is a dynamic-link library (DLL)"
-        if hdr["is_win_app"].value:
-            self.comment = "Is a Windows application"
+            self.format_version = "New-style executable: Dynamic-link library (DLL)"
+        elif hdr["is_win_app"].value:
+            self.format_version = "New-style executable: Windows 3.x application"
+        else:
+            self.format_version = "New-style executable for Windows 3.x"
 
     def usePE_Header(self, hdr):
         self.creation_date = hdr["creation_date"].value
         self.comment = "CPU: %s" % hdr["cpu"].display
         if hdr["is_dll"].value:
-            self.format_version = "Microsoft Windows DLL"
+            self.format_version = "Portable Executable: Dynamic-link library (DLL)"
         else:
-            self.format_version = "Microsoft Windows Portable Executable"
+            self.format_version = "Portable Executable: Windows application"
 
     def usePE_OptHeader(self, hdr):
         self.comment = "Subsystem: %s" % hdr["subsystem"].display
