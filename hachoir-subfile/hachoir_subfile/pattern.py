@@ -1,5 +1,5 @@
 from hachoir_parser import QueryParser
-from hachoir_core.regex import PatternMatching
+from hachoir_regex import PatternMatching
 
 class HachoirPatternMatching(PatternMatching):
     def __init__(self, categories=None, parser_ids=None):
