@@ -40,8 +40,6 @@ def main():
     # Test documentation in doc/*.rst files
     testDoc('doc/hachoir-api.rst')
     testDoc('doc/internals.rst')
-    testDoc('doc/regex.rst')
-    testDoc('tests/regression.rst')
 
     # Test documentation of some functions/classes
     testModule("hachoir_core.bits")
@@ -49,8 +47,6 @@ def main():
     testModule("hachoir_core.dict")
     testModule("hachoir_core.text_handler")
     testModule("hachoir_core.tools")
-    testModule("hachoir_core.regex.parser")
-    testModule("hachoir_core.regex.regex")
 
 if __name__ == "__main__":
     main()
