@@ -20,23 +20,8 @@ CLASSIFIERS = [
 PACKAGES = {"hachoir_regex": "hachoir_regex"}
 
 from imp import load_source
-import os
+from os import path
 import sys
-
-def getPackages(hachoir_dir):
-    # TODO: Remove this ugly function to use __import__
-    packages_dir = {
-        'hachoir_regex': [],
-    }
-    old_packages_dir = packages_dir
-    packages_dir = {}
-    for key in old_packages_dir.iterkeys():
-        packages_dir[key] = os.path.join(hachoir_dir, *old_packages_dir[key])
-    return packages_dir.keys(), packages_dir
-
-def get_long_description(root_dir):
-    """Read the content of README file"""
-    return open(os.path.join(root_dir, 'README'), 'r').read()
 
 def main():
     # Check Python version!
@@ -52,7 +37,7 @@ def main():
         from distutils.core import setup
         use_setuptools = False
 
-    hachoir_parser = load_source("version", path.join("hachoir_regex", "version.py"))
+    hachoir_regex = load_source("version", path.join("hachoir_regex", "version.py"))
 
     install_options = {
         "name": hachoir_regex.PACKAGE,
