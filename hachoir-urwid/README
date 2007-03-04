@@ -51,6 +51,16 @@ Command line options: use --help option.
 
 In hachoir-use, use F1 key to get help (keyboard keys).
 
+What's new in hachoir-urwid 0.8.0?
+==================================
+
+ * CTRL+E write field content to a file
+ * CTRL+X create a stream from a field a write it into a file
+ * Update to hachoir-core 0.8.0 (changes in input streams)
+   and hachoir-parser 0.9.0 (way to choose the right parser)
+ * Update to urwid 0.9.7.2 (use Unicode string)
+ * Add option 'profile-display' to use Python profiler
+
 What's new in hachoir-urwid 0.7.1?
 ==================================
 
