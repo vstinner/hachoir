@@ -56,7 +56,7 @@ class ExeFile(Parser):
     tags = {
         "id": "exe",
         "category": "program",
-        "file_ext": ("exe",),
+        "file_ext": ("exe", "dll", "ocx"),
         "mime": ("application/x-dosexec",),
         "min_size": 64*8,
         #"magic": (("MZ", 0),),
