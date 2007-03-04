@@ -24,6 +24,10 @@ class ExeMetadata(Metadata):
     def extractNE(self, exe):
         if "ne_header" in exe:
             self.useNE_Header(exe["ne_header"])
+        if "info" in exe:
+            for node in exe.array("info/node"):
+                if node["name"].value == "StringFileInfo":
+                    self.readVersionInfo(node["node[0]"])
 
     def extractPE(self, exe):
         # Read information from headers

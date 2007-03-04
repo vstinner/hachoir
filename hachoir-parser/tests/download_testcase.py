@@ -78,6 +78,7 @@ testcase_files = (
     (u"satellite_one.s3m", 39778, "4993611aca1474535d6396e01f86cca8"),
     (u"anti-arpeggio_tune.ptm", 175557, "34e39f476f48abe5e41d6e9a88af515e"),
     (u"deja_vu_serif-2.7.ttf", 205708, "a1d6d07d9be2ced64cf9b7e3ddadd399"),
+    (u"twunk_16.exe", 49680, "f36a271706edd23c94956afb56981184"),
 )
 
 def stringMD5(text):

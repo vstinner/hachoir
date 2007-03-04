@@ -254,6 +254,15 @@ def checkDejaVu(meta): return (
         u"Font direction: Mixed directional"]),
 )
 
+def checkTwunk16(meta): return (
+    checkAttr(meta, "title", [
+        "Twain Thunker",
+        "Twain_32.dll Client's 16-Bit Thunking Server"]),
+    checkAttr(meta, "author", "Twain Working Group"),
+    checkAttr(meta, "version", "1,7,0,0"),
+    checkAttr(meta, "format_version", "New-style executable: Dynamic-link library (DLL)"),
+)
+
 def checkFile(filename, check_metadata):
     sys.stdout.write("  - Create parser: ")
     sys.stdout.flush()
@@ -358,6 +367,7 @@ testcase_files = (
     (u"hachoir.org.sxw", checkHachoirOrgSXW),
     (u"firstrun.rm", checkFirstRun),
     (u"deja_vu_serif-2.7.ttf", checkDejaVu),
+    (u"twunk_16.exe", checkTwunk16),
 )
 
 if __name__ == "__main__":
