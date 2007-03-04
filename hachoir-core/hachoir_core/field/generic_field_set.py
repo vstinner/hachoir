@@ -205,7 +205,7 @@ class GenericFieldSet(BasicFieldSet):
             # Don't add the field <=> delete item
             if self._size is None:
                 self._size = self._current_size + new_size
-        self.warning("[Autofix] Delete '%s' (tXo large)" % field.path)
+        self.warning("[Autofix] Delete '%s' (too large)" % field.path)
         raise StopIteration()
 
     def _getField(self, name, const):
