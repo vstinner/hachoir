@@ -10,7 +10,7 @@ from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet,
     UInt8, UInt16, UInt32, Bits,
     String, RawBytes, Enum,
-    NullBytes, createPaddingField)
+    PaddingBytes, NullBytes, createPaddingField)
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.text_handler import hexadecimal
 from hachoir_parser.image.common import RGB, PaletteRGBA
@@ -112,8 +112,8 @@ class BmpFile(Parser):
         "min_size": 30*8,
 #        "magic": (("BM", 0),),
         "magic_regex": ((
-            # "BM", <filesize>, reserved='\0{4}', header_size=(12|40|108)
-            "BM.{4}\0{4}.{4}[\x0C\x28\x6C]\0{3}",
+            # "BM", <filesize>, <reserved>, header_size=(12|40|108)
+            "BM.{4}.{8}[\x0C\x28\x6C]\0{3}",
         0),),
         "description": "Microsoft bitmap (BMP) picture"
     }
@@ -140,7 +140,7 @@ class BmpFile(Parser):
     def createFields(self):
         yield String(self, "signature", 2, "Header (\"BM\")", charset="ASCII")
         yield UInt32(self, "file_size", "File size (bytes)")
-        yield NullBytes(self, "reserved", 4, "Reseved")
+        yield PaddingBytes(self, "reserved", 4, "Reseved")
         yield UInt32(self, "data_start", "Data start position")
         yield BmpHeader(self, "header")
 
