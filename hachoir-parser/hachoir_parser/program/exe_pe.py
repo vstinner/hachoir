@@ -1,7 +1,7 @@
 from hachoir_core.field import (FieldSet, ParserError,
     Bit, UInt8, UInt16, UInt32, TimestampUnix32,
     Bytes, String, Enum,
-    PaddingBytes, NullBytes, NullBits)
+    PaddingBytes, PaddingBits, NullBytes, NullBits)
 from hachoir_core.text_handler import hexadecimal, humanFilesize
 
 class SectionHeader(FieldSet):
@@ -125,7 +125,7 @@ class PE_Header(FieldSet):
         yield Bit(self, "32bit", "Machine based on 32-bit-word architecture")
         yield Bit(self, "is_stripped", "Debugging information removed?")
         yield Bit(self, "swap", "If image is on removable media, copy and run from swap file")
-        yield NullBits(self, "reserved2", 1)
+        yield PaddingBits(self, "reserved2", 1)
         yield Bit(self, "is_system", "It's a system file")
         yield Bit(self, "is_dll", "It's a dynamic-link library (DLL)")
         yield Bit(self, "up", "File should be run only on a UP machine")
