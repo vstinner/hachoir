@@ -1,3 +1,23 @@
+What's new in hachoir-parser 0.9?
+=================================
+
+New parsers:
+
+ * ACE, CAB, RAR, MOD, S3M, XM, PSD, Torrent, TTF, PDF, NE, MPEG TS
+
+Changes:
+
+ * Add unique identifier and category to each parser
+ * Use tags to choose the right parser
+ * Create ParserList and QueryParser classes
+ * Support magic string as regex ('magic_regex')
+
+Improved parsers:
+
+ * 7-zip: parse a lot of headers, just not start and signature headers
+ * ZIP: support file without file size, support 64-bit structures
+ * Ogg: support "video" chunk and add function to get last page
+
 What's new in hachoir-parser 0.8.1?
 ===================================
 
