@@ -35,7 +35,9 @@ from hachoir_core.text_handler import humanFilesize
 from hachoir_parser.video.fourcc import audio_codec_name, video_fourcc_name
 
 def parseText(self):
-    yield String(self, "text", self["size"].value, strip=" \0", charset="ASCII")
+    yield String(self, "text", self["size"].value,
+        strip=" \0", truncate="\0",
+        charset="ISO-8859-1")
 
 def parseRawFormat(self, size):
     yield RawBytes(self, "raw_format", size)

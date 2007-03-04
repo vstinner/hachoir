@@ -1,5 +1,6 @@
 from hachoir_metadata.metadata import Metadata, registerExtractor
 from hachoir_parser.program import ExeFile
+from hachoir_core.tools import makeUnicode
 
 class ExeMetadata(Metadata):
     KEY_TO_ATTR = {
@@ -70,9 +71,14 @@ class ExeMetadata(Metadata):
             value = node["value"].value
             key = node["name"].value
             values[key] = value
-        if "ProductName" in values and "FileDescription" in values \
-        and values["ProductName"] == values["FileDescription"]:
+
+        if "ProductName" in values and "FileDescription" in values:
+            # Make sure that FileDescription is set before ProductName
+            # as title value
+            self.title = values["FileDescription"]
+            self.title = values["ProductName"]
             del values["FileDescription"]
+            del values["ProductName"]
 
         for key, value in values.iteritems():
             if key in self.KEY_TO_ATTR:
