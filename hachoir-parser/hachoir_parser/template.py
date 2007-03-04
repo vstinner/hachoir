@@ -20,6 +20,8 @@ from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 
 class TODOFile(Parser):
     tags = {
+        "id": "TODO",
+        "category": "TODO",    # "archive", "audio", "container", ...
         "file_ext": ("TODO",), # TODO: Example ("bmp",) to parse the file "image.bmp"
         "mime": ("TODO"),      # TODO: Example: "image/png"
         "min_size": 0,         # TODO: Minimum file size (x bits, or x*8 in bytes)
