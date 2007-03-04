@@ -106,7 +106,7 @@ class VersionInfoNode(FieldSet):
                 yield RawBytes(self, "value", size)
         while 12 <= (self.size - self.current_size) // 8:
             yield VersionInfoNode(self, "node[]", self.is_32bit)
-        size = paddingSize(self.current_size//8, 4)
+        size = (self.size - self.current_size) // 8
         if size:
             yield NullBytes(self, "padding[]", size)
 
@@ -381,7 +381,7 @@ class NE_VersionInfoNode(FieldSet):
                 yield RawBytes(self, "value", size)
         while 12 <= (self.size - self.current_size) // 8:
             yield NE_VersionInfoNode(self, "node[]")
-        size = paddingSize(self.current_size//8, 4)
+        size = (self.size - self.current_size) // 8
         if size:
             yield NullBytes(self, "padding[]", size)
 
