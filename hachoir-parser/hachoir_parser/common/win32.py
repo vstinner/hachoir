@@ -1,27 +1,29 @@
 from hachoir_core.field import (FieldSet,
-    UInt16, UInt32, Enum, String)
+    UInt16, UInt32, Enum, String, Bytes)
 from hachoir_parser.video.fourcc import video_fourcc_name
-from hachoir_core.bits import str2hex, swap16, swap32
+from hachoir_core.bits import str2hex
 from hachoir_core.text_handler import hexadecimal
 
 class GUID(FieldSet):
     """ Windows GUID (128 bits) """
+    static_size = 128
     def createFields(self):
         yield UInt32(self, "a", text_handler=hexadecimal)
         yield UInt16(self, "b", text_handler=hexadecimal)
         yield UInt16(self, "c", text_handler=hexadecimal)
-        yield UInt16(self, "d", text_handler=hexadecimal)
-        yield UInt16(self, "e", text_handler=hexadecimal)
-        yield UInt32(self, "f", text_handler=hexadecimal)
+        yield Bytes(self, "d", 8)
+
+#        yield UInt16(self, "d", text_handler=hexadecimal)
+#        yield UInt16(self, "e", text_handler=hexadecimal)
+#        yield UInt32(self, "f", text_handler=hexadecimal)
 
     def createValue(self):
-        return "%08X-%04X-%04X-%04X-%04X%08X" % (
+        d = self["d"].value
+        return "%08X-%04X-%04X-%s-%s-%s-%s" % (
             self["a"].value,
             self["b"].value,
             self["c"].value,
-            swap16(self["d"].value),
-            swap16(self["e"].value),
-            swap32(self["f"].value))
+            str2hex(d[:2]), str2hex(d[2:4]), str2hex(d[4:6]),str2hex(d[6:8]))
 
     def createRawDisplay(self):
         value = self.stream.readBytes(self.absolute_address, 16)
