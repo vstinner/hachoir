@@ -14,7 +14,15 @@ from hachoir_core.tools import (
     humanDatetime,
     alignValue,
 )
+from types import FunctionType, MethodType
 from hachoir_core.i18n import _
+from hachoir_core.field import Field
+
+def textHandler(field, handler):
+    assert isinstance(handler, (FunctionType, MethodType))
+    assert issubclass(field.__class__, Field)
+    field.createDisplay = lambda: handler(field)
+    return field
 
 def timestampWin64(field):
     """
