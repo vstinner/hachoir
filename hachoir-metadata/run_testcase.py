@@ -256,8 +256,8 @@ def checkDejaVu(meta): return (
 
 def checkTwunk16(meta): return (
     checkAttr(meta, "title", [
-        "Twain Thunker",
-        "Twain_32.dll Client's 16-Bit Thunking Server"]),
+        "Twain_32.dll Client's 16-Bit Thunking Server",
+        "Twain Thunker"]),
     checkAttr(meta, "author", "Twain Working Group"),
     checkAttr(meta, "version", "1,7,0,0"),
     checkAttr(meta, "format_version", "New-style executable: Dynamic-link library (DLL)"),

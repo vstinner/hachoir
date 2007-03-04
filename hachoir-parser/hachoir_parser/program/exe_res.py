@@ -361,17 +361,14 @@ class NE_VersionInfoNode(FieldSet):
         1: "string",
     }
 
-    def __init__(self, parent, name, is_32bit=True):
+    def __init__(self, parent, name):
         FieldSet.__init__(self, parent, name)
         self._size = alignValue(self["size"].value, 4) * 8
-        self.is_32bit = is_32bit
 
     def createFields(self):
         yield UInt16(self, "size", "Node size (in bytes)")
         yield UInt16(self, "data_size")
         yield CString(self, "name", charset="ISO-8859-1")
-        if self["name"].value == "040904b0":
-            self.is_32bit = True
 
         size = paddingSize(self.current_size//8, 4)
         if size:
@@ -380,11 +377,10 @@ class NE_VersionInfoNode(FieldSet):
         if size:
             if self["name"].value == "VS_VERSION_INFO":
                 yield VersionInfoBinary(self, "value", size=size*8)
-                self.is_32bit = self["value/file_os_minor"].value != MINOR_OS_BASE
             else:
                 yield RawBytes(self, "value", size)
         while 12 <= (self.size - self.current_size) // 8:
-            yield NE_VersionInfoNode(self, "node[]", self.is_32bit)
+            yield NE_VersionInfoNode(self, "node[]")
         size = paddingSize(self.current_size//8, 4)
         if size:
             yield NullBytes(self, "padding[]", size)
