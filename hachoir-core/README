@@ -24,7 +24,7 @@ Website: http://hachoir.org/wiki/hachoir-core
 Installation
 ============
 
-For the installation: see INSTALL file or http://hachoir.org/wiki/Install
+For the installation, use setup.py or see: http://hachoir.org/wiki/Install
 
 What's new in hachoir-core 0.8?
 ===============================
