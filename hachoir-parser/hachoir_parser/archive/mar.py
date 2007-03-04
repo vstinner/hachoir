@@ -31,7 +31,7 @@ class MarFile(Parser):
         "id": "mar",
         "category": "archive",
         "file_ext": ("mar",),
-        "min_size": 12*8,
+        "min_size": 80*8,  # At least one file index
         "magic": ((MAGIC, 0),),
         "description": "Microsoft Archive",
     }
