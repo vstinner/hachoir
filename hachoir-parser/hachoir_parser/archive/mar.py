@@ -38,7 +38,6 @@ class MarFile(Parser):
     endian = LITTLE_ENDIAN
 
     def validate(self):
-        return True
         if self.stream.readBytes(0, 4) != self.MAGIC:
             return "Invalid magic"
         if self["version"].value != 3:
@@ -57,6 +56,7 @@ class MarFile(Parser):
             yield item
             if item["filesize"].value:
                 files.append(item)
+        files.sort(key=lambda item: item["offset"].value)
         for index in files:
             padding = self.seekByte(index["offset"].value)
             if padding:
