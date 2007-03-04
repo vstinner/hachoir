@@ -17,7 +17,7 @@ from hachoir_core.field import (StaticFieldSet,
 from hachoir_core.text_handler import hexadecimal
 from hachoir_parser.program.exe_ne import NE_Header
 from hachoir_parser.program.exe_pe import PE_Header, PE_OptHeader, SectionHeader
-from hachoir_parser.program.exe_res import PE_Resource
+from hachoir_parser.program.exe_res import PE_Resource, NE_VersionInfoNode
 
 class MSDosHeader(StaticFieldSet):
     format = (
@@ -37,7 +37,7 @@ class MSDosHeader(StaticFieldSet):
         (UInt16, "oem_id", "OEM id"),
         (UInt16, "oem_info", "OEM info"),
         (PaddingBytes, "reserved[]", 20, "Reserved"),
-        (UInt32, "pe_offset", "Offset to PE header"))
+        (UInt32, "next_offset", "Offset to next header (PE or NE)"))
 
     def isValid(self):
         if 512 <= self["size_mod_512"].value:
@@ -48,8 +48,8 @@ class MSDosHeader(StaticFieldSet):
         if looks_pe:
             if self["checksum"].value != 0:
                 return "Invalid value of checksum"
-            if not (80 <= self["pe_offset"].value <= 1024):
-                return "Invalid value of pe_offset"
+            if not (80 <= self["next_offset"].value <= 1024):
+                return "Invalid value of next_offset"
         return ""
 
 class ExeFile(Parser):
@@ -75,7 +75,7 @@ class ExeFile(Parser):
 
     def createFields(self):
         yield MSDosHeader(self, "msdos", "MS-DOS program header")
-        offset = self["msdos/pe_offset"].value * 8
+        offset = self["msdos/next_offset"].value * 8
 
         is_pe = False
         is_ne = False
@@ -109,6 +109,16 @@ class ExeFile(Parser):
 
     def parseNE_Executable(self):
         yield NE_Header(self, "ne_header")
+
+        # FIXME: Compute resource offset instead of using searchBytes()
+        # Ugly hack to get find version info structure
+        start = self.current_size
+        addr = self.stream.searchBytes('VS_VERSION_INFO', start)
+        if addr:
+            padding = self.seekBit(addr-32)
+            if padding:
+                yield padding
+            yield NE_VersionInfoNode(self, "info")
 
     def parsePortableExecutable(self):
         # Read PE header
