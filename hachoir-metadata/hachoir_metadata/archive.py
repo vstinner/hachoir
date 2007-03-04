@@ -1,6 +1,7 @@
 from hachoir_metadata.metadata import (
     Metadata, MultipleMetadata, registerExtractor)
-from hachoir_parser.archive import Bzip2Parser, CabFile, GzipParser, TarFile, ZipFile
+from hachoir_parser.archive import (Bzip2Parser, CabFile, GzipParser,
+    TarFile, ZipFile, MarFile)
 from hachoir_core.tools import humanUnixAttributes
 from hachoir_core.i18n import _
 
@@ -104,9 +105,24 @@ class CabMetadata(MultipleMetadata):
                 title = _("File")
             self.addGroup(field.name, meta, title)
 
+class MarMetadata(MultipleMetadata):
+    def extract(self, mar):
+        self.comment = "Contains %s files" % mar["nb_file"].value
+        self.format_version = "Microsoft Archive version %s" % mar["version"].value
+        for index, field in enumerate(mar.array("file")):
+            if MAX_NB_FILE <= index:
+                self.warning("MAR archive contains many files, but only first %s files are processed" % MAX_NB_FILE)
+                break
+            meta = Metadata()
+            meta.filename = field["filename"].value
+            meta.compression = "None"
+            meta.file_size = field["filesize"].value
+            self.addGroup(field.name, meta, "File \"%s\"" % meta.filename[0])
+
 registerExtractor(CabFile, CabMetadata)
 registerExtractor(GzipParser, GzipMetadata)
 registerExtractor(Bzip2Parser, Bzip2Metadata)
 registerExtractor(TarFile, TarMetadata)
 registerExtractor(ZipFile, ZipMetadata)
+registerExtractor(MarFile, MarMetadata)
 
