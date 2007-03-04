@@ -87,8 +87,6 @@ class VersionInfoNode(FieldSet):
         yield UInt16(self, "data_size")
         yield Enum(UInt16(self, "type"), self.TYPE_NAME)
         yield CString(self, "name", charset="UTF-16-LE")
-        if self["name"].value == "040904b0":
-            self.is_32bit = True
 
         size = paddingSize(self.current_size//8, 4)
         if size:
@@ -98,10 +96,11 @@ class VersionInfoNode(FieldSet):
             if self["type"].value == self.TYPE_STRING:
                 if self.is_32bit:
                     size *= 2
-                yield String(self, "value", size, charset="UTF-16-LE", strip="\0")
+                yield String(self, "value", size, charset="UTF-16-LE", truncate="\0")
             elif self["name"].value == "VS_VERSION_INFO":
                 yield VersionInfoBinary(self, "value", size=size*8)
-                self.is_32bit = self["value/file_os_minor"].value != MINOR_OS_BASE
+                if self["value/file_flags_mask"].value == 0:
+                    self.is_32bit = False
             else:
                 yield RawBytes(self, "value", size)
         while 12 <= (self.size - self.current_size) // 8:

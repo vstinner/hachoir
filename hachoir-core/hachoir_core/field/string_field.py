@@ -285,9 +285,9 @@ def stringFactory(name, format, doc):
     class NewString(GenericString):
         __doc__ = doc
         def __init__(self, parent, name, description=None,
-        strip=None, charset=None):
+        strip=None, charset=None, truncate=None):
             GenericString.__init__(self, parent, name, format, description,
-            strip=strip, charset=charset)
+            strip=strip, charset=charset, truncate=truncate)
     cls = NewString
     cls.__name__ = name
     return cls
