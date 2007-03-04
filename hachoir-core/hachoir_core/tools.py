@@ -199,7 +199,7 @@ def humanFrequency(hertz):
             return u"%.1f %s" % (hertz, unit)
     return u"%s %s" % (hertz, unit)
 
-regex_control_code = re.compile("([\x00-\x1f\x7f])")
+regex_control_code = re.compile(r"([\x00-\x1f\x7f\x5c])")
 controlchars = tuple({
         # Don't use "\0", because "\0"+"0"+"1" = "\001" = "\1" (1 character)
         # Same rease to not use octal syntax ("\1")
@@ -208,6 +208,7 @@ controlchars = tuple({
         ord("\t"): r"\t",
         ord("\a"): r"\a",
         ord("\b"): r"\b",
+        ord("\\"): r"\\",
     }.get(code, '\\x%02x' % code)
     for code in xrange(128)
 )
@@ -255,6 +256,8 @@ def makePrintable(data, charset, quote=None, to_unicode=False, smart=True):
     'a"b'
     >>> print makePrintable("a'b", "latin-1", quote="'")
     'a\'b'
+    >>> print makePrintable('\\', "latin-1", quote="'")
+    '\\'
     """
 
     if data:
