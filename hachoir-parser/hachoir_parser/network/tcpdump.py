@@ -21,17 +21,10 @@ from hachoir_core.endian import NETWORK_ENDIAN, LITTLE_ENDIAN
 from hachoir_core.tools import humanDuration
 from hachoir_core.text_handler import hexadecimal
 from hachoir_core.tools import createDict
+from hachoir_parser.network.common import MAC48_Address
 
 def diff(field):
     return humanDuration(field.value*1000)
-
-class MAC(Bytes):
-    def __init__(self, parent, name, description=None):
-        Bytes.__init__(self, parent, name, 6, description)
-
-    def createDisplay(self):
-        addr = ":".join(( "%02X" % ord(byte) for byte in self.value ))
-        return '"%s"' % addr
 
 class IPv4Address(Bytes):
     def __init__(self, parent, name, description=None):
@@ -58,9 +51,9 @@ class ARP(Layer):
         yield UInt8(self, "hw_size")
         yield UInt8(self, "proto_size")
         yield Enum(UInt16(self, "opcode"), ARP.opcode_name)
-        yield MAC(self, "src_mac")
+        yield MAC48_Address(self, "src_mac")
         yield IPv4Address(self, "src_ip")
-        yield MAC(self, "dst_mac")
+        yield MAC48_Address(self, "dst_mac")
         yield IPv4Address(self, "dst_ip")
 
     def createDescription(self):
@@ -382,8 +375,8 @@ class Unicast(Layer2):
 class Ethernet(Layer2):
     static_size = 14*8
     def createFields(self):
-        yield MAC(self, "dst")
-        yield MAC(self, "src")
+        yield MAC48_Address(self, "dst")
+        yield MAC48_Address(self, "src")
         yield Enum(UInt16(self, "protocol"), self.PROTO_DESC)
 
     def createDescription(self):
@@ -417,11 +410,16 @@ class Packet(FieldSet):
             yield RawBytes(self, "data", size)
 
     def getTimestamp(self):
-        return self["ts_epoch"].value + float(self["ts_nanosec"].value) / 1e9
+        nano_sec = float(self["ts_nanosec"].value) / 100
+        from datetime import timedelta
+        return self["ts_epoch"].value + timedelta(microseconds=nano_sec)
 
     def createDescription(self):
-        ts = max(self.getTimestamp() - self["/packet[0]"].getTimestamp(), 0.0)
-        text = ["%1.6f: " % ts]
+        t0 = self["/packet[0]"].getTimestamp()
+#        ts = max(self.getTimestamp() - t0, t0)
+        ts = self.getTimestamp() - t0
+        #text = ["%1.6f: " % ts]
+        text = ["%s: " % ts]
         if "tcp" in self:
             text.append(self["tcp"].description)
         elif "udp" in self:
