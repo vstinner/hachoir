@@ -4,7 +4,8 @@ InfoTech Storage Format (ITSF) parser, used by Microsoft's HTML Help (.chm)
 Document:
 - Microsoft's HTML Help (.chm) format
   http://www.wotsit.org (search "chm")
-- libchm library
+- chmlib library
+  http://www.jedrea.com/chmlib/
 
 Author: Victor Stinner
 Creation date: 2007-03-04
