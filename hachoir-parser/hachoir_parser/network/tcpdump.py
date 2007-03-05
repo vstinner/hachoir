@@ -21,17 +21,10 @@ from hachoir_core.endian import NETWORK_ENDIAN, LITTLE_ENDIAN
 from hachoir_core.tools import humanDuration
 from hachoir_core.text_handler import hexadecimal
 from hachoir_core.tools import createDict
-from hachoir_parser.network.common import MAC48_Address
+from hachoir_parser.network.common import MAC48_Address, IPv4_Address
 
 def diff(field):
     return humanDuration(field.value*1000)
-
-class IPv4Address(Bytes):
-    def __init__(self, parent, name, description=None):
-        Bytes.__init__(self, parent, name, 4, description)
-
-    def createDisplay(self):
-        return ".".join(( "%u" % ord(byte) for byte in self.value ))
 
 class Layer(FieldSet):
     endian = NETWORK_ENDIAN
@@ -52,9 +45,9 @@ class ARP(Layer):
         yield UInt8(self, "proto_size")
         yield Enum(UInt16(self, "opcode"), ARP.opcode_name)
         yield MAC48_Address(self, "src_mac")
-        yield IPv4Address(self, "src_ip")
+        yield IPv4_Address(self, "src_ip")
         yield MAC48_Address(self, "dst_mac")
-        yield IPv4Address(self, "dst_ip")
+        yield IPv4_Address(self, "dst_ip")
 
     def createDescription(self):
         desc = "ARP: %s" % self["opcode"].display
@@ -326,8 +319,8 @@ class IPv4(Layer):
         yield UInt8(self, "ttl", "Type to live")
         yield Enum(UInt8(self, "protocol"), self.PROTOCOL_NAME)
         yield UInt16(self, "checksum", text_handler=hexadecimal)
-        yield IPv4Address(self, "src")
-        yield IPv4Address(self, "dst")
+        yield IPv4_Address(self, "src")
+        yield IPv4_Address(self, "dst")
 
         size = (self.size - self.current_size) // 8
         if size:

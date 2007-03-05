@@ -1,7 +1,30 @@
-from hachoir_core.field import FieldSet, Bits
+from hachoir_core.field import FieldSet, Field, Bits
 from hachoir_core.bits import str2hex
 from hachoir_parser.network.ouid import REGISTERED_OUID
 from hachoir_core.endian import BIG_ENDIAN
+from socket import gethostbyaddr, herror as socket_host_error
+
+def ip2name(addr):
+    try:
+        if addr in ip2name.cache:
+            return ip2name.cache[addr]
+        name = gethostbyaddr(addr)[0]
+    except (socket_host_error, KeyboardInterrupt, ValueError):
+        name = addr
+    ip2name.cache[addr] = name
+    return name
+ip2name.cache = {}
+
+class IPv4_Address(Field):
+    def __init__(self, parent, name, description=None):
+        Field.__init__(self, parent, name, 32, description)
+
+    def createValue(self):
+        value = self._parent.stream.readBytes(self.absolute_address, 4)
+        return ".".join(( "%u" % ord(byte) for byte in value ))
+
+    def createDisplay(self):
+        return ip2name(self.value)
 
 class OrganizationallyUniqueIdentifier(Bits):
     """
