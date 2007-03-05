@@ -122,7 +122,7 @@ class Field(Logger):
     def createDisplay(self):
         return unicode(self.value)
     def _getDisplay(self):
-        if not hasattr(self, "__display"):
+        if not hasattr(self, "_Field__display"):
             try:
                 self.__display = self.createDisplay()
             except HACHOIR_ERRORS, err:
@@ -139,7 +139,7 @@ class Field(Logger):
         else:
             return unicode(value)
     def _getRawDisplay(self):
-        if not hasattr(self, "__raw_display"):
+        if not hasattr(self, "_Field__raw_display"):
             try:
                 self.__raw_display = self.createRawDisplay()
             except HACHOIR_ERRORS, err:
