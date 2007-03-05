@@ -255,8 +255,6 @@ def makePrintable(data, charset, quote=None, to_unicode=False, smart=True):
     'a"b'
     >>> print makePrintable("a'b", "latin-1", quote="'")
     'a\'b'
-    >>> print makePrintable('\\', "latin-1", quote="'")
-    '\\'
     """
 
     if data:
