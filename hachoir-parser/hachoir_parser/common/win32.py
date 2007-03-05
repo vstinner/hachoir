@@ -1,29 +1,71 @@
 from hachoir_core.field import (FieldSet,
-    UInt16, UInt32, Enum, String, Bytes)
+    UInt16, UInt32, Enum, String, Bytes, Bits)
 from hachoir_parser.video.fourcc import video_fourcc_name
 from hachoir_core.bits import str2hex
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
+from hachoir_parser.network.common import OrganizationallyUniqueIdentifier, MAC48_Address
+
+from hachoir_core.tools import timestampUUID60
+def formatTimestamp(field):
+    return timestampUUID60(field.value)
 
 class GUID(FieldSet):
-    """ Windows GUID (128 bits) """
-    static_size = 128
-    def createFields(self):
-        yield UInt32(self, "a", text_handler=hexadecimal)
-        yield UInt16(self, "b", text_handler=hexadecimal)
-        yield UInt16(self, "c", text_handler=hexadecimal)
-        yield Bytes(self, "d", 8)
+    """
+    Windows 128 bits Globally Unique Identifier (GUID)
 
-#        yield UInt16(self, "d", text_handler=hexadecimal)
-#        yield UInt16(self, "e", text_handler=hexadecimal)
-#        yield UInt32(self, "f", text_handler=hexadecimal)
+    Versions:
+       1: Time-based + MAC-48
+       2: DCE Security version, with embedded POSIX UIDs
+       3: SHA-1 hash for time, clock and node
+       4: Randomly generated version
+       5: MD5 hash for time, clock and node
+
+    See RFC 4122
+    """
+    static_size = 128
+    NULL = "00000000-0000-0000-0000-000000000000"
+    FIELD_NAMES = {
+        3: ("sha1_high", "sha1_low"),
+        4: ("random_high", "random_low"),
+        5: ("md5_high", "md5_low"),
+    }
+
+    def __init__(self, *args):
+        FieldSet.__init__(self, *args)
+        self.version = self.stream.readBits(self.absolute_address + 32 + 16 + 12, 4, self.endian)
+
+    def createFields(self):
+        if self.version == 1:
+            yield textHandler(Bits(self, "time", 60), formatTimestamp)
+            yield Bits(self, "version", 4)
+            yield Bits(self, "clock", 16)
+            if self.version == 1:
+                yield MAC48_Address(self, "mac", "IEEE 802 MAC address")
+            else:
+                yield Bytes(self, "node", 6)
+        else:
+            namea, nameb = self.FIELD_NAMES.get(
+                self.version, ("data_a", "data_b"))
+            yield textHandler(Bits(self, namea, 60), hexadecimal)
+            yield Bits(self, "version", 4)
+            yield textHandler(Bits(self, nameb, 64), hexadecimal)
 
     def createValue(self):
-        d = self["d"].value
-        return "%08X-%04X-%04X-%s-%s-%s-%s" % (
-            self["a"].value,
-            self["b"].value,
-            self["c"].value,
-            str2hex(d[:2]), str2hex(d[2:4]), str2hex(d[4:6]),str2hex(d[6:8]))
+        addr = self.absolute_address
+        a = self.stream.readBits (addr,      32, self.endian)
+        b = self.stream.readBits (addr + 32, 16, self.endian)
+        c = self.stream.readBits (addr + 48, 16, self.endian)
+        d = self.stream.readBytes(addr + 64, 2)
+        e = self.stream.readBytes(addr + 80, 6)
+        return "%08X-%04X-%04X-%s-%s" % (a, b, c, str2hex(d), str2hex(e))
+
+    def createDisplay(self):
+        value = self.value
+        if value == self.NULL:
+            name = "Null GUID: "
+        else:
+            name = "GUID version %s: " % self.version
+        return name + value
 
     def createRawDisplay(self):
         value = self.stream.readBytes(self.absolute_address, 16)

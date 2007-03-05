@@ -470,6 +470,29 @@ def timestampWin64(value):
     except OverflowError:
         raise ValueError(_("date newer than year %s (value=%s)") % (MAXYEAR, value))
 
+# Start of 60-bit UUID timestamp: 15 October 1582 at 00:00
+UUID60_TIMESTAMP_T0 = datetime(1582, 10, 15, 0, 0, 0)
+
+def timestampUUID60(value):
+    """
+    Convert UUID 60-bit timestamp to string. The timestamp format is
+    a 60-bit number which represents number of 100ns since the
+    the 15 October 1582 at 00:00. Result is an unicode string.
+
+    >>> timestampUUID60(0)
+    datetime.datetime(1582, 10, 15, 0, 0)
+    >>> timestampUUID60(130435676263032368)
+    datetime.datetime(1996, 2, 14, 5, 13, 46, 303236)
+    """
+    if not isinstance(value, (float, int, long)):
+        raise TypeError("an integer or float is required")
+    if value < 0:
+        raise ValueError("value have to be a positive or nul integer")
+    try:
+        return UUID60_TIMESTAMP_T0 + timedelta(microseconds=value/10)
+    except OverflowError:
+        raise ValueError(_("timestampUUID60() overflow (value=%s)") % value)
+
 def humanDatetime(value):
     """
     Convert a timestamp to Unicode string: use ISO format with space separator.
