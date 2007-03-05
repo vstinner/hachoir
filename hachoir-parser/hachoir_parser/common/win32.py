@@ -4,8 +4,8 @@ from hachoir_parser.video.fourcc import video_fourcc_name
 from hachoir_core.bits import str2hex
 from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_parser.network.common import OrganizationallyUniqueIdentifier, MAC48_Address
-
 from hachoir_core.tools import timestampUUID60
+
 def formatTimestamp(field):
     return timestampUUID60(field.value)
 
@@ -29,6 +29,13 @@ class GUID(FieldSet):
         4: "Randomly generated",
         5: "Name MD5 hash",
     }
+    VARIANT_NAME = {
+        0: "NCS",
+        2: "Leach-Salz",
+       # 5: Microsoft Corporation?
+        6: "Microsoft Corporation",
+        7: "Reserved Future",
+    }
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
         self.version = self.stream.readBits(self.absolute_address + 32 + 16 + 12, 4, self.endian)
@@ -37,7 +44,9 @@ class GUID(FieldSet):
         if self.version == 1:
             yield textHandler(Bits(self, "time", 60), formatTimestamp)
             yield Enum(Bits(self, "version", 4), self.VERSION_NAME)
-            yield Bits(self, "clock", 16)
+            yield Enum(Bits(self, "variant", 3), self.VARIANT_NAME)
+            yield textHandler(Bits(self, "clock", 13), hexadecimal)
+#            yield textHandler(Bits(self, "clock", 16), hexadecimal)
             if self.version == 1:
                 yield MAC48_Address(self, "mac", "IEEE 802 MAC address")
             else:
@@ -47,7 +56,8 @@ class GUID(FieldSet):
                 self.version, ("data_a", "data_b"))
             yield textHandler(Bits(self, namea, 60), hexadecimal)
             yield Enum(Bits(self, "version", 4), self.VERSION_NAME)
-            yield textHandler(Bits(self, nameb, 64), hexadecimal)
+            yield Enum(Bits(self, "variant", 3), self.VARIANT_NAME)
+            yield textHandler(Bits(self, nameb, 61), hexadecimal)
 
     def createValue(self):
         addr = self.absolute_address

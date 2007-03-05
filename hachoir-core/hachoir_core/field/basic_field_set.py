@@ -31,7 +31,7 @@ class BasicFieldSet(Field):
         assert issubclass(stream.__class__, InputStream)
 
         # Set field set size
-        if self.static_size:
+        if size is None and self.static_size:
             assert isinstance(self.static_size, (int, long))
             size = self.static_size
 

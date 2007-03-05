@@ -12,10 +12,10 @@ Creation date: 2007-03-04
 """
 
 from hachoir_parser import Parser
-from hachoir_core.field import (Field, FieldSet,
+from hachoir_core.field import (Field, FieldSet, ParserError,
     Int32, UInt32, UInt64,
     RawBytes, PaddingBytes,
-    Enum, String, DateTimeMSDOS32)
+    Enum, String)
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_parser.common.win32 import GUID
 from hachoir_parser.common.win32_lang_id import LANGUAGE_ID
@@ -46,7 +46,6 @@ class CWord(Field):
         self.createValue = lambda: value
 
 class Filesize_Header(FieldSet):
-    static_size = 24*8
     def createFields(self):
         yield UInt32(self, "unknown[]", "0x01FE", text_handler=hexadecimal)
         yield UInt32(self, "unknown[]", "0x0", text_handler=hexadecimal)
@@ -67,7 +66,7 @@ class ITSP(FieldSet):
         yield textHandler(UInt32(self, "block_size", "Directory block size"), humanFilesize)
         yield UInt32(self, "density", "Density of quickref section, usually 2")
         yield UInt32(self, "index_depth", "Depth of the index tree")
-        yield UInt32(self, "nb_dir", "Chunk number of root index chunk")
+        yield Int32(self, "nb_dir", "Chunk number of root index chunk")
         yield UInt32(self, "first_pmgl", "Chunk number of first PMGL (listing) chunk")
         yield UInt32(self, "last_pmgl", "Chunk number of last PMGL (listing) chunk")
         yield Int32(self, "unknown[]", "-1")
@@ -85,12 +84,12 @@ class ITSF(FieldSet):
         yield UInt32(self, "version")
         yield UInt32(self, "header_size", "Total header length (in bytes)")
         yield UInt32(self, "one")
-        yield DateTimeMSDOS32(self, "timestamp")
+        yield UInt32(self, "last_modified")
         yield Enum(UInt32(self, "lang_id", "Windows Language ID"), LANGUAGE_ID)
         yield GUID(self, "dir_uuid", "{7C01FD10-7BAA-11D0-9E0C-00A0-C922-E6EC}")
         yield GUID(self, "stream_uuid", "{7C01FD11-7BAA-11D0-9E0C-00A0-C922-E6EC}")
-        yield UInt64(self, "unknown_offset")
-        yield textHandler(UInt64(self, "unknown_len"), humanFilesize)
+        yield UInt64(self, "filesize_offset")
+        yield textHandler(UInt64(self, "filesize_len"), humanFilesize)
         yield UInt64(self, "dir_offset")
         yield textHandler(UInt64(self, "dir_len"), humanFilesize)
         if 3 <= self["version"].value:
@@ -108,17 +107,13 @@ class PMGL_Entry(FieldSet):
         return "%s (%s)" % (self["name"].value, self["length"].display)
 
 class PMGL(FieldSet):
-    def __init__(self, *args):
-        FieldSet.__init__(self, *args)
-        self._size = self["/itsp/block_size"].value * 8
-
     def createFields(self):
         # Header
         yield String(self, "magic", 4, "PMGL", charset="ASCII")
-        yield textHandler(UInt32(self, "free_space",
+        yield textHandler(Int32(self, "free_space",
             "Length of free space and/or quickref area at end of directory chunk"),
             humanFilesize)
-        yield UInt32(self, "zero", "Always 0")
+        yield Int32(self, "unknown")
         yield Int32(self, "previous", "Chunk number of previous listing chunk")
         yield Int32(self, "next", "Chunk number of previous listing chunk")
 
@@ -142,10 +137,6 @@ class PMGI_Entry(FieldSet):
         return "%s (page #%u)" % (self["name"].value, self["page"].value)
 
 class PMGI(FieldSet):
-    def __init__(self, *args):
-        FieldSet.__init__(self, *args)
-        self._size = self["/itsp/block_size"].value * 8
-
     def createFields(self):
         yield String(self, "magic", 4, "PMGI", charset="ASCII")
         yield textHandler(UInt32(self, "free_space",
@@ -159,6 +150,21 @@ class PMGI(FieldSet):
         padding = (self.size - self.current_size) // 8
         if padding:
             yield PaddingBytes(self, "padding", padding)
+
+class Directory(FieldSet):
+    def createFields(self):
+        yield ITSP(self, "itsp")
+        block_size = self["itsp/block_size"].value * 8
+
+        nb_dir = self["itsp/nb_dir"].value
+
+        if nb_dir < 0:
+            nb_dir = 1
+        for index in xrange(nb_dir):
+            yield PMGL(self, "pmgl[]", size=block_size)
+
+        if self.current_size < self.size:
+            yield PMGI(self, "pmgi", size=block_size)
 
 class ChmFile(Parser):
     tags = {
@@ -180,11 +186,12 @@ class ChmFile(Parser):
 
     def createFields(self):
         yield ITSF(self, "itsf")
-        yield Filesize_Header(self, "file_size")
-        yield ITSP(self, "itsp")
-        for index in xrange(self["itsp/nb_dir"].value):
-            yield PMGL(self, "pmgl[]")
-        yield PMGI(self, "pmgi")
+        yield Filesize_Header(self, "file_size", size=self["itsf/filesize_len"].value*8)
+
+        padding = self.seekByte(self["itsf/dir_offset"].value)
+        if padding:
+            yield padding
+        yield Directory(self, "dir", size=self["itsf/dir_len"].value*8)
 
         size = (self.size - self.current_size) // 8
         if size:
