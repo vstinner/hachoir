@@ -138,7 +138,15 @@ class Field(Logger):
             return makePrintable(value, "ASCII", to_unicode=True)
         else:
             return unicode(value)
-    raw_display = property(lambda self: self.createRawDisplay(),
+    def _getRawDisplay(self):
+        if not hasattr(self, "__raw_display"):
+            try:
+                self.__raw_display = self.createRawDisplay()
+            except HACHOIR_ERRORS, err:
+                self.error("Unable to create raw display: %s" % err)
+                self.__raw_display = u""
+        return self.__raw_display
+    raw_display = property(lambda self: self._getRawDisplay(),
     doc="(Unicode) string which represents raw field content")
 
     def _getName(self):
