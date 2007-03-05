@@ -294,15 +294,26 @@ class OggFile(Parser):
             yield OggPage(self, "page[]")
 
     def createLastPage(self):
-        # FIXME: This doesn't work on all files (eg. some Ogg/Theora)
         start = self[0].size
         end = MAX_FILESIZE * 8
-        offset = self.stream.searchBytes("OggS\0\5", start, end)
-        if offset is None:
-            offset = self.stream.searchBytes("OggS\0\4", start, end)
-        if offset is None:
-            return None
-        return createOrphanField(self, offset, OggPage, "page")
+        if True:
+            # FIXME: This doesn't work on all files (eg. some Ogg/Theora)
+            offset = self.stream.searchBytes("OggS\0\5", start, end)
+            if offset is None:
+                offset = self.stream.searchBytes("OggS\0\4", start, end)
+            if offset is None:
+                return None
+            return createOrphanField(self, offset, OggPage, "page")
+        else:
+            # Very slow version
+            page = None
+            while True:
+                offset = self.stream.searchBytes("OggS\0", start, end)
+                if offset is None:
+                    break
+                page = createOrphanField(self, offset, OggPage, "page")
+                start += page.size
+            return page
 
     def createContentSize(self):
         page = self.createLastPage()
