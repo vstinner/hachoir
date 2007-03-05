@@ -1,6 +1,7 @@
-from hachoir_core.field import FieldSet, Bits
+from hachoir_core.field import FieldSet, Bits, Enum
 from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_core.bits import str2hex
+from hachoir_parser.network.ouid import REGISTERED_OUID
 
 class OrganizationallyUniqueIdentifier(Bits):
     """
@@ -11,12 +12,22 @@ class OrganizationallyUniqueIdentifier(Bits):
     def __init__(self, parent, name, description=None):
         Bits.__init__(self, parent, name, 24, description=None)
 
-    def createDisplay(self):
-        value = self.value
+    def createValue(self):
+        value = Bits.createValue(self)
         a = value & 0xFF
         b = (value >> 8) & 0xFF
         c = value >> 16
         return "%02X-%02X-%02X" % (a, b, c)
+
+    def createDisplay(self, human=True):
+        if human:
+            key = Bits.createValue(self)
+            if key in REGISTERED_OUID:
+                return REGISTERED_OUID[key]
+            else:
+                return self.value
+        else:
+            return self.value
 
 class MAC48_Address(FieldSet):
     """
@@ -33,4 +44,7 @@ class MAC48_Address(FieldSet):
     def createValue(self):
         bytes = self.stream.readBytes(self.absolute_address, 6)
         return str2hex(bytes, format="%02x:")[:-1]
+
+    def createDisplay(self):
+        return "%s [%s]" % (self["organization"].display, self["nic"].display)
 

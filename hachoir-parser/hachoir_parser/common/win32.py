@@ -13,13 +13,6 @@ class GUID(FieldSet):
     """
     Windows 128 bits Globally Unique Identifier (GUID)
 
-    Versions:
-       1: Time-based + MAC-48
-       2: DCE Security version, with embedded POSIX UIDs
-       3: SHA-1 hash for time, clock and node
-       4: Randomly generated version
-       5: MD5 hash for time, clock and node
-
     See RFC 4122
     """
     static_size = 128
@@ -29,7 +22,13 @@ class GUID(FieldSet):
         4: ("random_high", "random_low"),
         5: ("md5_high", "md5_low"),
     }
-
+    VERSION_NAME = {
+        1: "Timestamp & MAC-48",
+        2: "DCE Security version",
+        3: "Name SHA-1 hash",
+        4: "Randomly generated",
+        5: "Name MD5 hash",
+    }
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
         self.version = self.stream.readBits(self.absolute_address + 32 + 16 + 12, 4, self.endian)
@@ -37,7 +36,7 @@ class GUID(FieldSet):
     def createFields(self):
         if self.version == 1:
             yield textHandler(Bits(self, "time", 60), formatTimestamp)
-            yield Bits(self, "version", 4)
+            yield Enum(Bits(self, "version", 4), self.VERSION_NAME)
             yield Bits(self, "clock", 16)
             if self.version == 1:
                 yield MAC48_Address(self, "mac", "IEEE 802 MAC address")
@@ -47,7 +46,7 @@ class GUID(FieldSet):
             namea, nameb = self.FIELD_NAMES.get(
                 self.version, ("data_a", "data_b"))
             yield textHandler(Bits(self, namea, 60), hexadecimal)
-            yield Bits(self, "version", 4)
+            yield Enum(Bits(self, "version", 4), self.VERSION_NAME)
             yield textHandler(Bits(self, nameb, 64), hexadecimal)
 
     def createValue(self):
@@ -64,7 +63,7 @@ class GUID(FieldSet):
         if value == self.NULL:
             name = "Null GUID: "
         else:
-            name = "GUID version %s: " % self.version
+            name = "GUID v%u (%s): " % (self.version, self["version"].display)
         return name + value
 
     def createRawDisplay(self):
