@@ -25,7 +25,7 @@ class RawBytes(Field):
         Field.__init__(self, parent, name, length*8, description)
         self._display = None
 
-    def createDisplay(self, human=True):
+    def _createDisplay(self, human):
         max_bytes = config.max_byte_length
         if type(self._getValue) is type(lambda: None):
             display = self.value[:max_bytes]
@@ -46,8 +46,11 @@ class RawBytes(Field):
             else:
                 return '"%s"' % display
 
+    def createDisplay(self):
+        return self._createDisplay(True)
+
     def createRawDisplay(self):
-        return self.createDisplay(human=False)
+        return self._createDisplay(False)
 
     def hasValue(self):
         return True
