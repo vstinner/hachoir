@@ -250,7 +250,7 @@ def checkBreakdance(parser): return (
 def checkArpDnsPingDns(parser): return (
     checkValue(parser, "/packet[5]/ipv4/ttl", 120),
     checkDisplay(parser, "/packet[3]/ts_epoch", "2006-11-23 23:13:19"),
-    checkDisplay(parser, "/packet[3]/ipv4/src", "212.27.54.252"),
+    checkDisplay(parser, "/packet[3]/ipv4/src", "dns2.proxad.net"),
     checkDisplay(parser, "/packet[7]/udp/src", "DNS"),
 )
 
