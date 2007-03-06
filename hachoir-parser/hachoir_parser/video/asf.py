@@ -194,7 +194,7 @@ class SimpleIndexEntry(FieldSet):
         yield UInt16(self, "pckt_count")
 
 class SimpleIndex(FieldSet):
-    guid = "\x90\x08\x00\x33\xB1\xE5\xCF\x11\x89\xF4\x00\xA0\xC9\x03\x49\xCB"
+    guid = "33000890-E5B1-11CF-89F4-00A0C90349CB"
 
     def createFields(self):
         yield GUID(self, "file_id")
