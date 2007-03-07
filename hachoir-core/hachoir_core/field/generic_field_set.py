@@ -66,6 +66,7 @@ class GenericFieldSet(BasicFieldSet):
         self._field_generator = self.createFields()
         self._field_array_count = {}
         self._array_cache = {}
+        self.__is_feeding = False
 
     def array(self, key):
         try:
@@ -165,20 +166,24 @@ class GenericFieldSet(BasicFieldSet):
             self.warning("assertion failed at GenericFieldSet._addField; fixing field._address...")
             field._address = self._current_size
 
-        # Compute field size and check that there is enough place for it
         ask_stop = False
+        # Compute field size and check that there is enough place for it
+        self.__is_feeding = True
         try:
             field_size = field.size
         except HACHOIR_ERRORS, err:
             if field.is_field_set and field.current_length and field.eof:
+                self.warning("Error when getting size of '%s': %s" % (field.name, err))
                 field._stopFeeding()
                 ask_stop = True
             else:
                 self.warning("Error when getting size of '%s': delete it" % field.name)
+                self.__is_feeding = False
                 raise
-        dsize = self._checkSize(field._address + field.size, False)
+        self.__is_feeding = False
 
         # No more place?
+        dsize = self._checkSize(field._address + field.size, False)
         if None < dsize < 0 or (field.is_field_set and field.size <= 0):
             if self.autofix:
                 self._fixFieldSize(field, field.size + dsize)
@@ -317,6 +322,11 @@ class GenericFieldSet(BasicFieldSet):
         """
         Return the field if it was found, None else
         """
+        if self.__is_feeding \
+        or (self._field_generator and self._field_generator.gi_running):
+            self.warning("Unable to get %s (and generator is already running)"
+                % field_name)
+            return None
         try:
             while True:
                 field = self._field_generator.next()
@@ -371,7 +381,8 @@ class GenericFieldSet(BasicFieldSet):
             return
         try:
             while True:
-                self._addField( self._field_generator.next() )
+                field = self._field_generator.next()
+                self._addField(field)
         except HACHOIR_ERRORS, err:
             if self._fixFeedError(err) is False:
                 raise
