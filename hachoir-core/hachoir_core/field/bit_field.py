@@ -68,3 +68,6 @@ class Bit(RawBits):
         return 1 == self._parent.stream.readBits(
                 self.absolute_address, 1, self._parent.endian)
 
+    def createRawDisplay(self):
+        return unicode(int(self.value))
+
