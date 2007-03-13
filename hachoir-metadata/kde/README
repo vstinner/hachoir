@@ -1,0 +1,26 @@
+Usage
+=====
+
+The hachoir.desktop file goes in:
+   /usr/share/apps/konqueror/servicemenus
+
+Effect
+======
+
+When right-clicking on any file in konqueror, produces a "hachoir metadata"
+entry under "Actions" menu.  This produces a pop-up which displays the file's
+metadata.
+
+Optional
+========
+
+Replace
+
+   Exec=kdialog --passivepopup "`hachoir-metadata %f`" 30 --title "%u" --caption Hachoir
+
+with
+
+   Exec=kdialog --msgbox "`hachoir-metadata %f`" --title "%F" --caption Hachoir
+
+for a real kdialog pop-up
+

@@ -1,0 +1,17 @@
+[Desktop Entry]
+ServiceTypes=all/allfiles
+TryExec=kdialog
+TryExec=hachoir-metadata
+Actions=Hachoir
+X-KDE-Priority=TopLevel
+
+[Desktop Action Hachoir]
+Name=Hachoir metadata
+Icon=info
+#Exec=kdialog --passivepopup "`hachoir-metadata %F`" 30 --title "%N" --caption "%c"
+# Other possibility:
+Exec=echo " " > /tmp/hachoir.tmp || exit; hachoir-metadata2 %F > /tmp/hachoir.tmp; kdialog --textbox /tmp/hachoir.tmp 500 600 --title "%N" --caption "%c"; unlink /tmp/hachoir.tmp
+#Exec=kdialog --msgbox "`hachoir-metadata %f`" --title "%n" --caption "%c"
+Name[fr]=Méta-données hachoir
+Name[de]=Hachoir-Metadaten
+
