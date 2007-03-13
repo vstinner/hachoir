@@ -1,0 +1,67 @@
+#!/usr/bin/python2.4
+import pygtk
+import sys
+pygtk.require ('2.0') # 2.2 for Clipboard
+import gtk.glade
+from hachoir_core.cmd_line import unicodeFilename
+from hachoir_parser import createParser
+
+UI_FILENAME = "hachoir.glade"
+
+class Interface:
+    def __init__(self, fieldset):
+        self.xml = gtk.glade.XML(UI_FILENAME, "main_window")
+        self.xml.signal_autoconnect(self)
+        self.fieldset = fieldset
+        self.table = self.xml.get_widget("table")
+
+    def quit(self):
+        gtk.main_quit()
+    def on_quit_activate(self, widget):
+        self.quit()
+    def on_window_destroy(self, widget, data=None):
+        self.quit()
+
+    def treeview_add_column(self, treeview, name, num):
+        col = gtk.TreeViewColumn(name)
+        treeview.append_column(col)
+        cell = gtk.CellRendererText()
+        col.pack_start(cell, True)
+        col.add_attribute(cell, 'text', num)
+        treeview.set_search_column(num)
+        col.set_sort_column_id(num)
+        return num+1
+
+
+    def display_tree(self, parent):
+        treeStore = gtk.TreeStore(str, str)
+        self.table.set_model(treeStore)
+        self.treeview_add_column(self.table, "name", 0)
+        self.treeview_add_column(self.table, "value", 1)
+        self.fill_tree(parent,None,treeStore)
+    def fill_tree(self, parent, treeparent, treeStore):
+        for field in parent:
+            if field.hasValue():
+                #value = field.display
+                value = field.raw_display
+            else:
+                value = ""
+            newparent = treeStore.append(treeparent,(field.name,value))
+            if field.is_field_set: self.fill_tree(field, newparent, treeStore)
+
+
+def main():
+    if(len(sys.argv)!=2 ):
+        print "usage: %s file" %sys.argv[0]
+        return
+    filename = sys.argv[1]
+    filename, realname = unicodeFilename(filename), filename
+    fieldset = createParser(filename, realname)
+
+    interface = Interface(fieldset)
+    interface.display_tree(fieldset)
+    gtk.main()
+
+if __name__ == "__main__":
+    main()
+
