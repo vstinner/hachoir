@@ -6,6 +6,7 @@ Victor Stinner aka haypo <victor DOT stinner AT haypocalc DOT com>
  * Contributors
 
 Aurélien Jacobs <aurel AT gnuage DOT org> - AVI parser big contributor
+Christophe Fergeau <teuf AT gnome.org> - Improve iTunesDB parser
 Christophe Gisquet <christophe.gisquet AT free.fr> - Write RAR parser
 Cyril Zorin <cyril.zorin AT gmail.com> - Author of 3DO parser
 Frédéric Weisbecker <chantecode AT gmail.com> - Author of ReiserFS parser

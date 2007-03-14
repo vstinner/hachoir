@@ -73,8 +73,17 @@ class DataObject(FieldSet):
         50:"Smart Playlist Data",
         51:"Smart Playlist Rules",
         52:"Library Playlist Index",
-        100:"Collumn info",
+        100:"Column info",
     }
+
+    mhod52_sort_index_type_name={
+        3:"Title",
+        4:"Album, then Disk/Tracknumber, then Title",
+        5:"Artist, then Album, then Disc/Tracknumber, then Title",
+        7:"Genre, then Artist, then Album, then Disc/Tracknumber, then Title",
+        8:"Composer, then Title"
+    }
+
     def __init__(self, *args, **kw):
         FieldSet.__init__(self, *args, **kw)
         self._size = self["entry_length"].value *8
@@ -92,11 +101,22 @@ class DataObject(FieldSet):
             yield UInt32(self, "unknow[]")
             yield UInt32(self, "unknow[]")
             yield String(self, "string", self["length"].value, "String Data", charset="UTF-16-LE")
-        elif self["type"].value<17:
+        elif (self["type"].value<17):
             yield UInt32(self, "unknow[]")
             yield UInt32(self, "unknow[]")
             yield String(self, "string", self._size/8-self["header_length"].value, "String Data", charset="UTF-8")
-
+        elif (self["type"].value == 52):
+            yield UInt32(self, "unknow[]", "unk1")
+            yield UInt32(self, "unknow[]", "unk2")
+            yield Enum(UInt32(self, "sort_index_type", "Sort Index Type"),self.mhod52_sort_index_type_name)
+            yield UInt32(self, "entry_count", "Entry Count")
+            indexes_size = self["entry_count"].value*4
+            padding_offset = self["entry_length"].value - indexes_size
+            padding = self.seekByte(padding_offset, "header padding")
+            if padding:
+                yield padding
+            for i in xrange(self["entry_count"].value):
+                yield UInt32(self, "index["+str(i)+"]", "Index of the "+str(i)+"nth mhit")
         else:
             padding = self.seekByte(self["header_length"].value, "header padding")
             if padding:
@@ -225,6 +245,120 @@ class TrackList(FieldSet):
         for i in xrange(self["track_number"].value):
             yield TrackItem(self, "track[]")
 
+class PlaylistItem(FieldSet):
+    def __init__(self, *args, **kw):
+        FieldSet.__init__(self, *args, **kw)
+        self._size = self["entry_length"].value *8
+
+    def createFields(self):
+        yield String(self, "header_id", 4, "Playlist Item Header Markup (\"mhip\")", charset="ISO-8859-1")
+        yield UInt32(self, "header_length", "Header Length")
+        yield UInt32(self, "entry_length", "Entry Length")
+        yield UInt32(self, "data_object_child_count", "Number of Child Data Objects")
+        yield UInt32(self, "podcast_grouping_flag", "Podcast Grouping Flag")
+        yield UInt32(self, "group_id", "Group ID")
+        yield UInt32(self, "track_id", "Track ID")
+        yield TimestampMac32(self, "timestamp", "Song Timestamp")
+        yield UInt32(self, "podcast_grouping_ref", "Podcast Grouping Reference")
+        padding = self.seekByte(self["header_length"].value, "header padding")
+        if padding:
+            yield padding
+
+        for i in xrange(self["data_object_child_count"].value):
+            yield DataObject(self, "mhod[]")
+
+
+class Playlist(FieldSet):
+    is_master_pl_name={
+        0:"Regular playlist",
+        1:"Master playlist"
+    }
+
+    is_podcast_name={
+        0:"Normal Playlist List",
+        1:"Podcast Playlist List"
+    }
+
+    list_sort_order_name={
+        1:"Manual Sort Order",
+        2:"???",
+        3:"Song Title",
+        4:"Album",
+        5:"Artist",
+        6:"Bitrate",
+        7:"Genre",
+        8:"Kind",
+        9:"Date Modified",
+        10:"Track Number",
+        11:"Size",
+        12:"Time",
+        13:"Year",
+        14:"Sample Rate",
+        15:"Comment",
+        16:"Date Added",
+        17:"Equalizer",
+        18:"Composer",
+        19:"???",
+        20:"Play Count",
+        21:"Last Played",
+        22:"Disc Number",
+        23:"My Rating",
+        24:"Release Date",
+        25:"BPM",
+        26:"Grouping",
+        27:"Category",
+        28:"Description",
+        29:"Show",
+        30:"Season",
+        31:"Episode Number"
+    }
+
+    def __init__(self, *args, **kw):
+        FieldSet.__init__(self, *args, **kw)
+        self._size = self["entry_length"].value *8
+
+    def createFields(self):
+        yield String(self, "header_id", 4, "Playlist List Header Markup (\"mhyp\")", charset="ISO-8859-1")
+        yield UInt32(self, "header_length", "Header Length")
+        yield UInt32(self, "entry_length", "Entry Length")
+        yield UInt32(self, "data_object_child_count", "Number of Child Data Objects")
+        yield UInt32(self, "playlist_count", "Number of Playlist Items")
+        yield Enum(UInt8(self, "type", "Normal or master playlist?"), self.is_master_pl_name)
+        yield UInt8(self, "XXX1", "XXX1")
+        yield UInt8(self, "XXX2", "XXX2")
+        yield UInt8(self, "XXX3", "XXX3")
+        yield TimestampMac32(self, "creation_date", "Date when the playlist was created")
+        yield UInt64(self, "playlistid", "Persistent Playlist ID")
+        yield UInt32(self, "unk3", "unk3")
+        yield UInt16(self, "string_mhod_count", "Number of string MHODs for this playlist")
+        yield Enum(UInt16(self, "is_podcast", "Playlist or Podcast List?"), self.is_podcast_name)
+        yield Enum(UInt32(self, "sort_order", "Playlist Sort Order"), self.list_sort_order_name)
+
+        padding = self.seekByte(self["header_length"].value, "entry padding")
+        if padding:
+            yield padding
+
+        for i in xrange(self["data_object_child_count"].value):
+            yield DataObject(self, "mhod[]")
+
+        for i in xrange(self["playlist_count"].value):
+            yield PlaylistItem(self, "playlist_item[]")
+
+
+
+class PlaylistList(FieldSet):
+    def createFields(self):
+        yield String(self, "header_id", 4, "Playlist List Header Markup (\"mhlp\")", charset="ISO-8859-1")
+        yield UInt32(self, "header_length", "Header Length")
+        yield UInt32(self, "playlist_number", "Number of Playlists")
+
+        padding = self.seekByte(self["header_length"].value, "header padding")
+        if padding:
+            yield padding
+
+        for i in xrange(self["playlist_number"].value):
+            yield Playlist(self, "playlist[]")
+
 class DataSet(FieldSet):
     type_name={
         1:"Track List",
@@ -243,9 +377,12 @@ class DataSet(FieldSet):
         padding = self.seekByte(self["header_length"].value, "header_raw")
         if padding:
             yield padding
-
         if self["type"].value == 1:
-            yield TrackList(self, "tracklist")
+            yield TrackList(self, "tracklist[]")
+        if self["type"].value == 2:
+            yield PlaylistList(self, "playlist_list[]");
+        if self["type"].value == 3:
+            yield PlaylistList(self, "podcast_list[]");
         padding = self.seekBit(self._size, "entry padding")
         if padding:
             yield padding
