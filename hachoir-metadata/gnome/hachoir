@@ -1,0 +1,34 @@
+#!/bin/bash
+set -x
+TMP_FILE=$(mktemp /tmp/hachoir-metadataXXXXXX)
+
+hachoir-metadata "$1" > $TMP_FILE
+NBR_LIGNES=$(wc -l $TMP_FILE | cut -d " " -f 1)
+
+X=$(($NBR_LIGNES/3+2))
+if [ $X -gt 10 ]
+    then HIGHT_WINDOWS=100
+else
+    if [[ $X -gt 3 && $X -lt 11 ]]
+        then HIGHT_WINDOWS=$((X*10))
+    else
+        HIGHT_WINDOWS=20
+    fi
+fi
+
+NBR_MAX_CHAR=$(wc -L $TMP_FILE | cut -d " " -f 1)
+
+if [ ${NBR_MAX_CHAR} -lt 10 ]
+    then WIDTH_WINDOWS=20
+else
+    if [ ${NBR_MAX_CHAR} -lg 100 ]
+        then WIDTH_WINDOWS=160
+    else
+        WIDTH_WINDOWS=$(( ( ${NBR_MAX_CHAR} * 15 ) / 13 ))
+    fi
+fi
+
+gdialog --title "$1" --textbox $TMP_FILE $HIGHT_WINDOWS $WIDTH_WINDOWS
+
+rm $TMP_FILE
+

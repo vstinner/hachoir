@@ -1,0 +1,5 @@
+Nautilus hachoir-metadata plugin.
+
+To install it, just copy "hachoir" file into directory:
+   ~/.gnome2/nautilus-scripts/
+
