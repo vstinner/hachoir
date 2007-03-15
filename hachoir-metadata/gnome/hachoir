@@ -21,7 +21,7 @@ NBR_MAX_CHAR=$(wc -L $TMP_FILE | cut -d " " -f 1)
 if [ ${NBR_MAX_CHAR} -lt 10 ]
     then WIDTH_WINDOWS=20
 else
-    if [ ${NBR_MAX_CHAR} -lg 100 ]
+    if [ ${NBR_MAX_CHAR} -lt 100 ]
         then WIDTH_WINDOWS=160
     else
         WIDTH_WINDOWS=$(( ( ${NBR_MAX_CHAR} * 15 ) / 13 ))
