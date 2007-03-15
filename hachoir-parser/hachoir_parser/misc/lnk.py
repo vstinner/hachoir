@@ -13,31 +13,11 @@ Creation date: 2007-03-15
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet,
     UInt32, UInt16, TimestampWin64, Bit,
-    NullBytes, PaddingBits, Enum)
+    NullBytes, PaddingBits, Enum, RawBytes)
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_parser.common.win32 import GUID
 from hachoir_parser.common.msdos import MSDOSFileAttr32
 from hachoir_core.text_handler import textHandler, humanFilesize
-
-class ShellItem(FieldSet):
-    def __init__(self, *args, **kw):
-        FieldSet.__init__(self, *args, **kw)
-        self._size = self["size"].value * 8
-
-    def createFields(self):
-        yield UInt16(self, "size")
-        yield UInt16(self, "xxx", "???")
-        yield textHandler(UInt32(self, "filesize"), humanFilesize)
-        yield UInt32(self, "xxx", "???")
-
-class ShellID(FieldSet):
-    def __init__(self, *args, **kw):
-        FieldSet.__init__(self, *args, **kw)
-        self._size = self["size"].value * 8
-
-    def createFields(self):
-        yield UInt16(self, "size")
-        yield ShellItem(self, "item[]")
 
 class LnkFile(Parser):
     MAGIC = "\x4C\0\0\0\x01\x14\x02\x00\x00\x00\x00\x00\xc0\x00\x00\x00\x00\x00\x00\x46"
@@ -98,6 +78,7 @@ class LnkFile(Parser):
         yield UInt32(self, "hot_key")
         yield NullBytes(self, "reserved[]", 8)
 
-        if self["has_shell_id"].value:
-            yield ShellID(self, "shell_id")
+        size = (self.size - self.current_size) // 8
+        if size:
+            yield RawBytes(self, "raw_end")
 
