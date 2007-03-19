@@ -89,6 +89,11 @@ class RiffMetadata(MultipleMetadata):
         else:
             meta.width = header["right"].value - header["left"].value
             meta.height = header["bottom"].value - header["top"].value
+
+        root = video["/"]
+        if hasattr(self, "duration") and "movie/size" in root:
+            size = root["movie/size"].value
+            self.bit_rate = size * 8.0 / (self.duration[0] / 1000.0)
         self.addGroup("video", meta, "Video stream")
 
     def extractAVIAudio(self, audio):
