@@ -9,7 +9,7 @@ You have to replace all "TODO" with you code.
 TODO parser.
 
 Author: TODO TODO
-Creation date: DD mmmm YY
+Creation date: YYYY-mm-DD
 """
 
 # TODO: Just keep what you need
