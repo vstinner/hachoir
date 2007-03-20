@@ -1,0 +1,9 @@
+#!/bin/bash
+
+for i in "$@"
+do
+echo "File: '$i'" 
+hachoir-metadata "$i" 
+echo " " 
+done
+

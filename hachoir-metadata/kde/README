@@ -4,6 +4,10 @@ Usage
 The hachoir.desktop file goes in:
    /usr/share/apps/konqueror/servicemenus
 
+The hachoir-metadata-kde goes in:
+   /usr/bin
+(or anywhere in the PATH)
+
 Effect
 ======
 
@@ -16,11 +20,11 @@ Optional
 
 Replace
 
-   Exec=kdialog --passivepopup "`hachoir-metadata %f`" 30 --title "%u" --caption Hachoir
+   Exec=kdialog --passivepopup "`hachoir-metadata %F`" 30 --title "%N" --caption "%c"
 
 with
 
-   Exec=kdialog --msgbox "`hachoir-metadata %f`" --title "%F" --caption Hachoir
+   Exec=echo " " > /tmp/hachoir.tmp || exit; hachoir-metadata-kde %F > /tmp/hachoir.tmp; kdialog --textbox /tmp/hachoir.tmp 500 600 --title "%N" --caption "%c"; unlink /tmp/hachoir.tmp
 
 for a real kdialog pop-up
 
