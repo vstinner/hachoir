@@ -64,7 +64,6 @@ class GenericFieldSet(BasicFieldSet):
         BasicFieldSet.__init__(self, parent, name, stream, description, size)
         self._fields = Dict()
         self._field_generator = self.createFields()
-        self._field_array_count = {}
         self._array_cache = {}
         self.__is_feeding = False
 
@@ -86,9 +85,9 @@ class GenericFieldSet(BasicFieldSet):
 
         But keep: name, value, description and size.
         """
+        BasicFieldSet.reset(self)
         self._fields = Dict()
         self._field_generator = self.createFields()
-        self._field_array_count = {}
         self._current_size = 0
         self._array_cache = {}
 
@@ -138,14 +137,6 @@ class GenericFieldSet(BasicFieldSet):
 
     autofix = property(lambda self: self.root.autofix)
 
-    def setUniqueFieldName(self, field):
-        key = field._name[:-2]
-        try:
-            self._field_array_count[key] += 1
-        except KeyError:
-            self._field_array_count[key] = 0
-        field._name = key + "[%u]" % self._field_array_count[key]
-
     def _addField(self, field):
         """
         Add a field to the field set:
@@ -163,7 +154,8 @@ class GenericFieldSet(BasicFieldSet):
 
         # required for the msoffice parser
         if field._address != self._current_size:
-            self.warning("assertion failed at GenericFieldSet._addField; fixing field._address...")
+            self.warning("Fix address of %s to %s (was %s)" %
+                (field.path, self._current_size, field._address))
             field._address = self._current_size
 
         ask_stop = False
@@ -539,4 +531,7 @@ class GenericFieldSet(BasicFieldSet):
             replace.append(padding)
 
         self.replaceField(old_field.name, replace)
+
+    def nextFieldAddress(self):
+        return self._current_size
 

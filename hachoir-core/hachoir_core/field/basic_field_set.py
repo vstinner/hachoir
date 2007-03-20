@@ -41,6 +41,7 @@ class BasicFieldSet(Field):
         self._size = size
         self._description = description
         self.stream = stream
+        self._field_array_count = {}
 
         # Set endian
         if not self.endian:
@@ -49,7 +50,7 @@ class BasicFieldSet(Field):
 
         if parent:
             # This field set is one of the root leafs
-            self._address = parent._current_size
+            self._address = parent.nextFieldAddress()
             self.root = parent.root
             assert id(self.stream) == id(parent.stream)
         else:
@@ -62,6 +63,9 @@ class BasicFieldSet(Field):
         assert self.endian in (BIG_ENDIAN, LITTLE_ENDIAN)
         if (self._size is not None) and (self._size <= 0):
             raise ParserError("Invalid parser '%s' size: %s" % (self.path, self._size))
+
+    def reset(self):
+        self._field_array_count = {}
 
     def createValue(self):
         return None
@@ -114,4 +118,12 @@ class BasicFieldSet(Field):
         # Transfer event to global listeners
         if self.root._global_event_handler is not None:
             self.root._global_event_handler.raiseEvent(event_name, *args)
+
+    def setUniqueFieldName(self, field):
+        key = field._name[:-2]
+        try:
+            self._field_array_count[key] += 1
+        except KeyError:
+            self._field_array_count[key] = 0
+        field._name = key + "[%u]" % self._field_array_count[key]
 

@@ -71,7 +71,7 @@ class Field(Logger):
         assert (size is None) or (0 <= size)
         self._parent = parent
         self._name = name
-        self._address = parent._current_size
+        self._address = parent.nextFieldAddress()
         self._size = size
         self._description = description
 
