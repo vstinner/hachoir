@@ -2,7 +2,7 @@ import re
 import types
 from hachoir_core.error import error
 from hachoir_core.i18n import _
-from hachoir_parser import Parser
+from hachoir_parser import Parser, HachoirParser
 
 ### Parser list ################################################################
 
@@ -152,7 +152,9 @@ class HachoirParserList(ParserList):
         for module in todo:
             for name in dir(module):
                 attr = getattr(module, name)
-                if isinstance(attr, type) and issubclass(attr, Parser) and attr != Parser:
+                if isinstance(attr, type) \
+                and issubclass(attr, HachoirParser) \
+                and attr not in (Parser, HachoirParser):
                     self.add(attr)
         assert 1 <= len(self.parser_list)
         return self.parser_list

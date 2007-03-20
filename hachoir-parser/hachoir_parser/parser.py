@@ -26,8 +26,22 @@ class HachoirParser(object):
       None otherwise).
     """
 
-    def __init__(self):
+    _autofix = False
+
+    def __init__(self, stream, **args):
+        validate = args.pop("validate", False)
         self._mime_type = None
+        while validate:
+            nbits = self.getTags()["min_size"]
+            if stream.sizeGe(nbits):
+                res = self.validate()
+                if res is True:
+                    break
+                res = makeUnicode(res)
+            else:
+                res = _("stream too small (< %u bits)" % nbits)
+            raise ValidateError(res or _("no reason given"))
+        self._autofix = True
 
     #--- Methods that can be overridden -------------------------------------
     def createDescription(self):
@@ -131,24 +145,10 @@ class HachoirParser(object):
                     ".%s" % file_ext for file_ext in tags["file_ext"])
                 print "  File extension: %s" % file_ext
 
+    autofix = property(lambda self: self._autofix and config.autofix)
 
 class Parser(HachoirParser, GenericParser):
-    _autofix = False
-
     def __init__(self, stream, **args):
-        validate = args.pop("validate", False)
-        GenericParser.__init__(self, stream, **args)
-        HachoirParser.__init__(self)
-        while validate:
-            nbits = self.getTags()["min_size"]
-            if stream.sizeGe(nbits):
-                res = self.validate()
-                if res is True:
-                    break
-                res = makeUnicode(res)
-            else:
-                res = _("stream too small (< %u bits)" % nbits)
-            raise ValidateError(res or _("no reason given"))
-        self._autofix = True
+        GenericParser.__init__(self, stream)
+        HachoirParser.__init__(self, stream, **args)
 
-    autofix = property(lambda self: self._autofix and config.autofix)
