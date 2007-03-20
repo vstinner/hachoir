@@ -15,7 +15,7 @@ from hachoir_core.field import (FieldSet, Enum,
     UInt8, UInt32, Bytes, RawBytes, NullBytes,
     Bit, Bits, PaddingBits, CString)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
-from hachoir_core.text_handler import textHandler, hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal, humanFilesize
 from hachoir_core.tools import paddingSize
 
 class TOC(FieldSet):
@@ -41,8 +41,12 @@ class TOC(FieldSet):
     def createFields(self):
         yield Enum(UInt32(self, "type"), self.TYPE_NAME)
         yield UInt32(self, "format")
-        yield UInt32(self, "size")
+        yield textHandler(UInt32(self, "size"), humanFilesize)
         yield UInt32(self, "offset")
+
+    def createDescription(self):
+        return "%s at %s (%s)" % (
+            self["type"].display, self["offset"].value, self["size"].display)
 
 class PropertiesFormat(FieldSet):
     static_size = 32
@@ -65,7 +69,7 @@ class Property(FieldSet):
         name = self["../name[%s]" % (self.index-2)].value
         return "Property %s" % name
 
-class Properties(FieldSet):
+class GlyphNames(FieldSet):
     def __init__(self, parent, name, toc, description, size=None):
         FieldSet.__init__(self, parent, name, description, size=size)
         self.toc = toc
@@ -74,6 +78,27 @@ class Properties(FieldSet):
         else:
             self.endian = LITTLE_ENDIAN
 
+    def createFields(self):
+        yield PropertiesFormat(self, "format")
+        yield UInt32(self, "count")
+        offsets = []
+        for index in xrange(self["count"].value):
+            offset = UInt32(self, "offset[]")
+            yield offset
+            offsets.append(offset.value)
+        yield UInt32(self, "total_str_length")
+        offsets.sort()
+        offset0 = self.current_size // 8
+        for offset in offsets:
+            padding = self.seekByte(offset0+offset)
+            if padding:
+                yield padding
+            yield CString(self, "name[]")
+        padding = (self.size - self.current_size) // 8
+        if padding:
+            yield NullBytes(self, "end_padding", padding)
+
+class Properties(GlyphNames):
     def createFields(self):
         yield PropertiesFormat(self, "format")
         yield UInt32(self, "nb_prop")
@@ -137,7 +162,9 @@ class PcfFile(Parser):
             if not size:
                 continue
             if entry["type"].value == 1:
-                yield Properties(self, "data[]", entry, "Properties", size=size*8)
+                yield Properties(self, "properties", entry, "Properties", size=size*8)
+            elif entry["type"].value == 128:
+                yield GlyphNames(self, "glyph_names", entry, "Glyph names", size=size*8)
             else:
                 yield RawBytes(self, "data[]", size, "Content of %s" % entry.path)
 
