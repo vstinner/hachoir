@@ -25,7 +25,7 @@ from hachoir_core.field.fake_array import FakeArray
 from hachoir_core.field.basic_field_set import (BasicFieldSet,
     ParserError, MatchError)
 from hachoir_core.field.generic_field_set import GenericFieldSet
-from hachoir_core.field.seekable_field_set import SeekableFieldSet
+from hachoir_core.field.seekable_field_set import SeekableFieldSet, RootSeekableFieldSet
 from hachoir_core.field.field_set import FieldSet
 from hachoir_core.field.static_field_set import StaticFieldSet
 from hachoir_core.field.parser import Parser

@@ -1,7 +1,9 @@
-from hachoir_core.field import BasicFieldSet, FakeArray
-from hachoir_core.tools import lowerBound
+from hachoir_core.field import BasicFieldSet, FakeArray, ParserError
+from hachoir_core.tools import lowerBound, makeUnicode
+from hachoir_core.error import HACHOIR_ERRORS
+from itertools import repeat
 
-class SeekableFieldSet(BasicFieldSet):
+class RootSeekableFieldSet(BasicFieldSet):
     def __init__(self, parent, name, stream, description, size):
         BasicFieldSet.__init__(self, parent, name, stream, description, size)
         self._generator = self.createFields()
@@ -39,6 +41,12 @@ class SeekableFieldSet(BasicFieldSet):
         self._generator = None
     done = property(lambda self: not bool(self._generator))
 
+    def _getSize(self):
+        if self._size is None:
+            self._feedAll()
+        return self._size
+    size = property(_getSize)
+
     def __getitem__(self, key):
         if isinstance(key, (int, long)):
             count = len(self._field_array)
@@ -61,6 +69,9 @@ class SeekableFieldSet(BasicFieldSet):
                         return field
             except StopIteration:
                 self._stopFeed()
+            except HACHOIR_ERRORS, err:
+                self.error("Error: %s" % makeUnicode(err))
+                self._stopFeed()
         raise AttributeError("%s has no field '%s'" % (self.path, key))
 
     def _addField(self, field):
@@ -78,23 +89,32 @@ class SeekableFieldSet(BasicFieldSet):
         self._current_max_size = max(self._current_max_size, field.address + field.size)
 
     def seekByte(self, address, relative=True):
-        assert 0 <= address
-        if relative:
-            self._offset = address * 8
-        else:
-            self._offset = address * 8 - self.absolute_address
-            assert self._offset >= 0
+        address *= 8
+        if not relative:
+            address -= self.absolute_address
+        if address < 0:
+            raise ParserError("Seek below field set start (%s)" % address)
+        self._offset = address
         self._current_max_size = max(self._current_max_size, address)
         return None
 
     def readMoreFields(self, number):
+        return self._readMoreFields(xrange(number))
+
+    def _feedAll(self):
+        return self._readMoreFields(repeat(1))
+
+    def _readMoreFields(self, index_generator):
         added = 0
         if self._generator:
             try:
-                for index in xrange(number):
+                for index in index_generator:
                     self._feedOne()
                     added += 1
             except StopIteration:
+                self._stopFeed()
+            except HACHOIR_ERRORS, err:
+                self.error("Error: %s" % makeUnicode(err))
                 self._stopFeed()
         return added
 
@@ -108,4 +128,9 @@ class SeekableFieldSet(BasicFieldSet):
 
     def nextFieldAddress(self):
         return self._offset
+
+class SeekableFieldSet(RootSeekableFieldSet):
+    def __init__(self, parent, name, description=None):
+        assert issubclass(parent.__class__, BasicFieldSet)
+        RootSeekableFieldSet.__init__(self, parent, name, parent.stream, description, None)
 
