@@ -8,7 +8,6 @@ class SeekableFieldSet(BasicFieldSet):
         self._offset = 0
         self._current_size = 0
         self._current_max_size = 0
-        self._current_length = 0
         self._field_dict = {}
         self._field_array = []
 
@@ -38,14 +37,14 @@ class SeekableFieldSet(BasicFieldSet):
     def _stopFeed(self):
         self._size = self._current_max_size
         self._generator = None
-    done = property(lambda self: bool(self._generator))
+    done = property(lambda self: not bool(self._generator))
 
     def __getitem__(self, key):
         if isinstance(key, (int, long)):
-            if key < len(self._field_array):
+            count = len(self._field_array)
+            if key < count:
                 return self._field_array[key]
-            else:
-                raise NotImplementedError()
+            raise AttributeError("%s has no field '%s'" % (self.path, key))
         if "/" in key:
             if key == "/":
                 return self.root
@@ -74,14 +73,17 @@ class SeekableFieldSet(BasicFieldSet):
         assert field.name not in self._field_dict
         self._field_dict[field.name] = field
         self._field_array.append(field)
-        self._current_length += 1
         self._current_size += field.size
         self._offset += field.size
         self._current_max_size = max(self._current_max_size, field.address + field.size)
 
-    def seekByte(self, address):
+    def seekByte(self, address, relative=True):
         assert 0 <= address
-        self._offset = address * 8
+        if relative:
+            self._offset = address * 8
+        else:
+            self._offset = address * 8 - self.absolute_address
+            assert self._offset >= 0
         self._current_max_size = max(self._current_max_size, address)
         return None
 
@@ -96,7 +98,7 @@ class SeekableFieldSet(BasicFieldSet):
                 self._stopFeed()
         return added
 
-    current_length = property(lambda self: self._current_length)
+    current_length = property(lambda self: len(self._field_array))
     current_size = property(lambda self: self._current_max_size)
 
     def __iter__(self):

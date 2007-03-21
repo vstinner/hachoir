@@ -70,15 +70,6 @@ class BasicFieldSet(Field):
     def createValue(self):
         return None
 
-    def createFields(self):
-        raise NotImplementedError()
-    def __iter__(self):
-        raise NotImplementedError()
-    def __len__(self):
-        raise NotImplementedError()
-    def getField(self, key, const=True):
-        raise NotImplementedError()
-
     def connectEvent(self, event_name, handler, local=True):
         assert event_name in (
             # Callback prototype: def f(field)
@@ -126,4 +117,15 @@ class BasicFieldSet(Field):
         except KeyError:
             self._field_array_count[key] = 0
         field._name = key + "[%u]" % self._field_array_count[key]
+
+    def createFields(self):
+        raise NotImplementedError()
+    def __iter__(self):
+        raise NotImplementedError()
+    def __len__(self):
+        raise NotImplementedError()
+    def getField(self, key, const=True):
+        raise NotImplementedError()
+    def nextFieldAddress(self):
+        raise NotImplementedError()
 
