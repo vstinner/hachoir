@@ -19,15 +19,19 @@ Author: Victor Stinner
 Creation: 8 january 2005
 """
 
-from hachoir_parser import Parser
+from hachoir_parser import HachoirParser
 from hachoir_core.field import (FieldSet, ParserError,
-    UInt8, UInt16, UInt32, TimestampWin64, Enum,
+    RootSeekableFieldSet, SeekableFieldSet,
+    UInt8, UInt16, UInt32, UInt64, TimestampWin64, Enum,
     Bytes, RawBytes, NullBytes,
     String)
 from hachoir_core.text_handler import hexadecimal
 from hachoir_core.tools import humanFilesize
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_parser.common.win32 import GUID
+
+# Number of items in DIFAT
+NB_DIFAT = 109
 
 class SECT(UInt32):
     END_OF_CHAIN = 0xFFFFFFFE
@@ -49,46 +53,42 @@ class SECT(UInt32):
         return SECT.special_value_name.get(val, str(val))
 
 class Property(FieldSet):
-    type_name = {
+    TYPE_NAME = {
         1: "storage",
         2: "stream",
         3: "ILockBytes",
         4: "IPropertyStorage",
         5: "root"
     }
-    decorator_name = {
+    DECORATOR_NAME = {
         0: "red",
         1: "black",
     }
     static_size = 128 * 8
 
-    def createDescription(self):
-        name = self["name"].display
-        size = self["size_hi"].value * (1 << 32) + self["size_lo"].value
-        size = humanFilesize(size)
-        return "Property: %s (%s)" % (name, size)
-
     def createFields(self):
         yield String(self, "name", 64, charset="UTF-16-LE", strip="\0")
         yield UInt16(self, "namelen", "Length of the name")
-        yield Enum(UInt8(self, "type", "Property type"), self.type_name)
-        yield Enum(UInt8(self, "decorator", "Decorator"), self.decorator_name)
+        yield Enum(UInt8(self, "type", "Property type"), self.TYPE_NAME)
+        yield Enum(UInt8(self, "decorator", "Decorator"), self.DECORATOR_NAME)
         yield SECT(self, "left")
         yield SECT(self, "right")
         yield SECT(self, "child")
         yield GUID(self, "clsid", "CLSID of this storage")
         yield RawBytes(self, "flags", 4, "User flags")
-        # Timestamp format: Number of nanosecond since January 1, 1601
         yield TimestampWin64(self, "creation", "Creation timestamp")
         yield TimestampWin64(self, "lastmod", "Modify timestamp")
         yield SECT(self, "start", "Starting SECT of the stream")
-#        block = self["start"].value
-#        if block != SECT.UNUSED and block != 0:
-#            chain = self["/"].getFatChain(block)
-        yield UInt32(self, "size_lo", "Size in bytes (low part)")
-        yield UInt32(self, "size_hi", "Size in bytes (high part)")
+        yield UInt64(self, "size", "Size in bytes")
+
+    def createDescription(self):
+        name = self["name"].display
+        size = self["size"].value
+        size = humanFilesize(size)
+        return "Property: %s (%s)" % (name, size)
 
 class Header(FieldSet):
+    static_size = 68 * 8
     def createFields(self):
         yield GUID(self, "clsid", "16 bytes GUID used by some apps")
         yield UInt16(self, "ver_min", "Minor version")
@@ -113,6 +113,9 @@ class Header(FieldSet):
         yield SECT(self, "db_start", "First block of DIFAT")
         yield UInt32(self, "db_count", "Number of SECTs in DIFAT")
 
+# Header (ole_id, header, difat) size in bytes
+HEADER_SIZE = 64 + Header.static_size + NB_DIFAT * SECT.static_size
+
 class SectFat(FieldSet):
     def __init__(self, parent, name, start, count, description=None):
         FieldSet.__init__(self, parent, name, description, size=count*32)
@@ -123,9 +126,7 @@ class SectFat(FieldSet):
         for i in xrange(self.start, self.start + self.count):
             yield SECT(self, "index[%u]" % i)
 
-class OLE_Document(Parser):
-    BIG_BLOCK_SIZE = 512
-
+class OLE2_File(HachoirParser, RootSeekableFieldSet):
     tags = {
         "id": "ole2",
         "category": "misc",
@@ -143,6 +144,10 @@ class OLE_Document(Parser):
     }
     endian = LITTLE_ENDIAN
 
+    def __init__(self, stream, **args):
+        RootSeekableFieldSet.__init__(self, None, "root", stream, None, stream.askSize(self))
+        HachoirParser.__init__(self, stream, **args)
+
     def validate(self):
         if self["ole_id"].value != "\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1":
             return "Invalid magic"
@@ -157,131 +162,72 @@ class OLE_Document(Parser):
 
         # Configure values
         if header["ver_maj"].value == 3:
-            self.sector_size = 512 # bytes
+            self.sector_size = 512*8
         else: # major version is 4
-            self.sector_size = 4096 # bytes
-        self.bb_size = (1 << header["bb_shift"].value)
-        self.sb_size = (1 << header["sb_shift"].value)
+            self.sector_size = 4096*8
         self.fat_count = header["bb_count"].value
-        self.items_per_bbfat = self.bb_size / (SECT.static_size/8)
-        self.items_per_sfat = self.bb_size / (SECT.static_size/8)
+        sector = (SECT.static_size // 8)
+        self.items_per_bbfat = (1 << header["bb_shift"].value) / sector
 
         # Read DIFAT (one level of indirection)
-        yield SectFat(self, "difat", 0, 109, "Double Indirection FAT")
+        yield SectFat(self, "difat", 0, NB_DIFAT, "Double Indirection FAT")
 
         # Read FAT (one level of indirection)
         for field in self.readBFAT():
             yield field
 
-        chain = self.getFatChain(self["header/bb_start"].value)
-        count = 512 / (Property.static_size/8)
+        # Read SFAT
+        for field in self.readSFAT():
+            yield field
+
+        # Read properties
+        chain = self.getFatChain(self.bb_fat, self["header/bb_start"].value)
+        prop_per_sector = self.sector_size // Property.static_size
         for block in chain:
-            fields = [ Property(self, "property[]") for i in range(count) ]
-            for field in self.write(block, fields):
-                yield field
+            self.seekBlock(block)
+            for index in xrange(prop_per_sector):
+                yield Property(self, "property[]")
 
-        chain = self.getFatChain(self["header/sb_start"].value)
-        index = 0
-        start = 0
-        for block in chain:
-            fat = SectFat(self, "sfat[]", \
-                start, self.items_per_sfat, \
-                "SFAT %u/%u at block %u" % \
-                (1+index, self["header/sb_count"].value, block))
-            start += len(fat)
-            index += 1
-
-            for field in self.write(block, (fat,)):
-                yield field
-
-        # Read SFAT and big block depot (root directory)
-        if False:
-            block_bb = self["/header/bb_start"].value
-            block_sb = self["/header/sb_start"].value
-            if block_bb < block_sb:
-                gen_list = (self.readRoot(), self.readSFAT())
-            else:
-                gen_list = (self.readSFAT(), self.readRoot())
-
-            for gen in gen_list:
-                for field in gen:
-                    yield field
-        if self.current_size < self._size:
-            yield self.seekBit(self._size, "end")
-
-    def write(self, block, fields):
-        address = self.blockAddress(block)
-        existing = self.getFieldByAddress(address, False)
-        if existing is None:
-            pad = self.seekBlock(block)
-            if pad is not None:
-                yield pad
-            for field in fields:
-                yield field
-        else:
-            self.writeFieldsIn(existing, address, fields)
-
-    def getFatSECT(self, block):
-        index = block / self.items_per_bbfat
-        return self.bb_fat[index]["index[%u]" % block].value
-
-    def getFatChain(self, block):
-        chain = [ ]
+    def getFatChain(self, fat, block):
         while block != SECT.END_OF_CHAIN:
-            chain.append(block)
-            block = self.getFatSECT(block)
-        return chain
+            yield block
+            index = block // self.items_per_bbfat
+            block = fat[index]["index[%u]" % block].value
 
     def readBFAT(self):
         self.bb_fat = []
         start = 0
+        count = self.items_per_bbfat
         for index, block in enumerate(self.array("difat/index")):
             block = block.value
             if block == SECT.UNUSED:
                 break
 
-            fat = SectFat(self, "bbfat[]", \
-                start, self.items_per_bbfat, \
-                "FAT %u/%u at block %u" % \
-                (1+index, self["header/bb_count"].value, block))
-            start += len(fat)
-            self.bb_fat.append(fat)
+            desc = "FAT %u/%u at block %u" % \
+                (1+index, self["header/bb_count"].value, block)
 
-            for field in self.write(block, (fat,)):
-                yield field
+            self.seekBlock(block)
+            field = SectFat(self, "bbfat[]", start, count, desc)
+            yield field
+            self.bb_fat.append(field)
+
+            start += count
 
     def readSFAT(self):
-        chain = self.getFatChain(self["header/sb_start"].value)
+        chain = self.getFatChain(self.bb_fat, self["header/sb_start"].value)
         start = 0
+        self.ss_fat = []
+        count = self.items_per_bbfat
         for index, block in enumerate(chain):
-            block = block.value
-            pad = self.seekBlock(block)
-            if pad is not None:
-                yield pad
+            self.seekBlock(block)
             field = SectFat(self, "sfat[]", \
-                start, self.items_per_sfat, \
+                start, count, \
                 "SFAT %u/%u at block %u" % \
                 (1+index, self["header/bb_count"].value, block))
-            start += len(field)
             yield field
-
-    def blockAddress(self, block):
-        """ Address in bits of a block """
-
-        # 512 is header size (in bytes)
-        return (512 + block * self.sector_size) * 8
+            self.ss_fat.append(field)
+            start += count
 
     def seekBlock(self, block):
-        address = self.blockAddress(block)
-        return self.seekBit(address)
-
-    def readRoot(self):
-        chain = self.getFatChain(self["header/bb_start"].value)
-        for block in chain:
-            pad = self.seekBlock(block)
-            if pad is not None:
-                yield pad
-            count = 512 / (Property.static_size/8)
-            for i in range(0, count):
-                yield Property(self, "property[]")
+        self.seekBit(HEADER_SIZE + block * self.sector_size)
 
