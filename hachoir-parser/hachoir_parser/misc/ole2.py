@@ -75,7 +75,7 @@ class Property(FieldSet):
         yield SECT(self, "right")
         yield SECT(self, "child")
         yield GUID(self, "clsid", "CLSID of this storage")
-        yield RawBytes(self, "flags", 4, "User flags")
+        yield NullBytes(self, "flags", 4, "User flags")
         yield TimestampWin64(self, "creation", "Creation timestamp")
         yield TimestampWin64(self, "lastmod", "Modify timestamp")
         yield SECT(self, "start", "Starting SECT of the stream")
@@ -166,8 +166,8 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
         else: # major version is 4
             self.sector_size = 4096*8
         self.fat_count = header["bb_count"].value
-        sector = (SECT.static_size // 8)
-        self.items_per_bbfat = (1 << header["bb_shift"].value) / sector
+        self.items_per_bbfat = (8 << header["bb_shift"].value) / SECT.static_size
+        self.ss_size = (8 << header["sb_shift"].value)
 
         # Read DIFAT (one level of indirection)
         yield SectFat(self, "difat", 0, NB_DIFAT, "Double Indirection FAT")
@@ -181,14 +181,67 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
             yield field
 
         # Read properties
-        chain = self.getFatChain(self.bb_fat, self["header/bb_start"].value)
+        chain = self.getChain(self["header/bb_start"].value)
         prop_per_sector = self.sector_size // Property.static_size
+        properties = []
         for block in chain:
             self.seekBlock(block)
             for index in xrange(prop_per_sector):
-                yield Property(self, "property[]")
+                property = Property(self, "property[]")
+                yield property
+                properties.append(property)
 
-    def getFatChain(self, fat, block):
+        # Parse first property
+        for index, property in enumerate(properties):
+            if index == 0:
+                name = "root"
+            else:
+                name = "prop_content_%s" % property["name"].value
+            for field in self.parseProperty(property, name):
+                yield field
+
+    def parseProperty(self, property, name_prefix):
+        name = "%s[]" % name_prefix
+        first = None
+        previous = None
+        size = 0
+        start = property["start"].value
+        if 4096 <= property["size"].value:
+            chain = self.getChain(start)
+            blocksize = self.sector_size
+            seek = self.seekBlock
+            desc_format = "Big blocks %s..%s (%s)" + " of %s bytes" % (blocksize//8)
+        else:
+            chain = self.getChain(start, self.ss_fat)
+            blocksize = self.ss_size
+            seek = self.seekSBlock
+            desc_format = "Small blocks %s..%s (%s)"
+        for block in chain:
+            contigious = False
+            if not first:
+                first = block
+                contigious = True
+            if previous and block == (previous+1):
+                contigious = True
+            if contigious:
+                #self.warning("Root block: %s" % block)
+                previous = block
+                size += blocksize
+                continue
+            seek(first)
+            desc = desc_format % (first, previous, previous-first+1)
+            yield RawBytes(self, name, size//8, desc)
+            first = block
+            previous = block
+            size = self.sector_size
+        seek(first)
+        desc = desc_format % (first, previous, previous-first+1)
+        yield RawBytes(self, name, size//8, desc)
+
+    def getChain(self, start, fat=None):
+        if not fat:
+            fat = self.bb_fat
+        block = start
         while block != SECT.END_OF_CHAIN:
             yield block
             index = block // self.items_per_bbfat
@@ -214,7 +267,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
             start += count
 
     def readSFAT(self):
-        chain = self.getFatChain(self.bb_fat, self["header/sb_start"].value)
+        chain = self.getChain(self["header/sb_start"].value)
         start = 0
         self.ss_fat = []
         count = self.items_per_bbfat
@@ -230,4 +283,8 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
 
     def seekBlock(self, block):
         self.seekBit(HEADER_SIZE + block * self.sector_size)
+
+    def seekSBlock(self, block):
+        # FIXME: Fix the offset
+        self.seekBit((1024 - 64)*8 + block * self.ss_size)
 
