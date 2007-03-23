@@ -22,10 +22,6 @@ class RootSeekableFieldSet(BasicFieldSet):
     def array(self, key):
         return FakeArray(self, key)
 
-    def seekBit(self, address):
-        self.error("%s.seekBit(%s) from %s" % (self.__class__.__name__, address, self._current_size))
-        self._current_size = address
-
     def getFieldByAddress(self, address, feed=True):
         # TODO: Merge with GenericFieldSet.getFieldByAddress()
         if feed and self._generator:
@@ -88,8 +84,7 @@ class RootSeekableFieldSet(BasicFieldSet):
         self._offset += field.size
         self._current_max_size = max(self._current_max_size, field.address + field.size)
 
-    def seekByte(self, address, relative=True):
-        address *= 8
+    def seekBit(self, address, relative=True):
         if not relative:
             address -= self.absolute_address
         if address < 0:
@@ -97,6 +92,9 @@ class RootSeekableFieldSet(BasicFieldSet):
         self._offset = address
         self._current_max_size = max(self._current_max_size, address)
         return None
+
+    def seekByte(self, address, relative=True):
+        return self.seekBit(address*8, relative)
 
     def readMoreFields(self, number):
         return self._readMoreFields(xrange(number))
