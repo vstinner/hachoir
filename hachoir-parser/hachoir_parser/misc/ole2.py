@@ -22,16 +22,20 @@ Creation: 8 january 2005
 from hachoir_parser import HachoirParser
 from hachoir_core.field import (FieldSet, ParserError,
     RootSeekableFieldSet, SeekableFieldSet,
+    Bit, Bits, NullBits,
     UInt8, UInt16, UInt32, UInt64, TimestampWin64, Enum,
-    Bytes, RawBytes, NullBytes,
-    String)
-from hachoir_core.text_handler import hexadecimal
-from hachoir_core.tools import humanFilesize
-from hachoir_core.endian import LITTLE_ENDIAN
+    Bytes, RawBytes, NullBytes, String,
+    Int8, Int16, Int32, Float32, Float64, PascalString32)
+from hachoir_core.text_handler import textHandler, hexadecimal
+from hachoir_core.tools import humanFilesize, createDict
+from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_parser.common.win32 import GUID
 
 # Number of items in DIFAT
 NB_DIFAT = 109
+
+# FIXME: Remove this hack
+HACK_FOR_SUMMARY = False
 
 class SECT(UInt32):
     END_OF_CHAIN = 0xFFFFFFFE
@@ -53,6 +57,7 @@ class SECT(UInt32):
         return SECT.special_value_name.get(val, str(val))
 
 class Property(FieldSet):
+    TYPE_ROOT = 5
     TYPE_NAME = {
         1: "storage",
         2: "stream",
@@ -106,7 +111,7 @@ class Header(FieldSet):
         yield UInt32(self, "csectdir", "Number of SECTs in directory chain for 4 KB sectors (version 4)")
         yield UInt32(self, "bb_count", "Number of Big Block Depot blocks")
         yield SECT(self, "bb_start", "Root start block")
-        yield RawBytes(self, "transaction", 4, "Signature used for transactions (must be zero)")
+        yield NullBytes(self, "transaction", 4, "Signature used for transactions (must be zero)")
         yield UInt32(self, "threshold", "Maximum size for a mini stream (typically 4096 bytes)")
         yield SECT(self, "sb_start", "Small Block Depot start block")
         yield UInt32(self, "sb_count")
@@ -125,6 +130,235 @@ class SectFat(FieldSet):
     def createFields(self):
         for i in xrange(self.start, self.start + self.count):
             yield SECT(self, "index[%u]" % i)
+
+class PropertyIndex(FieldSet):
+    COMMON_PROPERTY = {
+        0: "Dictionary",
+        1: "CodePage",
+        0x80000000: "LOCALE_SYSTEM_DEFAULT",
+        0x80000003: "CASE_SENSITIVE",
+    }
+
+    DOCUMENT_PROPERTY = {
+         2: "Category",
+         3: "PresentationFormat",
+         4: "NumBytes",
+         5: "NumLines",
+         6: "NumParagraphs",
+         7: "NumSlides",
+         8: "NumNotes",
+         9: "NumHiddenSlides",
+        10: "NumMMClips",
+        11: "Scale",
+        12: "HeadingPairs",
+        13: "DocumentParts",
+        14: "Manager",
+        15: "Company",
+        16: "LinksDirty",
+        17: "DocSumInfo_17",
+        18: "DocSumInfo_18",
+        19: "DocSumInfo_19",
+        20: "DocSumInfo_20",
+        21: "DocSumInfo_21",
+        22: "DocSumInfo_22",
+        23: "DocSumInfo_23",
+    }
+    DOCUMENT_PROPERTY.update(COMMON_PROPERTY)
+
+    COMPONENT_PROPERTY = {
+         2: "Title",
+         3: "Subject",
+         4: "Author",
+         5: "Keywords",
+         6: "Comments",
+         7: "Template",
+         8: "LastSavedBy",
+         9: "RevisionNumber",
+        10: "TotalEditingTime",
+        11: "LastPrinted",
+        12: "CreateTime",
+        13: "LastSavedTime",
+        14: "NumPages",
+        15: "NumWords",
+        16: "NumCharacters",
+        17: "Thumbnail",
+        18: "AppName",
+        19: "Security",
+    }
+    COMPONENT_PROPERTY.update(COMMON_PROPERTY)
+
+    def createFields(self):
+        if self["../.."].name.startswith("doc_summary"):
+            enum = self.DOCUMENT_PROPERTY
+        else:
+            enum = self.COMPONENT_PROPERTY
+        yield Enum(UInt32(self, "id"), enum)
+        yield UInt32(self, "offset")
+
+    def createDescription(self):
+        return "Propery: %s" % self["id"].display
+
+class Bool(Int8):
+    def createValue(self):
+        value = Int8.createValue(self)
+        return (value == -1)
+
+class Thumbnail(FieldSet):
+    """
+    Thumbnail.
+
+    Documents:
+    - See Jakarta POI
+      http://jakarta.apache.org/poi/hpsf/thumbnails.html
+      http://www.penguin-soft.com/penguin/developer/poi/
+          org/apache/poi/hpsf/Thumbnail.html#CF_BITMAP
+    - How To Extract Thumbnail Images
+      http://sparks.discreet.com/knowledgebase/public/
+          solutions/ExtractThumbnailImg.htm
+    """
+    FORMAT_NAME = {
+        -1: "Windows clipboard",
+        -2: "Macintosh clipboard",
+        -3: "GUID that contains format identifier",
+         0: "No data",
+         2: "Bitmap",
+         3: "Windows metafile format",
+         8: "Device Independent Bitmap",
+        14: "Enhanced Windows metafile",
+    }
+    def __init__(self, *args):
+        FieldSet.__init__(self, *args)
+        self._size = self["size"].value * 8
+
+    def createFields(self):
+        yield textHandler(UInt32(self, "size"), humanFilesize)
+        yield Enum(Int32(self, "format"), self.FORMAT_NAME)
+        size = (self.size - self.current_size) // 8
+        if size:
+            yield RawBytes(self, "data", size)
+
+class PropertyContent(FieldSet):
+    TYPE_INFO = {
+        0: ("EMPTY", None),
+        1: ("NULL", None),
+        2: ("Int16", Int16),
+        3: ("Int32", Int32),
+        4: ("Float32", Float32),
+        5: ("Float64", Float64),
+        6: ("CY", None),
+        7: ("DATE", None),
+        8: ("BSTR", None),
+        9: ("DISPATCH", None),
+        10: ("ERROR", None),
+        11: ("BOOL", Bool),
+        12: ("VARIANT", None),
+        13: ("UNKNOWN", None),
+        14: ("DECIMAL", None),
+        16: ("I1", None),
+        17: ("UI1", None),
+        18: ("UI2", None),
+        19: ("UI4", None),
+        20: ("I8", None),
+        21: ("UI8", None),
+        22: ("INT", None),
+        23: ("UINT", None),
+        24: ("VOID", None),
+        25: ("HRESULT", None),
+        26: ("PTR", None),
+        27: ("SAFEARRAY", None),
+        28: ("CARRAY", None),
+        29: ("USERDEFINED", None),
+        30: ("LPSTR", PascalString32),
+        31: ("LPWSTR", None),
+        64: ("FILETIME", TimestampWin64),
+        65: ("BLOB", None),
+        66: ("STREAM", None),
+        67: ("STORAGE", None),
+        68: ("STREAMED_OBJECT", None),
+        69: ("STORED_OBJECT", None),
+        70: ("BLOB_OBJECT", None),
+        71: ("THUMBNAIL", Thumbnail),
+        72: ("CLSID", None),
+        0x1000: ("Vector", None),
+    }
+    TYPE_NAME = createDict(TYPE_INFO, 0)
+
+    def createFields(self):
+        if True:
+            yield Enum(Bits(self, "type", 12), self.TYPE_NAME)
+            yield Bit(self, "is_vector")
+            yield NullBits(self, "padding", 32-12-1)
+        else:
+            yield Enum(Bits(self, "type", 32), self.TYPE_NAME)
+        try:
+            handler = self.TYPE_INFO[ self["type"].value ][1]
+        except LookupError:
+            handler = None
+        if not handler:
+            raise ParserError("OLE2: Unable to parse property of type %s" \
+                % self["type"].display)
+        if self["is_vector"].value:
+            yield UInt32(self, "count")
+            for index in xrange(self["count"].value):
+                yield handler(self, "item[]")
+        else:
+            yield handler(self, "value")
+            self.createValue = lambda: self["value"].value
+PropertyContent.TYPE_INFO[12] = ("VARIANT", PropertyContent)
+
+class SummarySection(SeekableFieldSet):
+    def __init__(self, *args):
+        SeekableFieldSet.__init__(self, *args)
+        self._size = self["size"].value * 8
+
+    def createFields(self):
+        yield UInt32(self, "size")
+        yield UInt32(self, "property_count")
+        for index in xrange(self["property_count"].value):
+            yield PropertyIndex(self, "property_index[]")
+        for index in xrange(self["property_count"].value):
+            findex = self["property_index[%u]" % index]
+            self.seekByte(findex["offset"].value)
+            yield PropertyContent(self, "property[]", findex["id"].display)
+
+class SummaryIndex(FieldSet):
+    def createFields(self):
+        yield String(self, "name", 16)
+        yield UInt32(self, "offset")
+
+class Summary(FieldSet):
+    OS_NAME = {
+        0: "Windows 16-bit",
+        1: "Mac",
+        2: "Windows 32-bit",
+    }
+
+    def __init__(self, *args, **kw):
+        FieldSet.__init__(self, *args, **kw)
+        if self["endian"].value == "\xFF\xFE":
+            self.endian = BIG_ENDIAN
+
+    def createFields(self):
+        yield Bytes(self, "endian", 2, "Endian (0xFF 0xFE for Intel)")
+        yield UInt16(self, "format", "Format (0)")
+        yield textHandler(UInt16(self, "os_version"), hexadecimal)
+        yield Enum(UInt16(self, "os"), self.OS_NAME)
+        yield GUID(self, "format_id")
+        yield UInt32(self, "section_count")
+
+        section_indexes = []
+        for index in xrange(self["section_count"].value):
+            section_index = SummaryIndex(self, "section_index[]")
+            yield section_index
+            section_indexes.append(section_index)
+
+        for section_index in section_indexes:
+            self.seekByte(section_index["offset"].value)
+            yield SummarySection(self, "section[]")
+
+        size = (self.size - self.current_size) // 8
+        if size:
+            yield NullBytes(self, "end_padding", size)
 
 class OLE2_File(HachoirParser, RootSeekableFieldSet):
     tags = {
@@ -192,21 +426,31 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
                 properties.append(property)
 
         # Parse first property
-        for index, property in enumerate(properties):
-            if index == 0:
-                name = "root"
-            else:
-                name = "prop_content_%s" % property["name"].value
-            for field in self.parseProperty(property, name):
+        if HACK_FOR_SUMMARY:
+            for field in self.parseProperty(self["property[0]"], "root"):
                 yield field
+            for field in self.parseProperty(self["property[4]"], "summary"):
+                yield field
+            for field in self.parseProperty(self["property[5]"], "doc_summary"):
+                yield field
+        else:
+            for index, property in enumerate(properties):
+                if index == 0:
+                    name = "root"
+                else:
+                    name = property.name+"content"
+                for field in self.parseProperty(property, name):
+                    yield field
 
     def parseProperty(self, property, name_prefix):
+        if not property["size"].value:
+            return
         name = "%s[]" % name_prefix
         first = None
         previous = None
         size = 0
         start = property["start"].value
-        if 4096 <= property["size"].value:
+        if HACK_FOR_SUMMARY or property["type"].value == Property.TYPE_ROOT:
             chain = self.getChain(start)
             blocksize = self.sector_size
             seek = self.seekBlock
@@ -216,27 +460,33 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
             blocksize = self.ss_size
             seek = self.seekSBlock
             desc_format = "Small blocks %s..%s (%s)"
-        for block in chain:
-            contigious = False
-            if not first:
-                first = block
-                contigious = True
-            if previous and block == (previous+1):
-                contigious = True
-            if contigious:
-                #self.warning("Root block: %s" % block)
-                previous = block
-                size += blocksize
-                continue
+        while True:
+            try:
+                block = chain.next()
+                contigious = False
+                if not first:
+                    first = block
+                    contigious = True
+                if previous and block == (previous+1):
+                    contigious = True
+                if contigious:
+                    #self.warning("Root block: %s" % block)
+                    previous = block
+                    size += blocksize
+                    continue
+            except StopIteration:
+                block = None
             seek(first)
             desc = desc_format % (first, previous, previous-first+1)
-            yield RawBytes(self, name, size//8, desc)
+            if name_prefix in ("summary", "doc_summary"):
+                yield Summary(self, name, desc, size=size)
+            else:
+                yield RawBytes(self, name, size//8, desc)
+            if block is None:
+                break
             first = block
             previous = block
             size = self.sector_size
-        seek(first)
-        desc = desc_format % (first, previous, previous-first+1)
-        yield RawBytes(self, name, size//8, desc)
 
     def getChain(self, start, fat=None):
         if not fat:
@@ -276,7 +526,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
             field = SectFat(self, "sfat[]", \
                 start, count, \
                 "SFAT %u/%u at block %u" % \
-                (1+index, self["header/bb_count"].value, block))
+                (1+index, self["header/sb_count"].value, block))
             yield field
             self.ss_fat.append(field)
             start += count
