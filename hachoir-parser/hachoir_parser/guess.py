@@ -15,6 +15,8 @@ class QueryParser(object):
     other = None
 
     def __init__(self, tags):
+        self.validate = True
+        self.parser_args = None
         self.db = HachoirParserList()
         self.parsers = set(self.db)
         parsers = []
@@ -51,6 +53,12 @@ class QueryParser(object):
             parsers = [ parser for parser in self.parsers if tag(parser) ]
             for parser in parsers:
                 self.parsers.remove(parser)
+        elif tag[0] == "class":
+            self.validate = False
+            return [ tag[1] ]
+        elif tag[0] == "args":
+            self.parser_args = tag[1]
+            return []
         else:
             tag = self.translate(*tag)
             parsers = []
@@ -72,7 +80,11 @@ class QueryParser(object):
         warn = warning
         for parser in self.parsers:
             try:
-                return parser(stream, validate=True)
+                parser_obj = parser(stream, validate=self.validate)
+                if self.parser_args:
+                    for key, value in self.parser_args.iteritems():
+                        setattr(parser_obj, key, value)
+                return parser_obj
             except ValidateError, err:
                 res = unicode(err)
                 if fallback and self.fallback:
