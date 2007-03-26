@@ -1,5 +1,6 @@
 from hachoir_metadata.metadata import Metadata, registerExtractor
-from hachoir_parser.misc import TorrentFile, TrueTypeFontFile
+from hachoir_parser.misc import TorrentFile, TrueTypeFontFile, OLE2_File
+from hachoir_core.error import warning
 
 class TorrentMetadata(Metadata):
     KEY_TO_ATTR = {
@@ -68,6 +69,48 @@ class TTF_Metadata(Metadata):
                 value = value[8:]
             setattr(self, key, value)
 
+class OLE2_Metadata(Metadata):
+    SUMMARY_ID_TO_ATTR = {
+         2: ("title", False),
+         4: ("author", False),
+         6: ("comment", False),
+         8: ("author", False),
+         9: ("version", True), # Revision number
+        12: ("creation_date", False),
+        13: ("last_modification", False),
+        14: ("nb_page", False),
+        15: ("comment", True), # Nb. words
+        16: ("comment", True), # Nb. characters
+        18: ("producer", False),
+    }
+
+    def extract(self, ole2):
+        if "summary[0]" in ole2:
+            self.useSummary(ole2["summary[0]"])
+
+    def useSummary(self, summary):
+        if "section[0]" not in summary:
+            return
+        summary = summary["section[0]"]
+        for property in summary.array("property_index"):
+            field = summary.getFieldByAddress(property["offset"].value*8)
+            if not field:
+                print "Unable to get value"
+                continue
+            if not field.hasValue():
+                continue
+            value = field.value
+            try:
+                key, use_prefix = self.SUMMARY_ID_TO_ATTR[property["id"].value]
+            except LookupError:
+                warning("Skip %s[%s]=%s" % (
+                    property["id"].display, property["id"].value, value))
+                continue
+            if use_prefix:
+                value = "%s: %s" % (property["id"].display, value)
+            setattr(self, key, value)
+
 registerExtractor(TorrentFile, TorrentMetadata)
 registerExtractor(TrueTypeFontFile, TTF_Metadata)
+registerExtractor(OLE2_File, OLE2_Metadata)
 

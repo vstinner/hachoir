@@ -25,6 +25,7 @@ MIN_YEAR = 1900                   # Year in 1900..2030
 MAX_YEAR = 2030
 MAX_FRAME_RATE = 150              # 150 frame/sec
 DATETIME_FILTER = Filter(datetime, datetime(MIN_YEAR, 1, 1), datetime(MAX_YEAR, 12, 31))
+MAX_NB_PAGE = 20000
 
 extractors = {}
 
@@ -75,10 +76,11 @@ class Metadata(Logger):
         self.register("album", 200, _("Album"))
         self.register("duration", 201, _("Duration"), # integer in milliseconde
             handler=humanDuration, filter=NumberFilter(1, MAX_DURATION))
-        self.register("music_genre", 202, _("Music genre"))
-        self.register("language", 203, _("Language"))
-        self.register("track_number", 204, _("Track number"), filter=NumberFilter(1, 99))
-        self.register("track_total", 205, _("Track total"), filter=NumberFilter(1, 99))
+        self.register("nb_page", 202, _("Nb page"), filter=NumberFilter(1, MAX_NB_PAGE))
+        self.register("music_genre", 203, _("Music genre"))
+        self.register("language", 204, _("Language"))
+        self.register("track_number", 205, _("Track number"), filter=NumberFilter(1, 99))
+        self.register("track_total", 206, _("Track total"), filter=NumberFilter(1, 99))
         self.register("organization", 210, _("Organization"))
         self.register("version", 220, _("Version"))
 
