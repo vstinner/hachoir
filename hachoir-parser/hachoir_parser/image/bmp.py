@@ -103,6 +103,25 @@ class BmpHeader(FieldSet):
         yield UInt32(self, "gamma_green")
         yield UInt32(self, "gamma_blue")
 
+def parseImageData(parent, name, size, header):
+    if ("compression" not in header) or (header["compression"].value in (0, 3)):
+        width = header["width"].value
+        height = header["height"].value
+        bpp = header["bpp"].value
+        if bpp == 32:
+            cls = UInt32
+        elif bpp == 24:
+            cls = RGB
+        elif bpp == 8:
+            cls = UInt8
+        elif bpp == 4:
+            cls = Pixel4bit
+        else:
+            cls = None
+        if cls:
+            return ImagePixels(parent, name, width, height, cls, size=size*8)
+    return RawBytes(parent, name, size)
+
 class BmpFile(Parser):
     tags = {
         "id": "bmp",
@@ -166,25 +185,7 @@ class BmpFile(Parser):
 
         # Image pixels
         size = min(self["file_size"].value-self["data_start"].value, (self.size - self.current_size)//8)
-        if ("compression" not in header) or (header["compression"].value in (0, 3)):
-            width = self["/header/width"].value
-            height = self["/header/height"].value
-            if bpp == 32:
-                cls = UInt32
-            elif bpp == 24:
-                cls = RGB
-            elif bpp == 8:
-                cls = UInt8
-            elif bpp == 4:
-                cls = Pixel4bit
-            else:
-                cls = None
-            if cls:
-                yield ImagePixels(self, "pixels", width, height, cls, size=size*8)
-            else:
-                yield RawBytes(self, "pixels_data", size)
-        else:
-            yield RawBytes(self, "pixels_data", size)
+        yield parseImageData(self, "pixels", size, header)
 
     def createDescription(self):
         return "Microsoft Bitmap version %s" % self["header"].getFormatVersion()
