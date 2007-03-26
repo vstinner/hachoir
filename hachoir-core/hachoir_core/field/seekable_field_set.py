@@ -1,4 +1,4 @@
-from hachoir_core.field import BasicFieldSet, FakeArray, ParserError
+from hachoir_core.field import Field, BasicFieldSet, FakeArray, MissingField, ParserError
 from hachoir_core.tools import lowerBound, makeUnicode
 from hachoir_core.error import HACHOIR_ERRORS
 from itertools import repeat
@@ -23,13 +23,12 @@ class RootSeekableFieldSet(BasicFieldSet):
         return FakeArray(self, key)
 
     def getFieldByAddress(self, address, feed=True):
-        # TODO: Merge with GenericFieldSet.getFieldByAddress()
-        if feed and self._generator:
-            raise NotImplementedError()
-        if address < self._current_size:
-            i = lowerBound(self._field_array, lambda x: x.address + x.size <= address)
-            if i is not None:
-                return self._field_array[i]
+        for field in self._field_array:
+            if field.address <= address < field.address + field.size:
+                return field
+        for field in self._readFields():
+            if field.address <= address < field.address + field.size:
+                return field
         return None
 
     def _stopFeed(self):
@@ -40,15 +39,19 @@ class RootSeekableFieldSet(BasicFieldSet):
     def _getSize(self):
         if self._size is None:
             self._feedAll()
+        self._feedAll()
         return self._size
     size = property(_getSize)
 
-    def __getitem__(self, key):
+    def getField(self, key, const=True):
+        return self.__getitem__(key, const)
+
+    def __getitem__(self, key, const=True):
         if isinstance(key, (int, long)):
             count = len(self._field_array)
             if key < count:
                 return self._field_array[key]
-            raise AttributeError("%s has no field '%s'" % (self.path, key))
+            raise MissingField(self, key)
         if "/" in key:
             if key == "/":
                 return self.root
@@ -68,7 +71,7 @@ class RootSeekableFieldSet(BasicFieldSet):
             except HACHOIR_ERRORS, err:
                 self.error("Error: %s" % makeUnicode(err))
                 self._stopFeed()
-        raise AttributeError("%s has no field '%s'" % (self.path, key))
+        raise MissingField(self, key)
 
     def _addField(self, field):
         if field._name.endswith("[]"):
@@ -101,6 +104,12 @@ class RootSeekableFieldSet(BasicFieldSet):
 
     def _feedAll(self):
         return self._readMoreFields(repeat(1))
+
+    def _readFields(self, number):
+        while True:
+            added = self._readMoreFields(xrange(1))
+            if added:
+                yield self._field_array[-1]
 
     def _readMoreFields(self, index_generator):
         added = 0
