@@ -145,7 +145,7 @@ def checkLechat(meta): return (
 def checkJpegExifPSD(meta): return (
     checkAttr(meta, "producer", [u"Adobe Photoshop 7.0"]),
     checkAttr(meta, "width", 124),
-    checkAttr(meta, "compression", "JPEG"),
+    checkAttr(meta, "compression", "JPEG (Progressive)"),
     checkAttr(meta, "creation_date", "2006:06:28 14:51:09"))
 
 def checkInterludeDavid(meta): return (
