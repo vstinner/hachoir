@@ -30,7 +30,7 @@ class Frame(FieldSet):
 
     # Bit rates (bit_rate * 1000 = bits/sec)
     # key 15 is always invalid
-    bit_rates = {
+    BIT_RATES = {
         1: ( # MPEG1
             ( 0, 32,  64,  96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448 ), # layer I
             ( 0, 32,  48,  56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 384 ), # layer II
@@ -44,15 +44,24 @@ class Frame(FieldSet):
             # -   1    2    3    4    5    6    7    8    9   10   11   12   13   14 -
         )
     }
-    sampling_rates = {
+    SAMPLING_RATES = {
         3: {0: 44100, 1: 48000, 2: 32000},  # MPEG1
         2: {0: 22050, 1: 24000, 2: 16000},  # MPEG2
         0: {0: 11025, 1: 12000, 2: 8000}    # MPEG2.5
     }
-    emphasis_name = {0: "none", 1: "50/15 ms",  3: "CCIT J.17"}
-    channel_mode_name = {
-        0: "Stereo", 1: "Joint stereo",
-        2: "Dual channel", 3: "Single channel"
+    EMPHASIS_NAME = {0: "none", 1: "50/15 ms",  3: "CCIT J.17"}
+    CHANNEL_MODE_NAME = {
+        0: "Stereo",
+        1: "Joint stereo",
+        2: "Dual channel",
+        3: "Single channel"
+    }
+    # Channel mode => number of channels
+    NB_CHANNEL = {
+        0: 2,
+        1: 2,
+        2: 2,
+        3: 1,
     }
 
     def __init__(self, *args, **kw):
@@ -77,11 +86,11 @@ class Frame(FieldSet):
         yield Bit(self, "extension", "Extension")
 
         # Channel mode, mode extension, copyright, ...
-        yield Enum(Bits(self, "channel_mode", 2, "Channel mode"), self.channel_mode_name)
+        yield Enum(Bits(self, "channel_mode", 2, "Channel mode"), self.CHANNEL_MODE_NAME)
         yield Bits(self, "mode_ext", 2, "Mode extension")
         yield Bit(self, "copyright", "Is copyrighted?")
         yield Bit(self, "original", "Is original?")
-        yield Enum(Bits(self, "emphasis", 2, "Emphasis"), self.emphasis_name)
+        yield Enum(Bits(self, "emphasis", 2, "Emphasis"), self.EMPHASIS_NAME)
 
         size = (self.size - self.current_size) / 8
         if size:
@@ -101,7 +110,7 @@ class Frame(FieldSet):
         version = self["version"].value
         rate = self["sampling_rate"].value
         try:
-            return self.sampling_rates[version][rate]
+            return self.SAMPLING_RATES[version][rate]
         except (KeyError, IndexError):
             return None
 
@@ -114,9 +123,9 @@ class Frame(FieldSet):
         if bit_rate in (0, 15):
             return None
         if self["version"].value == 3:
-            dataset = self.bit_rates[1] # MPEG1
+            dataset = self.BIT_RATES[1] # MPEG1
         else:
-            dataset = self.bit_rates[2] # MPEG2 / MPEG2.5
+            dataset = self.BIT_RATES[2] # MPEG2 / MPEG2.5
         try:
             return dataset[layer][bit_rate] * 1000
         except (KeyError, IndexError):
@@ -144,6 +153,9 @@ class Frame(FieldSet):
         else: # self.LAYER_I:
             frame_size = (frame_size * 12) / sample_rate
             return (frame_size + padding) * 4
+
+    def getNbChannel(self):
+        return self.NB_CHANNEL[ self["channel_mode"].value ]
 
     def createDescription(self):
         info = ["layer %s" % self["layer"].display]
