@@ -12,7 +12,7 @@ Creation date: 2007-01-19
 from hachoir_core.field import (FieldSet, Enum,
     Bit, Bits,
     UInt16, UInt32, TimestampUnix32,
-    RawBytes, PaddingBytes, NullBytes,
+    RawBytes, PaddingBytes, NullBytes, NullBits,
     CString, String, PascalString16)
 from hachoir_core.text_handler import humanFilesize, hexadecimal
 from hachoir_core.tools import createDict, paddingSize, alignValue, makePrintable
@@ -37,11 +37,13 @@ MINOR_OS_BASE = 0
 MINOR_OS_NAME = {
     0: "Base",
     1: "Windows 16-bit",
-    2: "PM 16",
-    3: "PM 32",
+    2: "Presentation Manager 16-bit",
+    3: "Presentation Manager 32-bit",
     4: "Windows 32-bit",
 }
 
+FILETYPE_DRIVER = 3
+FILETYPE_FONT = 4
 FILETYPE_NAME = {
     1: "Application",
     2: "DLL",
@@ -49,6 +51,25 @@ FILETYPE_NAME = {
     4: "Font",
     5: "VXD",
     7: "Static library",
+}
+
+DRIVER_SUBTYPE_NAME = {
+     1: "Printer",
+     2: "Keyboard",
+     3: "Language",
+     4: "Display",
+     5: "Mouse",
+     6: "Network",
+     7: "System",
+     8: "Installable",
+     9: "Sound",
+    10: "Communications",
+}
+
+FONT_SUBTYPE_NAME = {
+    1: "Raster",
+    2: "Vector",
+    3: "TrueType",
 }
 
 class VersionInfoBinary(FieldSet):
@@ -62,11 +83,24 @@ class VersionInfoBinary(FieldSet):
         yield Version(self, "product_ver_ms", "Product version MS")
         yield Version(self, "product_ver_ls", "Product version LS")
         yield UInt32(self, "file_flags_mask", text_handler=hexadecimal)
-        yield UInt32(self, "file_flags", text_handler=hexadecimal)
+
+        yield Bit(self, "debug")
+        yield Bit(self, "prerelease")
+        yield Bit(self, "patched")
+        yield Bit(self, "private_build")
+        yield Bit(self, "info_inferred")
+        yield Bit(self, "special_build")
+        yield NullBits(self, "reserved", 26)
+
         yield Enum(UInt16(self, "file_os_major", text_handler=hexadecimal), MAJOR_OS_NAME)
         yield Enum(UInt16(self, "file_os_minor", text_handler=hexadecimal), MINOR_OS_NAME)
         yield Enum(UInt32(self, "file_type", text_handler=hexadecimal), FILETYPE_NAME)
-        yield UInt32(self, "file_subfile", text_handler=hexadecimal)
+        field = UInt32(self, "file_subfile", text_handler=hexadecimal)
+        if field.value == FILETYPE_DRIVER:
+            field = Enum(field, DRIVER_SUBTYPE_NAME)
+        elif field.value == FILETYPE_FONT:
+            field = Enum(field, FONT_SUBTYPE_NAME)
+        yield field
         yield TimestampUnix32(self, "date_ms")
         yield TimestampUnix32(self, "date_ls")
 
