@@ -111,7 +111,8 @@ class MkvMetadata(MultipleMetadata):
         if "Duration/float" in info \
         and "TimecodeScale/unsigned" in info \
         and 0 < info["Duration/float"].value:
-            self.duration = timedelta(microseconds=info["Duration/float"].value * info["TimecodeScale/unsigned"].value)
+            seconds = info["Duration/float"].value * info["TimecodeScale/unsigned"].value * 1e-9
+            self.duration = timedelta(seconds=seconds)
         if "DateUTC/date" in info:
             self.creation_date = info["DateUTC/date"].display
         if "WritingApp/unicode" in info:

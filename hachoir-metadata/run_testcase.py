@@ -99,7 +99,9 @@ def checkPng331_90_8Meta(metadata): return (
 
 def checkFlashMobInfo(metadata): return (
     checkAttr(metadata, "copyright", u"© dadaprod, licence Creative Commons by-nc-sa 2.0 fr"),
-    checkAttr(metadata, "video[1]/width", 384))
+    checkAttr(metadata, "video[1]/width", 384),
+    checkAttr(metadata, "duration", timedelta(seconds=17, milliseconds=844)),
+)
 
 def checkCrossXCF(meta): return (
     checkAttr(meta, "comment", 'Created with The GIMP'),
