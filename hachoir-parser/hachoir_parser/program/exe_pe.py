@@ -143,11 +143,14 @@ class PE_OptHeader(FieldSet):
         0: "export",
         1: "import",
         2: "resource",
+        3: "exception_table",
+        4: "certificate_table",
         11: "bound_import",
     }
     def createFields(self):
-        yield UInt16(self, "signature", "PE optional header signature (267)")
-        if self["signature"].value != 267:
+        yield UInt16(self, "signature", "PE optional header signature (0x010b)")
+        # TODO: Support PE32+ (signature=0x020b)
+        if self["signature"].value != 0x010b:
             raise ParserError("Invalid PE optional header signature")
         yield UInt8(self, "maj_lnk_ver", "Major linker version")
         yield UInt8(self, "min_lnk_ver", "Minor linker version")
