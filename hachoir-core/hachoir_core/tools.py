@@ -8,6 +8,7 @@ from hachoir_core.i18n import _, ngettext
 import re
 import stat
 from datetime import datetime, timedelta, MAXYEAR
+from hachoir_core.i18n import ngettext
 
 def paddingSize(value, align):
     """
@@ -46,6 +47,19 @@ def alignValue(value, align):
     else:
         return value
 
+def timedelta2seconds(delta):
+    """
+    Convert a datetime.timedelta() objet to a number of second
+    (floatting point number).
+
+    >>> timedelta2seconds(timedelta(seconds=2, microseconds=40000))
+    2.04
+    >>> timedelta2seconds(timedelta(minutes=1, milliseconds=250))
+    60.25
+    """
+    return delta.microseconds / 1000000.0 \
+        + delta.seconds + delta.days * 60*60*24
+
 def humanDurationNanosec(nsec):
     """
     Convert a duration in nanosecond to human natural representation.
@@ -70,52 +84,49 @@ def humanDurationNanosec(nsec):
         return u"%.2f ms" % (msec + float(usec)/1000)
     return humanDuration(msec)
 
-def humanDuration(millisec):
+def humanDuration(delta):
     """
     Convert a duration in millisecond to human natural representation.
     Returns an unicode string.
 
+    >>> humanDuration(0)
+    u'0 ms'
     >>> humanDuration(213)
     u'213 ms'
     >>> humanDuration(4213)
-    u'4.21 sec'
+    u'4 sec 213 ms'
     >>> humanDuration(6402309)
-    u'1 hour(s) 46 min 42 sec'
+    u'1 hour 46 min 42 sec'
     """
+    if not isinstance(delta, timedelta):
+        delta = timedelta(microseconds=delta*1000)
+
     # Milliseconds
-    if millisec < 1000:
-        return u"%u ms" % millisec
+    text = []
+    if 1000 <= delta.microseconds:
+        text.append(u"%u ms" % (delta.microseconds//1000))
 
     # Seconds
-    second, millisec = divmod(millisec, 1000)
-    if second < 60:
-        return  u"%.2f sec" % (second+float(millisec)/1000)
-
-    # Minutes
-    minute, second = divmod(second, 60)
-    if minute < 60:
-        return u"%u min %u sec" % (minute, second)
-
-    # Hours
-    hour, minute = divmod(minute, 60)
-    if hour < 24:
-        if 0 < second:
-            return u"%u hour(s) %u min %u sec" % (hour, minute, second)
-        else:
-            return u"%u hour(s) %u min" % (hour, minute)
+    minutes, seconds = divmod(delta.seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    if seconds:
+        text.append(u"%u sec" % seconds)
+    if minutes:
+        text.append(u"%u min" % minutes)
+    if hours:
+        text.append(ngettext("%u hour", "%u hours", hours) % hours)
 
     # Days
-    day, hour = divmod(hour, 24)
-    if day < 365:
-        return u"%u day(s) %u hour(s)" % (day, hour)
-
-    # Years
-    year, day = divmod(day, 365)
-    if day != 0:
-        text = u"%u year(s) %u day(s)" % (year, day)
-    else:
-        text = u"%u year(s)" % (year)
-    return text
+    years, days = divmod(delta.days, 365)
+    if days:
+        text.append(ngettext("%u day", "%u days", days) % days)
+    if years:
+        text.append(ngettext("%u year", "%u years", years) % years)
+    if 3 < len(text):
+        text = text[-3:]
+    elif not text:
+        return u"0 ms"
+    return u" ".join(reversed(text))
 
 def humanFilesize(size):
     """
@@ -446,6 +457,22 @@ def timestampMac32(value):
         return _("invalid Mac timestamp (%s)") % value
     return MAC_TIMESTAMP_T0 + timedelta(seconds=value)
 
+def durationWin64(value):
+    """
+    Convert Windows 64-bit duration to string. The timestamp format is
+    a 64-bit number: number of 100ns. See also timestampWin64().
+
+    >>> str(durationWin64(1072580000))
+    '0:01:47.258000'
+    >>> str(durationWin64(2146280000))
+    '0:03:34.628000'
+    """
+    if not isinstance(value, (float, int, long)):
+        raise TypeError("an integer or float is required")
+    if value < 0:
+        raise ValueError("value have to be a positive or nul integer")
+    return timedelta(microseconds=value/10)
+
 # Start of 64-bit Windows timestamp: 1st January 1600 at 00:00
 WIN64_TIMESTAMP_T0 = datetime(1601, 1, 1, 0, 0, 0)
 
@@ -461,12 +488,8 @@ def timestampWin64(value):
     >>> timestampWin64(127840491566710000)
     datetime.datetime(2006, 2, 10, 12, 45, 56, 671000)
     """
-    if not isinstance(value, (float, int, long)):
-        raise TypeError("an integer or float is required")
-    if value < 0:
-        raise ValueError("value have to be a positive or nul integer")
     try:
-        return WIN64_TIMESTAMP_T0 + timedelta(microseconds=value/10)
+        return WIN64_TIMESTAMP_T0 + durationWin64(value)
     except OverflowError:
         raise ValueError(_("date newer than year %s (value=%s)") % (MAXYEAR, value))
 

@@ -10,6 +10,7 @@ from hachoir_core.tools import (
     humanFrequency as doHumanFrequency,
     timestampUNIX as doTimestampUNIX,
     timestampMac32 as doTimestampMac32,
+    durationWin64 as doDurationWin64,
     timestampWin64 as doTimestampWin64,
     humanDatetime,
     alignValue,
@@ -53,13 +54,14 @@ def durationWin64(field):
     a 64-bit number: number of 100ns. See also timestampWin64().
 
     >>> durationWin64(type("", (), dict(value=2146280000, size=64)))
-    u'3 min 34 sec'
+    u'3 min 34 sec 628 ms'
     >>> durationWin64(type("", (), dict(value=(1 << 64)-1, size=64)))
-    u'58494 year(s) 88 day(s)'
+    u'58494 years 88 days 5 hours'
     """
     assert hasattr(field, "value") and hasattr(field, "size")
     assert field.size == 64
-    return doHumanDuration(field.value/10000)
+    delta = doDurationWin64(field.value)
+    return doHumanDuration(delta)
 
 def timestampMSDOS(field):
     """
