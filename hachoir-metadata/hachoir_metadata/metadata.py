@@ -5,8 +5,9 @@ from hachoir_core.tools import makePrintable, makeUnicode
 from hachoir_core.dict import Dict
 from hachoir_core.i18n import _
 from hachoir_core.log import Logger
-from hachoir_metadata.metadata_item import (Data, registerAllItems,
-   MIN_PRIORITY, MAX_PRIORITY)
+from hachoir_metadata.metadata_item import (
+    Data, MIN_PRIORITY, MAX_PRIORITY)
+from hachoir_metadata.register import registerAllItems
 import re
 
 extractors = {}
