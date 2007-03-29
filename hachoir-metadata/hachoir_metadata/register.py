@@ -6,20 +6,22 @@ from hachoir_metadata.filter import Filter, NumberFilter
 from datetime import datetime, timedelta
 from hachoir_metadata.formatter import humanAudioChannel, humanFrameRate
 
-MAX_SAMPLE_RATE = 192000          # 192 kHz
-MAX_DURATION = 366*24*60*60*1000  # 1 year
-MAX_NB_CHANNEL = 8                # 8 channels
-MAX_WIDTH = 200000                # 200 000 pixels
+MAX_SAMPLE_RATE = 192000            # 192 kHz
+MAX_NB_CHANNEL = 8                  # 8 channels
+MAX_WIDTH = 200000                  # 200 000 pixels
 MAX_HEIGHT = MAX_WIDTH
-MAX_NB_COLOR = 2 ** 24            # 16 million of color
-MAX_BITS_PER_PIXEL = 256          # 256 bits/pixel
-MIN_YEAR = 1900                   # Year in 1900..2030
+MAX_NB_COLOR = 2 ** 24              # 16 million of color
+MAX_BITS_PER_PIXEL = 256            # 256 bits/pixel
+MIN_YEAR = 1900                     # Year in 1900..2030
 MAX_YEAR = 2030
-MAX_FRAME_RATE = 150              # 150 frame/sec
-DATETIME_FILTER = Filter(datetime, datetime(MIN_YEAR, 1, 1), datetime(MAX_YEAR, 12, 31))
+MAX_FRAME_RATE = 150                # 150 frame/sec
 MAX_NB_PAGE = 20000
 MAX_COMPR_RATE = 1000.0
 MIN_COMPR_RATE = 0.001
+MAX_TRACK = 999
+
+DATETIME_FILTER = Filter(datetime, datetime(MIN_YEAR, 1, 1), datetime(MAX_YEAR, 12, 31))
+DURATION_FILTER = Filter(timedelta, timedelta(milliseconds=1), timedelta(days=365))
 
 def registerAllItems(meta):
     meta.register("title", 100, _("Title"))
@@ -28,12 +30,12 @@ def registerAllItems(meta):
 
     meta.register("album", 200, _("Album"))
     meta.register("duration", 201, _("Duration"), # integer in milliseconde
-        type=timedelta, text_handler=humanDuration, filter=NumberFilter(1, MAX_DURATION))
+        type=timedelta, text_handler=humanDuration, filter=DURATION_FILTER)
     meta.register("nb_page", 202, _("Nb page"), filter=NumberFilter(1, MAX_NB_PAGE))
     meta.register("music_genre", 203, _("Music genre"))
     meta.register("language", 204, _("Language"))
-    meta.register("track_number", 205, _("Track number"), filter=NumberFilter(1, 99))
-    meta.register("track_total", 206, _("Track total"), filter=NumberFilter(1, 99))
+    meta.register("track_number", 205, _("Track number"), filter=NumberFilter(1, MAX_TRACK), type=(int, long))
+    meta.register("track_total", 206, _("Track total"), filter=NumberFilter(1, MAX_TRACK), type=(int, long))
     meta.register("organization", 210, _("Organization"))
     meta.register("version", 220, _("Version"))
 
@@ -41,7 +43,7 @@ def registerAllItems(meta):
     meta.register("artist", 300, _("Artist"))
     meta.register("width", 301, _("Image width"), filter=NumberFilter(1, MAX_WIDTH))
     meta.register("height", 302, _("Image height"), filter=NumberFilter(1, MAX_HEIGHT))
-    meta.register("nb_channel", 303, _("Channel"), text_handler=humanAudioChannel, filter=NumberFilter(1, MAX_NB_CHANNEL))
+    meta.register("nb_channel", 303, _("Channel"), text_handler=humanAudioChannel, filter=NumberFilter(1, MAX_NB_CHANNEL), type=(int, long))
     meta.register("sample_rate", 304, _("Sample rate"), text_handler=humanFrequency, filter=NumberFilter(1, MAX_SAMPLE_RATE))
     meta.register("bits_per_sample", 305, _("Bits/sample"), text_handler=humanBitSize, filter=NumberFilter(1, 64))
     meta.register("image_orientation", 306, _("Image orientation"))

@@ -49,7 +49,8 @@ class Data:
         if value is None:
             return
 
-        assert not self.type or isinstance(value, self.type)
+        assert not self.type or isinstance(value, self.type), \
+            "Value %r is not of type %r" % (value, self.type)
 
         # Convert string to Unicode string using charset ISO-8859-1
         if isinstance(value, str):
