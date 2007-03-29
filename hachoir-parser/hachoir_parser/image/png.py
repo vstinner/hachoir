@@ -1,6 +1,10 @@
 """
 PNG picture file parser.
 
+Documents:
+- RFC 2083
+  http://www.faqs.org/rfcs/rfc2083.html
+
 Author: Victor Stinner
 """
 
@@ -10,7 +14,7 @@ from hachoir_core.field import (FieldSet, Fragment,
     UInt8, UInt16, UInt32,
     String, CString,
     Bytes, RawBytes,
-    Bit, RawBits,
+    Bit, NullBits,
     Enum, CompressedField)
 from hachoir_parser.image.common import RGB
 from hachoir_core.text_handler import hexadecimal
@@ -45,18 +49,18 @@ MAX_CHUNK_SIZE = 500 * 1024 # Maximum chunk size (500 KB)
 def headerParse(parent):
     yield UInt32(parent, "width", "Width (pixels)")
     yield UInt32(parent, "height", "Height (pixels)")
-    yield UInt8(parent, "bpp", "Bits per pixel")
-    yield RawBits(parent, "reserved", 5)
-    yield Bit(parent, "alpha", "Alpha channel used?")
+    yield UInt8(parent, "bit_depth", "Bit depth")
+    yield NullBits(parent, "reserved", 5)
+    yield Bit(parent, "has_alpha", "Has alpha channel?")
     yield Bit(parent, "color", "Color used?")
-    yield Bit(parent, "palette", "Palette used?")
+    yield Bit(parent, "has_palette", "Has a color palette?")
     yield Enum(UInt8(parent, "compression", "Compression method"), COMPRESSION_NAME)
     yield UInt8(parent, "filter", "Filter method")
     yield UInt8(parent, "interlace", "Interlace method")
 
 def headerDescription(parent):
     return "Header: %ux%u pixels and %u bits/pixel" % \
-        (parent["width"].value, parent["height"].value, parent["bpp"].value)
+        (parent["width"].value, parent["height"].value, getBitsPerPixel(parent))
 
 def paletteParse(parent):
     size = parent["size"].value
@@ -147,6 +151,19 @@ class ImageData(Fragment):
             next = None
         self.setLinks(first, next)
 
+def parseTransparency(parent):
+    yield UInt8(parent, "color_index")
+
+def textTransparency(parent):
+    return "Transparency: color #%u" % parent["color_index"].value
+
+def getBitsPerPixel(header):
+    nr_component = 1
+    if header["has_alpha"].value:
+        nr_component += 1
+    if header["color"].value and not header["has_palette"].value:
+        nr_component += 2
+    return nr_component * header["bit_depth"].value
 
 class Chunk(FieldSet):
     TAG_INFO = {
@@ -156,6 +173,7 @@ class Chunk(FieldSet):
         "PLTE": ("palette", paletteParse, paletteDescription, None),
         "gAMA": ("gamma", gammaParse, gammaDescription, gammaValue),
         "tEXt": ("text[]", textParse, textDescription, None),
+        "tRNS": ("transparency", parseTransparency, textTransparency, None),
 
         "bKGD": ("background", parseBackgroundColor, backgroundColorDesc, None),
         "IDAT": ("data[]", lambda parent: (ImageData(parent),), "Image data", None),
@@ -236,8 +254,8 @@ class PngFile(Parser):
     def createDescription(self):
         header = self["header"]
         desc = "PNG picture: %ux%ux%u" % (
-            header["width"].value, header["height"].value, header["bpp"].value)
-        if header["alpha"].value:
+            header["width"].value, header["height"].value, getBitsPerPixel(header))
+        if header["has_alpha"].value:
             desc += " (alpha layer)"
         return desc
 

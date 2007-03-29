@@ -103,8 +103,8 @@ class OLE2_Metadata(Metadata):
             try:
                 key, use_prefix = self.SUMMARY_ID_TO_ATTR[property["id"].value]
             except LookupError:
-                warning("Skip %s[%s]=%s" % (
-                    property["id"].display, property["id"].value, value))
+#                warning("Skip %s[%s]=%s" % (
+#                    property["id"].display, property["id"].value, value))
                 continue
             if use_prefix:
                 value = "%s: %s" % (property["id"].display, value)

@@ -1,4 +1,5 @@
 from hachoir_metadata.metadata import Metadata, registerExtractor
+from hachoir_metadata.image import computeComprRate
 from hachoir_parser.image.exif import ExifEntry
 from hachoir_parser.image.jpeg import (JpegFile,
     QUALITY_HASH_COLOR, QUALITY_SUM_COLOR,
@@ -58,6 +59,8 @@ class JpegMetadata(Metadata):
             else:
                 self.pixel_format = _("Grayscale")
                 self.nb_colors = 256
+        elif "start_scan/content/nr_components" in jpeg:
+            self.bits_per_pixel = 8 * jpeg["start_scan/content/nr_components"].value
         self.compression = "JPEG"
         if "app0/content" in jpeg:
             app0 = jpeg["app0/content"]
@@ -78,6 +81,7 @@ class JpegMetadata(Metadata):
         for comment in jpeg.array("comment"):
             self.comment = comment["data"].value
         self.computeQuality(jpeg)
+        computeComprRate(self, jpeg["data"].size)
 
     def computeQuality(self, jpeg):
         # This function is an adaption to Python of ImageMagick code

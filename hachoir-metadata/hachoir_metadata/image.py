@@ -3,9 +3,25 @@ from hachoir_metadata.metadata import (Metadata, MultipleMetadata,
 from hachoir_parser.image import (
     BmpFile, IcoFile, PcxFile, GifFile, PngFile, TiffFile,
     XcfFile, TargaFile, WMF_File, PsdFile)
+from hachoir_parser.image.png import getBitsPerPixel as pngBitsPerPixel
 from hachoir_parser.image.xcf import XcfProperty
 from hachoir_core.i18n import _
 from hachoir_core.error import HACHOIR_ERRORS
+
+def computeComprRate(meta, compr_size):
+    """
+    Compute image compression rate. Skip size of color palette, focus on
+    image pixels. Original size is width x height x bpp. Compressed size
+    is an argument (in bits).
+
+    Set "compr_data" with a string like "1.52x".
+    """
+    if not hasattr(meta, "width") \
+    or not hasattr(meta, "height") \
+    or not hasattr(meta, "bits_per_pixel"):
+        return
+    orig_size = meta.width[0] * meta.height[0] * meta.bits_per_pixel[0]
+    meta.compr_rate = "%.3gx" % (float(orig_size) / compr_size)
 
 class BmpMetadata(Metadata):
     def extract(self, image):
@@ -21,6 +37,7 @@ class BmpMetadata(Metadata):
             self.bits_per_pixel = bpp
         self.compression = hdr["compression"].display
         self.format_version = "Microsoft Bitmap version %s" % hdr.getFormatVersion()
+        computeComprRate(self, image["pixels"].size)
 
 class TiffMetadata(Metadata):
     key_to_attr = {
@@ -74,6 +91,9 @@ class IcoMetadata(MultipleMetadata):
             key = "icon_data[%u]/header/codec" % index
             if key in icon:
                 image.compression = icon[key].display
+            key = "icon_data[%u]/pixels" % index
+            if key in icon:
+                computeComprRate(image, icon[key].size)
 
             # Store new image
             self.addGroup("image[%u]" % index, image)
@@ -87,6 +107,7 @@ class PcxMetadata(Metadata):
             self.nb_colors = 2 ** pcx["bpp"].value
         self.compression = _("Run-length encoding (RLE)")
         self.format_version = "PCX: %s" % pcx["version"].display
+        computeComprRate(self, pcx["image_data"].size)
 
 class XcfMetadata(Metadata):
     # Map image type to bits/pixel
@@ -124,17 +145,27 @@ class PngMetadata(Metadata):
         header = png["/header"]
         self.width = header["width"].value
         self.height = header["height"].value
-        bpp = header["bpp"].value
-        if header["palette"].value:
-            self.nb_colors = png["/palette/size"].value / 3
-        if 24 <= bpp:
-            if header["alpha"].value:
+
+        # Read number of colors and pixel format
+        if header["has_palette"].value:
+            nb_colors = png["/palette/size"].value // 3
+        else:
+            nb_colors = None
+        if not header["has_palette"].value:
+            if header["has_alpha"].value:
                 self.pixel_format = _("RGBA")
             else:
                 self.pixel_format = _("RGB")
+        elif "transparency" in png:
+            self.pixel_format = _("Color index with transparency")
+            nb_colors -= 1
         else:
             self.pixel_format = _("Color index")
-        self.bits_per_pixel = bpp
+        self.bits_per_pixel = pngBitsPerPixel(header)
+        if nb_colors:
+            self.nb_colors = nb_colors
+
+        # Read compression, timestamp, etc.
         self.compression = header["compression"].display
         if "time" in png:
             try:
@@ -150,6 +181,8 @@ class PngMetadata(Metadata):
                 self.comment = "%s=%s" % (keyword, text)
             else:
                 self.comment = text
+        compr_size = sum( data.size for data in png.array("data") )
+        computeComprRate(self, compr_size)
 
 class GifMetadata(Metadata):
     def extract(self, gif):
@@ -176,6 +209,7 @@ class TargaMetadata(Metadata):
         if tga["nb_color"].value:
             self.nb_colors = tga["nb_color"].value
         self.compression = tga["codec"].display
+        computeComprRate(self, tga["pixels"].size)
 
 class WmfMetadata(Metadata):
     def extract(self, wmf):

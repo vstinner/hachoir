@@ -69,7 +69,7 @@ def checkAttr(metadata, name, value):
     return True
 
 def checkLogoUbuntuMeta(metadata): return (
-    checkAttr(metadata, "bits_per_pixel", 8),
+    checkAttr(metadata, "bits_per_pixel", 32),
     checkAttr(metadata, "creation_date", "2006-05-26 09:41:46"),
     checkAttr(metadata, "mime_type", "image/png"))
 

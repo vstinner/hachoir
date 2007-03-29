@@ -26,6 +26,8 @@ MAX_YEAR = 2030
 MAX_FRAME_RATE = 150              # 150 frame/sec
 DATETIME_FILTER = Filter(datetime, datetime(MIN_YEAR, 1, 1), datetime(MAX_YEAR, 12, 31))
 MAX_NB_PAGE = 20000
+MAX_COMPR_RATE = 1000.0
+MIN_COMPR_RATE = 0.001
 
 extractors = {}
 
@@ -98,7 +100,7 @@ class Metadata(Logger):
         self.register("file_size", 310, _("File size"), handler=humanFilesize)
         self.register("pixel_format", 311, _("Pixel format"))
         self.register("compr_size", 312, _("Compressed file size"), handler=humanFilesize)
-        self.register("compr_rate", 313, _("Compression rate"))
+        self.register("compr_rate", 313, _("Compression rate"), filter=NumberFilter(MIN_COMPR_RATE, MAX_COMPR_RATE))
 
         self.register("file_attr", 400, _("File attributes"))
         self.register("file_type", 401, _("File type"))
