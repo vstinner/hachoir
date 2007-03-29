@@ -89,11 +89,6 @@ class RiffMetadata(MultipleMetadata):
         else:
             meta.width = header["right"].value - header["left"].value
             meta.height = header["bottom"].value - header["top"].value
-
-        root = video["/"]
-        if hasattr(self, "duration") and "movie/size" in root:
-            size = root["movie/size"].value
-            self.bit_rate = size * 8.0 / (self.duration[0] / 1000.0)
         self.addGroup("video", meta, "Video stream")
 
     def extractAVIAudio(self, audio):
@@ -101,7 +96,7 @@ class RiffMetadata(MultipleMetadata):
         format = audio["stream_fmt"]
         meta.nb_channel = format["channel"].value
         meta.sample_rate = format["sample_rate"].value
-        meta.bit_rate = format["bit_rate"].value
+        meta.bit_rate = format["bit_rate"].value * 8
         if "stream_hdr" in audio:
             header = audio["stream_hdr"]
             if header["rate"].value and header["scale"].value:
@@ -144,6 +139,10 @@ class RiffMetadata(MultipleMetadata):
                         audio_index += 1
             if not have_video_info and "avi_hdr" in headers:
                 self.useAviHeader(headers["avi_hdr"])
+
+        # Compute global bit rate
+        if hasattr(self, "duration") and "movie/size" in avi:
+            self.bit_rate = float(avi["movie/size"].value) * 8 / (self.duration[0] / 1000.0)
 
         # Video has index?
         if "index" in avi:
