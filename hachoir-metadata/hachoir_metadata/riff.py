@@ -7,6 +7,8 @@ from hachoir_parser.container.riff import RiffFile
 from hachoir_parser.video.fourcc import AUDIO_MICROSOFT_PCM, AUDIO_IEEE_FLOAT32
 from hachoir_core.tools import humanFilesize, makeUnicode
 from hachoir_core.i18n import _
+from hachoir_metadata.audio import computeComprRate as computeAudioComprRate
+from datetime import timedelta
 
 class RiffMetadata(MultipleMetadata):
     tag_to_key = {
@@ -41,14 +43,17 @@ class RiffMetadata(MultipleMetadata):
         self.compression = format["codec"].display
         if "nb_sample/nb_sample" in wav \
         and 0 < format["sample_per_sec"].value:
-            self.duration = wav["nb_sample/nb_sample"].value * 1000 // format["sample_per_sec"].value
+            self.duration = timedelta(seconds=float(wav["nb_sample/nb_sample"].value) / format["sample_per_sec"].value)
         if format["codec"].value in (AUDIO_MICROSOFT_PCM, AUDIO_IEEE_FLOAT32):
             # Codec with fixed bit rate
             self.bit_rate = format["nb_channel"].value * format["bit_per_sample"].value * format["sample_per_sec"].value
-            if not hasattr(self, "duration") \
+            if not self.has("duration") \
             and "audio_data/size" in wav \
-            and hasattr(self, "bit_rate"):
-                self.duration = wav["audio_data/size"].value * 8 * 1000 // self.bit_rate[0]
+            and self.has("bit_rate"):
+                duration = float(wav["audio_data/size"].value)*8 / self.get('bit_rate')
+                self.duration = timedelta(seconds=duration)
+        if "audio_data/size" in wav:
+            computeAudioComprRate(self, wav["audio_data/size"].value*8)
 
     def extract(self, riff):
         type = riff["type"].value
@@ -79,7 +84,7 @@ class RiffMetadata(MultipleMetadata):
             fps = float(header["rate"].value) / header["scale"].value
             meta.frame_rate = fps
             if 0 < fps:
-                self.duration = meta.duration = int(header["length"].value * 1000 // fps)
+                self.duration = meta.duration = timedelta(seconds=float(header["length"].value) / fps)
 
         if "stream_fmt/width" in video:
             format = video["stream_fmt"]
@@ -101,7 +106,7 @@ class RiffMetadata(MultipleMetadata):
             header = audio["stream_hdr"]
             if header["rate"].value and header["scale"].value:
                 frame_rate = float(header["rate"].value) / header["scale"].value
-                meta.duration = header["length"].value * 1000 // frame_rate
+                meta.duration = timedelta(seconds=float(header["length"].value) / frame_rate)
             if header["fourcc"].value != "":
                 meta.compression = "%s (fourcc:\"%s\")" \
                     % (format["codec"].display, header["fourcc"].value)
@@ -116,7 +121,7 @@ class RiffMetadata(MultipleMetadata):
         if microsec:
             self.frame_rate = 1000000.0 / microsec
             if "total_frame" in header and header["total_frame"].value:
-                self.duration = int(header["total_frame"].value * microsec) // 1000
+                self.duration = timedelta(seconds=header["total_frame"].value * microsec)
 
     def extractAVI(self, avi):
         # Process (audio and video) streams

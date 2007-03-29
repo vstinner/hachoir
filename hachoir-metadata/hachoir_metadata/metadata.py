@@ -1,66 +1,17 @@
 # -*- coding: utf-8 -*-
-
 from hachoir_core.compatibility import sorted
 from hachoir_core.endian import endian_name
-from hachoir_core.tools import (
-    humanDuration, makePrintable, humanBitRate,
-    humanFrequency, humanBitSize, humanFilesize,
-    normalizeNewline)
+from hachoir_core.tools import makePrintable, makeUnicode
 from hachoir_core.dict import Dict
 from hachoir_core.i18n import _
 from hachoir_core.log import Logger
-from datetime import datetime
-from hachoir_metadata.filter import Filter, NumberFilter
+from hachoir_metadata.metadata_item import (Data, registerAllItems,
+   MIN_PRIORITY, MAX_PRIORITY)
 import re
-
-MAX_STR_LENGTH = 300              # 300 characters
-MAX_SAMPLE_RATE = 192000          # 192 kHz
-MAX_DURATION = 366*24*60*60*1000  # 1 year
-MAX_NB_CHANNEL = 8                # 8 channels
-MAX_WIDTH = 200000                # 200 000 pixels
-MAX_HEIGHT = MAX_WIDTH
-MAX_NB_COLOR = 2 ** 24            # 16 million of color
-MAX_BITS_PER_PIXEL = 256          # 256 bits/pixel
-MIN_YEAR = 1900                   # Year in 1900..2030
-MAX_YEAR = 2030
-MAX_FRAME_RATE = 150              # 150 frame/sec
-DATETIME_FILTER = Filter(datetime, datetime(MIN_YEAR, 1, 1), datetime(MAX_YEAR, 12, 31))
-MAX_NB_PAGE = 20000
-MAX_COMPR_RATE = 1000.0
-MIN_COMPR_RATE = 0.001
 
 extractors = {}
 
-def formatFrameRate(value):
-    if isinstance(value, (int, long, float)):
-        return _("%.1f fps") % value
-    else:
-        return value
-
-class Data:
-    def __init__(self, key, priority, description,  handler=None, filter=None):
-        """
-        handler is only used if value is not string nor unicode, prototype:
-           def handler(value) -> str/unicode
-        """
-        assert Metadata.MIN_PRIORITY <= priority <= Metadata.MAX_PRIORITY
-        assert isinstance(description, unicode)
-        self.key = key
-        self.description = description
-        self.values = []
-        self.handler = handler
-        self.filter = filter
-        self.priority = priority
-
-    def __contains__(self, value):
-        return value in self.values
-
-    def __cmp__(self, other):
-        return cmp(self.priority, other.priority)
-
 class Metadata(Logger):
-    MIN_PRIORITY = 100
-    MAX_PRIORITY = 999
     header = u"Metadata"
 
     def __init__(self):
@@ -71,68 +22,7 @@ class Metadata(Logger):
         header = self.__class__.header
         object.__setattr__(self, "_Metadata__header", header)
 
-        self.register("title", 100, _("Title"))
-        self.register("author", 101, _("Author"))
-        self.register("music_composer", 102, _("Music composer"))
-
-        self.register("album", 200, _("Album"))
-        self.register("duration", 201, _("Duration"), # integer in milliseconde
-            handler=humanDuration, filter=NumberFilter(1, MAX_DURATION))
-        self.register("nb_page", 202, _("Nb page"), filter=NumberFilter(1, MAX_NB_PAGE))
-        self.register("music_genre", 203, _("Music genre"))
-        self.register("language", 204, _("Language"))
-        self.register("track_number", 205, _("Track number"), filter=NumberFilter(1, 99))
-        self.register("track_total", 206, _("Track total"), filter=NumberFilter(1, 99))
-        self.register("organization", 210, _("Organization"))
-        self.register("version", 220, _("Version"))
-
-
-        self.register("artist", 300, _("Artist"))
-        self.register("width", 301, _("Image width"), filter=NumberFilter(1, MAX_WIDTH))
-        self.register("height", 302, _("Image height"), filter=NumberFilter(1, MAX_HEIGHT))
-        self.register("nb_channel", 303, _("Channel"), handler=humanAudioChannel, filter=NumberFilter(1, MAX_NB_CHANNEL))
-        self.register("sample_rate", 304, _("Sample rate"), handler=humanFrequency, filter=NumberFilter(1, MAX_SAMPLE_RATE))
-        self.register("bits_per_sample", 305, _("Bits/sample"), handler=humanBitSize, filter=NumberFilter(1, 64))
-        self.register("image_orientation", 306, _("Image orientation"))
-        self.register("nb_colors", 307, _("Number of colors"), filter=NumberFilter(1, MAX_NB_COLOR))
-        self.register("bits_per_pixel", 308, _("Bits/pixel"), filter=NumberFilter(1, MAX_BITS_PER_PIXEL))
-        self.register("filename", 309, _("File name"))
-        self.register("file_size", 310, _("File size"), handler=humanFilesize)
-        self.register("pixel_format", 311, _("Pixel format"))
-        self.register("compr_size", 312, _("Compressed file size"), handler=humanFilesize)
-        self.register("compr_rate", 313, _("Compression rate"), filter=NumberFilter(MIN_COMPR_RATE, MAX_COMPR_RATE))
-
-        self.register("file_attr", 400, _("File attributes"))
-        self.register("file_type", 401, _("File type"))
-        self.register("subtitle_author", 402, _("Subtitle author"))
-
-        self.register("creation_date", 500, _("Creation date"),
-            filter=DATETIME_FILTER)
-        self.register("last_modification", 501, _("Last modification"),
-            filter=DATETIME_FILTER)
-        self.register("country", 502, _("Country"))
-
-        self.register("camera_aperture", 520, _("Camera aperture"))
-        self.register("camera_focal", 521, _("Camera focal"))
-        self.register("camera_exposure", 522, _("Camera exposure"))
-        self.register("camera_brightness", 530, _("Camera brightness"))
-        self.register("camera_model", 531, _("Camera model"))
-        self.register("camera_manufacturer", 532, _("Camera manufacturer"))
-
-        self.register("compression", 600, _("Compression"))
-        self.register("copyright", 601, _("Copyright"))
-        self.register("url", 602, _("URL"))
-        self.register("frame_rate", 603, _("Frame rate"), handler=formatFrameRate,
-            filter=NumberFilter(1, MAX_FRAME_RATE))
-        self.register("bit_rate", 604, _("Bit rate"), handler=humanBitRate,
-            filter=NumberFilter(1))
-        self.register("aspect_ratio", 604, _("Aspect ratio"))
-
-        self.register("producer", 901, _("Producer"))
-        self.register("comment", 902, _("Comment"))
-        self.register("format_version", 950, _("Format version"))
-        self.register("mime_type", 951, _("MIME type"))
-        self.register("endian", 952, _("Endian"))
+        registerAllItems(self)
 
     def _logger(self):
         pass
@@ -145,108 +35,68 @@ class Metadata(Logger):
         if key not in self.__data:
             raise KeyError(_("%s has no metadata '%s'") % (self.__class__.__name__, key))
 
-        # Skip value 'None'
-        if value is None:
-            return
-
-        # Convert string to Unicode string using charset ISO-8859-1
-        if isinstance(value, str):
-            value = unicode(value, "ISO-8859-1")
-
-        # Skip empty strings
-        if isinstance(value, unicode):
-            value = value.strip(" \t\v\n\r\0")
-            if not value:
-                return
-            value = normalizeNewline(value)
-            if MAX_STR_LENGTH < len(value):
-                value = value[:MAX_STR_LENGTH] + "(...)"
-
         # Skip duplicates
-        data = self.__data[key]
-        if value in data:
-            return
-
-        # Use filter
-        if data.filter and not data.filter(value):
-            self.warning("Skip value %s=%r (filter)" % (key, value))
-            return
-
-        # For string, if you have "verlongtext" and "verylo",
-        # keep the longer value
-        if isinstance(value, unicode):
-            for index, item in enumerate(data.values):
-                if isinstance(item, unicode):
-                    if value.startswith(item):
-                        # Find longer value, replace the old one
-                        data.values[index] = value
-                        return
-                    if item.startswith(value):
-                        # Find truncated value, skip it
-                        return
-
-        # Add new value
-        data.values.append(value)
+        self.__data[key].add(value)
 
     def setHeader(self, text):
         object.__setattr__(self, "header", text)
 
-    def __getattr__(self, key):
-        """
-        Read values of tag with name 'key'.
-
-        >>> a = Metadata()
-        >>> a.author = "haypo"
-        >>> a.author = "julien"
-        >>> a.author
-        ['haypo', 'julien']
-        >>> a.duration = 2300
-        >>> a.duration
-        [2300]
-        """
-        if key not in self.__data:
-            raise AttributeError(_("%s has no attribute '%s'")
-                % (self.__class__.__name__, key))
-        data = self.__data[key]
-        if data.values:
-            return data.values
-        else:
-            raise AttributeError(_("Attribute '%s' of %s is not set")
-                % (key, self.__class__.__name__))
-
-    def get(self, name, glue=", ", charset="ISO-8859-1"):
-        r"""
-        Get an attribute as Unicode string. If the attribute doesn't exist,
-        empty string is returned. If the attribute has multiple value, they
-        will be joined with glue (optional argument, default value is ", ").
-        Basic string are converted to Unicode using charset (optional
-        argumet, default value is ISO-8859-1).
-
-        >>> a = Metadata()
-        >>> a.author = "haypo"
-        >>> a.author = "julien"
-        >>> a.get("author")
-        u'haypo, julien'
-        >>> a.get("author", glue=" and ")
-        u'haypo and julien'
-        >>> a.get("title")
-        u''
-        """
+    def getItems(self, key):
         try:
-            value = getattr(self, name)
-            if isinstance(value, list):
-                return glue.join( unicode(item) for item in value )
-            elif isinstance(value, str):
-                return makePrintable("ISO-8859-1", to_unicode=True)
-            else:
-                return value
-        except AttributeError:
-            return u''
+            return self.__data[key]
+        except LookupError:
+            raise ValueError("Metadata has no value '%s'" % key)
 
+    def getItem(self, key, index):
+        try:
+            return self.getItems(key)[index]
+        except (LookupError, ValueError):
+            return None
 
-    def register(self, key, priority, title, handler=None, filter=None):
+    def has(self, key):
+        return 1 <= len(self.getItems(key))
+
+    def get(self, key, index=0):
+        """
+        Read first value of tag with name 'key'.
+
+        >>> a = Metadata()
+        >>> a.duration = 2300
+        >>> a.get('duration')
+        2300
+        """
+        item = self.getItem(key, index)
+        if item is None:
+            raise ValueError("Metadata has no value '%s' (index %s)" % (key, index))
+        return item.value
+
+    def getValues(self, key):
+        try:
+            data = self.__data[key]
+        except LookupError:
+            raise ValueError("Metadata has no value '%s'" % key)
+        return [ item.value for item in data ]
+
+    def getText(self, key, index=0, default=None):
+        """
+        Read first value, as unicode string, of tag with name 'key'.
+
+        >>> a = Metadata()
+        >>> a.duration = 2300
+        >>> a.getText('duration')
+        u'2300'
+        >>>> a.getText('titre', u'Unknown')
+        u'Unknown'
+        """
+        item = self.getItem(key, index)
+        if item is not None:
+            return item.text
+        else:
+            return default
+
+    def register(self, key, priority, title, text_handler=None, type=None, filter=None):
         assert key not in self.__data
-        self.__data[key] = Data(key, priority, title, handler, filter)
+        self.__data[key] = Data(self, key, priority, title, text_handler, type, filter)
 
     def __iter__(self):
         return self.__data.itervalues()
@@ -281,7 +131,6 @@ class Metadata(Logger):
 
         @see __str__() and exportPlaintext()
         """
-
         return "\n".join(self.exportPlaintext())
 
     def exportPlaintext(self, priority=None, human=True, line_prefix=u"- ", title=None):
@@ -305,10 +154,10 @@ class Metadata(Logger):
         @see __str__() and __unicode__()
         """
         if priority is not None:
-            priority = max(priority, self.MIN_PRIORITY)
-            priority = min(priority, self.MAX_PRIORITY)
+            priority = max(priority, MIN_PRIORITY)
+            priority = min(priority, MAX_PRIORITY)
         else:
-            priority = self.MAX_PRIORITY
+            priority = MAX_PRIORITY
         if not title:
             title = self.header
         text = ["%s:" % title]
@@ -321,11 +170,11 @@ class Metadata(Logger):
                 title = data.description
             else:
                 title = data.key
-            for value in data.values:
-                if data.handler and not isinstance(value, (str, unicode)):
-                    value = data.handler(value)
-                if isinstance(value, str):
-                    value = makePrintable(value, "ISO-8859-1", to_unicode=True)
+            for item in data.values:
+                if human:
+                    value = item.text
+                else:
+                    value = makeUnicode(item.value)
                 text.append("%s%s: %s" % (line_prefix, title, value))
         if 1 < len(text):
             return text
@@ -394,13 +243,4 @@ def extractMetadata(parser):
     metadata.mime_type = parser.mime_type
     metadata.endian = endian_name[parser.endian]
     return metadata
-
-### Handler to give data a better human representation ####################
-
-nb_channel_name = {
-    1: _("mono"),
-    2: _("stereo")
-}
-def humanAudioChannel(value):
-    return nb_channel_name.get(value, unicode(value))
 

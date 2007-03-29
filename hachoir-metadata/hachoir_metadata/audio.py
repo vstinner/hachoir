@@ -2,7 +2,17 @@ from hachoir_metadata.metadata import Metadata, MultipleMetadata, registerExtrac
 from hachoir_parser.audio import AuFile, MpegAudioFile, RealAudioFile, AiffFile
 from hachoir_parser.container import OggFile, RealMediaFile
 from hachoir_core.i18n import _
-from hachoir_core.tools import makePrintable
+from hachoir_core.tools import makePrintable, timedelta2seconds
+from datetime import timedelta
+
+def computeComprRate(meta, size):
+    if not meta.has("duration") \
+    or not meta.has("sample_rate") \
+    or not meta.has("bits_per_sample") \
+    or not meta.has("nb_channel"):
+        return
+    orig_size = timedelta2seconds(meta.get("duration")) * meta.get('sample_rate') * meta.get('bits_per_sample') * meta.get('nb_channel')
+    meta.compr_rate = "%.2fx" % (float(orig_size) / size)
 
 class OggMetadata(MultipleMetadata):
     key_to_attr = {
@@ -112,6 +122,8 @@ class AuMetadata(Metadata):
         if "audio_data" in audio \
         and hasattr(self, "bit_rate"):
             self.duration = audio["audio_data"].size * 1000 / self.bit_rate[0]
+        if "data_size" in audio:
+            computeComprRate(self, audio["data_size"].value*8)
 
 class RealAudioMetadata(Metadata):
     def extract(self, real):
@@ -138,7 +150,7 @@ class RealMediaMetadata(MultipleMetadata):
         if "file_prop" in media:
             prop = media["file_prop"]
             self.bit_rate = prop["avg_bit_rate"].value
-            self.duration = prop["duration"].value
+            self.duration = timedelta(milliseconds=prop["duration"].value)
         if "content_desc" in media:
             content = media["content_desc"]
             self.title = content["title"].value
@@ -159,7 +171,7 @@ class RealMediaMetadata(MultipleMetadata):
                         self.warning("Skip %s: %s" % (prop["name"].value, value))
             else:
                 meta.bit_rate = stream["avg_bit_rate"].value
-                meta.duration = stream["duration"].value
+                meta.duration = timedelta(milliseconds=stream["duration"].value)
                 meta.mime_type = stream["mime_type"].value
             meta.title = stream["desc"].value
             index = 1 + stream["stream_number"].value
@@ -217,7 +229,7 @@ class MpegAudioMetadata(Metadata):
     def extract(self, mp3):
         if "/frames/frame[0]" in mp3:
             frame = mp3["/frames/frame[0]"]
-            self.nb_channel = frame["channel_mode"].display
+            self.nb_channel = (frame.getNbChannel(), frame["channel_mode"].display)
             self.format_version = "MPEG version %s layer %s" % \
                 (frame["version"].display, frame["layer"].display)
             sample_rate = frame.getSampleRate() # may returns None on error
@@ -229,7 +241,7 @@ class MpegAudioMetadata(Metadata):
                 if mp3["frames"].looksConstantBitRate():
                     self.bit_rate = bit_rate
                     # Guess music duration using fixed bit rate
-                    self.duration = (mp3["frames"].size * 1000) / bit_rate
+                    self.duration = timedelta(seconds=float(mp3["frames"].size) / bit_rate)
                 else:
                     self.bit_rate = _("Variable bit rate (VBR)")
         if "id3v1" in mp3:
@@ -244,6 +256,8 @@ class MpegAudioMetadata(Metadata):
                 self.track_number = id3["track_nb"].value
         if "id3v2" in mp3:
             self.readID3v2(mp3["id3v2"])
+        if "frames" in mp3:
+            computeComprRate(self, mp3["frames"].size)
 
 class AiffMetadata(Metadata):
     def extract(self, aiff):
@@ -252,7 +266,7 @@ class AiffMetadata(Metadata):
             rate = int(info["sample_rate"].value)
             if rate:
                 self.sample_rate = rate
-                self.duration = info["nb_sample"].value * 1000 // rate
+                self.duration = timedelta(seconds=float(info["nb_sample"].value) / rate)
             self.nb_channel = info["nb_channel"].value
             self.bits_per_sample = info["sample_size"].value
             if "codec" in info:

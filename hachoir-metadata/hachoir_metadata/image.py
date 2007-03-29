@@ -85,7 +85,7 @@ class IcoMetadata(MultipleMetadata):
                 bpp = 8
             image.bits_per_pixel = bpp
             image.setHeader(_("Icon #%u (%ux%u)")
-                % (1+index, image.width[0], image.height[0]))
+                % (1+index, image.get("width"), image.get("height")))
 
             # Read compression from data (if available)
             key = "icon_data[%u]/header/codec" % index

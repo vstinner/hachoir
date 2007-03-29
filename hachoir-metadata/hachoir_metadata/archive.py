@@ -11,7 +11,9 @@ def computeCompressionRate(meta):
     """
     Compute compression rate, sizes have to be in byte.
     """
-    file_size, compr_size = meta.file_size[0], meta.compr_size[0]
+    if not meta.has("file_size") or not meta.has("compr_size"):
+        return
+    file_size, compr_size = meta.get("file_size"), meta.get("compr_size")
     if file_size:
         rate = 100 - float(compr_size) * 100 / file_size
         meta.compr_rate = "%.1f%%" % rate
@@ -53,7 +55,7 @@ class ZipMetadata(MultipleMetadata):
                 if field["compressed_size"].value:
                     meta.compr_size = field["compressed_size"].value
                     computeCompressionRate(meta)
-            self.addGroup(field.name, meta, "File \"%s\"" % meta.filename[0])
+            self.addGroup(field.name, meta, "File \"%s\"" % meta.get('filename'))
 
 class TarMetadata(MultipleMetadata):
     def extract(self, tar):

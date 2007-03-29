@@ -16,7 +16,7 @@ from hachoir_core.stream import InputStreamError
 from hachoir_parser import createParser
 from hachoir_core.compatibility import all
 from hachoir_metadata import extractMetadata
-import datetime
+from datetime import timedelta, datetime
 from locale import setlocale, LC_ALL
 import os
 import sys
@@ -36,12 +36,12 @@ def checkAttr(metadata, name, value):
         metadata = metadata[group]
 
     # Has asked attribute?
-    if not hasattr(metadata, name):
+    if not metadata.has(name):
         sys.stdout.write("no attribute \"%s\"!\n" % name)
         return False
 
     # Read value
-    read = getattr(metadata, name)
+    read = metadata.getValues(name)
 
     # Check type
     if type(read) != type(value) \
@@ -76,7 +76,7 @@ def checkLogoUbuntuMeta(metadata): return (
 def checkClickMeta(metadata): return (
     checkAttr(metadata, "producer", "Sound Forge 4.5"),
     checkAttr(metadata, "creation_date", "2001-02-21"),
-    checkAttr(metadata, "duration", 19),
+    checkAttr(metadata, "duration", timedelta(microseconds=19546)),
     checkAttr(metadata, "bit_rate", 705600),
     checkAttr(metadata, "sample_rate", 22050))
 
@@ -112,7 +112,7 @@ def checkTARMeta(meta): return (
     checkAttr(meta, "file[0]/filename", "dummy.txt"),
     checkAttr(meta, "file[0]/file_size", 62),
     checkAttr(meta, "file[1]/file_attr", "-rwxr-xr-x (755)"),
-    checkAttr(meta, "file[1]/last_modification", datetime.datetime(2006, 10, 1, 13, 9, 3)),
+    checkAttr(meta, "file[1]/last_modification", datetime(2006, 10, 1, 13, 9, 3)),
     checkAttr(meta, "file[2]/file_type", "Normal disk file"),
 )
 
@@ -124,7 +124,7 @@ def checkCornerBMPMeta(meta): return (
 )
 
 def checkSmallville(metadata): return (
-    checkAttr(metadata, "duration", 2641141),
+    checkAttr(metadata, "duration", timedelta(minutes=44, seconds=1, microseconds=141141)),
     checkAttr(metadata, "producer", u"VirtualDubMod 1.5.10.1 (build 2366/release)"),
     checkAttr(metadata, "video/width", 640),
     checkAttr(metadata, "video/height", 352),
@@ -157,14 +157,14 @@ def checkInterludeDavid(meta): return (
 )
 
 def checkBreakdance(meta): return (
-    checkAttr(meta, "duration", 46942.0),
+    checkAttr(meta, "duration", timedelta(seconds=46, milliseconds=942)),
     checkAttr(meta, "producer",
         [u"YouTube, Inc.", u"YouTube Metadata Injector."]),
 )
 
 def checkMatrixPingPong(meta): return (
     checkAttr(meta, "title", u"欽ちゃん＆香取慎吾の全日本仮装大賞"),
-    checkAttr(meta, "duration", u'1 min 47 sec'),
+    checkAttr(meta, "duration", timedelta(minutes=1, seconds=47, milliseconds=258)),
     checkAttr(meta, "creation_date", u'2003-06-16 07:57:23.235000'),
     checkAttr(meta, "audio[1]/sample_rate", 8000),
     checkAttr(meta, "audio[1]/bits_per_sample", 16),
@@ -187,17 +187,8 @@ def checkHero(meta): return (
     checkAttr(meta, "compression", u"8-bit uncompressed"),
 )
 
-def checkFirstrun(meta): return (
-    checkAttr(meta, "duration", 17066),
-    checkAttr(meta, "creation_date", "6/14/2000 10:03:18"),
-    checkAttr(meta, "copyright", u"©2000 RealNetworks"),
-    checkAttr(meta, "producer", u"RealProducer Plus 6.1.0.153 Windows"),
-    checkAttr(meta, "stream[1]/bit_rate", 32148),
-    checkAttr(meta, "stream[1]/title", "Audio Stream"),
-)
-
 def check25min(meta): return (
-    checkAttr(meta, "duration", 1533000),
+    checkAttr(meta, "duration", timedelta(minutes=25, seconds=33)),
     checkAttr(meta, "nb_channel", 2),
     checkAttr(meta, "sample_rate", 44100),
     checkAttr(meta, "bits_per_sample", 16),
@@ -205,7 +196,7 @@ def check25min(meta): return (
 )
 
 def checkLadouce(meta): return (
-    checkAttr(meta, "duration", 4592516),
+    checkAttr(meta, "duration", timedelta(hours=1, minutes=16, seconds=32, microseconds=516032)),
     checkAttr(meta, "nb_channel", 6),
     checkAttr(meta, "sample_rate", 44100),
     checkAttr(meta, "bits_per_sample", 32),
@@ -228,14 +219,15 @@ def checkHachoirOrgSXW(meta): return (
 )
 
 def checkFirstRun(meta): return (
-    checkAttr(meta, "mime_type", u"audio/x-pn-realaudio"),
-    checkAttr(meta, "duration", 17066),
-    checkAttr(meta, "creation_date", u"6/14/2000 10:03:18"),
+    checkAttr(meta, "duration", timedelta(seconds=17, milliseconds=66)),
+    checkAttr(meta, "creation_date", "6/14/2000 10:03:18"),
     checkAttr(meta, "copyright", u"©2000 RealNetworks"),
-    checkAttr(meta, "bit_rate", 32348),
     checkAttr(meta, "producer", u"RealProducer Plus 6.1.0.153 Windows"),
-    checkAttr(meta, "stream[1]/title", u"Audio Stream"),
     checkAttr(meta, "stream[1]/mime_type", u"audio/x-pn-realaudio"),
+    checkAttr(meta, "stream[1]/bit_rate", 32148),
+    checkAttr(meta, "stream[1]/title", "Audio Stream"),
+    checkAttr(meta, "mime_type", u"audio/x-pn-realaudio"),
+    checkAttr(meta, "bit_rate", 32348),
     checkAttr(meta, "stream[2]/bit_rate", 200),
 )
 
@@ -243,8 +235,8 @@ def checkDejaVu(meta): return (
     checkAttr(meta, "title", u"DejaVu Serif"),
     checkAttr(meta, "author", u"DejaVu fonts team"),
     checkAttr(meta, "version", u"2.7"),
-    checkAttr(meta, "creation_date", datetime.datetime(2006, 7, 6, 17, 29, 52)),
-    checkAttr(meta, "last_modification", datetime.datetime(2006, 7, 6, 17, 29, 52)),
+    checkAttr(meta, "creation_date", datetime(2006, 7, 6, 17, 29, 52)),
+    checkAttr(meta, "last_modification", datetime(2006, 7, 6, 17, 29, 52)),
     checkAttr(meta, "copyright", [
         u"Copyright (c) 2003 by Bitstream, Inc. All Rights Reserved.\nDejaVu changes are in public domain",
         u"http://dejavu.sourceforge.net/wiki/index.php/License"]),
@@ -360,7 +352,6 @@ testcase_files = (
     (u"matrix_ping_pong.wmv", checkMatrixPingPong),
     (u"usa_railroad.jpg", checkUSARailroad),
     (u"hero.tga", checkHero),
-    (u"firstrun.rm", checkFirstrun),
     (u"25min.aifc", check25min),
     (u"ladouce_1h15.wav", checkLadouce),
     (u"lara_croft.pcx", checkLaraCroft),

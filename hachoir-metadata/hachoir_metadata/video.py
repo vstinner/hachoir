@@ -5,7 +5,8 @@ from hachoir_parser.video import MovFile, AsfFile, FlvFile
 from hachoir_parser.video.asf import Descriptor as ASF_Descriptor
 from hachoir_parser.container import MkvFile
 from hachoir_core.i18n import _
-from hachoir_core.tools import makePrintable
+from hachoir_core.tools import makePrintable, durationWin64
+from datetime import timedelta
 
 class MkvMetadata(MultipleMetadata):
     tag_key = {
@@ -110,7 +111,7 @@ class MkvMetadata(MultipleMetadata):
         if "Duration/float" in info \
         and "TimecodeScale/unsigned" in info \
         and 0 < info["Duration/float"].value:
-            self.duration = int(info["Duration/float"].value) * info["TimecodeScale/unsigned"].value // 1000000
+            self.duration = timedelta(microseconds=info["Duration/float"].value * info["TimecodeScale/unsigned"].value)
         if "DateUTC/date" in info:
             self.creation_date = info["DateUTC/date"].display
         if "WritingApp/unicode" in info:
@@ -154,7 +155,7 @@ class FlvMetadata(MultipleMetadata):
         for entry in amf.array("item"):
             key = entry["key"].value
             if key == "duration":
-                self.duration = entry["value"].value * 1000
+                self.duration = timedelta(seconds=entry["value"].value)
             elif key == "creator":
                 self.producer = entry["value"].value
             elif key == "audiosamplerate":
@@ -252,7 +253,7 @@ class AsfMetadata(MultipleMetadata):
         if "file_prop/content" in header:
             prop = header["file_prop/content"]
             self.creation_date = prop["creation_date"].display
-            self.duration = prop["play_duration"].display
+            self.duration = durationWin64(prop["play_duration"].value)
             if prop["seekable"]:
                 self.comment = "Is seekable"
             value = prop["max_bitrate"].display
