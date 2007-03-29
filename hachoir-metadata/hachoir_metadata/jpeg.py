@@ -1,7 +1,8 @@
 from hachoir_metadata.metadata import Metadata, registerExtractor
 from hachoir_metadata.image import computeComprRate
 from hachoir_parser.image.exif import ExifEntry
-from hachoir_parser.image.jpeg import (JpegFile,
+from hachoir_parser.image.jpeg import (
+    JpegFile, JpegChunk,
     QUALITY_HASH_COLOR, QUALITY_SUM_COLOR,
     QUALITY_HASH_GRAY, QUALITY_SUM_GRAY)
 from hachoir_core.field import MissingField
@@ -48,6 +49,7 @@ class JpegMetadata(Metadata):
     }
 
     def extract(self, jpeg):
+        compression = "JPEG"
         if "start_frame/content" in jpeg:
             sof = jpeg["start_frame/content"]
             self.width = sof["width"].value
@@ -59,9 +61,11 @@ class JpegMetadata(Metadata):
             else:
                 self.pixel_format = _("Grayscale")
                 self.nb_colors = 256
+            key = jpeg["start_frame/type"].value
+            compression += " (%s)" % JpegChunk.START_OF_FRAME[key]
         elif "start_scan/content/nr_components" in jpeg:
             self.bits_per_pixel = 8 * jpeg["start_scan/content/nr_components"].value
-        self.compression = "JPEG"
+        self.compression = compression
         if "app0/content" in jpeg:
             app0 = jpeg["app0/content"]
             self.format_version = "JFIF %u.%02u" \

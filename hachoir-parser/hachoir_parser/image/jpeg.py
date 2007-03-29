@@ -158,9 +158,9 @@ class StartOfScan(FieldSet):
 
         for index in range(self["nr_components"].value):
             comp_id = UInt8(self, "component_id[]")
-            if (comp_id.value == 0) or (self["nr_components"].value < comp_id.value):
-               raise ParserError("JPEG error: Invalid component-id")
             yield comp_id
+            if not(1 <= comp_id.value <= self["nr_components"].value):
+               raise ParserError("JPEG error: Invalid component-id")
             yield UInt8(self, "value[]")
         yield RawBytes(self, "raw", 3) # TODO: What's this???
 
@@ -198,7 +198,6 @@ class JpegChunk(FieldSet):
     TAG_DQT = 0xDB
     TAG_DRI = 0xDD
     TAG_INFO = {
-        0xC0: ("start_frame", "Start Of Frame 0 (SOF0)", StartOfFrame),
         0xC4: ("huffman[]", "Define Huffman Table (DHT)", None),
         0xD8: ("start_image", "Start of image (SOI)", None),
         0xD9: ("end_image", "End of image (EOI)", None),
@@ -211,6 +210,23 @@ class JpegChunk(FieldSet):
         0xEE: ("adobe", "Image encoding information for DCT filters (Adobe)", AdobeChunk),
         0xFE: ("comment[]", "Comment", None),
     }
+    START_OF_FRAME = {
+        0xC0: "Baseline",
+        0xC1: "Extended sequential",
+        0xC2: "Progressive",
+        0xC3: "Lossless",
+        0xC5: "Differential sequential",
+        0xC6: "Differential progressive",
+        0xC7: "Differential lossless",
+        0xC9: "Extended sequential, arithmetic coding",
+        0xCA: "Progressive, arithmetic coding",
+        0xCB: "Lossless, arithmetic coding",
+        0xCD: "Differential sequential, arithmetic coding",
+        0xCE: "Differential progressive, arithmetic coding",
+        0xCF: "Differential lossless, arithmetic coding",
+    }
+    for key, text in START_OF_FRAME.iteritems():
+        TAG_INFO[key] = ("start_frame", "Start of frame (%s)" % text.lower(), StartOfFrame)
 
     def __init__(self, parent, name, description=None):
         FieldSet.__init__(self, parent, name, description)
@@ -222,7 +238,9 @@ class JpegChunk(FieldSet):
             if bytes == "Exif\0\0":
                 self._name = "exif"
                 self._description = "EXIF"
-            self._parser = Exif
+                self._parser = Exif
+            else:
+                self._parser = None
         else:
             self._parser = None
 
