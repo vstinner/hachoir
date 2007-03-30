@@ -5,7 +5,7 @@ from hachoir_parser.video import MovFile, AsfFile, FlvFile
 from hachoir_parser.video.asf import Descriptor as ASF_Descriptor
 from hachoir_parser.container import MkvFile
 from hachoir_core.i18n import _
-from hachoir_core.tools import makePrintable, durationWin64
+from hachoir_core.tools import makePrintable, durationWin64, timedelta2seconds
 from datetime import timedelta
 
 class MkvMetadata(MultipleMetadata):
@@ -153,6 +153,9 @@ class FlvMetadata(MultipleMetadata):
 
         if "metadata/entry[1]" in flv:
             self.extractAMF(flv["metadata/entry[1]"])
+        if self.has('duration'):
+            self.bit_rate = flv.size / timedelta2seconds(self.get('duration'))
+
 
     def extractAMF(self, amf):
         for entry in amf.array("item"):
