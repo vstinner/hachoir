@@ -4,7 +4,7 @@ Extract metadata from RIFF file format: AVI video and WAV sound.
 
 from hachoir_metadata.metadata import Metadata, MultipleMetadata, registerExtractor
 from hachoir_parser.container.riff import RiffFile
-from hachoir_parser.video.fourcc import AUDIO_MICROSOFT_PCM, AUDIO_IEEE_FLOAT32
+from hachoir_parser.video.fourcc import UNCOMPRESSED_AUDIO
 from hachoir_core.tools import humanFilesize, makeUnicode, timedelta2seconds
 from hachoir_core.i18n import _
 from hachoir_metadata.audio import computeComprRate as computeAudioComprRate
@@ -44,7 +44,7 @@ class RiffMetadata(MultipleMetadata):
         if "nb_sample/nb_sample" in wav \
         and 0 < format["sample_per_sec"].value:
             self.duration = timedelta(seconds=float(wav["nb_sample/nb_sample"].value) / format["sample_per_sec"].value)
-        if format["codec"].value in (AUDIO_MICROSOFT_PCM, AUDIO_IEEE_FLOAT32):
+        if format["codec"].value in UNCOMPRESSED_AUDIO:
             # Codec with fixed bit rate
             self.bit_rate = format["nb_channel"].value * format["bit_per_sample"].value * format["sample_per_sec"].value
             if not self.has("duration") \

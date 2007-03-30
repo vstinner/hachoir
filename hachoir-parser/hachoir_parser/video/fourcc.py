@@ -7,12 +7,12 @@
 #    url:  http://sourceforge.net/projects/mmpython/
 #
 
-AUDIO_MICROSOFT_PCM = 1
-AUDIO_IEEE_FLOAT32 = 3
+# List of codecs with no compression (compression rate=1.0)
+UNCOMPRESSED_AUDIO = set((1,3,6))
 
 audio_codec_name = {
 0x0000: 'Microsoft Unknown Wave Format',
-AUDIO_MICROSOFT_PCM: 'Microsoft Pulse Code Modulation (PCM)',
+0x0001: 'Microsoft Pulse Code Modulation (PCM)',
 0x0002: 'Microsoft ADPCM',
 0x0003: 'IEEE Float',
 0x0004: 'Compaq Computer VSELP',

@@ -32,6 +32,13 @@ def computeComprRate(meta, size):
     orig_size = timedelta2seconds(meta.get("duration")) * meta.get('sample_rate') * meta.get('bits_per_sample') * meta.get('nb_channel')
     meta.compr_rate = "%.2fx" % (float(orig_size) / size)
 
+def computeBitRate(meta):
+    if not meta.has("bits_per_sample") \
+    or not meta.has("nb_channel") \
+    or not meta.has("sample_rate"):
+        return
+    meta.bit_rate = meta.get('bits_per_sample') * meta.get('nb_channel') * meta.get('sample_rate')
+
 class OggMetadata(MultipleMetadata):
     KEY_TO_ATTR = {
         "ARTIST": ("artist", None),
@@ -130,13 +137,6 @@ class OggMetadata(MultipleMetadata):
                         setattr(self, key, value)
                 elif value:
                     self.warning("Skip Ogg comment %s: %s" % (key, value))
-
-def computeBitRate(meta):
-    if not meta.has("bits_per_sample") \
-    or not meta.has("nb_channel") \
-    or not meta.has("sample_rate"):
-        return
-    meta.bit_rate = meta.get('bits_per_sample') * meta.get('nb_channel') * meta.get('sample_rate')
 
 class AuMetadata(Metadata):
     def extract(self, audio):

@@ -103,6 +103,17 @@ def checkFlashMobInfo(metadata): return (
     checkAttr(metadata, "duration", timedelta(seconds=17, milliseconds=844)),
 )
 
+def checkAudio8kHz(meta): return (
+    checkAttr(meta, "mime_type", "audio/basic"),
+    checkAttr(meta, "nb_channel", 1),
+    checkAttr(meta, "bits_per_sample", 8),
+    checkAttr(meta, "bit_rate", 64096),
+    checkAttr(meta, "sample_rate", 8012),
+    checkAttr(meta, "compression", "8-bit ISDN u-law"),
+    checkAttr(meta, "comment", "../tmp/temp.snd"),
+    checkAttr(meta, "duration", timedelta(seconds=4, microseconds=391538)),
+)
+
 def checkCrossXCF(meta): return (
     checkAttr(meta, "comment", 'Created with The GIMP'),
     checkAttr(meta, "width", 61),
@@ -341,7 +352,7 @@ testcase_files = (
     (u"flashmob.mkv", checkFlashMobInfo),
     (u"10min.mkv", True),
     (u"wormux_32x32_16c.ico", True),
-    (u"audio_8khz_8bit_ulaw_4s39.au", True),
+    (u"audio_8khz_8bit_ulaw_4s39.au", checkAudio8kHz),
     (u"sheep_on_drugs.mp3", checkSheepMeta),
     (u"cross.xcf", checkCrossXCF),
     (u"small_text.tar", checkTARMeta),
