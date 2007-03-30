@@ -128,7 +128,6 @@ class FlvMetadata(MultipleMetadata):
             meta = Metadata()
             audio = flv["audio[0]"]
             meta.sample_rate = audio.getSampleRate()
-            print audio.getSampleRate()
             if audio["is_16bit"].value:
                 meta.bits_per_sample = 16
             else:
@@ -163,7 +162,7 @@ class FlvMetadata(MultipleMetadata):
             elif key == "creator":
                 self.producer = entry["value"].value
             elif key == "audiosamplerate":
-                self.sample_rate = entry["value"].value
+                self.sample_rate = int(entry["value"].value)
             elif key == "framerate":
                 self.frame_rate = entry["value"].value
             elif key == "metadatacreator":

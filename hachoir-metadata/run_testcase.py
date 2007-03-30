@@ -171,6 +171,7 @@ def checkInterludeDavid(meta): return (
 )
 
 def checkBreakdance(meta): return (
+    checkAttr(meta, "audio/sample_rate", 22050),
     checkAttr(meta, "duration", timedelta(seconds=46, milliseconds=942)),
     checkAttr(meta, "producer",
         [u"YouTube, Inc.", u"YouTube Metadata Injector."]),
