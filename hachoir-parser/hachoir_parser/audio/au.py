@@ -46,7 +46,7 @@ class AuFile(Parser):
        24: (None, "ITU-T G.722 ADPCM"),
        25: (None, "ITU-T G.723 3-bit ADPCM"),
        26: (None, "ITU-T G.723 5-bit ADPCM"),
-       27: (None, "8-bit ISDN A-law"),
+       27: (8, "8-bit ISDN A-law"),
     }
 
     # Create bit rate and codec name dictionnaries
@@ -81,7 +81,8 @@ class AuFile(Parser):
         if 0 < size:
             yield String(self, "info", size, "Information", strip=" \0") # TODO: charset?
 
-        yield RawBytes(self, "audio_data", self["data_size"].value, "Audio data")
+        size = min(self["data_size"].value, (self.size - self.current_size) // 8)
+        yield RawBytes(self, "audio_data", size, "Audio data")
 
     def createContentSize(self):
         return (self["data_ofs"].value + self["data_size"].value) * 8
