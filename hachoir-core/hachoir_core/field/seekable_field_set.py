@@ -107,7 +107,7 @@ class RootSeekableFieldSet(BasicFieldSet):
     def _feedAll(self):
         return self._readMoreFields(repeat(1))
 
-    def _readFields(self, number):
+    def _readFields(self):
         while True:
             added = self._readMoreFields(xrange(1))
             if added:
