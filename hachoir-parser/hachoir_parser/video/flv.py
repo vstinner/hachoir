@@ -19,13 +19,16 @@ from hachoir_core.field import (FieldSet,
 from hachoir_core.endian import BIG_ENDIAN
 from hachoir_parser.audio.mpeg_audio import Frame
 from hachoir_parser.video.amf import AMFObject
+from hachoir_core.tools import createDict
 
 SAMPLING_RATE = {
-    0: "5.5 kHz",
-    1: "11 kHz",
-    2: "22 kHz",
-    3: "44 kHz",
+    0: ( 5512, "5.5 kHz"),
+    1: (11025, "11 kHz"),
+    2: (22050, "22.1 kHz"),
+    3: (44100, "44.1 kHz"),
 }
+SAMPLING_RATE_VALUE = createDict(SAMPLING_RATE, 0)
+SAMPLING_RATE_TEXT = createDict(SAMPLING_RATE, 1)
 
 AUDIO_CODEC_MP3 = 2
 AUDIO_CODEC_NAME = {
@@ -62,7 +65,7 @@ class Header(FieldSet):
 
 def parseAudio(parent, size):
     yield Enum(Bits(parent, "codec", 4, "Audio codec"), AUDIO_CODEC_NAME)
-    yield Enum(Bits(parent, "sampling_rate", 2, "Sampling rate"), SAMPLING_RATE)
+    yield Enum(Bits(parent, "sampling_rate", 2, "Sampling rate"), SAMPLING_RATE_TEXT)
     yield Bit(parent, "is_16bit", "16-bit or 8-bit per sample")
     yield Bit(parent, "is_stereo", "Stereo or mono channel")
 
@@ -111,6 +114,9 @@ class Chunk(FieldSet):
                     yield field
             else:
                 yield RawBytes(self, "content", size)
+
+    def getSampleRate(self):
+        return SAMPLING_RATE_VALUE[self["sampling_rate"].value]
 
 class FlvFile(Parser):
     tags = {

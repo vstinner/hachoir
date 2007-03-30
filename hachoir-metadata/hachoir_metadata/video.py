@@ -76,7 +76,7 @@ class MkvMetadata(MultipleMetadata):
         try:
             self.trackCommon(track, audio)
             if "Audio" in track:
-                audio.sample_rate = track["Audio/SamplingFrequency/float"].value
+                audio.sample_rate = int(track["Audio/SamplingFrequency/float"].value)
                 audio.nb_channel = track["Audio/Channels/unsigned"].value
             audio.compression = track["CodecID/string"].value
         except MissingField:
@@ -127,13 +127,16 @@ class FlvMetadata(MultipleMetadata):
         if "audio[0]" in flv:
             meta = Metadata()
             audio = flv["audio[0]"]
-            meta.sample_rate = audio["sampling_rate"].display
-            # audio["is_16bit"].value
-            if "mp3_frame" in audio:
-                meta.compression = audio["mp3_frame"].description
+            meta.sample_rate = audio.getSampleRate()
+            print audio.getSampleRate()
+            if audio["is_16bit"].value:
+                meta.bits_per_sample = 16
+            else:
+                meta.bits_per_sample = 8
+            if audio["codec"].display == "MP3" and "music_data" in audio:
+                meta.compression = audio["music_data"].description
             else:
                 meta.compression = audio["codec"].display
-
             if audio["is_stereo"].value:
                 meta.nb_channel = 2
             else:
