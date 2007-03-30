@@ -9,7 +9,7 @@ class RootSeekableFieldSet(BasicFieldSet):
         self._generator = self.createFields()
         self._offset = 0
         self._current_size = 0
-        self._current_max_size = 0
+        self._current_max_size = size
         self._field_dict = {}
         self._field_array = []
 
@@ -137,7 +137,7 @@ class RootSeekableFieldSet(BasicFieldSet):
         return self._offset
 
 class SeekableFieldSet(RootSeekableFieldSet):
-    def __init__(self, parent, name, description=None):
+    def __init__(self, parent, name, description=None, size=None):
         assert issubclass(parent.__class__, BasicFieldSet)
-        RootSeekableFieldSet.__init__(self, parent, name, parent.stream, description, None)
+        RootSeekableFieldSet.__init__(self, parent, name, parent.stream, description, size)
 

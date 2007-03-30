@@ -7,7 +7,7 @@ class SubFile(Bytes):
     File stored in another file
     """
     def __init__(self, parent, name, length, description=None,
-    parser=None, filename=None, mime_type=None):
+    parser=None, filename=None, mime_type=None, parser_class=None):
         if filename:
             if not isinstance(filename, unicode):
                 filename = makePrintable(filename, "ISO-8859-1")
@@ -16,8 +16,10 @@ class SubFile(Bytes):
         Bytes.__init__(self, parent, name, length, description)
         def createInputStream(cis, **args):
             tags = args.setdefault("tags",[])
+            if parser_class:
+                tags.append(( "class", parser_class ))
             if parser is not None:
-                tags.append(( "id", parser.tags["id"]))
+                tags.append(( "id", parser.tags["id"] ))
             if mime_type:
                 tags.append(( "mime", mime_type ))
             if filename:
