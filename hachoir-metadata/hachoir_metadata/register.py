@@ -64,6 +64,8 @@ def registerAllItems(meta):
     meta.register("last_modification", 501, _("Last modification"),
         filter=DATETIME_FILTER)
     meta.register("country", 502, _("Country"))
+    meta.register("charset", 503, _("Charset"))
+    meta.register("font_weight", 503, _("Font weight"))
 
     meta.register("camera_aperture", 520, _("Camera aperture"))
     meta.register("camera_focal", 521, _("Camera focal"))

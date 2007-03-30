@@ -1,5 +1,5 @@
 from hachoir_metadata.metadata import Metadata, registerExtractor
-from hachoir_parser.misc import TorrentFile, TrueTypeFontFile, OLE2_File
+from hachoir_parser.misc import TorrentFile, TrueTypeFontFile, OLE2_File, PcfFile
 from hachoir_core.error import warning
 
 class TorrentMetadata(Metadata):
@@ -110,7 +110,43 @@ class OLE2_Metadata(Metadata):
                 value = "%s: %s" % (property["id"].display, value)
             setattr(self, key, value)
 
+class PcfMetadata(Metadata):
+    PROP_TO_KEY = {
+        'CHARSET_REGISTRY': 'charset',
+        'COPYRIGHT': 'copyright',
+        'WEIGHT_NAME': 'font_weight',
+        'FOUNDRY': 'author',
+        'FONT': 'title',
+        '_XMBDFED_INFO': 'producer',
+    }
+
+    def extract(self, pcf):
+        if "properties" in pcf:
+            self.useProperties(pcf["properties"])
+
+    def useProperties(self, properties):
+        last = properties["total_str_length"]
+        offset0 = last.address + last.size
+        for index in properties.array("property"):
+            # Search name and value
+            value = properties.getFieldByAddress(offset0+index["value_offset"].value*8)
+            if not value:
+                continue
+            value = value.value
+            if not value:
+                continue
+            name = properties.getFieldByAddress(offset0+index["name_offset"].value*8)
+            if not name:
+                continue
+            name = name.value
+            if name not in self.PROP_TO_KEY:
+                warning("Skip %s=%r" % (name, value))
+                continue
+            key = self.PROP_TO_KEY[name]
+            setattr(self, key, value)
+
 registerExtractor(TorrentFile, TorrentMetadata)
 registerExtractor(TrueTypeFontFile, TTF_Metadata)
 registerExtractor(OLE2_File, OLE2_Metadata)
+registerExtractor(PcfFile, PcfMetadata)
 
