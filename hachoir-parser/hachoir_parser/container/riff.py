@@ -7,14 +7,19 @@ RIFF parser, able to parse:
    * CDA file
 
 Documents:
- * libavformat source code from ffmpeg library
- * http://www.opennet.ru/docs/formats/avi.txt
+- libavformat source code from ffmpeg library
+  http://ffmpeg.mplayerhq.hu/
+- Video for Windows Programmer's Guide
+  http://www.opennet.ru/docs/formats/avi.txt
+- What is an animated cursor?
+  http://www.gdgsoft.com/anituner/help/aniformat.htm
 
 Authors:
    * Aurélien Jacobs
    * Mickaël KENIKSSI
    * Victor Stinner
 Changelog:
+   * 2007-03-30: support ACON (animated icons)
    * 2006-08-08: merge AVI, WAV and CDA parsers into RIFF parser
    * 2006-08-03: creation of CDA parser by Mickaël KENIKSSI
    * 2005-06-21: creation of WAV parser by Victor Stinner
@@ -28,11 +33,14 @@ from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
     UInt8, UInt16, UInt32, Enum,
     Bit, NullBits, NullBytes,
-    RawBytes, String, PaddingBytes)
+    RawBytes, String, PaddingBytes,
+    SubFile)
 from hachoir_core.tools import alignValue, humanDuration
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.text_handler import humanFilesize
+from hachoir_core.text_handler import humanFilesize, textHandler
 from hachoir_parser.video.fourcc import audio_codec_name, video_fourcc_name
+from hachoir_parser.image.ico import IcoFile
+from datetime import timedelta
 
 def parseText(self):
     yield String(self, "text", self["size"].value,
@@ -294,11 +302,49 @@ class ChunkWAVE(Chunk):
         'data': ("audio_data", None, "Audio stream data"),
     })
 
+def parseAnimationHeader(self):
+    yield UInt32(self, "sizeof", "Size of header (36 bytes)")
+    if self["sizeof"].value != 36:
+        self.warning("Animation header with unknown size (%s)" % self["sizeof"].value)
+    yield UInt32(self, "nb_frame", "Number of unique Icons in this cursor")
+    yield UInt32(self, "nb_step", "Number of Blits before the animation cycles")
+    yield UInt32(self, "cx")
+    yield UInt32(self, "cy")
+    yield UInt32(self, "bit_count")
+    yield UInt32(self, "planes")
+    yield UInt32(self, "jiffie_rate", "Default Jiffies (1/60th of a second) if rate chunk not present")
+    yield Bit(self, "is_icon")
+    yield NullBits(self, "padding", 31)
+
+def parseAnimationSequence(self):
+    while not self.eof:
+        yield UInt32(self, "icon[]")
+
+def formatJiffie(field):
+    sec = float(field.value) / 60
+    return humanDuration(timedelta(seconds=sec))
+
+def parseAnimationRate(self):
+    while not self.eof:
+        yield textHandler(UInt32(self, "rate[]"), formatJiffie)
+
+def parseIcon(self):
+    yield SubFile(self, "icon_file", self["size"].value, parser_class=IcoFile)
+
+class ChunkACON(Chunk):
+    tag_info = Chunk.tag_info.copy()
+    tag_info.update({
+        'anih': ("anim_hdr", parseAnimationHeader, "Animation header"),
+        'seq ': ("anim_seq", parseAnimationSequence, "Animation sequence"),
+        'rate': ("anim_rate", parseAnimationRate, "Animation sequence"),
+        'icon': ("icon[]", parseIcon, "Icon"),
+    })
+
 class RiffFile(Parser):
     tags = {
         "id": "riff",
         "category": "container",
-        "file_ext": ("avi", "cda", "wav"),
+        "file_ext": ("avi", "cda", "wav", "ani"),
         "min_size": 16*8,
         "mime": ("video/x-msvideo", "audio/x-wav", "audio/x-cda"),
         # FIXME: Use regex "RIFF.{4}(WAVE|CDDA|AVI )"
@@ -306,13 +352,15 @@ class RiffFile(Parser):
             ("AVI LIST", 8*8),
             ("WAVEfmt ", 8*8),
             ("CDDAfmt ", 8*8),
+            ("ACONanih", 8*8),
         ),
         "description": "Microsoft RIFF container"
     }
     VALID_TYPES = {
         "WAVE": (ChunkWAVE, "audio/x-wav",     u"Microft WAVE audio", ".wav"),
-        "CDDA": (ChunkCDDA, "audio/x-cda",     u"Microsoft audio CD file (cda)", ".cda"),
+        "CDDA": (ChunkCDDA, "audio/x-cda",     u"Microsoft Windows audio CD file (cda)", ".cda"),
         "AVI ": (ChunkAVI,  "video/x-msvideo", u"Microsoft AVI video", ".avi"),
+        "ACON": (ChunkACON,  None, u"Microsoft Windows animated cursor", ".ani"),
     }
     endian = LITTLE_ENDIAN
 
@@ -355,7 +403,8 @@ class RiffFile(Parser):
                 if microsec:
                     desc += ", %.1f fps" % (1000000.0 / microsec)
                     if "total_frame" in header and header["total_frame"].value:
-                        desc += ", " + humanDuration(header["total_frame"].value * microsec / 1000)
+                        delta = timedelta(seconds=float(header["total_frame"].value) * microsec)
+                        desc += ", " + humanDuration(delta)
             return desc
         else:
             try:
@@ -364,7 +413,8 @@ class RiffFile(Parser):
                 return u"Microsoft RIFF container"
 
     def createContentSize(self):
-        return (self["filesize"].value + 8) * 8
+        size = (self["filesize"].value + 8) * 8
+        return min(size, self.stream.size)
 
     def createFilenameSuffix(self):
         try:
