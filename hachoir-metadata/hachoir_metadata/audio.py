@@ -72,7 +72,7 @@ class OggMetadata(MultipleMetadata):
                 meta = Metadata()
                 self.videoHeader(page["video_hdr"], meta)
                 self.addGroup("video[]", meta, "Video")
-                if not granule_quotient and hasattr(meta, "frame_rate"):
+                if not granule_quotient and meta.has("frame_rate"):
                     granule_quotient = meta.get('frame_rate')
             if "comment" in page:
                 self.vorbisComment(page["comment"])
@@ -131,6 +131,13 @@ class OggMetadata(MultipleMetadata):
                 elif value:
                     self.warning("Skip Ogg comment %s: %s" % (key, value))
 
+def computeBitRate(meta):
+    if not meta.has("bits_per_sample") \
+    or not meta.has("nb_channel") \
+    or not meta.has("sample_rate"):
+        return
+    meta.bit_rate = meta.get('bits_per_sample') * meta.get('nb_channel') * meta.get('sample_rate')
+
 class AuMetadata(Metadata):
     def extract(self, audio):
         self.sample_rate = audio["sample_rate"].value
@@ -139,11 +146,10 @@ class AuMetadata(Metadata):
         if "info" in audio:
             self.comment = audio["info"].value
         self.bits_per_sample = audio.getBitsPerSample()
-        if hasattr(self, "bits_per_sample"):
-            self.bit_rate = self.bits_per_sample[0] * audio["channels"].value * audio["sample_rate"].value
+        computeBitRate(self)
         if "audio_data" in audio \
-        and hasattr(self, "bit_rate"):
-            self.duration = audio["audio_data"].size * 1000 / self.bit_rate[0]
+        and self.has("bit_rate"):
+            self.duration = timedelta(seconds=float(audio["audio_data"].size) / self.get('bit_rate'))
         if "data_size" in audio:
             computeComprRate(self, audio["data_size"].value*8)
 

@@ -110,7 +110,7 @@ class RiffMetadata(MultipleMetadata):
             if header["fourcc"].value != "":
                 meta.compression = "%s (fourcc:\"%s\")" \
                     % (format["codec"].display, header["fourcc"].value)
-        if not hasattr(meta, "compression"):
+        if not meta.has("compression"):
             meta.compression = format["codec"].display
         return meta
 

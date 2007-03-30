@@ -136,7 +136,7 @@ class JpegMetadata(Metadata):
         if tag not in self.exif_key:
             return
         key = self.exif_key[tag]
-        if key in ("width", "height") and hasattr(self, key):
+        if key in ("width", "height") and self.has(key):
             # EXIF "valid size" are sometimes not updated when the image is scaled
             # so we just ignore it
             return

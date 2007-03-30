@@ -16,11 +16,11 @@ def computeComprRate(meta, compr_size):
 
     Set "compr_data" with a string like "1.52x".
     """
-    if not hasattr(meta, "width") \
-    or not hasattr(meta, "height") \
-    or not hasattr(meta, "bits_per_pixel"):
+    if not meta.has("width") \
+    or not meta.has("height") \
+    or not meta.has("bits_per_pixel"):
         return
-    orig_size = meta.width[0] * meta.height[0] * meta.bits_per_pixel[0]
+    orig_size = meta.get('width') * meta.get('height') * meta.get('bits_per_pixel')
     meta.compr_rate = "%.3gx" % (float(orig_size) / compr_size)
 
 class BmpMetadata(Metadata):
@@ -190,7 +190,7 @@ class GifMetadata(Metadata):
         self.width = header["width"].value
         self.height = header["height"].value
         self.bits_per_pixel = (1 + header["bpp"].value)
-        self.nb_colors = (1 << self.bits_per_pixel[0])
+        self.nb_colors = (1 << self.get('bits_per_pixel'))
         self.compression = _("LZW")
         self.format_version =  "GIF version %s" % gif["header"].value[-3:]
         if "comments" in gif:

@@ -119,7 +119,7 @@ class MarMetadata(MultipleMetadata):
             meta.filename = field["filename"].value
             meta.compression = "None"
             meta.file_size = field["filesize"].value
-            self.addGroup(field.name, meta, "File \"%s\"" % meta.filename[0])
+            self.addGroup(field.name, meta, "File \"%s\"" % meta.getText('filename'))
 
 registerExtractor(CabFile, CabMetadata)
 registerExtractor(GzipParser, GzipMetadata)

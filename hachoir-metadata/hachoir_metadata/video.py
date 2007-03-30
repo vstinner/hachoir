@@ -283,7 +283,7 @@ class AsfMetadata(MultipleMetadata):
             if "content/audio_header" in stream_prop:
                 audio = stream_prop["content/audio_header"]
                 meta = self.streamProperty(header, index)
-                if not hasattr(meta, "compression"):
+                if not meta.has("compression"):
                     meta.compression = audio["twocc"].display
                 meta.sample_rate = audio["sample_rate"].value
                 meta.bits_per_sample = audio["bits_per_sample"].value
@@ -296,7 +296,7 @@ class AsfMetadata(MultipleMetadata):
                 meta.height = video["height"].value
                 if "bmp_info" in video:
                     bmp_info = video["bmp_info"]
-                    if not hasattr(meta, "compression"):
+                    if not meta.has("compression"):
                         meta.compression = bmp_info["codec"].display
                     meta.bits_per_pixel = bmp_info["bpp"].value
                 self.addGroup("video[%u]" % video_index, meta, "Video stream #%u" % video_index)
