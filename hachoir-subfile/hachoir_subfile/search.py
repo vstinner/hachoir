@@ -107,8 +107,9 @@ class SearchSubfile:
         if not self.patterns:
             self.loadParsers()
 
-        print >>stderr, "[+] Start search (%s)" % \
-            humanFilesize((self.size-self.start_offset)//8)
+        bytes = (self.size-self.start_offset)//8
+        print >>stderr, "[+] Start search on %s bytes (%s)" % (
+            bytes, humanFilesize(bytes))
         print >>stderr
         self.stats = {}
         self.current_offset = self.start_offset
