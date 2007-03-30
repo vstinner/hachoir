@@ -6,7 +6,7 @@ from hachoir_core.field import (FieldSet, ParserError,
     Int8, Int16, Int32, Float32, Float64, PascalString32)
 from hachoir_core.text_handler import textHandler, hexadecimal, humanFilesize
 from hachoir_core.tools import createDict
-from hachoir_core.endian import BIG_ENDIAN
+from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_parser.common.win32 import GUID
 from hachoir_parser.image.bmp import BmpHeader, parseImageData
 

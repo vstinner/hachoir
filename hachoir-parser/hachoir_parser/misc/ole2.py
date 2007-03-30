@@ -27,7 +27,7 @@ from hachoir_core.field import (
 from hachoir_core.text_handler import textHandler, hexadecimal, humanFilesize
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_parser.common.win32 import GUID
-from hachoir_parser.misc.msoffice import CustomFragment
+from hachoir_parser.misc.msoffice import CustomFragment, PROPERTY_NAME
 from hachoir_parser.misc.msoffice_summary import Summary
 
 # Number of items in DIFAT
@@ -51,12 +51,6 @@ class SECT(Int32):
     def _processDisplay(self, field):
         val = field.value
         return SECT.special_value_name.get(val, str(val))
-
-PROPERTY_NAME = {
-    0: "root",
-    4: "summary",
-#    5: "doc_summary",
-}
 
 class Property(FieldSet):
     TYPE_ROOT = 5
@@ -207,10 +201,13 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
 #            if property["child"].value != SECT.UNUSED:
 #                children |= set((property["child"].value,))
 #                self.warning("Add %s" % property["child"].value)
-            try:
-                name = PROPERTY_NAME[index]
-            except LookupError:
-                name = property.name+"content"
+            if index == 0:
+                name = "root"
+            else:
+                try:
+                    name = PROPERTY_NAME[property["name"].value]
+                except LookupError:
+                    name = property.name+"content"
             for field in self.parseProperty(property, name):
                 yield field
 

@@ -4,6 +4,11 @@ from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.stream import StringInputStream
 from hachoir_parser.misc.msoffice_summary import Summary, CompObj
 
+PROPERTY_NAME = {
+    u"\5DocumentSummaryInformation": "doc_summary",
+    u"\5SummaryInformation": "summary",
+}
+
 class ParseFragments(HachoirParser, RootSeekableFieldSet):
     tags = {
         "description": "Microsoft Office document subfragments",
@@ -21,11 +26,9 @@ class ParseFragments(HachoirParser, RootSeekableFieldSet):
         for index, property in enumerate(self.ole2.properties):
             if index == 0:
                 continue
-            if index == 4:
-                name = "summary"
-            elif index == 5:
-                name = "doc_summary"
-            else:
+            try:
+                name = PROPERTY_NAME[property["name"].value]
+            except LookupError:
                 name = property.name+"content"
             for field in self.parseProperty(index, property, name):
                 yield field
