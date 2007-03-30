@@ -41,6 +41,10 @@ def parseOptions():
         action="store_true", default=False)
     common.add_option("--size", help=_("Maximum size of bytes of input file"),
         type="long", action="store", default=None)
+    common.add_option("--hide-value", dest="display_value", help=_("Don't display value"),
+        action="store_false", default=True)
+    common.add_option("--hide-size", dest="display_size", help=_("Don't display size"),
+        action="store_false", default=True)
     common.add_option("--version", help=_("Display version and exit"),
         action="callback", callback=displayVersion)
     parser.add_option_group(common)
@@ -107,7 +111,10 @@ def main():
     if values.profiler:
         ok = runProfiler(exploreFieldSet, parser, values)
     else:
-        exploreFieldSet(parser, values)
+        exploreFieldSet(parser, values, {
+            "display_size": values.display_size,
+            "display_value": values.display_value,
+        })
 
 if __name__ == "__main__":
     main()

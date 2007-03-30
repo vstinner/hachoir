@@ -112,10 +112,10 @@ class Walker:
 
     def __init__(self, charset, root, preload_fields, focus, options):
         self.charset = charset
-        if options.get("field-value",      True):  self.flags |= self.display_value
+        if options.get("display_value",      True):  self.flags |= self.display_value
         if options.get("description",      True):  self.flags |= self.display_description
         if options.get("display_type",     False): self.flags |= self.display_type
-        if options.get("field-set-size",   True):  self.flags |= self.display_size
+        if options.get("display_size",     True):  self.flags |= self.display_size
         if options.get("human-size",       True):  self.flags |= self.human_size
         if options.get("absolute-address", False): self.flags |= self.use_absolute_address
         if options.get("hex-address",      False): self.flags |= self.hex_address
