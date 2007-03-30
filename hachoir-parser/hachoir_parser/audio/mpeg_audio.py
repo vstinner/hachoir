@@ -7,7 +7,7 @@ Author: Victor Stinner
 
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet,
-    MissingField, ParserError,
+    MissingField, ParserError, createOrphanField,
     Bit, Bits, Enum,
     PaddingBits, PaddingBytes,
     RawBytes)
@@ -98,6 +98,7 @@ class Frame(FieldSet):
 
     def isValid(self):
         return (self["layer"].value != 0
+            and self["sync"].value == 2047
             and self["version"].value != 1
             and self["sampling_rate"].value != 3
             and self["bit_rate"].value not in (0, 15)
@@ -173,17 +174,25 @@ def findSynchronizeBits(parser, start, max_size):
 
     Returns None on error, or number of bytes before the synchronization.
     """
+    address0 = parser.absolute_address
     end = start + max_size
     size = 0
     while start < end:
+        # Fast search: search 0xFF (first byte of sync frame field)
         length = parser.stream.searchBytesLength("\xff", False, start, end)
         if length is None:
             return None
         size += length
         start += length * 8
-        sync = parser.stream.readBits(start, 11, parser.endian)
-        if sync == 2047:
+
+        # Strong validation of frame: create the frame
+        # and call method isValid()
+        frame = createOrphanField(parser, start-address0, Frame, "frame")
+        assert frame.absolute_address == start
+        if frame.isValid():
             return size
+
+        # Invalid frame: continue
         start += 8
         size += 1
     return None
