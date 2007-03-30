@@ -75,8 +75,8 @@ class TarMetadata(MultipleMetadata):
             meta.author = "%s (uid=%s), group %s (gid=%s)" %\
                 (field["uname"].value, field.getOctal("uid"),
                  field["gname"].value, field.getOctal("gid"))
-            if hasattr(meta, "filename"):
-                title = _("File \"%s\"") % meta.filename[0]
+            if meta.has("filename"):
+                title = _("File \"%s\"") % meta.getText('filename')
             else:
                 title = _("File")
             self.addGroup(field.name, meta, title)
@@ -101,8 +101,8 @@ class CabMetadata(MultipleMetadata):
             attr = field["attributes"].value
             if attr != "(none)":
                 meta.file_attr = attr
-            if hasattr(meta, "filename"):
-                title = _("File \"%s\"") % meta.filename[0]
+            if meta.has("filename"):
+                title = _("File \"%s\"") % meta.getText('filename')
             else:
                 title = _("File")
             self.addGroup(field.name, meta, title)

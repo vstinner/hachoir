@@ -62,8 +62,8 @@ class OggMetadata(MultipleMetadata):
                 meta = Metadata()
                 self.vorbisHeader(page["vorbis_hdr"], meta)
                 self.addGroup("audio[]", meta, "Audio")
-                if not granule_quotient and hasattr(meta, "sample_rate"):
-                    granule_quotient = meta.sample_rate[0]
+                if not granule_quotient and meta.has("sample_rate"):
+                    granule_quotient = meta.get('sample_rate')
             if "theora_hdr" in page:
                 meta = Metadata()
                 self.theoraHeader(page["theora_hdr"], meta)
@@ -73,7 +73,7 @@ class OggMetadata(MultipleMetadata):
                 self.videoHeader(page["video_hdr"], meta)
                 self.addGroup("video[]", meta, "Video")
                 if not granule_quotient and hasattr(meta, "frame_rate"):
-                    granule_quotient = meta.frame_rate[0]
+                    granule_quotient = meta.get('frame_rate')
             if "comment" in page:
                 self.vorbisComment(page["comment"])
             if 3 <= index:
@@ -84,7 +84,7 @@ class OggMetadata(MultipleMetadata):
         if granule_quotient:
             page = ogg.createLastPage()
             if page and "abs_granule_pos" in page:
-                self.duration = page["abs_granule_pos"].value * 1000 / granule_quotient
+                self.duration = timedelta(seconds=float(page["abs_granule_pos"].value) / granule_quotient)
 
     def videoHeader(self, header, meta):
         meta.compression = header["fourcc"].display

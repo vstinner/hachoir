@@ -5,7 +5,7 @@ Extract metadata from RIFF file format: AVI video and WAV sound.
 from hachoir_metadata.metadata import Metadata, MultipleMetadata, registerExtractor
 from hachoir_parser.container.riff import RiffFile
 from hachoir_parser.video.fourcc import AUDIO_MICROSOFT_PCM, AUDIO_IEEE_FLOAT32
-from hachoir_core.tools import humanFilesize, makeUnicode
+from hachoir_core.tools import humanFilesize, makeUnicode, timedelta2seconds
 from hachoir_core.i18n import _
 from hachoir_metadata.audio import computeComprRate as computeAudioComprRate
 from datetime import timedelta
@@ -146,8 +146,8 @@ class RiffMetadata(MultipleMetadata):
                 self.useAviHeader(headers["avi_hdr"])
 
         # Compute global bit rate
-        if hasattr(self, "duration") and "movie/size" in avi:
-            self.bit_rate = float(avi["movie/size"].value) * 8 / (self.duration[0] / 1000.0)
+        if self.has("duration") and "movie/size" in avi:
+            self.bit_rate = float(avi["movie/size"].value) * 8 / timedelta2seconds(self.get('duration'))
 
         # Video has index?
         if "index" in avi:

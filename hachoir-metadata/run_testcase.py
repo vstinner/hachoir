@@ -153,6 +153,7 @@ def checkJpegExifPSD(meta): return (
 def checkInterludeDavid(meta): return (
     checkAttr(meta, "title", u"interlude symbiosys1"),
     checkAttr(meta, "artist", u"david aubrun"),
+    checkAttr(meta, "duration", timedelta(minutes=1, seconds=12, microseconds=19592)),
     checkAttr(meta, "audio[1]/nb_channel", 2),
     checkAttr(meta, "audio[1]/format_version", "Vorbis version 0"),
     checkAttr(meta, "audio[1]/sample_rate", 44100),
