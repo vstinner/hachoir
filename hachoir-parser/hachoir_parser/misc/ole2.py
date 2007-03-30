@@ -33,9 +33,6 @@ from hachoir_parser.misc.msoffice_summary import Summary
 # Number of items in DIFAT
 NB_DIFAT = 109
 
-# FIXME: Remove this hack
-HACK_FOR_SUMMARY = False
-
 class SECT(Int32):
     END_OF_CHAIN = -2
     UNUSED = -1

@@ -10,6 +10,8 @@ from hachoir_core.endian import BIG_ENDIAN
 from hachoir_parser.common.win32 import GUID
 from hachoir_parser.image.bmp import BmpHeader, parseImageData
 
+MAX_SECTION_COUNT = 100
+
 class PropertyIndex(FieldSet):
     COMMON_PROPERTY = {
         0: "Dictionary",
@@ -221,7 +223,7 @@ class SummaryIndex(FieldSet):
         yield String(self, "name", 16)
         yield UInt32(self, "offset")
 
-class Summary(FieldSet):
+class Summary(SeekableFieldSet):
     OS_NAME = {
         0: "Windows 16-bit",
         1: "Mac",
@@ -229,9 +231,13 @@ class Summary(FieldSet):
     }
 
     def __init__(self, *args, **kw):
-        FieldSet.__init__(self, *args, **kw)
+        SeekableFieldSet.__init__(self, *args, **kw)
         if self["endian"].value == "\xFF\xFE":
             self.endian = BIG_ENDIAN
+        elif self["endian"].value == "\xFE\xFF":
+            self.endian = LITTLE_ENDIAN
+        else:
+            raise ParserError("Invalid endian value")
 
     def createFields(self):
         yield Bytes(self, "endian", 2, "Endian (0xFF 0xFE for Intel)")
@@ -240,6 +246,8 @@ class Summary(FieldSet):
         yield Enum(UInt16(self, "os"), self.OS_NAME)
         yield GUID(self, "format_id")
         yield UInt32(self, "section_count")
+        if MAX_SECTION_COUNT < self["section_count"].value:
+            raise ParserError("Too much sections (%s)" % self["section_count"].value)
 
         section_indexes = []
         for index in xrange(self["section_count"].value):
