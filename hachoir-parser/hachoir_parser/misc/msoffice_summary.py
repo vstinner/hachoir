@@ -166,7 +166,7 @@ class PropertyContent(FieldSet):
         28: ("CARRAY", None),
         29: ("USERDEFINED", None),
         30: ("LPSTR", PascalString32),
-        31: ("LPWSTR", None),
+        31: ("LPWSTR", (PascalString32, {"charset": "UTF-16-LE"})),
         64: ("FILETIME", TimestampWin64),
         65: ("BLOB", None),
         66: ("STREAM", None),
@@ -189,6 +189,10 @@ class PropertyContent(FieldSet):
             yield Enum(Bits(self, "type", 32), self.TYPE_NAME)
         try:
             handler = self.TYPE_INFO[ self["type"].value ][1]
+            if isinstance(handler, tuple):
+                handler, kw = handler
+            else:
+                kw = {}
         except LookupError:
             handler = None
         if not handler:
@@ -197,9 +201,9 @@ class PropertyContent(FieldSet):
         if self["is_vector"].value:
             yield UInt32(self, "count")
             for index in xrange(self["count"].value):
-                yield handler(self, "item[]")
+                yield handler(self, "item[]", **kw)
         else:
-            yield handler(self, "value")
+            yield handler(self, "value", **kw)
             self.createValue = lambda: self["value"].value
 PropertyContent.TYPE_INFO[12] = ("VARIANT", PropertyContent)
 
@@ -260,7 +264,7 @@ class Summary(SeekableFieldSet):
             yield SummarySection(self, "section[]")
 
         size = (self.size - self.current_size) // 8
-        if size:
+        if 0 < size:
             yield NullBytes(self, "end_padding", size)
 
 class PascalStringWin32(FieldSet):
