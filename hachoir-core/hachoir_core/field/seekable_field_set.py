@@ -9,7 +9,10 @@ class RootSeekableFieldSet(BasicFieldSet):
         self._generator = self.createFields()
         self._offset = 0
         self._current_size = 0
-        self._current_max_size = size
+        if size:
+            self._current_max_size = size
+        else:
+            self._current_max_size = 0
         self._field_dict = {}
         self._field_array = []
 
@@ -39,7 +42,6 @@ class RootSeekableFieldSet(BasicFieldSet):
     def _getSize(self):
         if self._size is None:
             self._feedAll()
-        self._feedAll()
         return self._size
     size = property(_getSize)
 
