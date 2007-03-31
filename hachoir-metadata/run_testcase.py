@@ -103,6 +103,21 @@ def checkFlashMobInfo(metadata): return (
     checkAttr(metadata, "duration", timedelta(seconds=17, milliseconds=844)),
 )
 
+def check10min(meta): return (
+    checkAttr(meta, "duration", timedelta(minutes=10)),
+    checkAttr(meta, "producer", [u"x264", u"Haali Matroska Writer b0"]),
+    checkAttr(meta, "video[1]/width", 384),
+    checkAttr(meta, "video[1]/height", 288),
+    checkAttr(meta, "video[1]/compression", u"V_MPEG4/ISO/AVC"),
+)
+
+def checkWormuxIco(meta): return (
+    checkAttr(meta, "image[0]/width", 16),
+    checkAttr(meta, "image[0]/height", 16),
+    checkAttr(meta, "image[0]/bits_per_pixel", 32),
+    checkAttr(meta, "image[0]/compression", u"Uncompressed (RGB)"),
+)
+
 def checkAudio8kHz(meta): return (
     checkAttr(meta, "mime_type", "audio/basic"),
     checkAttr(meta, "nb_channel", 1),
@@ -295,10 +310,7 @@ def checkFile(filename, check_metadata):
         return False
     sys.stdout.write("ok\n")
 
-    if check_metadata is not True:
-        return all(check_metadata(metadata))
-    else:
-        return True
+    return all(check_metadata(metadata))
 
 def testFiles(directory):
     if not os.path.exists(directory):
@@ -351,8 +363,8 @@ testcase_files = (
     (u"kde_click.wav", checkClickMeta),
     (u"test.txt.gz", checkGzipMeta),
     (u"flashmob.mkv", checkFlashMobInfo),
-    (u"10min.mkv", True),
-    (u"wormux_32x32_16c.ico", True),
+    (u"10min.mkv", check10min),
+    (u"wormux_32x32_16c.ico", checkWormuxIco),
     (u"audio_8khz_8bit_ulaw_4s39.au", checkAudio8kHz),
     (u"sheep_on_drugs.mp3", checkSheepMeta),
     (u"cross.xcf", checkCrossXCF),
