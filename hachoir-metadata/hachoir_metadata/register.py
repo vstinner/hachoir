@@ -83,6 +83,7 @@ def registerAllItems(meta):
         filter=NumberFilter(1))
     meta.register("aspect_ratio", 604, _("Aspect ratio"))
 
+    meta.register("os", 900, _("OS"))
     meta.register("producer", 901, _("Producer"))
     meta.register("comment", 902, _("Comment"))
     meta.register("format_version", 950, _("Format version"))

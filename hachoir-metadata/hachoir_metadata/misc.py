@@ -89,6 +89,7 @@ class OLE2_Metadata(Metadata):
             self.useSummary(ole2["summary[0]"])
 
     def useSummary(self, summary):
+        self.os = summary["os"].display
         if "section[0]" not in summary:
             return
         summary = summary["section[0]"]

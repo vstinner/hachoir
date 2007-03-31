@@ -84,6 +84,7 @@ def checkGzipMeta(metadata): return (
     checkAttr(metadata, "file_size", 99),
     checkAttr(metadata, "compr_size", 90),
     checkAttr(metadata, "last_modification", u'2006-07-29 12:20:44'),
+    checkAttr(metadata, "os", u"Unix"),
     checkAttr(metadata, "compression", "deflate"))
 
 def checkSheepMeta(metadata): return (

@@ -30,7 +30,7 @@ class GzipMetadata(Metadata):
         self.compression = gzip["compression"].display
         self.file_size = gzip["size"].value
         self.last_modification = gzip["mtime"].display
-        self.producer = _("Created on operating system: %s") % gzip["os"].display
+        self.os = gzip["os"].display
         if "comment" in gzip:
             self.comment = gzip["comment"].value
         computeCompressionRate(self)
