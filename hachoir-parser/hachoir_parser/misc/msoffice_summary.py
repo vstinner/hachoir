@@ -12,6 +12,15 @@ from hachoir_parser.image.bmp import BmpHeader, parseImageData
 
 MAX_SECTION_COUNT = 100
 
+class OSConfig:
+    def __init__(self, big_endian):
+        if big_endian:
+            self.charset = "MacRoman"
+            self.utf16 = "UTF-16-BE"
+        else:
+            self.charset = "ISO-8859-1"
+            self.utf16 = "UTF-16-LE"
+
 class PropertyIndex(FieldSet):
     COMMON_PROPERTY = {
         0: "Dictionary",
@@ -135,6 +144,7 @@ class Thumbnail(FieldSet):
             yield RawBytes(self, "data", size)
 
 class PropertyContent(FieldSet):
+    TYPE_LPSTR = 30
     TYPE_INFO = {
         0: ("EMPTY", None),
         1: ("NULL", None),
@@ -166,7 +176,7 @@ class PropertyContent(FieldSet):
         28: ("CARRAY", None),
         29: ("USERDEFINED", None),
         30: ("LPSTR", PascalString32),
-        31: ("LPWSTR", (PascalString32, {"charset": "UTF-16-LE"})),
+        31: ("LPWSTR", PascalString32),
         64: ("FILETIME", TimestampWin64),
         65: ("BLOB", None),
         66: ("STREAM", None),
@@ -187,12 +197,16 @@ class PropertyContent(FieldSet):
             yield NullBits(self, "padding", 32-12-1)
         else:
             yield Enum(Bits(self, "type", 32), self.TYPE_NAME)
+        tag =  self["type"].value
+        kw = {}
         try:
-            handler = self.TYPE_INFO[ self["type"].value ][1]
-            if isinstance(handler, tuple):
-                handler, kw = handler
-            else:
-                kw = {}
+            handler = self.TYPE_INFO[tag][1]
+            if handler == PascalString32:
+                osconfig = self["../.."].osconfig
+                if tag == self.TYPE_LPSTR:
+                    kw["charset"] = osconfig.charset
+                else:
+                    kw["charset"] = osconfig.utf16
         except LookupError:
             handler = None
         if not handler:
@@ -228,6 +242,7 @@ class SummaryIndex(FieldSet):
         yield UInt32(self, "offset")
 
 class Summary(SeekableFieldSet):
+    OS_MAC = 1
     OS_NAME = {
         0: "Windows 16-bit",
         1: "Mac",
@@ -242,6 +257,7 @@ class Summary(SeekableFieldSet):
             self.endian = LITTLE_ENDIAN
         else:
             raise ParserError("Invalid endian value")
+        self.osconfig = OSConfig(self["os"].value == self.OS_MAC)
 
     def createFields(self):
         yield Bytes(self, "endian", 2, "Endian (0xFF 0xFE for Intel)")

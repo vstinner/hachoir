@@ -25,7 +25,7 @@ from hachoir_core.field import (
     UInt8, UInt16, Int32, UInt32, UInt64, TimestampWin64, Enum,
     Bytes, RawBytes, NullBytes, String)
 from hachoir_core.text_handler import textHandler, hexadecimal, humanFilesize
-from hachoir_core.endian import LITTLE_ENDIAN
+from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_parser.common.win32 import GUID
 from hachoir_parser.misc.msoffice import CustomFragment, PROPERTY_NAME
 from hachoir_parser.misc.msoffice_summary import Summary
@@ -68,7 +68,12 @@ class Property(FieldSet):
     static_size = 128 * 8
 
     def createFields(self):
-        yield String(self, "name", 64, charset="UTF-16-LE", strip="\0")
+        bytes = self.stream.readBytes(self.absolute_address, 4)
+        if bytes == "\0R\0\0":
+            charset = "UTF-16-BE"
+        else:
+            charset = "UTF-16-LE"
+        yield String(self, "name", 64, charset=charset, strip="\0")
         yield UInt16(self, "namelen", "Length of the name")
         yield Enum(UInt8(self, "type", "Property type"), self.TYPE_NAME)
         yield Enum(UInt8(self, "decorator", "Decorator"), self.DECORATOR_NAME)
