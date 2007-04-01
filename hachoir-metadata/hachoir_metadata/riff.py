@@ -8,18 +8,30 @@ from hachoir_parser.video.fourcc import UNCOMPRESSED_AUDIO
 from hachoir_core.tools import humanFilesize, makeUnicode, timedelta2seconds
 from hachoir_core.i18n import _
 from hachoir_metadata.audio import computeComprRate as computeAudioComprRate
+from hachoir_metadata.video import setDatetime
 from datetime import timedelta
 
 class RiffMetadata(MultipleMetadata):
     tag_to_key = {
-        "INAM": "title",
-        "IART": "artist",
-        "ICMT": "comment",
-        "ICOP": "copyright",
-        "IENG": "author",
-        "ISFT": "producer",
-        "ICRD": "creation_date"
+        "INAM": ("title", None),
+        "IART": ("artist", None),
+        "ICMT": ("comment", None),
+        "ICOP": ("copyright", None),
+        "IENG": ("author", None),
+        "ISFT": ("producer", None),
+        "ICRD": ("creation_date", setDatetime),
     }
+
+    def extract(self, riff):
+        type = riff["type"].value
+        if type == "WAVE":
+            self.extractWAVE(riff)
+        elif type == "AVI ":
+            self.extractAVI(riff)
+        elif type == "ACON":
+            self.extractACON(riff)
+        if "info" in riff:
+            self.extractInfo(riff["info"])
 
     def processChunk(self, chunk):
         if "text" not in chunk:
@@ -29,8 +41,11 @@ class RiffMetadata(MultipleMetadata):
         if tag not in self.tag_to_key:
             self.warning("Skip RIFF metadata %s: %s" % (tag, value))
             return
-        key = self.tag_to_key[tag]
-        setattr(self, key, value)
+        key, setter = self.tag_to_key[tag]
+        if setter:
+            setter(self, key, value)
+        else:
+            setattr(self, key, value)
 
     def extractWAVE(self, wav):
         format = wav["format"]
@@ -54,15 +69,6 @@ class RiffMetadata(MultipleMetadata):
                 self.duration = timedelta(seconds=duration)
         if "audio_data/size" in wav:
             computeAudioComprRate(self, wav["audio_data/size"].value*8)
-
-    def extract(self, riff):
-        type = riff["type"].value
-        if type == "WAVE":
-            self.extractWAVE(riff)
-        elif type == "AVI ":
-            self.extractAVI(riff)
-        if "info" in riff:
-            self.extractInfo(riff["info"])
 
     def extractInfo(self, fieldset):
         for field in fieldset:
@@ -153,6 +159,17 @@ class RiffMetadata(MultipleMetadata):
         if "index" in avi:
             self.comment = _("Has audio/video index (%s)") \
                 % humanFilesize(avi["index"].size/8)
+
+    def extractACON(self, riff):
+        if "anim_hdr" in riff:
+            hdr = riff["anim_hdr"]
+            self.width = hdr["cx"].value
+            self.height = hdr["cy"].value
+            self.bits_per_pixel = hdr["bit_count"].value
+        if "anim_rate" in riff:
+            sec = sum(float(rate.value)/60
+                for rate in riff.array("anim_rate/rate"))
+            self.duration = timedelta(seconds=sec)
 
 registerExtractor(RiffFile, RiffMetadata)
 

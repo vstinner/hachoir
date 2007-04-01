@@ -3,7 +3,7 @@ from hachoir_core.tools import (
     humanDuration, makePrintable, humanBitRate,
     humanFrequency, humanBitSize, humanFilesize)
 from hachoir_metadata.filter import Filter, NumberFilter
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from hachoir_metadata.formatter import humanAudioChannel, humanFrameRate
 
 MAX_SAMPLE_RATE = 192000            # 192 kHz
@@ -60,7 +60,7 @@ def registerAllItems(meta):
     meta.register("subtitle_author", 402, _("Subtitle author"))
 
     meta.register("creation_date", 500, _("Creation date"),
-        filter=DATETIME_FILTER)
+        filter=DATETIME_FILTER, type=(datetime, date))
     meta.register("last_modification", 501, _("Last modification"),
         filter=DATETIME_FILTER)
     meta.register("country", 502, _("Country"))

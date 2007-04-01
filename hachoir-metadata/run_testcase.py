@@ -16,7 +16,7 @@ from hachoir_core.stream import InputStreamError
 from hachoir_parser import createParser
 from hachoir_core.compatibility import all
 from hachoir_metadata import extractMetadata
-from datetime import timedelta, datetime
+from datetime import date, timedelta, datetime
 from locale import setlocale, LC_ALL
 import os
 import sys
@@ -70,12 +70,12 @@ def checkAttr(metadata, name, value):
 
 def checkLogoUbuntuMeta(metadata): return (
     checkAttr(metadata, "bits_per_pixel", 32),
-    checkAttr(metadata, "creation_date", "2006-05-26 09:41:46"),
+    checkAttr(metadata, "creation_date", datetime(2006, 5, 26, 9, 41, 46)),
     checkAttr(metadata, "mime_type", "image/png"))
 
 def checkClickMeta(metadata): return (
     checkAttr(metadata, "producer", "Sound Forge 4.5"),
-    checkAttr(metadata, "creation_date", "2001-02-21"),
+    checkAttr(metadata, "creation_date", date(2001, 2, 21)),
     checkAttr(metadata, "duration", timedelta(microseconds=19546)),
     checkAttr(metadata, "bit_rate", 705600),
     checkAttr(metadata, "sample_rate", 22050))
@@ -94,7 +94,7 @@ def checkSheepMeta(metadata): return (
 
 def checkPng331_90_8Meta(metadata): return (
     checkAttr(metadata, "width", 331),
-    checkAttr(metadata, "creation_date", u"2006-05-26 09:41:46"),
+    checkAttr(metadata, "creation_date", datetime(2006, 5, 26, 9, 41, 46)),
     checkAttr(metadata, "mime_type", "image/png"),
     checkAttr(metadata, "endian", u"Big endian"))
 
@@ -166,7 +166,7 @@ def checkSmallville(metadata): return (
 def checkLechat(meta): return (
     checkAttr(meta, "album", [u"Arte Radio", u"Chat Broodthaers"]),
     checkAttr(meta, "url", "Liens direct ARTE Radio: www.arteradio.com/son.html?473"),
-    checkAttr(meta, "creation_date", "2003"),
+    checkAttr(meta, "creation_date", date(2003, 1, 1)),
     checkAttr(meta, "producer", "www.arteradio.com"),
     checkAttr(meta, "sample_rate", 44100),
     checkAttr(meta, "bit_rate", 128000))
