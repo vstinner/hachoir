@@ -13,16 +13,16 @@ import re
 
 class FileEntry(FieldSet):
     type_name = {
-        0: "Normal disk file (old format)",
         # 48 is "0", 49 is "1", ...
-        48: "Normal disk file",
-        49: "Link to previously dumped file",
-        50: "Symbolic link",
-        51: "Character special file",
-        52: "Block special file",
-        53: "Directory",
-        54: "FIFO special file",
-        55: "Contiguous file"
+         0: u"Normal disk file (old format)",
+        48: u"Normal disk file",
+        49: u"Link to previously dumped file",
+        50: u"Symbolic link",
+        51: u"Character special file",
+        52: u"Block special file",
+        53: u"Directory",
+        54: u"FIFO special file",
+        55: u"Contiguous file"
     }
 
     def getOctal(self, name):
@@ -36,7 +36,7 @@ class FileEntry(FieldSet):
         return timestampUNIX(timestamp)
 
     def createFields(self):
-        yield String(self, "name", 100, "Name", strip="\0") # TODO: charset?
+        yield String(self, "name", 100, "Name", strip="\0", charset="ISO-8859-1")
         yield String(self, "mode", 8, "Mode", strip=" \0", charset="ASCII")
         yield String(self, "uid", 8, "User ID", strip=" \0", charset="ASCII")
         yield String(self, "gid", 8, "Group ID", strip=" \0", charset="ASCII")
@@ -44,10 +44,10 @@ class FileEntry(FieldSet):
         yield String(self, "mtime", 12, "Modification time", strip=" \0", charset="ASCII")
         yield String(self, "check_sum", 8, "Check sum", strip=" \0", charset="ASCII")
         yield Enum(UInt8(self, "type", "Type"), self.type_name)
-        yield String(self, "lname", 100, "Link name", strip=" \0") # TODO: charset?
+        yield String(self, "lname", 100, "Link name", strip=" \0", charset="ISO-8859-1")
         yield String(self, "magic", 8, "Magic", strip=" \0", charset="ASCII")
-        yield String(self, "uname", 32, "User name", strip=" \0") # TODO: charset?
-        yield String(self, "gname", 32, "Group name", strip=" \0") # TODO: charset?
+        yield String(self, "uname", 32, "User name", strip=" \0", charset="ISO-8859-1")
+        yield String(self, "gname", 32, "Group name", strip=" \0", charset="ISO-8859-1")
         yield String(self, "devmajor", 8, "Dev major", strip=" \0", charset="ASCII")
         yield String(self, "devminor", 8, "Dev minor", strip=" \0", charset="ASCII")
         yield NullBytes(self, "padding", 167, "Padding (zero)")
@@ -88,7 +88,7 @@ class TarFile(Parser):
         "id": "tar",
         "category": "archive",
         "file_ext": ("tar",),
-        "mime": ("application/x-tar", "application/x-gtar"),
+        "mime": (u"application/x-tar", u"application/x-gtar"),
         "min_size": 512*8,
 # FIME: Re-enable that
 #        "magic": (("ustar  \0", 257*8),),
@@ -118,3 +118,4 @@ class TarFile(Parser):
             yield field
         if self.current_size < self._size:
             yield self.seekBit(self._size, "end")
+

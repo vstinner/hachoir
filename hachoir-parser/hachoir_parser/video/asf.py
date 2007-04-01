@@ -304,7 +304,7 @@ class AsfFile(Parser):
         "id": "asf",
         "category": "video",
         "file_ext": ("wmv", "wma", "asf"),
-        "mime": ("video/x-ms-asf", "video/x-ms-wmv", "audio/x-ms-wma"),
+        "mime": (u"video/x-ms-asf", u"video/x-ms-wmv", u"audio/x-ms-wma"),
         "min_size": 24*8,
         "description": "Advanced Streaming Format (ASF), used for WMV (video) and WMA (audio)",
         "magic": ((MAGIC, 0),),
@@ -330,13 +330,13 @@ class AsfFile(Parser):
         for prop in self.array("header/content/stream_prop"):
             guid = prop["content/type"].value
             if guid == VideoHeader.guid:
-                return "video/x-ms-wmv"
+                return u"video/x-ms-wmv"
             if guid == AudioHeader.guid:
                 audio = True
         if audio:
-            return "audio/x-ms-wma"
+            return u"audio/x-ms-wma"
         else:
-            return "video/x-ms-asf"
+            return u"video/x-ms-asf"
 
     def createFields(self):
         while not self.eof:

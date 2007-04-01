@@ -47,6 +47,7 @@ class BasicIFDEntry(FieldSet):
             if cls is String:
                 args = (self, name, value_size/8, "Value")
                 kw["strip"] = " \0"   # TODO: charset?
+                kw["charset"] = "ISO-8859-1"
             elif cls is Bytes:
                 args = (self, name, value_size/8, "Value")
             else:
@@ -245,8 +246,7 @@ class ExifIFD(FieldSet):
             desc = "Value of \"%s\"" % entry["tag"].display
             if cls is String:
                 for index in xrange(array_size):
-                    # TODO: charset?
-                    yield cls(self, name, value_size/8, desc, strip=" \0")
+                    yield cls(self, name, value_size/8, desc, strip=" \0", charset="ISO-8859-1")
             elif cls is Bytes:
                 for index in xrange(array_size):
                     yield cls(self, name, value_size/8, desc)

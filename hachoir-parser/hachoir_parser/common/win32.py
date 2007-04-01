@@ -84,7 +84,7 @@ class BitmapInfoHeader(FieldSet):
     """ Win32 BITMAPINFOHEADER structure from GDI """
     static_size = 40*8
 
-    compression_name = {
+    COMPRESSION_NAME = {
         0: u"Uncompressed (RGB)",
         1: u"RLE (8 bits)",
         2: u"RLE (4 bits)",
@@ -106,7 +106,7 @@ class BitmapInfoHeader(FieldSet):
         if self._use_fourcc:
             yield Enum(String(self, "codec", 4, charset="ASCII"), video_fourcc_name)
         else:
-            yield Enum(UInt32(self, "codec", "Compression"), self.compression_name)
+            yield Enum(UInt32(self, "codec", "Compression"), self.COMPRESSION_NAME)
         yield UInt32(self, "size", "Image size (in bytes)")
         yield UInt32(self, "xres", "X pixels per meter")
         yield UInt32(self, "yres", "Y pixels per meter")

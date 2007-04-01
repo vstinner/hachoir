@@ -16,19 +16,17 @@ class PcxFile(Parser):
         "id": "pcx",
         "category": "image",
         "file_ext": ("pcx",),
-        "mime": ["image/x-pcx"],
+        "mime": (u"image/x-pcx",),
         "min_size": 128*8,
         "description": "PC Paintbrush (PCX) picture"
     }
     compression_name = { 1: "Run-length encoding (RLE)" }
     version_name = {
-        0: "Version 2.5 of PC Paintbrush",
-        2: "Version 2.8 with palette information",
-        3: "Version 2.8 without palette information",
-        4: "PC Paintbrush for Windows",
-
-        # First version with 24 bpp support
-        5: "Version 3.0 (or greater) of PC Paintbrush"
+        0: u"Version 2.5 of PC Paintbrush",
+        2: u"Version 2.8 with palette information",
+        3: u"Version 2.8 without palette information",
+        4: u"PC Paintbrush for Windows",
+        5: u"Version 3.0 (or greater) of PC Paintbrush"
     }
 
     def validate(self):

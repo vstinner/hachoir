@@ -415,7 +415,7 @@ class NE_VersionInfoNode(FieldSet):
             if self["name"].value == "VS_VERSION_INFO":
                 yield VersionInfoBinary(self, "value", size=size*8)
             else:
-                yield RawBytes(self, "value", size)
+                yield String(self, "value", size, charset="ISO-8859-1")
         while 12 <= (self.size - self.current_size) // 8:
             yield NE_VersionInfoNode(self, "node[]")
         size = (self.size - self.current_size) // 8

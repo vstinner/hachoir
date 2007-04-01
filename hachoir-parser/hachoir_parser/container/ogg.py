@@ -242,10 +242,10 @@ class OggFile(Parser):
         "category": "container",
         "file_ext": ("ogg", "ogm"),
         "mime": (
-            "application/ogg", "application/x-ogg",
-            "audio/ogg", "audio/x-ogg",
-            "video/ogg", "video/x-ogg",
-            "video/theora", "video/x-theora",
+            u"application/ogg", u"application/x-ogg",
+            u"audio/ogg", u"audio/x-ogg",
+            u"video/ogg", u"video/x-ogg",
+            u"video/theora", u"video/x-theora",
          ),
         "magic": ((OggPage.MAGIC, 0),),
         "subfile": "skip",
@@ -273,12 +273,12 @@ class OggFile(Parser):
         return True
 
     def createMimeType(self):
-        if "theora_hdr" in self["page[0]"]:
-            return "video/theora"
-        elif "vorbis_hdr" in self["page[0]"]:
-            return "audio/vorbis"
+        if "theora_hdr" in self["page[0]/segments"]:
+            return u"video/theora"
+        elif "vorbis_hdr" in self["page[0]/segments"]:
+            return u"audio/vorbis"
         else:
-            return "application/ogg"
+            return u"application/ogg"
 
     def createDescription(self):
         if "theora_hdr" in self["page[0]"]:

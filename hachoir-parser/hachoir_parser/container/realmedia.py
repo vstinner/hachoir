@@ -55,9 +55,9 @@ class NameValueProperty(FieldSet):
     def createFields(self):
         yield UInt32(self, "size")
         yield UInt16(self, "obj_version")
-        yield PascalString8(self, "name")
+        yield PascalString8(self, "name", charset="ASCII")
         yield UInt32(self, "type")
-        yield PascalString16(self, "value", strip=" \0")
+        yield PascalString16(self, "value", charset="ISO-8859-1", strip=" \0")
 
 class LogicalFileInfo(FieldSet):
     def createFields(self):
@@ -84,8 +84,8 @@ def parseMediaPropertiesHeader(self):
     yield UInt32(self, "stream_start", "Stream start offset in milliseconds")
     yield UInt32(self, "preroll", "Preroll in milliseconds")
     yield UInt32(self, "duration", "Stream duration in milliseconds")
-    yield PascalString8(self, "desc", "Stream description")
-    yield PascalString8(self, "mime_type", "MIME type string")
+    yield PascalString8(self, "desc", "Stream description", charset="ISO-8859-1")
+    yield PascalString8(self, "mime_type", "MIME type string", charset="ASCII")
     yield UInt32(self, "specific_size", "Size of type-specific data")
     size = self['specific_size'].value
     if size:
@@ -140,14 +140,14 @@ class RealMediaFile(Parser):
         "category": "container",
         "file_ext": ("rm",),
         "mime": (
-            "video/x-pn-realvideo",
-            "audio/x-pn-realaudio",
-            "audio/x-pn-realaudio-plugin",
-            "audio/x-real-audio",
-            "application/vnd.rn-realmedia"),
+            u"video/x-pn-realvideo",
+            u"audio/x-pn-realaudio",
+            u"audio/x-pn-realaudio-plugin",
+            u"audio/x-real-audio",
+            u"application/vnd.rn-realmedia"),
         "min_size": len(MAGIC)*8, # just the identifier
         "magic": ((MAGIC, 0),),
-        "description": "RealMedia (rm) Container File"
+        "description": u"RealMedia (rm) Container File",
     }
     endian = BIG_ENDIAN
 
@@ -167,6 +167,6 @@ class RealMediaFile(Parser):
     def createMimeType(self):
         for prop in self.array("stream_prop"):
             if prop["mime_type"].value == "video/x-pn-realvideo":
-                return "video/x-pn-realvideo"
-        return "audio/x-pn-realaudio"
+                return u"video/x-pn-realvideo"
+        return u"audio/x-pn-realaudio"
 

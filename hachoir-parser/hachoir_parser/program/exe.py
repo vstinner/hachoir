@@ -178,20 +178,20 @@ class ExeFile(Parser):
     def createDescription(self):
         if self.isPE():
             if self["pe_header/is_dll"].value:
-                text = "Microsoft Windows DLL"
+                text = u"Microsoft Windows DLL"
             else:
-                text = "Microsoft Windows Portable Executable"
+                text = u"Microsoft Windows Portable Executable"
             info = [self["pe_header/cpu"].display]
             if "pe_opt_header" in self:
                 hdr = self["pe_opt_header"]
                 info.append(hdr["subsystem"].display)
             if self["pe_header/is_stripped"].value:
-                info.append("stripped")
-            return "%s: %s" % (text, ", ".join(info))
+                info.append(u"stripped")
+            return u"%s: %s" % (text, ", ".join(info))
         elif self.isNE():
-            return "New-style Executable (NE) for Microsoft MS Windows 3.x"
+            return u"New-style Executable (NE) for Microsoft MS Windows 3.x"
         else:
-            return "MS-DOS executable"
+            return u"MS-DOS executable"
 
     def createContentSize(self):
         if self.isPE() or self.isNE():

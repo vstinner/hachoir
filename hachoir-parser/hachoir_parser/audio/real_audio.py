@@ -18,10 +18,10 @@ from hachoir_core.endian import BIG_ENDIAN
 
 class Metadata(FieldSet):
     def createFields(self):
-        yield PascalString8(self, "title")
-        yield PascalString8(self, "author")
-        yield PascalString8(self, "copyright")
-        yield PascalString8(self, "comment")
+        yield PascalString8(self, "title", charset="ISO-8859-1")
+        yield PascalString8(self, "author", charset="ISO-8859-1")
+        yield PascalString8(self, "copyright", charset="ISO-8859-1")
+        yield PascalString8(self, "comment", charset="ISO-8859-1")
 
 class RealAudioFile(Parser):
     MAGIC = ".ra\xFD"
@@ -29,10 +29,10 @@ class RealAudioFile(Parser):
         "id": "real_audio",
         "category": "audio",
         "file_ext": ["ra"],
-        "mime": ["audio/x-realaudio", "audio/x-pn-realaudio"],
+        "mime": (u"audio/x-realaudio", u"audio/x-pn-realaudio"),
         "min_size": 6*8,
         "magic": ((MAGIC, 0),),
-        "description": "Real audio (.ra)"
+        "description": u"Real audio (.ra)",
     }
     endian = BIG_ENDIAN
 

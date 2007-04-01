@@ -268,7 +268,7 @@ class MpegAudioFile(Parser):
         "id": "mpeg_audio",
         "category": "audio",
         "file_ext": ("mpa", "mp1", "mp2", "mp3"),
-        "mime": ["audio/mpeg"],
+        "mime": (u"audio/mpeg",),
         "min_size": 4*8,
 #        "magic": createMpegAudioMagic(),
         "description": "MPEG audio version 1, 2, 2.5"

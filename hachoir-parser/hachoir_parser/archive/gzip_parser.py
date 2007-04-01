@@ -20,7 +20,7 @@ class GzipParser(Parser):
         "id": "gzip",
         "category": "archive",
         "file_ext": ("gz",),
-        "mime": ["application/x-gzip"],
+        "mime": (u"application/x-gzip",),
         "min_size": 18*8,
         #"magic": (('\x1F\x8B\x08', 0),),
         "magic_regex": (
@@ -30,23 +30,23 @@ class GzipParser(Parser):
         "description": u"gzip archive"
     }
     os_name = {
-        0: "FAT filesystem",
-        1: "Amiga",
-        2: "VMS (or OpenVMS)",
-        3: "Unix",
-        4: "VM/CMS",
-        5: "Atari TOS",
-        6: "HPFS filesystem (OS/2, NT)",
-        7: "Macintosh",
-        8: "Z-System",
-        9: "CP/M",
-        10: "TOPS-20",
-        11: "NTFS filesystem (NT)",
-        12: "QDOS",
-        13: "Acorn RISCOS",
+         0: u"FAT filesystem",
+         1: u"Amiga",
+         2: u"VMS (or OpenVMS)",
+         3: u"Unix",
+         4: u"VM/CMS",
+         5: u"Atari TOS",
+         6: u"HPFS filesystem (OS/2, NT)",
+         7: u"Macintosh",
+         8: u"Z-System",
+         9: u"CP/M",
+        10: u"TOPS-20",
+        11: u"NTFS filesystem (NT)",
+        12: u"QDOS",
+        13: u"Acorn RISCOS",
     }
     COMPRESSION_NAME = {
-        8: "deflate",
+        8: u"deflate",
     }
 
     def validate(self):
@@ -88,7 +88,7 @@ class GzipParser(Parser):
             yield UInt16(self, "extra_length", "Extra length")
             yield RawBytes(self, "extra", self["extra_length"].value, "Extra")
         if self["has_filename"].value:
-            yield CString(self, "filename", "Filename")
+            yield CString(self, "filename", "Filename", charset="ISO-8859-1")
         if self["has_comment"].value:
             yield CString(self, "comment", "Comment")
         if self["has_crc16"].value:

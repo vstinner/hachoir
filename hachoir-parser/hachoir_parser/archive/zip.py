@@ -14,6 +14,7 @@ from hachoir_core.field import (FieldSet, ParserError,
     RawBytes, SubFile, CompressedField)
 from hachoir_core.text_handler import humanFilesize, hexadecimal
 from hachoir_core.error import HACHOIR_ERRORS
+from hachoir_core.tools import makeUnicode
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_parser.common.deflate import Deflate
 
@@ -405,7 +406,7 @@ class ZipFile(Parser):
 
     def createMimeType(self):
         if self["file[0]/filename"].value == "mimetype":
-            return self["file[0]/data"].value
+            return makeUnicode(self["file[0]/data"].value)
         else:
             return u"application/zip"
 

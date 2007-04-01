@@ -81,7 +81,7 @@ class BmpHeader(FieldSet):
         # Version 3 (40 bytes)
         if self["header_size"].value < 40:
             return
-        yield Enum(UInt32(self, "compression", "Compression method"), BmpFile.compression_name)
+        yield Enum(UInt32(self, "compression", "Compression method"), BmpFile.COMPRESSION_NAME)
         yield UInt32(self, "image_size", "Image size (bytes)")
         yield UInt32(self, "horizontal_dpi", "Horizontal DPI")
         yield UInt32(self, "vertical_dpi", "Vertical DPI")
@@ -127,7 +127,7 @@ class BmpFile(Parser):
         "id": "bmp",
         "category": "image",
         "file_ext": ("bmp",),
-        "mime": ("image/x-ms-bmp", "image/x-bmp"),
+        "mime": (u"image/x-ms-bmp", u"image/x-bmp"),
         "min_size": 30*8,
 #        "magic": (("BM", 0),),
         "magic_regex": ((
@@ -138,13 +138,13 @@ class BmpFile(Parser):
     }
     endian = LITTLE_ENDIAN
 
-    compression_name = {
-        0: "Uncompressed",
-        1: "RLE 8-bit",
-        2: "RLE 4-bit",
-        3: "Bitfields",
-        4: "JPEG",
-        5: "PNG",
+    COMPRESSION_NAME = {
+        0: u"Uncompressed",
+        1: u"RLE 8-bit",
+        2: u"RLE 4-bit",
+        3: u"Bitfields",
+        4: u"JPEG",
+        5: u"PNG",
     }
 
     def validate(self):
@@ -188,7 +188,7 @@ class BmpFile(Parser):
         yield parseImageData(self, "pixels", size, header)
 
     def createDescription(self):
-        return "Microsoft Bitmap version %s" % self["header"].getFormatVersion()
+        return u"Microsoft Bitmap version %s" % self["header"].getFormatVersion()
 
     def createContentSize(self):
         return self["file_size"].value * 8
