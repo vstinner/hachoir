@@ -8,56 +8,7 @@ from hachoir_parser.container.mkv import dateToDatetime
 from hachoir_core.i18n import _
 from hachoir_core.tools import makePrintable, durationWin64, timedelta2seconds
 from hachoir_core.error import warning
-from datetime import date, datetime, timedelta
-import re
-
-# Date regex: YYYY-MM-DD (US format)
-sep = "[:-]"
-YEAR_REGEX1 = re.compile("^([0-9]{4})$")
-DATE_REGEX1 = re.compile("^([0-9]{4})-([01][0-9])-([0-9]{2})$")
-DATETIME_REGEX1 = re.compile("^([0-9]{4})%s([01][0-9])%s([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$" % (sep, sep))
-
-def parseDatetime(value):
-    regs = YEAR_REGEX1.match(value)
-    if regs:
-        try:
-            year = int(regs.group(1))
-            return date(year, 1, 1)
-        except ValueError:
-            pass
-    regs = DATE_REGEX1.match(value)
-    if regs:
-        try:
-            year = int(regs.group(1))
-            month = int(regs.group(2))
-            day = int(regs.group(3))
-            return date(year, month, day)
-        except ValueError:
-            pass
-    regs = DATETIME_REGEX1.match(value)
-    if regs:
-        try:
-            year = int(regs.group(1))
-            month = int(regs.group(2))
-            day = int(regs.group(3))
-            hour = int(regs.group(4))
-            min = int(regs.group(5))
-            sec = int(regs.group(6))
-            return datetime(year, month, day, hour, min, sec)
-        except ValueError:
-            pass
-
-def setDatetime(meta, key, value):
-    if isinstance(value, (str, unicode)):
-        oldvalue = value
-        value = parseDatetime(value)
-        if not value:
-            warning("Unable to convert datetime %r" % oldvalue)
-            return
-    elif not isinstance(value, (date, datetime)):
-        warning("Unable to convert datetime %r" % value)
-        return
-    setattr(meta, key, value)
+from datetime import timedelta
 
 class MkvMetadata(MultipleMetadata):
     tag_key = {
@@ -156,10 +107,7 @@ class MkvMetadata(MultipleMetadata):
             return
         key = self.tag_key[name]
         value = tag["TagString/unicode"].value
-        if key == "creation_date":
-            setDatetime(self, key, value)
-        else:
-            setattr(self, key, value)
+        setattr(self, key, value)
 
     def processInfo(self, info):
         if "Duration/float" in info \
@@ -312,7 +260,7 @@ class AsfMetadata(MultipleMetadata):
 
         if "file_prop/content" in header:
             prop = header["file_prop/content"]
-            self.creation_date = prop["creation_date"].display
+            self.creation_date = prop["creation_date"].value
             self.duration = durationWin64(prop["play_duration"].value)
             if prop["seekable"]:
                 self.comment = "Is seekable"

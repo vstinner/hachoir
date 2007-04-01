@@ -29,7 +29,7 @@ class GzipMetadata(Metadata):
         self.compr_size = gzip["file"].size/8
         self.compression = gzip["compression"].display
         self.file_size = gzip["size"].value
-        self.last_modification = gzip["mtime"].display
+        self.last_modification = gzip["mtime"].value
         self.os = gzip["os"].display
         if "comment" in gzip:
             self.comment = gzip["comment"].value
@@ -43,7 +43,7 @@ class ZipMetadata(MultipleMetadata):
                 break
             meta = Metadata()
             meta.filename = field["filename"].value
-            meta.creation_date = field["last_mod"].display
+            meta.creation_date = field["last_mod"].value
             meta.compression = field["compression"].display
             if "data_desc" in field:
                 meta.file_size = field["data_desc/file_uncompressed_size"].value

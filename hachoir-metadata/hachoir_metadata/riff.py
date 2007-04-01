@@ -8,18 +8,17 @@ from hachoir_parser.video.fourcc import UNCOMPRESSED_AUDIO
 from hachoir_core.tools import humanFilesize, makeUnicode, timedelta2seconds
 from hachoir_core.i18n import _
 from hachoir_metadata.audio import computeComprRate as computeAudioComprRate
-from hachoir_metadata.video import setDatetime
 from datetime import timedelta
 
 class RiffMetadata(MultipleMetadata):
-    tag_to_key = {
-        "INAM": ("title", None),
-        "IART": ("artist", None),
-        "ICMT": ("comment", None),
-        "ICOP": ("copyright", None),
-        "IENG": ("author", None),
-        "ISFT": ("producer", None),
-        "ICRD": ("creation_date", setDatetime),
+    TAG_TO_KEY = {
+        "INAM": "title",
+        "IART": "artist",
+        "ICMT": "comment",
+        "ICOP": "copyright",
+        "IENG": "author",
+        "ISFT": "producer",
+        "ICRD": "creation_date",
     }
 
     def extract(self, riff):
@@ -36,14 +35,11 @@ class RiffMetadata(MultipleMetadata):
             return
         value = chunk["text"].value
         tag = chunk["tag"].value
-        if tag not in self.tag_to_key:
+        if tag not in self.TAG_TO_KEY:
             self.warning("Skip RIFF metadata %s: %s" % (tag, value))
             return
-        key, setter = self.tag_to_key[tag]
-        if setter:
-            setter(self, key, value)
-        else:
-            setattr(self, key, value)
+        key = self.TAG_TO_KEY[tag]
+        setattr(self, key, value)
 
     def extractWAVE(self, wav):
         format = wav["format"]

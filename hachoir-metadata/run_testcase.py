@@ -83,7 +83,7 @@ def checkClickMeta(metadata): return (
 def checkGzipMeta(metadata): return (
     checkAttr(metadata, "file_size", 99),
     checkAttr(metadata, "compr_size", 90),
-    checkAttr(metadata, "last_modification", u'2006-07-29 12:20:44'),
+    checkAttr(metadata, "last_modification", datetime(2006, 7, 29, 12, 20, 44)),
     checkAttr(metadata, "os", u"Unix"),
     checkAttr(metadata, "compression", "deflate"))
 
@@ -175,7 +175,7 @@ def checkJpegExifPSD(meta): return (
     checkAttr(meta, "producer", [u"Adobe Photoshop 7.0"]),
     checkAttr(meta, "width", 124),
     checkAttr(meta, "compression", "JPEG (Progressive)"),
-    checkAttr(meta, "creation_date", "2006:06:28 14:51:09"))
+    checkAttr(meta, "creation_date", datetime(2006, 6, 28, 14, 51, 9)))
 
 def checkInterludeDavid(meta): return (
     checkAttr(meta, "title", u"interlude symbiosys1"),
@@ -196,7 +196,7 @@ def checkBreakdance(meta): return (
 def checkMatrixPingPong(meta): return (
     checkAttr(meta, "title", u"欽ちゃん＆香取慎吾の全日本仮装大賞"),
     checkAttr(meta, "duration", timedelta(minutes=1, seconds=47, milliseconds=258)),
-    checkAttr(meta, "creation_date", u'2003-06-16 07:57:23.235000'),
+    checkAttr(meta, "creation_date", datetime(2003, 6, 16, 7, 57, 23, 235000)),
     checkAttr(meta, "audio[1]/sample_rate", 8000),
     checkAttr(meta, "audio[1]/bits_per_sample", 16),
     checkAttr(meta, "audio[1]/compression", "Windows Media Audio V7 / V8 / V9"),
@@ -244,14 +244,14 @@ def checkLaraCroft(meta): return (
 def checkHachoirOrgSXW(meta): return (
     checkAttr(meta, "mime_type", "application/vnd.sun.xml.writer"),
     checkAttr(meta, "file[0]/file_size", 30),
-    checkAttr(meta, "file[1]/creation_date", u"2007-01-22 19:08:14"),
+    checkAttr(meta, "file[1]/creation_date", datetime(2007, 1, 22, 19, 8, 14)),
     checkAttr(meta, "file[2]/filename", u"Configurations2/accelerator/current.xml"),
     checkAttr(meta, "file[2]/compression", u"Deflate"),
 )
 
 def checkFirstRun(meta): return (
     checkAttr(meta, "duration", timedelta(seconds=17, milliseconds=66)),
-    checkAttr(meta, "creation_date", "6/14/2000 10:03:18"),
+    checkAttr(meta, "creation_date", datetime(2000, 6, 14, 10, 3, 18)),
     checkAttr(meta, "copyright", u"©2000 RealNetworks"),
     checkAttr(meta, "producer", u"RealProducer Plus 6.1.0.153 Windows"),
     checkAttr(meta, "stream[1]/mime_type", u"audio/x-pn-realaudio"),

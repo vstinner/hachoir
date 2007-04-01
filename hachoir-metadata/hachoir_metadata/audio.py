@@ -1,5 +1,4 @@
 from hachoir_metadata.metadata import Metadata, MultipleMetadata, registerExtractor
-from hachoir_metadata.video import setDatetime
 from hachoir_parser.audio import AuFile, MpegAudioFile, RealAudioFile, AiffFile
 from hachoir_parser.container import OggFile, RealMediaFile
 from hachoir_core.i18n import _
@@ -215,7 +214,7 @@ class MpegAudioMetadata(Metadata):
         "TRK": ("track_number", setTrackNumber),
         "TAL": ("album", None),
         "TT2": ("title", None),
-        "TYE": ("creation_date", setDatetime),
+        "TYE": ("creation_date", None),
 
         # ID3 version 2.3+
         "TPE1": ("author", None),
@@ -224,7 +223,7 @@ class MpegAudioMetadata(Metadata):
         "TRCK": ("track_number", int),
         "TALB": ("album", None),
         "TIT2": ("title", None),
-        "TYER": ("creation_date", setDatetime),
+        "TYER": ("creation_date", None),
         "WXXX": ("url", None),
     }
 
@@ -284,7 +283,7 @@ class MpegAudioMetadata(Metadata):
             self.title = id3["song"].value
             self.album = id3["album"].value
             if id3["year"].value != "0":
-                setDatetime(self, "creation_date", id3["year"].value)
+                self.creation_date = id3["year"].value
             if "track_nb" in id3:
                 setTrackNumber(self, "track_number", id3["track_nb"].value)
         if "id3v2" in mp3:

@@ -1,6 +1,5 @@
 from hachoir_metadata.metadata import Metadata, registerExtractor
 from hachoir_metadata.image import computeComprRate
-from hachoir_metadata.video import setDatetime
 from hachoir_parser.image.exif import ExifEntry
 from hachoir_parser.image.jpeg import (
     JpegFile, JpegChunk,
@@ -168,10 +167,7 @@ class JpegMetadata(Metadata):
             value = "%.3g" % value
 
         # Store information
-        if key == "creation_date":
-            setDatetime(self, key, value)
-        else:
-            setattr(self, key, value)
+        setattr(self, key, value)
 
     def parseIPTC(self, iptc):
         for field in iptc:
