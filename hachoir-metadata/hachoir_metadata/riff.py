@@ -28,8 +28,6 @@ class RiffMetadata(MultipleMetadata):
             self.extractWAVE(riff)
         elif type == "AVI ":
             self.extractAVI(riff)
-        elif type == "ACON":
-            self.extractACON(riff)
         if "info" in riff:
             self.extractInfo(riff["info"])
 
@@ -159,17 +157,6 @@ class RiffMetadata(MultipleMetadata):
         if "index" in avi:
             self.comment = _("Has audio/video index (%s)") \
                 % humanFilesize(avi["index"].size/8)
-
-    def extractACON(self, riff):
-        if "anim_hdr" in riff:
-            hdr = riff["anim_hdr"]
-            self.width = hdr["cx"].value
-            self.height = hdr["cy"].value
-            self.bits_per_pixel = hdr["bit_count"].value
-        if "anim_rate" in riff:
-            sec = sum(float(rate.value)/60
-                for rate in riff.array("anim_rate/rate"))
-            self.duration = timedelta(seconds=sec)
 
 registerExtractor(RiffFile, RiffMetadata)
 
