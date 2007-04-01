@@ -60,6 +60,7 @@ class Data:
                 return
             value = new_value
         elif isinstance(value, str):
+            print "CONVERT TO UNICODE: %r" % value
             value = unicode(value, "ISO-8859-1")
 
         assert not self.type or isinstance(value, self.type), \

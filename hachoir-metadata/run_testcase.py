@@ -285,6 +285,11 @@ def checkTwunk16(meta): return (
     checkAttr(meta, "format_version", u"New-style executable: Dynamic-link library (DLL)"),
 )
 
+def checkDebianTorrent(meta): return (
+    checkAttr(meta, "file_size", 669775872),
+    checkAttr(meta, "creation_date", datetime(2006, 11, 16, 21, 44, 37)),
+)
+
 def checkFile(filename, check_metadata):
     sys.stdout.write("  - Create parser: ")
     sys.stdout.flush()
@@ -386,6 +391,7 @@ testcase_files = (
     (u"firstrun.rm", checkFirstRun),
     (u"deja_vu_serif-2.7.ttf", checkDejaVu),
     (u"twunk_16.exe", checkTwunk16),
+    (u"debian-31r4-i386-binary-1.iso.torrent", checkDebianTorrent),
 )
 
 if __name__ == "__main__":

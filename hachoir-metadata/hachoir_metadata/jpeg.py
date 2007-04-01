@@ -68,7 +68,7 @@ class JpegMetadata(Metadata):
         self.compression = compression
         if "app0/content" in jpeg:
             app0 = jpeg["app0/content"]
-            self.format_version = "JFIF %u.%02u" \
+            self.format_version = u"JFIF %u.%02u" \
                 % (app0["ver_maj"].value, app0["ver_min"].value)
 
         if "exif/content" in jpeg:

@@ -21,7 +21,7 @@ def computeComprRate(meta, compr_size):
     or not meta.has("bits_per_pixel"):
         return
     orig_size = meta.get('width') * meta.get('height') * meta.get('bits_per_pixel')
-    meta.compr_rate = "%.3gx" % (float(orig_size) / compr_size)
+    meta.compr_rate = u"%.3gx" % (float(orig_size) / compr_size)
 
 class BmpMetadata(Metadata):
     def extract(self, image):

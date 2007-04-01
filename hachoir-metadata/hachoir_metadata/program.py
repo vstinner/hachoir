@@ -56,9 +56,9 @@ class ExeMetadata(Metadata):
         self.creation_date = hdr["creation_date"].value
         self.comment = "CPU: %s" % hdr["cpu"].display
         if hdr["is_dll"].value:
-            self.format_version = "Portable Executable: Dynamic-link library (DLL)"
+            self.format_version = u"Portable Executable: Dynamic-link library (DLL)"
         else:
-            self.format_version = "Portable Executable: Windows application"
+            self.format_version = u"Portable Executable: Windows application"
 
     def usePE_OptHeader(self, hdr):
         self.comment = "Subsystem: %s" % hdr["subsystem"].display

@@ -30,7 +30,7 @@ def computeComprRate(meta, size):
     or not meta.has("nb_channel"):
         return
     orig_size = timedelta2seconds(meta.get("duration")) * meta.get('sample_rate') * meta.get('bits_per_sample') * meta.get('nb_channel')
-    meta.compr_rate = "%.2fx" % (float(orig_size) / size)
+    meta.compr_rate = u"%.2fx" % (float(orig_size) / size)
 
 def computeBitRate(meta):
     if not meta.has("bits_per_sample") \

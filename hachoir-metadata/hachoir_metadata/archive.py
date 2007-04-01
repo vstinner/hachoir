@@ -14,9 +14,10 @@ def computeCompressionRate(meta):
     if not meta.has("file_size") or not meta.has("compr_size"):
         return
     file_size, compr_size = meta.get("file_size"), meta.get("compr_size")
-    if file_size:
-        rate = 100 - float(compr_size) * 100 / file_size
-        meta.compr_rate = "%.1f%%" % rate
+    if not file_size:
+        return
+    rate = 100 - float(compr_size) * 100 / file_size
+    meta.compr_rate = u"%.1f%%" % rate
 
 class Bzip2Metadata(Metadata):
     def extract(self, zip):
