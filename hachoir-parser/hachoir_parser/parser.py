@@ -94,7 +94,7 @@ class HachoirParser(object):
             and self.createMimeType != Parser.createMimeType:
                 self._mime_type = Parser.createMimeType(self)
             if not self._mime_type:
-                self._mime_type = "application/octet-stream"
+                self._mime_type = u"application/octet-stream"
         return self._mime_type
     mime_type = property(_getMimeType)
 

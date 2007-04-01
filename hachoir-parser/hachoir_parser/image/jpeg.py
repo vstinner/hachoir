@@ -211,19 +211,19 @@ class JpegChunk(FieldSet):
         0xFE: ("comment[]", "Comment", None),
     }
     START_OF_FRAME = {
-        0xC0: "Baseline",
-        0xC1: "Extended sequential",
-        0xC2: "Progressive",
-        0xC3: "Lossless",
-        0xC5: "Differential sequential",
-        0xC6: "Differential progressive",
-        0xC7: "Differential lossless",
-        0xC9: "Extended sequential, arithmetic coding",
-        0xCA: "Progressive, arithmetic coding",
-        0xCB: "Lossless, arithmetic coding",
-        0xCD: "Differential sequential, arithmetic coding",
-        0xCE: "Differential progressive, arithmetic coding",
-        0xCF: "Differential lossless, arithmetic coding",
+        0xC0: u"Baseline",
+        0xC1: u"Extended sequential",
+        0xC2: u"Progressive",
+        0xC3: u"Lossless",
+        0xC5: u"Differential sequential",
+        0xC6: u"Differential progressive",
+        0xC7: u"Differential lossless",
+        0xC9: u"Extended sequential, arithmetic coding",
+        0xCA: u"Progressive, arithmetic coding",
+        0xCB: u"Lossless, arithmetic coding",
+        0xCD: u"Differential sequential, arithmetic coding",
+        0xCE: u"Differential progressive, arithmetic coding",
+        0xCF: u"Differential lossless, arithmetic coding",
     }
     for key, text in START_OF_FRAME.iteritems():
         TAG_INFO[key] = ("start_frame", "Start of frame (%s)" % text.lower(), StartOfFrame)
@@ -269,7 +269,7 @@ class JpegFile(Parser):
         "id": "jpeg",
         "category": "image",
         "file_ext": ("jpg", "jpeg"),
-        "mime": ["image/jpeg"],
+        "mime": [u"image/jpeg"],
         "magic": (
             ("\xFF\xD8\xFF\xE0", 0),   # (Start Of Image, APP0)
             ("\xFF\xD8\xFF\xE1", 0),   # (Start Of Image, EXIF)

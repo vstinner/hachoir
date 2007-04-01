@@ -63,7 +63,7 @@ class TorrentString(FieldSet):
             self.info("Empty string: len=%i" % len)
             return
         if len<512:
-            yield String(self, "value", len, "String value")
+            yield String(self, "value", len, "String value", charset="ISO-8859-1")
         else:
             # Probably raw data
             yield RawBytes(self, "value", len, "Raw data")
@@ -107,8 +107,10 @@ class DictionaryItem(FieldSet):
         if self["value"].hasValue() and self["value"].value != None:
             if key == "creation date":
                 self.createValue = self.createTimestampValue
+                self.createDisplay = self.createTimestampDisplay
             elif key in ("length", "piece length"):
-                self.createValue = self.createFilesizeValue
+                self.createValue = self.createDefaultValue
+                self.createDisplay = self.createFilesizeDisplay
             else:
                 self.createValue = self.createDefaultValue
 
@@ -120,11 +122,13 @@ class DictionaryItem(FieldSet):
         return self["value"].value
 
     def createTimestampValue(self):
-        timestamp = timestampUNIX(self["value"].value)
-        return humanDatetime(timestamp)
+        return timestampUNIX(self["value"].value)
 
-    def createFilesizeValue(self):
-        return humanFilesize(self["value"].value)
+    def createTimestampDisplay(self):
+        return humanDatetime(self.value)
+
+    def createFilesizeDisplay(self):
+        return humanFilesize(self.value)
 
 # Map first chunk byte => type
 TAGS = {'d': Dictionary, 'i': Integer, 'l': List}
@@ -148,6 +152,7 @@ class TorrentFile(Parser):
         "category": "misc",
         "file_ext": ("torrent",),
         "min_size": 50*8,
+        "mime": (u"application/x-bittorrent",),
         "magic": ((MAGIC, 0),),
         "description": "Torrent metainfo file"
     }

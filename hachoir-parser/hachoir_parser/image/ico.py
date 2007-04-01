@@ -66,7 +66,7 @@ class IcoFile(Parser):
         "id": "ico",
         "category": "image",
         "file_ext": ("ico", "cur"),
-        "mime": ["image/x-ico"],
+        "mime": [u"image/x-ico"],
         "min_size": (22 + 40)*8,
 #        "magic": (
 #            ("\0\0\1\0", 0), # Icon

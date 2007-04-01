@@ -545,7 +545,7 @@ class MkvFile(Parser):
         "id": "matroska",
         "category": "container",
         "file_ext": ("mka", "mkv"),
-        "mime": ("video/x-matroska", "audio/x-matroska"),
+        "mime": (u"video/x-matroska", u"audio/x-matroska"),
         "min_size": 5*8,
         "magic": (("\x1A\x45\xDF\xA3", 0),),
         "description": "Matroska multimedia container"

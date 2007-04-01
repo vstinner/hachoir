@@ -85,12 +85,12 @@ class BitmapInfoHeader(FieldSet):
     static_size = 40*8
 
     compression_name = {
-        0: "Uncompressed (RGB)",
-        1: "RLE (8 bits)",
-        2: "RLE (4 bits)",
-        3: "Bitfields",
-        4: "JPEG",
-        5: "PNG"
+        0: u"Uncompressed (RGB)",
+        1: u"RLE (8 bits)",
+        2: u"RLE (4 bits)",
+        3: u"Bitfields",
+        4: u"JPEG",
+        5: u"PNG"
     }
 
     def __init__(self, parent, name, use_fourcc=False):

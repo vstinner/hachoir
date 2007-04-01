@@ -42,7 +42,7 @@ except ImportError:
 
 UNIT_NAME = {1: "Meter"}
 COMPRESSION_NAME = {
-    0: "deflate" # with 32K sliding window
+    0: u"deflate" # with 32K sliding window
 }
 MAX_CHUNK_SIZE = 500 * 1024 # Maximum chunk size (500 KB)
 
@@ -232,7 +232,7 @@ class PngFile(Parser):
         "id": "png",
         "category": "image",
         "file_ext": ("png",),
-        "mime": ("image/png", "image/x-png"),
+        "mime": (u"image/png", u"image/x-png"),
         "min_size": 8*8, # just the identifier
         "magic": [('\x89PNG\r\n\x1A\n', 0)],
         "description": "Portable Network Graphics (PNG) picture"

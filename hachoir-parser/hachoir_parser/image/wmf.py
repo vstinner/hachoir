@@ -491,9 +491,9 @@ class WMF_File(Parser):
         "category": "image",
         "file_ext": ("wmf", "apm", "emf"),
         "mime": (
-            "image/wmf", "image/x-wmf", "image/x-win-metafile",
-            "application/x-msmetafile", "application/wmf", "application/x-wmf",
-            "image/x-emf"),
+            u"image/wmf", u"image/x-wmf", u"image/x-win-metafile",
+            u"application/x-msmetafile", u"application/wmf", u"application/x-wmf",
+            u"image/x-emf"),
         "magic": (
             (PlaceableHeader.MAGIC, 0),
             (EMF_Header.MAGIC, 40*8),
@@ -503,7 +503,7 @@ class WMF_File(Parser):
             ("\1\0\x09\0\0\3", 0),
         ),
         "min_size": 40*8,
-        "description": "Microsoft Windows Metafile (WMF)",
+        "description": u"Microsoft Windows Metafile (WMF)",
     }
     endian = LITTLE_ENDIAN
     FILE_TYPE = {0: "memory", 1: "disk"}
@@ -590,17 +590,17 @@ class WMF_File(Parser):
 
     def createDescription(self):
         if self.isEMF():
-            return "Microsoft Enhanced Metafile (EMF) picture"
+            return u"Microsoft Enhanced Metafile (EMF) picture"
         elif self.isAPM():
-            return "Aldus Placeable Metafile (APM) picture"
+            return u"Aldus Placeable Metafile (APM) picture"
         else:
-            return "Microsoft Windows Metafile (WMF) picture"
+            return u"Microsoft Windows Metafile (WMF) picture"
 
     def createMimeType(self):
         if self.isEMF():
-            return "image/x-emf"
+            return u"image/x-emf"
         else:
-            return "image/wmf"
+            return u"image/wmf"
 
     def createContentSize(self):
         if self.isEMF():

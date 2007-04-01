@@ -346,7 +346,7 @@ class RiffFile(Parser):
         "category": "container",
         "file_ext": ("avi", "cda", "wav", "ani"),
         "min_size": 16*8,
-        "mime": ("video/x-msvideo", "audio/x-wav", "audio/x-cda"),
+        "mime": (u"video/x-msvideo", u"audio/x-wav", u"audio/x-cda"),
         # FIXME: Use regex "RIFF.{4}(WAVE|CDDA|AVI )"
         "magic": (
             ("AVI LIST", 8*8),
@@ -357,9 +357,9 @@ class RiffFile(Parser):
         "description": "Microsoft RIFF container"
     }
     VALID_TYPES = {
-        "WAVE": (ChunkWAVE, "audio/x-wav",     u"Microft WAVE audio", ".wav"),
-        "CDDA": (ChunkCDDA, "audio/x-cda",     u"Microsoft Windows audio CD file (cda)", ".cda"),
-        "AVI ": (ChunkAVI,  "video/x-msvideo", u"Microsoft AVI video", ".avi"),
+        "WAVE": (ChunkWAVE, u"audio/x-wav",     u"Microft WAVE audio", ".wav"),
+        "CDDA": (ChunkCDDA, u"audio/x-cda",     u"Microsoft Windows audio CD file (cda)", ".cda"),
+        "AVI ": (ChunkAVI,  u"video/x-msvideo", u"Microsoft AVI video", ".avi"),
         "ACON": (ChunkACON,  None, u"Microsoft Windows animated cursor", ".ani"),
     }
     endian = LITTLE_ENDIAN

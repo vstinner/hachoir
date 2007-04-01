@@ -21,27 +21,27 @@ MAX_FILESIZE = 1000 * 1024 * 1024
 
 COMPRESSION_DEFLATE = 8
 COMPRESSION_METHOD = {
-    0: "no compression",
-    1: "Shrunk",
-    2: "Reduced (factor 1)",
-    3: "Reduced (factor 2)",
-    4: "Reduced (factor 3)",
-    5: "Reduced (factor 4)",
-    6: "Imploded",
-    7: "Tokenizing",
-    8: "Deflate",
-    9: "Deflate64",
-    10: "PKWARE Imploding",
-    11: "Reserved by PKWARE",
-    12: "File is compressed using BZIP2 algorithm",
-    13: "Reserved by PKWARE",
-    14: "LZMA (EFS)",
-    15: "Reserved by PKWARE",
-    16: "Reserved by PKWARE",
-    17: "Reserved by PKWARE",
-    18: "File is compressed using IBM TERSE (new)",
-    19: "IBM LZ77 z Architecture (PFS)",
-    98: "PPMd version I, Rev 1",
+     0: u"no compression",
+     1: u"Shrunk",
+     2: u"Reduced (factor 1)",
+     3: u"Reduced (factor 2)",
+     4: u"Reduced (factor 3)",
+     5: u"Reduced (factor 4)",
+     6: u"Imploded",
+     7: u"Tokenizing",
+     8: u"Deflate",
+     9: u"Deflate64",
+    10: u"PKWARE Imploding",
+    11: u"Reserved by PKWARE",
+    12: u"File is compressed using BZIP2 algorithm",
+    13: u"Reserved by PKWARE",
+    14: u"LZMA (EFS)",
+    15: u"Reserved by PKWARE",
+    16: u"Reserved by PKWARE",
+    17: u"Reserved by PKWARE",
+    18: u"File is compressed using IBM TERSE (new)",
+    19: u"IBM LZ77 z Architecture (PFS)",
+    98: u"PPMd version I, Rev 1",
 }
 
 def ZipRevision(field):
@@ -50,24 +50,24 @@ def ZipRevision(field):
 class ZipVersion(FieldSet):
     static_size = 16
     HOST_OS = {
-        0: "FAT file system (DOS, OS/2, NT)",
-        1: "Amiga",
-        2: "VMS (VAX or Alpha AXP)",
-        3: "Unix",
-        4: "VM/CMS",
-        5: "Atari",
-        6: "HPFS file system (OS/2, NT 3.x)",
-        7: "Macintosh",
-        8: "Z-System",
-        9: "CP/M",
-        10: "TOPS-20",
-        11: "NTFS file system (NT)",
-        12: "SMS/QDOS",
-        13: "Acorn RISC OS",
-        14: "VFAT file system (Win95, NT)",
-        15: "MVS",
-        16: "BeOS (BeBox or PowerMac)",
-        17: "Tandem",
+         0: u"FAT file system (DOS, OS/2, NT)",
+         1: u"Amiga",
+         2: u"VMS (VAX or Alpha AXP)",
+         3: u"Unix",
+         4: u"VM/CMS",
+         5: u"Atari",
+         6: u"HPFS file system (OS/2, NT 3.x)",
+         7: u"Macintosh",
+         8: u"Z-System",
+         9: u"CP/M",
+        10: u"TOPS-20",
+        11: u"NTFS file system (NT)",
+        12: u"SMS/QDOS",
+        13: u"Acorn RISC OS",
+        14: u"VFAT file system (Win95, NT)",
+        15: u"MVS",
+        16: u"BeOS (BeBox or PowerMac)",
+        17: u"Tandem",
     }
     def createFields(self):
         yield UInt8(self, "zip_version", "ZIP version", text_handler=ZipRevision)
@@ -315,43 +315,43 @@ class ZipFile(Parser):
     endian = LITTLE_ENDIAN
     MIME_TYPES = {
         # Default ZIP archive
-        "application/zip": "zip",
-        "application/x-zip": "zip",
+        u"application/zip": "zip",
+        u"application/x-zip": "zip",
 
         # Java archive (JAR)
-        "application/x-jar": "jar",
-        "application/java-archive": "jar",
+        u"application/x-jar": "jar",
+        u"application/java-archive": "jar",
 
         # OpenOffice 1.0
-        "application/vnd.sun.xml.calc": "sxc",
-        "application/vnd.sun.xml.draw": "sxd",
-        "application/vnd.sun.xml.impress": "sxi",
-        "application/vnd.sun.xml.writer": "sxw",
-        "application/vnd.sun.xml.math": "sxm",
+        u"application/vnd.sun.xml.calc": "sxc",
+        u"application/vnd.sun.xml.draw": "sxd",
+        u"application/vnd.sun.xml.impress": "sxi",
+        u"application/vnd.sun.xml.writer": "sxw",
+        u"application/vnd.sun.xml.math": "sxm",
 
         # OpenOffice 1.0 (template)
-        "application/vnd.sun.xml.calc.template": "stc",
-        "application/vnd.sun.xml.draw.template": "std",
-        "application/vnd.sun.xml.impress.template": "sti",
-        "application/vnd.sun.xml.writer.template": "stw",
-        "application/vnd.sun.xml.writer.global": "sxg",
+        u"application/vnd.sun.xml.calc.template": "stc",
+        u"application/vnd.sun.xml.draw.template": "std",
+        u"application/vnd.sun.xml.impress.template": "sti",
+        u"application/vnd.sun.xml.writer.template": "stw",
+        u"application/vnd.sun.xml.writer.global": "sxg",
 
         # OpenDocument
-        "application/vnd.oasis.opendocument.chart": "odc",
-        "application/vnd.oasis.opendocument.image": "odi",
-        "application/vnd.oasis.opendocument.database": "odb",
-        "application/vnd.oasis.opendocument.formula": "odf",
-        "application/vnd.oasis.opendocument.graphics": "odg",
-        "application/vnd.oasis.opendocument.presentation": "odp",
-        "application/vnd.oasis.opendocument.spreadsheet": "ods",
-        "application/vnd.oasis.opendocument.text": "odt",
-        "application/vnd.oasis.opendocument.text-master": "odm",
+        u"application/vnd.oasis.opendocument.chart": "odc",
+        u"application/vnd.oasis.opendocument.image": "odi",
+        u"application/vnd.oasis.opendocument.database": "odb",
+        u"application/vnd.oasis.opendocument.formula": "odf",
+        u"application/vnd.oasis.opendocument.graphics": "odg",
+        u"application/vnd.oasis.opendocument.presentation": "odp",
+        u"application/vnd.oasis.opendocument.spreadsheet": "ods",
+        u"application/vnd.oasis.opendocument.text": "odt",
+        u"application/vnd.oasis.opendocument.text-master": "odm",
 
         # OpenDocument (template)
-        "application/vnd.oasis.opendocument.graphics-template": "otg",
-        "application/vnd.oasis.opendocument.presentation-template": "otp",
-        "application/vnd.oasis.opendocument.spreadsheet-template": "ots",
-        "application/vnd.oasis.opendocument.text-template": "ott",
+        u"application/vnd.oasis.opendocument.graphics-template": "otg",
+        u"application/vnd.oasis.opendocument.presentation-template": "otp",
+        u"application/vnd.oasis.opendocument.spreadsheet-template": "ots",
+        u"application/vnd.oasis.opendocument.text-template": "ott",
     }
     tags = {
         "id": "zip",
@@ -407,7 +407,7 @@ class ZipFile(Parser):
         if self["file[0]/filename"].value == "mimetype":
             return self["file[0]/data"].value
         else:
-            return "application/zip"
+            return u"application/zip"
 
     def createFilenameSuffix(self):
         if self["file[0]/filename"].value == "mimetype":
