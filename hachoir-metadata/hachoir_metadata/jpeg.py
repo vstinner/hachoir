@@ -29,7 +29,7 @@ class JpegMetadata(Metadata):
         ExifEntry.TAG_HEIGHT: "height",
     }
 
-    iptc_key = {
+    IPTC_KEY = {
          80: "author",
         101: "country",
         116: "copyright",
@@ -80,13 +80,15 @@ class JpegMetadata(Metadata):
                         pass
         if "photoshop/content" in jpeg:
             psd = jpeg["photoshop/content"]
+            if "version/content/reader_name" in psd:
+                self.producer = psd["version/content/reader_name"].value
             if "iptc/content" in psd:
                 self.parseIPTC(psd["iptc/content"])
         for comment in jpeg.array("comment"):
             self.comment = comment["data"].value
         self.computeQuality(jpeg)
         computeComprRate(self, jpeg["data"].size)
-        if not self.has("producer") and ("photoshop" in jpeg or "adobe" in jpeg):
+        if not self.has("producer") and "photoshop" in jpeg:
             self.producer = u"Adobe Photoshop"
 
     def computeQuality(self, jpeg):
@@ -185,11 +187,11 @@ class JpegMetadata(Metadata):
 
             # Skip unknown tag
             tag = field["tag"].value
-            if tag not in self.iptc_key:
+            if tag not in self.IPTC_KEY:
                 if tag != 0:
                     self.warning("Skip IPTC key %s: %s" % (tag, value))
                 continue
-            setattr(self, self.iptc_key[tag], value)
+            setattr(self, self.IPTC_KEY[tag], value)
 
 registerExtractor(JpegFile, JpegMetadata)
 

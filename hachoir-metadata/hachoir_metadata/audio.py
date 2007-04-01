@@ -303,6 +303,7 @@ class AiffMetadata(Metadata):
             self.bits_per_sample = info["sample_size"].value
             if "codec" in info:
                 self.compression = info["codec"].display
+        computeBitRate(self)
 
 registerExtractor(AuFile, AuMetadata)
 registerExtractor(MpegAudioFile, MpegAudioMetadata)

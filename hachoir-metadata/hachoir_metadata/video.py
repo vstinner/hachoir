@@ -186,7 +186,7 @@ class MovMetadata(Metadata):
                 self.processMovie(atom["movie"])
 
     def processMovieHeader(self, hdr):
-        self.duration = hdr["duration"].value * 1000 / hdr["time_scale"].value
+        self.duration = timedelta(seconds=float(hdr["duration"].value) / hdr["time_scale"].value)
         self.creation_date = hdr["creat_date"].display
         self.last_modification = hdr["lastmod_date"].display
         self.comment = _("Play speed: %.1f%%") % (hdr["play_speed"].value*100)

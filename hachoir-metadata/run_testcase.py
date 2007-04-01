@@ -222,6 +222,7 @@ def check25min(meta): return (
     checkAttr(meta, "duration", timedelta(minutes=25, seconds=33)),
     checkAttr(meta, "nb_channel", 2),
     checkAttr(meta, "sample_rate", 44100),
+    checkAttr(meta, "bit_rate", 1411200),
     checkAttr(meta, "bits_per_sample", 16),
     checkAttr(meta, "compression", u"Little-endian, no compression"),
 )
