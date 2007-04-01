@@ -245,7 +245,7 @@ class Summary(SeekableFieldSet):
     OS_MAC = 1
     OS_NAME = {
         0: "Windows 16-bit",
-        1: "Mac",
+        1: "Macintosh",
         2: "Windows 32-bit",
     }
 
@@ -284,17 +284,18 @@ class Summary(SeekableFieldSet):
             yield NullBytes(self, "end_padding", size)
 
 class PascalStringWin32(FieldSet):
-    def __init__(self, parent, name, description=None, strip=None):
+    def __init__(self, parent, name, description=None, strip=None, charset="UTF-16-LE"):
         FieldSet.__init__(self, parent, name, description)
         length = self["length"].value
         self._size = 32 + length * 2
         self.strip = strip
+        self.charset = charset
 
     def createFields(self):
         yield UInt32(self, "length", "Length in widechar characters")
         size = self["length"].value
         if size:
-            yield String(self, "text", size*2, charset="UTF-16-LE", strip=self.strip)
+            yield String(self, "text", size*2, charset=self.charset, strip=self.strip)
 
     def createValue(self):
         if "text" in self:

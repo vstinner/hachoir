@@ -141,6 +141,10 @@ class XcfMetadata(Metadata):
         self.readProperties(xcf)
 
 class PngMetadata(Metadata):
+    TEXT_TO_ATTR = {
+        "software": "producer",
+    }
+
     def extract(self, png):
         header = png["/header"]
         self.width = header["width"].value
@@ -176,11 +180,15 @@ class PngMetadata(Metadata):
             if "text" not in comment:
                 continue
             keyword = comment["keyword"].value
-            text = comment["text"].display
-            if keyword.lower() != "comment":
-                self.comment = "%s=%s" % (keyword, text)
-            else:
-                self.comment = text
+            text = comment["text"].value
+            try:
+                key = self.TEXT_TO_ATTR[keyword.lower()]
+                setattr(self, key, text)
+            except KeyError:
+                if keyword.lower() != "comment":
+                    self.comment = "%s=%s" % (keyword, text)
+                else:
+                    self.comment = text
         compr_size = sum( data.size for data in png.array("data") )
         computeComprRate(self, compr_size)
 

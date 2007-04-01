@@ -49,7 +49,11 @@ class RootSeekableFieldSet(BasicFieldSet):
         return self.__getitem__(key, const)
 
     def _getField(self, key, const):
-        return self.__getitem__(key, const)
+        field = Field._getField(self, key, const)
+        if field is None:
+            return self.__getitem__(key, const)
+        else:
+            return field
 
     def __getitem__(self, key, const=True):
         if isinstance(key, (int, long)):
