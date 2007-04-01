@@ -10,14 +10,15 @@ class DataValue:
         self.text = text
 
 class Data:
-    def __init__(self, metadata, key, priority, description,  text_handler=None, type=None, filter=None):
+    def __init__(self, key, priority, description,
+    text_handler=None, type=None, filter=None, conversion=None):
         """
         handler is only used if value is not string nor unicode, prototype:
            def handler(value) -> str/unicode
         """
         assert MIN_PRIORITY <= priority <= MAX_PRIORITY
         assert isinstance(description, unicode)
-        self.metadata = metadata
+        self.metadata = None
         self.key = key
         self.description = description
         self.values = []
@@ -25,6 +26,7 @@ class Data:
         self.text_handler = text_handler
         self.filter = filter
         self.priority = priority
+        self.conversion = conversion
 
     def _createItem(self, value, text=None):
         if text is None:
@@ -49,12 +51,19 @@ class Data:
         if value is None:
             return
 
+        # Convert string to Unicode string using charset ISO-8859-1
+        if self.conversion:
+            new_value = self.conversion(self.key, value)
+            if not new_value:
+                self.metadata.error("Unable to convert %r to %s" % (
+                    value, " or ".join(str(item.__name__) for item in self.type)))
+                return
+            value = new_value
+        elif isinstance(value, str):
+            value = unicode(value, "ISO-8859-1")
+
         assert not self.type or isinstance(value, self.type), \
             "Value %r is not of type %r" % (value, self.type)
-
-        # Convert string to Unicode string using charset ISO-8859-1
-        if isinstance(value, str):
-            value = unicode(value, "ISO-8859-1")
 
         # Skip empty strings
         if isinstance(value, unicode):
