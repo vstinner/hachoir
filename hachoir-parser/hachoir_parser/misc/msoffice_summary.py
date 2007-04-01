@@ -7,7 +7,7 @@ from hachoir_core.field import (FieldSet, ParserError,
 from hachoir_core.text_handler import textHandler, hexadecimal, humanFilesize
 from hachoir_core.tools import createDict
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
-from hachoir_parser.common.win32 import GUID
+from hachoir_parser.common.win32 import GUID, PascalStringWin32
 from hachoir_parser.image.bmp import BmpHeader, parseImageData
 
 MAX_SECTION_COUNT = 100
@@ -282,26 +282,6 @@ class Summary(SeekableFieldSet):
         size = (self.size - self.current_size) // 8
         if 0 < size:
             yield NullBytes(self, "end_padding", size)
-
-class PascalStringWin32(FieldSet):
-    def __init__(self, parent, name, description=None, strip=None, charset="UTF-16-LE"):
-        FieldSet.__init__(self, parent, name, description)
-        length = self["length"].value
-        self._size = 32 + length * 2
-        self.strip = strip
-        self.charset = charset
-
-    def createFields(self):
-        yield UInt32(self, "length", "Length in widechar characters")
-        size = self["length"].value
-        if size:
-            yield String(self, "text", size*2, charset=self.charset, strip=self.strip)
-
-    def createValue(self):
-        if "text" in self:
-            return self["text"].value
-        else:
-            return None
 
 class CompObj(FieldSet):
     OS_VERSION = {
