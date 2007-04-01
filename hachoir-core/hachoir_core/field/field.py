@@ -157,7 +157,7 @@ class Field(Logger):
     def _getIndex(self):
         if not self._parent:
             return None
-        return self._parent._fields.index(self._name)
+        return self._parent.getFieldIndex(self)
     index = property(_getIndex)
 
     def _getPath(self):

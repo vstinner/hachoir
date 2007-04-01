@@ -535,3 +535,6 @@ class GenericFieldSet(BasicFieldSet):
     def nextFieldAddress(self):
         return self._current_size
 
+    def getFieldIndex(self, field):
+        return self._fields.index(field._name)
+

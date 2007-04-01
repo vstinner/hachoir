@@ -128,4 +128,6 @@ class BasicFieldSet(Field):
         raise NotImplementedError()
     def nextFieldAddress(self):
         raise NotImplementedError()
+    def getFieldIndex(self, field):
+        raise NotImplementedError()
 

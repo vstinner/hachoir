@@ -48,6 +48,9 @@ class RootSeekableFieldSet(BasicFieldSet):
     def getField(self, key, const=True):
         return self.__getitem__(key, const)
 
+    def _getField(self, key, const):
+        return self.__getitem__(key, const)
+
     def __getitem__(self, key, const=True):
         if isinstance(key, (int, long)):
             count = len(self._field_array)
@@ -137,6 +140,9 @@ class RootSeekableFieldSet(BasicFieldSet):
 
     def nextFieldAddress(self):
         return self._offset
+
+    def getFieldIndex(self, field):
+        return self._field_array.index(field)
 
 class SeekableFieldSet(RootSeekableFieldSet):
     def __init__(self, parent, name, description=None, size=None):
