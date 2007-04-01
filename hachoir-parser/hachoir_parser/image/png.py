@@ -104,7 +104,7 @@ def timestampValue(parent):
     value = datetime(
         parent["year"].value, parent["month"].value, parent["day"].value,
         parent["hour"].value, parent["minute"].value, parent["second"].value)
-    return humanDatetime(value)
+    return value
 
 def physicalParse(parent):
     yield UInt32(parent, "pixel_per_unit_x", "Pixel per unit, X axis")

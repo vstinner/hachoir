@@ -114,10 +114,11 @@ def Float(parent):
 
 TIMESTAMP_T0 = datetime(2001, 1, 1)
 
+def dateToDatetime(value):
+    return TIMESTAMP_T0 + timedelta(microseconds=value//1000)
+
 def dateToString(field):
-    value = field.value//1000
-    timestamp = TIMESTAMP_T0 + timedelta(microseconds=value)
-    return humanDatetime(timestamp)
+    return humanDatetime(dateToDatetime(field.value))
 
 def Date(parent):
     return GenericInteger(parent, 'date', True, parent['size'].value*8,
