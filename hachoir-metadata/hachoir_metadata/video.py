@@ -264,14 +264,15 @@ class AsfMetadata(MultipleMetadata):
             self.duration = durationWin64(prop["play_duration"].value)
             if prop["seekable"]:
                 self.comment = "Is seekable"
-            value = prop["max_bitrate"].display
+            value = prop["max_bitrate"].value
+            text = prop["max_bitrate"].display
             if is_vbr is True:
-                text = "VBR (%s max)" % value
+                text = "VBR (%s max)" % text
             elif is_vbr is False:
-                text = "%s (CBR)" % value
+                text = "%s (CBR)" % text
             else:
-                text = "%s (max)" % value
-            self.bit_rate = text
+                text = "%s (max)" % text
+            self.bit_rate = (value, text)
 
         if "codec_list/content" in header:
             for codec in header.array("codec_list/content/codec"):

@@ -47,14 +47,14 @@ def registerAllItems(meta):
     meta.register(Data("height", 302, _("Image height"), filter=NumberFilter(1, MAX_HEIGHT), type=(int, long)))
     meta.register(Data("nb_channel", 303, _("Channel"), text_handler=humanAudioChannel, filter=NumberFilter(1, MAX_NB_CHANNEL), type=(int, long)))
     meta.register(Data("sample_rate", 304, _("Sample rate"), text_handler=humanFrequency, filter=NumberFilter(1, MAX_SAMPLE_RATE), type=(int, long)))
-    meta.register(Data("bits_per_sample", 305, _("Bits/sample"), text_handler=humanBitSize, filter=NumberFilter(1, 64)))
+    meta.register(Data("bits_per_sample", 305, _("Bits/sample"), text_handler=humanBitSize, filter=NumberFilter(1, 64), type=(int, long)))
     meta.register(Data("image_orientation", 306, _("Image orientation")))
     meta.register(Data("nb_colors", 307, _("Number of colors"), filter=NumberFilter(1, MAX_NB_COLOR), type=(int, long)))
     meta.register(Data("bits_per_pixel", 308, _("Bits/pixel"), filter=NumberFilter(1, MAX_BITS_PER_PIXEL), type=(int, long)))
     meta.register(Data("filename", 309, _("File name")))
-    meta.register(Data("file_size", 310, _("File size"), text_handler=humanFilesize))
+    meta.register(Data("file_size", 310, _("File size"), text_handler=humanFilesize, type=(int, long)))
     meta.register(Data("pixel_format", 311, _("Pixel format")))
-    meta.register(Data("compr_size", 312, _("Compressed file size"), text_handler=humanFilesize))
+    meta.register(Data("compr_size", 312, _("Compressed file size"), text_handler=humanFilesize, type=(int, long)))
     meta.register(Data("compr_rate", 313, _("Compression rate"), filter=NumberFilter(MIN_COMPR_RATE, MAX_COMPR_RATE)))
 
     meta.register(Data("file_attr", 400, _("File attributes")))
@@ -80,9 +80,9 @@ def registerAllItems(meta):
     meta.register(Data("copyright", 601, _("Copyright")))
     meta.register(Data("url", 602, _("URL")))
     meta.register(Data("frame_rate", 603, _("Frame rate"), text_handler=humanFrameRate,
-        filter=NumberFilter(1, MAX_FRAME_RATE)))
+        filter=NumberFilter(1, MAX_FRAME_RATE), type=(int, long, float)))
     meta.register(Data("bit_rate", 604, _("Bit rate"), text_handler=humanBitRate,
-        filter=NumberFilter(1)))
+        filter=NumberFilter(1), type=(int, long, float)))
     meta.register(Data("aspect_ratio", 604, _("Aspect ratio")))
 
     meta.register(Data("os", 900, _("OS")))
