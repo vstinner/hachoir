@@ -397,7 +397,7 @@ def humanUnixAttributes(mode):
             chars[9] = 'T'
         else:
             chars[9] = 't'
-    return "%s (%o)" % (''.join(chars), mode)
+    return u"%s (%o)" % (''.join(chars), mode)
 
 def createDict(data, index):
     """
