@@ -273,6 +273,7 @@ class JpegFile(Parser):
         "magic": (
             ("\xFF\xD8\xFF\xE0", 0),   # (Start Of Image, APP0)
             ("\xFF\xD8\xFF\xE1", 0),   # (Start Of Image, EXIF)
+            ("\xFF\xD8\xFF\xEE", 0),   # (Start Of Image, Adobe)
         ),
         "min_size": 22*8,
         "description": "JPEG picture"
