@@ -95,9 +95,10 @@ class Metadata(Logger):
         else:
             return default
 
-    def register(self, key, priority, title, text_handler=None, type=None, filter=None):
-        assert key not in self.__data
-        self.__data[key] = Data(self, key, priority, title, text_handler, type, filter)
+    def register(self, data):
+        assert data.key not in self.__data
+        data.metadata = self
+        self.__data[data.key] = data
 
     def __iter__(self):
         return self.__data.itervalues()
