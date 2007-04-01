@@ -68,7 +68,9 @@ class ExeMetadata(Metadata):
         for node in info.array("node"):
             if "value" not in node:
                 continue
-            value = node["value"].value
+            value = node["value"].value.strip(" \0")
+            if not value:
+                continue
             key = node["name"].value
             values[key] = value
 
