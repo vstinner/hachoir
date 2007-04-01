@@ -201,6 +201,10 @@ class AsfMetadata(MultipleMetadata):
     EXT_DESC_TO_ATTR = {
         "Encoder": "producer",
         "ToolName": "producer",
+        "AlbumTitle": "album",
+        "Track": "track_number",
+        "TrackNumber": "track_number",
+        "Year": "creation_date",
     }
     SKIP_EXT_DESC = set((
         # Useless informations
@@ -234,6 +238,8 @@ class AsfMetadata(MultipleMetadata):
                 if "/" in key:
                     # Replace "WM/ToolName" with "ToolName"
                     key = key.split("/", 1)[1]
+                if not value:
+                    continue
                 data[key] = value
 
             # Have ToolName and ToolVersion? If yes, group them to producer key
