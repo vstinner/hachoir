@@ -18,7 +18,7 @@ def parseDatetime(value):
     if regs:
         try:
             year = int(regs.group(1))
-            return date(year, 1, 1)
+            return (date(year, 1, 1), unicode(year))
         except ValueError:
             pass
     regs = DATE_REGEX1.match(value)

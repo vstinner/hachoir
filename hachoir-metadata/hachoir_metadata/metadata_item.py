@@ -63,7 +63,13 @@ class Data:
                 self.metadata.error("Unable to convert %r to %s" % (
                     value, " or ".join(str(item.__name__) for item in self.type)))
                 return
-            value = new_value
+            if isinstance(new_value, tuple):
+                if text:
+                    value = new_value[0]
+                else:
+                    value, text = new_value
+            else:
+                value = new_value
         elif isinstance(value, str):
             value = unicode(value, "ISO-8859-1")
 
