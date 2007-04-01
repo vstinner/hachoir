@@ -7,10 +7,10 @@ YEAR_REGEX1 = re.compile("^([0-9]{4})$")
 DATE_REGEX1 = re.compile("^([0-9]{4})-([01][0-9])-([0-9]{2})$")
 
 # Date regex: YYYY-MM-DD (US format)
-DATETIME_REGEX1 = re.compile("^([0-9]{4})-([01][0-9])-([0-9]{2})-([0-9]{2})-([0-9]{2})-([0-9]{2})$")
+DATETIME_REGEX1 = re.compile("^([0-9]{4})-([01][0-9])-([0-9]{2})-([0-9]{1,2})-([0-9]{2})-([0-9]{2})$")
 
 # Date regex: "MM-DD-YYYY HH:MM:SS" (FR format)
-DATETIME_REGEX2 = re.compile("^([01]?[0-9])-([0-9]{2})-([0-9]{4})-([0-9]{2})-([0-9]{2})-([0-9]{2})$")
+DATETIME_REGEX2 = re.compile("^([01]?[0-9])-([0-9]{2})-([0-9]{4})-([0-9]{1,2})-([0-9]{2})-([0-9]{2})$")
 
 def parseDatetime(value):
     value = NORMALIZE_REGEX.sub("-", value.strip())
