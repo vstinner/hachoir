@@ -356,15 +356,15 @@ def lowerBound(seq, cmp_func):
 
 def humanUnixAttributes(mode):
     """
-    Convert a Unix file attributes (or "file mode") to a string.
+    Convert a Unix file attributes (or "file mode") to an unicode string.
 
     Original source code:
     http://cvs.savannah.gnu.org/viewcvs/coreutils/lib/filemode.c?root=coreutils
 
     >>> humanUnixAttributes(0644)
-    '-rw-r--r-- (644)'
+    u'-rw-r--r-- (644)'
     >>> humanUnixAttributes(02755)
-    '-rwxr-sr-x (2755)'
+    u'-rwxr-sr-x (2755)'
     """
 
     def ftypelet(mode):

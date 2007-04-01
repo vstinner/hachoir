@@ -83,7 +83,7 @@ def registerAllItems(meta):
         filter=NumberFilter(1, MAX_FRAME_RATE), type=(int, long, float)))
     meta.register(Data("bit_rate", 604, _("Bit rate"), text_handler=humanBitRate,
         filter=NumberFilter(1), type=(int, long, float)))
-    meta.register(Data("aspect_ratio", 604, _("Aspect ratio")))
+    meta.register(Data("aspect_ratio", 604, _("Aspect ratio"), type=(int, long, float)))
 
     meta.register(Data("os", 900, _("OS")))
     meta.register(Data("producer", 901, _("Producer")))
