@@ -1,10 +1,22 @@
 from hachoir_core.field import (FieldSet, ParserError,
-    UInt16,
-    String, CString, PascalString8,
+    UInt8, UInt16, UInt32,
+    String, CString, PascalString8, PascalString32,
     NullBytes, RawBytes)
 from hachoir_core.text_handler import hexadecimal
 from hachoir_core.tools import alignValue, createDict
 from hachoir_parser.image.iptc import IPTC
+from hachoir_parser.common.win32 import GUID, PascalStringWin32
+
+class Version(FieldSet):
+    def createFields(self):
+        yield UInt32(self, "version")
+        yield UInt8(self, "has_realm")
+        yield PascalStringWin32(self, "writer_name", charset="UTF-16-BE")
+        yield PascalStringWin32(self, "reader_name", charset="UTF-16-BE")
+        yield UInt32(self, "file_version")
+        size = (self.size - self.current_size) // 8
+        if size:
+            yield NullBytes(self, "padding", size)
 
 class Photoshop8BIM(FieldSet):
     TAG_INFO = {
@@ -23,7 +35,7 @@ class Photoshop8BIM(FieldSet):
         0x0419: ("glob_altitude", None, "Global altitude"),
         0x041a: ("slices", None, "Slices"),
         0x041e: ("url_list", None, "Unicode URL's"),
-        0x0421: ("version", None, "Version information"),
+        0x0421: ("version", Version, "Version information"),
         0x2710: ("print_flg2", None, "Print flags (2)"),
     }
     TAG_NAME = createDict(TAG_INFO, 0)
@@ -32,11 +44,10 @@ class Photoshop8BIM(FieldSet):
 
     def __init__(self, *args, **kw):
         FieldSet.__init__(self, *args, **kw)
-        tag = self["tag"].value
-        if tag in self.TAG_NAME:
-            self._name = self.TAG_NAME[tag]
-        if tag in self.TAG_DESC:
-            self._description = self.TAG_DESC[tag]
+        try:
+            self._name, self.handler, self._description = self.TAG_INFO[self["tag"].value]
+        except KeyError:
+            self.handler = None
         size = self["size"]
         self._size = size.address + size.size + alignValue(size.value, 2) * 8
 
@@ -53,13 +64,12 @@ class Photoshop8BIM(FieldSet):
             yield String(self, "name", 4, strip="\0")
         yield UInt16(self, "size")
         size = alignValue(self["size"].value, 2)
-        if 0 < size:
-            tag = self["tag"].value
-            if tag in self.CONTENT_HANDLER:
-                cls = self.CONTENT_HANDLER[tag]
-                yield cls(self, "content", size=size*8)
-            else:
-                yield RawBytes(self, "content", size)
+        if not size:
+            return
+        if self.handler:
+            yield self.handler(self, "content", size=size*8)
+        else:
+            yield RawBytes(self, "content", size)
 
 class PhotoshopMetadata(FieldSet):
     def createFields(self):
