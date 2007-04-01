@@ -183,6 +183,7 @@ def checkInterludeDavid(meta): return (
     checkAttr(meta, "audio[1]/nb_channel", 2),
     checkAttr(meta, "audio[1]/format_version", u"Vorbis version 0"),
     checkAttr(meta, "audio[1]/sample_rate", 44100),
+    checkAttr(meta, "mime_type", u"audio/vorbis"),
 )
 
 def checkBreakdance(meta): return (
@@ -286,6 +287,8 @@ def checkTwunk16(meta): return (
 )
 
 def checkDebianTorrent(meta): return (
+    checkAttr(meta, "filename", u"debian-31r4-i386-binary-1.iso"),
+    checkAttr(meta, "url", u"http://bttracker.acc.umu.se:6969/announce"),
     checkAttr(meta, "file_size", 669775872),
     checkAttr(meta, "creation_date", datetime(2006, 11, 16, 21, 44, 37)),
 )

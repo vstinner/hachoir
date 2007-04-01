@@ -263,7 +263,7 @@ class AsfMetadata(MultipleMetadata):
             self.creation_date = prop["creation_date"].value
             self.duration = durationWin64(prop["play_duration"].value)
             if prop["seekable"]:
-                self.comment = "Is seekable"
+                self.comment = u"Is seekable"
             value = prop["max_bitrate"].value
             text = prop["max_bitrate"].display
             if is_vbr is True:

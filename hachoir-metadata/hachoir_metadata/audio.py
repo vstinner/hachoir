@@ -117,10 +117,10 @@ class OggMetadata(MultipleMetadata):
         meta.comment = "Quality: %s" % header["quality"].value
 
     def vorbisHeader(self, header, meta):
-        meta.compression = "Vorbis"
+        meta.compression = u"Vorbis"
         meta.sample_rate = header["audio_sample_rate"].value
         meta.nb_channel = header["audio_channels"].value
-        meta.format_version = "Vorbis version %s" % header["vorbis_version"].value
+        meta.format_version = u"Vorbis version %s" % header["vorbis_version"].value
         meta.bit_rate = header["bitrate_nominal"].value
 
     def vorbisComment(self, comment):
@@ -262,7 +262,7 @@ class MpegAudioMetadata(Metadata):
         if "/frames/frame[0]" in mp3:
             frame = mp3["/frames/frame[0]"]
             self.nb_channel = (frame.getNbChannel(), frame["channel_mode"].display)
-            self.format_version = "MPEG version %s layer %s" % \
+            self.format_version = u"MPEG version %s layer %s" % \
                 (frame["version"].display, frame["layer"].display)
             sample_rate = frame.getSampleRate() # may returns None on error
             if sample_rate:

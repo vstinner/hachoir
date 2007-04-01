@@ -46,11 +46,11 @@ class ExeMetadata(Metadata):
 
     def useNE_Header(self, hdr):
         if hdr["is_dll"].value:
-            self.format_version = "New-style executable: Dynamic-link library (DLL)"
+            self.format_version = u"New-style executable: Dynamic-link library (DLL)"
         elif hdr["is_win_app"].value:
-            self.format_version = "New-style executable: Windows 3.x application"
+            self.format_version = u"New-style executable: Windows 3.x application"
         else:
-            self.format_version = "New-style executable for Windows 3.x"
+            self.format_version = u"New-style executable for Windows 3.x"
 
     def usePE_Header(self, hdr):
         self.creation_date = hdr["creation_date"].value

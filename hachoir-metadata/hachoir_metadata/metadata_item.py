@@ -51,6 +51,11 @@ class Data:
         if value is None:
             return
 
+        if isinstance(value, (str, unicode)):
+            value = value.strip(" \t\v\n\r\0")
+            if not value:
+                return
+
         # Convert string to Unicode string using charset ISO-8859-1
         if self.conversion:
             new_value = self.conversion(self.key, value)
@@ -60,7 +65,6 @@ class Data:
                 return
             value = new_value
         elif isinstance(value, str):
-            print "CONVERT TO UNICODE: %r" % value
             value = unicode(value, "ISO-8859-1")
 
         assert not self.type or isinstance(value, self.type), \
@@ -68,9 +72,6 @@ class Data:
 
         # Skip empty strings
         if isinstance(value, unicode):
-            value = value.strip(" \t\v\n\r\0")
-            if not value:
-                return
             value = normalizeNewline(value)
             if MAX_STR_LENGTH < len(value):
                 value = value[:MAX_STR_LENGTH] + "(...)"

@@ -36,7 +36,7 @@ class BmpMetadata(Metadata):
                 self.nb_colors = hdr["used_colors"].value
             self.bits_per_pixel = bpp
         self.compression = hdr["compression"].display
-        self.format_version = "Microsoft Bitmap version %s" % hdr.getFormatVersion()
+        self.format_version = u"Microsoft Bitmap version %s" % hdr.getFormatVersion()
         computeComprRate(self, image["pixels"].size)
 
 class TiffMetadata(Metadata):

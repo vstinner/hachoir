@@ -162,9 +162,9 @@ class JpegMetadata(Metadata):
             if not value:
                 return
             if isinstance(value, float):
-                value = "1/%g" % (1/value)
+                value = u"1/%g" % (1/value)
         elif rational:
-            value = "%.3g" % value
+            value = u"%.3g" % value
 
         # Store information
         setattr(self, key, value)

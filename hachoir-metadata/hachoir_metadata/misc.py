@@ -49,8 +49,8 @@ class TTF_Metadata(Metadata):
     def extractHeader(self, header):
         self.creation_date = header["created"].value
         self.last_modification = header["modified"].value
-        self.comment = "Smallest readable size in pixels: %s pixels" % header["lowest"].value
-        self.comment = "Font direction: %s" % header["font_dir"].display
+        self.comment = u"Smallest readable size in pixels: %s pixels" % header["lowest"].value
+        self.comment = u"Font direction: %s" % header["font_dir"].display
 
     def extractNames(self, names):
         offset = names["offset"].value
