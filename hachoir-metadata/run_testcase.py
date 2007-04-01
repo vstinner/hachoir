@@ -41,29 +41,28 @@ def checkAttr(metadata, name, value):
         return False
 
     # Read value
-    read = metadata.getValues(name)
-
-    # Check type
-    if type(read) != type(value) \
-    and (not isinstance(value, (int, long)) or not isinstance(value, (int, long))):
-        sys.stdout.write("wrong type (%s instead of %s)!\n"
-            % (type(read).__name__, type(value).__name__))
-        return False
+    reads = metadata.getValues(name)
 
     # Check value
-    if isinstance(read, (list, tuple)):
-        if len(read) != len(value):
-            sys.stdout.write("wrong len (%s instead of %s)!\n"
-                % (len(read), len(value)))
+    if len(reads) != len(value):
+        sys.stdout.write("wrong len (%s instead of %s)!\n"
+            % (len(reads), len(value)))
+        return False
+    values = value
+    for index, value in enumerate(values):
+        read = reads[index]
+
+        # Check type
+        if type(read) != type(value) \
+        and not(isinstance(value, (int, long)) and isinstance(value, (int, long))):
+            sys.stdout.write("wrong type (%s instead of %s)!\n"
+                % (type(read).__name__, type(value).__name__))
             return False
-        for index in xrange(len(value)):
-            if value[index] != read[index]:
-                sys.stdout.write("wrong value %s (%s instead of %s)!\n"
-                    % (index, repr(read[index]), repr(value[index])))
-                return False
-    else:
+
+        # Check value
         if value != read:
-            sys.stdout.write("wrong value (%s)!\n" % repr(read))
+            sys.stdout.write("wrong value %s (%r instead of %r)!\n"
+                % (index, read, value))
             return False
     sys.stdout.write("ok\n")
     return True
@@ -71,10 +70,10 @@ def checkAttr(metadata, name, value):
 def checkLogoUbuntuMeta(metadata): return (
     checkAttr(metadata, "bits_per_pixel", 32),
     checkAttr(metadata, "creation_date", datetime(2006, 5, 26, 9, 41, 46)),
-    checkAttr(metadata, "mime_type", "image/png"))
+    checkAttr(metadata, "mime_type", u"image/png"))
 
 def checkClickMeta(metadata): return (
-    checkAttr(metadata, "producer", "Sound Forge 4.5"),
+    checkAttr(metadata, "producer", u"Sound Forge 4.5"),
     checkAttr(metadata, "creation_date", date(2001, 2, 21)),
     checkAttr(metadata, "duration", timedelta(microseconds=19546)),
     checkAttr(metadata, "bit_rate", 705600),
@@ -85,17 +84,17 @@ def checkGzipMeta(metadata): return (
     checkAttr(metadata, "compr_size", 90),
     checkAttr(metadata, "last_modification", datetime(2006, 7, 29, 12, 20, 44)),
     checkAttr(metadata, "os", u"Unix"),
-    checkAttr(metadata, "compression", "deflate"))
+    checkAttr(metadata, "compression", u"deflate"))
 
 def checkSheepMeta(metadata): return (
-    checkAttr(metadata, "format_version", "MPEG version 1 layer III"),
-    checkAttr(metadata, "author", "Sheep On Drugs"),
-    checkAttr(metadata, "comment", "Stainless Steel Provider is compilated to the car of Twinstar."))
+    checkAttr(metadata, "format_version", u"MPEG version 1 layer III"),
+    checkAttr(metadata, "author", u"Sheep On Drugs"),
+    checkAttr(metadata, "comment", u"Stainless Steel Provider is compilated to the car of Twinstar."))
 
 def checkPng331_90_8Meta(metadata): return (
     checkAttr(metadata, "width", 331),
     checkAttr(metadata, "creation_date", datetime(2006, 5, 26, 9, 41, 46)),
-    checkAttr(metadata, "mime_type", "image/png"),
+    checkAttr(metadata, "mime_type", u"image/png"),
     checkAttr(metadata, "endian", u"Big endian"))
 
 def checkFlashMobInfo(metadata): return (
@@ -120,36 +119,36 @@ def checkWormuxIco(meta): return (
 )
 
 def checkAudio8kHz(meta): return (
-    checkAttr(meta, "mime_type", "audio/basic"),
+    checkAttr(meta, "mime_type", u"audio/basic"),
     checkAttr(meta, "nb_channel", 1),
     checkAttr(meta, "bits_per_sample", 8),
     checkAttr(meta, "bit_rate", 64096),
     checkAttr(meta, "sample_rate", 8012),
-    checkAttr(meta, "compression", "8-bit ISDN u-law"),
-    checkAttr(meta, "comment", "../tmp/temp.snd"),
+    checkAttr(meta, "compression", u"8-bit ISDN u-law"),
+    checkAttr(meta, "comment", u"../tmp/temp.snd"),
     checkAttr(meta, "duration", timedelta(seconds=4, microseconds=391538)),
 )
 
 def checkCrossXCF(meta): return (
-    checkAttr(meta, "comment", 'Created with The GIMP'),
+    checkAttr(meta, "comment", u"Created with The GIMP"),
     checkAttr(meta, "width", 61),
     checkAttr(meta, "height", 72),
-    checkAttr(meta, "compression", "RLE"),
-    checkAttr(meta, "mime_type", "image/x-xcf"))
+    checkAttr(meta, "compression", u"RLE"),
+    checkAttr(meta, "mime_type", u"image/x-xcf"))
 
 def checkTARMeta(meta): return (
-    checkAttr(meta, "file[0]/filename", "dummy.txt"),
+    checkAttr(meta, "file[0]/filename", u"dummy.txt"),
     checkAttr(meta, "file[0]/file_size", 62),
-    checkAttr(meta, "file[1]/file_attr", "-rwxr-xr-x (755)"),
+    checkAttr(meta, "file[1]/file_attr", u"-rwxr-xr-x (755)"),
     checkAttr(meta, "file[1]/last_modification", datetime(2006, 10, 1, 13, 9, 3)),
-    checkAttr(meta, "file[2]/file_type", "Normal disk file"),
+    checkAttr(meta, "file[2]/file_type", u"Normal disk file"),
 )
 
 def checkCornerBMPMeta(meta): return (
     checkAttr(meta, "width", 189),
     checkAttr(meta, "nb_colors", 70),
-    checkAttr(meta, "compression", "Uncompressed"),
-    checkAttr(meta, "mime_type", "image/x-ms-bmp"),
+    checkAttr(meta, "compression", u"Uncompressed"),
+    checkAttr(meta, "mime_type", u"image/x-ms-bmp"),
 )
 
 def checkSmallville(metadata): return (
@@ -165,16 +164,16 @@ def checkSmallville(metadata): return (
 
 def checkLechat(meta): return (
     checkAttr(meta, "album", [u"Arte Radio", u"Chat Broodthaers"]),
-    checkAttr(meta, "url", "Liens direct ARTE Radio: www.arteradio.com/son.html?473"),
+    checkAttr(meta, "url", u"Liens direct ARTE Radio: www.arteradio.com/son.html?473"),
     checkAttr(meta, "creation_date", date(2003, 1, 1)),
-    checkAttr(meta, "producer", "www.arteradio.com"),
+    checkAttr(meta, "producer", u"www.arteradio.com"),
     checkAttr(meta, "sample_rate", 44100),
     checkAttr(meta, "bit_rate", 128000))
 
 def checkJpegExifPSD(meta): return (
     checkAttr(meta, "producer", [u"Adobe Photoshop 7.0"]),
     checkAttr(meta, "width", 124),
-    checkAttr(meta, "compression", "JPEG (Progressive)"),
+    checkAttr(meta, "compression", u"JPEG (Progressive)"),
     checkAttr(meta, "creation_date", datetime(2006, 6, 28, 14, 51, 9)))
 
 def checkInterludeDavid(meta): return (
@@ -182,7 +181,7 @@ def checkInterludeDavid(meta): return (
     checkAttr(meta, "artist", u"david aubrun"),
     checkAttr(meta, "duration", timedelta(minutes=1, seconds=12, microseconds=19592)),
     checkAttr(meta, "audio[1]/nb_channel", 2),
-    checkAttr(meta, "audio[1]/format_version", "Vorbis version 0"),
+    checkAttr(meta, "audio[1]/format_version", u"Vorbis version 0"),
     checkAttr(meta, "audio[1]/sample_rate", 44100),
 )
 
@@ -199,7 +198,7 @@ def checkMatrixPingPong(meta): return (
     checkAttr(meta, "creation_date", datetime(2003, 6, 16, 7, 57, 23, 235000)),
     checkAttr(meta, "audio[1]/sample_rate", 8000),
     checkAttr(meta, "audio[1]/bits_per_sample", 16),
-    checkAttr(meta, "audio[1]/compression", "Windows Media Audio V7 / V8 / V9"),
+    checkAttr(meta, "audio[1]/compression", u"Windows Media Audio V7 / V8 / V9"),
     checkAttr(meta, "video[1]/width", 200),
     checkAttr(meta, "video[1]/height", 150),
     checkAttr(meta, "video[1]/bits_per_pixel", 24),
@@ -231,18 +230,18 @@ def checkLadouce(meta): return (
     checkAttr(meta, "nb_channel", 6),
     checkAttr(meta, "sample_rate", 44100),
     checkAttr(meta, "bits_per_sample", 32),
-    checkAttr(meta, "compression", "IEEE Float"),
+    checkAttr(meta, "compression", u"IEEE Float"),
     checkAttr(meta, "bit_rate", 8467200),
 )
 
 def checkLaraCroft(meta): return (
     checkAttr(meta, "width", 320),
     checkAttr(meta, "nb_colors", 256),
-    checkAttr(meta, "compression", "Run-length encoding (RLE)"),
+    checkAttr(meta, "compression", u"Run-length encoding (RLE)"),
 )
 
 def checkHachoirOrgSXW(meta): return (
-    checkAttr(meta, "mime_type", "application/vnd.sun.xml.writer"),
+    checkAttr(meta, "mime_type", u"application/vnd.sun.xml.writer"),
     checkAttr(meta, "file[0]/file_size", 30),
     checkAttr(meta, "file[1]/creation_date", datetime(2007, 1, 22, 19, 8, 14)),
     checkAttr(meta, "file[2]/filename", u"Configurations2/accelerator/current.xml"),
@@ -256,7 +255,7 @@ def checkFirstRun(meta): return (
     checkAttr(meta, "producer", u"RealProducer Plus 6.1.0.153 Windows"),
     checkAttr(meta, "stream[1]/mime_type", u"audio/x-pn-realaudio"),
     checkAttr(meta, "stream[1]/bit_rate", 32148),
-    checkAttr(meta, "stream[1]/title", "Audio Stream"),
+    checkAttr(meta, "stream[1]/title", u"Audio Stream"),
     checkAttr(meta, "mime_type", u"audio/x-pn-realaudio"),
     checkAttr(meta, "bit_rate", 32348),
     checkAttr(meta, "stream[2]/bit_rate", 200),
@@ -271,7 +270,7 @@ def checkDejaVu(meta): return (
     checkAttr(meta, "copyright", [
         u"Copyright (c) 2003 by Bitstream, Inc. All Rights Reserved.\nDejaVu changes are in public domain",
         u"http://dejavu.sourceforge.net/wiki/index.php/License"]),
-    checkAttr(meta, "url", "http://dejavu.sourceforge.net"),
+    checkAttr(meta, "url", u"http://dejavu.sourceforge.net"),
     checkAttr(meta, "comment", [
         u"Smallest readable size in pixels: 8 pixels",
         u"Font direction: Mixed directional"]),
@@ -279,11 +278,11 @@ def checkDejaVu(meta): return (
 
 def checkTwunk16(meta): return (
     checkAttr(meta, "title", [
-        "Twain_32.dll Client's 16-Bit Thunking Server",
-        "Twain Thunker"]),
-    checkAttr(meta, "author", "Twain Working Group"),
-    checkAttr(meta, "version", "1,7,0,0"),
-    checkAttr(meta, "format_version", "New-style executable: Dynamic-link library (DLL)"),
+        u"Twain_32.dll Client's 16-Bit Thunking Server",
+        u"Twain Thunker"]),
+    checkAttr(meta, "author", u"Twain Working Group"),
+    checkAttr(meta, "version", u"1,7,0,0"),
+    checkAttr(meta, "format_version", u"New-style executable: Dynamic-link library (DLL)"),
 )
 
 def checkFile(filename, check_metadata):
