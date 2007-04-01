@@ -10,12 +10,13 @@ Creation date: 2007-01-19
 """
 
 from hachoir_core.field import (FieldSet, Enum,
-    Bit, Bits,
+    Bit, Bits, SeekableFieldSet,
     UInt16, UInt32, TimestampUnix32,
     RawBytes, PaddingBytes, NullBytes, NullBits,
     CString, String, PascalString16)
 from hachoir_core.text_handler import humanFilesize, hexadecimal
 from hachoir_core.tools import createDict, paddingSize, alignValue, makePrintable
+from hachoir_core.error import HACHOIR_ERRORS
 from hachoir_parser.common.win32 import BitmapInfoHeader
 
 class Version(FieldSet):
@@ -312,9 +313,9 @@ class Directory(FieldSet):
     def createDescription(self):
         return self["header"].description
 
-class PE_Resource(FieldSet):
+class PE_Resource(SeekableFieldSet):
     def __init__(self, parent, name, section, size):
-        FieldSet.__init__(self, parent, name, size=size)
+        SeekableFieldSet.__init__(self, parent, name, size=size)
         self.section = section
 
     def parseSub(self, directory, name, depth):
@@ -377,11 +378,14 @@ class PE_Resource(FieldSet):
 
         # Parse resource content
         for entry in entries:
-            offset = self.section.rva2file(entry["rva"].value)
-            padding = self.seekByte(offset, relative=False)
-            if padding:
-                yield padding
-            yield ResourceContent(self, "content[]", entry)
+            try:
+                offset = self.section.rva2file(entry["rva"].value)
+                padding = self.seekByte(offset, relative=False)
+                if padding:
+                    yield padding
+                yield ResourceContent(self, "content[]", entry)
+            except HACHOIR_ERRORS, err:
+                self.warning("Error when parsing entry %s: %s" % (entry.path, err))
 
         size = (self.size - self.current_size) // 8
         if size:
