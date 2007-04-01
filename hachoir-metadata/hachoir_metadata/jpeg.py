@@ -86,6 +86,8 @@ class JpegMetadata(Metadata):
             self.comment = comment["data"].value
         self.computeQuality(jpeg)
         computeComprRate(self, jpeg["data"].size)
+        if not self.has("producer") and ("photoshop" in jpeg or "adobe" in jpeg):
+            self.producer = u"Adobe Photoshop"
 
     def computeQuality(self, jpeg):
         # This function is an adaption to Python of ImageMagick code

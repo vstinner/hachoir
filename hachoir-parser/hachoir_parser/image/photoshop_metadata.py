@@ -3,59 +3,40 @@ from hachoir_core.field import (FieldSet, ParserError,
     String, CString, PascalString8,
     NullBytes, RawBytes)
 from hachoir_core.text_handler import hexadecimal
-from hachoir_core.tools import alignValue
+from hachoir_core.tools import alignValue, createDict
 from hachoir_parser.image.iptc import IPTC
 
 class Photoshop8BIM(FieldSet):
-    tag_name = {
-        0x03ed: "res_info",
-        0x03f3: "print_flg",
-        0x03f5: "col_half_info",
-        0x03f8: "color_trans_func",
-        0x0404: "iptc",
-        0x0406: "jpeg_qual",
-        0x0408: "grid_guide",
-        0x040a: "copyright_flg",
-        0x040c: "thumb_res2",
-        0x040d: "glob_angle",
-        0x0411: "icc_tagged",
-        0x0414: "base_layer_id",
-        0x0419: "glob_altitude",
-        0x041a: "slices",
-        0x041e: "url_list",
-        0x0421: "version",
-        0x2710: "print_flg2"
+    TAG_INFO = {
+        0x03ed: ("res_info", None, "Resolution information"),
+        0x03f3: ("print_flg", None, "Print flags: labels, crop marks, colour bars, etc."),
+        0x03f5: ("col_half_info", None, "Colour half-toning information"),
+        0x03f8: ("color_trans_func", None, "Colour transfer function"),
+        0x0404: ("iptc", IPTC, "IPTC/NAA"),
+        0x0406: ("jpeg_qual", None, "JPEG quality"),
+        0x0408: ("grid_guide", None, "Grid guides informations"),
+        0x040a: ("copyright_flg", None, "Copyright flag"),
+        0x040c: ("thumb_res2", None, "Thumbnail resource (2)"),
+        0x040d: ("glob_angle", None, "Global lighting angle for effects"),
+        0x0411: ("icc_tagged", None, "ICC untagged (1 means intentionally untagged)"),
+        0x0414: ("base_layer_id", None, "Base value for new layers ID's"),
+        0x0419: ("glob_altitude", None, "Global altitude"),
+        0x041a: ("slices", None, "Slices"),
+        0x041e: ("url_list", None, "Unicode URL's"),
+        0x0421: ("version", None, "Version information"),
+        0x2710: ("print_flg2", None, "Print flags (2)"),
     }
-    tag_desc = {
-        0x03ed: "Resolution information",
-        0x03f3: "Print flags: labels, crop marks, colour bars, ecc, ...",
-        0x03f5: "Colour half-toning information",
-        0x03f8: "Colour transfer function",
-        0x0404: "IPTC/NAA",
-        0x0406: "JPEG quality",
-        0x0408: "Grid guides informations",
-        0x040a: "Copyright flag",
-        0x040c: "Thumbnail resource (2)",
-        0x040d: "Global lighting angle for effects",
-        0x0411: "ICC untagged (1 means intentionally untagged)",
-        0x0414: "Base value for new layers ID's",
-        0x0419: "Global altitude",
-        0x041a: "Slices",
-        0x041e: "Unicode URL's",
-        0x0421: "Version information",
-        0x2710: "Print flags (2)"
-    }
-    content_handler = {
-        0x0404: IPTC,
-    }
+    TAG_NAME = createDict(TAG_INFO, 0)
+    CONTENT_HANDLER = createDict(TAG_INFO, 1)
+    TAG_DESC = createDict(TAG_INFO, 2)
 
     def __init__(self, *args, **kw):
         FieldSet.__init__(self, *args, **kw)
         tag = self["tag"].value
-        if tag in self.tag_name:
-            self._name = self.tag_name[tag]
-        if tag in self.tag_desc:
-            self._description = self.tag_desc[tag]
+        if tag in self.TAG_NAME:
+            self._name = self.TAG_NAME[tag]
+        if tag in self.TAG_DESC:
+            self._description = self.TAG_DESC[tag]
         size = self["size"]
         self._size = size.address + size.size + alignValue(size.value, 2) * 8
 
@@ -74,8 +55,8 @@ class Photoshop8BIM(FieldSet):
         size = alignValue(self["size"].value, 2)
         if 0 < size:
             tag = self["tag"].value
-            if tag in self.content_handler:
-                cls = self.content_handler[tag]
+            if tag in self.CONTENT_HANDLER:
+                cls = self.CONTENT_HANDLER[tag]
                 yield cls(self, "content", size=size*8)
             else:
                 yield RawBytes(self, "content", size)
