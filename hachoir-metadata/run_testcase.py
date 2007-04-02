@@ -294,7 +294,7 @@ def checkDebianTorrent(meta): return (
     checkAttr(meta, "creation_date", datetime(2006, 11, 16, 21, 44, 37)),
 )
 
-def checkFile(filename, check_metadata):
+def checkFile(filename, check_metadata, quality=1.0):
     sys.stdout.write("  - Create parser: ")
     sys.stdout.flush()
     try:
@@ -310,7 +310,7 @@ def checkFile(filename, check_metadata):
     sys.stdout.write("  - Create metadata: ")
     sys.stdout.flush()
     try:
-        metadata = extractMetadata(parser)
+        metadata = extractMetadata(parser, quality)
     except HachoirError, err:
         sys.stdout.write("stream error! %s\n" % unicode(err))
         sys.exit(1)

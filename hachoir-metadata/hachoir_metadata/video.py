@@ -1,6 +1,7 @@
 from hachoir_core.field import MissingField
 from hachoir_core.error import HachoirError
 from hachoir_metadata.metadata import Metadata, MultipleMetadata, registerExtractor
+from hachoir_metadata.metadata_item import QUALITY_GOOD
 from hachoir_parser.video import MovFile, AsfFile, FlvFile
 from hachoir_parser.video.asf import Descriptor as ASF_Descriptor
 from hachoir_parser.container import MkvFile
@@ -39,6 +40,9 @@ class MkvMetadata(MultipleMetadata):
                     self.processTag(tag)
             elif field.name.startswith("Tracks["):
                 self.processTracks(field)
+            elif field.name.startswith("Cluster["):
+                if self.quality < QUALITY_GOOD:
+                    return
 
     def processTracks(self, tracks):
         for entry in tracks.array("TrackEntry"):

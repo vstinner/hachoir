@@ -8,7 +8,7 @@ from hachoir_parser.image.jpeg import (
 from hachoir_core.field import MissingField
 from hachoir_core.i18n import _
 from hachoir_core.error import HACHOIR_ERRORS
-import types
+from datetime import datetime
 
 class JpegMetadata(Metadata):
     exif_key = {
@@ -31,6 +31,7 @@ class JpegMetadata(Metadata):
 
     IPTC_KEY = {
          80: "author",
+         90: "city",
         101: "country",
         116: "copyright",
         120: "title",
@@ -174,6 +175,7 @@ class JpegMetadata(Metadata):
         setattr(self, key, value)
 
     def parseIPTC(self, iptc):
+        datestr = hourstr = None
         for field in iptc:
             # Skip incomplete field
             if "tag" not in field or "content" not in field:
@@ -181,17 +183,33 @@ class JpegMetadata(Metadata):
 
             # Get value
             value = field["content"].value
-            if isinstance(value, types.StringTypes):
+            if isinstance(value, (str, unicode)):
                 value = value.replace("\r", " ")
                 value = value.replace("\n", " ")
 
             # Skip unknown tag
             tag = field["tag"].value
+            if tag == 55:
+                datestr = value
+                continue
+            if tag == 60:
+                hourstr = value
+                continue
             if tag not in self.IPTC_KEY:
                 if tag != 0:
-                    self.warning("Skip IPTC key %s: %s" % (tag, value))
+                    self.warning("Skip IPTC key %s: %s" % (field["tag"].display, value))
                 continue
             setattr(self, self.IPTC_KEY[tag], value)
-
+        if datestr and hourstr:
+            try:
+                year = int(datestr[0:4])
+                month = int(datestr[4:6])
+                day = int(datestr[6:8])
+                hour = int(hourstr[0:2])
+                min = int(hourstr[2:4])
+                sec = int(hourstr[4:6])
+                self.creation_date = datetime(year, month, day, hour, min, sec)
+            except ValueError:
+                pass
 registerExtractor(JpegFile, JpegMetadata)
 

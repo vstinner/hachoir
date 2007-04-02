@@ -4,7 +4,7 @@ from hachoir_parser.container import OggFile, RealMediaFile
 from hachoir_core.i18n import _
 from hachoir_core.tools import makePrintable, timedelta2seconds, humanBitRate
 from datetime import timedelta, date
-from hachoir_metadata import QUALITY_FAST, QUALITY_BEST
+from hachoir_metadata.metadata_item import QUALITY_FAST, QUALITY_NORMAL, QUALITY_BEST
 
 def setTrackTotal(meta, key, total):
     try:
@@ -89,7 +89,7 @@ class OggMetadata(MultipleMetadata):
                 break
 
         # Compute duration
-        if granule_quotient:
+        if granule_quotient and QUALITY_NORMAL <= self.quality:
             page = ogg.createLastPage()
             if page and "abs_granule_pos" in page:
                 self.duration = timedelta(seconds=float(page["abs_granule_pos"].value) / granule_quotient)
@@ -292,8 +292,8 @@ class MpegAudioMetadata(Metadata):
         bit_rate = frame.getBitRate() # may returns None on error
         if not bit_rate:
             return
-        self.bit_rate = (bit_rate, _("%s (constant)") % humanBitRate(avg))
-        self.duration = timedelta(seconds=float(mp3["frames"].size) / bit_rate)
+        self.bit_rate = (bit_rate, _("%s (constant)") % humanBitRate(bit_rate))
+        self.duration = timedelta(seconds=float(frame["/frames"].size) / bit_rate)
 
     def computeVariableBitrate(self, mp3):
         if self.quality <= QUALITY_FAST:

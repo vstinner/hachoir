@@ -15,10 +15,15 @@ extractors = {}
 class Metadata(Logger):
     header = u"Metadata"
 
-    def __init__(self, quality):
+    def __init__(self, quality=None, parent=None):
         assert isinstance(self.header, unicode)
 
         # Limit to 0.0 .. 1.0
+        if quality is None:
+            if parent:
+                quality = parent.quality
+            else:
+                quality = 0.5
         quality = min(max(0.0, quality), 1.0)
 
         object.__init__(self)
@@ -189,8 +194,8 @@ class Metadata(Logger):
 
 class MultipleMetadata(Metadata):
     header = _("Common")
-    def __init__(self):
-        Metadata.__init__(self)
+    def __init__(self, quality):
+        Metadata.__init__(self, quality)
         object.__setattr__(self, "_MultipleMetadata__groups", Dict())
         object.__setattr__(self, "_MultipleMetadata__key_counter", {})
 

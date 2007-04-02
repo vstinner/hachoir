@@ -68,6 +68,7 @@ def registerAllItems(meta):
     meta.register(Data("country", 502, _("Country")))
     meta.register(Data("charset", 503, _("Charset")))
     meta.register(Data("font_weight", 503, _("Font weight")))
+    meta.register(Data("city", 504, _("City")))
 
     meta.register(Data("camera_aperture", 520, _("Camera aperture")))
     meta.register(Data("camera_focal", 521, _("Camera focal")))

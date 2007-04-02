@@ -1,8 +1,5 @@
 from hachoir_metadata.version import VERSION as __version__
 from hachoir_metadata.metadata import extractMetadata
-from hachoir_metadata.metadata_item import (QUALITY_FASTEST,
-    QUALITY_FAST, QUALITY_NORMAL, QUALITY_NORMAL, QUALITY_GOOD,
-    QUALITY_BEST)
 
 # Just import the module,
 # each module use registerExtractor() method

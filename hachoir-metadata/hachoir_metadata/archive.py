@@ -1,3 +1,4 @@
+from hachoir_metadata.metadata_item import QUALITY_BEST
 from hachoir_metadata.metadata import (
     Metadata, MultipleMetadata, registerExtractor)
 from hachoir_parser.archive import (Bzip2Parser, CabFile, GzipParser,
@@ -5,7 +6,10 @@ from hachoir_parser.archive import (Bzip2Parser, CabFile, GzipParser,
 from hachoir_core.tools import humanUnixAttributes
 from hachoir_core.i18n import _
 
-MAX_NB_FILE = 5
+def maxNbFile(meta):
+    if QUALITY_BEST <= meta.quality:
+        return None
+    return 1 + int(10 * meta.quality)
 
 def computeCompressionRate(meta):
     """
@@ -38,11 +42,12 @@ class GzipMetadata(Metadata):
 
 class ZipMetadata(MultipleMetadata):
     def extract(self, zip):
+        max_nb = maxNbFile(self)
         for index, field in enumerate(zip.array("file")):
-            if MAX_NB_FILE <= index:
-                self.warning("ZIP archive contains many files, but only first %s files are processed" % MAX_NB_FILE)
+            if max_nb and max_nb <= index:
+                self.warning("ZIP archive contains many files, but only first %s files are processed" % max_nb)
                 break
-            meta = Metadata()
+            meta = Metadata(parent=self)
             meta.filename = field["filename"].value
             meta.creation_date = field["last_mod"].value
             meta.compression = field["compression"].display
@@ -60,11 +65,12 @@ class ZipMetadata(MultipleMetadata):
 
 class TarMetadata(MultipleMetadata):
     def extract(self, tar):
+        max_nb = maxNbFile(self)
         for index, field in enumerate(tar.array("file")):
-            if MAX_NB_FILE <= index:
-                self.warning("TAR archive contains many files, but only first %s files are processed" % MAX_NB_FILE)
+            if max_nb and max_nb <= index:
+                self.warning("TAR archive contains many files, but only first %s files are processed" % max_nb)
                 break
-            meta = Metadata()
+            meta = Metadata(parent=self)
             meta.filename = field["name"].value
             meta.file_size = field.getOctal("size")
             try:
@@ -91,11 +97,12 @@ class CabMetadata(MultipleMetadata):
         self.format_version = "Microsoft Cabinet version %s" % cab["cab_version"].display
         self.comment = "%s folders, %s files" % (
             cab["nb_folder"].value, cab["nb_files"].value)
+        max_nb = maxNbFile(self)
         for index, field in enumerate(cab.array("file")):
-            if MAX_NB_FILE <= index:
-                self.warning("CAB archive contains many files, but only first %s files are processed" % MAX_NB_FILE)
+            if max_nb and max_nb <= index:
+                self.warning("CAB archive contains many files, but only first %s files are processed" % max_nb)
                 break
-            meta = Metadata()
+            meta = Metadata(parent=self)
             meta.filename = field["filename"].value
             meta.file_size = field["filesize"].value
             meta.creation_date = field["timestamp"].value
@@ -112,11 +119,12 @@ class MarMetadata(MultipleMetadata):
     def extract(self, mar):
         self.comment = "Contains %s files" % mar["nb_file"].value
         self.format_version = "Microsoft Archive version %s" % mar["version"].value
+        max_nb = maxNbFile(self)
         for index, field in enumerate(mar.array("file")):
-            if MAX_NB_FILE <= index:
-                self.warning("MAR archive contains many files, but only first %s files are processed" % MAX_NB_FILE)
+            if max_nb and max_nb <= index:
+                self.warning("MAR archive contains many files, but only first %s files are processed" % max_nb)
                 break
-            meta = Metadata()
+            meta = Metadata(parent=self)
             meta.filename = field["filename"].value
             meta.compression = "None"
             meta.file_size = field["filesize"].value
