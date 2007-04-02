@@ -15,11 +15,15 @@ extractors = {}
 class Metadata(Logger):
     header = u"Metadata"
 
-    def __init__(self):
+    def __init__(self, quality):
         assert isinstance(self.header, unicode)
+
+        # Limit to 0.0 .. 1.0
+        quality = min(max(0.0, quality), 1.0)
 
         object.__init__(self)
         object.__setattr__(self, "_Metadata__data", {})
+        object.__setattr__(self, "quality", quality)
         header = self.__class__.header
         object.__setattr__(self, "_Metadata__header", header)
 
@@ -231,7 +235,7 @@ def registerExtractor(parser, extractor):
     assert parser not in extractors
     extractors[parser] = extractor
 
-def extractMetadata(parser):
+def extractMetadata(parser, quality):
     """
     Create a Metadata class from a parser. Returns None if no metadata
     extractor does exist for the parser class.
@@ -240,7 +244,7 @@ def extractMetadata(parser):
         extractor = extractors[parser.__class__]
     except KeyError:
         return None
-    metadata = extractor()
+    metadata = extractor(quality)
     metadata.extract(parser)
     metadata.mime_type = parser.mime_type
     metadata.endian = endian_name[parser.endian]

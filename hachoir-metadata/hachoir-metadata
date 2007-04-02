@@ -57,6 +57,8 @@ def parseOptions():
         action="store_true", default=False)
     common.add_option("--version", help=_("Display version and exit"),
         action="callback", callback=displayVersion)
+    common.add_option("--quality", help=_("Information quality (0.0=fastest, 1.0=best, and default is 0.5)"),
+        action="store", type="float", default="0.5")
     parser.add_option_group(common)
 
     hachoir = getHachoirOptions(parser)
@@ -87,7 +89,7 @@ display_filename=False, priority=None, human=True, display=True):
     extract_metadata = not(values.mime or values.type)
     if extract_metadata:
         try:
-            metadata = extractMetadata(parser)
+            metadata = extractMetadata(parser, values.quality)
         except HachoirError, err:
             error(unicode(err))
             metadata = None

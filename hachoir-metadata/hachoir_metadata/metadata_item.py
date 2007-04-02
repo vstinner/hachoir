@@ -4,6 +4,12 @@ MIN_PRIORITY = 100
 MAX_PRIORITY = 999
 MAX_STR_LENGTH = 300              # 300 characters
 
+QUALITY_FASTEST = 0.0
+QUALITY_FAST = 0.25
+QUALITY_NORMAL = 0.5
+QUALITY_GOOD = 0.75
+QUALITY_BEST = 1.0
+
 class DataValue:
     def __init__(self, value, text):
         self.value = value
@@ -95,6 +101,7 @@ class Data:
         # keep the longer value
         if isinstance(value, unicode):
             for index, item in enumerate(self.values):
+                item = item.value
                 if not isinstance(item, unicode):
                     continue
                 if value.startswith(item):

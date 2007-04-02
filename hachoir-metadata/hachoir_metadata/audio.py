@@ -2,8 +2,9 @@ from hachoir_metadata.metadata import Metadata, MultipleMetadata, registerExtrac
 from hachoir_parser.audio import AuFile, MpegAudioFile, RealAudioFile, AiffFile
 from hachoir_parser.container import OggFile, RealMediaFile
 from hachoir_core.i18n import _
-from hachoir_core.tools import makePrintable, timedelta2seconds
+from hachoir_core.tools import makePrintable, timedelta2seconds, humanBitRate
 from datetime import timedelta, date
+from hachoir_metadata import QUALITY_FAST, QUALITY_BEST
 
 def setTrackTotal(meta, key, total):
     try:
@@ -220,7 +221,7 @@ class MpegAudioMetadata(Metadata):
         "TPE1": ("author", None),
         "COMM": ("comment", None),
         "TENC": ("producer", None),
-        "TRCK": ("track_number", int),
+        "TRCK": ("track_number", setTrackNumber),
         "TALB": ("album", None),
         "TIT2": ("title", None),
         "TYER": ("creation_date", None),
@@ -268,14 +269,10 @@ class MpegAudioMetadata(Metadata):
             if sample_rate:
                 self.sample_rate = sample_rate
             self.bits_per_sample = 16
-            bit_rate = frame.getBitRate() # may returns None on error
-            if bit_rate:
-                if mp3["frames"].looksConstantBitRate():
-                    self.bit_rate = bit_rate
-                    # Guess music duration using fixed bit rate
-                    self.duration = timedelta(seconds=float(mp3["frames"].size) / bit_rate)
-                else:
-                    self.bit_rate = _("Variable bit rate (VBR)")
+            if mp3["frames"].looksConstantBitRate():
+                self.computeBitrate(frame)
+            else:
+                self.computeVariableBitrate(mp3)
         if "id3v1" in mp3:
             id3 = mp3["id3v1"]
             self.comment = id3["comment"].value
@@ -290,6 +287,40 @@ class MpegAudioMetadata(Metadata):
             self.readID3v2(mp3["id3v2"])
         if "frames" in mp3:
             computeComprRate(self, mp3["frames"].size)
+
+    def computeBitrate(self, frame):
+        bit_rate = frame.getBitRate() # may returns None on error
+        if not bit_rate:
+            return
+        self.bit_rate = (bit_rate, _("%s (constant)") % humanBitRate(avg))
+        self.duration = timedelta(seconds=float(mp3["frames"].size) / bit_rate)
+
+    def computeVariableBitrate(self, mp3):
+        if self.quality <= QUALITY_FAST:
+            return
+        count = 0
+        if QUALITY_BEST <= self.quality:
+            self.warning("Process all MPEG audio frames to compute exact duration")
+            max_count = None
+        else:
+            max_count = 500 * self.quality
+        total_bit_rate = 0.0
+        for index, frame in enumerate(mp3.array("frames/frame")):
+            if index < 3:
+                continue
+            bit_rate = frame.getBitRate()
+            if bit_rate:
+                total_bit_rate += float(bit_rate)
+                count += 1
+                if max_count and max_count <= count:
+                    break
+        if not count:
+            return
+        bit_rate = total_bit_rate / count
+        self.bit_rate = (bit_rate,
+            _("%s (Variable bit rate)") % humanBitRate(bit_rate))
+        duration = timedelta(seconds=float(mp3["frames"].size) / bit_rate)
+        self.duration = duration
 
 class AiffMetadata(Metadata):
     def extract(self, aiff):
