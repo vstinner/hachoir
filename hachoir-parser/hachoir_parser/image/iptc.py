@@ -17,7 +17,7 @@ from hachoir_core.text_handler import hexadecimal
 
 def IPTC_String(parent, name, desc=None):
     return String(parent, name, parent["size"].value, desc,
-        charset="ISO-8859-15", strip=" ")
+        charset="UTF-8", strip=" ")
 
 dataset1 = {
 }
