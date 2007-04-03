@@ -15,6 +15,7 @@ from hachoir_parser.audio.id3 import ID3v1, ID3v2
 from hachoir_core.endian import BIG_ENDIAN
 from hachoir_core.tools import humanFrequency, humanBitSize
 from hachoir_core.bits import long2raw
+from hachoir_core.error import HACHOIR_ERRORS
 from hachoir_core.stream import InputStreamError
 
 class Frame(FieldSet):
@@ -187,9 +188,12 @@ def findSynchronizeBits(parser, start, max_size):
 
         # Strong validation of frame: create the frame
         # and call method isValid()
-        frame = createOrphanField(parser, start-address0, Frame, "frame")
-        assert frame.absolute_address == start
-        if frame.isValid():
+        try:
+            frame = createOrphanField(parser, start-address0, Frame, "frame")
+            valid = frame.isValid()
+        except HACHOIR_ERRORS:
+            valid = False
+        if valid:
             return size
 
         # Invalid frame: continue
@@ -239,6 +243,9 @@ class Frames(FieldSet):
 
         while self.current_size < self.size:
             yield Frame(self, "frame[]")
+#            padding = self.synchronize()
+#            if padding:
+#                yield padding
 
         # Read raw bytes at the end (if any)
         size = (self.size - self.current_size) / 8
