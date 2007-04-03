@@ -48,8 +48,10 @@ def createOrphanField(fieldset, address, field_cls, *args, **kw):
     field set.
     """
     save_size = fieldset._current_size
-    fieldset._current_size = address
-    field = field_cls(fieldset, *args, **kw)
-    fieldset._current_size = save_size
+    try:
+        fieldset._current_size = address
+        field = field_cls(fieldset, *args, **kw)
+    finally:
+        fieldset._current_size = save_size
     return field
 
