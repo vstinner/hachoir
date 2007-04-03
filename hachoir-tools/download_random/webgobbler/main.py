@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 total = 100
 directory = "imagepool"
 
