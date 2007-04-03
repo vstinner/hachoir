@@ -35,13 +35,14 @@ class RawBytes(Field):
                 length = min(self._size / 8, max_bytes)
                 self._display = self._parent.stream.readBytes(address, length)
             display = self._display
+        truncated = (8 * len(display) < self._size)
         if human:
-            if 8 * len(display) < self._size:
+            if truncated:
                 display += "(...)"
             return makePrintable(display, "latin-1", quote='"', to_unicode=True)
         else:
             display = str2hex(display, format=r"\x%02x")
-            if 8 * len(display) < self._size:
+            if truncated:
                 return '"%s(...)"' % display
             else:
                 return '"%s"' % display
