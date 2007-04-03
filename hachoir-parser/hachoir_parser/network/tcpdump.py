@@ -142,7 +142,7 @@ class TCP(FieldSet):
 
         yield UInt16(self, "winsize", "Windows size")
         yield UInt16(self, "checksum", text_handler=hexadecimal)
-        yield UInt16(self, "urgent", 2)
+        yield UInt16(self, "urgent")
 
         size = self["hdrlen"].value*8 - self.current_size
         while 0 < size:
