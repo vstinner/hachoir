@@ -10,6 +10,7 @@ from hachoir_core.i18n import _
 from hachoir_core.tools import makePrintable, durationWin64, timedelta2seconds
 from hachoir_core.error import warning
 from datetime import timedelta
+from hachoir_metadata.safe import getValue
 
 class MkvMetadata(MultipleMetadata):
     tag_key = {
@@ -236,14 +237,14 @@ class AsfMetadata(MultipleMetadata):
                 if key in self.SKIP_EXT_DESC:
                     # Skip some keys
                     continue
-                value = desc["value"].value
+                value = getValue(desc, "value")
+                if not value:
+                    continue
                 if isinstance(value, str):
                     value = makePrintable(value, "ISO-8859-1", to_unicode=True)
                 if "/" in key:
                     # Replace "WM/ToolName" with "ToolName"
                     key = key.split("/", 1)[1]
-                if not value:
-                    continue
                 data[key] = value
 
             # Have ToolName and ToolVersion? If yes, group them to producer key

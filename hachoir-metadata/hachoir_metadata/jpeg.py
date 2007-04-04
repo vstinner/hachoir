@@ -7,7 +7,7 @@ from hachoir_parser.image.jpeg import (
     QUALITY_HASH_GRAY, QUALITY_SUM_GRAY)
 from hachoir_core.field import MissingField
 from hachoir_core.i18n import _
-from hachoir_core.error import HACHOIR_ERRORS
+from hachoir_metadata.safe import fault_tolerant
 from datetime import datetime
 
 class JpegMetadata(Metadata):
@@ -68,17 +68,12 @@ class JpegMetadata(Metadata):
             self.bits_per_pixel = 8 * jpeg["start_scan/content/nr_components"].value
         self.compression = compression
         if "app0/content" in jpeg:
-            app0 = jpeg["app0/content"]
-            self.format_version = u"JFIF %u.%02u" \
-                % (app0["ver_maj"].value, app0["ver_min"].value)
+            self.extractAPP0(jpeg["app0/content"])
 
         if "exif/content" in jpeg:
             for ifd in jpeg.array("exif/content/ifd"):
                 for entry in ifd.array("entry"):
-                    try:
-                        self.processIfdEntry(ifd, entry)
-                    except HACHOIR_ERRORS:
-                        pass
+                    self.processIfdEntry(ifd, entry)
         if "photoshop/content" in jpeg:
             psd = jpeg["photoshop/content"]
             if "version/content/reader_name" in psd:
@@ -88,7 +83,8 @@ class JpegMetadata(Metadata):
         for comment in jpeg.array("comment"):
             self.comment = comment["data"].value
         self.computeQuality(jpeg)
-        computeComprRate(self, jpeg["data"].size)
+        if "data" in jpeg:
+            computeComprRate(self, jpeg["data"].size)
         if not self.has("producer") and "photoshop" in jpeg:
             self.producer = u"Adobe Photoshop"
 
@@ -135,6 +131,12 @@ class JpegMetadata(Metadata):
                 self.comment = "JPEG quality: %s" % quality
                 return
 
+    @fault_tolerant
+    def extractAPP0(self, app0):
+        self.format_version = u"JFIF %u.%02u" \
+            % (app0["ver_maj"].value, app0["ver_min"].value)
+
+    @fault_tolerant
     def processIfdEntry(self, ifd, entry):
         # Skip unknown tags
         tag = entry["tag"].value
