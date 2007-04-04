@@ -1,4 +1,4 @@
-from hachoir_metadata.metadata_item import QUALITY_BEST
+from hachoir_metadata.metadata_item import QUALITY_BEST, QUALITY_FASTEST
 from hachoir_metadata.metadata import (
     Metadata, MultipleMetadata, registerExtractor)
 from hachoir_parser.archive import (Bzip2Parser, CabFile, GzipParser,
@@ -7,6 +7,8 @@ from hachoir_core.tools import humanUnixAttributes
 from hachoir_core.i18n import _
 
 def maxNbFile(meta):
+    if meta.quality <= QUALITY_FASTEST:
+        return 0
     if QUALITY_BEST <= meta.quality:
         return None
     return 1 + int(10 * meta.quality)
@@ -44,7 +46,7 @@ class ZipMetadata(MultipleMetadata):
     def extract(self, zip):
         max_nb = maxNbFile(self)
         for index, field in enumerate(zip.array("file")):
-            if max_nb and max_nb <= index:
+            if max_nb is not None and max_nb <= index:
                 self.warning("ZIP archive contains many files, but only first %s files are processed" % max_nb)
                 break
             meta = Metadata(parent=self)
@@ -67,7 +69,7 @@ class TarMetadata(MultipleMetadata):
     def extract(self, tar):
         max_nb = maxNbFile(self)
         for index, field in enumerate(tar.array("file")):
-            if max_nb and max_nb <= index:
+            if max_nb is not None and max_nb <= index:
                 self.warning("TAR archive contains many files, but only first %s files are processed" % max_nb)
                 break
             meta = Metadata(parent=self)
@@ -99,7 +101,7 @@ class CabMetadata(MultipleMetadata):
             cab["nb_folder"].value, cab["nb_files"].value)
         max_nb = maxNbFile(self)
         for index, field in enumerate(cab.array("file")):
-            if max_nb and max_nb <= index:
+            if max_nb is not None and max_nb <= index:
                 self.warning("CAB archive contains many files, but only first %s files are processed" % max_nb)
                 break
             meta = Metadata(parent=self)
@@ -121,7 +123,7 @@ class MarMetadata(MultipleMetadata):
         self.format_version = "Microsoft Archive version %s" % mar["version"].value
         max_nb = maxNbFile(self)
         for index, field in enumerate(mar.array("file")):
-            if max_nb and max_nb <= index:
+            if max_nb is not None and max_nb <= index:
                 self.warning("MAR archive contains many files, but only first %s files are processed" % max_nb)
                 break
             meta = Metadata(parent=self)
