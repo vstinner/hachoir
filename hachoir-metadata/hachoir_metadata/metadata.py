@@ -3,6 +3,7 @@ from hachoir_core.compatibility import sorted
 from hachoir_core.endian import endian_name
 from hachoir_core.tools import makePrintable, makeUnicode
 from hachoir_core.dict import Dict
+from hachoir_core.error import error, HACHOIR_ERRORS
 from hachoir_core.i18n import _
 from hachoir_core.log import Logger
 from hachoir_metadata.metadata_item import (
@@ -250,7 +251,10 @@ def extractMetadata(parser, quality):
     except KeyError:
         return None
     metadata = extractor(quality)
-    metadata.extract(parser)
+    try:
+        metadata.extract(parser)
+    except HACHOIR_ERRORS, err:
+        error("Error during metadata extraction: %s" % unicode(err))
     metadata.mime_type = parser.mime_type
     metadata.endian = endian_name[parser.endian]
     return metadata
