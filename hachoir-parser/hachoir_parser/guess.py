@@ -16,6 +16,7 @@ class QueryParser(object):
 
     def __init__(self, tags):
         self.validate = True
+        self.use_fallback = False
         self.parser_args = None
         self.db = HachoirParserList()
         self.parsers = set(self.db)
@@ -96,7 +97,7 @@ class QueryParser(object):
                     warn = info
                 warn(_("Skip parser '%s': %s") % (parser.__name__, res))
             fallback = False
-        if fb:
+        if self.use_fallback and fb:
             warning(_("Force use of parser '%s'") % fb.__name__)
             return fb(stream)
 
