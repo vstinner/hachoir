@@ -216,6 +216,7 @@ class MpegAudioMetadata(Metadata):
         "TAL": ("album", None),
         "TT2": ("title", None),
         "TYE": ("creation_date", None),
+        "TCO": ("music_genre", None),
 
         # ID3 version 2.3+
         "TPE1": ("author", None),
@@ -226,6 +227,8 @@ class MpegAudioMetadata(Metadata):
         "TIT2": ("title", None),
         "TYER": ("creation_date", None),
         "WXXX": ("url", None),
+        "TCON": ("music_genre", None),
+        "TLAN": ("language", None),
     }
 
     def processID3v2(self, field):
