@@ -19,5 +19,3 @@ $PYTHON $ROOT/hachoir-parser/tests/run_testcase.py $TESTCASE
 
 echo "=== hachoir-metadata: testcase ==="
 $PYTHON $ROOT/hachoir-metadata/run_testcase.py $TESTCASE
-
-exit $1

@@ -615,7 +615,7 @@ def exploreFieldSet(field_set, args, options={}):
                         hachoir_log.error(_("No parser found for %s") % stream.source)
                     else:
                         logger.objects[parser] = e
-                        body.append((e, TreeBox(charset, Node(parser, None), preload_fields, options)))
+                        body.append((e, TreeBox(charset, Node(parser, None), preload_fields, None, options)))
                         resize = log.height
                 except NeedInput, e:
                     input.do(*e.args)
