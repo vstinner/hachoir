@@ -66,8 +66,9 @@ class Data:
         if self.conversion:
             new_value = self.conversion(self.key, value)
             if not new_value:
-                self.metadata.error("Unable to convert %r to %s" % (
-                    value, " or ".join(str(item.__name__) for item in self.type)))
+                dest_types = " or ".join(str(item.__name__) for item in self.type)
+                self.metadata.warning("Unable to convert %r (%s) to %s" % (
+                    value, type(value).__name__, dest_types))
                 return
             if isinstance(new_value, tuple):
                 if text:

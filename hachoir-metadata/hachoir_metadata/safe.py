@@ -5,7 +5,7 @@ def fault_tolerant(func, *args):
         try:
             func(*args, **kw)
         except HACHOIR_ERRORS, err:
-            error("Error when calling %s: %s" % (func.__name__, err))
+            warning("Error when calling %s: %s" % (func.__name__, err))
     return safe_func
 
 def getValue(fieldset, key):
