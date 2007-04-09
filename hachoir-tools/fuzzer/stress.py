@@ -48,6 +48,8 @@ class Fuzzer:
             return
         if "Unable to create value" in text:
             return
+        if "Unable to create value" in text:
+            return
         self.log_error += 1
         print "METADATA ERROR: %s %s" % (prefix, text)
 
@@ -72,7 +74,7 @@ class Fuzzer:
         except InputStreamError, err:
             parser = None
         if not parser:
-            #print "Unable to create parser"
+            print "  (unable to create parser)"
             return
 
         # Extract metadata
