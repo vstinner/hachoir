@@ -26,15 +26,12 @@ MAX_DURATION = 2.0
 
 def mangle(data):
     hsize = len(data)-1
-    max_count = min(hsize // 25, 50)
+    max_count = min(hsize // 25, 250)
     max_count = max(max_count, 4)
     count = randint(1, max_count)
     for index in xrange(count):
         off = randint(0, hsize)
-        c = randint(0, 255)
-        if randint(0, 1) == 1:
-            c |= 128
-        data[off] = c
+        data[off] = randint(0, 255)
 
 class Fuzzer:
     def __init__(self, filedb_dirs, error_dir):
@@ -52,6 +49,8 @@ class Fuzzer:
         if "Unable to create value" in text:
             return
         if "Unable to create value" in text:
+            return
+        if "field is too large" in text:
             return
         self.log_error += 1
         print "METADATA ERROR: %s %s" % (prefix, text)
