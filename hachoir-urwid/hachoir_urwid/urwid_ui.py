@@ -11,6 +11,8 @@ from shutil import copyfileobj
 from weakref import WeakKeyDictionary
 import os, urwid.curses_display
 
+urwid_old = urwid.__version__ < '0.9.8'
+
 def browse_completion(text):
     path = os.path.dirname(text)
     for name in os.listdir(path):
@@ -432,14 +434,22 @@ class Separator(Text):
         mc = maxcol - 2
         if lr <= mc:
             return l, r
-        return l * mc / lr, r * mc / lr
+        return l * mc // lr, r * mc // lr
 
-    def render(self, (maxcol,), focus=False):
-        l, r = self.cols(maxcol)
-        return CanvasJoin([
-            Text.render(self, (l,), focus),
-            maxcol - r, self.info.render((r,)),
-        ])
+    if urwid_old:
+        def render(self, (maxcol,), focus=False):
+            l, r = self.cols(maxcol)
+            return CanvasJoin([
+                Text.render(self, (l,), focus),
+                maxcol - r, self.info.render((r,)),
+            ])
+    else:
+        def render(self, (maxcol,), focus=False):
+            l, r = self.cols(maxcol)
+            return CanvasJoin([
+                (Text.render(self, (l,), focus), None, True, maxcol - r),
+                (self.info.render((r,)), None, False, r),
+            ])
 
     def rows(self, (maxcol,), focus=False):
         l, r = self.cols(maxcol)
