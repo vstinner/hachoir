@@ -34,16 +34,12 @@ def mangle(data):
         data[off] = c
 
 class Fuzzer:
-    def __init__(self):
+    def __init__(self, filedb_dir, error_dir):
+        self.filedb_dir = filedb_dir
         self.filedb = []
         self.tmp_file = "/tmp/stress-hachoir"
         self.nb_error = 0
-
-    def load(self, TEST_FILES):
-        self.filedb = glob(path.join(TEST_FILES, "*.*"))
-        if not self.filedb:
-            print "Empty directory: %s" % TEST_FILES
-            exit(1)
+        self.error_dir = error_dir
 
     def newLog(self, level, prefix, text, context):
         if level < Log.LOG_ERROR:
@@ -55,7 +51,7 @@ class Fuzzer:
         self.log_error += 1
         print "METADATA ERROR: %s %s" % (prefix, text)
 
-    def fuzzOnce(self, test_file):
+    def fuzzFile(self, test_file):
         # Read bytes
         data = open(test_file, "rb").read(MAX_SIZE)
         data = array('B', data)
@@ -85,25 +81,41 @@ class Fuzzer:
 
         # Process error (if any)
         if self.log_error:
-            self.fuzzError(test_file, data)
+            self.copyError(test_file, data)
 
-    def fuzzError(self, test_file, data):
+    def copyError(self, test_file, data):
         self.nb_error += 1
         SHA=sha.new(data).hexdigest()
         ERRNAME="%s-%s" % (SHA, basename(test_file))
-        error_filename = path.join(GOTCHA, ERRNAME)
+        error_filename = path.join(self.error_dir, ERRNAME)
         open(error_filename, "wb").write(data)
         print "=> ERROR: %s" % error_filename
 
-    def fuzz(self):
+    def init(self):
+        # Setup log
         self.nb_error=0
         hachoir_logger.use_print = False
         hachoir_logger.on_new_message = self.newLog
 
+        # Load file DB
+        self.filedb = glob(path.join(self.filedb_dir, "*.*"))
+        if not self.filedb:
+            print "Empty directory: %s" % self.filedb_dir
+            exit(1)
+
+        # Create error directory
+        try:
+            mkdir(self.error_dir)
+        except OSError, err:
+            if err[0] == EEXIST:
+                pass
+
+    def run(self):
+        self.init()
         while True:
             test_file = random.choice(self.filedb)
             print "total: %s error -- test file: %s" % (self.nb_error, basename(test_file))
-            self.fuzzOnce(test_file)
+            self.fuzzFile(test_file)
 
 def main():
     # Read command line argument
@@ -115,20 +127,14 @@ def main():
     TEST_FILES = path.normpath(TEST_FILES)
 
     # Directory is current directory?
-    GOTCHA=path.join(getcwd(), "error")
-    try:
-        mkdir(GOTCHA)
-    except OSError, err:
-        if err[0] == EEXIST:
-            pass
+    err_dir = path.join(getcwd(), "error")
 
     # Nice
     nice(19)
 
-    fuzzer = Fuzzer()
+    fuzzer = Fuzzer(TEST_FILES, err_dir)
     try:
-        fuzzer.load(TEST_FILES)
-        fuzzer.fuzz()
+        fuzzer.run()
     except KeyboardInterrupt:
         print "Stop"
 
