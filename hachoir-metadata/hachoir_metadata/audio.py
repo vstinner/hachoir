@@ -5,12 +5,13 @@ from hachoir_core.i18n import _
 from hachoir_core.tools import makePrintable, timedelta2seconds, humanBitRate
 from datetime import timedelta, date
 from hachoir_metadata.metadata_item import QUALITY_FAST, QUALITY_NORMAL, QUALITY_BEST
+from hachoir_metadata.safe import fault_tolerant, getValue
 
 def setTrackTotal(meta, key, total):
     try:
         meta.track_total = int(total)
     except ValueError:
-        meta.error("Invalid track total: %r" % total)
+        meta.warning("Invalid track total: %r" % total)
 
 def setTrackNumber(meta, key, number):
     if isinstance(number, (int, long)):
@@ -22,7 +23,7 @@ def setTrackNumber(meta, key, number):
     try:
         meta.track_number = int(number)
     except ValueError:
-        meta.error("Invalid track number: %r" % number)
+        meta.warning("Invalid track number: %r" % number)
 
 def computeComprRate(meta, size):
     if not meta.has("duration") \
@@ -190,21 +191,25 @@ class RealMediaMetadata(MultipleMetadata):
             meta = Metadata()
             if stream["stream_start"].value:
                 meta.comment = "Start: %s" % stream["stream_start"].value
-            if stream["mime_type"].value == "logical-fileinfo":
+            if getValue(stream, "mime_type") == "logical-fileinfo":
                 for prop in stream.array("file_info/prop"):
-                    key = prop["name"].value.lower()
-                    value = prop["value"].value
-                    if key in self.KEY_TO_ATTR:
-                        setattr(self, self.KEY_TO_ATTR[key], value)
-                    elif value:
-                        self.warning("Skip %s: %s" % (prop["name"].value, value))
+                    self.useFileInfoProp(prop)
             else:
                 meta.bit_rate = stream["avg_bit_rate"].value
                 meta.duration = timedelta(milliseconds=stream["duration"].value)
-                meta.mime_type = stream["mime_type"].value
-            meta.title = stream["desc"].value
+                meta.mime_type = getValue(stream, "mime_type")
+            meta.title = getValue(stream, "desc")
             index = 1 + stream["stream_number"].value
             self.addGroup("stream[%u]" % index, meta, "Stream #%u" % index)
+
+    @fault_tolerant
+    def useFileInfoProp(self, prop):
+        key = prop["name"].value.lower()
+        value = prop["value"].value
+        if key in self.KEY_TO_ATTR:
+            setattr(self, self.KEY_TO_ATTR[key], value)
+        elif value:
+            self.warning("Skip %s: %s" % (prop["name"].value, value))
 
 class MpegAudioMetadata(Metadata):
     TAG_TO_KEY = {
@@ -329,7 +334,9 @@ class AiffMetadata(Metadata):
     def extract(self, aiff):
         if "common" in aiff:
             info = aiff["common"]
-            rate = int(info["sample_rate"].value)
+            rate = info["sample_rate"].value
+            if rate:
+                rate = int(rate)
             if rate:
                 self.sample_rate = rate
                 self.duration = timedelta(seconds=float(info["nb_sample"].value) / rate)
