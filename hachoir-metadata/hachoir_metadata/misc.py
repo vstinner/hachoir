@@ -1,5 +1,6 @@
 from hachoir_metadata.metadata import Metadata, registerExtractor
 from hachoir_parser.misc import TorrentFile, TrueTypeFontFile, OLE2_File, PcfFile
+from hachoir_core.field import isString
 from hachoir_core.error import warning
 
 class TorrentMetadata(Metadata):
@@ -58,7 +59,7 @@ class TTF_Metadata(Metadata):
             key = header["nameID"].value
             foffset = offset + header["offset"].value
             field = names.getFieldByAddress(foffset*8)
-            if not field:
+            if not field or not isString(field):
                 continue
             value = field.value
             if key not in self.NAMEID_TO_ATTR:

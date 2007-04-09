@@ -27,8 +27,6 @@ class MkvMetadata(MultipleMetadata):
     }
 
     def extract(self, mkv):
-        if "Segment[0]" not in mkv:
-            raise HachoirError(_("Invalid Matroska video"))
         for segment in mkv.array("Segment"):
             self.processSegment(segment)
 

@@ -7,6 +7,7 @@ from hachoir_parser.image.jpeg import (
     QUALITY_HASH_GRAY, QUALITY_SUM_GRAY)
 from hachoir_core.field import MissingField
 from hachoir_core.i18n import _
+from hachoir_core.tools import makeUnicode
 from hachoir_metadata.safe import fault_tolerant
 from datetime import datetime
 
@@ -200,7 +201,8 @@ class JpegMetadata(Metadata):
                 continue
             if tag not in self.IPTC_KEY:
                 if tag != 0:
-                    self.warning("Skip IPTC key %s: %s" % (field["tag"].display, value))
+                    self.warning("Skip IPTC key %s: %s" % (
+                        field["tag"].display, makeUnicode(value)))
                 continue
             setattr(self, self.IPTC_KEY[tag], value)
         if datestr and hourstr:
