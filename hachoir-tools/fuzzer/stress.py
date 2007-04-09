@@ -9,12 +9,17 @@ import random
 from random import randint
 from array import array
 from cStringIO import StringIO
+from hachoir_core.memory import getTotalMemory, setMemoryLimit
+from errno import EEXIST
 
 from hachoir_core.cmd_line import unicodeFilename
 from hachoir_core.log import log as hachoir_logger, Log
 from hachoir_core.stream import InputIOStream, InputStreamError
 from hachoir_metadata import extractMetadata
 from hachoir_parser import guessParser
+
+# Constants
+MAX_SIZE = 5000*512
 
 def mangle(data):
     hsize = len(data)-1
@@ -43,101 +48,89 @@ class Fuzzer:
     def newLog(self, level, prefix, text, context):
         if level < Log.LOG_ERROR:
             return
-        if "Error: Can't get field \"" in text:
+        if "Can't get field \"" in text:
             return
         if "Unable to create value" in text:
             return
         self.log_error += 1
         print "METADATA ERROR: %s %s" % (prefix, text)
 
+    def fuzzOnce(self, test_file):
+        # Read bytes
+        data = open(test_file, "rb").read(MAX_SIZE)
+        data = array('B', data)
+
+        # Mangle
+        size = len(data)
+        mangle(data)
+
+        # Create stream
+        data = data.tostring()
+        output = StringIO(data)
+        stream = InputIOStream(output, filename=test_file)
+
+        # Create parser
+        test_file_unicode = unicodeFilename(test_file)
+        try:
+            parser = guessParser(stream)
+        except InputStreamError, err:
+            parser = None
+        if not parser:
+            #print "Unable to create parser"
+            return
+
+        # Extract metadata
+        self.log_error = 0
+        metadata = extractMetadata(parser, 0.5)
+
+        # Process error (if any)
+        if self.log_error:
+            self.fuzzError(test_file, data)
+
+    def fuzzError(self, test_file, data):
+        self.nb_error += 1
+        SHA=sha.new(data).hexdigest()
+        ERRNAME="%s-%s" % (SHA, basename(test_file))
+        error_filename = path.join(GOTCHA, ERRNAME)
+        open(error_filename, "wb").write(data)
+        print "=> ERROR: %s" % error_filename
+
     def fuzz(self):
         self.nb_error=0
-        unlink_tmp_file = False
         hachoir_logger.use_print = False
         hachoir_logger.on_new_message = self.newLog
 
         while True:
-            try:
-                test_file = random.choice(self.filedb)
-                print "total: %s error -- test file: %s" % (self.nb_error, basename(test_file))
+            test_file = random.choice(self.filedb)
+            print "total: %s error -- test file: %s" % (self.nb_error, basename(test_file))
+            self.fuzzOnce(test_file)
 
-                # Load bytes
-                data = open(test_file, "rb").read(MAX_SIZE)
-                data = array('B', data)
+def main():
+    # Read command line argument
+    if len(argv) != 2:
+        print >>stderr, "usage: %s directory" % argv[0]
+        exit(1)
+    TEST_FILES = argv[1]
+    TEST_FILES = path.expanduser(TEST_FILES)
+    TEST_FILES = path.normpath(TEST_FILES)
 
-                # Mangle
-                size = len(data)
-                mangle(data)
+    # Directory is current directory?
+    GOTCHA=path.join(getcwd(), "error")
+    try:
+        mkdir(GOTCHA)
+    except OSError, err:
+        if err[0] == EEXIST:
+            pass
 
-                # Run metadata
-                data = data.tostring()
-                output = StringIO(data)
+    # Nice
+    nice(19)
 
-                stream = InputIOStream(output, filename=test_file)
+    fuzzer = Fuzzer()
+    try:
+        fuzzer.load(TEST_FILES)
+        fuzzer.fuzz()
+    except KeyboardInterrupt:
+        print "Stop"
 
-                # Create parser
-                test_file_unicode = unicodeFilename(test_file)
-                try:
-                    parser = guessParser(stream)
-                except InputStreamError, err:
-#                    print "Unable to create parser: %s" % err
-                    continue
-                if not parser:
-#                    print "Unable to create parser"
-                    continue
-
-                self.log_error = 0
-                metadata = extractMetadata(parser, 0.5)
-
-                if self.log_error:
-                    self.nb_error += 1
-                    SHA=sha.new(data).hexdigest()
-                    ERRNAME="%s-%s" % (SHA, basename(test_file))
-                    error_filename = path.join(GOTCHA, ERRNAME)
-                    print error_filename
-                    open(error_filename, "wb").write(data)
-                    unlink_tmp_file = False
-                    print "=> ERROR: %s" % ERRNAME
-            finally:
-                if unlink_tmp_file:
-                    unlink(self.tmp_file)
-
-if len(argv) != 2:
-    print >>stderr, "usage: %s directory" % argv[0]
-    exit(1)
-
-pwd = getcwd()
-TEST_FILES=argv[1]
-GOTCHA=path.join(pwd, "error")
-if False:
-    PROG="hachoir-grep --all --quiet"
-else:
-    PROG="hachoir-metadata --quiet"
-MAX_SIZE=5000*512
-
-TEST_FILES = path.expanduser(TEST_FILES)
-TEST_FILES = path.normpath(TEST_FILES)
-
-try:
-    mkdir(GOTCHA)
-except OSError, err:
-    if err[0]:
-        pass
-    else:
-        raise
-
-if pwd == TEST_FILES:
-    print "ERROR: don't run %s in %s directory (or your files will be removed)" % (
-        argv[0], TEST_FILES)
-    exit(1)
-
-# Nice
-nice(19)
-
-fuzzer = Fuzzer()
-try:
-    fuzzer.load(TEST_FILES)
-    fuzzer.fuzz()
-except KeyboardInterrupt:
-    print "Stop"
-
+if __name__ == "__main__":
+    main()
