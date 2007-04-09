@@ -174,7 +174,7 @@ class QuantizationTable(FieldSet):
         yield Bits(self, "is_16bit", 4)
         yield Bits(self, "index", 4)
         if self["index"].value >= 4:
-            self.warning("Invalid quantification index (%s)" % self["index"].value)
+            raise ParserError("Invalid quantification index (%s)" % self["index"].value)
         if self["is_16bit"].value:
             coeff_type = UInt16
         else:
