@@ -368,7 +368,10 @@ class PE_Resource(SeekableFieldSet):
         # Parse entries
         entries = []
         for resource in resources:
-            padding = self.seekByte(resource["offset"].value)
+            offset = resource["offset"].value
+            if offset is None:
+                continue
+            padding = self.seekByte(offset)
             if padding:
                 yield padding
             entry = Entry(self, "entry[]", inode=resource)
