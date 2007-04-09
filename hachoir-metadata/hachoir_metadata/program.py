@@ -1,6 +1,6 @@
 from hachoir_metadata.metadata import Metadata, registerExtractor
 from hachoir_parser.program import ExeFile
-from hachoir_core.tools import makeUnicode
+from hachoir_metadata.safe import fault_tolerant
 
 class ExeMetadata(Metadata):
     KEY_TO_ATTR = {
@@ -26,9 +26,13 @@ class ExeMetadata(Metadata):
         if "ne_header" in exe:
             self.useNE_Header(exe["ne_header"])
         if "info" in exe:
-            for node in exe.array("info/node"):
-                if node["name"].value == "StringFileInfo":
-                    self.readVersionInfo(node["node[0]"])
+            self.useNEInfo(exe["info"])
+
+    @fault_tolerant
+    def useNEInfo(self, info):
+        for node in info.array("node"):
+            if node["name"].value == "StringFileInfo":
+                self.readVersionInfo(node["node[0]"])
 
     def extractPE(self, exe):
         # Read information from headers
@@ -60,6 +64,7 @@ class ExeMetadata(Metadata):
         else:
             self.format_version = u"Portable Executable: Windows application"
 
+    @fault_tolerant
     def usePE_OptHeader(self, hdr):
         self.comment = "Subsystem: %s" % hdr["subsystem"].display
 

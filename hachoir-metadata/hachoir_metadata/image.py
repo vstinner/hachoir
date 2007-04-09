@@ -20,6 +20,8 @@ def computeComprRate(meta, compr_size):
     or not meta.has("height") \
     or not meta.has("bits_per_pixel"):
         return
+    if not compr_size:
+        return
     orig_size = meta.get('width') * meta.get('height') * meta.get('bits_per_pixel')
     meta.compr_rate = u"%.3gx" % (float(orig_size) / compr_size)
 
@@ -37,7 +39,8 @@ class BmpMetadata(Metadata):
             self.bits_per_pixel = bpp
         self.compression = hdr["compression"].display
         self.format_version = u"Microsoft Bitmap version %s" % hdr.getFormatVersion()
-        computeComprRate(self, image["pixels"].size)
+        if "pixels" in image:
+            computeComprRate(self, image["pixels"].size)
 
 class TiffMetadata(Metadata):
     key_to_attr = {
@@ -121,6 +124,8 @@ class XcfMetadata(Metadata):
         type = prop["type"].value
         if type == XcfProperty.PROP_PARASITES:
             for field in prop["data"]:
+                if "name" not in field or "data" not in field:
+                    continue
                 if field["name"].value == "gimp-comment":
                     self.comment = field["data"].value
         elif type == XcfProperty.PROP_COMPRESSION:
@@ -151,7 +156,7 @@ class PngMetadata(Metadata):
         self.height = header["height"].value
 
         # Read number of colors and pixel format
-        if header["has_palette"].value:
+        if "/palette/size" in png:
             nb_colors = png["/palette/size"].value // 3
         else:
             nb_colors = None

@@ -27,7 +27,8 @@ def computeCompressionRate(meta):
 
 class Bzip2Metadata(Metadata):
     def extract(self, zip):
-        self.compr_size = zip["file"].size/8
+        if "file" in zip:
+            self.compr_size = zip["file"].size/8
 
 class GzipMetadata(Metadata):
     def extract(self, gzip):
