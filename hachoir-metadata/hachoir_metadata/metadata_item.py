@@ -80,8 +80,11 @@ class Data:
         elif isinstance(value, str):
             value = unicode(value, "ISO-8859-1")
 
-        assert not self.type or isinstance(value, self.type), \
-            "Value %r is not of type %r" % (value, self.type)
+        if self.type and not isinstance(value, self.type):
+            dest_types = " or ".join(str(item.__name__) for item in self.type)
+            self.metadata.error("Key %r: value %r type (%s) is not %s" % (
+                self.key, value, type(value).__name__, dest_types))
+            return
 
         # Skip empty strings
         if isinstance(value, unicode):
