@@ -1,4 +1,10 @@
 def getTotalMemory():
+    """
+    Get total size of memory (not swap) in bytes.
+    Use /proc/meminfo on Linux.
+
+    Returns None on error. May also raise a ValueError.
+    """
     try:
         line = open('/proc/meminfo').readlines()[0].split()
     except IOError:
