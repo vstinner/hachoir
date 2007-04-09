@@ -189,8 +189,7 @@ class GifFile(Parser):
                 # GIF Terminator
                 break
             else:
-                self.error("Wrong GIF image separator: ASCII %02X." % ord(code))
-                break
+                raise ParserError("Wrong GIF image separator: 0x%02X" % ord(code))
 
     def createContentSize(self):
         field = self["image[0]"]
