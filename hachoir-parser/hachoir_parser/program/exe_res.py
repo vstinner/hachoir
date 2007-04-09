@@ -334,7 +334,7 @@ class PE_Resource(SeekableFieldSet):
             if index["is_subdir"].value:
                 indexes.append(index)
 
-        indexes.sort(key=lambda index: index["offset"].value)
+        #indexes.sort(key=lambda index: index["offset"].value)
         for index in indexes:
             self.seekByte(index["offset"].value)
             if depth == 1:
@@ -378,9 +378,7 @@ class PE_Resource(SeekableFieldSet):
             offset = resource["offset"].value
             if offset is None:
                 continue
-            padding = self.seekByte(offset)
-            if padding:
-                yield padding
+            self.seekByte(offset)
             entry = Entry(self, "entry[]", inode=resource)
             yield entry
             entries.append(entry)
