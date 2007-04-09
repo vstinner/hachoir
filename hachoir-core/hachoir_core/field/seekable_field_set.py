@@ -85,16 +85,32 @@ class RootSeekableFieldSet(BasicFieldSet):
     def _addField(self, field):
         if field._name.endswith("[]"):
             self.setUniqueFieldName(field)
+
         if field._address != self._offset:
             self.warning("Set field %s address to %s (was %s)" % (
                 field.path, self._offset//8, field._address//8))
             field._address = self._offset
         assert field.name not in self._field_dict
+
+        self._checkFieldSize(field)
+
         self._field_dict[field.name] = field
         self._field_array.append(field)
         self._current_size += field.size
         self._offset += field.size
         self._current_max_size = max(self._current_max_size, field.address + field.size)
+
+    def _checkFieldSize(self, field):
+        size = field.size
+        addr = field.address
+
+        if self._size is not None:
+            max_addr = self._size
+        else:
+            # FIXME: Use parent size
+            max_addr = self.stream.size
+        if max_addr < (addr + size):
+            raise ParserError("Unable to add %s: field is too large" % field.name)
 
     def seekBit(self, address, relative=True):
         if not relative:
