@@ -11,7 +11,9 @@ from array import array
 from cStringIO import StringIO
 from hachoir_core.memory import getTotalMemory, setMemoryLimit
 from errno import EEXIST
+from time import time
 
+from hachoir_core.error import HACHOIR_ERRORS
 from hachoir_core.cmd_line import unicodeFilename
 from hachoir_core.log import log as hachoir_logger, Log
 from hachoir_core.stream import InputIOStream, InputStreamError
@@ -20,10 +22,11 @@ from hachoir_parser import guessParser
 
 # Constants
 MAX_SIZE = 5000*512
+MAX_DURATION = 2.0
 
 def mangle(data):
     hsize = len(data)-1
-    max_count = hsize // 100
+    max_count = min(hsize // 25, 50)
     max_count = max(max_count, 4)
     count = randint(1, max_count)
     for index in xrange(count):
@@ -34,8 +37,8 @@ def mangle(data):
         data[off] = c
 
 class Fuzzer:
-    def __init__(self, filedb_dir, error_dir):
-        self.filedb_dir = filedb_dir
+    def __init__(self, filedb_dirs, error_dir):
+        self.filedb_dirs = filedb_dirs
         self.filedb = []
         self.tmp_file = "/tmp/stress-hachoir"
         self.nb_error = 0
@@ -68,6 +71,7 @@ class Fuzzer:
         stream = InputIOStream(output, filename=test_file)
 
         # Create parser
+        start = time()
         test_file_unicode = unicodeFilename(test_file)
         try:
             parser = guessParser(stream)
@@ -79,16 +83,29 @@ class Fuzzer:
 
         # Extract metadata
         self.log_error = 0
-        metadata = extractMetadata(parser, 0.5)
+        prefix = ""
+        try:
+            metadata = extractMetadata(parser, 0.5)
+            failure = bool(self.log_error)
+        except (HACHOIR_ERRORS, AssertionError), err:
+            print "SERIOUS ERROR: %s" % err
+            failure = True
+        duration = time() - start
 
-        # Process error (if any)
-        if self.log_error:
-            self.copyError(test_file, data)
+        # Timeout?
+        if MAX_DURATION < duration:
+            print "Process is too long: %.1f seconds" % duration
+            failure = True
+            prefix = "timeout-"
 
-    def copyError(self, test_file, data):
+        # Process error
+        if failure:
+            self.copyError(test_file, data, prefix)
+
+    def copyError(self, test_file, data, prefix):
         self.nb_error += 1
         SHA=sha.new(data).hexdigest()
-        ERRNAME="%s-%s" % (SHA, basename(test_file))
+        ERRNAME="%s%s-%s" % (prefix, SHA, basename(test_file))
         error_filename = path.join(self.error_dir, ERRNAME)
         open(error_filename, "wb").write(data)
         print "=> ERROR: %s" % error_filename
@@ -100,9 +117,12 @@ class Fuzzer:
         hachoir_logger.on_new_message = self.newLog
 
         # Load file DB
-        self.filedb = glob(path.join(self.filedb_dir, "*.*"))
+        self.filedb = []
+        for directory in self.filedb_dirs:
+            new_files = glob(path.join(directory, "*.*"))
+            self.filedb.extend(new_files)
         if not self.filedb:
-            print "Empty directory: %s" % self.filedb_dir
+            print "Empty directories: %s" % self.filedb_dirs
             exit(1)
 
         # Create error directory
@@ -121,12 +141,10 @@ class Fuzzer:
 
 def main():
     # Read command line argument
-    if len(argv) != 2:
-        print >>stderr, "usage: %s directory" % argv[0]
+    if len(argv) < 2:
+        print >>stderr, "usage: %s directory [directory2 ...]" % argv[0]
         exit(1)
-    TEST_FILES = argv[1]
-    TEST_FILES = path.expanduser(TEST_FILES)
-    TEST_FILES = path.normpath(TEST_FILES)
+    test_dirs = [ path.normpath(path.expanduser(item)) for item in argv[1:] ]
 
     # Directory is current directory?
     err_dir = path.join(getcwd(), "error")
@@ -134,7 +152,7 @@ def main():
     # Nice
     nice(19)
 
-    fuzzer = Fuzzer(TEST_FILES, err_dir)
+    fuzzer = Fuzzer(test_dirs, err_dir)
     try:
         fuzzer.run()
     except KeyboardInterrupt:
