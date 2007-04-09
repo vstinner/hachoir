@@ -204,10 +204,7 @@ class GenericString(Bytes):
             size = self._size/8
         if size == 0:
             # Empty string
-            if self._charset:
-                return u""
-            else:
-                return ""
+            return u""
 
         # Read bytes in data stream
         text = self._parent.stream.readBytes(addr, size)
@@ -220,6 +217,7 @@ class GenericString(Bytes):
                 # On error, use 'str' type
                 self.warning("Unable to convert string to Unicode: " + unicode(err))
                 self._charset = None
+                text = unicode(text, "ISO-8859-1")
 
         if human:
             # Truncate
@@ -234,6 +232,7 @@ class GenericString(Bytes):
                     text = text.strip(self._strip)
                 else:
                     text = text.strip()
+        assert isinstance(text, unicode)
         return text
 
     def createDisplay(self, human=True):
