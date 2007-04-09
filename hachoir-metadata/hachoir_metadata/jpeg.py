@@ -88,6 +88,7 @@ class JpegMetadata(Metadata):
         if not self.has("producer") and "photoshop" in jpeg:
             self.producer = u"Adobe Photoshop"
 
+    @fault_tolerant
     def computeQuality(self, jpeg):
         # This function is an adaption to Python of ImageMagick code
         # to compute JPEG quality using quantization tables
