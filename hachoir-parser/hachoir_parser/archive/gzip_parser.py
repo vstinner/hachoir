@@ -11,7 +11,6 @@ from hachoir_core.field import (
     NullBits, Bytes, RawBytes)
 from hachoir_core.text_handler import hexadecimal, humanFilesize
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.tools import makeUnicode
 from hachoir_parser.common.deflate import Deflate
 
 class GzipParser(Parser):
@@ -122,8 +121,7 @@ class GzipParser(Parser):
         desc = self.tags["description"]
         info = []
         if "filename" in self:
-            filename = makeUnicode(self["filename"].value)
-            info.append('filename "%s"' % filename)
+            info.append('filename "%s"' % self["filename"].value)
         if "size" in self:
             info.append("was %s" % humanFilesize(self["size"]))
         if self["mtime"].value:
