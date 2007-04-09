@@ -9,7 +9,7 @@ Author: Victor Stinner
 Creation date: 2007-01-19
 """
 
-from hachoir_core.field import (FieldSet, Enum,
+from hachoir_core.field import (FieldSet, ParserError, Enum,
     Bit, Bits, SeekableFieldSet,
     UInt16, UInt32, TimestampUnix32,
     RawBytes, PaddingBytes, NullBytes, NullBits,
@@ -18,6 +18,9 @@ from hachoir_core.text_handler import humanFilesize, hexadecimal
 from hachoir_core.tools import createDict, paddingSize, alignValue, makePrintable
 from hachoir_core.error import HACHOIR_ERRORS
 from hachoir_parser.common.win32 import BitmapInfoHeader
+
+MAX_INDEX_PER_HEADER = 300
+MAX_NAME_PER_HEADER = MAX_INDEX_PER_HEADER
 
 class Version(FieldSet):
     static_size = 32
@@ -273,7 +276,14 @@ class Header(FieldSet):
         yield UInt16(self, "maj_ver", "Major version")
         yield UInt16(self, "min_ver", "Minor version")
         yield UInt16(self, "nb_name", "Number of named entries")
+        if MAX_NAME_PER_HEADER < self["nb_name"].value:
+            raise ParserError("EXE resource: invalid number of name (%s)"
+                % self["nb_name"].value)
         yield UInt16(self, "nb_index", "Number of indexed entries")
+        if MAX_INDEX_PER_HEADER < self["nb_index"].value:
+            raise ParserError("EXE resource: invalid number of index (%s)"
+                % self["nb_index"].value)
+
     def createDescription(self):
         text = "Resource header"
         info = []
@@ -326,13 +336,7 @@ class PE_Resource(SeekableFieldSet):
 
         indexes.sort(key=lambda index: index["offset"].value)
         for index in indexes:
-            try:
-                padding = self.seekByte(index["offset"].value)
-            except Exception, err:
-                self.error("ERROR: %s, index=%s" % (err, index))
-                raise
-            if padding:
-                yield padding
+            self.seekByte(index["offset"].value)
             if depth == 1:
                 res_type = index["type"].value
             else:
@@ -351,10 +355,13 @@ class PE_Resource(SeekableFieldSet):
             newsubdirs = []
             for index, subdir in enumerate(subdirs):
                 name = "directory[%u][%u][]" % (depth, index)
-                for field in self.parseSub(subdir, name, depth):
-                    if field.__class__ == Directory:
-                        newsubdirs.append(field)
-                    yield field
+                try:
+                    for field in self.parseSub(subdir, name, depth):
+                        if field.__class__ == Directory:
+                            newsubdirs.append(field)
+                        yield field
+                except HACHOIR_ERRORS, err:
+                    self.error("Unable to create directory %s: %s" % (name, err))
             subdirs = newsubdirs
             alldirs.extend(subdirs)
 
