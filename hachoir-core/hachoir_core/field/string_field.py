@@ -209,8 +209,12 @@ class GenericString(Bytes):
         # Read bytes in data stream
         text = self._parent.stream.readBytes(addr, size)
 
-        # Convert to unicode if needed
-        if self._charset and human:
+        # Don't transform data?
+        if not human:
+            return text
+
+        # Convert to Unicode
+        if self._charset:
             try:
                 text = unicode(text, self._charset)
             except UnicodeDecodeError, err:
@@ -218,20 +222,21 @@ class GenericString(Bytes):
                 self.warning("Unable to convert string to Unicode: " + unicode(err))
                 self._charset = None
                 text = unicode(text, "ISO-8859-1")
+        else:
+            text = unicode(text, "ISO-8859-1")
 
-        if human:
-            # Truncate
-            if self._truncate:
-                pos = text.find(self._truncate)
-                if 0 <= pos:
-                    text = text[:pos]
+        # Truncate
+        if self._truncate:
+            pos = text.find(self._truncate)
+            if 0 <= pos:
+                text = text[:pos]
 
-            # Strip string if needed
-            if self._strip:
-                if isinstance(self._strip, (str, unicode)):
-                    text = text.strip(self._strip)
-                else:
-                    text = text.strip()
+        # Strip string if needed
+        if self._strip:
+            if isinstance(self._strip, (str, unicode)):
+                text = text.strip(self._strip)
+            else:
+                text = text.strip()
         assert isinstance(text, unicode)
         return text
 
