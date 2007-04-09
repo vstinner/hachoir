@@ -18,7 +18,7 @@ class Log:
         self.__file = None
         self.use_print = True
         self.use_buffer = False
-        self.on_new_message = None # Prototype: def func(level, prefix, text)
+        self.on_new_message = None # Prototype: def func(level, prefix, text, context)
 
     def shutdown(self):
         if self.__file:
