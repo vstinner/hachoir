@@ -118,7 +118,6 @@ class RootSeekableFieldSet(BasicFieldSet):
         if address < 0:
             raise ParserError("Seek below field set start (%s)" % address)
         self._offset = address
-        self._current_max_size = max(self._current_max_size, address)
         return None
 
     def seekByte(self, address, relative=True):
