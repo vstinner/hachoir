@@ -2,7 +2,7 @@
 
 from os import path, getcwd, access, R_OK, unlink, nice, mkdir, system, popen4, rename
 from os.path import basename
-from sys import exit, argv
+from sys import exit, argv, stderr
 from glob import glob
 import sha
 import random
@@ -43,6 +43,8 @@ class Fuzzer:
     def newLog(self, level, prefix, text, context):
         if level < Log.LOG_ERROR:
             return
+        if "Error: Can't get field \"" in text:
+            return
         if "Unable to create value" in text:
             return
         self.log_error += 1
@@ -57,7 +59,7 @@ class Fuzzer:
         while True:
             try:
                 test_file = random.choice(self.filedb)
-#                print "total: %s error -- test file: %s" % (self.nb_error, basename(test_file))
+                print "total: %s error -- test file: %s" % (self.nb_error, basename(test_file))
 
                 # Load bytes
                 data = open(test_file, "rb").read(MAX_SIZE)
