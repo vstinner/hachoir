@@ -51,23 +51,10 @@ class JpegMetadata(Metadata):
     }
 
     def extract(self, jpeg):
-        compression = "JPEG"
         if "start_frame/content" in jpeg:
-            sof = jpeg["start_frame/content"]
-            self.width = sof["width"].value
-            self.height = sof["height"].value
-            nb_components = sof["nr_components"].value
-            self.bits_per_pixel = 8 * nb_components
-            if nb_components == 3:
-                self.pixel_format = _("YCbCr")
-            else:
-                self.pixel_format = _("Grayscale")
-                self.nb_colors = 256
-            key = jpeg["start_frame/type"].value
-            compression += " (%s)" % JpegChunk.START_OF_FRAME[key]
+            self.startOfFrame(jpeg["start_frame/content"])
         elif "start_scan/content/nr_components" in jpeg:
             self.bits_per_pixel = 8 * jpeg["start_scan/content/nr_components"].value
-        self.compression = compression
         if "app0/content" in jpeg:
             self.extractAPP0(jpeg["app0/content"])
 
@@ -88,6 +75,25 @@ class JpegMetadata(Metadata):
             computeComprRate(self, jpeg["data"].size)
         if not self.has("producer") and "photoshop" in jpeg:
             self.producer = u"Adobe Photoshop"
+        if self.has("compression"):
+            self.compression = "JPEG"
+
+    @fault_tolerant
+    def startOfFrame(self, sof):
+        # Set compression method
+        key = sof["../type"].value
+        self.compression = "JPEG (%s)" % JpegChunk.START_OF_FRAME[key]
+
+        # Read image size and bits/pixel
+        self.width = sof["width"].value
+        self.height = sof["height"].value
+        nb_components = sof["nr_components"].value
+        self.bits_per_pixel = 8 * nb_components
+        if nb_components == 3:
+            self.pixel_format = _("YCbCr")
+        else:
+            self.pixel_format = _("Grayscale")
+            self.nb_colors = 256
 
     @fault_tolerant
     def computeQuality(self, jpeg):
