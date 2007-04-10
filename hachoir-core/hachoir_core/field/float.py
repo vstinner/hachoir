@@ -58,11 +58,15 @@ def floatFactory(name, format, mantissa_bits, exponent_bits, doc):
                     self.absolute_address, self._size/8)
                 return struct.unpack(self.struct_format, raw)[0]
             else:
-                value = self["mantissa"].value * (2.0 ** float(self["exponent"].value))
-                if self["negative"].value:
-                    return -(value)
-                else:
-                    return value
+                try:
+                    value = self["mantissa"].value * (2.0 ** self["exponent"].value)
+                    if self["negative"].value:
+                        return -(value)
+                    else:
+                        return value
+                except OverflowError:
+                    raise ValueError("[%s] floating point overflow" %
+                        self.__class__.__name__)
 
         def createFields(self):
             yield Bit(self, "negative")
