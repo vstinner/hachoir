@@ -50,21 +50,24 @@ class ZipMetadata(MultipleMetadata):
             if max_nb is not None and max_nb <= index:
                 self.warning("ZIP archive contains many files, but only first %s files are processed" % max_nb)
                 break
-            meta = Metadata(parent=self)
-            meta.filename = field["filename"].value
-            meta.creation_date = field["last_mod"].value
-            meta.compression = field["compression"].display
-            if "data_desc" in field:
-                meta.file_size = field["data_desc/file_uncompressed_size"].value
-                if field["data_desc/file_compressed_size"].value:
-                    meta.compr_size = field["data_desc/file_compressed_size"].value
-                    computeCompressionRate(meta)
-            else:
-                meta.file_size = field["uncompressed_size"].value
-                if field["compressed_size"].value:
-                    meta.compr_size = field["compressed_size"].value
-                    computeCompressionRate(meta)
-            self.addGroup(field.name, meta, "File \"%s\"" % meta.get('filename'))
+            self.processFile(field)
+
+    def processFile(self, field):
+        meta = Metadata(parent=self)
+        meta.filename = field["filename"].value
+        meta.creation_date = field["last_mod"].value
+        meta.compression = field["compression"].display
+        if "data_desc" in field:
+            meta.file_size = field["data_desc/file_uncompressed_size"].value
+            if field["data_desc/file_compressed_size"].value:
+                meta.compr_size = field["data_desc/file_compressed_size"].value
+                computeCompressionRate(meta)
+        else:
+            meta.file_size = field["uncompressed_size"].value
+            if field["compressed_size"].value:
+                meta.compr_size = field["compressed_size"].value
+                computeCompressionRate(meta)
+        self.addGroup(field.name, meta, "File \"%s\"" % meta.get('filename'))
 
 class TarMetadata(MultipleMetadata):
     def extract(self, tar):

@@ -160,9 +160,7 @@ class RealAudioMetadata(Metadata):
         if "metadata" in real:
             self.useMetadata(real["metadata"])
         if real["version"].value == 4:
-            self.sample_rate = real["sample_rate"].value
-            self.nb_channel = real["channels"].value
-            self.compression = real["FourCC"].value
+            self.useRoot(real)
         self.format_version = "Real audio version %s" % real["version"].value
 
     @fault_tolerant
@@ -171,6 +169,12 @@ class RealAudioMetadata(Metadata):
         self.author = info["author"].value
         self.copyright = info["copyright"].value
         self.comment = info["comment"].value
+
+    @fault_tolerant
+    def useRoot(self, real):
+        self.sample_rate = real["sample_rate"].value
+        self.nb_channel = real["channels"].value
+        self.compression = real["FourCC"].value
 
 class RealMediaMetadata(MultipleMetadata):
     KEY_TO_ATTR = {
@@ -181,9 +185,7 @@ class RealMediaMetadata(MultipleMetadata):
     }
     def extract(self, media):
         if "file_prop" in media:
-            prop = media["file_prop"]
-            self.bit_rate = prop["avg_bit_rate"].value
-            self.duration = timedelta(milliseconds=prop["duration"].value)
+            self.useFileProp(media["file_prop"])
         if "content_desc" in media:
             self.useContentDesc(media["content_desc"])
         for stream in media.array("stream_prop"):
@@ -209,6 +211,11 @@ class RealMediaMetadata(MultipleMetadata):
             setattr(self, self.KEY_TO_ATTR[key], value)
         elif value:
             self.warning("Skip %s: %s" % (prop["name"].value, value))
+
+    @fault_tolerant
+    def useFileProp(self, prop):
+        self.bit_rate = prop["avg_bit_rate"].value
+        self.duration = timedelta(milliseconds=prop["duration"].value)
 
     @fault_tolerant
     def useContentDesc(self, content):
