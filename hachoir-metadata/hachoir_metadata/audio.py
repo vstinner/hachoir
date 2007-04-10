@@ -158,7 +158,7 @@ class AuMetadata(Metadata):
 class RealAudioMetadata(Metadata):
     def extract(self, real):
         if "metadata" in real:
-            self.useMetata(real["metadata"])
+            self.useMetadata(real["metadata"])
         if real["version"].value == 4:
             self.sample_rate = real["sample_rate"].value
             self.nb_channel = real["channels"].value
