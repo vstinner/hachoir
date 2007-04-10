@@ -15,6 +15,12 @@ try:
     from urwid import __version__ as urwid_ver
 except ImportError:
     urwid_ver = None
+try:
+    from urwid import ListWalker
+except ImportError:
+    class ListWalker(object):
+        def _modified(self):
+            pass
 
 def browse_completion(text):
     path = os.path.dirname(text)
@@ -102,7 +108,7 @@ class Node:
             self.sync()
 
 
-class Walker:
+class Walker(ListWalker):
     valid                 = 1 << 0
     display_value         = 1 << 1
     display_size          = 1 << 2
@@ -177,8 +183,9 @@ class Walker:
         if key == 'right':
             self.start += 1
         elif key == 'left':
-            if self.start:
-                self.start -= 1
+            if not self.start:
+                return
+            self.start -= 1
         elif key == 'a': self.flags ^= self.use_absolute_address
         elif key == 'b': self.flags ^= self.hex_address
         elif key == 'h': self.flags ^= self.human_size
@@ -190,6 +197,7 @@ class Walker:
             if self.focus.field.size != 0:
                 raise NeedInput(lambda path: self.save_field(path, key == 'ctrl e'),
                                 'save field to: ', os.getcwd() + os.sep, browse_completion)
+            return
         elif key == 'enter':
             pos = self.focus
             if pos.field.is_field_set:
@@ -207,11 +215,14 @@ class Walker:
                     assert not self.event
                 if target:
                     self.set_focus(self.fromField(root, target.path))
+                return
         elif key == ' ':
             if self.focus.parent and self.focus.field.size != 0:
                 raise NewTab_Stream(self.focus.field)
+            return
         else:
             return key
+        self._modified()
 
     def update(self, node):
         if node.depth:
@@ -310,6 +321,7 @@ class Walker:
         self.focus = pos
         if pos.flags is None and pos.parent:
             self.read(pos.parent, self.preload_fields)
+        self._modified()
 
     def get_home(self):
         if self.focus.parent:
