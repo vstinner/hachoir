@@ -3,6 +3,7 @@ Extract metadata from RIFF file format: AVI video and WAV sound.
 """
 
 from hachoir_metadata.metadata import Metadata, MultipleMetadata, registerExtractor
+from hachoir_metadata.safe import fault_tolerant
 from hachoir_parser.container.riff import RiffFile
 from hachoir_parser.video.fourcc import UNCOMPRESSED_AUDIO
 from hachoir_core.tools import humanFilesize, makeUnicode, timedelta2seconds
@@ -25,6 +26,9 @@ class RiffMetadata(MultipleMetadata):
         type = riff["type"].value
         if type == "WAVE":
             self.extractWAVE(riff)
+            size = getValue(riff, "audio_data/size")
+            if size:
+                computeAudioComprRate(self, size*8)
         elif type == "AVI ":
             self.extractAVI(riff)
         if "info" in riff:
@@ -41,6 +45,7 @@ class RiffMetadata(MultipleMetadata):
         key = self.TAG_TO_KEY[tag]
         setattr(self, key, value)
 
+    @fault_tolerant
     def extractWAVE(self, wav):
         format = wav["format"]
 
@@ -61,8 +66,6 @@ class RiffMetadata(MultipleMetadata):
             and self.has("bit_rate"):
                 duration = float(wav["audio_data/size"].value)*8 / self.get('bit_rate')
                 self.duration = timedelta(seconds=duration)
-        if "audio_data/size" in wav:
-            computeAudioComprRate(self, wav["audio_data/size"].value*8)
 
     def extractInfo(self, fieldset):
         for field in fieldset:
