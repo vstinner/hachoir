@@ -10,12 +10,13 @@ from array import array
 from cStringIO import StringIO
 from hachoir_core.memory import PAGE_SIZE, MemoryLimit
 from errno import EEXIST
-from time import time
+from time import time, sleep
 from hachoir_core.error import HACHOIR_ERRORS
 from hachoir_core.log import log as hachoir_logger, Log
 from hachoir_core.stream import InputIOStream, InputStreamError
 from hachoir_metadata import extractMetadata
 from hachoir_parser import guessParser
+import re
 
 try:
     import sha
@@ -30,7 +31,7 @@ except ImportError:
 # Constants
 MAX_SIZE = 5000*512
 MAX_DURATION = 2.0
-MEMORY_LIMIT = PAGE_SIZE * 100
+MEMORY_LIMIT = 5 * 1024 * 1024
 
 def mangle(data):
     hsize = len(data)-1
@@ -49,16 +50,24 @@ class Fuzzer:
         self.nb_error = 0
         self.error_dir = error_dir
 
+    def filterError(self, text):
+        if "Error during metadata extraction" in text:
+            return False
+        if "Can't get field \"" in text:
+            return True
+        if re.match("Unable to create value: Can't read [0-9]+ bits at ", text):
+            return True
+        if re.match("Unable to create value: (hour|month) must be in ", text):
+            return True
+        if "field is too large" in text:
+            return True
+        return False
+
     def newLog(self, level, prefix, text, context):
         if level < Log.LOG_ERROR:
             return
-        if "Can't get field \"" in text:
-            return
-        if "Unable to create value" in text:
-            return
-        if "Unable to create value" in text:
-            return
-        if "field is too large" in text:
+        print "ERR: %s" % text
+        if self.filterError(text):
             return
         self.log_error += 1
         print "METADATA ERROR: %s %s" % (prefix, text)
@@ -167,6 +176,8 @@ class Fuzzer:
                 test_file = random.choice(self.filedb)
                 print "total: %s error -- test file: %s" % (self.nb_error, basename(test_file))
                 ok = self.fuzzFile(test_file)
+                if ok:
+                    sleep(0.100)
         except KeyboardInterrupt:
             print "Stop"
 
