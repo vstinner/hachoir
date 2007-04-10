@@ -39,8 +39,8 @@ def getMemoryLimit():
 
 def setMemoryLimit(max_mem, hard_limit=None):
     """
-    Set memory limit using setrlimit(RLIMIT_AS, ...).
-    Use value -1 to disable memory limit.
+    Set memory limit in bytes.
+    Use value 'None' to disable memory limit.
 
     Return True if limit is set, False on error.
     """
@@ -68,10 +68,6 @@ try:
             hard_limit = -1
         if hard_limit is None:
             hard_limit = -1
-        if max_mem != -1:
-            max_mem = max_mem // PAGE_SIZE
-        if hard_limit != -1:
-            hard_limit = hard_limit // PAGE_SIZE
         try:
             setrlimit(RLIMIT_AS, (max_mem, hard_limit))
             return True
