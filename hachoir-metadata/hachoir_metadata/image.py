@@ -7,6 +7,7 @@ from hachoir_parser.image.png import getBitsPerPixel as pngBitsPerPixel
 from hachoir_parser.image.xcf import XcfProperty
 from hachoir_core.i18n import _
 from hachoir_core.error import HACHOIR_ERRORS
+from hachoir_metadata.safe import fault_tolerant
 
 def computeComprRate(meta, compr_size):
     """
@@ -53,7 +54,11 @@ class TiffMetadata(Metadata):
 #        "orientation": "image_orientation",
     }
     def extract(self, tiff):
-        for field in tiff["ifd"]:
+        if "ifd" in tiff:
+            self.useIFD(tiff["ifd"])
+
+    def useIFD(self, ifd):
+        for field in ifd:
             key = field.name
             try:
                 attrname = self.key_to_attr[field.name]
@@ -249,6 +254,7 @@ class WmfMetadata(Metadata):
             self.height = emf["height_px"].value
 
 class PsdMetadata(Metadata):
+    @fault_tolerant
     def extract(self, psd):
         self.width = psd["width"].value
         self.height = psd["height"].value
