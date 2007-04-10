@@ -4,25 +4,33 @@ from os import path, getcwd, access, R_OK, unlink, nice, mkdir, system, popen4, 
 from os.path import basename
 from sys import exit, argv, stderr
 from glob import glob
-import sha
 import random
 from random import randint
 from array import array
 from cStringIO import StringIO
-from hachoir_core.memory import getTotalMemory, setMemoryLimit
+from hachoir_core.memory import PAGE_SIZE, MemoryLimit
 from errno import EEXIST
 from time import time
-
 from hachoir_core.error import HACHOIR_ERRORS
-from hachoir_core.cmd_line import unicodeFilename
 from hachoir_core.log import log as hachoir_logger, Log
 from hachoir_core.stream import InputIOStream, InputStreamError
 from hachoir_metadata import extractMetadata
 from hachoir_parser import guessParser
 
+try:
+    import sha
+    def generateUniqueID(data):
+        return sha.new(data).hexdigest()
+except ImportError:
+    def generateUniqueID(data):
+        generateUniqueID.sequence += 1
+        return generateUniqueID.sequence
+    generateUniqueID.sequence = 0
+
 # Constants
 MAX_SIZE = 5000*512
 MAX_DURATION = 2.0
+MEMORY_LIMIT = PAGE_SIZE * 100
 
 def mangle(data):
     hsize = len(data)-1
@@ -55,7 +63,7 @@ class Fuzzer:
         self.log_error += 1
         print "METADATA ERROR: %s %s" % (prefix, text)
 
-    def fuzzFile(self, test_file):
+    def createStream(self, test_file):
         # Read bytes
         data = open(test_file, "rb").read(MAX_SIZE)
         data = array('B', data)
@@ -67,18 +75,18 @@ class Fuzzer:
         # Create stream
         data = data.tostring()
         output = StringIO(data)
-        stream = InputIOStream(output, filename=test_file)
+        return data, InputIOStream(output, filename=test_file)
 
+    def fuzzStream(self, stream):
         # Create parser
         start = time()
-        test_file_unicode = unicodeFilename(test_file)
         try:
             parser = guessParser(stream)
         except InputStreamError, err:
             parser = None
         if not parser:
             print "  (unable to create parser)"
-            return
+            return False, ""
 
         # Extract metadata
         self.log_error = 0
@@ -95,19 +103,39 @@ class Fuzzer:
         if MAX_DURATION < duration:
             print "Process is too long: %.1f seconds" % duration
             failure = True
-            prefix = "timeout-"
+            prefix = "timeout"
+        return failure, prefix
+
+    def fuzzFile(self, test_file):
+        data, stream = self.createStream(test_file)
+
+        fatal_error = False
+        try:
+            limiter = MemoryLimit(MEMORY_LIMIT)
+            failure, prefix = limiter.call(self.fuzzStream, stream)
+        except KeyboardInterrupt:
+            failure = True
+            prefix = "interrupt"
+            fatal_error = True
+        except MemoryError:
+            print "MEMORY ERROR!"
+            failure = True
+            prefix = "memory"
 
         # Process error
         if failure:
             self.copyError(test_file, data, prefix)
+        return (not fatal_error)
 
     def copyError(self, test_file, data, prefix):
         self.nb_error += 1
-        SHA=sha.new(data).hexdigest()
-        ERRNAME="%s%s-%s" % (prefix, SHA, basename(test_file))
+        uniq_id = generateUniqueID(data)
+        ERRNAME="%s-%s" % (uniq_id, basename(test_file))
+        if prefix:
+            ERRNAME = "%s-%s" % (prefix, ERRNAME)
         error_filename = path.join(self.error_dir, ERRNAME)
         open(error_filename, "wb").write(data)
-        print "=> ERROR: %s" % error_filename
+        print "=> Store file %s" % ERRNAME
 
     def init(self):
         # Setup log
@@ -133,10 +161,14 @@ class Fuzzer:
 
     def run(self):
         self.init()
-        while True:
-            test_file = random.choice(self.filedb)
-            print "total: %s error -- test file: %s" % (self.nb_error, basename(test_file))
-            self.fuzzFile(test_file)
+        try:
+            ok = True
+            while ok:
+                test_file = random.choice(self.filedb)
+                print "total: %s error -- test file: %s" % (self.nb_error, basename(test_file))
+                ok = self.fuzzFile(test_file)
+        except KeyboardInterrupt:
+            print "Stop"
 
 def main():
     # Read command line argument
@@ -152,10 +184,7 @@ def main():
     nice(19)
 
     fuzzer = Fuzzer(test_dirs, err_dir)
-    try:
-        fuzzer.run()
-    except KeyboardInterrupt:
-        print "Stop"
+    fuzzer.run()
 
 if __name__ == "__main__":
     main()
