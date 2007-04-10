@@ -2,15 +2,16 @@ from hachoir_core.field import MissingField
 from hachoir_core.error import HachoirError
 from hachoir_metadata.metadata import Metadata, MultipleMetadata, registerExtractor
 from hachoir_metadata.metadata_item import QUALITY_GOOD
+from hachoir_metadata.safe import fault_tolerant
 from hachoir_parser.video import MovFile, AsfFile, FlvFile
 from hachoir_parser.video.asf import Descriptor as ASF_Descriptor
 from hachoir_parser.container import MkvFile
 from hachoir_parser.container.mkv import dateToDatetime
 from hachoir_core.i18n import _
-from hachoir_core.tools import makePrintable, durationWin64, timedelta2seconds
+from hachoir_core.tools import (makeUnicode, makePrintable,
+    durationWin64, timedelta2seconds)
 from hachoir_core.error import warning
 from datetime import timedelta
-from hachoir_metadata.safe import getValue
 
 class MkvMetadata(MultipleMetadata):
     tag_key = {
@@ -228,22 +229,7 @@ class AsfMetadata(MultipleMetadata):
             # Extract all data from ext_desc
             data = {}
             for desc in header.array("ext_desc/content/descriptor"):
-                if desc["type"].value == ASF_Descriptor.TYPE_BYTE_ARRAY:
-                    # Skip binary data
-                    continue
-                key = desc["name"].value
-                if key in self.SKIP_EXT_DESC:
-                    # Skip some keys
-                    continue
-                value = getValue(desc, "value")
-                if not value:
-                    continue
-                if isinstance(value, str):
-                    value = makePrintable(value, "ISO-8859-1", to_unicode=True)
-                if "/" in key:
-                    # Replace "WM/ToolName" with "ToolName"
-                    key = key.split("/", 1)[1]
-                data[key] = value
+                self.useExtDescItem(desc)
 
             # Have ToolName and ToolVersion? If yes, group them to producer key
             if "ToolName" in data and "ToolVersion" in data:
@@ -324,6 +310,25 @@ class AsfMetadata(MultipleMetadata):
                 self.copyright = info["copyright"].value
             except MissingField:
                 pass
+
+    @fault_tolerant
+    def useExtDescItem(self, desc):
+        if desc["type"].value == ASF_Descriptor.TYPE_BYTE_ARRAY:
+            # Skip binary data
+            return
+        key = desc["name"].value
+        if key in self.SKIP_EXT_DESC:
+            # Skip some keys
+            return
+        value = desc["value"].value
+        if not value:
+            return
+        value = makeUnicode(value)
+        if "/" in key:
+            # Replace "WM/ToolName" with "ToolName"
+            key = key.split("/", 1)[1]
+        data[key] = value
+
 
     def streamProperty(self, header, index):
         meta = Metadata()
