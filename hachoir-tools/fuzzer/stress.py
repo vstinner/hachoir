@@ -55,10 +55,16 @@ class Fuzzer:
             return False
         if "Can't get field \"" in text:
             return True
-        if re.match("Unable to create value: Can't read [0-9]+ bits at ", text):
-            return True
-        if re.match("Unable to create value: (hour|month) must be in ", text):
-            return True
+        if text.startswith("Unable to create value: "):
+            why = text[24:]
+            if why.startswith("invalid literal for int(): "):
+                return True
+            if re.match("^Can't read [0-9]+ bits at ", why):
+                return True
+            if why == "day is out of range for month":
+                return True
+            if re.match("^(hour|month) must be in ", why):
+                return True
         if "field is too large" in text:
             return True
         return False
