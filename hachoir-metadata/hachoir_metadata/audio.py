@@ -158,16 +158,19 @@ class AuMetadata(Metadata):
 class RealAudioMetadata(Metadata):
     def extract(self, real):
         if "metadata" in real:
-            info = real["metadata"]
-            self.title = info["title"].value
-            self.author = info["author"].value
-            self.copyright = info["copyright"].value
-            self.comment = info["comment"].value
+            self.useMetata(real["metadata"])
         if real["version"].value == 4:
             self.sample_rate = real["sample_rate"].value
             self.nb_channel = real["channels"].value
             self.compression = real["FourCC"].value
         self.format_version = "Real audio version %s" % real["version"].value
+
+    @fault_tolerant
+    def useMetadata(self, info):
+        self.title = info["title"].value
+        self.author = info["author"].value
+        self.copyright = info["copyright"].value
+        self.comment = info["comment"].value
 
 class RealMediaMetadata(MultipleMetadata):
     KEY_TO_ATTR = {
@@ -182,11 +185,7 @@ class RealMediaMetadata(MultipleMetadata):
             self.bit_rate = prop["avg_bit_rate"].value
             self.duration = timedelta(milliseconds=prop["duration"].value)
         if "content_desc" in media:
-            content = media["content_desc"]
-            self.title = content["title"].value
-            self.author = content["author"].value
-            self.copyright = content["copyright"].value
-            self.comment = content["comment"].value
+            self.useContentDesc(media["content_desc"])
         for stream in media.array("stream_prop"):
             meta = Metadata()
             if stream["stream_start"].value:
@@ -210,6 +209,13 @@ class RealMediaMetadata(MultipleMetadata):
             setattr(self, self.KEY_TO_ATTR[key], value)
         elif value:
             self.warning("Skip %s: %s" % (prop["name"].value, value))
+
+    @fault_tolerant
+    def useContentDesc(self, content):
+        self.title = content["title"].value
+        self.author = content["author"].value
+        self.copyright = content["copyright"].value
+        self.comment = content["comment"].value
 
 class MpegAudioMetadata(Metadata):
     TAG_TO_KEY = {
