@@ -6,12 +6,15 @@ from hachoir_core.error import HachoirError
 from hachoir_core.i18n import _, ngettext
 from hachoir_core.stream import InputFieldStream
 from hachoir_parser import guessParser
-from urwid import AttrWrap, Text, ListBox, CanvasJoin, BoxAdapter, Edit
+from urwid import AttrWrap, BoxAdapter, BoxWidget, CanvasJoin, Edit, Frame, ListBox, Pile, Text
 from shutil import copyfileobj
 from weakref import WeakKeyDictionary
 import os, urwid.curses_display
 
-urwid_old = urwid.__version__ < '0.9.8'
+try:
+    from urwid import __version__ as urwid_ver
+except ImportError:
+    urwid_ver = None
 
 def browse_completion(text):
     path = os.path.dirname(text)
@@ -371,12 +374,11 @@ class TreeBox(ListBox):
         return canvas
 
 
-class Tabbed(BoxAdapter):
+class Tabbed(BoxWidget):
     tabs = []
     active = None
 
     def __init__(self, title):
-        BoxAdapter.__init__(self, None, 1)
         self.title = title
 
     def select(self, pos):
@@ -408,13 +410,16 @@ class Tabbed(BoxAdapter):
                 pos = None
         self.select(pos)
 
+    def render(self, *args, **kw):
+        return self.box_widget.render(*args, **kw)
+
     def keypress(self, size, key):
         if key == '<':
             pos = self.active - 1
         elif key == '>':
             pos = self.active + 1
         else:
-            return BoxAdapter.keypress(self, size, key)
+            return self.box_widget.keypress(size, key)
         self.select(pos % len(self.tabs))
 
 
@@ -436,7 +441,7 @@ class Separator(Text):
             return l, r
         return l * mc // lr, r * mc // lr
 
-    if urwid_old:
+    if urwid_ver < '0.9.8':
         def render(self, (maxcol,), focus=False):
             l, r = self.cols(maxcol)
             return CanvasJoin([
@@ -571,16 +576,24 @@ def exploreFieldSet(field_set, args, options={}):
     body.append((name, TreeBox(charset, Node(field_set, None), preload_fields, args.path, options)))
 
     log = BoxAdapter(ListBox(msgs[1]), 0)
+    log.selectable = lambda: False
     wrapped_sep = AttrWrap(sep, 'sep')
-    top_widgets = [ body, wrapped_sep, log ]
-    top = ListBox(top_widgets)
+    footer = Pile([ ('flow', wrapped_sep), log ])
+
+    # awful way to allow the user to hide the log widget
+    log.render = lambda size, focus=False: BoxAdapter.render(log, size[:1], focus)
+    footer.render = lambda (maxcol,), focus=False: Pile.render(footer, (maxcol, sep.rows((maxcol,))+log.height), focus)
+
+    top = Frame(body, None, footer)
 
     def input_enter(w):
-        top_widgets[1] = w
-        top.set_focus(1)
+        footer.widget_list[0] = w
+        footer.set_focus(0)
+        top.set_focus('footer')
     def input_leave():
-        top_widgets[1] = wrapped_sep
-        top.set_focus(0)
+        footer.widget_list[0] = wrapped_sep
+        footer.set_focus(0)
+        top.set_focus('body')
     input = Input(input_enter, input_leave)
 
     def run():
@@ -594,7 +607,7 @@ def exploreFieldSet(field_set, args, options={}):
                         size = ui.get_cols_rows()
                         resize = log.height
                     else:
-                        e = top.get_focus()[0].keypress(size[:1], e)
+                        e = top.keypress(size, e)
                         if e is None:
                             pass
                         elif e == 'f1':
