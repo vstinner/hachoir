@@ -1,4 +1,5 @@
 from hachoir_metadata.metadata import Metadata, registerExtractor
+from hachoir_metadata.safe import fault_tolerant
 from hachoir_parser.misc import TorrentFile, TrueTypeFontFile, OLE2_File, PcfFile
 from hachoir_core.field import isString
 from hachoir_core.error import warning
@@ -47,6 +48,7 @@ class TTF_Metadata(Metadata):
         if "names" in ttf:
             self.extractNames(ttf["names"])
 
+    @fault_tolerant
     def extractHeader(self, header):
         self.creation_date = header["created"].value
         self.last_modification = header["modified"].value
