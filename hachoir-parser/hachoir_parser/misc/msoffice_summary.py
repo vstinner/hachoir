@@ -256,7 +256,7 @@ class Summary(SeekableFieldSet):
         elif self["endian"].value == "\xFE\xFF":
             self.endian = LITTLE_ENDIAN
         else:
-            raise ParserError("Invalid endian value")
+            raise ParserError("OLE2: Invalid endian value")
         self.osconfig = OSConfig(self["os"].value == self.OS_MAC)
 
     def createFields(self):
@@ -267,7 +267,7 @@ class Summary(SeekableFieldSet):
         yield GUID(self, "format_id")
         yield UInt32(self, "section_count")
         if MAX_SECTION_COUNT < self["section_count"].value:
-            raise ParserError("Too much sections (%s)" % self["section_count"].value)
+            raise ParserError("OLE2: Too much sections (%s)" % self["section_count"].value)
 
         section_indexes = []
         for index in xrange(self["section_count"].value):
