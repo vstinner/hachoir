@@ -14,6 +14,8 @@ from hachoir_core.text_handler import hexadecimal
 from hachoir_core.tools import paddingSize
 from hachoir_core.tools import createDict
 
+MAX_COUNT = 200
+
 class BasicIFDEntry(FieldSet):
     TYPE_RATIONAL = 5
     TYPE_SIGNED_RATIONAL = 10
@@ -34,6 +36,8 @@ class BasicIFDEntry(FieldSet):
         yield Enum(UInt16(self, "tag", "Tag", text_handler=hexadecimal), self.TAG_NAME)
         yield Enum(UInt16(self, "type", "Type", text_handler=hexadecimal), self.TYPE_NAME)
         yield UInt32(self, "count", "Count")
+        if MAX_COUNT < self["count"].value:
+            raise ParserError("EXIF: Invalid count value (%s)" % self["count"].value)
         value_size, array_size = self.getSizes()
 
         # Get offset/value
