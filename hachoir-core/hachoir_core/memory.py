@@ -1,3 +1,7 @@
+import gc
+
+PAGE_SIZE = 4096
+
 def getTotalMemory():
     """
     Get total size of memory (not swap) in bytes.
@@ -6,27 +10,106 @@ def getTotalMemory():
     Returns None on error. May also raise a ValueError.
     """
     try:
-        line = open('/proc/meminfo').readlines()[0].split()
+        line = open('/proc/meminfo').readline().strip()
+        meminfo = line.split()
     except IOError:
         return None
-    if line[2] != 'kB':
+    if meminfo[2] != 'kB':
         raise ValueError("Don't support %s memory unit" % line[2])
-    return int(line[1]) * 1024
+    return int(meminfo[1]) * 1024
 
-def setMemoryLimit(max_mem):
+def _getProcStatm(index):
+    try:
+        statm = open('/proc/self/statm').readline().split()
+    except IOError:
+        return None
+    return int(statm[index]) * PAGE_SIZE
+
+def getMaxRSS():
+    return _getProcStatm(0)
+
+def getRSS():
+    return _getProcStatm(1)
+
+def getData():
+    return _getProcStatm(5)
+
+def getMemoryLimit():
+    return None
+
+def setMemoryLimit(max_mem, hard_limit=None):
     """
     Set memory limit using setrlimit(RLIMIT_AS, ...).
     Use value -1 to disable memory limit.
 
     Return True if limit is set, False on error.
     """
-    try:
-        from resource import setrlimit, RLIMIT_AS
+    return False
+
+try:
+    from resource import (getpagesize, getrusage,
+        getrlimit, setrlimit,
+        RUSAGE_SELF, RLIMIT_AS)
+
+    PAGE_SIZE = getpagesize()
+
+    def getMemoryLimit():
         try:
-            setrlimit(RLIMIT_AS, (max_mem, -1))
+            limit = getrlimit(RLIMIT_AS)[0]
+            if 0 < limit:
+                limit *= PAGE_SIZE
+            return limit
+        except ValueError:
+            return None
+
+    def setMemoryLimit(max_mem, hard_limit=None):
+        if max_mem is None:
+            max_mem = -1 # getTotalMem() * 2
+            hard_limit = -1
+        if hard_limit is None:
+            hard_limit = -1
+        if max_mem != -1:
+            max_mem = max_mem // PAGE_SIZE
+        if hard_limit != -1:
+            hard_limit = hard_limit // PAGE_SIZE
+        try:
+            setrlimit(RLIMIT_AS, (max_mem, hard_limit))
+            return True
         except ValueError:
             return False
-    except ImportError:
-        return False
-    return True
+except ImportError:
+    pass
+
+class MemoryLimit:
+    def __init__(self, limit):
+        self.limit = limit
+
+    def clearCaches(self):
+        gc.collect()
+        #import re; re.purge()
+
+    def call(self, func, *args, **kw):
+        # First step: clear cache to gain memory
+        self.clearCaches()
+
+        # Get total program size
+        max_rss = getMaxRSS()
+        if max_rss is not None:
+            # Get old limit and then set our new memory limit
+            old_limit = getMemoryLimit()
+            limit = max_rss + self.limit
+            limited = setMemoryLimit(limit)
+        else:
+            limited = False
+
+        try:
+            # Call function
+            return func(*args, **kw)
+        finally:
+            # and unset our memory limit
+            if limited:
+                setMemoryLimit(old_limit)
+
+            # After calling the function: clear all caches
+            self.clearCaches()
 
