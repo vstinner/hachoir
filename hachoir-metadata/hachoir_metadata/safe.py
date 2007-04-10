@@ -9,13 +9,19 @@ def fault_tolerant(func, *args):
                 func.__name__, err))
     return safe_func
 
-def getValue(fieldset, key):
+def getFieldAttribute(fieldset, key, attrname):
     try:
         field = fieldset[key]
         if field.hasValue():
-            return field.value
+            return getattr(field, attrname)
     except HACHOIR_ERRORS, err:
-        warning("Unable to get value of field %s/%s: %s" % (
-            fieldset.path, key, err))
+        warning("Unable to get %s of field %s/%s: %s" % (
+            attrname, fieldset.path, key, err))
     return None
+
+def getValue(fieldset, key):
+    return getFieldAttribute(fieldset, key, "value")
+
+def getDisplay(fieldset, key):
+    return getFieldAttribute(fieldset, key, "display")
 

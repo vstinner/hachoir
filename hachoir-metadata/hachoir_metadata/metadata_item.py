@@ -82,7 +82,7 @@ class Data:
 
         if self.type and not isinstance(value, self.type):
             dest_types = " or ".join(str(item.__name__) for item in self.type)
-            self.metadata.error("Key %r: value %r type (%s) is not %s" % (
+            self.metadata.warning("Key %r: value %r type (%s) is not %s" % (
                 self.key, value, type(value).__name__, dest_types))
             return
 
