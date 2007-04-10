@@ -132,8 +132,9 @@ class RootSeekableFieldSet(BasicFieldSet):
     def _readFields(self):
         while True:
             added = self._readMoreFields(xrange(1))
-            if added:
-                yield self._field_array[-1]
+            if not added:
+                break
+            yield self._field_array[-1]
 
     def _readMoreFields(self, index_generator):
         added = 0
