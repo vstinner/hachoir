@@ -283,7 +283,7 @@ class MpegAudioFile(Parser):
     endian = BIG_ENDIAN
 
     def validate(self):
-        if self.stream.readBytes(0, 3) == "ID3":
+        if self[0].name == "id3v2":
             return True
 
         if not self.stream.checked: # TODO: is it possible to handle piped input?

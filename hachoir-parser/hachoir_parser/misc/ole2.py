@@ -30,6 +30,9 @@ from hachoir_parser.common.win32 import GUID
 from hachoir_parser.misc.msoffice import CustomFragment, PROPERTY_NAME
 from hachoir_parser.misc.msoffice_summary import Summary
 
+MIN_BIG_BLOCK_LOG2 = 6   # 512 bytes
+MAX_BIG_BLOCK_LOG2 = 14  # 64 kB
+
 # Number of items in DIFAT
 NB_DIFAT = 109
 
@@ -98,15 +101,9 @@ class Header(FieldSet):
         yield GUID(self, "clsid", "16 bytes GUID used by some apps")
         yield UInt16(self, "ver_min", "Minor version")
         yield UInt16(self, "ver_maj", "Minor version")
-        if self["ver_maj"].value not in (3, 4):
-            raise ParserError("Unknown Header version!")
         yield textHandler(UInt16(self, "endian", "Endian (0xFFFE for Intel)"), hexadecimal)
         yield UInt16(self, "bb_shift", "Log, base 2, of the big block size")
-        if not(6 <= self["bb_shift"].value < 31):
-            raise ParserError("Invalid (log 2 of) big block size")
         yield UInt16(self, "sb_shift", "Log, base 2, of the small block size")
-        if self["bb_shift"].value < self["sb_shift"].value:
-            raise ParserError("Small block size is bigger than big block size!")
         yield NullBytes(self, "reserverd[]", 6, "(reserved)")
         yield UInt32(self, "csectdir", "Number of SECTs in directory chain for 4 KB sectors (version 4)")
         yield UInt32(self, "bb_count", "Number of Big Block Depot blocks")
@@ -156,6 +153,15 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
     def validate(self):
         if self["ole_id"].value != "\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1":
             return "Invalid magic"
+        if self["header/ver_maj"].value not in (3, 4):
+            return "Unknown major version (%s)" % self["header/ver_maj"].value
+        if self["header/endian"].value != 0xFFFE:
+            return "Unknown endian (0x%x)" % self["header/endian"].value
+        if not(MIN_BIG_BLOCK_LOG2 <= self["header/bb_shift"].value <= MAX_BIG_BLOCK_LOG2):
+            return "Invalid (log 2 of) big block size (%s)" % self["header/bb_shift"].value
+        if self["header/bb_shift"].value < self["header/sb_shift"].value:
+            return "Small block size (log2=%s) is bigger than big block size (log2=%s)!" \
+                % (self["header/sb_shift"].value, self["header/bb_shift"].value)
         return True
 
     def createFields(self):
@@ -267,7 +273,10 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
         while block != SECT.END_OF_CHAIN:
             yield block
             index = block // self.items_per_bbfat
-            block = fat[index]["index[%u]" % block].value
+            try:
+                block = fat[index]["index[%u]" % block].value
+            except LookupError, err:
+                self.error("Unable to parse a FAT chain: %s" % err)
 
     def readBFAT(self):
         self.bb_fat = []

@@ -19,6 +19,7 @@ from hachoir_core.field import (FieldSet, ParserError,
 from hachoir_core.endian import BIG_ENDIAN
 from hachoir_core.text_handler import hexadecimal, humanFilesize
 
+MAX_NAME_COUNT = 300
 MIN_NB_TABLE = 3
 MAX_NB_TABLE = 30
 
@@ -162,6 +163,9 @@ def parseNames(self):
         raise ParserError("TTF (names): Invalid format (%u)" % self["format"].value)
     yield UInt16(self, "count")
     yield UInt16(self, "offset")
+    if MAX_NAME_COUNT < self["count"].value:
+        raise ParserError("Invalid number of names (%s)"
+            % self["count"].value)
 
     # Read name index
     entries = []
