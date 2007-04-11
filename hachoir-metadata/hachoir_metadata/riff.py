@@ -30,7 +30,8 @@ class RiffMetadata(MultipleMetadata):
             if size:
                 computeAudioComprRate(self, size*8)
         elif type == "AVI ":
-            self.extractAVI(riff)
+            if "headers" in riff:
+                self.extractAVI(riff["headers"])
         if "info" in riff:
             self.extractInfo(riff["info"])
 
@@ -77,6 +78,7 @@ class RiffMetadata(MultipleMetadata):
                 else:
                     self.processChunk(field)
 
+    @fault_tolerant
     def extractAVIVideo(self, header, meta):
         meta.compression = "%s (fourcc:\"%s\")" \
             % (header["fourcc"].display, makeUnicode(header["fourcc"].value))
@@ -95,6 +97,7 @@ class RiffMetadata(MultipleMetadata):
             meta.width = header["right"].value - header["left"].value
             meta.height = header["bottom"].value - header["top"].value
 
+    @fault_tolerant
     def extractAVIAudio(self, format, meta):
         meta.nb_channel = format["channel"].value
         meta.sample_rate = format["sample_rate"].value
@@ -125,30 +128,25 @@ class RiffMetadata(MultipleMetadata):
         self.width = header["width"].value
         self.height = header["height"].value
 
-    def extractAVI(self, avi):
-        # Process (audio and video) streams
-        if "headers" in avi:
-            audio_index = 1
-            headers = avi["headers"]
-            have_video_info = False
-            for stream in headers.array("stream"):
-                if "stream_hdr/stream_type" not in stream:
-                    continue
-                stream_type = stream["stream_hdr/stream_type"].value
-                if stream_type == "vids":
-                    if "stream_hdr" in stream:
-                        meta = Metadata(self)
-                        self.extractAVIVideo(stream["stream_hdr"], meta)
-                        self.addGroup("video", meta, "Video stream")
-                        have_video_info = True
-                elif stream_type == "auds":
-                    if "stream_fmt" in stream:
-                        meta = Metadata(self)
-                        self.extractAVIAudio(stream["stream_fmt"], meta)
-                        self.addGroup("audio[%u]" % audio_index, meta, "Audio stream")
-                        audio_index += 1
-            if not have_video_info and "avi_hdr" in headers:
-                self.useAviHeader(headers["avi_hdr"])
+    def extractAVI(self, headers):
+        audio_index = 1
+        for stream in headers.array("stream"):
+            if "stream_hdr/stream_type" not in stream:
+                continue
+            stream_type = stream["stream_hdr/stream_type"].value
+            if stream_type == "vids":
+                if "stream_hdr" in stream:
+                    meta = Metadata(self)
+                    self.extractAVIVideo(stream["stream_hdr"], meta)
+                    self.addGroup("video", meta, "Video stream")
+            elif stream_type == "auds":
+                if "stream_fmt" in stream:
+                    meta = Metadata(self)
+                    self.extractAVIAudio(stream["stream_fmt"], meta)
+                    self.addGroup("audio[%u]" % audio_index, meta, "Audio stream")
+                    audio_index += 1
+        if "avi_hdr" in headers:
+            self.useAviHeader(headers["avi_hdr"])
 
         # Compute global bit rate
         if self.has("duration") and "movie/size" in avi:
