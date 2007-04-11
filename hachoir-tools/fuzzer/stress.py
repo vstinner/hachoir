@@ -21,7 +21,7 @@ import re
 # Constants
 SLEEP_SEC = 0
 MAX_SIZE = 1024 * 1024
-MAX_DURATION = 2.0
+MAX_DURATION = 10.0
 MEMORY_LIMIT = 5 * 1024 * 1024
 MANGLE_PERCENT = 0.25
 
@@ -49,10 +49,10 @@ class Fuzzer:
             return False
         if text.startswith("Error when creating MIME type"):
             return True
-#        if "Can't get field \"" in text:
-#            return True
         if text.startswith("Unable to create value: "):
             why = text[24:]
+            if why.startswith("Can't get field \""):
+                return True
             if why.startswith("invalid literal for int(): "):
                 return True
             if why.startswith("timestampUNIX(): value have to be in "):
