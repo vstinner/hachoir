@@ -149,13 +149,13 @@ class RiffMetadata(MultipleMetadata):
             self.useAviHeader(headers["avi_hdr"])
 
         # Compute global bit rate
-        if self.has("duration") and "movie/size" in avi:
-            self.bit_rate = float(avi["movie/size"].value) * 8 / timedelta2seconds(self.get('duration'))
+        if self.has("duration") and "/movie/size" in headers:
+            self.bit_rate = float(headers["/movie/size"].value) * 8 / timedelta2seconds(self.get('duration'))
 
         # Video has index?
-        if "index" in avi:
+        if "/index" in headers:
             self.comment = _("Has audio/video index (%s)") \
-                % humanFilesize(avi["index"].size/8)
+                % humanFilesize(headers["/index"].size/8)
 
 registerExtractor(RiffFile, RiffMetadata)
 
