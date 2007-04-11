@@ -77,10 +77,7 @@ class RiffMetadata(MultipleMetadata):
                 else:
                     self.processChunk(field)
 
-    def extractAVIVideo(self, video):
-        meta = Metadata(self)
-        header = video["stream_hdr"]
-
+    def extractAVIVideo(self, header, meta):
         meta.compression = "%s (fourcc:\"%s\")" \
             % (header["fourcc"].display, makeUnicode(header["fourcc"].value))
         if header["rate"].value and header["scale"].value:
@@ -89,24 +86,21 @@ class RiffMetadata(MultipleMetadata):
             if 0 < fps:
                 self.duration = meta.duration = timedelta(seconds=float(header["length"].value) / fps)
 
-        if "stream_fmt/width" in video:
-            format = video["stream_fmt"]
+        if "../stream_fmt/width" in header:
+            format = header["../stream_fmt"]
             meta.width = format["width"].value
             meta.height = format["height"].value
             meta.bits_per_pixel = format["depth"].value
         else:
             meta.width = header["right"].value - header["left"].value
             meta.height = header["bottom"].value - header["top"].value
-        self.addGroup("video", meta, "Video stream")
 
-    def extractAVIAudio(self, audio):
-        meta = Metadata(self)
-        format = audio["stream_fmt"]
+    def extractAVIAudio(self, format, meta):
         meta.nb_channel = format["channel"].value
         meta.sample_rate = format["sample_rate"].value
         meta.bit_rate = format["bit_rate"].value * 8
-        if "stream_hdr" in audio:
-            header = audio["stream_hdr"]
+        if "../stream_hdr" in format:
+            header = format["../stream_hdr"]
             if header["rate"].value and header["scale"].value:
                 frame_rate = float(header["rate"].value) / header["scale"].value
                 meta.duration = timedelta(seconds=float(header["length"].value) / frame_rate)
@@ -115,7 +109,6 @@ class RiffMetadata(MultipleMetadata):
                     % (format["codec"].display, header["fourcc"].value)
         if not meta.has("compression"):
             meta.compression = format["codec"].display
-        return meta
 
     @fault_tolerant
     def useAviHeader(self, header):
@@ -144,11 +137,14 @@ class RiffMetadata(MultipleMetadata):
                 stream_type = stream["stream_hdr/stream_type"].value
                 if stream_type == "vids":
                     if "stream_hdr" in stream:
-                        self.extractAVIVideo(stream)
+                        meta = Metadata(self)
+                        self.extractAVIVideo(stream["stream_hdr"], meta)
+                        self.addGroup("video", meta, "Video stream")
                         have_video_info = True
                 elif stream_type == "auds":
                     if "stream_fmt" in stream:
-                        meta = self.extractAVIAudio(stream)
+                        meta = Metadata(self)
+                        self.extractAVIAudio(stream["stream_fmt"], meta)
                         self.addGroup("audio[%u]" % audio_index, meta, "Audio stream")
                         audio_index += 1
             if not have_video_info and "avi_hdr" in headers:
