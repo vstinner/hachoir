@@ -270,8 +270,14 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
         if not fat:
             fat = self.bb_fat
         block = start
+        block_set = set()
+        previous = block
         while block != SECT.END_OF_CHAIN:
+            if block in block_set:
+                raise ParserError("Loop in FAT chain (%s=>%s)" % (previous, block))
+            block_set.add(block)
             yield block
+            previous = block
             index = block // self.items_per_bbfat
             try:
                 block = fat[index]["index[%u]" % block].value
