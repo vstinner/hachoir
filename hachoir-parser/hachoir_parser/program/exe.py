@@ -168,7 +168,7 @@ class ExeFile(Parser):
             return None
 
         # Check if PE has resource or not
-        if "pe_opt_header/resource" in self:
+        if "pe_opt_header/resource/size" in self:
             if not self["pe_opt_header/resource/size"].value:
                 return None
         if "section_rsrc" in self:

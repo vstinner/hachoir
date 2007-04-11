@@ -46,6 +46,7 @@ class File(FieldSet):
         yield DateTimeMSDOS32(self, "timestamp")
         yield MSDOSFileAttr16(self, "attributes")
         yield CString(self, "filename", charset="ASCII")
+
     def createDescription(self):
         return "File %s (%s)" % (
             self["filename"].display, self["filesize"].display)
@@ -115,7 +116,9 @@ class CabFile(Parser):
         for index in xrange(self["nb_files"].value):
             yield File(self, "file[]")
 
-        yield self.seekBit(self.size, "endraw")
+        end = self.seekBit(self.size, "endraw")
+        if end:
+            yield end
 
     def createContentSize(self):
         return self["filesize"].value * 8
