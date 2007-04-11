@@ -115,7 +115,8 @@ class PcxMetadata(Metadata):
             self.nb_colors = 2 ** pcx["bpp"].value
         self.compression = _("Run-length encoding (RLE)")
         self.format_version = "PCX: %s" % pcx["version"].display
-        computeComprRate(self, pcx["image_data"].size)
+        if "image_data" in pcx:
+            computeComprRate(self, pcx["image_data"].size)
 
 class XcfMetadata(Metadata):
     # Map image type to bits/pixel
@@ -233,7 +234,8 @@ class TargaMetadata(Metadata):
         if tga["nb_color"].value:
             self.nb_colors = tga["nb_color"].value
         self.compression = tga["codec"].display
-        computeComprRate(self, tga["pixels"].size)
+        if "pixels" in tga:
+            computeComprRate(self, tga["pixels"].size)
 
 class WmfMetadata(Metadata):
     def extract(self, wmf):

@@ -117,9 +117,8 @@ class RiffMetadata(MultipleMetadata):
             meta.compression = format["codec"].display
         return meta
 
+    @fault_tolerant
     def useAviHeader(self, header):
-        self.width = header["width"].value
-        self.height = header["height"].value
         microsec = header["microsec_per_frame"].value
         if microsec:
             self.frame_rate = 1000000.0 / microsec
@@ -130,6 +129,8 @@ class RiffMetadata(MultipleMetadata):
                 except OverflowError:
                     # OverflowError: "days=1036668219; must have magnitude <= 999999999"
                     pass
+        self.width = header["width"].value
+        self.height = header["height"].value
 
     def extractAVI(self, avi):
         # Process (audio and video) streams

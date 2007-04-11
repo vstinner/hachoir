@@ -96,10 +96,8 @@ class TarMetadata(MultipleMetadata):
 
 class CabMetadata(MultipleMetadata):
     def extract(self, cab):
-        compr = cab["folder[0]/compr_method"].display
-        if cab["folder[0]/compr_method"].value != 0:
-            compr += " (level %u)" % cab["folder[0]/compr_level"].value
-        self.compression = compr
+        if "folder[0]" in cab:
+            self.useFolder(cab["folder[0]"])
         self.format_version = "Microsoft Cabinet version %s" % cab["cab_version"].display
         self.comment = "%s folders, %s files" % (
             cab["nb_folder"].value, cab["nb_files"].value)
@@ -120,6 +118,13 @@ class CabMetadata(MultipleMetadata):
             else:
                 title = _("File")
             self.addGroup(field.name, meta, title)
+
+    @fault_tolerant
+    def useFolder(self, folder):
+        compr = cab["compr_method"].display
+        if cab["compr_method"].value != 0:
+            compr += " (level %u)" % cab["compr_level"].value
+        self.compression = compr
 
 class MarMetadata(MultipleMetadata):
     def extract(self, mar):
