@@ -14,6 +14,8 @@ from hachoir_parser.common.msdos import MSDOSFileAttr16
 from hachoir_core.text_handler import hexadecimal, humanFilesize
 from hachoir_core.endian import LITTLE_ENDIAN
 
+MAX_NB_FOLDER = 30
+
 COMPRESSION_NONE = 0
 COMPRESSION_NAME = {
     0: "Uncompressed",
@@ -81,6 +83,8 @@ class CabFile(Parser):
             return "Invalid magic"
         if self["cab_version"].value != 0x0103:
             return "Unknown version (%s)" % self["cab_version"].display
+        if not (1 <= self["nb_folder"].value <= MAX_NB_FOLDER):
+            return "Invalid number of folder (%s)" % self["nb_folder"].value
         return True
 
     def createFields(self):

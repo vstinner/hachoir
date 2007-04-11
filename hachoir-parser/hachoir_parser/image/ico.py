@@ -116,7 +116,7 @@ class IcoFile(Parser):
             items.append(item)
         for header in items:
             if header["offset"].value*8 != self.current_size:
-                raise ParserError("Problem with icon data offset.")
+                raise ParserError("Icon: Problem with icon data offset.")
             yield IconData(self, "icon_data[]", header)
 
     def createDescription(self):
