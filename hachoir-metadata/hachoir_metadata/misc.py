@@ -55,6 +55,7 @@ class TTF_Metadata(Metadata):
         self.comment = u"Smallest readable size in pixels: %s pixels" % header["lowest"].value
         self.comment = u"Font direction: %s" % header["font_dir"].display
 
+    @fault_tolerant
     def extractNames(self, names):
         offset = names["offset"].value
         for header in names.array("header"):

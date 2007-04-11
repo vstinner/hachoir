@@ -45,9 +45,11 @@ class ExeMetadata(Metadata):
         ressource = exe.getRessource()
         if ressource and "version_info/node[0]" in ressource:
             for node in ressource.array("version_info/node[0]/node"):
-                if node["name"].value == "StringFileInfo":
+                if node["name"].value == "StringFileInfo" \
+                and "node[0]" in node:
                     self.readVersionInfo(node["node[0]"])
 
+    @fault_tolerant
     def useNE_Header(self, hdr):
         if hdr["is_dll"].value:
             self.format_version = u"New-style executable: Dynamic-link library (DLL)"
@@ -56,6 +58,7 @@ class ExeMetadata(Metadata):
         else:
             self.format_version = u"New-style executable for Windows 3.x"
 
+    @fault_tolerant
     def usePE_Header(self, hdr):
         self.creation_date = hdr["creation_date"].value
         self.comment = "CPU: %s" % hdr["cpu"].display

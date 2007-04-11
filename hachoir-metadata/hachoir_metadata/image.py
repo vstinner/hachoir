@@ -156,31 +156,8 @@ class PngMetadata(Metadata):
     }
 
     def extract(self, png):
-        header = png["/header"]
-        self.width = header["width"].value
-        self.height = header["height"].value
-
-        # Read number of colors and pixel format
-        if "/palette/size" in png:
-            nb_colors = png["/palette/size"].value // 3
-        else:
-            nb_colors = None
-        if not header["has_palette"].value:
-            if header["has_alpha"].value:
-                self.pixel_format = _("RGBA")
-            else:
-                self.pixel_format = _("RGB")
-        elif "transparency" in png:
-            self.pixel_format = _("Color index with transparency")
-            nb_colors -= 1
-        else:
-            self.pixel_format = _("Color index")
-        self.bits_per_pixel = pngBitsPerPixel(header)
-        if nb_colors:
-            self.nb_colors = nb_colors
-
-        # Read compression, timestamp, etc.
-        self.compression = header["compression"].display
+        if "header" in png:
+            self.useHeader(png["header"])
         if "time" in png:
             try:
                 self.creation_date = png["time"].value
@@ -202,13 +179,40 @@ class PngMetadata(Metadata):
         compr_size = sum( data.size for data in png.array("data") )
         computeComprRate(self, compr_size)
 
-class GifMetadata(Metadata):
-    def extract(self, gif):
-        header = gif["/screen"]
+    @fault_tolerant
+    def useHeader(self, header):
         self.width = header["width"].value
         self.height = header["height"].value
-        self.bits_per_pixel = (1 + header["bpp"].value)
-        self.nb_colors = (1 << self.get('bits_per_pixel'))
+
+        # Read number of colors and pixel format
+        if "/palette/size" in header:
+            nb_colors = header["/palette/size"].value // 3
+        else:
+            nb_colors = None
+        if not header["has_palette"].value:
+            if header["has_alpha"].value:
+                self.pixel_format = _("RGBA")
+            else:
+                self.pixel_format = _("RGB")
+        elif "/transparency" in header:
+            self.pixel_format = _("Color index with transparency")
+            if nb_colors:
+                nb_colors -= 1
+        else:
+            self.pixel_format = _("Color index")
+        self.bits_per_pixel = pngBitsPerPixel(header)
+        if nb_colors:
+            self.nb_colors = nb_colors
+
+        # Read compression, timestamp, etc.
+        self.compression = header["compression"].display
+
+
+class GifMetadata(Metadata):
+    def extract(self, gif):
+        self.useScreen(gif["/screen"])
+        if self.has("bits_per_pixel"):
+            self.nb_colors = (1 << self.get('bits_per_pixel'))
         self.compression = _("LZW")
         self.format_version =  "GIF version %s" % gif["header"].value[-3:]
         if "comments" in gif:
@@ -218,6 +222,12 @@ class GifMetadata(Metadata):
             self.pixel_format = _("Color index with transparency")
         else:
             self.pixel_format = _("Color index")
+
+    @fault_tolerant
+    def useScreen(self, screen):
+        self.width = screen["width"].value
+        self.height = screen["height"].value
+        self.bits_per_pixel = (1 + screen["bpp"].value)
 
 class TargaMetadata(Metadata):
     def extract(self, tga):

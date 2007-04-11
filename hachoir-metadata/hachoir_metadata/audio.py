@@ -29,7 +29,8 @@ def computeComprRate(meta, size):
     if not meta.has("duration") \
     or not meta.has("sample_rate") \
     or not meta.has("bits_per_sample") \
-    or not meta.has("nb_channel"):
+    or not meta.has("nb_channel") \
+    or not size:
         return
     orig_size = timedelta2seconds(meta.get("duration")) * meta.get('sample_rate') * meta.get('bits_per_sample') * meta.get('nb_channel')
     meta.compr_rate = u"%.2fx" % (float(orig_size) / size)
@@ -285,9 +286,7 @@ class MpegAudioMetadata(Metadata):
             self.nb_channel = (frame.getNbChannel(), frame["channel_mode"].display)
             self.format_version = u"MPEG version %s layer %s" % \
                 (frame["version"].display, frame["layer"].display)
-            sample_rate = frame.getSampleRate() # may returns None on error
-            if sample_rate:
-                self.sample_rate = sample_rate
+            self.sample_rate = frame.getSampleRate()
             self.bits_per_sample = 16
             if mp3["frames"].looksConstantBitRate():
                 self.computeBitrate(frame)
@@ -345,18 +344,21 @@ class MpegAudioMetadata(Metadata):
 class AiffMetadata(Metadata):
     def extract(self, aiff):
         if "common" in aiff:
-            info = aiff["common"]
-            rate = info["sample_rate"].value
-            if rate:
-                rate = int(rate)
-            if rate:
-                self.sample_rate = rate
-                self.duration = timedelta(seconds=float(info["nb_sample"].value) / rate)
-            self.nb_channel = info["nb_channel"].value
-            self.bits_per_sample = info["sample_size"].value
-            if "codec" in info:
-                self.compression = info["codec"].display
+            self.useCommon(aiff["common"])
         computeBitRate(self)
+
+    @fault_tolerant
+    def useCommon(self, info):
+        self.nb_channel = info["nb_channel"].value
+        self.bits_per_sample = info["sample_size"].value
+        self.sample_rate = getValue(info, "sample_rate")
+        if self.has("sample_rate"):
+            rate = self.get("sample_rate")
+            if rate:
+                sec = float(info["nb_sample"].value) / rate
+                self.duration = timedelta(seconds=sec)
+        if "codec" in info:
+            self.compression = info["codec"].display
 
 registerExtractor(AuFile, AuMetadata)
 registerExtractor(MpegAudioFile, MpegAudioMetadata)

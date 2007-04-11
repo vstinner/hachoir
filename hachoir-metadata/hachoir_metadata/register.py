@@ -8,6 +8,7 @@ from hachoir_metadata.formatter import (humanAudioChannel,
     humanFrameRate, setDatetime)
 from hachoir_metadata.metadata_item import Data
 
+MIN_SAMPLE_RATE = 1000              # 1 kHz
 MAX_SAMPLE_RATE = 192000            # 192 kHz
 MAX_NB_CHANNEL = 8                  # 8 channels
 MAX_WIDTH = 200000                  # 200 000 pixels
@@ -46,7 +47,7 @@ def registerAllItems(meta):
     meta.register(Data("width", 301, _("Image width"), filter=NumberFilter(1, MAX_WIDTH), type=(int, long)))
     meta.register(Data("height", 302, _("Image height"), filter=NumberFilter(1, MAX_HEIGHT), type=(int, long)))
     meta.register(Data("nb_channel", 303, _("Channel"), text_handler=humanAudioChannel, filter=NumberFilter(1, MAX_NB_CHANNEL), type=(int, long)))
-    meta.register(Data("sample_rate", 304, _("Sample rate"), text_handler=humanFrequency, filter=NumberFilter(1, MAX_SAMPLE_RATE), type=(int, long)))
+    meta.register(Data("sample_rate", 304, _("Sample rate"), text_handler=humanFrequency, filter=NumberFilter(MIN_SAMPLE_RATE, MAX_SAMPLE_RATE), type=(int, long, float)))
     meta.register(Data("bits_per_sample", 305, _("Bits/sample"), text_handler=humanBitSize, filter=NumberFilter(1, 64), type=(int, long)))
     meta.register(Data("image_orientation", 306, _("Image orientation")))
     meta.register(Data("nb_colors", 307, _("Number of colors"), filter=NumberFilter(1, MAX_NB_COLOR), type=(int, long)))

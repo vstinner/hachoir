@@ -5,7 +5,7 @@ def fault_tolerant(func, *args):
         try:
             func(*args, **kw)
         except HACHOIR_ERRORS, err:
-            warning("Error when calling function %s: %s" % (
+            warning("Error when calling function %s(): %s" % (
                 func.__name__, err))
     return safe_func
 

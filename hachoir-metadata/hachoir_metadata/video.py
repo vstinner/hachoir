@@ -82,7 +82,7 @@ class MkvMetadata(MultipleMetadata):
         try:
             self.trackCommon(track, audio)
             if "Audio" in track:
-                audio.sample_rate = int(track["Audio/SamplingFrequency/float"].value)
+                audio.sample_rate = track["Audio/SamplingFrequency/float"].value
                 audio.nb_channel = track["Audio/Channels/unsigned"].value
             audio.compression = track["CodecID/string"].value
         except MissingField:
@@ -117,8 +117,13 @@ class MkvMetadata(MultipleMetadata):
         if "Duration/float" in info \
         and "TimecodeScale/unsigned" in info \
         and 0 < info["Duration/float"].value:
-            seconds = info["Duration/float"].value * info["TimecodeScale/unsigned"].value * 1e-9
-            self.duration = timedelta(seconds=seconds)
+            try:
+                seconds = info["Duration/float"].value * info["TimecodeScale/unsigned"].value * 1e-9
+                self.duration = timedelta(seconds=seconds)
+            except OverflowError:
+                # Catch OverflowError for timedelta
+                # (long int too large to convert to int)
+                pass
         if "DateUTC/date" in info:
             self.creation_date = dateToDatetime(info["DateUTC/date"].value)
         if "WritingApp/unicode" in info:
@@ -171,7 +176,7 @@ class FlvMetadata(MultipleMetadata):
             elif key == "creator":
                 self.producer = entry["value"].value
             elif key == "audiosamplerate":
-                self.sample_rate = int(entry["value"].value)
+                self.sample_rate = entry["value"].value
             elif key == "framerate":
                 self.frame_rate = entry["value"].value
             elif key == "metadatacreator":
@@ -255,20 +260,7 @@ class AsfMetadata(MultipleMetadata):
                 setattr(self, key, value)
 
         if "file_prop/content" in header:
-            prop = header["file_prop/content"]
-            self.creation_date = prop["creation_date"].value
-            self.duration = durationWin64(prop["play_duration"].value)
-            if prop["seekable"]:
-                self.comment = u"Is seekable"
-            value = prop["max_bitrate"].value
-            text = prop["max_bitrate"].display
-            if is_vbr is True:
-                text = "VBR (%s max)" % text
-            elif is_vbr is False:
-                text = "%s (CBR)" % text
-            else:
-                text = "%s (max)" % text
-            self.bit_rate = (value, text)
+            self.useFileProp(header["file_prop/content"])
 
         if "codec_list/content" in header:
             for codec in header.array("codec_list/content/codec"):
@@ -330,6 +322,21 @@ class AsfMetadata(MultipleMetadata):
             key = key.split("/", 1)[1]
         data[key] = value
 
+    @fault_tolerant
+    def useFileProp(self, prop):
+        self.creation_date = prop["creation_date"].value
+        self.duration = durationWin64(prop["play_duration"].value)
+        if prop["seekable"].value:
+            self.comment = u"Is seekable"
+        value = prop["max_bitrate"].value
+        text = prop["max_bitrate"].display
+        if is_vbr is True:
+            text = "VBR (%s max)" % text
+        elif is_vbr is False:
+            text = "%s (CBR)" % text
+        else:
+            text = "%s (max)" % text
+        self.bit_rate = (value, text)
 
     def streamProperty(self, header, index):
         meta = Metadata()
