@@ -6,11 +6,13 @@ Creation date: 30 september 2006
 """
 
 from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet,
+from hachoir_core.field import (FieldSet, ParserError,
     UInt16, UInt32, String)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_parser.image.exif import BasicIFDEntry
 from hachoir_core.tools import createDict
+
+MAX_COUNT = 250
 
 class IFDEntry(BasicIFDEntry):
     static_size = 12*8
@@ -78,6 +80,9 @@ class IFD(FieldSet):
 
     def createFields(self):
         yield UInt16(self, "count")
+        if MAX_COUNT < self["count"].value:
+            raise ParserError("TIFF IFD: Invalid count (%s)"
+                % self["count"].value)
         for index in xrange(self["count"].value):
             yield IFDEntry(self, "entry[]")
 
