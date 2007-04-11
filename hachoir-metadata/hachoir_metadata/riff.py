@@ -123,8 +123,13 @@ class RiffMetadata(MultipleMetadata):
         microsec = header["microsec_per_frame"].value
         if microsec:
             self.frame_rate = 1000000.0 / microsec
-            if "total_frame" in header and header["total_frame"].value:
-                self.duration = timedelta(seconds=header["total_frame"].value * microsec)
+            total_frame = getValue(header, "total_frame")
+            if total_frame:
+                try:
+                    self.duration = timedelta(seconds=total_frame * microsec)
+                except OverflowError:
+                    # OverflowError: "days=1036668219; must have magnitude <= 999999999"
+                    pass
 
     def extractAVI(self, avi):
         # Process (audio and video) streams

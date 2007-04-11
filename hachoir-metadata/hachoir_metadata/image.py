@@ -92,8 +92,8 @@ class IcoMetadata(MultipleMetadata):
             elif bpp == 0:
                 bpp = 8
             image.bits_per_pixel = bpp
-            image.setHeader(_("Icon #%u (%ux%u)")
-                % (1+index, image.get("width"), image.get("height")))
+            image.setHeader(_("Icon #%u (%sx%s)")
+                % (1+index, image.get("width", "?"), image.get("height", "?")))
 
             # Read compression from data (if available)
             key = "icon_data[%u]/header/codec" % index
@@ -206,7 +206,6 @@ class PngMetadata(Metadata):
 
         # Read compression, timestamp, etc.
         self.compression = header["compression"].display
-
 
 class GifMetadata(Metadata):
     def extract(self, gif):
