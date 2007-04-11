@@ -1,7 +1,7 @@
 from hachoir_metadata.metadata_item import QUALITY_BEST, QUALITY_FASTEST
 from hachoir_metadata.safe import fault_tolerant, getValue
 from hachoir_metadata.metadata import (
-    Metadata, MultipleMetadata, registerExtractor)
+    RootMetadata, Metadata, MultipleMetadata, registerExtractor)
 from hachoir_parser.archive import (Bzip2Parser, CabFile, GzipParser,
     TarFile, ZipFile, MarFile)
 from hachoir_core.tools import humanUnixAttributes
@@ -23,12 +23,12 @@ def computeCompressionRate(meta):
         return
     meta.compr_rate = float(meta.get("file_size")) / meta.get("compr_size")
 
-class Bzip2Metadata(Metadata):
+class Bzip2Metadata(RootMetadata):
     def extract(self, zip):
         if "file" in zip:
             self.compr_size = zip["file"].size/8
 
-class GzipMetadata(Metadata):
+class GzipMetadata(RootMetadata):
     def extract(self, gzip):
         self.useHeader(gzip)
         computeCompressionRate(self)
@@ -54,7 +54,7 @@ class ZipMetadata(MultipleMetadata):
 
     @fault_tolerant
     def processFile(self, field):
-        meta = Metadata(parent=self)
+        meta = Metadata(self)
         meta.filename = field["filename"].value
         meta.creation_date = field["last_mod"].value
         meta.compression = field["compression"].display
@@ -76,7 +76,7 @@ class TarMetadata(MultipleMetadata):
             if max_nb is not None and max_nb <= index:
                 self.warning("TAR archive contains many files, but only first %s files are processed" % max_nb)
                 break
-            meta = Metadata(parent=self)
+            meta = Metadata(self)
             meta.filename = field["name"].value
             meta.file_size = field.getOctal("size")
             try:
@@ -117,7 +117,7 @@ class CabMetadata(MultipleMetadata):
 
     @fault_tolerant
     def useFile(self, field):
-        meta = Metadata(parent=self)
+        meta = Metadata(self)
         meta.filename = field["filename"].value
         meta.file_size = field["filesize"].value
         meta.creation_date = field["timestamp"].value
@@ -139,7 +139,7 @@ class MarMetadata(MultipleMetadata):
             if max_nb is not None and max_nb <= index:
                 self.warning("MAR archive contains many files, but only first %s files are processed" % max_nb)
                 break
-            meta = Metadata(parent=self)
+            meta = Metadata(self)
             meta.filename = field["filename"].value
             meta.compression = "None"
             meta.file_size = field["filesize"].value

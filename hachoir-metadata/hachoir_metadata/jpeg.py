@@ -1,4 +1,4 @@
-from hachoir_metadata.metadata import Metadata, registerExtractor
+from hachoir_metadata.metadata import RootMetadata, registerExtractor
 from hachoir_metadata.image import computeComprRate
 from hachoir_parser.image.exif import ExifEntry
 from hachoir_parser.image.jpeg import (
@@ -11,7 +11,7 @@ from hachoir_core.tools import makeUnicode
 from hachoir_metadata.safe import fault_tolerant, getValue
 from datetime import datetime
 
-class JpegMetadata(Metadata):
+class JpegMetadata(RootMetadata):
     exif_key = {
         # Exif metadatas
         ExifEntry.TAG_CAMERA_MANUFACTURER: "camera_manufacturer",
@@ -222,5 +222,6 @@ class JpegMetadata(Metadata):
                 self.creation_date = datetime(year, month, day, hour, min, sec)
             except ValueError:
                 pass
+
 registerExtractor(JpegFile, JpegMetadata)
 

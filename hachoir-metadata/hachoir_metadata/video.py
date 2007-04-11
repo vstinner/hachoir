@@ -1,6 +1,7 @@
 from hachoir_core.field import MissingField
 from hachoir_core.error import HachoirError
-from hachoir_metadata.metadata import Metadata, MultipleMetadata, registerExtractor
+from hachoir_metadata.metadata import (registerExtractor,
+    Metadata, RootMetadata, MultipleMetadata)
 from hachoir_metadata.metadata_item import QUALITY_GOOD
 from hachoir_metadata.safe import fault_tolerant
 from hachoir_parser.video import MovFile, AsfFile, FlvFile
@@ -66,7 +67,7 @@ class MkvMetadata(MultipleMetadata):
             meta.language = track["Language/string"].display
 
     def processVideo(self, track):
-        video = Metadata()
+        video = Metadata(self)
         try:
             self.trackCommon(track, video)
             video.compression = track["CodecID/string"].value
@@ -78,7 +79,7 @@ class MkvMetadata(MultipleMetadata):
         self.addGroup("video[]", video, "Video stream")
 
     def processAudio(self, track):
-        audio = Metadata()
+        audio = Metadata(self)
         try:
             self.trackCommon(track, audio)
             if "Audio" in track:
@@ -90,7 +91,7 @@ class MkvMetadata(MultipleMetadata):
         self.addGroup("audio[]", audio, "Audio stream")
 
     def processSubtitle(self, track):
-        sub = Metadata()
+        sub = Metadata(self)
         try:
             self.trackCommon(track, sub)
             sub.compression = track["CodecID/string"].value
@@ -136,7 +137,7 @@ class MkvMetadata(MultipleMetadata):
 class FlvMetadata(MultipleMetadata):
     def extract(self, flv):
         if "audio[0]" in flv:
-            meta = Metadata()
+            meta = Metadata(self)
             audio = flv["audio[0]"]
             meta.sample_rate = audio.getSampleRate()
             if audio["is_16bit"].value:
@@ -153,7 +154,7 @@ class FlvMetadata(MultipleMetadata):
                 meta.nb_channel = 1
             self.addGroup("audio", meta)
         if "video[0]" in flv:
-            meta = Metadata()
+            meta = Metadata(self)
             video = flv["video[0]"]
             meta.compression = video["codec"].display
             self.addGroup("video", meta)
@@ -188,7 +189,7 @@ class FlvMetadata(MultipleMetadata):
             elif key == "height":
                 self.height = int(entry["value"].value)
 
-class MovMetadata(Metadata):
+class MovMetadata(RootMetadata):
     def extract(self, mov):
         for atom in mov:
             if "movie" in atom:
@@ -339,7 +340,7 @@ class AsfMetadata(MultipleMetadata):
         self.bit_rate = (value, text)
 
     def streamProperty(self, header, index):
-        meta = Metadata()
+        meta = Metadata(self)
         key = "bit_rates/content/bit_rate[%u]/avg_bitrate" % index
         if key in header:
             meta.bit_rate = header[key].value

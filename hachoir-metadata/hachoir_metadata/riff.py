@@ -78,7 +78,7 @@ class RiffMetadata(MultipleMetadata):
                     self.processChunk(field)
 
     def extractAVIVideo(self, video):
-        meta = Metadata()
+        meta = Metadata(self)
         header = video["stream_hdr"]
 
         meta.compression = "%s (fourcc:\"%s\")" \
@@ -100,7 +100,7 @@ class RiffMetadata(MultipleMetadata):
         self.addGroup("video", meta, "Video stream")
 
     def extractAVIAudio(self, audio):
-        meta = Metadata()
+        meta = Metadata(self)
         format = audio["stream_fmt"]
         meta.nb_channel = format["channel"].value
         meta.sample_rate = format["sample_rate"].value

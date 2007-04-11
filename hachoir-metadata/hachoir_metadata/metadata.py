@@ -7,7 +7,7 @@ from hachoir_core.error import error, HACHOIR_ERRORS
 from hachoir_core.i18n import _
 from hachoir_core.log import Logger
 from hachoir_metadata.metadata_item import (
-    Data, MIN_PRIORITY, MAX_PRIORITY)
+    Data, MIN_PRIORITY, MAX_PRIORITY, QUALITY_NORMAL)
 from hachoir_metadata.register import registerAllItems
 import re
 
@@ -16,16 +16,14 @@ extractors = {}
 class Metadata(Logger):
     header = u"Metadata"
 
-    def __init__(self, quality=None, parent=None):
+    def __init__(self, parent, quality=QUALITY_NORMAL):
         assert isinstance(self.header, unicode)
 
         # Limit to 0.0 .. 1.0
-        if quality is None:
-            if parent:
-                quality = parent.quality
-            else:
-                quality = 0.5
-        quality = min(max(0.0, quality), 1.0)
+        if parent:
+            quality = parent.quality
+        else:
+            quality = min(max(0.0, quality), 1.0)
 
         object.__init__(self)
         object.__setattr__(self, "_Metadata__data", {})
@@ -72,7 +70,7 @@ class Metadata(Logger):
         Read first value of tag with name 'key'.
 
         >>> from datetime import timedelta
-        >>> a = Metadata()
+        >>> a = RootMetadata()
         >>> a.duration = timedelta(seconds=2300)
         >>> a.get('duration')
         datetime.timedelta(0, 2300)
@@ -99,7 +97,7 @@ class Metadata(Logger):
         Read first value, as unicode string, of tag with name 'key'.
 
         >>> from datetime import timedelta
-        >>> a = Metadata()
+        >>> a = RootMetadata()
         >>> a.duration = timedelta(seconds=2300)
         >>> a.getText('duration')
         u'38 min 20 sec'
@@ -125,7 +123,7 @@ class Metadata(Logger):
         Create a multi-line ASCII string (end of line is "\n") which
         represents all datas.
 
-        >>> a = Metadata()
+        >>> a = RootMetadata()
         >>> a.author = "haypo"
         >>> a.copyright = unicode("© Hachoir", "UTF-8")
         >>> print a
@@ -143,7 +141,7 @@ class Metadata(Logger):
         Create a multi-line Unicode string (end of line is "\n") which
         represents all datas.
 
-        >>> a = Metadata()
+        >>> a = RootMetadata()
         >>> a.copyright = unicode("© Hachoir", "UTF-8")
         >>> print repr(unicode(a))
         u'Metadata:\n- Copyright: \xa9 Hachoir'
@@ -163,9 +161,9 @@ class Metadata(Logger):
 
         If priority is too small, metadata are empty and so None is returned.
 
-        >>> print Metadata().exportPlaintext()
+        >>> print RootMetadata().exportPlaintext()
         None
-        >>> meta = Metadata()
+        >>> meta = RootMetadata()
         >>> meta.copyright = unicode("© Hachoir", "UTF-8")
         >>> print repr(meta.exportPlaintext())
         [u'Metadata:', u'- Copyright: \xa9 Hachoir']
@@ -200,10 +198,14 @@ class Metadata(Logger):
         else:
             return None
 
-class MultipleMetadata(Metadata):
+class RootMetadata(Metadata):
+    def __init__(self, quality=QUALITY_NORMAL):
+        Metadata.__init__(self, None, quality)
+
+class MultipleMetadata(RootMetadata):
     header = _("Common")
-    def __init__(self, quality):
-        Metadata.__init__(self, quality)
+    def __init__(self, quality=QUALITY_NORMAL):
+        RootMetadata.__init__(self, quality)
         object.__setattr__(self, "_MultipleMetadata__groups", Dict())
         object.__setattr__(self, "_MultipleMetadata__key_counter", {})
 
@@ -246,6 +248,7 @@ class MultipleMetadata(Metadata):
 
 def registerExtractor(parser, extractor):
     assert parser not in extractors
+    assert issubclass(extractor, RootMetadata)
     extractors[parser] = extractor
 
 def extractMetadata(parser, quality):

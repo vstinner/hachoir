@@ -1,5 +1,5 @@
-from hachoir_metadata.metadata import (Metadata, MultipleMetadata,
-    registerExtractor)
+from hachoir_metadata.metadata import (registerExtractor,
+    Metadata, RootMetadata, MultipleMetadata)
 from hachoir_parser.image import (
     BmpFile, IcoFile, PcxFile, GifFile, PngFile, TiffFile,
     XcfFile, TargaFile, WMF_File, PsdFile)
@@ -26,7 +26,7 @@ def computeComprRate(meta, compr_size):
     orig_size = meta.get('width') * meta.get('height') * meta.get('bits_per_pixel')
     meta.compr_rate = float(orig_size) / compr_size
 
-class BmpMetadata(Metadata):
+class BmpMetadata(RootMetadata):
     def extract(self, image):
         if "header" not in image:
             return
@@ -43,7 +43,7 @@ class BmpMetadata(Metadata):
         if "pixels" in image:
             computeComprRate(self, image["pixels"].size)
 
-class TiffMetadata(Metadata):
+class TiffMetadata(RootMetadata):
     key_to_attr = {
         "img_width": "width",
         "img_height": "width",
@@ -78,7 +78,7 @@ class IcoMetadata(MultipleMetadata):
 
     def extract(self, icon):
         for index, header in enumerate(icon.array("icon_header")):
-            image = Metadata()
+            image = Metadata(self)
 
             # Read size and colors from header
             image.width = header["width"].value
@@ -106,7 +106,7 @@ class IcoMetadata(MultipleMetadata):
             # Store new image
             self.addGroup("image[%u]" % index, image)
 
-class PcxMetadata(Metadata):
+class PcxMetadata(RootMetadata):
     def extract(self, pcx):
         self.width = 1 + pcx["xmax"].value
         self.height = 1 + pcx["ymax"].value
@@ -118,7 +118,7 @@ class PcxMetadata(Metadata):
         if "image_data" in pcx:
             computeComprRate(self, pcx["image_data"].size)
 
-class XcfMetadata(Metadata):
+class XcfMetadata(RootMetadata):
     # Map image type to bits/pixel
     TYPE_TO_BPP = {0: 24, 1: 8, 2: 8}
 
@@ -148,7 +148,7 @@ class XcfMetadata(Metadata):
         for prop in xcf.array("property"):
             self.processProperty(prop)
 
-class PngMetadata(Metadata):
+class PngMetadata(RootMetadata):
     TEXT_TO_ATTR = {
         "software": "producer",
     }
@@ -205,7 +205,7 @@ class PngMetadata(Metadata):
         # Read compression, timestamp, etc.
         self.compression = header["compression"].display
 
-class GifMetadata(Metadata):
+class GifMetadata(RootMetadata):
     def extract(self, gif):
         self.useScreen(gif["/screen"])
         if self.has("bits_per_pixel"):
@@ -226,7 +226,7 @@ class GifMetadata(Metadata):
         self.height = screen["height"].value
         self.bits_per_pixel = (1 + screen["bpp"].value)
 
-class TargaMetadata(Metadata):
+class TargaMetadata(RootMetadata):
     def extract(self, tga):
         self.width = tga["width"].value
         self.height = tga["height"].value
@@ -237,7 +237,7 @@ class TargaMetadata(Metadata):
         if "pixels" in tga:
             computeComprRate(self, tga["pixels"].size)
 
-class WmfMetadata(Metadata):
+class WmfMetadata(RootMetadata):
     def extract(self, wmf):
         if wmf.isAPM():
             if "amf_header/rect" in wmf:
@@ -261,7 +261,7 @@ class WmfMetadata(Metadata):
             self.width = emf["width_px"].value
             self.height = emf["height_px"].value
 
-class PsdMetadata(Metadata):
+class PsdMetadata(RootMetadata):
     @fault_tolerant
     def extract(self, psd):
         self.width = psd["width"].value

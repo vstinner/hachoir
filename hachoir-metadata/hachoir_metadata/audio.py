@@ -1,4 +1,5 @@
-from hachoir_metadata.metadata import Metadata, MultipleMetadata, registerExtractor
+from hachoir_metadata.metadata import (registerExtractor,
+    Metadata, RootMetadata, MultipleMetadata)
 from hachoir_parser.audio import AuFile, MpegAudioFile, RealAudioFile, AiffFile
 from hachoir_parser.container import OggFile, RealMediaFile
 from hachoir_core.i18n import _
@@ -69,17 +70,17 @@ class OggMetadata(MultipleMetadata):
                 continue
             page = page["segments"]
             if "vorbis_hdr" in page:
-                meta = Metadata()
+                meta = Metadata(self)
                 self.vorbisHeader(page["vorbis_hdr"], meta)
                 self.addGroup("audio[]", meta, "Audio")
                 if not granule_quotient and meta.has("sample_rate"):
                     granule_quotient = meta.get('sample_rate')
             if "theora_hdr" in page:
-                meta = Metadata()
+                meta = Metadata(self)
                 self.theoraHeader(page["theora_hdr"], meta)
                 self.addGroup("video[]", meta, "Video")
             if "video_hdr" in page:
-                meta = Metadata()
+                meta = Metadata(self)
                 self.videoHeader(page["video_hdr"], meta)
                 self.addGroup("video[]", meta, "Video")
                 if not granule_quotient and meta.has("frame_rate"):
@@ -141,7 +142,7 @@ class OggMetadata(MultipleMetadata):
                 elif value:
                     self.warning("Skip Ogg comment %s: %s" % (key, value))
 
-class AuMetadata(Metadata):
+class AuMetadata(RootMetadata):
     def extract(self, audio):
         self.sample_rate = audio["sample_rate"].value
         self.nb_channel = audio["channels"].value
@@ -156,7 +157,7 @@ class AuMetadata(Metadata):
         if "data_size" in audio:
             computeComprRate(self, audio["data_size"].value*8)
 
-class RealAudioMetadata(Metadata):
+class RealAudioMetadata(RootMetadata):
     def extract(self, real):
         if "metadata" in real:
             self.useMetadata(real["metadata"])
@@ -215,7 +216,7 @@ class RealMediaMetadata(MultipleMetadata):
 
     @fault_tolerant
     def useStreamProp(self, stream, index):
-        meta = Metadata()
+        meta = Metadata(self)
         meta.comment = "Start: %s" % stream["stream_start"].value
         if getValue(stream, "mime_type") == "logical-fileinfo":
             for prop in stream.array("file_info/prop"):
@@ -227,7 +228,7 @@ class RealMediaMetadata(MultipleMetadata):
         meta.title = getValue(stream, "desc")
         self.addGroup("stream[%u]" % index, meta, "Stream #%u" % (1+index))
 
-class MpegAudioMetadata(Metadata):
+class MpegAudioMetadata(RootMetadata):
     TAG_TO_KEY = {
         # ID3 version 2.2
         "TP1": ("author", None),
@@ -344,7 +345,7 @@ class MpegAudioMetadata(Metadata):
         duration = timedelta(seconds=float(mp3["frames"].size) / bit_rate)
         self.duration = duration
 
-class AiffMetadata(Metadata):
+class AiffMetadata(RootMetadata):
     def extract(self, aiff):
         if "common" in aiff:
             self.useCommon(aiff["common"])

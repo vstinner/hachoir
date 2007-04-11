@@ -1,8 +1,8 @@
-from hachoir_metadata.metadata import Metadata, registerExtractor
+from hachoir_metadata.metadata import RootMetadata, registerExtractor
 from hachoir_parser.program import ExeFile
 from hachoir_metadata.safe import fault_tolerant, getValue
 
-class ExeMetadata(Metadata):
+class ExeMetadata(RootMetadata):
     KEY_TO_ATTR = {
         u"ProductName": "title",
         u"LegalCopyright": "copyright",

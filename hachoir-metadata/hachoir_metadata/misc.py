@@ -1,10 +1,10 @@
-from hachoir_metadata.metadata import Metadata, registerExtractor
+from hachoir_metadata.metadata import RootMetadata, registerExtractor
 from hachoir_metadata.safe import fault_tolerant
 from hachoir_parser.misc import TorrentFile, TrueTypeFontFile, OLE2_File, PcfFile
 from hachoir_core.field import isString
 from hachoir_core.error import warning
 
-class TorrentMetadata(Metadata):
+class TorrentMetadata(RootMetadata):
     KEY_TO_ATTR = {
         u"announce": "url",
         u"comment": "comment",
@@ -32,7 +32,7 @@ class TorrentMetadata(Metadata):
             elif field.name == "piece_length":
                 self.comment = "Piece length: %s" % field.display
 
-class TTF_Metadata(Metadata):
+class TTF_Metadata(RootMetadata):
     NAMEID_TO_ATTR = {
         0: "copyright",   # Copyright notice
         3: "title",       # Unique font identifier
@@ -73,7 +73,7 @@ class TTF_Metadata(Metadata):
                 value = value[8:]
             setattr(self, key, value)
 
-class OLE2_Metadata(Metadata):
+class OLE2_Metadata(RootMetadata):
     SUMMARY_ID_TO_ATTR = {
          2: ("title", False),
          4: ("author", False),
@@ -115,7 +115,7 @@ class OLE2_Metadata(Metadata):
                 value = "%s: %s" % (property["id"].display, value)
             setattr(self, key, value)
 
-class PcfMetadata(Metadata):
+class PcfMetadata(RootMetadata):
     PROP_TO_KEY = {
         'CHARSET_REGISTRY': 'charset',
         'COPYRIGHT': 'copyright',
