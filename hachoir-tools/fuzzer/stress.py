@@ -4,7 +4,7 @@ from os import path, getcwd, access, R_OK, unlink, nice, mkdir, system, popen4, 
 from os.path import basename
 from sys import exit, argv, stderr
 from glob import glob
-from random import choice as random_choice
+from random import choice as random_choice, randint
 from array import array
 from cStringIO import StringIO
 from hachoir_core.memory import PAGE_SIZE, MemoryLimit
@@ -79,6 +79,8 @@ class Fuzzer:
             return True
         if "Seek below field set start" in text:
             return True
+        if "Loop in FAT chain" in text:
+            return True
         if text.startswith("Unable to create directory directory["):
             # [/section_rsrc] Unable to create directory directory[2][0][]: Can't get field "header" from /section_rsrc/directory[2][0][]
             return True
@@ -97,7 +99,8 @@ class Fuzzer:
 
     def createStream(self, test_file):
         # Read bytes
-        data = open(test_file, "rb").read(MAX_SIZE)
+        size = randint(1, MAX_SIZE)
+        data = open(test_file, "rb").read(size)
         data = array('B', data)
 
         # Mangle
