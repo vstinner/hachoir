@@ -19,6 +19,8 @@ from hachoir_parser.program.exe_ne import NE_Header
 from hachoir_parser.program.exe_pe import PE_Header, PE_OptHeader, SectionHeader
 from hachoir_parser.program.exe_res import PE_Resource, NE_VersionInfoNode
 
+MAX_NB_SECTION = 50
+
 class MSDosHeader(StaticFieldSet):
     format = (
         (String, "header", 2, "File header (MZ)", {"charset": "ASCII"}),
@@ -71,31 +73,25 @@ class ExeFile(Parser):
         err = self["msdos"].isValid()
         if err:
             return "Invalid MSDOS header: "+err
+        if self.isPE():
+            if MAX_NB_SECTION < self["pe_header/nb_section"].value:
+                return "Invalid number of section (%s)" \
+                    % self["pe_header/nb_section"].value
         return True
 
     def createFields(self):
         yield MSDosHeader(self, "msdos", "MS-DOS program header")
-        offset = self["msdos/next_offset"].value * 8
 
-        is_pe = False
-        is_ne = False
-        if 64 <= offset:
-            if (offset+PE_Header.static_size) <= self.size \
-            and self.stream.readBytes(offset, 4) == 'PE\0\0':
-                is_pe = True
-            elif (offset+NE_Header.static_size) <= self.size \
-            and self.stream.readBytes(offset, 2) == 'NE':
-                is_ne = True
-
-        if is_pe or is_ne:
-            code = self.seekBit(offset, "msdos_code", relative=False)
+        if self.isPE() or self.isNE():
+            offset = self["msdos/next_offset"].value
+            code = self.seekByte(offset, "msdos_code", relative=False)
             if code:
                 yield code
 
-        if is_pe:
+        if self.isPE():
             for field in self.parsePortableExecutable():
                 yield field
-        elif is_ne:
+        elif self.isNE():
             for field in self.parseNE_Executable():
                 yield field
         else:
@@ -157,10 +153,24 @@ class ExeFile(Parser):
                     yield RawBytes(self, name, size)
 
     def isPE(self):
-        return "pe_header" in self
+        if not hasattr(self, "_is_pe"):
+            self._is_pe = False
+            offset = self["msdos/next_offset"].value * 8
+            if 64*8 <= offset \
+            and (offset+PE_Header.static_size) <= self.size \
+            and self.stream.readBytes(offset, 4) == 'PE\0\0':
+                self._is_pe = True
+        return self._is_pe
 
     def isNE(self):
-        return "ne_header" in self
+        if not hasattr(self, "_is_ne"):
+            self._is_ne = False
+            offset = self["msdos/next_offset"].value * 8
+            if 64*8 <= offset \
+            and (offset+NE_Header.static_size) <= self.size \
+            and self.stream.readBytes(offset, 2) == 'NE':
+                self._is_ne = True
+        return self._is_ne
 
     def getRessource(self):
         # MS-DOS program: no resource

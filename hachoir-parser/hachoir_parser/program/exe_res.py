@@ -19,6 +19,7 @@ from hachoir_core.tools import createDict, paddingSize, alignValue, makePrintabl
 from hachoir_core.error import HACHOIR_ERRORS
 from hachoir_parser.common.win32 import BitmapInfoHeader
 
+MAX_DEPTH = 5
 MAX_INDEX_PER_HEADER = 300
 MAX_NAME_PER_HEADER = MAX_INDEX_PER_HEADER
 
@@ -354,6 +355,9 @@ class PE_Resource(SeekableFieldSet):
         alldirs = [subdir]
         while subdirs:
             depth += 1
+            if MAX_DEPTH < depth:
+                self.error("EXE resource: depth too high (%s), stop parsing directories" % depth)
+                break
             newsubdirs = []
             for index, subdir in enumerate(subdirs):
                 name = "directory[%u][%u][]" % (depth, index)
