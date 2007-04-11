@@ -1,6 +1,6 @@
 from hachoir_metadata.metadata import Metadata, registerExtractor
 from hachoir_parser.program import ExeFile
-from hachoir_metadata.safe import fault_tolerant
+from hachoir_metadata.safe import fault_tolerant, getValue
 
 class ExeMetadata(Metadata):
     KEY_TO_ATTR = {
@@ -45,7 +45,7 @@ class ExeMetadata(Metadata):
         ressource = exe.getRessource()
         if ressource and "version_info/node[0]" in ressource:
             for node in ressource.array("version_info/node[0]/node"):
-                if node["name"].value == "StringFileInfo" \
+                if getValue(node, "name") == "StringFileInfo" \
                 and "node[0]" in node:
                     self.readVersionInfo(node["node[0]"])
 
@@ -74,7 +74,7 @@ class ExeMetadata(Metadata):
     def readVersionInfo(self, info):
         values = {}
         for node in info.array("node"):
-            if "value" not in node:
+            if "value" not in node or "name" not in node:
                 continue
             value = node["value"].value.strip(" \0")
             if not value:

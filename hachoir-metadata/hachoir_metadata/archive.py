@@ -1,5 +1,5 @@
 from hachoir_metadata.metadata_item import QUALITY_BEST, QUALITY_FASTEST
-from hachoir_metadata.safe import fault_tolerant
+from hachoir_metadata.safe import fault_tolerant, getValue
 from hachoir_metadata.metadata import (
     Metadata, MultipleMetadata, registerExtractor)
 from hachoir_parser.archive import (Bzip2Parser, CabFile, GzipParser,
@@ -18,13 +18,10 @@ def computeCompressionRate(meta):
     """
     Compute compression rate, sizes have to be in byte.
     """
-    if not meta.has("file_size") or not meta.has("compr_size"):
+    if not meta.has("file_size") \
+    or not meta.get("compr_size", 0):
         return
-    file_size, compr_size = meta.get("file_size"), meta.get("compr_size")
-    if not file_size:
-        return
-    rate = 100 - float(compr_size) * 100 / file_size
-    meta.compr_rate = u"%.1f%%" % rate
+    meta.compr_rate = float(meta.get("file_size")) / meta.get("compr_size")
 
 class Bzip2Metadata(Metadata):
     def extract(self, zip):
@@ -33,16 +30,18 @@ class Bzip2Metadata(Metadata):
 
 class GzipMetadata(Metadata):
     def extract(self, gzip):
-        if "filename" in gzip:
-            self.filename = gzip["filename"].value
-        self.compr_size = gzip["file"].size/8
+        self.useHeader(gzip)
+        computeCompressionRate(self)
+
+    @fault_tolerant
+    def useHeader(self, gzip):
         self.compression = gzip["compression"].display
-        self.file_size = gzip["size"].value
         self.last_modification = gzip["mtime"].value
         self.os = gzip["os"].display
-        if "comment" in gzip:
-            self.comment = gzip["comment"].value
-        computeCompressionRate(self)
+        self.filename = getValue(gzip, "filename")
+        self.comment = getValue(gzip, "comment")
+        self.compr_size = gzip["file"].size/8
+        self.file_size = gzip["size"].value
 
 class ZipMetadata(MultipleMetadata):
     def extract(self, zip):
@@ -63,12 +62,11 @@ class ZipMetadata(MultipleMetadata):
             meta.file_size = field["data_desc/file_uncompressed_size"].value
             if field["data_desc/file_compressed_size"].value:
                 meta.compr_size = field["data_desc/file_compressed_size"].value
-                computeCompressionRate(meta)
         else:
             meta.file_size = field["uncompressed_size"].value
             if field["compressed_size"].value:
                 meta.compr_size = field["compressed_size"].value
-                computeCompressionRate(meta)
+        computeCompressionRate(meta)
         self.addGroup(field.name, meta, "File \"%s\"" % meta.get('filename'))
 
 class TarMetadata(MultipleMetadata):

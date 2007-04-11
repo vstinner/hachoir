@@ -5,7 +5,7 @@ from hachoir_core.tools import (
 from hachoir_metadata.filter import Filter, NumberFilter
 from datetime import date, datetime, timedelta
 from hachoir_metadata.formatter import (humanAudioChannel,
-    humanFrameRate, setDatetime)
+    humanFrameRate, setDatetime, humanComprRate)
 from hachoir_metadata.metadata_item import Data
 
 MIN_SAMPLE_RATE = 1000              # 1 kHz
@@ -56,7 +56,7 @@ def registerAllItems(meta):
     meta.register(Data("file_size", 310, _("File size"), text_handler=humanFilesize, type=(int, long)))
     meta.register(Data("pixel_format", 311, _("Pixel format")))
     meta.register(Data("compr_size", 312, _("Compressed file size"), text_handler=humanFilesize, type=(int, long)))
-    meta.register(Data("compr_rate", 313, _("Compression rate"), filter=NumberFilter(MIN_COMPR_RATE, MAX_COMPR_RATE)))
+    meta.register(Data("compr_rate", 313, _("Compression rate"), text_handler=humanComprRate, filter=NumberFilter(MIN_COMPR_RATE, MAX_COMPR_RATE), type=(int, long, float)))
 
     meta.register(Data("file_attr", 400, _("File attributes")))
     meta.register(Data("file_type", 401, _("File type")))

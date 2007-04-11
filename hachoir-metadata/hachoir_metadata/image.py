@@ -24,7 +24,7 @@ def computeComprRate(meta, compr_size):
     if not compr_size:
         return
     orig_size = meta.get('width') * meta.get('height') * meta.get('bits_per_pixel')
-    meta.compr_rate = u"%.3gx" % (float(orig_size) / compr_size)
+    meta.compr_rate = float(orig_size) / compr_size
 
 class BmpMetadata(Metadata):
     def extract(self, image):
@@ -119,12 +119,19 @@ class PcxMetadata(Metadata):
 
 class XcfMetadata(Metadata):
     # Map image type to bits/pixel
-    type_to_bpp = {
-        0: 24,
-        1: 8,
-        2: 8
-    }
+    TYPE_TO_BPP = {0: 24, 1: 8, 2: 8}
 
+    def extract(self, xcf):
+        self.width = xcf["width"].value
+        self.height = xcf["height"].value
+        try:
+            self.bits_per_pixel = self.TYPE_TO_BPP[ xcf["type"].value ]
+        except KeyError:
+            pass
+        self.format_version = xcf["type"].display
+        self.readProperties(xcf)
+
+    @fault_tolerant
     def processProperty(self, prop):
         type = prop["type"].value
         if type == XcfProperty.PROP_PARASITES:
@@ -139,16 +146,6 @@ class XcfMetadata(Metadata):
     def readProperties(self, xcf):
         for prop in xcf.array("property"):
             self.processProperty(prop)
-
-    def extract(self, xcf):
-        self.width = xcf["width"].value
-        self.height = xcf["height"].value
-        try:
-            self.bits_per_pixel = self.type_to_bpp[ xcf["type"].value ]
-        except KeyError:
-            pass
-        self.format_version = xcf["type"].display
-        self.readProperties(xcf)
 
 class PngMetadata(Metadata):
     TEXT_TO_ATTR = {

@@ -73,3 +73,6 @@ def humanFrameRate(value):
     else:
         return value
 
+def humanComprRate(rate):
+    return u"%.1fx" % rate
+

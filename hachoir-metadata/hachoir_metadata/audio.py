@@ -33,7 +33,7 @@ def computeComprRate(meta, size):
     or not size:
         return
     orig_size = timedelta2seconds(meta.get("duration")) * meta.get('sample_rate') * meta.get('bits_per_sample') * meta.get('nb_channel')
-    meta.compr_rate = u"%.2fx" % (float(orig_size) / size)
+    meta.compr_rate = float(orig_size) / size
 
 def computeBitRate(meta):
     if not meta.has("bits_per_sample") \
@@ -127,7 +127,7 @@ class OggMetadata(MultipleMetadata):
         meta.bit_rate = header["bitrate_nominal"].value
 
     def vorbisComment(self, comment):
-        self.producer = comment["vendor"].value
+        self.producer = getValue(comment, "vendor")
         for metadata in comment.array("metadata"):
             if "=" in metadata.value:
                 key, value = metadata.value.split("=", 1)
@@ -190,18 +190,7 @@ class RealMediaMetadata(MultipleMetadata):
         if "content_desc" in media:
             self.useContentDesc(media["content_desc"])
         for index, stream in enumerate(media.array("stream_prop")):
-            meta = Metadata()
-            if stream["stream_start"].value:
-                meta.comment = "Start: %s" % stream["stream_start"].value
-            if getValue(stream, "mime_type") == "logical-fileinfo":
-                for prop in stream.array("file_info/prop"):
-                    self.useFileInfoProp(prop)
-            else:
-                meta.bit_rate = stream["avg_bit_rate"].value
-                meta.duration = timedelta(milliseconds=stream["duration"].value)
-                meta.mime_type = getValue(stream, "mime_type")
-            meta.title = getValue(stream, "desc")
-            self.addGroup("stream[%u]" % index, meta, "Stream #%u" % (1+index))
+            self.useStreamProp(stream, index)
 
     @fault_tolerant
     def useFileInfoProp(self, prop):
@@ -223,6 +212,20 @@ class RealMediaMetadata(MultipleMetadata):
         self.author = content["author"].value
         self.copyright = content["copyright"].value
         self.comment = content["comment"].value
+
+    @fault_tolerant
+    def useStreamProp(self, stream, index):
+        meta = Metadata()
+        meta.comment = "Start: %s" % stream["stream_start"].value
+        if getValue(stream, "mime_type") == "logical-fileinfo":
+            for prop in stream.array("file_info/prop"):
+                self.useFileInfoProp(prop)
+        else:
+            meta.bit_rate = stream["avg_bit_rate"].value
+            meta.duration = timedelta(milliseconds=stream["duration"].value)
+            meta.mime_type = getValue(stream, "mime_type")
+        meta.title = getValue(stream, "desc")
+        self.addGroup("stream[%u]" % index, meta, "Stream #%u" % (1+index))
 
 class MpegAudioMetadata(Metadata):
     TAG_TO_KEY = {
