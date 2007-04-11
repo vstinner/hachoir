@@ -59,7 +59,7 @@ def floatFactory(name, format, mantissa_bits, exponent_bits, doc):
                 return struct.unpack(self.struct_format, raw)[0]
             else:
                 try:
-                    value = self["mantissa"].value * (2.0 ** self["exponent"].value)
+                    value = self["mantissa"].value * (2.0 ** float(self["exponent"].value))
                     if self["negative"].value:
                         return -(value)
                     else:
