@@ -150,7 +150,7 @@ def checkGzip(parser):
 def checkSteganography(parser): return (
     checkValue(parser, "/frames/padding[0]", "misc est un canard\r"),
     checkDesc(parser, "/frames", 'Frames: Variable bit rate (VBR)'),
-    checkDesc(parser, "/frames/frame[1]", u'MPEG-1 layer III, 160.0 Kbit/sec, %.1f KHz' % 44.1))
+    checkDesc(parser, "/frames/frame[1]", u'MPEG-1 layer III, 160.0 Kbit/sec, 44.1 kHz'))
 
 def checkRPM(parser): return (
     checkValue(parser, "name", "ftp-0.17-537"),
@@ -234,7 +234,7 @@ def checkClaqueBeignet(parser): return (
     checkDesc(parser, "rect", "Rectangle: 550x400"),
     checkDisplay(parser, "frame_rate", "24.0"),
     checkDesc(parser, "bkgd_color[0]/color", "RGB color: #CC9933"),
-    checkDisplay(parser, "def_sound[0]/rate", "11.0 KHz"),
+    checkDisplay(parser, "def_sound[0]/rate", "11.0 kHz"),
     checkValue(parser, "def_sound[0]/len", 1661),
     checkValue(parser, "sound_hdr2[0]/sound_is_16bit", False),
     checkValue(parser, "export[0]/export[0]/name", u"C bras"),

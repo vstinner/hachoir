@@ -197,12 +197,12 @@ def humanFrequency(hertz):
     >>> humanFrequency(790)
     u'790 Hz'
     >>> humanFrequency(629469)
-    u'629.5 KHz'
+    u'629.5 kHz'
     """
     divisor = 1000
     if hertz < divisor:
         return u"%u Hz" % hertz
-    units = [u"KHz", u"MHz", u"GHz", u"THz"]
+    units = [u"kHz", u"MHz", u"GHz", u"THz"]
     hertz = float(hertz)
     for unit in units:
         hertz = hertz / divisor
