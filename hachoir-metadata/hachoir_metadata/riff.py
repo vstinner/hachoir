@@ -119,12 +119,8 @@ class RiffMetadata(MultipleMetadata):
         if microsec:
             self.frame_rate = 1000000.0 / microsec
             total_frame = getValue(header, "total_frame")
-            if total_frame:
-                try:
-                    self.duration = timedelta(seconds=total_frame * microsec)
-                except OverflowError:
-                    # OverflowError: "days=1036668219; must have magnitude <= 999999999"
-                    pass
+            if total_frame and not self.has("duration"):
+                self.duration = timedelta(microseconds=total_frame * microsec)
         self.width = header["width"].value
         self.height = header["height"].value
 
