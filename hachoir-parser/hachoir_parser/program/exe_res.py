@@ -276,13 +276,7 @@ class Header(FieldSet):
         yield UInt16(self, "maj_ver", "Major version")
         yield UInt16(self, "min_ver", "Minor version")
         yield UInt16(self, "nb_name", "Number of named entries")
-        if MAX_NAME_PER_HEADER < self["nb_name"].value:
-            raise ParserError("EXE resource: invalid number of name (%s)"
-                % self["nb_name"].value)
         yield UInt16(self, "nb_index", "Number of indexed entries")
-        if MAX_INDEX_PER_HEADER < self["nb_index"].value:
-            raise ParserError("EXE resource: invalid number of index (%s)"
-                % self["nb_index"].value)
 
     def createDescription(self):
         text = "Resource header"
@@ -314,6 +308,14 @@ class Directory(FieldSet):
 
     def createFields(self):
         yield Header(self, "header")
+
+        if MAX_NAME_PER_HEADER < self["header/nb_name"].value:
+            raise ParserError("EXE resource: invalid number of name (%s)"
+                % self["header/nb_name"].value)
+        if MAX_INDEX_PER_HEADER < self["header/nb_index"].value:
+            raise ParserError("EXE resource: invalid number of index (%s)"
+                % self["header/nb_index"].value)
+
         hdr = self["header"]
         for index in xrange(hdr["nb_name"].value):
             yield NameOffset(self, "name[]")
