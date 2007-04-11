@@ -147,7 +147,9 @@ class GenericFieldSet(BasicFieldSet):
         """
         if config.debug:
             self.info("[+] DBG: _addField(%s)" % field.name)
-        assert issubclass(field.__class__, Field)
+        if not issubclass(field.__class__, Field):
+            raise ParserError("Field type (%s) is not a subclass of 'Field'!"
+                % field.__class__.__name__)
         assert isinstance(field._name, str)
         if field._name.endswith("[]"):
             self.setUniqueFieldName(field)
