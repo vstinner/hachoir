@@ -1,4 +1,5 @@
 from hachoir_metadata.metadata_item import QUALITY_BEST, QUALITY_FASTEST
+from hachoir_metadata.safe import fault_tolerant
 from hachoir_metadata.metadata import (
     Metadata, MultipleMetadata, registerExtractor)
 from hachoir_parser.archive import (Bzip2Parser, CabFile, GzipParser,
@@ -52,6 +53,7 @@ class ZipMetadata(MultipleMetadata):
                 break
             self.processFile(field)
 
+    @fault_tolerant
     def processFile(self, field):
         meta = Metadata(parent=self)
         meta.filename = field["filename"].value

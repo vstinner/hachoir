@@ -255,12 +255,12 @@ def checkFirstRun(meta): return (
     checkAttr(meta, "creation_date", datetime(2000, 6, 14, 10, 3, 18)),
     checkAttr(meta, "copyright", u"©2000 RealNetworks"),
     checkAttr(meta, "producer", u"RealProducer Plus 6.1.0.153 Windows"),
-    checkAttr(meta, "stream[1]/mime_type", u"audio/x-pn-realaudio"),
-    checkAttr(meta, "stream[1]/bit_rate", 32148),
-    checkAttr(meta, "stream[1]/title", u"Audio Stream"),
+    checkAttr(meta, "stream[0]/mime_type", u"audio/x-pn-realaudio"),
+    checkAttr(meta, "stream[0]/bit_rate", 32148),
+    checkAttr(meta, "stream[0]/title", u"Audio Stream"),
     checkAttr(meta, "mime_type", u"audio/x-pn-realaudio"),
     checkAttr(meta, "bit_rate", 32348),
-    checkAttr(meta, "stream[2]/bit_rate", 200),
+    checkAttr(meta, "stream[1]/bit_rate", 200),
 )
 
 def checkDejaVu(meta): return (

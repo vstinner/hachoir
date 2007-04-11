@@ -8,7 +8,7 @@ from hachoir_parser.image.jpeg import (
 from hachoir_core.field import MissingField
 from hachoir_core.i18n import _
 from hachoir_core.tools import makeUnicode
-from hachoir_metadata.safe import fault_tolerant
+from hachoir_metadata.safe import fault_tolerant, getValue
 from datetime import datetime
 
 class JpegMetadata(Metadata):
@@ -69,7 +69,7 @@ class JpegMetadata(Metadata):
             if "iptc/content" in psd:
                 self.parseIPTC(psd["iptc/content"])
         for comment in jpeg.array("comment"):
-            self.comment = comment["data"].value
+            self.comment = getValue(comment, "data")
         self.computeQuality(jpeg)
         if "data" in jpeg:
             computeComprRate(self, jpeg["data"].size)

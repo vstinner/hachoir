@@ -189,10 +189,11 @@ class MovMetadata(Metadata):
             if "movie" in atom:
                 self.processMovie(atom["movie"])
 
+    @fault_tolerant
     def processMovieHeader(self, hdr):
+        self.creation_date = hdr["creat_date"].value
+        self.last_modification = hdr["lastmod_date"].value
         self.duration = timedelta(seconds=float(hdr["duration"].value) / hdr["time_scale"].value)
-        self.creation_date = hdr["creat_date"].display
-        self.last_modification = hdr["lastmod_date"].display
         self.comment = _("Play speed: %.1f%%") % (hdr["play_speed"].value*100)
         self.comment = _("User volume: %.1f%%") % (float(hdr["volume"].value)*100//255)
 
@@ -229,7 +230,7 @@ class AsfMetadata(MultipleMetadata):
             # Extract all data from ext_desc
             data = {}
             for desc in header.array("ext_desc/content/descriptor"):
-                self.useExtDescItem(desc)
+                self.useExtDescItem(desc, data)
 
             # Have ToolName and ToolVersion? If yes, group them to producer key
             if "ToolName" in data and "ToolVersion" in data:
@@ -312,7 +313,7 @@ class AsfMetadata(MultipleMetadata):
                 pass
 
     @fault_tolerant
-    def useExtDescItem(self, desc):
+    def useExtDescItem(self, desc, data):
         if desc["type"].value == ASF_Descriptor.TYPE_BYTE_ARRAY:
             # Skip binary data
             return

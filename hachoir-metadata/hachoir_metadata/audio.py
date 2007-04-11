@@ -188,7 +188,7 @@ class RealMediaMetadata(MultipleMetadata):
             self.useFileProp(media["file_prop"])
         if "content_desc" in media:
             self.useContentDesc(media["content_desc"])
-        for stream in media.array("stream_prop"):
+        for index, stream in enumerate(media.array("stream_prop")):
             meta = Metadata()
             if stream["stream_start"].value:
                 meta.comment = "Start: %s" % stream["stream_start"].value
@@ -200,8 +200,7 @@ class RealMediaMetadata(MultipleMetadata):
                 meta.duration = timedelta(milliseconds=stream["duration"].value)
                 meta.mime_type = getValue(stream, "mime_type")
             meta.title = getValue(stream, "desc")
-            index = 1 + stream["stream_number"].value
-            self.addGroup("stream[%u]" % index, meta, "Stream #%u" % index)
+            self.addGroup("stream[%u]" % index, meta, "Stream #%u" % (1+index))
 
     @fault_tolerant
     def useFileInfoProp(self, prop):
