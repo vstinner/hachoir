@@ -4,8 +4,7 @@ from os import path, getcwd, access, R_OK, unlink, nice, mkdir, system, popen4, 
 from os.path import basename
 from sys import exit, argv, stderr
 from glob import glob
-import random
-from random import randint
+from random import choice as random_choice
 from array import array
 from cStringIO import StringIO
 from hachoir_core.memory import PAGE_SIZE, MemoryLimit
@@ -16,6 +15,7 @@ from hachoir_core.log import log as hachoir_logger, Log
 from hachoir_core.stream import InputIOStream, InputStreamError
 from hachoir_metadata import extractMetadata
 from hachoir_parser import guessParser
+from mangle import mangle
 import re
 
 try:
@@ -29,18 +29,10 @@ except ImportError:
     generateUniqueID.sequence = 0
 
 # Constants
-MAX_SIZE = 5000*512
+MAX_SIZE = 1024 * 1024
 MAX_DURATION = 2.0
 MEMORY_LIMIT = 5 * 1024 * 1024
-
-def mangle(data):
-    hsize = len(data)-1
-    max_count = min(hsize // 25, 250)
-    max_count = max(max_count, 4)
-    count = randint(1, max_count)
-    for index in xrange(count):
-        off = randint(0, hsize)
-        data[off] = randint(0, 255)
+MANGLE_PERCENT = 0.10
 
 class Fuzzer:
     def __init__(self, filedb_dirs, error_dir):
@@ -49,12 +41,15 @@ class Fuzzer:
         self.tmp_file = "/tmp/stress-hachoir"
         self.nb_error = 0
         self.error_dir = error_dir
+        self.verbose = False
 
     def filterError(self, text):
         if "Error during metadata extraction" in text:
             return False
-        if "Can't get field \"" in text:
+        if text.startswith("Error when creating MIME type"):
             return True
+#        if "Can't get field \"" in text:
+#            return True
         if text.startswith("Unable to create value: "):
             why = text[24:]
             if why.startswith("invalid literal for int(): "):
@@ -63,21 +58,31 @@ class Fuzzer:
                 return True
             if re.match("^Can't read [0-9]+ bits at ", why):
                 return True
-            if why == "day is out of range for month":
+            if why.startswith("'decimal' codec can't encode character"):
+                return True
+            if why in (
+            "day is out of range for month",
+            "year is out of range",
+            "[Float80] floating point overflow"):
                 return True
             if re.match("^(second|hour|month) must be in ", why):
                 return True
+        if re.match("days=[0-9]+; must have magnitude ", text):
+            # Error during metadata extraction: days=1143586582; must have magnitude <= 999999999
+            return True
         if "floating point overflow" in text:
             return True
         if "field is too large" in text:
             return True
+        if text.startswith("Unable to create directory directory["):
+            # [/section_rsrc] Unable to create directory directory[2][0][]: Can't get field "header" from /section_rsrc/directory[2][0][]
+            return True
         return False
 
     def newLog(self, level, prefix, text, context):
-        if level < Log.LOG_ERROR:
-            return
-        if self.filterError(text):
-            print "  ignore error: %s" % text
+        if level < Log.LOG_ERROR or self.filterError(text):
+            if self.verbose:
+                print "   ignore %s %s" % (prefix, text)
             return
         self.log_error += 1
         print "METADATA ERROR: %s %s" % (prefix, text)
@@ -89,7 +94,10 @@ class Fuzzer:
 
         # Mangle
         size = len(data)
-        mangle(data)
+        count = mangle(data, MANGLE_PERCENT )
+        if self.verbose:
+            print "   mangle: %.2f%% (%s/%s)" % (
+                count * 100.0 / size, count, size)
 
         # Create stream
         data = data.tostring()
@@ -104,7 +112,7 @@ class Fuzzer:
         except InputStreamError, err:
             parser = None
         if not parser:
-            print "  (unable to create parser)"
+            print "   unable to create parser"
             return False, ""
 
         # Extract metadata
@@ -123,6 +131,9 @@ class Fuzzer:
             print "Process is too long: %.1f seconds" % duration
             failure = True
             prefix = "timeout"
+        if self.verbose:
+            for line in unicode(metadata).split("\n"):
+                print "   metadata>> %s" % line
         return failure, prefix
 
     def fuzzFile(self, test_file):
@@ -183,8 +194,8 @@ class Fuzzer:
         try:
             ok = True
             while ok:
-                test_file = random.choice(self.filedb)
-                print "total: %s error -- test file: %s" % (self.nb_error, basename(test_file))
+                test_file = random_choice(self.filedb)
+                print "[+] %s error -- test file: %s" % (self.nb_error, basename(test_file))
                 ok = self.fuzzFile(test_file)
                 if ok:
                     sleep(0.100)
