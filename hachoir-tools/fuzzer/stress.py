@@ -18,6 +18,13 @@ from hachoir_parser import guessParser
 from mangle import mangle
 import re
 
+# Constants
+SLEEP_SEC = 0
+MAX_SIZE = 1024 * 1024
+MAX_DURATION = 2.0
+MEMORY_LIMIT = 5 * 1024 * 1024
+MANGLE_PERCENT = 0.25
+
 try:
     import sha
     def generateUniqueID(data):
@@ -27,12 +34,6 @@ except ImportError:
         generateUniqueID.sequence += 1
         return generateUniqueID.sequence
     generateUniqueID.sequence = 0
-
-# Constants
-MAX_SIZE = 1024 * 1024
-MAX_DURATION = 2.0
-MEMORY_LIMIT = 5 * 1024 * 1024
-MANGLE_PERCENT = 0.10
 
 class Fuzzer:
     def __init__(self, filedb_dirs, error_dir):
@@ -60,6 +61,8 @@ class Fuzzer:
                 return True
             if why.startswith("'decimal' codec can't encode character"):
                 return True
+            if why.startswith("date newer than year "):
+                return True
             if why in (
             "day is out of range for month",
             "year is out of range",
@@ -74,8 +77,13 @@ class Fuzzer:
             return True
         if "field is too large" in text:
             return True
+        if "Seek below field set start" in text:
+            return True
         if text.startswith("Unable to create directory directory["):
             # [/section_rsrc] Unable to create directory directory[2][0][]: Can't get field "header" from /section_rsrc/directory[2][0][]
+            return True
+        if text.startswith("Unable to parse a FAT chain: "):
+            # Unable to parse a FAT chain: list index out of range
             return True
         return False
 
@@ -112,7 +120,8 @@ class Fuzzer:
         except InputStreamError, err:
             parser = None
         if not parser:
-            print "   unable to create parser"
+            if self.verbose:
+                print "   unable to create parser"
             return False, ""
 
         # Extract metadata
@@ -132,8 +141,11 @@ class Fuzzer:
             failure = True
             prefix = "timeout"
         if self.verbose:
-            for line in unicode(metadata).split("\n"):
-                print "   metadata>> %s" % line
+            if metadata:
+                for line in unicode(metadata).split("\n"):
+                    print "   metadata>> %s" % line
+            else:
+                print "   unable to create metadata"
         return failure, prefix
 
     def fuzzFile(self, test_file):
@@ -192,13 +204,14 @@ class Fuzzer:
     def run(self):
         self.init()
         try:
-            ok = True
-            while ok:
+            while True:
                 test_file = random_choice(self.filedb)
                 print "[+] %s error -- test file: %s" % (self.nb_error, basename(test_file))
                 ok = self.fuzzFile(test_file)
-                if ok:
-                    sleep(0.100)
+                if not ok:
+                    break
+                if SLEEP_SEC:
+                    sleep(SLEEP_SEC)
         except KeyboardInterrupt:
             print "Stop"
 
@@ -220,3 +233,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

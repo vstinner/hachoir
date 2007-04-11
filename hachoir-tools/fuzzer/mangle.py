@@ -3,6 +3,10 @@ from array import array
 
 MAX_MIX = 20
 MIN_MIX = -MAX_MIX
+MIN_COUNT = 1
+MAX_COUNT = 2500
+MAX_INC = 32
+MIN_INC = -MAX_INC
 
 SPECIAL_VALUES_NOENDIAN = (
     "\x00",
@@ -10,6 +14,9 @@ SPECIAL_VALUES_NOENDIAN = (
     "\x7f",
     "\x7f\xff",
     "\x7f\xff\xff\xff",
+    "\x80",
+    "\x80\x00",
+    "\x80\x00\x00\x00",
     "\xfe",
     "\xfe\xff",
     "\xfe\xff\xff\xff",
@@ -29,7 +36,7 @@ def mangle_replace(data, offset):
     data[offset] = randint(0, 255)
 
 def mangle_increment(data, offset):
-    value = data[offset] + randint(-255, 255)
+    value = data[offset] + randint(MIN_INC, MAX_INC)
     data[offset] = max(min(value, 255), 0)
 
 def mangle_bit(data, offset):
@@ -59,7 +66,7 @@ MANGLE_OPERATIONS = (
     mangle_mix,
 )
 
-def mangle(data, percent, min_count=5, max_count=5000):
+def mangle(data, percent, min_count=MIN_COUNT, max_count=MAX_COUNT):
     """
     Mangle data: add few random bytes in input byte array.
 
