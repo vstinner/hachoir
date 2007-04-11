@@ -28,6 +28,8 @@ class Data:
         self.key = key
         self.description = description
         self.values = []
+        if type and not isinstance(type, (tuple, list)):
+            type = (type,)
         self.type = type
         self.text_handler = text_handler
         self.filter = filter

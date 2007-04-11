@@ -67,18 +67,24 @@ class Metadata(Logger):
     def has(self, key):
         return 1 <= len(self.getItems(key))
 
-    def get(self, key, index=0):
+    def get(self, key, default=None, index=0):
         """
         Read first value of tag with name 'key'.
 
+        >>> from datetime import timedelta
         >>> a = Metadata()
-        >>> a.duration = 2300
+        >>> a.duration = timedelta(seconds=2300)
         >>> a.get('duration')
-        2300
+        datetime.timedelta(0, 2300)
+        >>> a.get('author', u'Anonymous')
+        u'Anonymous'
         """
         item = self.getItem(key, index)
         if item is None:
-            raise ValueError("Metadata has no value '%s' (index %s)" % (key, index))
+            if default is None:
+                raise ValueError("Metadata has no value '%s' (index %s)" % (key, index))
+            else:
+                return default
         return item.value
 
     def getValues(self, key):
@@ -88,15 +94,16 @@ class Metadata(Logger):
             raise ValueError("Metadata has no value '%s'" % key)
         return [ item.value for item in data ]
 
-    def getText(self, key, index=0, default=None):
+    def getText(self, key, default=None, index=0):
         """
         Read first value, as unicode string, of tag with name 'key'.
 
+        >>> from datetime import timedelta
         >>> a = Metadata()
-        >>> a.duration = 2300
+        >>> a.duration = timedelta(seconds=2300)
         >>> a.getText('duration')
-        u'2300'
-        >>>> a.getText('titre', u'Unknown')
+        u'38 min 20 sec'
+        >>> a.getText('titre', u'Unknown')
         u'Unknown'
         """
         item = self.getItem(key, index)
