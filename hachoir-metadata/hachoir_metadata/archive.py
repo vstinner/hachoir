@@ -106,18 +106,7 @@ class CabMetadata(MultipleMetadata):
             if max_nb is not None and max_nb <= index:
                 self.warning("CAB archive contains many files, but only first %s files are processed" % max_nb)
                 break
-            meta = Metadata(parent=self)
-            meta.filename = field["filename"].value
-            meta.file_size = field["filesize"].value
-            meta.creation_date = field["timestamp"].value
-            attr = field["attributes"].value
-            if attr != "(none)":
-                meta.file_attr = attr
-            if meta.has("filename"):
-                title = _("File \"%s\"") % meta.getText('filename')
-            else:
-                title = _("File")
-            self.addGroup(field.name, meta, title)
+            self.useFile(field)
 
     @fault_tolerant
     def useFolder(self, folder):
@@ -125,6 +114,21 @@ class CabMetadata(MultipleMetadata):
         if cab["compr_method"].value != 0:
             compr += " (level %u)" % cab["compr_level"].value
         self.compression = compr
+
+    @fault_tolerant
+    def useFile(self, field):
+        meta = Metadata(parent=self)
+        meta.filename = field["filename"].value
+        meta.file_size = field["filesize"].value
+        meta.creation_date = field["timestamp"].value
+        attr = field["attributes"].value
+        if attr != "(none)":
+            meta.file_attr = attr
+        if meta.has("filename"):
+            title = _("File \"%s\"") % meta.getText('filename')
+        else:
+            title = _("File")
+        self.addGroup(field.name, meta, title)
 
 class MarMetadata(MultipleMetadata):
     def extract(self, mar):
