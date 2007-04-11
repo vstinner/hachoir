@@ -68,7 +68,7 @@ class Fuzzer:
             "year is out of range",
             "[Float80] floating point overflow"):
                 return True
-            if re.match("^(second|hour|month) must be in ", why):
+            if re.match("^(second|minute|hour|month) must be in ", why):
                 return True
         if re.match("days=[0-9]+; must have magnitude ", text):
             # Error during metadata extraction: days=1143586582; must have magnitude <= 999999999
