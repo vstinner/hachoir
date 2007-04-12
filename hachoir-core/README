@@ -26,6 +26,51 @@ Installation
 
 For the installation, use setup.py or see: http://hachoir.org/wiki/Install
 
+What's new in hachoir-core 0.9?
+===============================
+
+Major changes:
+
+ * String value is ALWAYS unicode, even on charset conversion:
+   use charset ISO-8859-1 on error
+ * Field.raw_display attribute creation is now fault tolerant and use cache
+ * GenericFieldSet: avoid field creation recursion
+ * Add function to call another function with a memory limit
+ * Add functions durationWin64(), timestampUUID60() and timedelta2seconds()
+ * Rewrite humanDuration() which now accepts float and datetime.timedelta()
+ * SeekableFieldSet class is near complete and more stable
+ * String classes: add truncate argument to constructor
+ * SubFile: add "class" (specify a parser class) argument to constructor
+
+Changes:
+
+ * BasicFieldSet: only use static_size if size is None (in constructor)
+ * Bit.raw_display is now "0" or "1" (and not "True" or "False")
+ * Float80.createValue() raises ValueError on overflow
+ * humanUnixAttributes() returns unicode string
+ * ISO 639: convert data to Unicode
+ * Field uses parent.nextFieldAddress() to get address
+ * Field uses parent.getFieldIndex() to know its index
+ * Move setUniqueFieldName() method in BasicFieldSet
+ * GenericFieldSet: _addField() raise an ParserError if field type is invalid
+   instead of an assertion
+ * SeekableFieldSet: constructor use size argument
+ * SeekableFieldSet: add getField(), _getField(), __getitem()__,
+   current_size and size attributes
+ * SeekableFieldSet: field creation check higger limit (address+size)
+ * String: support "CP037" charset
+
+Bug fixes:
+
+ * SeekableFieldSet: fix seekBit(), getFieldByAddress() and done attribute
+ * GenericFieldSet: _fixFieldSize() doesn't display warning if the field is
+   not deleted
+ * Fix createOrphanField(): always restore old field set address
+ * Fix Field._getDisplay(), cache wasn't used
+ * RawBytes: create method _createDisplay() to use classic prototype for
+   createDisplay() method (no extra argument)
+ * Fix RawBytes._createDisplay() when string is truncated
+
 What's new in hachoir-core 0.8?
 ===============================
 

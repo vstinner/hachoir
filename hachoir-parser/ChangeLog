@@ -1,3 +1,85 @@
+What's new in hachoir-parser 0.10?
+==================================
+
+Major changes:
+
+ * New parsers:
+   * Microsoft Archive parser (.mar)
+   * Microsoft Windows animated icon (.ani): based on RIFF file format
+   * Microsoft's HTML Help (.chm)
+   * Windows Shortcut (.lnk)
+   * X11 Portable Compiled Font (pcf)
+   * Adobe Portable Document Format (PDF)
+ * Convert many constants to Unicode
+ * Set charset to ISO-8859-1 for many strings with no charset. Examples:
+   filename in gzip, strings in ID3v1
+ * MIME type is now in Unicode
+ * Timestamp are stored as datetime.datetime() object
+ * Add MAC48_Address and NIC24 parser
+ * Add IEEE 24-bit Organizationally unique identifiers list
+
+Changes:
+
+ * Disable QueryParser fallback feature
+ * QueryParser accepts "class" tag
+ * Split Parser in HachoirParser and Parser classes
+ * OLE2:
+   * Rewrite most of the code using SeekableFieldSet
+   * Support FAT block chain
+   * Able to parse fragmented streams
+   * Add parser for component object and document summary
+ * MKV: add method to convert date value to datetime.datetime() object
+ * OGG: validate() checks magic string
+ * Write PascalStringWin32 class
+ * Add Win32 LANGUAGE_ID dictionary
+ * Rewrite GUID class using RFC 4122:
+   * Supports differents GUID format versions
+   * Able to read timestamp
+   * Able to read network address
+ * AU: Codec 27 is 8 bits/sample
+ * iTunesDB: support sort index type and playlist
+ * BMP: move code to parse image data in a separated function, so code can be
+   reused; fix magic regex (reserved may be not nul)
+ * EXIF/TIFF: reject IFD entry with more than 300 values
+ * MPEG audio:
+   * Frame.isValid() also checks sync field
+   * Add getNbChannel() method
+   * findSyncrhonizeBits() uses stronger validation to avoid false positive
+   * validate() checks first field name and not just if stream starts with
+     bytes "ID3"
+ * RIFF: text: truncate to nul byte and use ISO-8859-1 charset
+ * JPEG: reject invalid component id or quantization index (instead of using a
+   warning message)
+ * JPEG: support all sort of start of scan (especially progressive jpeg)
+ * JPEG: add magic string of JPEG starting with Adobe chunk
+ * Photoshop metadata: add parser for version information
+ * PNG: add method to get number of bits per pixel and use do not format
+   timestamp value
+ * PNG: support transparency color
+ * TTF: Reject chunk with more than 300 names
+ * EXE: Reject PE program with more than 50 sections
+ * EXE resource:
+   * PE_Resource now uses SeekableFieldSet
+   * Parse file flags
+   * Read file subtype (for driver or font)
+   * Reject header with more than 300 entries
+   * Stop parser at depth 5
+   * Write version information parser for NE program
+
+Minor changes:
+
+ * GIF: replace image marker warning with a parser error
+ * IPTC: use charset UTF-8 and not ISO-8859-15
+
+Bugfixes:
+
+ * CAB: validate() rejects file with more than 30 folders
+ * AU: fix end padding size
+
+Minor bugfixes:
+
+ * CAB: fix misuse of seekBit()
+
 What's new in hachoir-parser 0.9?
 =================================
 
