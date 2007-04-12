@@ -261,7 +261,7 @@ class AsfMetadata(MultipleMetadata):
                 setattr(self, key, value)
 
         if "file_prop/content" in header:
-            self.useFileProp(header["file_prop/content"])
+            self.useFileProp(header["file_prop/content"], is_vbr)
 
         if "codec_list/content" in header:
             for codec in header.array("codec_list/content/codec"):
@@ -324,7 +324,7 @@ class AsfMetadata(MultipleMetadata):
         data[key] = value
 
     @fault_tolerant
-    def useFileProp(self, prop):
+    def useFileProp(self, prop, is_vbr):
         self.creation_date = prop["creation_date"].value
         self.duration = durationWin64(prop["play_duration"].value)
         if prop["seekable"].value:
