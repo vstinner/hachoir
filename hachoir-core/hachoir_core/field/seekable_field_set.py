@@ -100,23 +100,27 @@ class RootSeekableFieldSet(BasicFieldSet):
         self._offset += field.size
         self._current_max_size = max(self._current_max_size, field.address + field.size)
 
-    def _checkFieldSize(self, field):
-        size = field.size
-        addr = field.address
-
+    def _checkAddress(self, address):
         if self._size is not None:
             max_addr = self._size
         else:
             # FIXME: Use parent size
             max_addr = self.stream.size
-        if max_addr < (addr + size):
+        return address < max_addr
+
+    def _checkFieldSize(self, field):
+        size = field.size
+        addr = field.address
+        if not self._checkAddress(addr+size-1):
             raise ParserError("Unable to add %s: field is too large" % field.name)
 
     def seekBit(self, address, relative=True):
         if not relative:
             address -= self.absolute_address
         if address < 0:
-            raise ParserError("Seek below field set start (%s)" % address)
+            raise ParserError("Seek below field set start (%s.%s)" % divmod(address, 8))
+        if not self._checkAddress(address):
+            raise ParserError("Seek above field set end (%s.%s)" % divmod(address, 8))
         self._offset = address
         return None
 
