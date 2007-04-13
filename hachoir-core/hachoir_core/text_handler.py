@@ -4,13 +4,8 @@ Utilities used to convert a field to human classic reprentation of data.
 
 from datetime import datetime, MAXYEAR
 from hachoir_core.tools import (
-    humanDuration as doHumanDuration,
-    humanFilesize as doHumanFilesize,
-    durationWin64 as doDurationWin64,
-    timestampWin64 as doTimestampWin64,
-    humanDatetime,
-    alignValue,
-)
+    humanDuration, humanFilesize, alignValue,
+    durationWin64 as doDurationWin64)
 from types import FunctionType, MethodType
 from hachoir_core.i18n import _
 from hachoir_core.field import Field
@@ -27,29 +22,6 @@ def displayHandler(field, handler):
     field.createDisplay = lambda: handler(field.value)
     return field
 
-def timestampWin64(field):
-    """
-    Convert Windows 64-bit timestamp to string. The timestamp format is
-    a 64-bit number which represents number of 100ns since the
-    1st January 1601 at 00:00. Result is an unicode string.
-    See also durationWin64(). Maximum date is 28 may 60056.
-
-    >>> timestampWin64(type("", (), {"value": 127840491566710000, "size": 64}))
-    u'2006-02-10 12:45:56.671000'
-    >>> timestampWin64(type("", (), {"value": 0, "size": 64}))
-    u'(not set)'
-    >>> timestampWin64(type("", (), {"value": (1 << 64)-1, "size": 64}))
-    u'invalid date (value=18446744073709551615)'
-    """
-    assert hasattr(field, "value") and hasattr(field, "size")
-    assert field.size == 64
-    if field.value == 0:
-        return _("(not set)")
-    try:
-        return humanDatetime(doTimestampWin64(field.value))
-    except ValueError:
-        return _("invalid date (value=%s)") % field.value
-
 def durationWin64(field):
     """
     Convert Windows 64-bit duration to string. The timestamp format is
@@ -63,13 +35,13 @@ def durationWin64(field):
     assert hasattr(field, "value") and hasattr(field, "size")
     assert field.size == 64
     delta = doDurationWin64(field.value)
-    return doHumanDuration(delta)
+    return humanDuration(delta)
 
 def filesizeHandler(field):
     """
     Format field value using humanFilesize()
     """
-    return displayHandler(field, doHumanFilesize)
+    return displayHandler(field, humanFilesize)
 
 def hexadecimal(field):
     """
@@ -82,7 +54,6 @@ def hexadecimal(field):
     """
     assert hasattr(field, "value") and hasattr(field, "size")
     size = field.size
-#    assert 0 < size <= 64 and not size % 8
     padding = alignValue(size, 4) // 4
     pattern = u"0x%%0%ux" % padding
     return pattern % field.value
