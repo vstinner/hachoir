@@ -13,40 +13,38 @@ class SectionHeader(FieldSet):
         yield UInt32(self, "phys_size", "Physical size (on disk)", text_handler=humanFilesize)
         yield UInt32(self, "phys_off", "Physical location (on disk)", text_handler=humanFilesize)
         yield PaddingBytes(self, "reserved", 12)
-        if False:
-            yield UInt32(self, "flags", text_handler=hexadecimal)
-        else:
-            # 0x0000000#
-            yield NullBits(self, "reserved[]", 4)
-            # 0x000000#0
-            yield NullBits(self, "reserved[]", 1)
-            yield Bit(self, "has_code", "Contains code")
-            yield Bit(self, "has_init_data", "Contains initialized data")
-            yield Bit(self, "has_uinit_data", "Contains uninitialized data")
-            # 0x00000#00
-            yield NullBits(self, "reserved[]", 1)
-            yield Bit(self, "has_comment", "Contains comments?")
-            yield NullBits(self, "reserved[]", 1)
-            yield Bit(self, "remove", "Contents will not become part of image")
-            # 0x0000#000
-            yield Bit(self, "has_comdata", "Contains comdat?")
-            yield NullBits(self, "reserved[]", 1)
-            yield Bit(self, "no_defer_spec_exc", "Reset speculative exceptions handling bits in the TLB entries")
-            yield Bit(self, "gp_rel", "Content can be accessed relative to GP")
-            # 0x000#0000
-            yield NullBits(self, "reserved[]", 4)
-            # 0x00#00000
-            yield NullBits(self, "reserved[]", 4)
-            # 0x0#000000
-            yield Bit(self, "ext_reloc", "Contains extended relocations?")
-            yield Bit(self, "discarded", "Can be discarded?")
-            yield Bit(self, "is_not_cached", "Is not cachable?")
-            yield Bit(self, "is_not_paged", "Is not pageable?")
-            # 0x#0000000
-            yield Bit(self, "is_shareable", "Is shareable?")
-            yield Bit(self, "is_executable", "Is executable?")
-            yield Bit(self, "is_readable", "Is readable?")
-            yield Bit(self, "is_writable", "Is writable?")
+
+        # 0x0000000#
+        yield NullBits(self, "reserved[]", 4)
+        # 0x000000#0
+        yield NullBits(self, "reserved[]", 1)
+        yield Bit(self, "has_code", "Contains code")
+        yield Bit(self, "has_init_data", "Contains initialized data")
+        yield Bit(self, "has_uinit_data", "Contains uninitialized data")
+        # 0x00000#00
+        yield NullBits(self, "reserved[]", 1)
+        yield Bit(self, "has_comment", "Contains comments?")
+        yield NullBits(self, "reserved[]", 1)
+        yield Bit(self, "remove", "Contents will not become part of image")
+        # 0x0000#000
+        yield Bit(self, "has_comdata", "Contains comdat?")
+        yield NullBits(self, "reserved[]", 1)
+        yield Bit(self, "no_defer_spec_exc", "Reset speculative exceptions handling bits in the TLB entries")
+        yield Bit(self, "gp_rel", "Content can be accessed relative to GP")
+        # 0x000#0000
+        yield NullBits(self, "reserved[]", 4)
+        # 0x00#00000
+        yield NullBits(self, "reserved[]", 4)
+        # 0x0#000000
+        yield Bit(self, "ext_reloc", "Contains extended relocations?")
+        yield Bit(self, "discarded", "Can be discarded?")
+        yield Bit(self, "is_not_cached", "Is not cachable?")
+        yield Bit(self, "is_not_paged", "Is not pageable?")
+        # 0x#0000000
+        yield Bit(self, "is_shareable", "Is shareable?")
+        yield Bit(self, "is_executable", "Is executable?")
+        yield Bit(self, "is_readable", "Is readable?")
+        yield Bit(self, "is_writable", "Is writable?")
 
     def rva2file(self, rva):
         return self["phys_off"].value + (rva - self["rva"].value)
