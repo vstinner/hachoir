@@ -87,6 +87,10 @@ class Fuzzer:
         if text.startswith("Unable to parse a FAT chain: "):
             # Unable to parse a FAT chain: list index out of range
             return True
+        if text.startswith("EXE resource: depth too high"):
+            return True
+        if "OLE2: Too much sections" in text:
+            return True
         return False
 
     def newLog(self, level, prefix, text, context):
