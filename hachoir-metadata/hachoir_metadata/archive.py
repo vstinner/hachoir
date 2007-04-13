@@ -84,6 +84,7 @@ class TarMetadata(MultipleMetadata):
                 title = _("File")
             self.addGroup(field.name, meta, title)
 
+    @fault_tolerant
     def extractFile(self, field, meta):
         meta.filename = field["name"].value
         meta.file_attr = humanUnixAttributes(field.getOctal("mode"))
