@@ -13,7 +13,7 @@ Author: Victor Stinner
 
 from hachoir_core.field import (FieldSet, ParserError,
     UInt8, UInt16, String, RawBytes, NullBytes)
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 
 def IPTC_String(parent, name, desc=None):
     return String(parent, name, parent["size"].value, desc,
@@ -84,10 +84,10 @@ class IPTC_Chunk(FieldSet):
         self._size = 3*8 + size_chunk.size + size_chunk.value*8
 
     def createFields(self):
-        yield UInt8(self, "signature", "IPTC signature (0x1c)", text_handler=hexadecimal)
+        yield textHandler(UInt8(self, "signature", "IPTC signature (0x1c)"), hexadecimal)
         if self["signature"].value != 0x1C:
             raise ParserError("Wrong IPTC signature")
-        yield UInt8(self, "dataset_nb", "Dataset number", text_handler=hexadecimal)
+        yield textHandler(UInt8(self, "dataset_nb", "Dataset number"), hexadecimal)
         yield UInt8(self, "tag", "Tag")
         yield IPTC_Size(self, "size", "Content size")
 

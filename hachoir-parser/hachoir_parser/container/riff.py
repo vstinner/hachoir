@@ -145,8 +145,8 @@ def parseCDDA(self):
     """
     yield UInt16(self, "cda_version", "CD file version (currently 1)")
     yield UInt16(self, "track_no", "Number of track")
-    yield UInt32(self, "disc_serial", "Disc serial number",
-        text_handler=formatSerialNumber)
+    yield textHandler(UInt32(self, "disc_serial", "Disc serial number"),
+        formatSerialNumber)
     yield UInt32(self, "hsg_offset", "Track offset (HSG format)")
     yield UInt32(self, "hsg_length", "Track length (HSG format)")
     yield RedBook(self, "rb_offset", "Track offset (Red-book format)")
@@ -252,7 +252,7 @@ class Chunk(FieldSet):
 
     def createFields(self):
         yield String(self, "tag", 4, "Tag", charset="ASCII")
-        yield UInt32(self, "size", "Size", text_handler=humanFilesize)
+        yield textHandler(UInt32(self, "size", "Size"), humanFilesize)
         if not self["size"].value:
             return
         if self["tag"].value == "LIST":
@@ -373,7 +373,7 @@ class RiffFile(Parser):
 
     def createFields(self):
         yield String(self, "signature", 4, "AVI header (RIFF)", charset="ASCII")
-        yield UInt32(self, "filesize", "File size", text_handler=humanFilesize)
+        yield textHandler(UInt32(self, "filesize", "File size"), humanFilesize)
         yield String(self, "type", 4, "Content type (\"AVI \", \"WAVE\", ...)", charset="ASCII")
 
         # Choose chunk type depending on file type

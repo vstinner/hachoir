@@ -12,7 +12,7 @@ from hachoir_core.field import (FieldSet,
     String, RawBytes, Enum,
     PaddingBytes, NullBytes, createPaddingField)
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_parser.image.common import RGB, PaletteRGBA
 from hachoir_core.tools import alignValue
 
@@ -91,10 +91,10 @@ class BmpHeader(FieldSet):
         # Version 4 (108 bytes)
         if self["header_size"].value < 108:
             return
-        yield UInt32(self, "red_mask", text_handler=hexadecimal)
-        yield UInt32(self, "green_mask", text_handler=hexadecimal)
-        yield UInt32(self, "blue_mask", text_handler=hexadecimal)
-        yield UInt32(self, "alpha_mask", text_handler=hexadecimal)
+        yield textHandler(UInt32(self, "red_mask"), hexadecimal)
+        yield textHandler(UInt32(self, "green_mask"), hexadecimal)
+        yield textHandler(UInt32(self, "blue_mask"), hexadecimal)
+        yield textHandler(UInt32(self, "alpha_mask"), hexadecimal)
         yield Enum(UInt32(self, "color_space"), self.color_space_name)
         yield CIEXYZ(self, "red_primary")
         yield CIEXYZ(self, "green_primary")

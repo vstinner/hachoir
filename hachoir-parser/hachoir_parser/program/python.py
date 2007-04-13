@@ -12,10 +12,10 @@ Creation: 25 march 2005
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet,
     UInt16, Int32, UInt32, UInt64, ParserError, Float64, Enum,
-    Character, Bytes, RawBytes, PascalString8)
+    Character, Bytes, RawBytes, PascalString8, TimestampUnix32)
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.bits import long2raw
-from hachoir_core.text_handler import hexadecimal, timestampUNIX
+from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_core.i18n import ngettext
 
 # --- String and string reference ---
@@ -26,7 +26,7 @@ def parseString(parent):
         yield RawBytes(parent, "text", length, "Content")
 
 def parseStringRef(parent):
-    yield UInt32(parent, "ref", text_handler=hexadecimal)
+    yield textHandler(UInt32(parent, "ref"), hexadecimal)
 def createStringRefDesc(parent):
     return "String ref: %s" % parent["ref"].display
 
@@ -264,6 +264,6 @@ class PythonCompiledFile(Parser):
 
     def createFields(self):
         yield Enum(Bytes(self, "signature", 4, "Python file signature and version"), self.STR_MAGIC)
-        yield UInt32(self, "timestamp", "Timestamp", text_handler=timestampUNIX)
+        yield TimestampUnix32(self, "timestamp", "Timestamp")
         yield Object(self)
 

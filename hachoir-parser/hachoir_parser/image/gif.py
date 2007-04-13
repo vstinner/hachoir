@@ -12,7 +12,7 @@ from hachoir_core.field import (FieldSet, ParserError,
     NullBits, RawBytes)
 from hachoir_parser.image.common import PaletteRGB
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.text_handler import hexadecimal, humanDuration
+from hachoir_core.text_handler import textHandler, hexadecimal, humanDuration
 
 # Maximum image dimension (in pixel)
 MAX_WIDTH = 6000
@@ -74,7 +74,7 @@ def parseGraphicControl(parent):
 
     if parent["size"].value != 4:
         raise ParserError("Invalid graphic control size")
-    yield UInt16(parent, "delay", "Delay time in millisecond", text_handler=humanDuration)
+    yield textHandler(UInt16(parent, "delay", "Delay time in millisecond"), humanDuration)
     yield UInt8(parent, "transp", "Transparent color index")
     yield NullBytes(parent, "terminator", 1, "Terminator (0)")
 
@@ -109,7 +109,7 @@ class Extension(FieldSet):
             self.parser = defaultExtensionParser
 
     def createFields(self):
-        yield UInt8(self, "code", "Extension code", text_handler=hexadecimal)
+        yield textHandler(UInt8(self, "code", "Extension code"), hexadecimal)
         for field in self.parser(self):
             yield field
 

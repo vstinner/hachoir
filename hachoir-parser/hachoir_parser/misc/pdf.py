@@ -13,7 +13,7 @@ from hachoir_core.field import (
     String,
     RawBytes)
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 
 MAGIC = "%PDF-"
 ENDMAGIC = "%%EOF"
@@ -263,9 +263,9 @@ class Body(FieldSet):
         while self.stream.readBytes(self.absolute_address+self.current_size, 1) == '%':
             size = getLineEnd(self, 4)
             if size == 2:
-                yield UInt16(self, "crc32", text_handler=hexadecimal)
+                yield textHandler(UInt16(self, "crc32"), hexadecimal)
             elif size == 4:
-                yield UInt32(self, "crc32", text_handler=hexadecimal)
+                yield textHandler(UInt32(self, "crc32"), hexadecimal)
             elif self.stream.readBytes(self.absolute_address+self.current_size, size).isalpha():
                 yield String(self, "comment[]", size)
             else:

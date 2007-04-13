@@ -17,7 +17,7 @@ from hachoir_core.field import (FieldSet, ParserError,
     String, RawBytes, Bytes, Enum,
     TimestampMac32)
 from hachoir_core.endian import BIG_ENDIAN
-from hachoir_core.text_handler import hexadecimal, humanFilesize
+from hachoir_core.text_handler import textHandler, hexadecimal, humanFilesize
 
 MAX_NAME_COUNT = 300
 MIN_NB_TABLE = 3
@@ -72,9 +72,9 @@ CHARSET_MAP = {
 class TableHeader(FieldSet):
     def createFields(self):
         yield String(self, "tag", 4)
-        yield UInt32(self, "checksum", text_handler=hexadecimal)
+        yield textHandler(UInt32(self, "checksum"), hexadecimal)
         yield UInt32(self, "offset")
-        yield UInt32(self, "size", text_handler=humanFilesize)
+        yield textHandler(UInt32(self, "size"), humanFilesize)
 
     def createDescription(self):
          return "Table entry: %s (%s)" % (self["tag"].display, self["size"].display)
@@ -107,7 +107,7 @@ def parseFontHeader(self):
     yield UInt16(self, "min_ver", "Minor version")
     yield UInt16(self, "font_maj_ver", "Font major version")
     yield UInt16(self, "font_min_ver", "Font minor version")
-    yield UInt32(self, "checksum", text_handler=hexadecimal)
+    yield textHandler(UInt32(self, "checksum"), hexadecimal)
     yield Bytes(self, "magic", 4, r"Magic string (\x5F\x0F\x3C\xF5)")
     if self["magic"].value != "\x5F\x0F\x3C\xF5":
         raise ParserError("TTF: invalid magic of font header")

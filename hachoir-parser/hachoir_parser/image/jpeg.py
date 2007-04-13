@@ -18,7 +18,7 @@ from hachoir_core.field import (FieldSet, ParserError,
     String, RawBytes)
 from hachoir_parser.image.common import PaletteRGB
 from hachoir_core.endian import BIG_ENDIAN
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_parser.image.exif import Exif
 from hachoir_parser.image.photoshop_metadata import PhotoshopMetadata
 
@@ -245,10 +245,10 @@ class JpegChunk(FieldSet):
             self._parser = None
 
     def createFields(self):
-        yield UInt8(self, "header", "Header", text_handler=hexadecimal)
+        yield textHandler(UInt8(self, "header", "Header"), hexadecimal)
         if self["header"].value != 0xFF:
             raise ParserError("JPEG: Invalid chunk header!")
-        yield UInt8(self, "type", "Type", text_handler=hexadecimal)
+        yield textHandler(UInt8(self, "type", "Type"), hexadecimal)
         tag = self["type"].value
         if tag in (self.TAG_SOI, self.TAG_EOI):
             return

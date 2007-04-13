@@ -14,7 +14,7 @@ from hachoir_core.field import (FieldSet, ParserError, Enum,
     UInt16, UInt32, TimestampUnix32,
     RawBytes, PaddingBytes, NullBytes, NullBits,
     CString, String, PascalString16)
-from hachoir_core.text_handler import humanFilesize, hexadecimal
+from hachoir_core.text_handler import textHandler, humanFilesize, hexadecimal
 from hachoir_core.tools import createDict, paddingSize, alignValue, makePrintable
 from hachoir_core.error import HACHOIR_ERRORS
 from hachoir_parser.common.win32 import BitmapInfoHeader
@@ -26,8 +26,8 @@ MAX_NAME_PER_HEADER = MAX_INDEX_PER_HEADER
 class Version(FieldSet):
     static_size = 32
     def createFields(self):
-        yield UInt16(self, "minor", "Minor version number", text_handler=hexadecimal)
-        yield UInt16(self, "major", "Major version number", text_handler=hexadecimal)
+        yield textHandler(UInt16(self, "minor", "Minor version number"), hexadecimal)
+        yield textHandler(UInt16(self, "major", "Major version number"), hexadecimal)
     def createValue(self):
         return self["major"].value + float(self["minor"].value) / 10000
 
@@ -79,7 +79,7 @@ FONT_SUBTYPE_NAME = {
 
 class VersionInfoBinary(FieldSet):
     def createFields(self):
-        yield UInt32(self, "magic", "File information magic (0xFEEF04BD)", text_handler=hexadecimal)
+        yield textHandler(UInt32(self, "magic", "File information magic (0xFEEF04BD)"), hexadecimal)
         if self["magic"].value != 0xFEEF04BD:
             raise ParserError("EXE resource: invalid file info magic")
         yield Version(self, "struct_ver", "Structure version (1.0)")
@@ -87,7 +87,7 @@ class VersionInfoBinary(FieldSet):
         yield Version(self, "file_ver_ls", "File version LS")
         yield Version(self, "product_ver_ms", "Product version MS")
         yield Version(self, "product_ver_ls", "Product version LS")
-        yield UInt32(self, "file_flags_mask", text_handler=hexadecimal)
+        yield textHandler(UInt32(self, "file_flags_mask"), hexadecimal)
 
         yield Bit(self, "debug")
         yield Bit(self, "prerelease")
@@ -97,10 +97,10 @@ class VersionInfoBinary(FieldSet):
         yield Bit(self, "special_build")
         yield NullBits(self, "reserved", 26)
 
-        yield Enum(UInt16(self, "file_os_major", text_handler=hexadecimal), MAJOR_OS_NAME)
-        yield Enum(UInt16(self, "file_os_minor", text_handler=hexadecimal), MINOR_OS_NAME)
-        yield Enum(UInt32(self, "file_type", text_handler=hexadecimal), FILETYPE_NAME)
-        field = UInt32(self, "file_subfile", text_handler=hexadecimal)
+        yield Enum(textHandler(UInt16(self, "file_os_major"), hexadecimal), MAJOR_OS_NAME)
+        yield Enum(textHandler(UInt16(self, "file_os_minor"), hexadecimal), MINOR_OS_NAME)
+        yield Enum(textHandler(UInt32(self, "file_type"), hexadecimal), FILETYPE_NAME)
+        field = textHandler(UInt32(self, "file_subfile"), hexadecimal)
         if field.value == FILETYPE_DRIVER:
             field = Enum(field, DRIVER_SUBTYPE_NAME)
         elif field.value == FILETYPE_FONT:
@@ -209,8 +209,8 @@ class Entry(FieldSet):
         self.inode = inode
 
     def createFields(self):
-        yield UInt32(self, "rva", text_handler=hexadecimal)
-        yield UInt32(self, "size", text_handler=humanFilesize)
+        yield textHandler(UInt32(self, "rva"), hexadecimal)
+        yield textHandler(UInt32(self, "size"), humanFilesize)
         yield UInt32(self, "codepage")
         yield NullBytes(self, "reserved", 4)
 

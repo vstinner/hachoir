@@ -10,6 +10,7 @@ from hachoir_core.field import (FieldSet, MatchError, ParserError,
     Enum, UInt8, UInt24, UInt32,
     CString, String, RawBytes,
     Bit, Bits, NullBytes, NullBits)
+from hachoir_core.text_handler import textHandler
 from hachoir_core.tools import humanDuration
 from hachoir_core.endian import NETWORK_ENDIAN
 
@@ -262,8 +263,8 @@ class ID3_Private(FieldSet):
 class ID3_TrackLength(FieldSet):
     def createFields(self):
         yield NullBytes(self, "zero", 1)
-        yield String(self, "length", self._size/8 - 1, "Length in ms",
-            text_handler=self.computeLength, charset="ASCII")
+        yield textHandler(String(self, "length", self._size/8 - 1,
+            "Length in ms", charset="ASCII"), self.computeLength)
 
     def computeLength(self, field):
         try:

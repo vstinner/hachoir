@@ -13,7 +13,7 @@ from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError, MissingField,
     UInt8, Enum, Bit, Bits, RawBytes)
 from hachoir_core.endian import BIG_ENDIAN
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 
 class Packet(FieldSet):
     def __init__(self, *args):
@@ -35,13 +35,13 @@ class Packet(FieldSet):
     }
 
     def createFields(self):
-        yield UInt8(self, "sync", 8, text_handler=hexadecimal)
+        yield textHandler(UInt8(self, "sync", 8), hexadecimal)
         if self["sync"].value != 0x47:
             raise ParserError("MPEG-2 TS: Invalid synchronization byte")
         yield Bit(self, "has_error")
         yield Bit(self, "payload_unit_start")
         yield Bit(self, "priority")
-        yield Enum(Bits(self, "pid", 13, "Program identifier", text_handler=hexadecimal), self.PID)
+        yield Enum(textHandler(Bits(self, "pid", 13, "Program identifier"), hexadecimal), self.PID)
         yield Bits(self, "scrambling_control", 2)
         yield Bit(self, "has_adaptation")
         yield Bit(self, "has_payload")

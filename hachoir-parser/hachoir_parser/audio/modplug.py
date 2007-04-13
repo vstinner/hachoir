@@ -12,7 +12,7 @@ from hachoir_core.field import (FieldSet,
     UInt32, UInt16, UInt8, Int8, Float32,
     RawBytes, String, GenericVector, ParserError)
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 
 MAX_ENVPOINTS = 32
 
@@ -68,8 +68,8 @@ def parseEQBands(parser):
 class SoundMixPluginInfo(FieldSet):
     static_size = 128*8
     def createFields(self):
-        yield UInt32(self, "plugin_id1", text_handler=hexadecimal)
-        yield UInt32(self, "plugin_id2", text_handler=hexadecimal)
+        yield textHandler(UInt32(self, "plugin_id1"), hexadecimal)
+        yield textHandler(UInt32(self, "plugin_id2"), hexadecimal)
         yield UInt32(self, "input_routing")
         yield UInt32(self, "output_routing")
         yield GenericVector(self, "routing_info", 4, UInt32, "reserved")

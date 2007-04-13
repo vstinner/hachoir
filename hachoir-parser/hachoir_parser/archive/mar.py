@@ -10,15 +10,15 @@ MAX_NB_FILE = 100000
 from hachoir_parser import Parser
 from hachoir_core.field import FieldSet, String, UInt32, SubFile
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.text_handler import humanFilesize, hexadecimal
+from hachoir_core.text_handler import textHandler, humanFilesize, hexadecimal
 
 class FileIndex(FieldSet):
     static_size = 68*8
 
     def createFields(self):
         yield String(self, "filename", 56, truncate="\0", charset="ASCII")
-        yield UInt32(self, "filesize", text_handler=humanFilesize)
-        yield UInt32(self, "crc32", text_handler=hexadecimal)
+        yield textHandler(UInt32(self, "filesize"), humanFilesize)
+        yield textHandler(UInt32(self, "crc32"), hexadecimal)
         yield UInt32(self, "offset")
 
     def createDescription(self):

@@ -13,7 +13,7 @@ from hachoir_core.field import (FieldSet,
     UInt8, UInt16, UInt32,
     Bytes, RawBytes, String,
     PascalString8)
-from hachoir_core.text_handler import humanFrequency
+from hachoir_core.text_handler import textHandler, humanFrequency
 from hachoir_core.endian import BIG_ENDIAN
 
 class Metadata(FieldSet):
@@ -67,7 +67,7 @@ class RealAudioFile(Parser):
             yield UInt16(self, "frame_size", "Frame size")
             yield UInt16(self, "sub_packet_size", "Subpacket size")
             yield UInt16(self, "unknown2", "Unknown")
-            yield UInt16(self, "sample_rate", "Sample rate", text_handler=humanFrequency)
+            yield textHandler(UInt16(self, "sample_rate", "Sample rate"), humanFrequency)
             yield UInt16(self, "unknown3", "Unknown")
             yield UInt16(self, "sample_size", "Sample size")
             yield UInt16(self, "channels", "Channels")

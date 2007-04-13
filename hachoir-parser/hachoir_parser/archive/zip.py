@@ -12,7 +12,7 @@ from hachoir_core.field import (FieldSet, ParserError,
     UInt8, UInt16, UInt32, UInt64,
     String, PascalString16,
     RawBytes, SubFile, CompressedField)
-from hachoir_core.text_handler import humanFilesize, hexadecimal
+from hachoir_core.text_handler import textHandler, humanFilesize, hexadecimal
 from hachoir_core.error import HACHOIR_ERRORS
 from hachoir_core.tools import makeUnicode
 from hachoir_core.endian import LITTLE_ENDIAN
@@ -71,7 +71,7 @@ class ZipVersion(FieldSet):
         17: u"Tandem",
     }
     def createFields(self):
-        yield UInt8(self, "zip_version", "ZIP version", text_handler=ZipRevision)
+        yield textHandler(UInt8(self, "zip_version", "ZIP version"), ZipRevision)
         yield Enum(UInt8(self, "host_os", "ZIP Host OS"), self.HOST_OS)
 
 class ZipGeneralFlags(FieldSet):
@@ -149,7 +149,7 @@ def ZipStartCommonFields(self):
     yield Enum(UInt16(self, "compression", "Compression method"),
                COMPRESSION_METHOD)
     yield TimeDateMSDOS32(self, "last_mod", "Last moditication file time")
-    yield UInt32(self, "crc32", "CRC-32", text_handler=hexadecimal)
+    yield textHandler(UInt32(self, "crc32", "CRC-32"), hexadecimal)
     yield UInt32(self, "compressed_size", "Compressed size")
     yield UInt32(self, "uncompressed_size", "Uncompressed size")
     yield UInt16(self, "filename_length", "Filename length")
@@ -226,12 +226,12 @@ class ZipDataDescriptor(FieldSet):
     HEADER = 0x08074B50
     static_size = 96
     def createFields(self):
-        yield UInt32(self, "file_crc32", "Checksum (CRC32)",
-                     text_handler=hexadecimal)
-        yield UInt32(self, "file_compressed_size", "Compressed size (bytes)",
-                     text_handler=humanFilesize)
-        yield UInt32(self, "file_uncompressed_size",
-                     "Uncompressed size (bytes)", text_handler=humanFilesize)
+        yield textHandler(UInt32(self, "file_crc32",
+            "Checksum (CRC32)"), hexadecimal)
+        yield textHandler(UInt32(self, "file_compressed_size",
+            "Compressed size (bytes)"), humanFilesize)
+        yield textHandler(UInt32(self, "file_uncompressed_size",
+             "Uncompressed size (bytes)"), humanFilesize)
 
 class FileEntry(FieldSet):
     HEADER = 0x04034B50
@@ -255,7 +255,7 @@ class FileEntry(FieldSet):
             raise ParserError("Couldn't resync to %s" %
                               ZipDataDescriptor.HEADER_STRING)
         yield self.data(size)
-        yield UInt32(self, "header[]", "Header", text_handler=hexadecimal)
+        yield textHandler(UInt32(self, "header[]", "Header"), hexadecimal)
         data_desc = ZipDataDescriptor(self, "data_desc", "Data descriptor")
         #self.info("Resynced!")
         yield data_desc
@@ -382,7 +382,7 @@ class ZipFile(Parser):
         self.signature = None
         self.central_directory = []
         while not self.eof:
-            header = UInt32(self, "header[]", "Header", text_handler=hexadecimal)
+            header = textHandler(UInt32(self, "header[]", "Header"), hexadecimal)
             yield header
             header = header.value
             if header == FileEntry.HEADER:

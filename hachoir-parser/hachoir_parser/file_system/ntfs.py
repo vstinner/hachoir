@@ -19,7 +19,7 @@ from hachoir_core.field import (FieldSet, Enum,
     String, Bytes, Bit,
     NullBits, NullBytes, PaddingBytes, RawBytes)
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.text_handler import hexadecimal, humanFilesize
+from hachoir_core.text_handler import textHandler, hexadecimal, humanFilesize
 from hachoir_core.tools import humanFilesize as doHumanFilesize, createDict
 from hachoir_parser.common.msdos import MSDOSFileAttr32
 
@@ -60,9 +60,9 @@ class MasterBootRecord(FieldSet):
         yield String(self, "name", 8)
         yield BiosParameterBlock(self, "bios", "BIOS parameters")
 
-        yield UInt8(self, "physical_drive", "(0x80)", text_handler=hexadecimal)
+        yield textHandler(UInt8(self, "physical_drive", "(0x80)"), hexadecimal)
         yield NullBytes(self, "current_head", 1)
-        yield UInt8(self, "ext_boot_sig", "Extended boot signature (0x80)", text_handler=hexadecimal)
+        yield textHandler(UInt8(self, "ext_boot_sig", "Extended boot signature (0x80)"), hexadecimal)
         yield NullBytes(self, "unused", 1)
 
         yield UInt64(self, "nb_sectors")
@@ -72,8 +72,8 @@ class MasterBootRecord(FieldSet):
         yield NullBytes(self, "reserved[]", 3)
         yield UInt8(self, "cluster_per_index", "Index block size in clusters")
         yield NullBytes(self, "reserved[]", 3)
-        yield UInt64(self, "serial_number", text_handler=hexadecimal)
-        yield UInt32(self, "checksum", "Boot sector checksum", text_handler=hexadecimal)
+        yield textHandler(UInt64(self, "serial_number"), hexadecimal)
+        yield textHandler(UInt32(self, "checksum", "Boot sector checksum"), hexadecimal)
         yield Bytes(self, "boot_code", 426)
         yield Bytes(self, "mbr_magic", 2, r"Master boot record magic number (\x55\xAA)")
 
@@ -99,13 +99,13 @@ class Attribute(FieldSet):
             self._parser = self.ATTR_INFO[type][2]
 
     def createFields(self):
-        yield Enum(UInt32(self, "type", text_handler=hexadecimal), self.ATTR_NAME)
+        yield Enum(textHandler(UInt32(self, "type"), hexadecimal), self.ATTR_NAME)
         yield UInt32(self, "size")
         yield UInt8(self, "non_resident", "Non-resident flag")
         yield UInt8(self, "name_length", "Name length in bytes")
         yield UInt16(self, "name_offset", "Name offset")
         yield UInt16(self, "flags")
-        yield UInt16(self, "attribute_id", text_handler=hexadecimal)
+        yield textHandler(UInt16(self, "attribute_id"), hexadecimal)
         yield UInt32(self, "length_attr", "Length of the Attribute")
         yield UInt16(self, "offset_attr", "Offset of the Attribute")
         yield UInt8(self, "indexed_flag")
@@ -142,7 +142,7 @@ class Attribute(FieldSet):
         yield UInt32(self, "class_id")
         yield UInt32(self, "owner_id")
         yield UInt32(self, "security_id")
-        yield UInt64(self, "quota_charged", "Quota Charged", text_handler=humanFilesize)
+        yield textHandler(UInt64(self, "quota_charged", "Quota Charged"), humanFilesize)
         yield UInt64(self, "usn", "Update Sequence Number (USN)")
 
     def parseFilename(self):
@@ -151,8 +151,8 @@ class Attribute(FieldSet):
         yield TimestampWin64(self, "atime", "File Altered")
         yield TimestampWin64(self, "mtime", "MFT Changed")
         yield TimestampWin64(self, "rtime", "File Read")
-        yield UInt64(self, "alloc_size", "Allocated size of the file", text_handler=humanFilesize)
-        yield UInt64(self, "real_size", "Real size of the file", text_handler=humanFilesize)
+        yield textHandler(UInt64(self, "alloc_size", "Allocated size of the file"), humanFilesize)
+        yield textHandler(UInt64(self, "real_size", "Real size of the file"), humanFilesize)
         yield UInt32(self, "file_flags")
         yield UInt32(self, "file_flags2", "Used by EAs and Reparse")
         yield UInt8(self, "filename_length", "Filename length in characters")

@@ -18,7 +18,7 @@ from hachoir_core.field import (FieldSet, ParserError,
     Bit, Bits, UInt8, UInt32, UInt16, CString, Enum,
     Bytes, RawBytes, NullBits, String, SubFile)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
-from hachoir_core.text_handler import humanFilesize
+from hachoir_core.text_handler import textHandler, humanFilesize
 from hachoir_core.tools import paddingSize, humanFrequency
 from hachoir_parser.image.common import RGB
 from hachoir_parser.image.jpeg import JpegChunk, JpegFile
@@ -120,7 +120,7 @@ def parseDefineSound(parent, size):
 
     yield Bit(parent, "is_stereo")
     yield Bit(parent, "is_16bit")
-    yield Bits(parent, "rate", 2, text_handler=bit2hertz)
+    yield textHandler(Bits(parent, "rate", 2), bit2hertz)
     yield Enum(Bits(parent, "codec", 4), SOUND_CODEC)
 
     yield UInt32(parent, "sample_count")
@@ -135,12 +135,12 @@ def parseDefineSound(parent, size):
 def parseSoundHeader(parent, size):
     yield Bit(parent, "playback_is_stereo")
     yield Bit(parent, "playback_is_16bit")
-    yield Bits(parent, "playback_rate", 2, text_handler=bit2hertz)
+    yield textHandler(Bits(parent, "playback_rate", 2), bit2hertz)
     yield NullBits(parent, "reserved", 4)
 
     yield Bit(parent, "sound_is_stereo")
     yield Bit(parent, "sound_is_16bit")
-    yield Bits(parent, "sound_rate", 2, text_handler=bit2hertz)
+    yield textHandler(Bits(parent, "sound_rate", 2), bit2hertz)
     yield Enum(Bits(parent, "codec", 4), SOUND_CODEC)
 
     yield UInt16(parent, "sample_count")
@@ -315,9 +315,9 @@ class Tag(FieldSet):
         if self.stream.readBits(self.absolute_address, 6, self.endian) == 63:
             yield Bits(self, "length_ext", 6)
             yield Bits(self, "code", 10)
-            yield UInt32(self, "length", text_handler=humanFilesize)
+            yield textHandler(UInt32(self, "length"), humanFilesize)
         else:
-            yield Bits(self, "length", 6, text_handler=humanFilesize)
+            yield textHandler(Bits(self, "length", 6), humanFilesize)
             yield Bits(self, "code", 10)
         size = self["length"].value
         if 0 < size:
@@ -362,7 +362,7 @@ class SwfFile(Parser):
     def createFields(self):
         yield String(self, "signature", 3, "SWF format signature", charset="ASCII")
         yield UInt8(self, "version")
-        yield UInt32(self, "filesize", text_handler=humanFilesize)
+        yield textHandler(UInt32(self, "filesize"), humanFilesize)
         if self["signature"].value != "CWS":
             yield RECT(self, "rect")
             yield FixedFloat16(self, "frame_rate")

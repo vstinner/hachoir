@@ -8,7 +8,7 @@ Creation: 12 july 2006
 from hachoir_parser import Parser
 from hachoir_core.field import UInt32, Enum, String, RawBytes
 from hachoir_core.endian import BIG_ENDIAN
-from hachoir_core.text_handler import humanFilesize, humanFrequency
+from hachoir_core.text_handler import textHandler, humanFilesize, humanFrequency
 from hachoir_core.tools import createDict
 
 class AuFile(Parser):
@@ -71,9 +71,9 @@ class AuFile(Parser):
     def createFields(self):
         yield String(self, "signature", 4, 'Format signature (".snd")', charset="ASCII")
         yield UInt32(self, "data_ofs", "Data offset")
-        yield UInt32(self, "data_size", "Data size", text_handler=humanFilesize)
+        yield textHandler(UInt32(self, "data_size", "Data size"), humanFilesize)
         yield Enum(UInt32(self, "codec", "Audio codec"), self.CODEC_NAME)
-        yield UInt32(self, "sample_rate", "Number of samples/second", text_handler=humanFrequency)
+        yield textHandler(UInt32(self, "sample_rate", "Number of samples/second"), humanFrequency)
         yield UInt32(self, "channels", "Number of interleaved channels")
 
         size = self["data_ofs"].value - self.current_size // 8

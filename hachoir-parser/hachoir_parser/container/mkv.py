@@ -14,7 +14,7 @@ from hachoir_core.field import (FieldSet, Link,
 from hachoir_core.endian import BIG_ENDIAN
 from hachoir_core.iso639 import ISO639_2
 from hachoir_core.tools import humanDatetime
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_parser.container.ogg import XiphInt
 from datetime import datetime, timedelta
 
@@ -22,8 +22,8 @@ class RawInt(GenericInteger):
     """
     Raw integer: have to be used in BIG_ENDIAN!
     """
-    def __init__(self, parent, name, description=None, text_handler=hexadecimal):
-        GenericInteger.__init__(self, parent, name, False, 8, description, text_handler)
+    def __init__(self, parent, name, description=None):
+        GenericInteger.__init__(self, parent, name, False, 8, description)
         i = GenericInteger.createValue(self)
         if i == 0:
             raise ParserError('Invalid integer length!')
@@ -32,8 +32,8 @@ class RawInt(GenericInteger):
             i <<= 1
 
 class Unsigned(RawInt):
-    def __init__(self, parent, name, description=None, text_handler=None):
-        RawInt.__init__(self, parent, name, description, text_handler)
+    def __init__(self, parent, name, description=None):
+        RawInt.__init__(self, parent, name, description)
 
     def hasValue(self):
         return True
@@ -121,12 +121,12 @@ def dateToString(field):
     return humanDatetime(dateToDatetime(field.value))
 
 def Date(parent):
-    return GenericInteger(parent, 'date', True, parent['size'].value*8,
-        text_handler=dateToString)
+    return textHandler(GenericInteger(parent, 'date', True, parent['size'].value*8),
+        dateToString)
 
 def SeekID(parent):
-    return GenericInteger(parent, 'binary', False, parent['size'].value*8,
-        text_handler=lambda chunk: segment.get(chunk.value, (hexadecimal(chunk),))[0])
+    return textHandler(GenericInteger(parent, 'binary', False, parent['size'].value*8),
+        lambda chunk: segment.get(chunk.value, (hexadecimal(chunk),))[0])
 
 def CueClusterPosition(parent):
     class Cluster(Link):

@@ -19,7 +19,7 @@ from hachoir_core.field import (FieldSet, ParserError,
     Bit, Bits, NullBits)
 from hachoir_core.endian import NETWORK_ENDIAN, LITTLE_ENDIAN
 from hachoir_core.tools import humanDuration
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_core.tools import createDict
 from hachoir_parser.network.common import MAC48_Address, IPv4_Address
 
@@ -141,7 +141,7 @@ class TCP(FieldSet):
         yield Bit(self, "fin", "Stop the connection")
 
         yield UInt16(self, "winsize", "Windows size")
-        yield UInt16(self, "checksum", text_handler=hexadecimal)
+        yield textHandler(UInt16(self, "checksum"), hexadecimal)
         yield UInt16(self, "urgent")
 
         size = self["hdrlen"].value*8 - self.current_size
@@ -204,7 +204,7 @@ class UDP(FieldSet):
         yield Enum(UInt16(self, "src"), UDP.port_name)
         yield Enum(UInt16(self, "dst"), UDP.port_name)
         yield UInt16(self, "length")
-        yield UInt16(self, "checksum", text_handler=hexadecimal)
+        yield textHandler(UInt16(self, "checksum"), hexadecimal)
 
     def parseNext(self, parent):
         return None
@@ -253,7 +253,7 @@ class ICMP(FieldSet):
         yield field
 
         # Options
-        yield UInt16(self, "checksum", text_handler=hexadecimal)
+        yield textHandler(UInt16(self, "checksum"), hexadecimal)
         if type in (self.PING, self.PONG): # and self["code"].value == 0:
             yield UInt16(self, "id")
             yield UInt16(self, "seq_num")
@@ -318,7 +318,7 @@ class IPv4(Layer):
         yield UInt8(self, "frag_ofst_hi")
         yield UInt8(self, "ttl", "Type to live")
         yield Enum(UInt8(self, "protocol"), self.PROTOCOL_NAME)
-        yield UInt16(self, "checksum", text_handler=hexadecimal)
+        yield textHandler(UInt16(self, "checksum"), hexadecimal)
         yield IPv4_Address(self, "src")
         yield IPv4_Address(self, "dst")
 

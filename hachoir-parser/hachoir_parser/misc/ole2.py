@@ -48,10 +48,9 @@ class SECT(Int32):
     }
 
     def __init__(self, parent, name, description=None):
-        Int32.__init__(self, parent, name, \
-            text_handler=self._processDisplay, description=description)
+        Int32.__init__(self, parent, name, description)
 
-    def _processDisplay(self, field):
+    def createDisplay(self, field):
         val = field.value
         return SECT.special_value_name.get(val, str(val))
 

@@ -15,7 +15,7 @@ from hachoir_core.field import (Field, StaticFieldSet, FieldSet, ParserError,
     Enum, UInt8, UInt32, UInt64,
     Bytes, RawBytes)
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.text_handler import hexadecimal, humanFilesize
+from hachoir_core.text_handler import textHandler, hexadecimal, humanFilesize
 
 class SZUInt64(Field):
     """
@@ -102,8 +102,8 @@ class HashDigest(FieldSet):
             yield GenericVector(self, "defined[]", self.num_digests, UInt8, "bool")
             for index in xrange(self.num_digests):
                 if bytes[index]:
-                    yield UInt32(self, "hash[]", "Hash for digest %u" % index, \
-                                 text_handler=hexadecimal)
+                    yield textHandler(UInt32(self, "hash[]",
+                        "Hash for digest %u" % index), hexadecimal)
 
 class PackInfo(FieldSet):
     def createFields(self):
@@ -163,7 +163,7 @@ class CoderID(FieldSet):
                 self.info("Undetermined codec %s" % name)
                 name = "unknown"
             yield RawBytes(self, name, size)
-            #yield Bytes(self, "id", size, text_handler=lambda: name)
+            #yield textHandler(Bytes(self, "id", size), lambda: name)
         if byte & 0x10:
             yield SZUInt64(self, "num_stream_in")
             yield SZUInt64(self, "num_stream_out")
@@ -174,8 +174,8 @@ class CoderID(FieldSet):
             yield size
             if size.value == 5:
                 #LzmaDecodeProperties@LZMAStateDecode.c
-                yield UInt8(self, "parameters", text_handler=lzmaParams)
-                yield UInt32(self, "dictionary_size", text_handler=humanFilesize)
+                yield textHandler(UInt8(self, "parameters"), lzmaParams)
+                yield textHandler(UInt32(self, "dictionary_size"), humanFilesize)
             elif size.value > 0:
                 yield RawBytes(self, "properties[]", size.value)
 

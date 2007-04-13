@@ -15,7 +15,7 @@ from hachoir_core.field import (StaticFieldSet, FieldSet, Field,
     UInt32, UInt16, UInt8, Enum,
     RawBytes, String, GenericVector, ParserError)
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_core.tools import alignValue
 
 class Chunk:
@@ -139,7 +139,7 @@ def parseChannelType(val):
 class ChannelSettings(FieldSet):
     static_size = 8
     def createFields(self):
-        yield Bits(self, "type", 7, text_handler=parseChannelType)
+        yield textHandler(Bits(self, "type", 7), parseChannelType)
         yield Bit(self, "enabled")
 
 class ChannelPanning(FieldSet):
@@ -209,7 +209,7 @@ class Header(SizeFieldSet):
     # or modify _size in a derived class if never.
     def createUnpaddedFields(self):
         yield String(self, "title", 28, strip='\0')
-        yield UInt8(self, "marker[]", text_handler=hexadecimal)
+        yield textHandler(UInt8(self, "marker[]"), hexadecimal)
         for field in self.getFileVersionField():
             yield field
 
@@ -282,8 +282,8 @@ class S3MHeader(Header):
 
     def getFirstProperties(self):
         yield S3MFlags(self, "flags")
-        yield UInt16(self, "creation_version",
-                     text_handler=S3MHeader.getTrackerVersion)
+        yield textHandler(UInt16(self, "creation_version"),
+            S3MHeader.getTrackerVersion)
         yield UInt16(self, "format_version")
 
     def getLastProperties(self):
@@ -525,7 +525,7 @@ class PTMInstrument(Instrument):
         yield UInt32(self, "gus_begin")
         yield UInt32(self, "gus_loop_start")
         yield UInt32(self, "gus_loop_end")
-        yield UInt8(self, "gus_loop_flags", text_handler=hexadecimal)
+        yield textHandler(UInt8(self, "gus_loop_flags"), hexadecimal)
         yield UInt8(self, "reserved[]") # Should be 0
 
     def getSubChunks(self):

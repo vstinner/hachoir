@@ -6,7 +6,7 @@ from hachoir_core.field import (FieldSet, StaticFieldSet,
     String, Bytes, NullBytes)
 from hachoir_core.field.integer import GenericInteger
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_core.error import error
 from hachoir_core.tools import humanFilesize, makePrintable
 import datetime
@@ -69,7 +69,7 @@ class FAT(FieldSet):
             version = parent.parent.version
             text_handler = parent.text_handler
             while self.current_size < self._size:
-                yield GenericInteger(self, 'entry[]', False, version, text_handler=text_handler)
+                yield textHandler(GenericInteger(self, 'entry[]', False, version), text_handler)
     def createFields(self):
         version = self.parent.version
         max_entry = 1 << min(28, version)

@@ -19,7 +19,7 @@ from hachoir_core.field import (StaticFieldSet, FieldSet,
     UInt32, UInt16, UInt8, Int8, Enum,
     RawBytes, String, GenericVector)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
-from hachoir_core.text_handler import humanFilesize, hexadecimal
+from hachoir_core.text_handler import textHandler, humanFilesize, hexadecimal
 from hachoir_parser.audio.modplug import ParseModplugMetadata
 from hachoir_parser.common.tracker import NOTE_NAME
 
@@ -247,17 +247,17 @@ class Note(FieldSet):
             if info["has_instrument"].value:
                 yield UInt8(self, "instrument")
             if info["has_volume"].value:
-                yield UInt8(self, "volume", text_handler=parseVolume)
+                yield textHandler(UInt8(self, "volume"), parseVolume)
             if info["has_type"].value:
                 yield Effect(self, "effect_type")
             if info["has_parameter"].value:
-                yield UInt8(self, "effect_parameter", text_handler=hexadecimal)
+                yield textHandler(UInt8(self, "effect_parameter"), hexadecimal)
         else:
             yield Enum(Bits(self, "note", 7), NOTE_NAME)
             yield UInt8(self, "instrument")
-            yield UInt8(self, "volume", text_handler=parseVolume)
+            yield textHandler(UInt8(self, "volume"), parseVolume)
             yield Effect(self, "effect_type")
-            yield UInt8(self, "effect_parameter", text_handler=hexadecimal)
+            yield textHandler(UInt8(self, "effect_parameter"), hexadecimal)
 
     def createDescription(self):
         if "info" in self:
@@ -320,7 +320,7 @@ class Header(FieldSet):
         yield String(self, "tracker_name", 20, "XM tracker name", charset="ASCII", strip=' ')
         yield UInt8(self, "format_minor")
         yield UInt8(self, "format_major")
-        yield UInt32(self, "header_size", "Header size (276)", text_handler=humanFilesize)
+        yield textHandler(UInt32(self, "header_size", "Header size (276)"), humanFilesize)
         yield UInt16(self, "song_length", "Length in patten order table")
         yield UInt16(self, "restart", "Restart position")
         yield UInt16(self, "channels", "Number of channels (2,4,6,8,10,...,32)")

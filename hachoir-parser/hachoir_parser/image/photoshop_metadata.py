@@ -2,7 +2,7 @@ from hachoir_core.field import (FieldSet, ParserError,
     UInt8, UInt16, UInt32,
     String, CString, PascalString8, PascalString32,
     NullBytes, RawBytes)
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_core.tools import alignValue, createDict
 from hachoir_parser.image.iptc import IPTC
 from hachoir_parser.common.win32 import GUID, PascalStringWin32
@@ -55,7 +55,7 @@ class Photoshop8BIM(FieldSet):
         yield String(self, "signature", 4, "8BIM signature", charset="ASCII")
         if self["signature"].value != "8BIM":
             raise ParserError("Stream doesn't look like 8BIM item (wrong signature)!")
-        yield UInt16(self, "tag", text_handler=hexadecimal)
+        yield textHandler(UInt16(self, "tag"), hexadecimal)
         if self.stream.readBytes(self.absolute_address + self.current_size, 4) != "\0\0\0\0":
             yield PascalString8(self, "name")
             size = 2 + (self["name"].size // 8) % 2

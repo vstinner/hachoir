@@ -19,7 +19,7 @@ from hachoir_core.field import (FieldSet,
     RawBytes, PaddingBytes,
     Enum)
 from hachoir_core.endian import BIG_ENDIAN
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 
 class Timestamp(FieldSet):
     static_size = 36
@@ -184,7 +184,7 @@ class Video(FieldSet):
             yield Bits(self, "copy_info", 7)
 
         if self["has_prev_crc"].value:
-            yield UInt16(self, "prev_crc", text_handler=hexadecimal)
+            yield textHandler(UInt16(self, "prev_crc"), hexadecimal)
 
         # --- Extension ---
         if self["has_extension"].value:
@@ -231,7 +231,7 @@ class Chunk(FieldSet):
 
     def createFields(self):
         yield Bytes(self, "sync", 3)
-        yield UInt8(self, "tag", text_handler=hexadecimal)
+        yield textHandler(UInt8(self, "tag"), hexadecimal)
         if self.parser:
             if self.parser != ProgramStream:
                 yield UInt16(self, "length")

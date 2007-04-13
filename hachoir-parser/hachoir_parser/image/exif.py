@@ -10,7 +10,7 @@ from hachoir_core.field import (FieldSet, ParserError,
     Bytes, SubFile,
     PaddingBytes, createPaddingField)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN, NETWORK_ENDIAN
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_core.tools import paddingSize
 from hachoir_core.tools import createDict
 
@@ -33,8 +33,8 @@ class BasicIFDEntry(FieldSet):
     TYPE_NAME = createDict(TYPE_INFO, 1)
 
     def createFields(self):
-        yield Enum(UInt16(self, "tag", "Tag", text_handler=hexadecimal), self.TAG_NAME)
-        yield Enum(UInt16(self, "type", "Type", text_handler=hexadecimal), self.TYPE_NAME)
+        yield Enum(textHandler(UInt16(self, "tag", "Tag"), hexadecimal), self.TAG_NAME)
+        yield Enum(textHandler(UInt16(self, "type", "Type"), hexadecimal), self.TYPE_NAME)
         yield UInt32(self, "count", "Count")
         if MAX_COUNT < self["count"].value:
             raise ParserError("EXIF: Invalid count value (%s)" % self["count"].value)

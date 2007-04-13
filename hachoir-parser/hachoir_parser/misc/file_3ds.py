@@ -8,7 +8,7 @@ from hachoir_core.field import (StaticFieldSet, FieldSet,
     UInt16, UInt32, RawBytes, Enum, CString)
 from hachoir_parser.image.common import RGB
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_parser.misc.common import Vertex, MapUV
 
 def readObject(parent):
@@ -136,7 +136,7 @@ class Chunk(FieldSet):
         self._size = self["size"].value * 8
 
     def createFields(self):
-        yield Enum(UInt16(self, "type", "Chunk type", text_handler=hexadecimal), Chunk.type_name)
+        yield Enum(textHandler(UInt16(self, "type", "Chunk type"), hexadecimal), Chunk.type_name)
         yield UInt32(self, "size", "Chunk size (in bytes)")
         content_size = self["size"].value - 6
         if content_size == 0:

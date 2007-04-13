@@ -2,16 +2,16 @@ from hachoir_core.field import (FieldSet, ParserError,
     Bit, UInt8, UInt16, UInt32, TimestampUnix32,
     Bytes, String, Enum,
     PaddingBytes, PaddingBits, NullBytes, NullBits)
-from hachoir_core.text_handler import hexadecimal, humanFilesize
+from hachoir_core.text_handler import textHandler, hexadecimal, humanFilesize
 
 class SectionHeader(FieldSet):
     static_size = 40 * 8
     def createFields(self):
         yield String(self, "name", 8, charset="ASCII", strip="\0 ")
-        yield UInt32(self, "mem_size", "Size in memory", text_handler=humanFilesize)
-        yield UInt32(self, "rva", "RVA (location) in memory", text_handler=hexadecimal)
-        yield UInt32(self, "phys_size", "Physical size (on disk)", text_handler=humanFilesize)
-        yield UInt32(self, "phys_off", "Physical location (on disk)", text_handler=humanFilesize)
+        yield textHandler(UInt32(self, "mem_size", "Size in memory"), humanFilesize)
+        yield textHandler(UInt32(self, "rva", "RVA (location) in memory"), hexadecimal)
+        yield textHandler(UInt32(self, "phys_size", "Physical size (on disk)"), humanFilesize)
+        yield textHandler(UInt32(self, "phys_off", "Physical location (on disk)"), humanFilesize)
         yield PaddingBytes(self, "reserved", 12)
 
         # 0x0000000#
@@ -63,8 +63,8 @@ class SectionHeader(FieldSet):
 
 class DataDirectory(FieldSet):
     def createFields(self):
-        yield UInt32(self, "rva", "Virtual address", text_handler=hexadecimal)
-        yield UInt32(self, "size", text_handler=humanFilesize)
+        yield textHandler(UInt32(self, "rva", "Virtual address"), hexadecimal)
+        yield textHandler(UInt32(self, "size"), humanFilesize)
 
     def createDescription(self):
         if self["size"].value:
@@ -152,15 +152,15 @@ class PE_OptHeader(FieldSet):
             raise ParserError("Invalid PE optional header signature")
         yield UInt8(self, "maj_lnk_ver", "Major linker version")
         yield UInt8(self, "min_lnk_ver", "Minor linker version")
-        yield UInt32(self, "size_code", "Size of code", text_handler=humanFilesize)
-        yield UInt32(self, "size_init_data", "Size of initialized data", text_handler=humanFilesize)
-        yield UInt32(self, "size_uninit_data", "Size of uninitialized data", text_handler=humanFilesize)
-        yield UInt32(self, "entry_point", "Address (RVA) of the code entry point", text_handler=hexadecimal)
-        yield UInt32(self, "base_code", "Base (RVA) of code", text_handler=hexadecimal)
-        yield UInt32(self, "base_data", "Base (RVA) of data", text_handler=hexadecimal)
-        yield UInt32(self, "image_base", "Image base (RVA)", text_handler=hexadecimal)
-        yield UInt32(self, "sect_align", "Section alignment", text_handler=humanFilesize)
-        yield UInt32(self, "file_align", "File alignment", text_handler=humanFilesize)
+        yield textHandler(UInt32(self, "size_code", "Size of code"), humanFilesize)
+        yield textHandler(UInt32(self, "size_init_data", "Size of initialized data"), humanFilesize)
+        yield textHandler(UInt32(self, "size_uninit_data", "Size of uninitialized data"), humanFilesize)
+        yield textHandler(UInt32(self, "entry_point", "Address (RVA) of the code entry point"), hexadecimal)
+        yield textHandler(UInt32(self, "base_code", "Base (RVA) of code"), hexadecimal)
+        yield textHandler(UInt32(self, "base_data", "Base (RVA) of data"), hexadecimal)
+        yield textHandler(UInt32(self, "image_base", "Image base (RVA)"), hexadecimal)
+        yield textHandler(UInt32(self, "sect_align", "Section alignment"), humanFilesize)
+        yield textHandler(UInt32(self, "file_align", "File alignment"), humanFilesize)
         yield UInt16(self, "maj_os_ver", "Major OS version")
         yield UInt16(self, "min_os_ver", "Minor OS version")
         yield UInt16(self, "maj_img_ver", "Major image version")
@@ -168,15 +168,15 @@ class PE_OptHeader(FieldSet):
         yield UInt16(self, "maj_subsys_ver", "Major subsystem version")
         yield UInt16(self, "min_subsys_ver", "Minor subsystem version")
         yield NullBytes(self, "reserved", 4)
-        yield UInt32(self, "size_img", "Size of image", text_handler=humanFilesize)
-        yield UInt32(self, "size_hdr", "Size of headers", text_handler=humanFilesize)
-        yield UInt32(self, "checksum", text_handler=hexadecimal)
+        yield textHandler(UInt32(self, "size_img", "Size of image"), humanFilesize)
+        yield textHandler(UInt32(self, "size_hdr", "Size of headers"), humanFilesize)
+        yield textHandler(UInt32(self, "checksum"), hexadecimal)
         yield Enum(UInt16(self, "subsystem"), self.SUBSYSTEM_NAME)
         yield UInt16(self, "dll_flags")
-        yield UInt32(self, "size_stack_reserve", text_handler=humanFilesize)
-        yield UInt32(self, "size_stack_commit", text_handler=humanFilesize)
-        yield UInt32(self, "size_heap_reserve", text_handler=humanFilesize)
-        yield UInt32(self, "size_heap_commit", text_handler=humanFilesize)
+        yield textHandler(UInt32(self, "size_stack_reserve"), humanFilesize)
+        yield textHandler(UInt32(self, "size_stack_commit"), humanFilesize)
+        yield textHandler(UInt32(self, "size_heap_reserve"), humanFilesize)
+        yield textHandler(UInt32(self, "size_heap_commit"), humanFilesize)
         yield UInt32(self, "loader_flags")
         yield UInt32(self, "nb_directory", "Number of RVA and sizes")
         for index in xrange(self["nb_directory"].value):

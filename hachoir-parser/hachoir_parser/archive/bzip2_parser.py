@@ -8,7 +8,7 @@ from hachoir_parser import Parser
 from hachoir_core.field import (ParserError, String,
     Bytes, Character, UInt8, UInt32, CompressedField)
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 
 try:
     from bz2 import BZ2Decompressor
@@ -57,7 +57,7 @@ class Bzip2Parser(Parser):
                 raise ParserError("Invalid identifier 2 (AY&SY)!")
         else:
             raise ParserError("Invalid block header!")
-        yield UInt32(self, "crc32", "CRC32", text_handler=hexadecimal)
+        yield textHandler(UInt32(self, "crc32", "CRC32"), hexadecimal)
 
         if self._size is None: # TODO: is it possible to handle piped input?
             raise NotImplementedError

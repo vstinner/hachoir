@@ -19,7 +19,7 @@ from hachoir_core.field import (ParserError, FieldSet,
     String, PascalString8, CString,
     RawBytes, PaddingBytes)
 from hachoir_core.endian import BIG_ENDIAN
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 
 class QTFloat32(FieldSet):
     static_size = 32
@@ -38,7 +38,7 @@ class AtomList(FieldSet):
 
 class TrackHeader(FieldSet):
     def createFields(self):
-        yield UInt8(self, "version", text_handler=hexadecimal)
+        yield textHandler(UInt8(self, "version"), hexadecimal)
 
         # TODO: sum of :
         # TrackEnabled = 1;
@@ -69,7 +69,7 @@ class TrackHeader(FieldSet):
 
 class HDLR(FieldSet):
     def createFields(self):
-        yield UInt8(self, "version", text_handler=hexadecimal)
+        yield textHandler(UInt8(self, "version"), hexadecimal)
         yield RawBytes(self, "flags", 3)
         yield String(self, "subtype", 8)
         yield String(self, "manufacturer", 4)
@@ -82,7 +82,7 @@ class HDLR(FieldSet):
 
 class MediaHeader(FieldSet):
     def createFields(self):
-        yield UInt8(self, "version", text_handler=hexadecimal)
+        yield textHandler(UInt8(self, "version"), hexadecimal)
         yield RawBytes(self, "flags", 3)
         yield TimestampMac32(self, "creat_date")
         yield TimestampMac32(self, "lastmod_date")
@@ -93,7 +93,7 @@ class MediaHeader(FieldSet):
 
 class ELST(FieldSet):
     def createFields(self):
-        yield UInt8(self, "version", text_handler=hexadecimal)
+        yield textHandler(UInt8(self, "version"), hexadecimal)
         yield RawBytes(self, "flags", 3)
         yield UInt32(self, "nb_edits")
         yield UInt32(self, "length")
@@ -109,7 +109,7 @@ class Load(FieldSet):
 
 class MovieHeader(FieldSet):
     def createFields(self):
-        yield UInt8(self, "version", text_handler=hexadecimal)
+        yield textHandler(UInt8(self, "version"), hexadecimal)
         yield RawBytes(self, "flags", 3)
         yield TimestampMac32(self, "creat_date")
         yield TimestampMac32(self, "lastmod_date")

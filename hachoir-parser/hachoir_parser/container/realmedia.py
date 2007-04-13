@@ -17,7 +17,7 @@ from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet,
     UInt16, UInt32, Bit, RawBits,
     RawBytes, String, PascalString8, PascalString16)
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_core.endian import BIG_ENDIAN
 
 def parseHeader(self):
@@ -32,8 +32,8 @@ def parseFileProperties(self):
     yield UInt32(self, "num_pkts", "Number of data packets")
     yield UInt32(self, "duration", "File duration in milliseconds")
     yield UInt32(self, "preroll", "Suggested preroll in milliseconds")
-    yield UInt32(self, "index_offset", "Absolute offset of first index chunk", text_handler=hexadecimal)
-    yield UInt32(self, "data_offset", "Absolute offset of first data chunk", text_handler=hexadecimal)
+    yield textHandler(UInt32(self, "index_offset", "Absolute offset of first index chunk"), hexadecimal)
+    yield textHandler(UInt32(self, "data_offset", "Absolute offset of first data chunk"), hexadecimal)
     yield UInt16(self, "stream_count", "Number of streams in the file")
     yield RawBits(self, "reserved", 13)
     yield Bit(self, "is_live", "Whether file is a live broadcast")

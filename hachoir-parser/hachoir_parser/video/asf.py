@@ -19,7 +19,7 @@ from hachoir_core.field import (FieldSet, ParserError,
     PaddingBytes, NullBytes, RawBytes)
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.text_handler import (
-    humanFilesize, humanBitRate, durationWin64)
+    textHandler, humanFilesize, humanBitRate, durationWin64)
 from itertools import izip
 from hachoir_parser.video.fourcc import audio_codec_name, video_fourcc_name
 from hachoir_parser.common.win32 import BitmapInfoHeader, GUID
@@ -80,18 +80,18 @@ class FileProperty(FieldSet):
     guid = "8CABDCA1-A947-11CF-8EE4-00C00C205365"
     def createFields(self):
         yield GUID(self, "guid")
-        yield UInt64(self, "file_size", text_handler=humanFilesize)
+        yield textHandler(UInt64(self, "file_size"), humanFilesize)
         yield TimestampWin64(self, "creation_date")
         yield UInt64(self, "pckt_count")
-        yield UInt64(self, "play_duration", text_handler=durationWin64)
-        yield UInt64(self, "send_duration", text_handler=durationWin64)
+        yield textHandler(UInt64(self, "play_duration"), durationWin64)
+        yield textHandler(UInt64(self, "send_duration"), durationWin64)
         yield UInt64(self, "preroll")
         yield Bit(self, "broadcast", "Is broadcast?")
         yield Bit(self, "seekable", "Seekable stream?")
         yield PaddingBits(self, "reserved[]", 30)
-        yield UInt32(self, "min_pckt_size", text_handler=humanFilesize)
-        yield UInt32(self, "max_pckt_size", text_handler=humanFilesize)
-        yield UInt32(self, "max_bitrate", text_handler=humanBitRate)
+        yield textHandler(UInt32(self, "min_pckt_size"), humanFilesize)
+        yield textHandler(UInt32(self, "max_pckt_size"), humanFilesize)
+        yield textHandler(UInt32(self, "max_bitrate"), humanBitRate)
 
 class HeaderExtension(FieldSet):
     guid = "5FBF03B5-A92E-11CF-8EE3-00C00C205365"
@@ -198,7 +198,7 @@ class SimpleIndex(FieldSet):
 
     def createFields(self):
         yield GUID(self, "file_id")
-        yield UInt64(self, "entry_interval", text_handler=durationWin64)
+        yield textHandler(UInt64(self, "entry_interval"), durationWin64)
         yield UInt32(self, "max_pckt_count")
         yield UInt32(self, "entry_count")
         for index in xrange(self["entry_count"].value):
@@ -211,7 +211,7 @@ class BitRate(FieldSet):
     def createFields(self):
         yield Bits(self, "stream_index", 7)
         yield PaddingBits(self, "reserved", 9)
-        yield UInt32(self, "avg_bitrate", text_handler=humanBitRate)
+        yield textHandler(UInt32(self, "avg_bitrate"), humanBitRate)
 
 class BitRateList(FieldSet):
     guid = "7BF875CE-468D-11D1-8D82-006097C9A2B2"

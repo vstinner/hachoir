@@ -45,6 +45,7 @@ from hachoir_core.field import (FieldSet,
 from hachoir_core.endian import BIG_ENDIAN
 from hachoir_core.tools import createDict, humanDatetime
 from hachoir_core.stream import InputStreamError
+from hachoir_core.text_handler import textHandler
 
 # --- Field parser ---
 
@@ -117,7 +118,7 @@ def formatObjectID(fieldset):
     return ".".join(text)
 
 def readObjectID(self, content_size):
-    yield UInt8(self, "first", text_handler=formatFirstObjectID)
+    yield textHandler(UInt8(self, "first"), formatFirstObjectID)
     while self.current_size < self.size:
         yield OID_Integer(self, "item[]")
 

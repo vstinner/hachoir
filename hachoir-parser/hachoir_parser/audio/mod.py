@@ -24,7 +24,7 @@ from hachoir_core.field import (StaticFieldSet, FieldSet,
     UInt32, UInt16, UInt8, Int8, Enum,
     RawBytes, String, GenericVector)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
-from hachoir_core.text_handler import humanFilesize, hexadecimal
+from hachoir_core.text_handler import textHandler, humanFilesize, hexadecimal
 from hachoir_parser.audio.modplug import ParseModplugMetadata
 from hachoir_parser.common.tracker import NOTE_NAME
 
@@ -57,8 +57,8 @@ class SampleInfo(FieldSet):
     def createFields(self):
         yield String(self, "name", 22, strip='\0')
         yield UInt16(self, "sample_count")
-        yield UInt8(self, "fine_tune", text_handler=getFineTune)
-        yield UInt8(self, "volume", text_handler=getVolume)
+        yield textHandler(UInt8(self, "fine_tune"), getFineTune)
+        yield textHandler(UInt8(self, "volume"), getVolume)
         yield UInt16(self, "loop_start", "Loop start offset in samples")
         yield UInt16(self, "loop_len", "Loop length in samples")
 

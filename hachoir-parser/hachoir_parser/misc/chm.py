@@ -47,11 +47,11 @@ class CWord(Field):
 
 class Filesize_Header(FieldSet):
     def createFields(self):
-        yield UInt32(self, "unknown[]", "0x01FE", text_handler=hexadecimal)
-        yield UInt32(self, "unknown[]", "0x0", text_handler=hexadecimal)
+        yield textHandler(UInt32(self, "unknown[]", "0x01FE"), hexadecimal)
+        yield textHandler(UInt32(self, "unknown[]", "0x0"), hexadecimal)
         yield textHandler(UInt64(self, "file_size"), humanFilesize)
-        yield UInt32(self, "unknown[]", "0x0", text_handler=hexadecimal)
-        yield UInt32(self, "unknown[]", "0x0", text_handler=hexadecimal)
+        yield textHandler(UInt32(self, "unknown[]", "0x0"), hexadecimal)
+        yield textHandler(UInt32(self, "unknown[]", "0x0"), hexadecimal)
 
 class ITSP(FieldSet):
     def __init__(self, *args):

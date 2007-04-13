@@ -10,7 +10,7 @@ File samples: http://samples.mplayerhq.hu/game-formats/spiderman-segacd-bin/
 from hachoir_parser import Parser
 from hachoir_core.field import FieldSet, UInt32, String, RawBytes
 from hachoir_core.endian import BIG_ENDIAN
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 
 class Chunk(FieldSet):
     tag_info = {
@@ -36,7 +36,7 @@ class Chunk(FieldSet):
 
     def createFields(self):
         yield String(self, "fourcc", 4, "FourCC", charset="ASCII")
-        yield UInt32(self, "length", "length", text_handler=hexadecimal)
+        yield textHandler(UInt32(self, "length", "length"), hexadecimal)
         size = self["length"].value - 8
         if 0 < size:
             if self._parser:

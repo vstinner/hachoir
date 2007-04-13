@@ -9,7 +9,7 @@ from hachoir_core.field import (
     UInt8, UInt16, UInt32, Enum, TimestampUnix32,
     Bit, CString, SubFile,
     NullBits, Bytes, RawBytes)
-from hachoir_core.text_handler import hexadecimal, humanFilesize
+from hachoir_core.text_handler import textHandler, hexadecimal, humanFilesize
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_parser.common.deflate import Deflate
 
@@ -91,8 +91,8 @@ class GzipParser(Parser):
         if self["has_comment"].value:
             yield CString(self, "comment", "Comment")
         if self["has_crc16"].value:
-            yield UInt16(self, "hdr_crc16", "CRC16 of the header",
-                text_handler=hexadecimal)
+            yield textHandler(UInt16(self, "hdr_crc16", "CRC16 of the header"),
+                hexadecimal)
 
         if self._size is None: # TODO: is it possible to handle piped input?
             raise NotImplementedError()
@@ -112,10 +112,10 @@ class GzipParser(Parser):
             yield Deflate(SubFile(self, "file", size, filename=filename))
 
         # Footer
-        yield UInt32(self, "crc32", "Uncompressed data content CRC32",
-            text_handler=hexadecimal)
-        yield UInt32(self, "size", "Uncompressed size",
-            text_handler=humanFilesize)
+        yield textHandler(UInt32(self, "crc32",
+            "Uncompressed data content CRC32"), hexadecimal)
+        yield textHandler(UInt32(self, "size",
+            "Uncompressed size"), humanFilesize)
 
     def createDescription(self):
         desc = self.tags["description"]

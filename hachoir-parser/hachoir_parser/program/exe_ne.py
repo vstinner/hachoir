@@ -1,7 +1,7 @@
 from hachoir_core.field import (FieldSet,
     Bit, UInt8, UInt16, UInt32, Bytes,
     PaddingBits, PaddingBytes, NullBits, NullBytes)
-from hachoir_core.text_handler import hexadecimal, humanFilesize
+from hachoir_core.text_handler import textHandler, hexadecimal, humanFilesize
 
 class NE_Header(FieldSet):
     static_size = 64*8
@@ -23,14 +23,14 @@ class NE_Header(FieldSet):
         yield Bit(self, "is_lib", "Is a library module?")
 
         yield UInt16(self, "auto_data_seg", "Automatic data segment number")
-        yield UInt16(self, "local_heap_size", "Initial size (in bytes) of the local heap", text_handler=humanFilesize)
-        yield UInt16(self, "stack_size", "Initial size (in bytes) of the stack", text_handler=humanFilesize)
-        yield UInt32(self, "cs_ip", "Value of CS:IP", text_handler=hexadecimal)
-        yield UInt32(self, "ss_sp", "Value of SS:SP", text_handler=hexadecimal)
+        yield textHandler(UInt16(self, "local_heap_size", "Initial size (in bytes) of the local heap"), humanFilesize)
+        yield textHandler(UInt16(self, "stack_size", "Initial size (in bytes) of the stack"), humanFilesize)
+        yield textHandler(UInt32(self, "cs_ip", "Value of CS:IP"), hexadecimal)
+        yield textHandler(UInt32(self, "ss_sp", "Value of SS:SP"), hexadecimal)
 
         yield UInt16(self, "nb_entry_seg_tab", "Number of entries in the segment table")
         yield UInt16(self, "nb_entry_modref_tab", "Number of entries in the module-reference table")
-        yield UInt16(self, "size_nonres_name_tab", "Number of bytes in the nonresident-name table", text_handler=humanFilesize)
+        yield textHandler(UInt16(self, "size_nonres_name_tab", "Number of bytes in the nonresident-name table"), humanFilesize)
         yield UInt16(self, "seg_tab_ofs", "Segment table offset")
         yield UInt16(self, "rsrc_ofs", "Resource offset")
 
@@ -56,5 +56,5 @@ class NE_Header(FieldSet):
         yield UInt16(self, "fastload_size", "Fast-load area length (in sector)")
 
         yield NullBytes(self, "reserved[]", 2)
-        yield UInt16(self, "win_version", "Expected Windows version number", text_handler=hexadecimal)
+        yield textHandler(UInt16(self, "win_version", "Expected Windows version number"), hexadecimal)
 

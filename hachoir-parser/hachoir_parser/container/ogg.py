@@ -12,7 +12,7 @@ from hachoir_core.field import (Field, FieldSet, createOrphanField,
 from hachoir_core.stream import FragmentedStream, InputStreamError
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_core.tools import humanDurationNanosec
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 
 MAX_FILESIZE = 1000 * 1024 * 1024
 
@@ -65,7 +65,7 @@ def parseVideoHeader(parent):
     yield NullBytes(parent, "padding[]", 2)
     yield String(parent, "fourcc", 4)
     yield UInt32(parent, "size")
-    yield UInt64(parent, "time_unit", "Frame duration", text_handler=formatTimeUnit)
+    yield textHandler(UInt64(parent, "time_unit", "Frame duration"), formatTimeUnit)
     yield UInt64(parent, "sample_per_unit")
     yield UInt32(parent, "default_len")
     yield UInt32(parent, "buffer_size")
@@ -228,7 +228,7 @@ class OggPage(FieldSet):
         yield Bit(self, 'last_page')
         yield NullBits(self, 'unused', 5)
         yield UInt64(self, 'abs_granule_pos')
-        yield UInt32(self, 'serial', text_handler=hexadecimal)
+        yield textHandler(UInt32(self, 'serial'), hexadecimal)
         yield UInt32(self, 'page')
         yield UInt32(self, 'checksum')
         yield UInt8(self, 'lacing_size')

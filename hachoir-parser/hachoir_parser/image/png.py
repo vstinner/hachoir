@@ -17,7 +17,7 @@ from hachoir_core.field import (FieldSet, Fragment,
     Bit, NullBits,
     Enum, CompressedField)
 from hachoir_parser.image.common import RGB
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_core.endian import NETWORK_ENDIAN
 from hachoir_core.tools import humanFilesize, humanDatetime
 from datetime import datetime
@@ -219,7 +219,7 @@ class Chunk(FieldSet):
                     yield field
             else:
                 yield RawBytes(self, "content", size, "Data")
-        yield UInt32(self, "crc32", "CRC32", text_handler=hexadecimal)
+        yield textHandler(UInt32(self, "crc32", "CRC32"), hexadecimal)
 
     def createDescription(self):
         if self.desc_func:

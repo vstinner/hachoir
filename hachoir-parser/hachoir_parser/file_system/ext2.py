@@ -17,6 +17,7 @@ from hachoir_core.field import (FieldSet, ParserError,
 from hachoir_core.tools import (alignValue,
     humanDuration, humanFilesize)
 from hachoir_core.endian import LITTLE_ENDIAN
+from hachoir_core.text_handler import textHandler
 
 class DirectoryEntry(FieldSet):
     file_type = {
@@ -260,7 +261,7 @@ class SuperBlock(FieldSet):
         yield Enum(UInt16(self, "errors", "Behaviour when detecting errors"), self.error_handling_desc)
         yield UInt16(self, "minor_rev_level", "Minor revision level")
         yield TimestampUnix32(self, "last_check", "Time of last check")
-        yield UInt32(self, "check_interval", "Maximum time between checks", text_handler=self.postMaxTime)
+        yield textHandler(UInt32(self, "check_interval", "Maximum time between checks"), self.postMaxTime)
         yield Enum(UInt32(self, "creator_os", "Creator OS"), self.os_name)
         yield UInt32(self, "rev_level", "Revision level")
         yield UInt16(self, "def_resuid", "Default uid for reserved blocks")

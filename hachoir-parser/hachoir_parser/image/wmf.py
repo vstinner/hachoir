@@ -21,7 +21,7 @@ from hachoir_core.field import (FieldSet, StaticFieldSet, Enum,
     MissingField, ParserError,
     UInt32, Int32, UInt16, Int16, UInt8, NullBytes, RawBytes, String)
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_core.tools import createDict
 from hachoir_parser.image.common import RGBA
 
@@ -211,7 +211,7 @@ def parseXY32(parser):
     yield Int32(parser, "y")
 
 def parseObjectID32(parser):
-    yield UInt32(parser, "object_id", text_handler=hexadecimal)
+    yield textHandler(UInt32(parser, "object_id"), hexadecimal)
 
 def parseBrushIndirect(parser):
     yield UInt32(parser, "ihBrush")
@@ -439,12 +439,12 @@ class PlaceableHeader(FieldSet):
     MAGIC = "\xD7\xCD\xC6\x9A\0\0"   # (magic, handle=0x0000)
 
     def createFields(self):
-        yield UInt32(self, "signature", "Placeable Metafiles signature (0x9AC6CDD7)", text_handler=hexadecimal)
+        yield textHandler(UInt32(self, "signature", "Placeable Metafiles signature (0x9AC6CDD7)"), hexadecimal)
         yield UInt16(self, "handle")
         yield RECT16(self, "rect")
         yield UInt16(self, "inch")
         yield NullBytes(self, "reserved", 4)
-        yield UInt16(self, "checksum", text_handler=hexadecimal)
+        yield textHandler(UInt16(self, "checksum"), hexadecimal)
 
 class EMF_Header(FieldSet):
     MAGIC = "\x20\x45\x4D\x46\0\0"   # (magic, min_ver=0x0000)
@@ -458,7 +458,7 @@ class EMF_Header(FieldSet):
         yield UInt32(self, "size", "Size of the header in bytes")
         yield RECT32(self, "Bounds", "Inclusive bounds")
         yield RECT32(self, "Frame", "Inclusive picture frame")
-        yield UInt32(self, "signature", "Signature ID (always 0x464D4520)", text_handler=hexadecimal)
+        yield textHandler(UInt32(self, "signature", "Signature ID (always 0x464D4520)"), hexadecimal)
         yield UInt16(self, "min_ver", "Minor version")
         yield UInt16(self, "maj_ver", "Major version")
         yield UInt32(self, "file_size", "Size of the file in bytes")

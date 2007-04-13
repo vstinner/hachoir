@@ -66,7 +66,7 @@ from hachoir_core.field import (
         UInt8, UInt16, Int32, UInt32, Int64,
         Bit, NullBits )
 from hachoir_core.endian import BIG_ENDIAN
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 
 ###############################################################################
 def parse_flags(flags, flags_dict, show_unknown_flags=True, separator=" "):
@@ -668,8 +668,8 @@ class JavaCompiledClassFile(Parser):
             return "Compiled Java class, version %s" % version
 
     def createFields(self):
-        yield UInt32(self, "magic", "Java compiled class signature",
-                text_handler=hexadecimal)
+        yield textHandler(UInt32(self, "magic", "Java compiled class signature"),
+            hexadecimal)
         yield UInt16(self, "minor_version", "Class format minor version")
         yield UInt16(self, "major_version", "Class format major version")
         yield UInt16(self, "constant_pool_count", "Size of the constant pool")

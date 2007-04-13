@@ -12,7 +12,7 @@ from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, Bits, ParserError,
     String, UInt32, UInt24, UInt16, UInt8, Enum, RawBytes)
 from hachoir_core.endian import BIG_ENDIAN
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_core.tools import createDict, humanDurationNanosec
 from hachoir_parser.common.tracker import NOTE_NAME
 
@@ -60,7 +60,7 @@ def formatTempo(field):
     return humanDurationNanosec(field.value*1000)
 
 def parseTempo(parser, size):
-    yield UInt24(parser, "microsec_quarter", "Microseconds per quarter note", text_handler=formatTempo)
+    yield textHandler(UInt24(parser, "microsec_quarter", "Microseconds per quarter note"), formatTempo)
 
 def parseTimeSignature(parser, size):
     yield UInt8(parser, "numerator", "Numerator of time signature")
@@ -103,10 +103,10 @@ class Command(FieldSet):
 
     def createFields(self):
         yield Integer(self, "time", "Delta time in ticks")
-        yield Enum(UInt8(self, "command", text_handler=hexadecimal), self.COMMAND_DESC)
+        yield Enum(textHandler(UInt8(self, "command"), hexadecimal), self.COMMAND_DESC)
         command = self["command"].value
         if command == 0xFF:
-            yield Enum(UInt8(self, "meta_command", text_handler=hexadecimal), self.META_COMMAND_DESC)
+            yield Enum(textHandler(UInt8(self, "meta_command"), hexadecimal), self.META_COMMAND_DESC)
             yield UInt8(self, "data_len")
             size = self["data_len"].value
             if size:

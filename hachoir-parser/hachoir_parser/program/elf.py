@@ -9,7 +9,7 @@ from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
     UInt8, UInt16, UInt32, Enum,
     String, Bytes)
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_core.endian import LITTLE_ENDIAN
 
 class ElfHeader(FieldSet):
@@ -81,9 +81,9 @@ class SectionHeader32(FieldSet):
         yield UInt32(self, "name", "Name")
         yield Enum(UInt32(self, "type", "Type"), self.TYPE_NAME)
         yield UInt32(self, "flags", "Flags")
-        yield UInt32(self, "VMA", "Virtual memory address", text_handler=hexadecimal)
-        yield UInt32(self, "LMA", "Logical memory address (in file)", text_handler=hexadecimal)
-        yield UInt32(self, "size", "Size", text_handler=hexadecimal)
+        yield textHandler(UInt32(self, "VMA", "Virtual memory address"), hexadecimal)
+        yield textHandler(UInt32(self, "LMA", "Logical memory address (in file)"), hexadecimal)
+        yield textHandler(UInt32(self, "size", "Size"), hexadecimal)
         yield UInt32(self, "link", "Link")
         yield UInt32(self, "info", "Information")
         yield UInt32(self, "addr_align", "Address alignment")
@@ -103,8 +103,8 @@ class ProgramHeader32(FieldSet):
         yield Enum(UInt16(self, "type", "Type"), ProgramHeader32.TYPE_NAME)
         yield UInt16(self, "flags", "Flags")
         yield UInt32(self, "offset", "Offset")
-        yield UInt32(self, "vaddr", "V. address", text_handler=hexadecimal)
-        yield UInt32(self, "paddr", "P. address", text_handler=hexadecimal)
+        yield textHandler(UInt32(self, "vaddr", "V. address"), hexadecimal)
+        yield textHandler(UInt32(self, "paddr", "P. address"), hexadecimal)
         yield UInt32(self, "file_size", "File size")
         yield UInt32(self, "mem_size", "Memory size")
         yield UInt32(self, "align", "Alignement")
