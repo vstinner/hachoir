@@ -43,7 +43,7 @@ class Boot(FieldSet):
         yield UInt8(self, "phys_drv", "Physical drive number")
         yield NullBytes(self, "reserved[]", 1, 'Reserved ("current head")')
         yield UInt8(self, "sign", "Signature")
-        yield UInt32(self, "serial", "ID (serial number)", hexadecimal)
+        yield textHandler(UInt32(self, "serial", "ID (serial number)"), hexadecimal)
         yield String(self, "label", 11, "Volume Label", strip=' ', charset="ASCII")
         yield String(self, "fs_type", 8, "FAT file system type", strip=' ', charset="ASCII")
         yield Bytes(self, "code", 510-self.current_size/8, "Operating system boot code")

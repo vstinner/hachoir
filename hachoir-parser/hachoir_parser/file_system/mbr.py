@@ -13,13 +13,13 @@ Master Boot Record.
 # 3. 255 heads and 63 sectors/cylinder.
 
 from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet, StaticFieldSet,
+from hachoir_core.field import (FieldSet,
     Enum, Bits, UInt8, UInt16, UInt32,
     RawBytes)
 from hachoir_core.field.integer import GenericInteger
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.tools import humanFilesize
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 
 BLOCK_SIZE = 512  # bytes
 
@@ -162,15 +162,16 @@ class PartitionHeader(FieldSet):
         return desc
 
 
-class MasterBootRecord(StaticFieldSet):
-    format = (
-        (RawBytes, "program", 446, "Boot program (Intel x86 machine code)"),
-        (PartitionHeader, "header[0]"),
-        (PartitionHeader, "header[1]"),
-        (PartitionHeader, "header[2]"),
-        (PartitionHeader, "header[3]"),
-        (UInt16, "signature", "Signature (0xAA55)", {"text_handler": hexadecimal}),
-    )
+class MasterBootRecord(FieldSet):
+    static_size = 512*8
+
+    def createFields(self):
+        yield RawBytes(self, "program", 446, "Boot program (Intel x86 machine code)")
+        yield PartitionHeader(self, "header[0]")
+        yield PartitionHeader(self, "header[1]")
+        yield PartitionHeader(self, "header[2]")
+        yield PartitionHeader(self, "header[3]")
+        yield textHandler(UInt16(self, "signature", "Signature (0xAA55)"), hexadecimal)
 
     def _getPartitions(self):
         return ( self[index] for index in xrange(1,5) )

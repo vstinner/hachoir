@@ -544,13 +544,14 @@ class AttributeInfo(FieldSet):
         elif self["attribute_length"].value > 0:
             yield RawBytes(self, "info", self["attribute_length"].value)
 
-class ExceptionTableEntry(StaticFieldSet):
-    format = (
-        (UInt16, "start_pc", {"text_handler": hexadecimal}),
-        (UInt16, "end_pc", {"text_handler": hexadecimal}),
-        (UInt16, "handler_pc", {"text_handler": hexadecimal}),
-        (CPIndex, "catch_type", {"target_types": "Class"})
-    )
+class ExceptionTableEntry(FieldSet):
+    static_size = 48 + CPIndex.static_size
+
+    def createFields(self):
+        yield textHandler(UInt16(self, "start_pc"), hexadecimal)
+        yield textHandler(UInt16(self, "end_pc"), hexadecimal)
+        yield textHandler(UInt16(self, "handler_pc"), hexadecimal)
+        yield CPIndex(self, "catch_type", target_types="Class")
 
 class InnerClassesEntry(StaticFieldSet):
     format = (

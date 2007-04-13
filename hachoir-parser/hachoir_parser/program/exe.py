@@ -11,35 +11,37 @@ Creation date: 2006-08-13
 
 from hachoir_parser import Parser
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.field import (StaticFieldSet,
+from hachoir_core.field import (FieldSet,
     UInt16, UInt32, Bytes, String,
     RawBytes, PaddingBytes)
-from hachoir_core.text_handler import hexadecimal
+from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_parser.program.exe_ne import NE_Header
 from hachoir_parser.program.exe_pe import PE_Header, PE_OptHeader, SectionHeader
 from hachoir_parser.program.exe_res import PE_Resource, NE_VersionInfoNode
 
 MAX_NB_SECTION = 50
 
-class MSDosHeader(StaticFieldSet):
-    format = (
-        (String, "header", 2, "File header (MZ)", {"charset": "ASCII"}),
-        (UInt16, "size_mod_512", "File size in bytes modulo 512"),
-        (UInt16, "size_div_512", "File size in bytes divide by 512"),
-        (UInt16, "reloc_entries", "Number of relocation entries"),
-        (UInt16, "code_offset", "Offset to the code in the file (divided by 16)"),
-        (UInt16, "needed_memory", "Memory needed to run (divided by 16)"),
-        (UInt16, "max_memory", "Maximum memory needed to run (divided by 16)"),
-        (UInt32, "init_ss_sp", "Initial value of SP:SS registers.", {"text_handler": hexadecimal}),
-        (UInt16, "checksum", "Checksum"),
-        (UInt32, "init_cs_ip", "Initial value of CS:IP registers.", {"text_handler": hexadecimal}),
-        (UInt16, "reloc_offset", "Offset in file to relocation table"),
-        (UInt16, "overlay_number", "Overlay number"),
-        (PaddingBytes, "reserved[]", 8, "Reserverd"),
-        (UInt16, "oem_id", "OEM id"),
-        (UInt16, "oem_info", "OEM info"),
-        (PaddingBytes, "reserved[]", 20, "Reserved"),
-        (UInt32, "next_offset", "Offset to next header (PE or NE)"))
+class MSDosHeader(FieldSet):
+    static_size = 64*8
+
+    def createFields(self):
+        yield String(self, "header", 2, "File header (MZ)", charset="ASCII")
+        yield UInt16(self, "size_mod_512", "File size in bytes modulo 512")
+        yield UInt16(self, "size_div_512", "File size in bytes divide by 512")
+        yield UInt16(self, "reloc_entries", "Number of relocation entries")
+        yield UInt16(self, "code_offset", "Offset to the code in the file (divided by 16)")
+        yield UInt16(self, "needed_memory", "Memory needed to run (divided by 16)")
+        yield UInt16(self, "max_memory", "Maximum memory needed to run (divided by 16)")
+        yield textHandler(UInt32(self, "init_ss_sp", "Initial value of SP:SS registers"), hexadecimal)
+        yield UInt16(self, "checksum", "Checksum")
+        yield textHandler(UInt32(self, "init_cs_ip", "Initial value of CS:IP registers"), hexadecimal)
+        yield UInt16(self, "reloc_offset", "Offset in file to relocation table")
+        yield UInt16(self, "overlay_number", "Overlay number")
+        yield PaddingBytes(self, "reserved[]", 8, "Reserverd")
+        yield UInt16(self, "oem_id", "OEM id")
+        yield UInt16(self, "oem_info", "OEM info")
+        yield PaddingBytes(self, "reserved[]", 20, "Reserved")
+        yield UInt32(self, "next_offset", "Offset to next header (PE or NE)")
 
     def isValid(self):
         if 512 <= self["size_mod_512"].value:

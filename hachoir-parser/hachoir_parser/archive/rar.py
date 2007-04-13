@@ -225,13 +225,14 @@ class EndFlags(StaticFieldSet):
 def endFlags(s):
     yield EndFlags(s, "flags", "End block flags")
 
-class BlockFlags(StaticFieldSet):
-    format = (
-        (Bits, "unused[]", 8, "Unused flag bits", hexadecimal),
-        (Bit, "has_added_size", "Additional field indicating additional size"),
-        (Bit, "is_ignorable", "Old versions of RAR should ignore this block when copying data"),
-        (Bits, "unused[]", 6)
-    )
+class BlockFlags(FieldSet):
+    static_size = 16
+
+    def createFields(self):
+        yield textHandler(Bits(self, "unused[]", 8, "Unused flag bits"), hexadecimal)
+        yield Bit(self, "has_added_size", "Additional field indicating additional size")
+        yield Bit(self, "is_ignorable", "Old versions of RAR should ignore this block when copying data")
+        yield Bits(self, "unused[]", 6)
 
 class Block(FieldSet):
     BLOCK_INFO = {

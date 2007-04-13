@@ -10,7 +10,7 @@ Creation date: 6 december 2006
 """
 
 from hachoir_parser import Parser
-from hachoir_core.field import (Field, StaticFieldSet, FieldSet, ParserError,
+from hachoir_core.field import (Field, FieldSet, ParserError,
     GenericVector,
     Enum, UInt8, UInt32, UInt64,
     Bytes, RawBytes)
@@ -352,21 +352,24 @@ class Body(FieldSet):
         elif "header" in self["/next_hdr"]:
             yield RawBytes(self, "compressed_data", self._size//8, "Compressed data")
 
-class StartHeader(StaticFieldSet):
-    format = (
-        (UInt64, "next_hdr_offset", "Next header offset", hexadecimal),
-        (UInt64, "next_hdr_size", "Next header size"),
-        (UInt32, "next_hdr_crc", "Next header CRC", hexadecimal)
-    )
+class StartHeader(FieldSet):
+    static_size = 160
+    def createFields(self):
+        yield textHandler(UInt64(self, "next_hdr_offset",
+            "Next header offset"), hexadecimal)
+        yield UInt64(self, "next_hdr_size", "Next header size")
+        yield textHandler(UInt32(self, "next_hdr_crc",
+            "Next header CRC"), hexadecimal)
 
-class SignatureHeader(StaticFieldSet):
-    format = (
-        (Bytes, "signature", 6, "Signature Header"),
-        (UInt8, "major_ver", "Archive major version"),
-        (UInt8, "minor_ver", "Archive minor version"),
-        (UInt32, "start_hdr_crc", "Start header CRC", hexadecimal),
-        (StartHeader, "start_hdr", "Start header")
-    )
+class SignatureHeader(FieldSet):
+    static_size = 96 + StartHeader.static_size
+    def createFields(self):
+        yield Bytes(self, "signature", 6, "Signature Header")
+        yield UInt8(self, "major_ver", "Archive major version")
+        yield UInt8(self, "minor_ver", "Archive minor version")
+        yield textHandler(UInt32(self, "start_hdr_crc",
+            "Start header CRC"), hexadecimal)
+        yield StartHeader(self, "start_hdr", "Start header")
 
 class SevenZipParser(Parser):
     tags = {
