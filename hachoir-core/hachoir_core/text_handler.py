@@ -68,14 +68,6 @@ def durationWin64(field):
     delta = doDurationWin64(field.value)
     return doHumanDuration(delta)
 
-def humanFilesize(field):
-    """
-    Convert a file size to human representation (just call
-    hachoir_core.tools.humanFilesize())
-    """
-    assert hasattr(field, "value") and hasattr(field, "size")
-    return doHumanFilesize(field.value)
-
 def filesizeHandler(field):
     """
     Format field value using humanFilesize()
