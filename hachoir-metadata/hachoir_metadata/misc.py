@@ -100,7 +100,6 @@ class OLE2_Metadata(RootMetadata):
         for property in summary.array("property_index"):
             field = summary.getFieldByAddress(property["offset"].value*8)
             if not field:
-                print "Unable to get value"
                 continue
             if not field.hasValue():
                 continue
