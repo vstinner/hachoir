@@ -16,7 +16,7 @@ from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet,
     Enum, Bits, UInt8, UInt16, UInt32,
     RawBytes)
-from hachoir_core.field.integer import GenericInteger
+from hachoir_core.field.integer import Bits
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.tools import humanFilesize
 from hachoir_core.text_handler import textHandler, hexadecimal
@@ -139,11 +139,11 @@ class PartitionHeader(FieldSet):
         if self["bootable"].value not in (0x00, 0x80):
             self.warning("Stream doesn't look like master boot record (partition bootable error)!")
         yield UInt8(self, "start_head", "Starting head number of the partition")
-        yield GenericInteger(self, "start_sector", False, 6, "Starting sector number of the partition")
+        yield Bits(self, "start_sector", 6, "Starting sector number of the partition")
         yield CylinderNumber(self, "start_cylinder", "Starting cylinder number of the partition")
         yield Enum(UInt8(self, "system", "System indicator"), self.system_name)
         yield UInt8(self, "end_head", "Ending head number of the partition")
-        yield GenericInteger(self, "end_sector", False, 6, "Ending sector number of the partition")
+        yield Bits(self, "end_sector", 6, "Ending sector number of the partition")
         yield CylinderNumber(self, "end_cylinder", "Ending cylinder number of the partition")
         yield UInt32(self, "LBA", "LBA (number of sectors before this partition)")
         yield UInt32(self, "size", "Size (block count)")

@@ -39,7 +39,7 @@ class HachoirParser(object):
                     break
                 res = makeUnicode(res)
             else:
-                res = _("stream too small (< %u bits)" % nbits)
+                res = _("stream is smaller than %s.%s bytes" % divmod(nbits, 8))
             raise ValidateError(res or _("no reason given"))
         self._autofix = True
 
