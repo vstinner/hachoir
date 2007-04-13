@@ -182,7 +182,7 @@ class MidiFile(Parser):
         "id": "midi",
         "category": "audio",
         "file_ext": ["mid", "midi"],
-        "mime": ("audio/mime", ),
+        "mime": (u"audio/mime", ),
         "magic": ((MAGIC, 0),),
         "min_size": 64,
         "description": "MIDI audio"

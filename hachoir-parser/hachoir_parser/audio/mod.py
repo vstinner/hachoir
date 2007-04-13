@@ -113,7 +113,7 @@ class AmigaModule(Parser):
         "id": "mod",
         "category": "audio",
         "file_ext": ("mod", "nst", "wow", "oct", "sd0" ),
-        "mime": ('audio/mod', 'audio/x-mod', 'audio/mod', 'audio/x-mod'),
+        "mime": (u'audio/mod', u'audio/x-mod', u'audio/mod', u'audio/x-mod'),
         "min_size": 1084*8,
         "description": "Uncompressed amiga module"
     }

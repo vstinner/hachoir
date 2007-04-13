@@ -49,9 +49,13 @@ class ParserList(object):
         file_ext = tags.get("file_ext", ())
         if not isinstance(file_ext, (tuple, list)):
             return "File extension is not a tuple or list"
-        mime = tags.get("mime", ())
-        if not isinstance(mime, (tuple, list)):
-            return "MIME type is not a tuple or list"
+        mimes = tags.get("mime", ())
+        if not isinstance(mimes, tuple):
+            return "MIME type is not a tuple"
+        for mime in mimes:
+            if not isinstance(mime, unicode):
+                return "MIME type %r is not an unicode string" % mime
+
         return ""
 
     def add(self, parser):

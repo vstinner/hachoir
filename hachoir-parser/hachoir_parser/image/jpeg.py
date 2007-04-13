@@ -269,7 +269,7 @@ class JpegFile(Parser):
         "id": "jpeg",
         "category": "image",
         "file_ext": ("jpg", "jpeg"),
-        "mime": [u"image/jpeg"],
+        "mime": (u"image/jpeg",),
         "magic": (
             ("\xFF\xD8\xFF\xE0", 0),   # (Start Of Image, APP0)
             ("\xFF\xD8\xFF\xE1", 0),   # (Start Of Image, EXIF)

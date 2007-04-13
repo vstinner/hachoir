@@ -418,7 +418,7 @@ class PDFDocument(Parser):
         "id": "pdf",
         "category": "misc",
         "file_ext": ("pdf",),
-        "mime": ("application/pdf",),
+        "mime": (u"application/pdf",),
         "min_size": (5+4)*8,
         "magic": ((MAGIC, 5),),
         "description": "Portable Document Format (PDF) document"

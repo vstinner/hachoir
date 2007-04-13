@@ -342,7 +342,9 @@ class XMModule(Parser):
         "id": "fasttracker2",
         "category": "audio",
         "file_ext": ("xm",),
-        "mime": ('audio/xm', 'audio/x-xm', 'audio/module-xm', 'audio/mod', 'audio/x-mod'),
+        "mime": (
+            u'audio/xm', u'audio/x-xm',
+            u'audio/module-xm', u'audio/mod', u'audio/x-mod'),
         "magic": ((Header.MAGIC, 0),),
         "min_size": Header.static_size +29*8, # Header + 1 empty instrument
         "description": "FastTracker2 module"

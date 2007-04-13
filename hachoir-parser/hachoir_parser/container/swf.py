@@ -336,7 +336,7 @@ class SwfFile(Parser):
         "id": "swf",
         "category": "container",
         "file_ext": ["swf"],
-        "mime": ["application/x-shockwave-flash"],
+        "mime": (u"application/x-shockwave-flash",),
         "min_size": 64,
         "description": u"Macromedia Flash data"
     }

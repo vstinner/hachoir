@@ -137,9 +137,9 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
             "ppt", "ppz", "pps", "pot",  # Microsoft Powerpoint
             "xls", "xla"),               # Microsoft Excel
         "mime": (
-            "application/msword",
-            "application/msexcel",
-            "application/mspowerpoint"),
+            u"application/msword",
+            u"application/msexcel",
+            u"application/mspowerpoint"),
         "min_size": 512*8,
         "description": "Microsoft Office document",
         "magic": (("\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1", 0),),

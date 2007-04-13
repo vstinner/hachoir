@@ -247,7 +247,7 @@ class MPEGVideoFile(Parser):
         "id": "mpeg_video",
         "category": "video",
         "file_ext": ("mpeg", "mpg", "mpe", "vob"),
-        "mime": ("video/mpeg", "video/mp2p"),
+        "mime": (u"video/mpeg", u"video/mp2p"),
         "min_size": 12*8,
 #TODO:        "magic": xxx,
         "description": "MPEG video, version 1 or 2"

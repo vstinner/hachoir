@@ -326,7 +326,7 @@ class RarFile(Parser):
         "id": "rar",
         "category": "archive",
         "file_ext": ("rar",),
-        "mime": ("application/x-rar-compressed", ),
+        "mime": (u"application/x-rar-compressed", ),
         "min_size": 7*8,
         "magic": ((MAGIC, 0),),
         "description": "Roshal archive (RAR)",

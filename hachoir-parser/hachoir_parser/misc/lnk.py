@@ -25,7 +25,7 @@ class LnkFile(Parser):
         "id": "lnk",
         "category": "misc",
         "file_ext": ("lnk",),
-        "mime": ("application/x-ms-shortcut",),
+        "mime": (u"application/x-ms-shortcut",),
         "magic": ((MAGIC, 0),),
         "min_size": 32, # FIXME
         "description": "Windows Shortcut (.lnk)",

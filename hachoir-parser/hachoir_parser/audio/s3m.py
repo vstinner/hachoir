@@ -640,7 +640,7 @@ class S3MModule(Module):
         "id": "s3m",
         "category": "audio",
         "file_ext": ("s3m",),
-        "mime": ('audio/s3m', 'audio/x-s3m'),
+        "mime": (u'audio/s3m', u'audio/x-s3m'),
         "min_size": 64*8,
         "description": "ScreamTracker3 module"
     }

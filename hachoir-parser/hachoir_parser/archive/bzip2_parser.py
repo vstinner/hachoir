@@ -29,7 +29,7 @@ class Bzip2Parser(Parser):
         "id": "bzip2",
         "category": "archive",
         "file_ext": ("bz2",),
-        "mime": ["application/x-bzip2"],
+        "mime": (u"application/x-bzip2",),
         "min_size": 10*8,
         "magic": (('BZh', 0),),
         "description": "bzip2 archive"

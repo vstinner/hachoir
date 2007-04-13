@@ -136,11 +136,11 @@ class ElfFile(Parser):
         "file_ext": ("so", ""),
         "min_size": ElfHeader.static_size,  # At least one program header
         "mime": (
-            "application/x-executable",
-            "application/x-object",
-            "application/x-sharedlib",
-            "application/x-executable-file",
-            "application/x-coredump"),
+            u"application/x-executable",
+            u"application/x-object",
+            u"application/x-sharedlib",
+            u"application/x-executable-file",
+            u"application/x-coredump"),
         "magic": (("\x7FELF", 0),),
         "description": "ELF Unix/BSD program/library"
     }

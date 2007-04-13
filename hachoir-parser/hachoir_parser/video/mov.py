@@ -188,7 +188,7 @@ class MovFile(Parser):
         "id": "mov",
         "category": "video",
         "file_ext": ("mov", "qt", "mp4", "m4v", "m4a", "m4p", "m4b"),
-        "mime": ["video/quicktime"],
+        "mime": (u"video/quicktime",),
         "min_size": 8*8,
 #        "magic": TODO,
         "description": "Apple QuickTime movie"

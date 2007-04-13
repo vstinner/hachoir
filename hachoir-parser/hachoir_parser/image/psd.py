@@ -27,7 +27,7 @@ class PsdFile(Parser):
         "id": "psd",
         "category": "image",
         "file_ext": ("psd",),
-        "mime": ("image/psd", "image/photoshop", "image/x-photoshop"),
+        "mime": (u"image/psd", u"image/photoshop", u"image/x-photoshop"),
         "min_size": 4*8,
         "magic": (("8BPS\0\1",0),),
         "description": "Photoshop (PSD) picture",

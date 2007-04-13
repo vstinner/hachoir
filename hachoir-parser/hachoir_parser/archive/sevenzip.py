@@ -266,7 +266,7 @@ class UnpackInfo(FieldSet):
             for index in xrange(folder_item.out_streams):
                 #yield UInt8(self, "unpack_size[]")
                 yield SZUInt64(self, "unpack_size[]")
-        
+
         # Extract digests
         while not self.eof:
             addr = self.absolute_address+self.current_size
@@ -373,7 +373,7 @@ class SevenZipParser(Parser):
         "id": "7zip",
         "category": "archive",
         "file_ext": ("7z",),
-        "mime": ("application/x-7z-compressed",),
+        "mime": (u"application/x-7z-compressed",),
         "min_size": 32*8,
         "magic": (("7z\xbc\xaf\x27\x1c", 0),),
         "description": "Compressed archive in 7z format"

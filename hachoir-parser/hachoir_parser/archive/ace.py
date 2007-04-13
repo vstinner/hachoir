@@ -254,7 +254,7 @@ class AceFile(Parser):
         "id": "ace",
         "category": "archive",
         "file_ext": ("ace",),
-        "mime": ("application/x-ace-compressed",),
+        "mime": (u"application/x-ace-compressed",),
         "min_size": 50*8,
         "description": "ACE archive"
     }

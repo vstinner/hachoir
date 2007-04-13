@@ -179,7 +179,7 @@ class File3do(Parser):
         "id": "3do",
         "category": "misc",
         "file_ext": ("3do",),
-        "mime": ("image/x-3do",),
+        "mime": (u"image/x-3do",),
         "min_size": 8*4,
         "description": "renderdroid 3d model."
     }

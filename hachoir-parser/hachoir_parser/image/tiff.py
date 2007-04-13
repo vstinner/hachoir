@@ -91,7 +91,7 @@ class TiffFile(Parser):
         "id": "tiff",
         "category": "image",
         "file_ext": ("tif", "tiff"),
-        "mime": ("image/tiff",),
+        "mime": (u"image/tiff",),
         "min_size": 8*8,
 # TODO: Re-enable magic
 #        "magic": (("II\x2A\0", 0), ("MM\0\x2A", 0)),
