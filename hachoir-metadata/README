@@ -71,6 +71,59 @@ UNIX "file" program)::
     sheep_on_drugs.mp3: MPEG v1 layer III, 128.0 Kbit/sec, 44.1 KHz, Joint stereo
     wormux_32x32_16c.ico: Microsoft Windows icon: 16x16x32
 
+What's new in hachoir-metadata 0.10.0?
+======================================
+
+New features:
+
+ * Make a distinction between the raw value and the formated value, so it's
+   possible to reuse data. Eg. number of channel raw value is 2 (integer) and
+   formated value is "stereo" (string)
+ * Plugin for Nautilus (of Gnome project)
+ * Plugin for Konqueror (of KDE project)
+ * New API:
+   * hasattr(meta, "key") => meta.has("key")
+   * meta.key[0] => meta.get("key") or meta.getText("key")
+ * "quality" argument to limit extraction complexity (quality=0 is
+   the fastest extraction, quality=1.0 is the best but also the slowest)
+ * Code is now fault tolerant: don't crash on error but just display error
+   message and continue the extraction
+ * creation_date and last_modification value type is datetime.date() or
+   datetime.datetime() (and not a string)
+ * track_number and track_total raw value type is an integer
+ * duration type is datetime.timedelta(): precision is now microseconds
+   and not milliseconds
+ * New supported formats:
+   * Microsoft Archive (.mar)
+   * Microsoft Office documents: Word (.doc), Excel (.xls), Powerpoint (.ppt)
+   * X11 Portable Compiled Font (.pcf)
+   * New-style Executable (Windows 16-bits program)
+ * MPEG audio:
+   * Read music genre and language from ID3v2
+   * Compute approximation of duration and bit rate of VBR MP3
+ * JPEG: support progressive JPEG (all start of frame types)
+ * JPEG (IPTC): Support creation date (keys 55 and 60)
+ * Convert more strings to Unicode
+ * Add minimum sample rate (1 kHz)
+ * MKV: don't read tags if quality<good
+ * ASF: extract album title, track number and create date (year)
+
+Changes:
+
+ * Code to check and store a value is moved to Data code
+
+Bugfixes:
+
+ * PNG: Fix bits/pixel computation
+
+Changes:
+
+ * Archives: max number of processed files depends on quality argument
+ * Compute compression rate of archive, audio and picture documents (when we
+   have enough informations to do it)
+ * Don't compute Ogg duration with quality < 0.5 (default)
+
+
 What's new in hachoir-metadata 0.9.0?
 =====================================
 
