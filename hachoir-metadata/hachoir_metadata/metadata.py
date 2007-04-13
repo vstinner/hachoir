@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from hachoir_core.compatibility import sorted
+from hachoir_core.compatibility import any, sorted
 from hachoir_core.endian import endian_name
 from hachoir_core.tools import makePrintable, makeUnicode
 from hachoir_core.dict import Dict
@@ -198,6 +198,9 @@ class Metadata(Logger):
         else:
             return None
 
+    def __nonzero__(self):
+        return any(item for item in self.__data.itervalues())
+
 class RootMetadata(Metadata):
     def __init__(self, quality=QUALITY_NORMAL):
         Metadata.__init__(self, None, quality)
@@ -215,7 +218,15 @@ class MultipleMetadata(RootMetadata):
     def __getitem__(self, key):
         return self.__groups[key]
 
+    def __nonzero__(self):
+        if RootMetadata.__nonzero__(self):
+            return True
+        return any(bool(group) for group in self.__groups)
+
     def addGroup(self, key, metadata, header=None):
+        if not metadata:
+            self.warning("Skip empty group %s" % key)
+            return
         if key.endswith("[]"):
             key = key[:-2]
             if key in self.__key_counter:
