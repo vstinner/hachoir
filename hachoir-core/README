@@ -33,6 +33,8 @@ Major changes:
 
  * String value is ALWAYS unicode, even on charset conversion:
    use charset ISO-8859-1 on error
+ * Remove text_handler argument to bit and integer fields:
+   use textHandler() instead
  * Field.raw_display attribute creation is now fault tolerant and use cache
  * GenericFieldSet: avoid field creation recursion
  * Add function to call another function with a memory limit
