@@ -20,7 +20,8 @@ import re
 
 # Constants
 SLEEP_SEC = 0
-MAX_SIZE = 1024 * 1024
+MIN_SIZE = 1
+MAX_SIZE = 8132 #1024 * 1024
 MAX_DURATION = 10.0
 MEMORY_LIMIT = 5 * 1024 * 1024
 MANGLE_PERCENT = 0.25
@@ -91,6 +92,10 @@ class Fuzzer:
             return True
         if "OLE2: Too much sections" in text:
             return True
+        if "OLE2: Invalid endian value" in text:
+            return True
+        if "Seek above field set end" in text:
+            return True
         return False
 
     def newLog(self, level, prefix, text, context):
@@ -103,7 +108,7 @@ class Fuzzer:
 
     def createStream(self, test_file):
         # Read bytes
-        size = randint(1, MAX_SIZE)
+        size = randint(MIN_SIZE, MAX_SIZE)
         data = open(test_file, "rb").read(size)
         data = array('B', data)
 
@@ -170,6 +175,10 @@ class Fuzzer:
             print "MEMORY ERROR!"
             failure = True
             prefix = "memory"
+        except Exception, err:
+            print "EXCEPTION (%s): %s" % (err.__class__.__name__, err)
+            failure = True
+            prefix = "exception"
 
         # Process error
         if failure:
