@@ -55,8 +55,12 @@ def floatFactory(name, format, mantissa_bits, exponent_bits, doc):
             """
             if self.struct_format:
                 raw = self._parent.stream.readBytes(
-                    self.absolute_address, self._size/8)
-                return struct.unpack(self.struct_format, raw)[0]
+                    self.absolute_address, self._size//8)
+                try:
+                    return struct.unpack(self.struct_format, raw)[0]
+                except struct.error, err:
+                    raise ValueError("[%s] conversion error: %s" %
+                        (self.__class__.__name__, err))
             else:
                 try:
                     value = self["mantissa"].value * (2.0 ** float(self["exponent"].value))
