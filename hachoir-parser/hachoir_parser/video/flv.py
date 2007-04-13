@@ -116,7 +116,10 @@ class Chunk(FieldSet):
                 yield RawBytes(self, "content", size)
 
     def getSampleRate(self):
-        return SAMPLING_RATE_VALUE[self["sampling_rate"].value]
+        try:
+            return SAMPLING_RATE_VALUE[self["sampling_rate"].value]
+        except LookupError:
+            return None
 
 class FlvFile(Parser):
     tags = {

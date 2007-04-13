@@ -138,20 +138,7 @@ class FlvMetadata(MultipleMetadata):
     def extract(self, flv):
         if "audio[0]" in flv:
             meta = Metadata(self)
-            audio = flv["audio[0]"]
-            meta.sample_rate = audio.getSampleRate()
-            if audio["is_16bit"].value:
-                meta.bits_per_sample = 16
-            else:
-                meta.bits_per_sample = 8
-            if audio["codec"].display == "MP3" and "music_data" in audio:
-                meta.compression = audio["music_data"].description
-            else:
-                meta.compression = audio["codec"].display
-            if audio["is_stereo"].value:
-                meta.nb_channel = 2
-            else:
-                meta.nb_channel = 1
+            self.extractAudio(flv["audio[0]"], meta)
             self.addGroup("audio", meta)
         if "video[0]" in flv:
             meta = Metadata(self)
@@ -168,6 +155,21 @@ class FlvMetadata(MultipleMetadata):
         if self.has('duration'):
             self.bit_rate = flv.size / timedelta2seconds(self.get('duration'))
 
+    @fault_tolerant
+    def extractAudio(self, audio, meta):
+        if audio["codec"].display == "MP3" and "music_data" in audio:
+            meta.compression = audio["music_data"].description
+        else:
+            meta.compression = audio["codec"].display
+        meta.sample_rate = audio.getSampleRate()
+        if audio["is_16bit"].value:
+            meta.bits_per_sample = 16
+        else:
+            meta.bits_per_sample = 8
+        if audio["is_stereo"].value:
+            meta.nb_channel = 2
+        else:
+            meta.nb_channel = 1
 
     def extractAMF(self, amf):
         for entry in amf.array("item"):
