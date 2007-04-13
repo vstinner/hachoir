@@ -16,16 +16,11 @@ class RawBits(Field):
     """
     static_size = staticmethod(lambda *args, **kw: args[1])
 
-    def __init__(self, parent, name, size, description=None,
-    text_handler=None):
+    def __init__(self, parent, name, size, description=None):
         """
         Constructor: see L{Field.__init__} for parameter description
         """
-        Field.__init__(self, parent, name, size=size, description=description)
-        if text_handler:
-            assert isinstance(text_handler, types.FunctionType) \
-                or isinstance(text_handler, types.MethodType)
-            self.createDisplay = lambda: text_handler(self)
+        Field.__init__(self, parent, name, size, description)
 
     def hasValue(self):
         return True

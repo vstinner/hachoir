@@ -2,10 +2,6 @@
 Integer field classes:
 - UInt8, UInt16, UInt24, UInt32, UInt64: unsigned integer of 8, 16, 32, 64 bits ;
 - Int8, Int16, Int24, Int32, Int64: signed integer of 8, 16, 32, 64 bits.
-
-Constructor has an optional argument: text_handler, which is a function
-called to create display attribute. You can use for example
-hexadecimal() from hachoir_core.text_handler module.
 """
 
 import types
@@ -15,16 +11,11 @@ class GenericInteger(Bits):
     """
     Generic integer class used to generate other classes.
     """
-    def __init__(self, parent, name, signed, size, description=None,
-    text_handler=None):
+    def __init__(self, parent, name, signed, size, description=None):
         if 256 < size:
             raise FieldError("Integer size bigger than 256: %s bits" % size)
         Bits.__init__(self, parent, name, size, description)
         self.signed = signed
-        if text_handler:
-            assert isinstance(text_handler, types.FunctionType) \
-                or isinstance(text_handler, types.MethodType)
-            self.createDisplay = lambda: text_handler(self)
 
     def createValue(self):
         return self._parent.stream.readInteger(
@@ -34,8 +25,8 @@ def integerFactory(name, is_signed, size, doc):
     class Integer(GenericInteger):
         __doc__ = doc
         static_size = size
-        def __init__(self, parent, name, description=None, text_handler=None):
-            GenericInteger.__init__(self, parent, name, is_signed, size, description, text_handler=text_handler)
+        def __init__(self, parent, name, description=None):
+            GenericInteger.__init__(self, parent, name, is_signed, size, description)
     cls = Integer
     cls.__name__ = name
     return cls
