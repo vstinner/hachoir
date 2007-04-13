@@ -76,10 +76,6 @@ def humanFilesize(field):
     assert hasattr(field, "value") and hasattr(field, "size")
     return doHumanFilesize(field.value)
 
-def humanDuration(field):
-    assert hasattr(field, "value") and hasattr(field, "size")
-    return doHumanDuration(field.value)
-
 def humanBitRate(field):
     """
     Convert a bit rate to human representation
