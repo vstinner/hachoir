@@ -77,22 +77,26 @@ class TarMetadata(MultipleMetadata):
                 self.warning("TAR archive contains many files, but only first %s files are processed" % max_nb)
                 break
             meta = Metadata(self)
-            meta.filename = field["name"].value
-            meta.file_size = field.getOctal("size")
-            try:
-                meta.last_modification = field.getDatetime()
-            except ValueError:
-                pass
-            meta.file_attr = humanUnixAttributes(field.getOctal("mode"))
-            meta.file_type = field["type"].display
-            meta.author = "%s (uid=%s), group %s (gid=%s)" %\
-                (field["uname"].value, field.getOctal("uid"),
-                 field["gname"].value, field.getOctal("gid"))
+            self.extractFile(field, meta)
             if meta.has("filename"):
-                title = _("File \"%s\"") % meta.getText('filename')
+                title = _('File "%s"') % meta.getText('filename')
             else:
                 title = _("File")
             self.addGroup(field.name, meta, title)
+
+    def extractFile(self, field, meta):
+        meta.filename = field["name"].value
+        meta.file_attr = humanUnixAttributes(field.getOctal("mode"))
+        meta.file_size = field.getOctal("size")
+        try:
+            meta.last_modification = field.getDatetime()
+        except ValueError:
+            pass
+        meta.file_type = field["type"].display
+        meta.author = "%s (uid=%s), group %s (gid=%s)" %\
+            (field["uname"].value, field.getOctal("uid"),
+             field["gname"].value, field.getOctal("gid"))
+
 
 class CabMetadata(MultipleMetadata):
     def extract(self, cab):
