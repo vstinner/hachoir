@@ -142,8 +142,7 @@ class FlvMetadata(MultipleMetadata):
             self.addGroup("audio", meta)
         if "video[0]" in flv:
             meta = Metadata(self)
-            video = flv["video[0]"]
-            meta.compression = video["codec"].display
+            self.extractVideo(flv["video[0]"], meta)
             self.addGroup("video", meta)
         # TODO: Computer duration
         # One technic: use last video/audio chunk and use timestamp
@@ -170,6 +169,10 @@ class FlvMetadata(MultipleMetadata):
             meta.nb_channel = 2
         else:
             meta.nb_channel = 1
+
+    @fault_tolerant
+    def extractVideo(self, video, meta):
+        meta.compression = video["codec"].display
 
     def extractAMF(self, amf):
         for entry in amf.array("item"):
