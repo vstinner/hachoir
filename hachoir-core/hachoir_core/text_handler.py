@@ -6,9 +6,6 @@ from datetime import datetime, MAXYEAR
 from hachoir_core.tools import (
     humanDuration as doHumanDuration,
     humanFilesize as doHumanFilesize,
-    humanBitRate as doHumanBitRate,
-    timestampUNIX as doTimestampUNIX,
-    timestampMac32 as doTimestampMac32,
     durationWin64 as doDurationWin64,
     timestampWin64 as doTimestampWin64,
     humanDatetime,
@@ -73,53 +70,6 @@ def filesizeHandler(field):
     Format field value using humanFilesize()
     """
     return displayHandler(field, doHumanFilesize)
-
-def humanBitRate(field):
-    """
-    Convert a bit rate to human representation
-    """
-    assert hasattr(field, "value") and hasattr(field, "size")
-    return doHumanBitRate(field.value)
-
-def timestampUNIX(field):
-    """
-    Convert an UNIX (32-bit) timestamp to string. The format is the number
-    of seconds since the 1st January 1970 at 00:00. Returns unicode string.
-
-    >>> timestampUNIX(type("", (), dict(value=0, size=32)))
-    u'1970-01-01 00:00:00'
-    >>> timestampUNIX(type("", (), dict(value=1154175644, size=32)))
-    u'2006-07-29 12:20:44'
-    >>> timestampUNIX(type("", (), dict(value=-1, size=32)))
-    u'invalid UNIX timestamp (-1)'
-    >>> timestampUNIX(type("", (), dict(value=2147483650, size=32)))
-    u'invalid UNIX timestamp (2147483650)'
-    """
-    assert hasattr(field, "value") and hasattr(field, "size")
-    assert field.size == 32
-    try:
-        timestamp = doTimestampUNIX(field.value)
-        return humanDatetime(timestamp)
-    except ValueError:
-        return u'invalid UNIX timestamp (%s)' % field.value
-
-def timestampMac(field):
-    """
-    Convert an Mac (32-bit) timestamp to string. The format is the number
-    of seconds since the 1st January 1904 (to 2040). Returns unicode string.
-
-    >>> timestampMac(type("", (), dict(value=2843043290, size=32)))
-    u'1994-02-02 14:14:50'
-    >>> timestampMac(type("", (), dict(value=-1, size=32)))
-    u'invalid Mac timestamp (-1)'
-    >>> timestampMac(type("", (), dict(value=4294967296, size=32)))
-    u'invalid Mac timestamp (4294967296)'
-    """
-    assert hasattr(field, "value") and hasattr(field, "size")
-    assert field.size == 32
-    if not(0 <= field.value <= 4294967295):
-        return _("invalid Mac timestamp (%s)") % field.value
-    return humanDatetime(doTimestampMac32(field.value))
 
 def hexadecimal(field):
     """

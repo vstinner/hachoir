@@ -19,7 +19,8 @@ from hachoir_core.field import (FieldSet, ParserError,
     PaddingBytes, NullBytes, RawBytes)
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.text_handler import (
-    textHandler, filesizeHandler, humanBitRate, durationWin64)
+    textHandler, displayHandler, filesizeHandler, durationWin64)
+from hachoir_core.tools import humanBitRate
 from itertools import izip
 from hachoir_parser.video.fourcc import audio_codec_name, video_fourcc_name
 from hachoir_parser.common.win32 import BitmapInfoHeader, GUID
@@ -91,7 +92,7 @@ class FileProperty(FieldSet):
         yield PaddingBits(self, "reserved[]", 30)
         yield filesizeHandler(UInt32(self, "min_pckt_size"))
         yield filesizeHandler(UInt32(self, "max_pckt_size"))
-        yield textHandler(UInt32(self, "max_bitrate"), humanBitRate)
+        yield displayHandler(UInt32(self, "max_bitrate"), humanBitRate)
 
 class HeaderExtension(FieldSet):
     guid = "5FBF03B5-A92E-11CF-8EE3-00C00C205365"
@@ -211,7 +212,7 @@ class BitRate(FieldSet):
     def createFields(self):
         yield Bits(self, "stream_index", 7)
         yield PaddingBits(self, "reserved", 9)
-        yield textHandler(UInt32(self, "avg_bitrate"), humanBitRate)
+        yield displayHandler(UInt32(self, "avg_bitrate"), humanBitRate)
 
 class BitRateList(FieldSet):
     guid = "7BF875CE-468D-11D1-8D82-006097C9A2B2"
