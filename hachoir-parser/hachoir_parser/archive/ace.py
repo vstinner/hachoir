@@ -18,7 +18,7 @@ from hachoir_core.field import (StaticFieldSet, FieldSet,
     UInt8, UInt16, UInt32, PascalString8, PascalString16,
     String, TimeDateMSDOS32,
     RawBytes)
-from hachoir_core.text_handler import textHandler, humanFilesize, hexadecimal
+from hachoir_core.text_handler import textHandler, filesizeHandler, hexadecimal
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_parser.common.msdos import MSDOSFileAttr32
 
@@ -89,8 +89,7 @@ def markerHeader(self):
     if flags["has_av_string"].value:
         yield PascalString8(self, "av_string", "AV String")
     if flags["has_comment"].value:
-        size = textHandler(UInt16(self, "comment_size", "Comment size"),
-                      humanFilesize)
+        size = filesizeHandler(UInt16(self, "comment_size", "Comment size"))
         yield size
         if size.value > 0:
             yield RawBytes(self, "compressed_comment", size.value, \
@@ -111,8 +110,8 @@ def fileFlags(self):
     yield FileFlags(self, "flags", "File flags")
 
 def fileHeader(self):
-    yield textHandler(UInt32(self, "compressed_size", "Size of the compressed file"), humanFilesize)
-    yield textHandler(UInt32(self, "uncompressed_size", "Uncompressed file size"), humanFilesize)
+    yield filesizeHandler(UInt32(self, "compressed_size", "Size of the compressed file"))
+    yield filesizeHandler(UInt32(self, "uncompressed_size", "Uncompressed file size"))
     yield TimeDateMSDOS32(self, "ftime", "Date and time (MS DOS format)")
     if self["/header/host_os"].value in (OS_MSDOS, OS_WIN32):
         yield MSDOSFileAttr32(self, "file_attr", "File attributes")
@@ -127,7 +126,7 @@ def fileHeader(self):
     yield PascalString16(self, "filename", "Filename")
     # Comment
     if self["flags/has_comment"].value:
-        yield textHandler(UInt16(self, "comment_size", "Size of the compressed comment"), humanFilesize)
+        yield filesizeHandler(UInt16(self, "comment_size", "Size of the compressed comment"))
         if self["comment_size"].value > 0:
             yield RawBytes(self, "comment_data", self["comment_size"].value, "Comment data")
 
@@ -140,7 +139,7 @@ def fileDesc(self):
     return "File entry: %s (%s)" % (self["filename"].value, self["compressed_size"].display)
 
 def recoveryHeader(self):
-    yield textHandler(UInt32(self, "rec_blk_size", "Size of recovery data"), humanFilesize)
+    yield filesizeHandler(UInt32(self, "rec_blk_size", "Size of recovery data"))
     self.body_size = self["rec_blk_size"].size
     yield String(self, "signature", 7, "Signature, normally '**ACE**'")
     yield textHandler(UInt32(self, "relative_start",
@@ -157,14 +156,14 @@ def recoveryHeader(self):
     yield RawBytes(self, "xor_data", size, "The XOR value of the above data blocks")
 
 def recoveryDesc(self):
-    return "Recovery block, size=%u" % humanFilesize(self["body_size"].value)
+    return "Recovery block, size=%u" % self["body_size"].display
 
 def newRecoveryHeader(self):
     """
     This header is described nowhere
     """
     if self["flags/extend"].value:
-        yield UInt32(self, "body_size", "Size of the unknown body following")
+        yield filesizeHandler(UInt32(self, "body_size", "Size of the unknown body following"))
         self.body_size = self["body_size"].value
     yield textHandler(UInt32(self, "unknown[]", "Unknown field, probably 0"),
         hexadecimal)
@@ -185,7 +184,7 @@ def parseFlags(self):
 
 def parseHeader(self):
     if self["flags/extend"].value:
-        yield UInt32(self, "body_size", "Size of the unknown body following")
+        yield filesizeHandler(UInt32(self, "body_size", "Size of the unknown body following"))
         self.body_size = self["body_size"].value
 
 def parseBody(self):
@@ -223,7 +222,7 @@ class Block(FieldSet):
 
     def createFields(self):
         yield textHandler(UInt16(self, "crc16", "Archive CRC16 (from byte 4 on)"), hexadecimal)
-        yield textHandler(UInt16(self, "head_size", "Block size (from byte 4 on)"), humanFilesize)
+        yield filesizeHandler(UInt16(self, "head_size", "Block size (from byte 4 on)"))
         yield UInt8(self, "block_type", "Block type")
 
         # Flags

@@ -15,7 +15,7 @@ from hachoir_core.field import (Field, FieldSet, ParserError,
     Enum, UInt8, UInt32, UInt64,
     Bytes, RawBytes)
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.text_handler import textHandler, hexadecimal, humanFilesize
+from hachoir_core.text_handler import textHandler, hexadecimal, filesizeHandler
 
 class SZUInt64(Field):
     """
@@ -175,7 +175,7 @@ class CoderID(FieldSet):
             if size.value == 5:
                 #LzmaDecodeProperties@LZMAStateDecode.c
                 yield textHandler(UInt8(self, "parameters"), lzmaParams)
-                yield textHandler(UInt32(self, "dictionary_size"), humanFilesize)
+                yield filesizeHandler(UInt32(self, "dictionary_size"))
             elif size.value > 0:
                 yield RawBytes(self, "properties[]", size.value)
 

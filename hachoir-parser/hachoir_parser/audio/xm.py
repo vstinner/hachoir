@@ -19,7 +19,7 @@ from hachoir_core.field import (StaticFieldSet, FieldSet,
     UInt32, UInt16, UInt8, Int8, Enum,
     RawBytes, String, GenericVector)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
-from hachoir_core.text_handler import textHandler, humanFilesize, hexadecimal
+from hachoir_core.text_handler import textHandler, filesizeHandler, hexadecimal
 from hachoir_parser.audio.modplug import ParseModplugMetadata
 from hachoir_parser.common.tracker import NOTE_NAME
 
@@ -320,7 +320,7 @@ class Header(FieldSet):
         yield String(self, "tracker_name", 20, "XM tracker name", charset="ASCII", strip=' ')
         yield UInt8(self, "format_minor")
         yield UInt8(self, "format_major")
-        yield textHandler(UInt32(self, "header_size", "Header size (276)"), humanFilesize)
+        yield filesizeHandler(UInt32(self, "header_size", "Header size (276)"))
         yield UInt16(self, "song_length", "Length in patten order table")
         yield UInt16(self, "restart", "Restart position")
         yield UInt16(self, "channels", "Number of channels (2,4,6,8,10,...,32)")

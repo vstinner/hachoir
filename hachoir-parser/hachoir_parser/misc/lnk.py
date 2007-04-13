@@ -17,7 +17,7 @@ from hachoir_core.field import (FieldSet,
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_parser.common.win32 import GUID
 from hachoir_parser.common.msdos import MSDOSFileAttr32
-from hachoir_core.text_handler import textHandler, humanFilesize
+from hachoir_core.text_handler import filesizeHandler
 
 class LnkFile(Parser):
     MAGIC = "\x4C\0\0\0\x01\x14\x02\x00\x00\x00\x00\x00\xc0\x00\x00\x00\x00\x00\x00\x46"
@@ -72,7 +72,7 @@ class LnkFile(Parser):
         yield TimestampWin64(self, "creation_time")
         yield TimestampWin64(self, "modification_time")
         yield TimestampWin64(self, "last_access_time")
-        yield textHandler(UInt32(self, "target_filesize"), humanFilesize)
+        yield filesizeHandler(UInt32(self, "target_filesize"))
         yield UInt32(self, "nb_icons")
         yield Enum(UInt32(self, "show_window"), self.SHOW_WINDOW_STATE)
         yield UInt32(self, "hot_key")

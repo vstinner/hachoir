@@ -11,7 +11,7 @@ from hachoir_core.field import (FieldSet,
     RawBytes, NullBytes,
     String, Enum, PascalString32)
 from hachoir_core.endian import BIG_ENDIAN
-from hachoir_core.text_handler import textHandler, humanFilesize
+from hachoir_core.text_handler import filesizeHandler
 from hachoir_core.tools import alignValue
 from hachoir_parser.audio.id3 import ID3v2
 
@@ -79,7 +79,7 @@ class Chunk(FieldSet):
 
     def createFields(self):
         yield String(self, "type", 4, "Signature (FORM)", charset="ASCII")
-        yield textHandler(UInt32(self, "size"), humanFilesize)
+        yield filesizeHandler(UInt32(self, "size"))
         size = self["size"].value
         if size:
             if self._parser:
@@ -111,7 +111,7 @@ class AiffFile(Parser):
 
     def createFields(self):
         yield String(self, "signature", 4, "Signature (FORM)", charset="ASCII")
-        yield textHandler(UInt32(self, "filesize"), humanFilesize)
+        yield filesizeHandler(UInt32(self, "filesize"))
         yield String(self, "type", 4, "Form type (AIFF or AIFC)", charset="ASCII")
         while not self.eof:
             yield Chunk(self, "chunk[]")

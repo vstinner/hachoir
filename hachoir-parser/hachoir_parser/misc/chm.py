@@ -19,7 +19,7 @@ from hachoir_core.field import (Field, FieldSet, ParserError,
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_parser.common.win32 import GUID
 from hachoir_parser.common.win32_lang_id import LANGUAGE_ID
-from hachoir_core.text_handler import textHandler, hexadecimal, humanFilesize
+from hachoir_core.text_handler import textHandler, hexadecimal, filesizeHandler
 
 class CWord(Field):
     """
@@ -49,7 +49,7 @@ class Filesize_Header(FieldSet):
     def createFields(self):
         yield textHandler(UInt32(self, "unknown[]", "0x01FE"), hexadecimal)
         yield textHandler(UInt32(self, "unknown[]", "0x0"), hexadecimal)
-        yield textHandler(UInt64(self, "file_size"), humanFilesize)
+        yield filesizeHandler(UInt64(self, "file_size"))
         yield textHandler(UInt32(self, "unknown[]", "0x0"), hexadecimal)
         yield textHandler(UInt32(self, "unknown[]", "0x0"), hexadecimal)
 
@@ -61,9 +61,9 @@ class ITSP(FieldSet):
     def createFields(self):
         yield String(self, "magic", 4, "ITSP", charset="ASCII")
         yield UInt32(self, "version", "Version (=1)")
-        yield textHandler(UInt32(self, "size", "Length (in bytes) of the directory header (84)"), humanFilesize)
+        yield filesizeHandler(UInt32(self, "size", "Length (in bytes) of the directory header (84)"))
         yield UInt32(self, "unknown[]", "(=10)")
-        yield textHandler(UInt32(self, "block_size", "Directory block size"), humanFilesize)
+        yield filesizeHandler(UInt32(self, "block_size", "Directory block size"))
         yield UInt32(self, "density", "Density of quickref section, usually 2")
         yield UInt32(self, "index_depth", "Depth of the index tree")
         yield Int32(self, "nb_dir", "Chunk number of root index chunk")
@@ -73,7 +73,7 @@ class ITSP(FieldSet):
         yield UInt32(self, "nb_dir_chunk", "Number of directory chunks (total)")
         yield Enum(UInt32(self, "lang_id", "Windows language ID"), LANGUAGE_ID)
         yield GUID(self, "system_uuid", "{5D02926A-212E-11D0-9DF9-00A0C922E6EC}")
-        yield textHandler(UInt32(self, "size2", "Same value than size"), humanFilesize)
+        yield filesizeHandler(UInt32(self, "size2", "Same value than size"))
         yield Int32(self, "unknown[]", "-1")
         yield Int32(self, "unknown[]", "-1")
         yield Int32(self, "unknown[]", "-1")
@@ -89,9 +89,9 @@ class ITSF(FieldSet):
         yield GUID(self, "dir_uuid", "{7C01FD10-7BAA-11D0-9E0C-00A0-C922-E6EC}")
         yield GUID(self, "stream_uuid", "{7C01FD11-7BAA-11D0-9E0C-00A0-C922-E6EC}")
         yield UInt64(self, "filesize_offset")
-        yield textHandler(UInt64(self, "filesize_len"), humanFilesize)
+        yield filesizeHandler(UInt64(self, "filesize_len"))
         yield UInt64(self, "dir_offset")
-        yield textHandler(UInt64(self, "dir_len"), humanFilesize)
+        yield filesizeHandler(UInt64(self, "dir_len"))
         if 3 <= self["version"].value:
             yield UInt64(self, "data_offset")
 
@@ -101,7 +101,7 @@ class PMGL_Entry(FieldSet):
         yield String(self, "name", self["name_len"].value, charset="UTF-8")
         yield CWord(self, "space")
         yield CWord(self, "start")
-        yield textHandler(CWord(self, "length"), humanFilesize)
+        yield filesizeHandler(CWord(self, "length"))
 
     def createDescription(self):
         return "%s (%s)" % (self["name"].value, self["length"].display)
@@ -110,9 +110,8 @@ class PMGL(FieldSet):
     def createFields(self):
         # Header
         yield String(self, "magic", 4, "PMGL", charset="ASCII")
-        yield textHandler(Int32(self, "free_space",
-            "Length of free space and/or quickref area at end of directory chunk"),
-            humanFilesize)
+        yield filesizeHandler(Int32(self, "free_space",
+            "Length of free space and/or quickref area at end of directory chunk"))
         yield Int32(self, "unknown")
         yield Int32(self, "previous", "Chunk number of previous listing chunk")
         yield Int32(self, "next", "Chunk number of previous listing chunk")
@@ -139,9 +138,8 @@ class PMGI_Entry(FieldSet):
 class PMGI(FieldSet):
     def createFields(self):
         yield String(self, "magic", 4, "PMGI", charset="ASCII")
-        yield textHandler(UInt32(self, "free_space",
-            "Length of free space and/or quickref area at end of directory chunk"),
-            humanFilesize)
+        yield filesizeHandler(UInt32(self, "free_space",
+            "Length of free space and/or quickref area at end of directory chunk"))
 
         stop = self.size - self["free_space"].value * 8
         while self.current_size < stop:

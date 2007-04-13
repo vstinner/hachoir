@@ -12,7 +12,7 @@ from hachoir_core.field import (FieldSet, ParserError,
     UInt8, UInt16, UInt32, UInt64,
     String, PascalString16,
     RawBytes, SubFile, CompressedField)
-from hachoir_core.text_handler import textHandler, humanFilesize, hexadecimal
+from hachoir_core.text_handler import textHandler, filesizeHandler, hexadecimal
 from hachoir_core.error import HACHOIR_ERRORS
 from hachoir_core.tools import makeUnicode
 from hachoir_core.endian import LITTLE_ENDIAN
@@ -228,10 +228,10 @@ class ZipDataDescriptor(FieldSet):
     def createFields(self):
         yield textHandler(UInt32(self, "file_crc32",
             "Checksum (CRC32)"), hexadecimal)
-        yield textHandler(UInt32(self, "file_compressed_size",
-            "Compressed size (bytes)"), humanFilesize)
-        yield textHandler(UInt32(self, "file_uncompressed_size",
-             "Uncompressed size (bytes)"), humanFilesize)
+        yield filesizeHandler(UInt32(self, "file_compressed_size",
+            "Compressed size (bytes)"))
+        yield filesizeHandler(UInt32(self, "file_uncompressed_size",
+             "Uncompressed size (bytes)"))
 
 class FileEntry(FieldSet):
     HEADER = 0x04034B50

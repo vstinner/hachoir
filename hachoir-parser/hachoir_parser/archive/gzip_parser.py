@@ -9,7 +9,7 @@ from hachoir_core.field import (
     UInt8, UInt16, UInt32, Enum, TimestampUnix32,
     Bit, CString, SubFile,
     NullBits, Bytes, RawBytes)
-from hachoir_core.text_handler import textHandler, hexadecimal, humanFilesize
+from hachoir_core.text_handler import textHandler, hexadecimal, filesizeHandler
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_parser.common.deflate import Deflate
 
@@ -114,8 +114,7 @@ class GzipParser(Parser):
         # Footer
         yield textHandler(UInt32(self, "crc32",
             "Uncompressed data content CRC32"), hexadecimal)
-        yield textHandler(UInt32(self, "size",
-            "Uncompressed size"), humanFilesize)
+        yield filesizeHandler(UInt32(self, "size", "Uncompressed size"))
 
     def createDescription(self):
         desc = self.tags["description"]
@@ -123,7 +122,7 @@ class GzipParser(Parser):
         if "filename" in self:
             info.append('filename "%s"' % self["filename"].value)
         if "size" in self:
-            info.append("was %s" % humanFilesize(self["size"]))
+            info.append("was %s" % self["size"].display)
         if self["mtime"].value:
             info.append(self["mtime"].display)
         return "%s: %s" % (desc, ", ".join(info))

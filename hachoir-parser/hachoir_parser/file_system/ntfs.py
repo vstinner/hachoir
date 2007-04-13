@@ -19,8 +19,8 @@ from hachoir_core.field import (FieldSet, Enum,
     String, Bytes, Bit,
     NullBits, NullBytes, PaddingBytes, RawBytes)
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.text_handler import textHandler, hexadecimal, humanFilesize
-from hachoir_core.tools import humanFilesize as doHumanFilesize, createDict
+from hachoir_core.text_handler import textHandler, hexadecimal, filesizeHandler
+from hachoir_core.tools import humanFilesize, createDict
 from hachoir_parser.common.msdos import MSDOSFileAttr32
 
 class BiosParameterBlock(FieldSet):
@@ -79,7 +79,7 @@ class MasterBootRecord(FieldSet):
 
     def createDescription(self):
         size = self["nb_sectors"].value * self["bios/bytes_per_sector"].value
-        return "NTFS Master Boot Record (%s)" % doHumanFilesize(size)
+        return "NTFS Master Boot Record (%s)" % humanFilesize(size)
 
 class MFT_Flags(FieldSet):
     static_size = 16
@@ -142,7 +142,7 @@ class Attribute(FieldSet):
         yield UInt32(self, "class_id")
         yield UInt32(self, "owner_id")
         yield UInt32(self, "security_id")
-        yield textHandler(UInt64(self, "quota_charged", "Quota Charged"), humanFilesize)
+        yield filesizeHandler(UInt64(self, "quota_charged", "Quota Charged"))
         yield UInt64(self, "usn", "Update Sequence Number (USN)")
 
     def parseFilename(self):
@@ -151,8 +151,8 @@ class Attribute(FieldSet):
         yield TimestampWin64(self, "atime", "File Altered")
         yield TimestampWin64(self, "mtime", "MFT Changed")
         yield TimestampWin64(self, "rtime", "File Read")
-        yield textHandler(UInt64(self, "alloc_size", "Allocated size of the file"), humanFilesize)
-        yield textHandler(UInt64(self, "real_size", "Real size of the file"), humanFilesize)
+        yield filesizeHandler(UInt64(self, "alloc_size", "Allocated size of the file"))
+        yield filesizeHandler(UInt64(self, "real_size", "Real size of the file"))
         yield UInt32(self, "file_flags")
         yield UInt32(self, "file_flags2", "Used by EAs and Reparse")
         yield UInt8(self, "filename_length", "Filename length in characters")

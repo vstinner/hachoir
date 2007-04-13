@@ -11,7 +11,7 @@ from hachoir_core.field import (FieldSet, Enum,
     UInt16, UInt32, Bit, Bits, PaddingBits, NullBits,
     DateTimeMSDOS32, RawBytes)
 from hachoir_parser.common.msdos import MSDOSFileAttr16
-from hachoir_core.text_handler import textHandler, hexadecimal, humanFilesize
+from hachoir_core.text_handler import textHandler, hexadecimal, filesizeHandler
 from hachoir_core.endian import LITTLE_ENDIAN
 
 MAX_NB_FOLDER = 30
@@ -40,7 +40,7 @@ class Folder(FieldSet):
 
 class File(FieldSet):
     def createFields(self):
-        yield textHandler(UInt32(self, "filesize", "Uncompressed file size"), humanFilesize)
+        yield filesizeHandler(UInt32(self, "filesize", "Uncompressed file size"))
         yield UInt32(self, "offset", "File offset after decompression")
         yield UInt16(self, "iFolder", "file control id")
         yield DateTimeMSDOS32(self, "timestamp")
@@ -91,7 +91,7 @@ class CabFile(Parser):
     def createFields(self):
         yield String(self, "magic", 4, "Magic (MSCF)", charset="ASCII")
         yield textHandler(UInt32(self, "hdr_checksum", "Header checksum (0 if not used)"), hexadecimal)
-        yield textHandler(UInt32(self, "filesize", "Cabinet file size"), humanFilesize)
+        yield filesizeHandler(UInt32(self, "filesize", "Cabinet file size"))
         yield textHandler(UInt32(self, "fld_checksum", "Folders checksum (0 if not used)"), hexadecimal)
         yield UInt32(self, "off_file", "Offset of first file")
         yield textHandler(UInt32(self, "files_checksum", "Files checksum (0 if not used)"), hexadecimal)

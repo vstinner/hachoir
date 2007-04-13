@@ -17,7 +17,7 @@ from hachoir_core.field import (FieldSet, ParserError,
     String, RawBytes, Bytes, Enum,
     TimestampMac32)
 from hachoir_core.endian import BIG_ENDIAN
-from hachoir_core.text_handler import textHandler, hexadecimal, humanFilesize
+from hachoir_core.text_handler import textHandler, hexadecimal, filesizeHandler
 
 MAX_NAME_COUNT = 300
 MIN_NB_TABLE = 3
@@ -74,7 +74,7 @@ class TableHeader(FieldSet):
         yield String(self, "tag", 4)
         yield textHandler(UInt32(self, "checksum"), hexadecimal)
         yield UInt32(self, "offset")
-        yield textHandler(UInt32(self, "size"), humanFilesize)
+        yield filesizeHandler(UInt32(self, "size"))
 
     def createDescription(self):
          return "Table entry: %s (%s)" % (self["tag"].display, self["size"].display)

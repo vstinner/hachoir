@@ -24,7 +24,7 @@ from hachoir_core.field import (
     FieldSet, ParserError, RootSeekableFieldSet,
     UInt8, UInt16, Int32, UInt32, UInt64, TimestampWin64, Enum,
     Bytes, RawBytes, NullBytes, String)
-from hachoir_core.text_handler import textHandler, hexadecimal, humanFilesize
+from hachoir_core.text_handler import textHandler, hexadecimal, filesizeHandler
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_parser.common.win32 import GUID
 from hachoir_parser.misc.msoffice import CustomFragment, PROPERTY_NAME
@@ -87,7 +87,7 @@ class Property(FieldSet):
         yield TimestampWin64(self, "creation", "Creation timestamp")
         yield TimestampWin64(self, "lastmod", "Modify timestamp")
         yield SECT(self, "start", "Starting SECT of the stream")
-        yield textHandler(UInt64(self, "size", "Size in bytes"), humanFilesize)
+        yield filesizeHandler(UInt64(self, "size", "Size in bytes"))
 
     def createDescription(self):
         name = self["name"].display

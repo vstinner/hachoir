@@ -14,7 +14,7 @@ from hachoir_core.field import (FieldSet, ParserError, Enum,
     UInt16, UInt32, TimestampUnix32,
     RawBytes, PaddingBytes, NullBytes, NullBits,
     CString, String, PascalString16)
-from hachoir_core.text_handler import textHandler, humanFilesize, hexadecimal
+from hachoir_core.text_handler import textHandler, filesizeHandler, hexadecimal
 from hachoir_core.tools import createDict, paddingSize, alignValue, makePrintable
 from hachoir_core.error import HACHOIR_ERRORS
 from hachoir_parser.common.win32 import BitmapInfoHeader
@@ -210,7 +210,7 @@ class Entry(FieldSet):
 
     def createFields(self):
         yield textHandler(UInt32(self, "rva"), hexadecimal)
-        yield textHandler(UInt32(self, "size"), humanFilesize)
+        yield filesizeHandler(UInt32(self, "size"))
         yield UInt32(self, "codepage")
         yield NullBytes(self, "reserved", 4)
 

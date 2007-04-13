@@ -4,7 +4,7 @@ from hachoir_core.field import (FieldSet, ParserError,
     UInt16, UInt32, TimestampWin64, Enum,
     Bytes, RawBytes, NullBytes, String,
     Int8, Int16, Int32, Float32, Float64, PascalString32)
-from hachoir_core.text_handler import textHandler, hexadecimal, humanFilesize
+from hachoir_core.text_handler import textHandler, hexadecimal, filesizeHandler
 from hachoir_core.tools import createDict
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_parser.common.win32 import GUID, PascalStringWin32
@@ -130,7 +130,7 @@ class Thumbnail(FieldSet):
         self._size = self["size"].value * 8
 
     def createFields(self):
-        yield textHandler(UInt32(self, "size"), humanFilesize)
+        yield filesizeHandler(UInt32(self, "size"))
         yield Enum(Int32(self, "format"), self.FORMAT_NAME)
         if self["format"].value == self.FORMAT_CLIPBOARD:
             yield Enum(UInt32(self, "dib_format"), self.DIB_FORMAT)

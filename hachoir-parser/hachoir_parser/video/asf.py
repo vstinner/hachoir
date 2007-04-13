@@ -19,7 +19,7 @@ from hachoir_core.field import (FieldSet, ParserError,
     PaddingBytes, NullBytes, RawBytes)
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.text_handler import (
-    textHandler, humanFilesize, humanBitRate, durationWin64)
+    textHandler, filesizeHandler, humanBitRate, durationWin64)
 from itertools import izip
 from hachoir_parser.video.fourcc import audio_codec_name, video_fourcc_name
 from hachoir_parser.common.win32 import BitmapInfoHeader, GUID
@@ -80,7 +80,7 @@ class FileProperty(FieldSet):
     guid = "8CABDCA1-A947-11CF-8EE4-00C00C205365"
     def createFields(self):
         yield GUID(self, "guid")
-        yield textHandler(UInt64(self, "file_size"), humanFilesize)
+        yield filesizeHandler(UInt64(self, "file_size"))
         yield TimestampWin64(self, "creation_date")
         yield UInt64(self, "pckt_count")
         yield textHandler(UInt64(self, "play_duration"), durationWin64)
@@ -89,8 +89,8 @@ class FileProperty(FieldSet):
         yield Bit(self, "broadcast", "Is broadcast?")
         yield Bit(self, "seekable", "Seekable stream?")
         yield PaddingBits(self, "reserved[]", 30)
-        yield textHandler(UInt32(self, "min_pckt_size"), humanFilesize)
-        yield textHandler(UInt32(self, "max_pckt_size"), humanFilesize)
+        yield filesizeHandler(UInt32(self, "min_pckt_size"))
+        yield filesizeHandler(UInt32(self, "max_pckt_size"))
         yield textHandler(UInt32(self, "max_bitrate"), humanBitRate)
 
 class HeaderExtension(FieldSet):
@@ -286,7 +286,7 @@ class Object(FieldSet):
 
     def createFields(self):
         yield GUID(self, "guid")
-        yield UInt64(self, "size")
+        yield filesizeHandler(UInt64(self, "size"))
 
         size = self["size"].value - self.current_size/8
         if 0 < size:

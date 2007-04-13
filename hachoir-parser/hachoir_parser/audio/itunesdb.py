@@ -14,7 +14,7 @@ from hachoir_core.field import (FieldSet,
     String, Float32, NullBytes, Enum)
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.tools import humanDuration
-from hachoir_core.text_handler import textHandler, displayHandler, humanFilesize
+from hachoir_core.text_handler import displayHandler, filesizeHandler
 
 list_order={
         1 : "playlist order (manual sort order)",
@@ -163,7 +163,7 @@ class TrackItem(FieldSet):
         yield UInt8(self, "compilation_flag", "Compilation Flag")
         yield UInt8(self, "rating", "Rating")
         yield TimestampMac32(self, "added_date", "Date when the item was added")
-        yield textHandler(UInt32(self, "size", "Track size in bytes"), humanFilesize)
+        yield filesizeHandler(UInt32(self, "size", "Track size in bytes"))
         yield displayHandler(UInt32(self, "length", "Track length in milliseconds"), humanDuration)
         yield UInt32(self, "track_number", "Number of this track")
         yield UInt32(self, "total_track", "Total number of tracks")

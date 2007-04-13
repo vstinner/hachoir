@@ -11,7 +11,7 @@ from hachoir_core.field import (StaticFieldSet, FieldSet,
     UInt8, UInt16, UInt32, UInt64,
     String, TimeDateMSDOS32,
     NullBytes, NullBits, RawBytes)
-from hachoir_core.text_handler import textHandler, humanFilesize, hexadecimal
+from hachoir_core.text_handler import textHandler, filesizeHandler, hexadecimal
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_parser.common.msdos import MSDOSFileAttr32
 
@@ -90,8 +90,8 @@ def archiveHeader(s):
     yield NullBytes(s, "reserved[]", 4, "Reserved dword")
 
 def commentHeader(s):
-    yield textHandler(UInt16(s, "total_size", "Comment header size + comment size"), humanFilesize)
-    yield textHandler(UInt16(s, "uncompressed_size", "Uncompressed comment size"), humanFilesize)
+    yield filesizeHandler(UInt16(s, "total_size", "Comment header size + comment size"))
+    yield filesizeHandler(UInt16(s, "uncompressed_size", "Uncompressed comment size"))
     yield UInt8(s, "required_version", "RAR version needed to extract comment")
     yield UInt8(s, "packing_method", "Comment packing method")
     yield UInt16(s, "comment_crc16", "Comment CRC")
@@ -103,18 +103,18 @@ def commentBody(s):
 
 def signatureHeader(s):
     yield TimeDateMSDOS32(s, "creation_time")
-    yield textHandler(UInt16(s, "arc_name_size"), humanFilesize)
-    yield textHandler(UInt16(s, "user_name_size"), humanFilesize)
+    yield filesizeHandler(UInt16(s, "arc_name_size"))
+    yield filesizeHandler(UInt16(s, "user_name_size"))
 
 def recoveryHeader(s):
-    yield textHandler(UInt32(s, "total_size"), humanFilesize)
+    yield filesizeHandler(UInt32(s, "total_size"))
     yield textHandler(UInt8(s, "version"), hexadecimal)
     yield UInt16(s, "rec_sectors")
     yield UInt32(s, "total_blocks")
     yield RawBytes(s, "mark", 8)
 
 def avInfoHeader(s):
-    yield textHandler(UInt16(s, "total_size", "Total block size"), humanFilesize)
+    yield filesizeHandler(UInt16(s, "total_size", "Total block size"))
     yield UInt8(s, "version", "Version needed to decompress", handler=hexadecimal)
     yield UInt8(s, "method", "Compression method", handler=hexadecimal)
     yield UInt8(s, "av_version", "Version for AV", handler=hexadecimal)
@@ -160,14 +160,14 @@ class ExtTime(FieldSet):
                     yield RawBytes(self, "remainder[]", rmode & 3, "Time remainder")
 
 def specialHeader(s, is_file):
-    yield textHandler(UInt32(s, "compressed_size", "Compressed size (bytes)"), humanFilesize)
-    yield textHandler(UInt32(s, "uncompressed_size", "Uncompressed size (bytes)"), humanFilesize)
+    yield filesizeHandler(UInt32(s, "compressed_size", "Compressed size (bytes)"))
+    yield filesizeHandler(UInt32(s, "uncompressed_size", "Uncompressed size (bytes)"))
     yield Enum(UInt8(s, "host_os", "Operating system used for archiving"), OS_NAME)
     yield textHandler(UInt32(s, "crc32", "File CRC32"), hexadecimal)
     yield TimeDateMSDOS32(s, "ftime", "Date and time (MS DOS format)")
     yield textHandler(UInt8(s, "version", "RAR version needed to extract file"), formatRARVersion)
     yield Enum(UInt8(s, "method", "Packing method"), COMPRESSION_NAME)
-    yield textHandler(UInt16(s, "filename_length", "File name size"), humanFilesize)
+    yield filesizeHandler(UInt16(s, "filename_length", "File name size"))
     if s["host_os"].value in (OS_MSDOS, OS_WIN32):
         yield MSDOSFileAttr32(s, "file_attr", "File attributes")
     else:
@@ -175,7 +175,7 @@ def specialHeader(s, is_file):
 
     # Start additional field from unrar
     if s["flags/is_large"].value:
-        yield textHandler(UInt64(s, "large_size", "Extended 64bits filesize"), humanFilesize)
+        yield filesizeHandler(UInt64(s, "large_size", "Extended 64bits filesize"))
 
     # End additional field
     size = s["filename_length"].value
@@ -284,7 +284,7 @@ class Block(FieldSet):
             yield field
 
         # Get block size
-        yield textHandler(UInt16(self, "block_size", "Block size"), humanFilesize)
+        yield filesizeHandler(UInt16(self, "block_size", "Block size"))
 
         # Parse remaining header
         for field in self.parseHeader():
@@ -308,8 +308,8 @@ class Block(FieldSet):
     def parseHeader(self):
         if "has_added_size" in self["flags"] and \
            self["flags/has_added_size"].value:
-            yield textHandler(UInt32(self, "added_size",
-                "Supplementary block size"), humanFilesize)
+            yield filesizeHandler(UInt32(self, "added_size",
+                "Supplementary block size"))
 
     def parseBody(self):
         """

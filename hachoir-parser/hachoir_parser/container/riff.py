@@ -37,7 +37,7 @@ from hachoir_core.field import (FieldSet, ParserError,
     SubFile)
 from hachoir_core.tools import alignValue, humanDuration
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.text_handler import humanFilesize, textHandler
+from hachoir_core.text_handler import filesizeHandler, textHandler
 from hachoir_parser.video.fourcc import audio_codec_name, video_fourcc_name
 from hachoir_parser.image.ico import IcoFile
 from datetime import timedelta
@@ -252,7 +252,7 @@ class Chunk(FieldSet):
 
     def createFields(self):
         yield String(self, "tag", 4, "Tag", charset="ASCII")
-        yield textHandler(UInt32(self, "size", "Size"), humanFilesize)
+        yield filesizeHandler(UInt32(self, "size", "Size"))
         if not self["size"].value:
             return
         if self["tag"].value == "LIST":
@@ -373,7 +373,7 @@ class RiffFile(Parser):
 
     def createFields(self):
         yield String(self, "signature", 4, "AVI header (RIFF)", charset="ASCII")
-        yield textHandler(UInt32(self, "filesize", "File size"), humanFilesize)
+        yield filesizeHandler(UInt32(self, "filesize", "File size"))
         yield String(self, "type", 4, "Content type (\"AVI \", \"WAVE\", ...)", charset="ASCII")
 
         # Choose chunk type depending on file type

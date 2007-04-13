@@ -24,7 +24,7 @@ from hachoir_core.field import (StaticFieldSet, FieldSet,
     UInt32, UInt16, UInt8, Int8, Enum,
     RawBytes, String, GenericVector)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
-from hachoir_core.text_handler import textHandler, humanFilesize, hexadecimal
+from hachoir_core.text_handler import textHandler, filesizeHandler, hexadecimal
 from hachoir_parser.audio.modplug import ParseModplugMetadata
 from hachoir_parser.common.tracker import NOTE_NAME
 
