@@ -63,24 +63,6 @@ def durationWin64(field):
     delta = doDurationWin64(field.value)
     return doHumanDuration(delta)
 
-def timestampMSDOS(field):
-    """
-    Convert MS-DOS timestamp (32-bit integer) to string
-    """
-    assert hasattr(field, "value") and hasattr(field, "size")
-    assert field.size == 32
-    val = field.value
-    sec = 2 * (val & 31)              # 5 bits: second
-    minute = (val >> 5) & 63          # 6 bits: minute
-    hour = (val >> 11) & 31           # 5 bits: hour
-    day = (val >> 16) & 31            # 5 bits: day of the month
-    month = (val >> 21) & 15          # 4 bits: month
-    year = 1980 + ((val >> 25) & 127) # 7 bits: year
-    try:
-        return unicode(datetime(year, month, day, hour, minute, sec))
-    except ValueError: # Wrong date
-        return _("invalid msdos datetime (%s)") % unicode(val)
-
 def humanFilesize(field):
     """
     Convert a file size to human representation (just call
