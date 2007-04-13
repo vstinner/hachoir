@@ -8,8 +8,8 @@ Creation: 12 july 2006
 from hachoir_parser import Parser
 from hachoir_core.field import UInt32, Enum, String, RawBytes
 from hachoir_core.endian import BIG_ENDIAN
-from hachoir_core.text_handler import textHandler, humanFilesize, humanFrequency
-from hachoir_core.tools import createDict
+from hachoir_core.text_handler import textHandler, displayHandler, humanFilesize
+from hachoir_core.tools import createDict, humanFrequency
 
 class AuFile(Parser):
     tags = {
@@ -73,7 +73,7 @@ class AuFile(Parser):
         yield UInt32(self, "data_ofs", "Data offset")
         yield textHandler(UInt32(self, "data_size", "Data size"), humanFilesize)
         yield Enum(UInt32(self, "codec", "Audio codec"), self.CODEC_NAME)
-        yield textHandler(UInt32(self, "sample_rate", "Number of samples/second"), humanFrequency)
+        yield displayHandler(UInt32(self, "sample_rate", "Number of samples/second"), humanFrequency)
         yield UInt32(self, "channels", "Number of interleaved channels")
 
         size = self["data_ofs"].value - self.current_size // 8

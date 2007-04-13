@@ -7,7 +7,6 @@ from hachoir_core.tools import (
     humanDuration as doHumanDuration,
     humanFilesize as doHumanFilesize,
     humanBitRate as doHumanBitRate,
-    humanFrequency as doHumanFrequency,
     timestampUNIX as doTimestampUNIX,
     timestampMac32 as doTimestampMac32,
     durationWin64 as doDurationWin64,
@@ -23,6 +22,12 @@ def textHandler(field, handler):
     assert isinstance(handler, (FunctionType, MethodType))
     assert issubclass(field.__class__, Field)
     field.createDisplay = lambda: handler(field)
+    return field
+
+def displayHandler(field, handler):
+    assert isinstance(handler, (FunctionType, MethodType))
+    assert issubclass(field.__class__, Field)
+    field.createDisplay = lambda: handler(field.value)
     return field
 
 def timestampWin64(field):
@@ -70,14 +75,6 @@ def humanFilesize(field):
     """
     assert hasattr(field, "value") and hasattr(field, "size")
     return doHumanFilesize(field.value)
-
-def humanFrequency(field):
-    """
-    Convert a file size to human representation (just call
-    hachoir_core.tools.humanHertz())
-    """
-    assert hasattr(field, "value") and hasattr(field, "size")
-    return doHumanFrequency(field.value)
 
 def humanDuration(field):
     assert hasattr(field, "value") and hasattr(field, "size")
