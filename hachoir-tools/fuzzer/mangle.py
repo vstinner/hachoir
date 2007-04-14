@@ -3,8 +3,8 @@ from array import array
 
 MAX_MIX = 20
 MIN_MIX = -MAX_MIX
-MIN_COUNT = 25
-MAX_COUNT = 5000
+MIN_COUNT = 15
+MAX_COUNT = 2500
 MAX_INC = 32
 MIN_INC = -MAX_INC
 

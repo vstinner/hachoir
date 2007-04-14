@@ -20,15 +20,15 @@ MAX_DURATION = 10.0
 
 # Number of mangle operation depending of current size
 # '0.30' means: 30% of current size in byte
-MANGLE_PERCENT = 0.30
-MANGLE_PERCENT_INCR = 0.05
-MIN_MANGLE_PERCENT = 0.05
+MANGLE_PERCENT = 0.01
+MANGLE_PERCENT_INCR = 0
+MIN_MANGLE_PERCENT = 0.10
 
 # Limit fuzzing to 40 tests
 MAX_NB_EXTRACT = 40
 
-# Truncate file if its current size is bigger than 10% of original size
-TRUNCATE_PERCENT = 0.10
+# 1 times on 20 tries
+TRUNCATE_RATE = 20
 
 class UndoMangle:
     def __init__(self, fuzz):
@@ -74,7 +74,7 @@ class FileFuzzer:
             self.info("Size: %s bytes" % len(self.data))
 
     def acceptTruncate(self):
-        return max(self.size * TRUNCATE_PERCENT, MIN_SIZE) < len(self.data)
+        return MIN_SIZE < len(self.data)
 
     def sumUp(self):
         self.warning("[SUMUP] Extraction: %s" % self.nb_extract)
@@ -182,7 +182,7 @@ class FileFuzzer:
         filename="%s-%s" % (uniq_id, basename(self.filename))
         if prefix:
             filename = "%s-%s" % (prefix, filename)
-        error_filename = path.join(self.fuzzer.error_dir, filename)
-        open(error_filename, "wb").write(data)
+        filename = path.join(self.fuzzer.error_dir, filename)
+        open(filename, "wb").write(data)
         print "=> Store file %s" % filename
 
