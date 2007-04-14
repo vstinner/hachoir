@@ -24,7 +24,10 @@ MIN_SIZE = 1
 MAX_SIZE = 1024 * 1024
 MAX_DURATION = 10.0
 MEMORY_LIMIT = 5 * 1024 * 1024
-MANGLE_PERCENT = 0.10
+MANGLE_PERCENT = 0.25
+MAX_NB_UNDO = 10
+MIN_MANGLE_PERCENT = 0.05
+MANGLE_PERCENT_INCR = float(MANGLE_PERCENT - MIN_MANGLE_PERCENT) / MAX_NB_UNDO
 
 try:
     import sha
@@ -42,11 +45,21 @@ def getFilesize(file):
     file.seek(0, 0)
     return size
 
+class FileFuzzerUndo:
+    def __init__(self):
+        self.mangle_count = 0
+        self.reset()
+
+    def reset(self):
+        self.data = None
+
 class FileFuzzer:
     def __init__(self, fuzzer, filename):
         self.fuzzer = fuzzer
         self.verbose = fuzzer.verbose
+        self.mangle_percent = MANGLE_PERCENT
         self.file = open(filename, "rb")
+        self.nb_undo = 0
         self.filename = filename
         self.size = getFilesize(self.file)
         self.mangle_count = 0
@@ -54,16 +67,24 @@ class FileFuzzer:
         data_str = self.file.read(size)
         self.data = array('B', data_str)
         self.truncated = len(self.data) < self.size
+        self.undo_state = FileFuzzerUndo()
         self.nb_extract = 0
         if self.truncated:
             self.info("Truncate to %s bytes" % len(self.data))
         else:
             self.info("Size: %s bytes" % len(self.data))
-            self.mangle()
+#            self.mangle()
+        self.accept_truncate = True
+
+    def acceptTruncate(self):
+        if not self.accept_truncate:
+            return False
+        return 1 < len(self.data)
 
     def sumUp(self):
-        print "Extract: %s; size: %.1f%%; mangle: %s" % (
-            self.nb_extract, len(self.data)*100.0/self.size, self.mangle_count)
+        print "Extract: %s; size: %.1f%% of %s; mangle: %s" % (
+            self.nb_extract, len(self.data)*100.0/self.size,
+            self.size, self.mangle_count)
 
     def info(self, message):
         if not self.verbose:
@@ -71,20 +92,48 @@ class FileFuzzer:
         print "[%s] %s" % (basename(self.filename), message)
 
     def mangle(self):
-        count = mangle(self.data, MANGLE_PERCENT)
+        # Store last state
+        self.undo_state.data = self.data.tostring()
+        self.undo_state.mangle_count = self.mangle_count
+
+        # Mangle data
+        count = mangle(self.data, self.mangle_percent)
+
+        # Update state
         self.mangle_count += count
-        self.info("Mangle: %s operations (+%s)"
-            % (self.mangle_count, count))
+        self.info("Mangle: %s operations (+%s)" % (self.mangle_count, count))
 
     def truncate(self):
         assert 1 < len(self.data)
+        #  Store last state (for undo)
+        self.undo_state.data = self.data.tostring()
+
+        # Truncate
         new_size = randint(1, len(self.data)-1)
         self.info("Truncate to %s bytes" % new_size)
         self.data = self.data[:new_size]
         self.truncated = True
 
+    def tryUndo(self):
+        if not self.undo_state.data:
+            self.info("Unable to undo")
+            return False
+        self.nb_undo += 1
+        self.info("UNDO! (%u/%s)" % (self.nb_undo, MAX_NB_UNDO))
+#        self.accept_truncate = False
+        percent = max(self.mangle_percent - MANGLE_PERCENT_INCR, MIN_MANGLE_PERCENT)
+        if self.mangle_percent != percent:
+            self.mangle_percent = percent
+            self.info("Set mangle percent to: %u%%" % int(self.mangle_percent*100))
+        self.data = array('B', self.undo_state.data)
+        self.mangle_count = self.undo_state.mangle_count
+        self.undo_state.reset()
+        return True
+
     def extract(self):
         self.nb_extract += 1
+        self.prefix = ""
+
         data = self.data.tostring()
         stream = InputIOStream(StringIO(data), filename=self.filename)
 
@@ -99,9 +148,8 @@ class FileFuzzer:
             return None
 
         # Extract metadata
-        self.prefix = ""
         try:
-            metadata = extractMetadata(parser, 0.5)
+            metadata = extractMetadata(parser, 0.5, False)
             failure = bool(self.fuzzer.log_error)
         except (HACHOIR_ERRORS, AssertionError), err:
             self.info("SERIOUS ERROR: %s" % err)
@@ -114,9 +162,11 @@ class FileFuzzer:
             self.info("Process is too long: %.1f seconds" % duration)
             failure = True
             self.prefix = "timeout"
-        if not failure and metadata is None:
+        if not failure and (metadata is None or not metadata):
             self.info("Unable to extract metadata")
             return None
+#        for line in metadata.exportPlaintext():
+#            print ">>> %s" % line
         return failure
 
     def keepFile(self, prefix):
@@ -136,7 +186,7 @@ class Fuzzer:
         self.tmp_file = "/tmp/stress-hachoir"
         self.nb_error = 0
         self.error_dir = error_dir
-        self.verbose = True
+        self.verbose = False
 
     def filterError(self, text):
         if "Error during metadata extraction" in text:
@@ -173,13 +223,10 @@ class Fuzzer:
             return True
         if "Seek below field set start" in text:
             return True
-        if "Loop in FAT chain" in text:
-            return True
         if text.startswith("Unable to create directory directory["):
             # [/section_rsrc] Unable to create directory directory[2][0][]: Can't get field "header" from /section_rsrc/directory[2][0][]
             return True
-        if text.startswith("Unable to parse a FAT chain: "):
-            # Unable to parse a FAT chain: list index out of range
+        if text.startswith("FAT chain: "):
             return True
         if text.startswith("EXE resource: depth too high"):
             return True
@@ -208,14 +255,13 @@ class Fuzzer:
             fatal_error = False
             try:
                 failure = limiter.call(fuzz.extract)
-                if failure is None:
-                    return True
                 prefix = fuzz.prefix
             except KeyboardInterrupt:
                 try:
                     failure = (raw_input("Keep current file (y/n)?").strip() == "y")
                 except (KeyboardInterrupt, EOFError):
-                    failure = True
+                    print
+                    failure = False
                 prefix = "interrupt"
                 fatal_error = True
             except MemoryError:
@@ -226,9 +272,17 @@ class Fuzzer:
                 print "EXCEPTION (%s): %s" % (err.__class__.__name__, err)
                 failure = True
                 prefix = "exception"
-            if failure or fatal_error:
+            if fatal_error:
                 break
-            if 1 < len(fuzz.data):
+            if failure in (True, None) \
+            and fuzz.nb_undo < MAX_NB_UNDO:
+                if fuzz.tryUndo():
+                    continue
+            if failure is None:
+                return True
+            if failure:
+                break
+            if fuzz.acceptTruncate():
                 if randint(0,20) == 0:
                     fuzz.truncate()
                 else:
