@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 import re
 
 regex_control_code = re.compile("([\x00-\x1f\x7f])")
