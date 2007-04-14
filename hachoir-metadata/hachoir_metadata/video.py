@@ -305,6 +305,7 @@ class AsfMetadata(MultipleMetadata):
     def streamAudioHeader(self, audio, meta):
         if not meta.has("compression"):
             meta.compression = audio["twocc"].display
+        meta.nb_channel = audio["channels"].value
         meta.sample_rate = audio["sample_rate"].value
         meta.bits_per_sample = audio["bits_per_sample"].value
 
