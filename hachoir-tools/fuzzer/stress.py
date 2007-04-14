@@ -8,7 +8,7 @@ from hachoir_core.memory import PAGE_SIZE, MemoryLimit
 from errno import EEXIST
 from time import sleep
 from hachoir_core.log import log as hachoir_logger, Log
-from file_fuzzer import FileFuzzer, MAX_NB_UNDO
+from file_fuzzer import FileFuzzer, MAX_NB_EXTRACT
 import re
 
 # Constants
@@ -87,7 +87,7 @@ class Fuzzer:
         limiter = MemoryLimit(MEMORY_LIMIT)
 
         failure = False
-        while True:
+        while fuzz.nb_extract < MAX_NB_EXTRACT:
             self.log_error = 0
             fatal_error = False
             try:
@@ -111,12 +111,15 @@ class Fuzzer:
                 prefix = "exception"
             if fatal_error:
                 break
-            if failure is None \
-            and fuzz.nb_undo < MAX_NB_UNDO:
+            if failure is None:
                 if fuzz.tryUndo():
                     failure = False
+                elif fuzz.is_original:
+                    print "    Warning: Unsupported file format: remove %s from test suite" % fuzz.filename
+                    self.filedb.remove(fuzz.filename)
+                    return True
             if failure is None:
-                return True
+                break
             if failure:
                 break
             if fuzz.acceptTruncate():
@@ -131,6 +134,7 @@ class Fuzzer:
         if failure:
             fuzz.keepFile(prefix)
             self.nb_error += 1
+        fuzz.sumUp()
         return (not fatal_error)
 
     def init(self):
@@ -163,7 +167,6 @@ class Fuzzer:
                 print "[+] %s error -- test file: %s" % (self.nb_error, basename(test_file))
                 fuzz = FileFuzzer(self, test_file)
                 ok = self.fuzzFile(fuzz)
-                fuzz.sumUp()
                 if not ok:
                     break
                 if SLEEP_SEC:

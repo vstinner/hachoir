@@ -15,24 +15,28 @@ MIN_SIZE = 1
 MAX_SIZE = 1024 * 1024
 MAX_DURATION = 10.0
 MANGLE_PERCENT = 0.30
-MAX_NB_UNDO = 10
-MIN_MANGLE_PERCENT = 0.01
-MANGLE_PERCENT_INCR = float(MANGLE_PERCENT - MIN_MANGLE_PERCENT) / MAX_NB_UNDO
+MANGLE_PERCENT_INCR = 0.05
+MIN_MANGLE_PERCENT = 0.05
 MAX_NB_TRUNCATE = 5
+MAX_NB_EXTRACT = 40
 
 class UndoMangle:
     def __init__(self, fuzz):
         self.data = fuzz.data.tostring()
+        self.orig = fuzz.is_original
 
     def __call__(self, fuzz):
         fuzz.data = array('B', self.data)
+        fuzz.is_original = self.orig
 
 class UndoTruncate:
     def __init__(self, fuzz):
         self.data = fuzz.data
+        self.orig = fuzz.is_original
 
     def __call__(self, fuzz):
         fuzz.data = self.data
+        fuzz.is_original = self.orig
 
 class FileFuzzer:
     def __init__(self, fuzzer, filename):
@@ -48,13 +52,14 @@ class FileFuzzer:
         size = randint(MIN_SIZE, MAX_SIZE)
         data_str = self.file.read(size)
         self.data = array('B', data_str)
-        self.truncated = len(self.data) < self.size
         self.undo = None
         self.nb_extract = 0
-        if self.truncated:
+        if len(self.data) < self.size:
+            self.is_original = False
             self.nb_truncate = 1
             self.warning("Truncate to %s bytes" % len(self.data))
         else:
+            self.is_original = True
             self.nb_truncate = 0
             self.info("Size: %s bytes" % len(self.data))
 
@@ -69,7 +74,8 @@ class FileFuzzer:
         if self.nb_truncate:
             percent = len(self.data) * 100.0 / self.size
             self.warning("[SUMUP] Truncate# %s  -- size: %.1f%% of %s" % (
-                self.nb_truncate, self.size, percent))
+                self.nb_truncate, percent, self.size))
+
     def warning(self, message):
         print "    %s (%s): %s" % (basename(self.filename), self.nb_extract, message)
 
@@ -87,6 +93,7 @@ class FileFuzzer:
         # Update state
         self.mangle_call += 1
         self.mangle_count += count
+        self.is_original = False
         self.warning("Mangle #%s (%s op.)" % (self.mangle_call, count))
 
     def truncate(self):
@@ -99,7 +106,7 @@ class FileFuzzer:
         new_size = randint(1, len(self.data)-1)
         self.warning("Truncate #%s (%s bytes)" % (self.nb_truncate, new_size))
         self.data = self.data[:new_size]
-        self.truncated = True
+        self.is_original = False
 
     def tryUndo(self):
         # No operation to undo?
@@ -109,7 +116,7 @@ class FileFuzzer:
 
         # Undo
         self.nb_undo += 1
-        self.info("Undo! %u/%u" % (self.nb_undo, MAX_NB_UNDO))
+        self.info("Undo #%s" % self.nb_undo)
         self.undo(self)
         self.undo = None
 
