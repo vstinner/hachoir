@@ -230,11 +230,18 @@ class OggPage(FieldSet):
         yield UInt64(self, 'abs_granule_pos')
         yield textHandler(UInt32(self, 'serial'), hexadecimal)
         yield UInt32(self, 'page')
-        yield UInt32(self, 'checksum')
+        yield textHandler(UInt32(self, 'checksum'), hexadecimal)
         yield UInt8(self, 'lacing_size')
         if self.lacing_size:
             yield Lacing(self, "lacing", size=self.lacing_size*8)
             yield Segments(self, "segments", size=self._size-self._current_size)
+
+    def validate(self):
+        if self['capture_pattern'].value != self.MAGIC:
+            return "Wrong signature"
+        if self['stream_structure_version'].value != 0:
+            return "Unknown structure version (%s)" % self['stream_structure_version'].value
+        return ""
 
 class OggFile(Parser):
     tags = {
@@ -268,8 +275,9 @@ class OggFile(Parser):
                 return "Unable to get page #%u" % index
             except (InputStreamError, ParserError):
                 return "Unable to create page #%u" % index
-            if page['capture_pattern'].value != OggPage.MAGIC:
-                return "Wrong signature"
+            err = page.validate()
+            if err:
+                return "Invalid page #%s: %s" % (index, err)
         return True
 
     def createMimeType(self):
