@@ -13,7 +13,7 @@ CLASSIFIERS = [
     'Programming Language :: Python']
 MODULES = (
     "archive", "audio", "container", "common", "file_system", "game",
-    "image", "misc", "network", "office", "program", "video")
+    "image", "misc", "network", "program", "video")
 
 def main():
     if "--setuptools" in argv:
