@@ -156,8 +156,8 @@ class RealMediaFile(Parser):
             return "Invalid magic"
         if self["header/size"].value != 18:
             return "Invalid header size"
-        if self["header/version"].value != 1:
-            return "Unknown file format version"
+        if self["header/version"].value not in (0, 1):
+            return "Unknown file format version (%s)" % self["header/version"].value
         return True
 
     def createFields(self):
