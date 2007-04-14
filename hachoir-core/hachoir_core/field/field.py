@@ -99,7 +99,8 @@ class Field(Logger):
     def __unicode__(self):
         return self.display
     def __repr__(self):
-        return self.raw_display
+        return "<%s path=%r, address=%s, size=%s>" % (
+            self.__class__.__name__, self.path, self._address, self._size)
 
     def hasValue(self):
         return self._getValue() is not None
@@ -161,6 +162,8 @@ class Field(Logger):
     index = property(_getIndex)
 
     def _getPath(self):
+        if not self._parent:
+            return '/'
         names = []
         field = self
         while field:
@@ -233,9 +236,10 @@ class Field(Logger):
         assert self._parent
         return InputFieldStream(self, **args)
     def getSubIStream(self):
-        stream = None
         if hasattr(self, "_sub_istream"):
             stream = self._sub_istream()
+        else:
+            stream = None
         if stream is None:
             stream = self._createInputStream()
             self._sub_istream = weakref_ref(stream)
