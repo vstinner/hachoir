@@ -247,6 +247,8 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
                     continue
             except StopIteration:
                 block = None
+            if first is None:
+                break
             self.seekBlock(first)
             desc = "Big blocks %s..%s (%s)" % (first, previous, previous-first+1)
             desc += " of %s bytes" % (self.sector_size//8)
@@ -271,7 +273,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
         block = start
         block_set = set()
         previous = block
-        while block != SECT.END_OF_CHAIN:
+        while block not in (None, SECT.END_OF_CHAIN):
             if block < 0:
                 raise ParserError("FAT chain: Invalid block index (negative: %s)" % block)
             if block in block_set:
