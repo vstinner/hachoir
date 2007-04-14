@@ -50,8 +50,8 @@ class SECT(Int32):
     def __init__(self, parent, name, description=None):
         Int32.__init__(self, parent, name, description)
 
-    def createDisplay(self, field):
-        val = field.value
+    def createDisplay(self):
+        val = self.value
         return SECT.special_value_name.get(val, str(val))
 
 class Property(FieldSet):
@@ -272,8 +272,10 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
         block_set = set()
         previous = block
         while block != SECT.END_OF_CHAIN:
+            if block < 0:
+                raise ParserError("FAT chain: Invalid block index (negative: %s)" % block)
             if block in block_set:
-                raise ParserError("Loop in FAT chain (%s=>%s)" % (previous, block))
+                raise ParserError("FAT chain: Found a loop (%s=>%s)" % (previous, block))
             block_set.add(block)
             yield block
             previous = block
@@ -281,7 +283,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
             try:
                 block = fat[index]["index[%u]" % block].value
             except LookupError, err:
-                self.error("Unable to parse a FAT chain: %s" % err)
+                self.error("FAT chain: %s" % err)
 
     def readBFAT(self):
         self.bb_fat = []
