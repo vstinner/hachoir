@@ -1,4 +1,4 @@
-from hachoir_core.field import (BasicFieldSet, Field, ParserError,
+from hachoir_core.field import (MissingField, BasicFieldSet, Field, ParserError,
     createRawField, createNullField, createPaddingField, FakeArray)
 from hachoir_core.dict import Dict, UniqKeyError
 from hachoir_core.error import HACHOIR_ERRORS
@@ -222,6 +222,8 @@ class GenericFieldSet(BasicFieldSet):
                 raise KeyError("Key must be positive!")
             if not const:
                 self.readFirstFields(key+1)
+            if len(self._fields.values) <= key:
+                raise MissingField(self, key)
             return self._fields.values[key]
         return Field.getField(self, key, const)
 
