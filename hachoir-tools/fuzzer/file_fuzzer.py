@@ -143,7 +143,7 @@ class FileFuzzer:
 
         # Extract metadata
         try:
-            metadata = extractMetadata(parser, 0.5, False)
+            metadata = extractMetadata(parser, 0.5)
             failure = bool(self.fuzzer.log_error)
         except (HACHOIR_ERRORS, AssertionError), err:
             self.info("SERIOUS ERROR: %s" % err)
