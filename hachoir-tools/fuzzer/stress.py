@@ -114,7 +114,7 @@ class Fuzzer:
             if failure is None \
             and fuzz.nb_undo < MAX_NB_UNDO:
                 if fuzz.tryUndo():
-                    continue
+                    failure = False
             if failure is None:
                 return True
             if failure:

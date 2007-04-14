@@ -22,23 +22,17 @@ MAX_NB_TRUNCATE = 5
 
 class UndoMangle:
     def __init__(self, fuzz):
-        self.count = fuzz.mangle_count
         self.data = fuzz.data.tostring()
-        self.ncall = fuzz.mangle_call
 
     def __call__(self, fuzz):
-        fuzz.mangle_count = self.count
         fuzz.data = array('B', self.data)
-        fuzz.mangle_call = self.ncall
 
 class UndoTruncate:
     def __init__(self, fuzz):
-        self.count = fuzz.nb_truncate
         self.data = fuzz.data
 
     def __call__(self, fuzz):
         fuzz.data = self.data
-        fuzz.nb_truncate = self.count
 
 class FileFuzzer:
     def __init__(self, fuzzer, filename):
@@ -68,14 +62,16 @@ class FileFuzzer:
         return (self.nb_truncate < MAX_NB_TRUNCATE) and (1 < len(self.data))
 
     def sumUp(self):
-        self.warning("[TOTAL] Extraction: %s" % self.nb_extract)
-        self.warning("[TOTAL] Mangle# %s (%s op.)" % (
-            self.mangle_call, self.mangle_count))
-        percent = len(self.data) * 100.0 / self.size
-        self.warning("[TOTAL] Truncate# %s  -- size: %.1f%% of %s" % (
-            self.nb_truncate, self.size, percent))
+        self.warning("[SUMUP] Extraction: %s" % self.nb_extract)
+        if self.mangle_call:
+            self.warning("[SUMUP] Mangle# %s (%s op.)" % (
+                self.mangle_call, self.mangle_count))
+        if self.nb_truncate:
+            percent = len(self.data) * 100.0 / self.size
+            self.warning("[SUMUP] Truncate# %s  -- size: %.1f%% of %s" % (
+                self.nb_truncate, self.size, percent))
     def warning(self, message):
-        print "[%s:#%s] %s" % (basename(self.filename), self.nb_undo, message)
+        print "   %s (%s): %s" % (basename(self.filename), self.nb_extract, message)
 
     def info(self, message):
         if self.verbose:
@@ -91,7 +87,7 @@ class FileFuzzer:
         # Update state
         self.mangle_call += 1
         self.mangle_count += count
-        self.warning("Mangle #%s: %s operations" % (self.mangle_call, count))
+        self.warning("Mangle #%s: %s op." % (self.mangle_call, count))
 
     def truncate(self):
         assert 1 < len(self.data)
