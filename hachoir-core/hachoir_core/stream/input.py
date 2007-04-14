@@ -127,10 +127,7 @@ class InputStream(Logger):
         self._size = size   # in bits
         if size == 0:
             raise NullStreamError(source)
-        if "tags" in args:
-            self.tags = list(args["tags"])
-        else:
-            self.tags = []
+        self.tags = tuple(args.get("tags", tuple()))
         self.packets = packets
 
     def askSize(self, client):
