@@ -24,10 +24,11 @@ MIN_SIZE = 1
 MAX_SIZE = 1024 * 1024
 MAX_DURATION = 10.0
 MEMORY_LIMIT = 5 * 1024 * 1024
-MANGLE_PERCENT = 0.25
+MANGLE_PERCENT = 0.30
 MAX_NB_UNDO = 10
-MIN_MANGLE_PERCENT = 0.05
+MIN_MANGLE_PERCENT = 0.01
 MANGLE_PERCENT_INCR = float(MANGLE_PERCENT - MIN_MANGLE_PERCENT) / MAX_NB_UNDO
+MAX_NB_TRUNCATE = 5
 
 try:
     import sha
@@ -48,6 +49,7 @@ def getFilesize(file):
 class FileFuzzerUndo:
     def __init__(self):
         self.mangle_count = 0
+        self.nb_truncate = 0
         self.reset()
 
     def reset(self):
@@ -63,6 +65,7 @@ class FileFuzzer:
         self.filename = filename
         self.size = getFilesize(self.file)
         self.mangle_count = 0
+        self.nb_truncate = 0
         size = randint(MIN_SIZE, MAX_SIZE)
         data_str = self.file.read(size)
         self.data = array('B', data_str)
@@ -70,26 +73,25 @@ class FileFuzzer:
         self.undo_state = FileFuzzerUndo()
         self.nb_extract = 0
         if self.truncated:
-            self.info("Truncate to %s bytes" % len(self.data))
+            self.warning("Truncate to %s bytes" % len(self.data))
         else:
             self.info("Size: %s bytes" % len(self.data))
-#            self.mangle()
         self.accept_truncate = True
 
     def acceptTruncate(self):
-        if not self.accept_truncate:
-            return False
-        return 1 < len(self.data)
+        return (self.nb_truncate < MAX_NB_TRUNCATE) and (1 < len(self.data))
 
     def sumUp(self):
         print "Extract: %s; size: %.1f%% of %s; mangle: %s" % (
             self.nb_extract, len(self.data)*100.0/self.size,
             self.size, self.mangle_count)
 
-    def info(self, message):
-        if not self.verbose:
-            return
+    def warning(self, message):
         print "[%s] %s" % (basename(self.filename), message)
+
+    def info(self, message):
+        if self.verbose:
+            self.warning(message)
 
     def mangle(self):
         # Store last state
@@ -107,10 +109,12 @@ class FileFuzzer:
         assert 1 < len(self.data)
         #  Store last state (for undo)
         self.undo_state.data = self.data.tostring()
+        self.undo_state.nb_truncate = self.nb_truncate
+        self.nb_truncate += 1
 
         # Truncate
         new_size = randint(1, len(self.data)-1)
-        self.info("Truncate to %s bytes" % new_size)
+        self.warning("Truncate to %s bytes" % new_size)
         self.data = self.data[:new_size]
         self.truncated = True
 
@@ -119,7 +123,7 @@ class FileFuzzer:
             self.info("Unable to undo")
             return False
         self.nb_undo += 1
-        self.info("UNDO! (%u/%s)" % (self.nb_undo, MAX_NB_UNDO))
+
 #        self.accept_truncate = False
         percent = max(self.mangle_percent - MANGLE_PERCENT_INCR, MIN_MANGLE_PERCENT)
         if self.mangle_percent != percent:
@@ -127,7 +131,10 @@ class FileFuzzer:
             self.info("Set mangle percent to: %u%%" % int(self.mangle_percent*100))
         self.data = array('B', self.undo_state.data)
         self.mangle_count = self.undo_state.mangle_count
+        self.nb_truncate = self.undo_state.nb_truncate
         self.undo_state.reset()
+
+        self.warning("Undo! %u/%u" % (self.nb_undo, MAX_NB_UNDO))
         return True
 
     def extract(self):
@@ -226,7 +233,7 @@ class Fuzzer:
         if text.startswith("Unable to create directory directory["):
             # [/section_rsrc] Unable to create directory directory[2][0][]: Can't get field "header" from /section_rsrc/directory[2][0][]
             return True
-        if text.startswith("FAT chain: "):
+        if "FAT chain: " in text:
             return True
         if text.startswith("EXE resource: depth too high"):
             return True
@@ -274,7 +281,7 @@ class Fuzzer:
                 prefix = "exception"
             if fatal_error:
                 break
-            if failure in (True, None) \
+            if failure is None \
             and fuzz.nb_undo < MAX_NB_UNDO:
                 if fuzz.tryUndo():
                     continue
@@ -283,7 +290,7 @@ class Fuzzer:
             if failure:
                 break
             if fuzz.acceptTruncate():
-                if randint(0,20) == 0:
+                if randint(0,10) == 0:
                     fuzz.truncate()
                 else:
                     fuzz.mangle()
