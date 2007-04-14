@@ -11,14 +11,24 @@ from array import array
 from mangle import mangle
 from time import time
 
+# Truncate: minimum/maximum file size (in bytes)
 MIN_SIZE = 1
 MAX_SIZE = 1024 * 1024
+
+# Limit each test to 10 secondes
 MAX_DURATION = 10.0
+
+# Number of mangle operation depending of current size
+# '0.30' means: 30% of current size in byte
 MANGLE_PERCENT = 0.30
 MANGLE_PERCENT_INCR = 0.05
 MIN_MANGLE_PERCENT = 0.05
-MAX_NB_TRUNCATE = 5
+
+# Limit fuzzing to 40 tests
 MAX_NB_EXTRACT = 40
+
+# Truncate file if its current size is bigger than 10% of original size
+TRUNCATE_PERCENT = 0.10
 
 class UndoMangle:
     def __init__(self, fuzz):
@@ -64,7 +74,7 @@ class FileFuzzer:
             self.info("Size: %s bytes" % len(self.data))
 
     def acceptTruncate(self):
-        return (self.nb_truncate < MAX_NB_TRUNCATE) and (1 < len(self.data))
+        return max(self.size * TRUNCATE_PERCENT, MIN_SIZE) < len(self.data)
 
     def sumUp(self):
         self.warning("[SUMUP] Extraction: %s" % self.nb_extract)
@@ -97,13 +107,13 @@ class FileFuzzer:
         self.warning("Mangle #%s (%s op.)" % (self.mangle_call, count))
 
     def truncate(self):
-        assert 1 < len(self.data)
+        assert MIN_SIZE < len(self.data)
         #  Store last state (for undo)
         self.undo = UndoTruncate(self)
 
         # Truncate
         self.nb_truncate += 1
-        new_size = randint(1, len(self.data)-1)
+        new_size = randint(MIN_SIZE, len(self.data)-1)
         self.warning("Truncate #%s (%s bytes)" % (self.nb_truncate, new_size))
         self.data = self.data[:new_size]
         self.is_original = False
