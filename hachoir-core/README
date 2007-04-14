@@ -36,34 +36,35 @@ Major changes:
  * Remove text_handler argument to bit and integer fields:
    use textHandler() instead
  * Field.raw_display attribute creation is now fault tolerant and use cache
- * GenericFieldSet: avoid field creation recursion
- * Add function to call another function with a memory limit
- * Add functions durationWin64(), timestampUUID60() and timedelta2seconds()
- * Rewrite humanDuration() which now accepts float and datetime.timedelta()
  * SeekableFieldSet class is near complete and more stable
- * String classes: add truncate argument to constructor
- * SubFile: add "class" (specify a parser class) argument to constructor
+ * GenericFieldSet: use a lock to avoid field creation recursion
+ * Add function limitedMemory() to call another function with a memory limit
+ * Add functions durationWin64(), timestampUUID60() and timedelta2seconds()
+ * Add "class" argument to SubFile constructor: specify a parser class
 
 Changes:
 
+ * String classes: add truncate argument to constructor
+ * Rewrite humanDuration() which now accepts float and datetime.timedelta()
  * BasicFieldSet: only use static_size if size is None (in constructor)
  * Bit.raw_display is now "0" or "1" (and not "True" or "False")
  * Float80.createValue() raises ValueError on overflow
  * humanUnixAttributes() returns unicode string
  * ISO 639: convert data to Unicode
- * Field uses parent.nextFieldAddress() to get address
- * Field uses parent.getFieldIndex() to know its index
- * Move setUniqueFieldName() method in BasicFieldSet
- * GenericFieldSet: _addField() raise an ParserError if field type is invalid
-   instead of an assertion
+ * Field uses parent.nextFieldAddress() to get address and
+   parent.getFieldIndex() to know its index (to be compatible with
+   SeekableFieldSet)
  * SeekableFieldSet: constructor use size argument
  * SeekableFieldSet: add getField(), _getField(), __getitem()__,
    current_size and size attributes
- * SeekableFieldSet: field creation check higger limit (address+size)
+ * SeekableFieldSet: seekBit()/seekByte() checks address and field
+   creation check higger limit (address+size)
  * String: support "CP037" charset
 
 Bug fixes:
 
+ * GenericFieldSet: _addField() raise an ParserError if field type is invalid
+   instead of an assertion
  * SeekableFieldSet: fix seekBit(), getFieldByAddress() and done attribute
  * GenericFieldSet: _fixFieldSize() doesn't display warning if the field is
    not deleted
