@@ -68,10 +68,12 @@ class FileFuzzer:
         return (self.nb_truncate < MAX_NB_TRUNCATE) and (1 < len(self.data))
 
     def sumUp(self):
-        print "Extract: %s; size: %.1f%% of %s; mangle: %s (%s op.); truncate: %s" % (
-            self.nb_extract, len(self.data)*100.0/self.size,
-            self.size, self.mangle_call, self.mangle_count, self.nb_truncate)
-
+        self.warning("[TOTAL] Extraction: %s" % self.nb_extract)
+        self.warning("[TOTAL] Mangle# %s (%s op.)" % (
+            self.mangle_call, self.mangle_count))
+        percent = len(self.data) * 100.0 / self.size
+        self.warning("[TOTAL] Truncate# %s  -- size: %.1f%% of %s" % (
+            self.nb_truncate, self.size, percent))
     def warning(self, message):
         print "[%s:#%s] %s" % (basename(self.filename), self.nb_undo, message)
 
@@ -111,7 +113,7 @@ class FileFuzzer:
 
         # Undo
         self.nb_undo += 1
-        self.warning("Undo! %u/%u" % (self.nb_undo, MAX_NB_UNDO))
+        self.info("Undo! %u/%u" % (self.nb_undo, MAX_NB_UNDO))
         self.undo(self)
         self.undo = None
 

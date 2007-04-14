@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 from os import path, getcwd, nice, mkdir
 from os.path import basename
 from sys import exit, argv, stderr
@@ -15,6 +14,7 @@ import re
 # Constants
 SLEEP_SEC = 0
 MEMORY_LIMIT = 5 * 1024 * 1024
+TRUNCATE_RATE = 20  # 1 times on 20 tries
 
 class Fuzzer:
     def __init__(self, filedb_dirs, error_dir):
@@ -63,8 +63,8 @@ class Fuzzer:
         if text.startswith("Unable to create directory directory["):
             # [/section_rsrc] Unable to create directory directory[2][0][]: Can't get field "header" from /section_rsrc/directory[2][0][]
             return True
-#        if "FAT chain: " in text:
-#            return True
+        if "FAT chain: " in text:
+            return True
         if text.startswith("EXE resource: depth too high"):
             return True
         if "OLE2: Too much sections" in text:
@@ -120,7 +120,7 @@ class Fuzzer:
             if failure:
                 break
             if fuzz.acceptTruncate():
-                if randint(0,10) == 0:
+                if randint(0,TRUNCATE_RATE-1) == 0:
                     fuzz.truncate()
                 else:
                     fuzz.mangle()

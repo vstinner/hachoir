@@ -3,7 +3,7 @@ from array import array
 
 MAX_MIX = 20
 MIN_MIX = -MAX_MIX
-MIN_COUNT = 1
+MIN_COUNT = 25
 MAX_COUNT = 2500
 MAX_INC = 32
 MIN_INC = -MAX_INC
@@ -76,8 +76,8 @@ def mangle(data, percent, min_count=MIN_COUNT, max_count=MAX_COUNT):
     max_percent = max(min(percent, 1.0), 0.0001)
     count = int( float(len(data)) * max_percent )
     count = max(count, min_count)
-    count = min(count, max_count)
-    count = randint(min_count, count)
+#    count = min(count, max_count)
+    count = randint(1, count)
     for index in xrange(count):
         operation = random_choice(MANGLE_OPERATIONS)
         offset = randint(0, hsize)
