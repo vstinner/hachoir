@@ -64,11 +64,14 @@ class QueryParser(object):
             tag = self.translate(*tag)
             parsers = []
             if tag is not None:
-                byname = self.db.bytag.get(tag[0],{})
+                key = tag[0]
+                byname = self.db.bytag.get(key,{})
                 if tag[1] is None:
                     values = byname.itervalues()
                 else:
                     values = byname.get(tag[1],()),
+                if key == "id" and values:
+                    self.validate = False
                 for value in values:
                     for parser in value:
                         if parser in self.parsers:
