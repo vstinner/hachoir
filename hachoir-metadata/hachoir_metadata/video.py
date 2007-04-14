@@ -126,7 +126,10 @@ class MkvMetadata(MultipleMetadata):
                 # (long int too large to convert to int)
                 pass
         if "DateUTC/date" in info:
-            self.creation_date = dateToDatetime(info["DateUTC/date"].value)
+            try:
+                self.creation_date = dateToDatetime(info["DateUTC/date"].value)
+            except OverflowError:
+                pass
         if "WritingApp/unicode" in info:
             self.producer = info["WritingApp/unicode"].value
         if "MuxingApp/unicode" in info:
