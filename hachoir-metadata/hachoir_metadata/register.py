@@ -11,7 +11,8 @@ from hachoir_metadata.metadata_item import Data
 MIN_SAMPLE_RATE = 1000              # 1 kHz
 MAX_SAMPLE_RATE = 192000            # 192 kHz
 MAX_NB_CHANNEL = 8                  # 8 channels
-MAX_WIDTH = 200000                  # 200 000 pixels
+MAX_WIDTH = 20000                   # 20 000 pixels
+MAX_BIT_RATE = 500 * 1024 * 1024    # 500 Mbit/s
 MAX_HEIGHT = MAX_WIDTH
 MAX_NB_COLOR = 2 ** 24              # 16 million of color
 MAX_BITS_PER_PIXEL = 256            # 256 bits/pixel
@@ -84,7 +85,7 @@ def registerAllItems(meta):
     meta.register(Data("frame_rate", 603, _("Frame rate"), text_handler=humanFrameRate,
         filter=NumberFilter(1, MAX_FRAME_RATE), type=(int, long, float)))
     meta.register(Data("bit_rate", 604, _("Bit rate"), text_handler=humanBitRate,
-        filter=NumberFilter(1), type=(int, long, float)))
+        filter=NumberFilter(1, MAX_BIT_RATE), type=(int, long, float)))
     meta.register(Data("aspect_ratio", 604, _("Aspect ratio"), type=(int, long, float)))
 
     meta.register(Data("os", 900, _("OS"), type=unicode))
