@@ -71,7 +71,7 @@ class FileFuzzer:
             self.warning("[SUMUP] Truncate# %s  -- size: %.1f%% of %s" % (
                 self.nb_truncate, self.size, percent))
     def warning(self, message):
-        print "   %s (%s): %s" % (basename(self.filename), self.nb_extract, message)
+        print "    %s (%s): %s" % (basename(self.filename), self.nb_extract, message)
 
     def info(self, message):
         if self.verbose:
@@ -87,7 +87,7 @@ class FileFuzzer:
         # Update state
         self.mangle_call += 1
         self.mangle_count += count
-        self.warning("Mangle #%s: %s op." % (self.mangle_call, count))
+        self.warning("Mangle #%s (%s op.)" % (self.mangle_call, count))
 
     def truncate(self):
         assert 1 < len(self.data)
@@ -97,7 +97,7 @@ class FileFuzzer:
         # Truncate
         self.nb_truncate += 1
         new_size = randint(1, len(self.data)-1)
-        self.warning("Truncate #%s: to %s bytes" % (self.nb_truncate, new_size))
+        self.warning("Truncate #%s (%s bytes)" % (self.nb_truncate, new_size))
         self.data = self.data[:new_size]
         self.truncated = True
 
