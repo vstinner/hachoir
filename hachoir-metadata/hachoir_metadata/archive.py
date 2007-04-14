@@ -115,9 +115,9 @@ class CabMetadata(MultipleMetadata):
 
     @fault_tolerant
     def useFolder(self, folder):
-        compr = cab["compr_method"].display
-        if cab["compr_method"].value != 0:
-            compr += " (level %u)" % cab["compr_level"].value
+        compr = folder["compr_method"].display
+        if folder["compr_method"].value != 0:
+            compr += " (level %u)" % folder["compr_level"].value
         self.compression = compr
 
     @fault_tolerant
