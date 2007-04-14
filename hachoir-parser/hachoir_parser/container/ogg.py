@@ -258,8 +258,8 @@ class OggFile(Parser):
         magic = OggPage.MAGIC
         if self.stream.readBytes(0, len(magic)) != magic:
             return "Invalid magic string"
-        # Validate first 5 pages
-        for index in xrange(5):
+        # Validate first 3 pages
+        for index in xrange(3):
             try:
                 page = self[index]
             except MissingField:
