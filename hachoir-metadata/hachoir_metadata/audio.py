@@ -95,7 +95,10 @@ class OggMetadata(MultipleMetadata):
         if granule_quotient and QUALITY_NORMAL <= self.quality:
             page = ogg.createLastPage()
             if page and "abs_granule_pos" in page:
-                self.duration = timedelta(seconds=float(page["abs_granule_pos"].value) / granule_quotient)
+                try:
+                    self.duration = timedelta(seconds=float(page["abs_granule_pos"].value) / granule_quotient)
+                except OverflowError:
+                    pass
 
     def videoHeader(self, header, meta):
         meta.compression = header["fourcc"].display

@@ -224,9 +224,14 @@ class MultipleMetadata(RootMetadata):
         return any(bool(group) for group in self.__groups)
 
     def addGroup(self, key, metadata, header=None):
+        """
+        Add a new group (metadata of a sub-document).
+
+        Returns False if the group is skipped, True if it has been added.
+        """
         if not metadata:
             self.warning("Skip empty group %s" % key)
-            return
+            return False
         if key.endswith("[]"):
             key = key[:-2]
             if key in self.__key_counter:
@@ -237,6 +242,7 @@ class MultipleMetadata(RootMetadata):
         if header:
             metadata.setHeader(header)
         self.__groups.append(key, metadata)
+        return False
 
     def exportPlaintext(self, priority=None, human=True, line_prefix=u"- "):
         common = Metadata.exportPlaintext(self, priority, human, line_prefix)

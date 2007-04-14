@@ -280,26 +280,17 @@ class AsfMetadata(MultipleMetadata):
         video_index = 1
         for index, stream_prop in enumerate(header.array("stream_prop")):
             if "content/audio_header" in stream_prop:
-                audio = stream_prop["content/audio_header"]
-                meta = self.streamProperty(header, index)
-                if not meta.has("compression"):
-                    meta.compression = audio["twocc"].display
-                meta.sample_rate = audio["sample_rate"].value
-                meta.bits_per_sample = audio["bits_per_sample"].value
-                self.addGroup("audio[%u]" % audio_index, meta, "Audio stream #%u" % audio_index)
-                audio_index += 1
+                meta = Metadata(self)
+                self.streamProperty(header, index, meta)
+                self.streamAudioHeader(stream_prop["content/audio_header"], meta)
+                if self.addGroup("audio[%u]" % audio_index, meta, "Audio stream #%u" % audio_index):
+                    audio_index += 1
             elif "content/video_header" in stream_prop:
-                video = stream_prop["content/video_header"]
-                meta = self.streamProperty(header, index)
-                meta.width = video["width"].value
-                meta.height = video["height"].value
-                if "bmp_info" in video:
-                    bmp_info = video["bmp_info"]
-                    if not meta.has("compression"):
-                        meta.compression = bmp_info["codec"].display
-                    meta.bits_per_pixel = bmp_info["bpp"].value
-                self.addGroup("video[%u]" % video_index, meta, "Video stream #%u" % video_index)
-                video_index += 1
+                meta = Metadata(self)
+                self.streamProperty(header, index, meta)
+                self.streamVideoHeader(stream_prop["content/video_header"], meta)
+                if self.addGroup("video[%u]" % video_index, meta, "Video stream #%u" % video_index):
+                    video_index += 1
 
         if "metadata/content" in header:
             info = header["metadata/content"]
@@ -309,6 +300,23 @@ class AsfMetadata(MultipleMetadata):
                 self.copyright = info["copyright"].value
             except MissingField:
                 pass
+
+    @fault_tolerant
+    def streamAudioHeader(self, audio, meta):
+        if not meta.has("compression"):
+            meta.compression = audio["twocc"].display
+        meta.sample_rate = audio["sample_rate"].value
+        meta.bits_per_sample = audio["bits_per_sample"].value
+
+    @fault_tolerant
+    def streamVideoHeader(self, video, meta):
+        meta.width = video["width"].value
+        meta.height = video["height"].value
+        if "bmp_info" in video:
+            bmp_info = video["bmp_info"]
+            if not meta.has("compression"):
+                meta.compression = bmp_info["codec"].display
+            meta.bits_per_pixel = bmp_info["bpp"].value
 
     @fault_tolerant
     def useExtDescItem(self, desc, data):
@@ -344,8 +352,7 @@ class AsfMetadata(MultipleMetadata):
             text = "%s (max)" % text
         self.bit_rate = (value, text)
 
-    def streamProperty(self, header, index):
-        meta = Metadata(self)
+    def streamProperty(self, header, index, meta):
         key = "bit_rates/content/bit_rate[%u]/avg_bitrate" % index
         if key in header:
             meta.bit_rate = header[key].value
@@ -363,7 +370,6 @@ class AsfMetadata(MultipleMetadata):
 #                    meta.compression = "%s (%s)" % (text, codec["desc"].value)
 #                else:
 #                    meta.compression = text
-        return meta
 
 registerExtractor(MovFile, MovMetadata)
 registerExtractor(AsfFile, AsfMetadata)
