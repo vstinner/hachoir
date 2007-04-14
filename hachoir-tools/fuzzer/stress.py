@@ -21,10 +21,10 @@ import re
 # Constants
 SLEEP_SEC = 0
 MIN_SIZE = 1
-MAX_SIZE = 8132 #1024 * 1024
+MAX_SIZE = 1024 * 1024
 MAX_DURATION = 10.0
 MEMORY_LIMIT = 5 * 1024 * 1024
-MANGLE_PERCENT = 0.25
+MANGLE_PERCENT = 0.10
 
 try:
     import sha
@@ -36,6 +36,99 @@ except ImportError:
         return generateUniqueID.sequence
     generateUniqueID.sequence = 0
 
+def getFilesize(file):
+    file.seek(0, 2)
+    size = file.tell()
+    file.seek(0, 0)
+    return size
+
+class FileFuzzer:
+    def __init__(self, fuzzer, filename):
+        self.fuzzer = fuzzer
+        self.verbose = fuzzer.verbose
+        self.file = open(filename, "rb")
+        self.filename = filename
+        self.size = getFilesize(self.file)
+        self.mangle_count = 0
+        size = randint(MIN_SIZE, MAX_SIZE)
+        data_str = self.file.read(size)
+        self.data = array('B', data_str)
+        self.truncated = len(self.data) < self.size
+        self.nb_extract = 0
+        if self.truncated:
+            self.info("Truncate to %s bytes" % len(self.data))
+        else:
+            self.info("Size: %s bytes" % len(self.data))
+            self.mangle()
+
+    def sumUp(self):
+        print "Extract: %s; size: %.1f%%; mangle: %s" % (
+            self.nb_extract, len(self.data)*100.0/self.size, self.mangle_count)
+
+    def info(self, message):
+        if not self.verbose:
+            return
+        print "[%s] %s" % (basename(self.filename), message)
+
+    def mangle(self):
+        count = mangle(self.data, MANGLE_PERCENT)
+        self.mangle_count += count
+        self.info("Mangle: %s operations (+%s)"
+            % (self.mangle_count, count))
+
+    def truncate(self):
+        assert 1 < len(self.data)
+        new_size = randint(1, len(self.data)-1)
+        self.info("Truncate to %s bytes" % new_size)
+        self.data = self.data[:new_size]
+        self.truncated = True
+
+    def extract(self):
+        self.nb_extract += 1
+        data = self.data.tostring()
+        stream = InputIOStream(StringIO(data), filename=self.filename)
+
+        # Create parser
+        start = time()
+        try:
+            parser = guessParser(stream)
+        except InputStreamError, err:
+            parser = None
+        if not parser:
+            self.info("Unable to create parser: stop")
+            return None
+
+        # Extract metadata
+        self.prefix = ""
+        try:
+            metadata = extractMetadata(parser, 0.5)
+            failure = bool(self.fuzzer.log_error)
+        except (HACHOIR_ERRORS, AssertionError), err:
+            self.info("SERIOUS ERROR: %s" % err)
+            self.prefix = "metadata"
+            failure = True
+        duration = time() - start
+
+        # Timeout?
+        if MAX_DURATION < duration:
+            self.info("Process is too long: %.1f seconds" % duration)
+            failure = True
+            self.prefix = "timeout"
+        if not failure and metadata is None:
+            self.info("Unable to extract metadata")
+            return None
+        return failure
+
+    def keepFile(self, prefix):
+        data = self.data.tostring()
+        uniq_id = generateUniqueID(data)
+        filename="%s-%s" % (uniq_id, basename(self.filename))
+        if prefix:
+            filename = "%s-%s" % (prefix, filename)
+        error_filename = path.join(self.fuzzer.error_dir, filename)
+        open(error_filename, "wb").write(data)
+        print "=> Store file %s" % filename
+
 class Fuzzer:
     def __init__(self, filedb_dirs, error_dir):
         self.filedb_dirs = filedb_dirs
@@ -43,7 +136,7 @@ class Fuzzer:
         self.tmp_file = "/tmp/stress-hachoir"
         self.nb_error = 0
         self.error_dir = error_dir
-        self.verbose = False
+        self.verbose = True
 
     def filterError(self, text):
         if "Error during metadata extraction" in text:
@@ -100,100 +193,54 @@ class Fuzzer:
 
     def newLog(self, level, prefix, text, context):
         if level < Log.LOG_ERROR or self.filterError(text):
-            if self.verbose:
-                print "   ignore %s %s" % (prefix, text)
+#            if self.verbose:
+#                print "   ignore %s %s" % (prefix, text)
             return
         self.log_error += 1
         print "METADATA ERROR: %s %s" % (prefix, text)
 
-    def createStream(self, test_file):
-        # Read bytes
-        size = randint(MIN_SIZE, MAX_SIZE)
-        data = open(test_file, "rb").read(size)
-        data = array('B', data)
+    def fuzzFile(self, fuzz):
+        limiter = MemoryLimit(MEMORY_LIMIT)
 
-        # Mangle
-        size = len(data)
-        count = mangle(data, MANGLE_PERCENT )
-        if self.verbose:
-            print "   mangle: %.2f%% (%s/%s)" % (
-                count * 100.0 / size, count, size)
-
-        # Create stream
-        data = data.tostring()
-        output = StringIO(data)
-        return data, InputIOStream(output, filename=test_file)
-
-    def fuzzStream(self, stream):
-        # Create parser
-        start = time()
-        try:
-            parser = guessParser(stream)
-        except InputStreamError, err:
-            parser = None
-        if not parser:
-            if self.verbose:
-                print "   unable to create parser"
-            return False, ""
-
-        # Extract metadata
-        self.log_error = 0
-        prefix = ""
-        try:
-            metadata = extractMetadata(parser, 0.5)
-            failure = bool(self.log_error)
-        except (HACHOIR_ERRORS, AssertionError), err:
-            print "SERIOUS ERROR: %s" % err
-            failure = True
-        duration = time() - start
-
-        # Timeout?
-        if MAX_DURATION < duration:
-            print "Process is too long: %.1f seconds" % duration
-            failure = True
-            prefix = "timeout"
-        if self.verbose:
-            if metadata:
-                for line in unicode(metadata).split("\n"):
-                    print "   metadata>> %s" % line
+        failure = False
+        while True:
+            self.log_error = 0
+            fatal_error = False
+            try:
+                failure = limiter.call(fuzz.extract)
+                if failure is None:
+                    return True
+                prefix = fuzz.prefix
+            except KeyboardInterrupt:
+                try:
+                    failure = (raw_input("Keep current file (y/n)?").strip() == "y")
+                except (KeyboardInterrupt, EOFError):
+                    failure = True
+                prefix = "interrupt"
+                fatal_error = True
+            except MemoryError:
+                print "MEMORY ERROR!"
+                failure = True
+                prefix = "memory"
+            except Exception, err:
+                print "EXCEPTION (%s): %s" % (err.__class__.__name__, err)
+                failure = True
+                prefix = "exception"
+            if failure or fatal_error:
+                break
+            if 1 < len(fuzz.data):
+                if randint(0,20) == 0:
+                    fuzz.truncate()
+                else:
+                    fuzz.mangle()
             else:
-                print "   unable to create metadata"
-        return failure, prefix
-
-    def fuzzFile(self, test_file):
-        data, stream = self.createStream(test_file)
-
-        fatal_error = False
-        try:
-            limiter = MemoryLimit(MEMORY_LIMIT)
-            failure, prefix = limiter.call(self.fuzzStream, stream)
-        except KeyboardInterrupt:
-            failure = True
-            prefix = "interrupt"
-            fatal_error = True
-        except MemoryError:
-            print "MEMORY ERROR!"
-            failure = True
-            prefix = "memory"
-        except Exception, err:
-            print "EXCEPTION (%s): %s" % (err.__class__.__name__, err)
-            failure = True
-            prefix = "exception"
+                fuzz.mangle()
 
         # Process error
         if failure:
-            self.copyError(test_file, data, prefix)
+            fuzz.keepFile(prefix)
+            self.nb_error += 1
         return (not fatal_error)
-
-    def copyError(self, test_file, data, prefix):
-        self.nb_error += 1
-        uniq_id = generateUniqueID(data)
-        ERRNAME="%s-%s" % (uniq_id, basename(test_file))
-        if prefix:
-            ERRNAME = "%s-%s" % (prefix, ERRNAME)
-        error_filename = path.join(self.error_dir, ERRNAME)
-        open(error_filename, "wb").write(data)
-        print "=> Store file %s" % ERRNAME
 
     def init(self):
         # Setup log
@@ -223,7 +270,9 @@ class Fuzzer:
             while True:
                 test_file = random_choice(self.filedb)
                 print "[+] %s error -- test file: %s" % (self.nb_error, basename(test_file))
-                ok = self.fuzzFile(test_file)
+                fuzz = FileFuzzer(self, test_file)
+                ok = self.fuzzFile(fuzz)
+                fuzz.sumUp()
                 if not ok:
                     break
                 if SLEEP_SEC:
