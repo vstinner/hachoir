@@ -3,6 +3,7 @@ from hachoir_metadata.safe import fault_tolerant
 from hachoir_parser.misc import TorrentFile, TrueTypeFontFile, OLE2_File, PcfFile
 from hachoir_core.field import isString
 from hachoir_core.error import warning
+from hachoir_parser import guessParser
 
 class TorrentMetadata(RootMetadata):
     KEY_TO_ATTR = {
@@ -93,6 +94,16 @@ class OLE2_Metadata(RootMetadata):
             self.useSummary(ole2["summary[0]"])
 
     def useSummary(self, summary):
+        # FIXME: Remove this hack
+        # Problem: there is no method to get all fragments from a file
+        summary.parent._feedAll()
+        # ---
+
+        stream = summary.getSubIStream()
+        summary = guessParser(stream)
+        if not summary:
+            print "Unable to create summary parser"
+
         self.os = summary["os"].display
         if "section[0]" not in summary:
             return
