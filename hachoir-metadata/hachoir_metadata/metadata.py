@@ -242,7 +242,7 @@ class MultipleMetadata(RootMetadata):
         if header:
             metadata.setHeader(header)
         self.__groups.append(key, metadata)
-        return False
+        return True
 
     def exportPlaintext(self, priority=None, human=True, line_prefix=u"- "):
         common = Metadata.exportPlaintext(self, priority, human, line_prefix)
