@@ -27,7 +27,7 @@ from hachoir_core.field import (
 from hachoir_core.text_handler import textHandler, hexadecimal, filesizeHandler
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_parser.common.win32 import GUID
-from hachoir_parser.misc.msoffice import CustomFragment, PROPERTY_NAME
+from hachoir_parser.misc.msoffice import CustomFragment, OfficeRootEntry, PROPERTY_NAME
 from hachoir_parser.misc.msoffice_summary import Summary
 
 MIN_BIG_BLOCK_LOG2 = 6   # 512 bytes
@@ -199,18 +199,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
                 self.properties.append(property)
 
         # Parse first property
-#        children = set()
         for index, property in enumerate(self.properties):
-#            if index in children:
-#                self.warning("Skip %s" % index)
-#                if property["left"].value != SECT.UNUSED:
-#                    children |= set((property["left"].value,))
-#                if property["right"].value != SECT.UNUSED:
-#                    children |= set((property["right"].value,))
-#                continue
-#            if property["child"].value != SECT.UNUSED:
-#                children |= set((property["child"].value,))
-#                self.warning("Add %s" % property["child"].value)
             if index == 0:
                 name = "root"
             else:
@@ -252,10 +241,12 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
             self.seekBlock(first)
             desc = "Big blocks %s..%s (%s)" % (first, previous, previous-first+1)
             desc += " of %s bytes" % (self.sector_size//8)
-            if name_prefix in ("summary", "doc_summary"):
-                yield Summary(self, name, desc, size=size)
-            elif name_prefix == "root":
-                field = CustomFragment(self, name, size, desc, fragment_group)
+            if name_prefix in set(("root", "summary", "doc_summary")):
+                if name_prefix == "root":
+                    parser = OfficeRootEntry
+                else:
+                    parser = Summary
+                field = CustomFragment(self, name, size, parser, desc, fragment_group)
                 yield field
                 if not fragment_group:
                     fragment_group = field.group

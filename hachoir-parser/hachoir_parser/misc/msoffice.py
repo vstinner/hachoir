@@ -9,7 +9,7 @@ PROPERTY_NAME = {
     u"\5SummaryInformation": "summary",
 }
 
-class ParseFragments(HachoirParser, RootSeekableFieldSet):
+class OfficeRootEntry(HachoirParser, RootSeekableFieldSet):
     tags = {
         "description": "Microsoft Office document subfragments",
     }
@@ -79,8 +79,9 @@ class ParseFragments(HachoirParser, RootSeekableFieldSet):
             size = ole2.sector_size
 
 class FragmentGroup:
-    def __init__(self):
+    def __init__(self, parser):
         self.items = []
+        self.parser = parser
 
     def add(self, item):
         self.items.append(item)
@@ -94,15 +95,15 @@ class FragmentGroup:
 
         # FIXME: Use smarter code to send arguments
         args = {"ole2": self.items[0].root}
-        tags = {"class": ParseFragments, "args": args}
+        tags = {"class": self.parser, "args": args}
         tags = tags.iteritems()
         return StringInputStream(data, "<fragment group>", tags=tags)
 
 class CustomFragment(FieldSet):
-    def __init__(self, parent, name, size, description=None, group=None):
+    def __init__(self, parent, name, size, parser, description=None, group=None):
         FieldSet.__init__(self, parent, name, description, size=size)
         if not group:
-            group = FragmentGroup()
+            group = FragmentGroup(parser)
         self.group = group
         self.group.add(self)
 

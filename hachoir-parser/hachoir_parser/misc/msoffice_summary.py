@@ -1,5 +1,6 @@
+from hachoir_parser import HachoirParser
 from hachoir_core.field import (FieldSet, ParserError,
-    SeekableFieldSet,
+    RootSeekableFieldSet, SeekableFieldSet,
     Bit, Bits, NullBits,
     UInt16, UInt32, TimestampWin64, Enum,
     Bytes, RawBytes, NullBytes, String,
@@ -237,11 +238,17 @@ class SummarySection(SeekableFieldSet):
             yield PropertyContent(self, "property[]", findex["id"].display)
 
 class SummaryIndex(FieldSet):
+    static_size = 20*8
     def createFields(self):
         yield String(self, "name", 16)
         yield UInt32(self, "offset")
 
-class Summary(SeekableFieldSet):
+class Summary(HachoirParser, RootSeekableFieldSet):
+    tags = {
+        "description": "Microsoft Office document subfragments",
+    }
+    endian = LITTLE_ENDIAN
+
     OS_MAC = 1
     OS_NAME = {
         0: "Windows 16-bit",
@@ -249,8 +256,9 @@ class Summary(SeekableFieldSet):
         2: "Windows 32-bit",
     }
 
-    def __init__(self, *args, **kw):
-        SeekableFieldSet.__init__(self, *args, **kw)
+    def __init__(self, stream, **args):
+        RootSeekableFieldSet.__init__(self, None, "root", stream, None, stream.askSize(self))
+        HachoirParser.__init__(self, stream, **args)
         if self["endian"].value == "\xFF\xFE":
             self.endian = BIG_ENDIAN
         elif self["endian"].value == "\xFE\xFF":
@@ -258,6 +266,10 @@ class Summary(SeekableFieldSet):
         else:
             raise ParserError("OLE2: Invalid endian value")
         self.osconfig = OSConfig(self["os"].value == self.OS_MAC)
+
+    def validate(self):
+        return True
+
 
     def createFields(self):
         yield Bytes(self, "endian", 2, "Endian (0xFF 0xFE for Intel)")
