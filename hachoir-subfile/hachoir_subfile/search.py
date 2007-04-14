@@ -1,7 +1,7 @@
 from hachoir_core.error import HACHOIR_ERRORS, error
 from hachoir_core.stream import InputSubStream
 from hachoir_core.tools import humanFilesize, humanDuration
-from hachoir_core.memory import getTotalMemory, setMemoryLimit
+from hachoir_core.memory import limitedMemory
 from hachoir_subfile.data_rate import DataRate
 from hachoir_subfile.output import Output
 from hachoir_subfile.pattern import HachoirPatternMatching as PatternMatching
@@ -13,7 +13,7 @@ def skipSubfile(parser):
 
 FILE_MAX_SIZE = 100 * 1024 * 1024   # Max. file size in bytes (100 MB)
 SLICE_SIZE = 64*1024                # Slice size in bytes (64 KB)
-HARD_MEMORY_LIMIT = 100*1024*1024
+MEMORY_LIMIT = 50*1024*1024
 PROGRESS_UPDATE = 1.5   # Minimum number of second between two progress messages
 
 class SearchSubfile:
@@ -53,10 +53,6 @@ class SearchSubfile:
         self.datarate = DataRate(self.start_offset)
         self.main_start = time()
 
-        # Memory
-        self.total_mem = getTotalMemory()
-        self.mem_limit = None
-
         # Other flags and attributes
         self.patterns = None
         self.verbose = True
@@ -79,23 +75,19 @@ class SearchSubfile:
         """
 
         # Initialize
-        self.limitMemory()
         self.mainHeader()
 
         # Prepare search
         main_error = False
         try:
             # Run search
-            self.searchSubfiles()
+            limitedMemory(MEMORY_LIMIT, self.searchSubfiles)
         except KeyboardInterrupt:
             print >>stderr, "[!] Program interrupted (CTRL+C)"
             main_error = True
         except MemoryError:
             main_error = True
-            if not self.total_mem:
-                raise
-            setMemoryLimit(self.total_mem)   # Disable memory limit
-            print >>stderr, "[!] Memory error: %s limit exceed!" % humanFilesize(self.mem_limit)
+            print >>stderr, "[!] Memory error!"
         self.mainFooter()
         return not(main_error)
 
@@ -114,15 +106,6 @@ class SearchSubfile:
         self.stats = {}
         self.current_offset = self.start_offset
         self.main_start = time()
-
-    def limitMemory(self):
-        if not self.total_mem:
-            return
-        self.mem_limit = min(int(0.25 * self.total_mem), HARD_MEMORY_LIMIT)
-        if setMemoryLimit(self.mem_limit):
-            print >>stderr, "Set maximum memory to %s" % humanFilesize(self.mem_limit)
-        else:
-            print >>stderr, "(unable to set memory limit)"
 
     def mainFooter(self):
         print >>stderr
