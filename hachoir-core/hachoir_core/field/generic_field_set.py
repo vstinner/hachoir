@@ -230,7 +230,6 @@ class GenericFieldSet(BasicFieldSet):
     def _truncate(self, size):
         assert size > 0
         if size < self._current_size:
-            self.error("Truncating recursively")
             self._size = size
             while True:
                 field = self._fields.values[-1]
