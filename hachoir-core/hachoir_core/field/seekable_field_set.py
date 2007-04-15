@@ -45,27 +45,11 @@ class RootSeekableFieldSet(BasicFieldSet):
         return self._size
     size = property(_getSize)
 
-    def getField(self, key, const=True):
-        return self.__getitem__(key, const)
-
     def _getField(self, key, const):
         field = Field._getField(self, key, const)
-        if field is None:
-            return self.__getitem__(key, const)
-        else:
+        if field is not None:
             return field
 
-    def __getitem__(self, key, const=True):
-        if isinstance(key, (int, long)):
-            count = len(self._field_array)
-            if key < count:
-                return self._field_array[key]
-            raise MissingField(self, key)
-        if "/" in key:
-            if key == "/":
-                return self.root
-            parent, children = key.split("/", 1)
-            return self[parent][children]
         assert "/" not in key
         if key in self._field_dict:
             return self._field_dict[key]
@@ -81,6 +65,28 @@ class RootSeekableFieldSet(BasicFieldSet):
                 self.error("Error: %s" % makeUnicode(err))
                 self._stopFeed()
         raise MissingField(self, key)
+
+    def getField(self, key, const=True):
+        if isinstance(key, (int, long)):
+            # Integer key
+            count = len(self._field_array)
+            if key < count:
+                return self._field_array[key]
+            raise MissingField(self, key)
+
+        # String key
+        if key[0] == "/":
+            current = self._parent.root
+            key = key[1:]
+        else:
+            current = self
+        for part in key.split("/"):
+            field = current._getField(part, const)
+            if field is None:
+                raise MissingField(current, part)
+            current = field
+        assert current
+        return current
 
     def _addField(self, field):
         if field._name.endswith("[]"):
@@ -158,9 +164,16 @@ class RootSeekableFieldSet(BasicFieldSet):
     current_size = property(lambda self: self._current_max_size)
 
     def __iter__(self):
-        raise NotImplementedError()
+        for field in self._field_array:
+            yield field
+        if self._generator:
+            for field in self._readFields():
+                yield field
+
     def __len__(self):
-        raise NotImplementedError()
+        if self._generator:
+            self._feedAll()
+        return len(self._field_array)
 
     def nextFieldAddress(self):
         return self._offset
