@@ -7,11 +7,11 @@ class field_view_imp_t:
     def __init__(self):
         self.addr_func = lambda field: field._getAbsoluteAddress()
         self.format_addr = lambda field: format_addr_hex(self.addr_func(field))
-        
+
     def on_field_set_ready(self, dispatcher, field_set):
         assert field_set is not None
         self.fields = field_set
-    
+
     def on_field_view_ready(self, dispatcher, view):
         assert view is not None
         self.view = view
@@ -19,7 +19,10 @@ class field_view_imp_t:
         self.dispatcher.trigger('field_activated', self.fields)
 
     def on_item_selected(self):
-        self.dispatcher.trigger('field_selected', self.fields[self.view.get_selected(_('name'))])
+        name = self.view.get_selected(_('name'))
+        if isinstance(name, unicode):
+            name = str(name)
+        self.dispatcher.trigger('field_selected', self.fields[name])
 
     def on_item_activated(self):
         field = self.fields[self.view.get_selected(_('name'))]
@@ -39,7 +42,7 @@ class field_view_imp_t:
     def on_address_relative(self, dispatcher):
         self.addr_func = lambda field: field._getAddress()
         self.refill_view()
-    
+
     def on_address_absolute(self, dispatcher):
         self.addr_func = lambda field: field._getAbsoluteAddress()
         self.refill_view()
