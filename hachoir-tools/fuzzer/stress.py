@@ -3,7 +3,7 @@ from os import path, getcwd, nice, mkdir
 from sys import exit, argv, stderr
 from glob import glob
 from random import choice as random_choice, randint
-from hachoir_core.memory import PAGE_SIZE, MemoryLimit
+from hachoir_core.memory import limitedMemory
 from errno import EEXIST
 from time import sleep
 from hachoir_core.log import log as hachoir_logger, Log
@@ -11,7 +11,7 @@ from file_fuzzer import FileFuzzer, MAX_NB_EXTRACT, TRUNCATE_RATE
 import re
 
 # Constants
-SLEEP_SEC = 0
+SLEEP_SEC = 0.200
 MEMORY_LIMIT = 5 * 1024 * 1024
 
 class Fuzzer:
@@ -65,7 +65,7 @@ class Fuzzer:
             return True
         if text.startswith("EXE resource: depth too high"):
             return True
-        if "OLE2: Unable to parser property of type" in text:
+        if "OLE2: Unable to parse property of type" in text:
             return True
         if "OLE2: Too much sections" in text:
             return True
@@ -84,14 +84,15 @@ class Fuzzer:
         print "METADATA ERROR: %s %s" % (prefix, text)
 
     def fuzzFile(self, fuzz):
-        limiter = MemoryLimit(MEMORY_LIMIT)
 
         failure = False
         while fuzz.nb_extract < MAX_NB_EXTRACT:
+            if SLEEP_SEC:
+                sleep(SLEEP_SEC)
             self.log_error = 0
             fatal_error = False
             try:
-                failure = limiter.call(fuzz.extract)
+                failure = limitedMemory(MEMORY_LIMIT, fuzz.extract)
                 prefix = fuzz.prefix
             except KeyboardInterrupt:
                 try:
@@ -169,8 +170,6 @@ class Fuzzer:
                 ok = self.fuzzFile(fuzz)
                 if not ok:
                     break
-                if SLEEP_SEC:
-                    sleep(SLEEP_SEC)
         except KeyboardInterrupt:
             print "Stop"
 
