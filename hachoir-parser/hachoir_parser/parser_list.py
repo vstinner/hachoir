@@ -87,7 +87,7 @@ class ParserList(object):
     def print_(self, title=None, verbose=False, format="default"):
         """Display a list of parser with its title
          * title : title of the list to display
-         * format: "rest", "one_line" or "default"
+         * format: "rest", "trac", "one_line" or "default"
         """
 
         if format != "rest":
@@ -95,6 +95,9 @@ class ParserList(object):
                 print title
             else:
                 print _("List of Hachoir parsers.")
+            print
+        if format == "trac":
+            print "Total: %s metadata extractors" % len(self.parser_list)
             print
 
         # Create parser list sorted by module
@@ -109,6 +112,9 @@ class ParserList(object):
                     print category.replace("_", " ").title()
                     print "-" * len(category)
                     print
+                elif format == "trac":
+                    print "=== %s ===" % category.replace("_", " ").title()
+                    print
                 else:
                     print "[%s]" % category
                 parser_list = sorted(bycategory[category],
@@ -117,11 +123,18 @@ class ParserList(object):
                     for parser in parser_list:
                         tags = parser.getTags()
                         print "* %s: %s" % (tags["id"], tags["description"])
+                elif format == "trac":
+                    for parser in parser_list:
+                        tags = parser.getTags()
+                        desc = tags["description"]
+                        desc = re.sub(r"([A-Z][a-z]+[A-Z][^ ]+)", r"!\1", desc)
+                        print " * %s: %s" % (tags["id"], desc)
                 else:
                     for parser in parser_list:
                         parser.print_(verbose)
                 print
-        print "Total: %s parsers" % len(self.parser_list)
+        if format != "trac":
+            print "Total: %s parsers" % len(self.parser_list)
 
 
 class HachoirParserList(ParserList):
