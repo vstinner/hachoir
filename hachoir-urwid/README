@@ -51,6 +51,18 @@ Command line options: use --help option.
 
 In hachoir-use, use F1 key to get help (keyboard keys).
 
+What's new in hachoir-urwid 0.9.0?
+==================================
+
+Changes:
+
+ * Fixes to support latest version of urwid
+ * Updates to last version of hachoir-core and hachoir-parser (eg. use
+   HachoirParserList class to display parser list)
+ * Replace command line option --force-mime with --parser (value is now the
+   parser identifier and not a MIME type)
+ * Add command line options --hide-value and --hide-size
+
 What's new in hachoir-urwid 0.8.0?
 ==================================
 
