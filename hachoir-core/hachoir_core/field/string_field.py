@@ -21,6 +21,10 @@ from hachoir_core.tools import alignValue, makePrintable
 from hachoir_core.i18n import _
 from hachoir_core import config
 
+# Default charset used to convert byte string to Unicode
+# This charset is used if no charset is specified or on conversion error
+FALLBACK_CHARSET = "ISO-8859-1"
+
 class GenericString(Bytes):
     """
     Generic string class.
@@ -194,6 +198,36 @@ class GenericString(Bytes):
             self._format, self._charset, self._parent.endian)
     suffix_str = property(_getSuffixStr)
 
+    def _convertText(self, text):
+        # No charset: use fallback charset
+        if not self._charset:
+            return unicode(text, FALLBACK_CHARSET, "strict")
+
+        # Try to convert to Unicode
+        try:
+            return unicode(text, self._charset, "strict")
+        except UnicodeDecodeError, err:
+            pass
+
+        #--- Conversion error ---
+
+        # Fix truncated UTF-16 string like 'B\0e' (3 bytes)
+        # => Add missing nul byte: 'B\0e\0' (4 bytes)
+        if err.reason == "truncated data" \
+        and err.end == len(text) \
+        and self._charset == "UTF-16-LE":
+            try:
+                text = unicode(text+"\0", self._charset, "strict")
+                self.warning("Fix truncated %s string: add missing nul byte" % self._charset)
+                return text
+            except UnicodeDecodeError, err:
+                pass
+
+        # On error, use "ISO-8859-1"
+        self.warning("Unable to convert string to Unicode: " + unicode(err))
+        self._charset = None
+        return unicode(text, FALLBACK_CHARSET, "strict")
+
     def createValue(self, human=True):
         # Compress data address (in bits) and size (in bytes)
         if human:
@@ -213,17 +247,8 @@ class GenericString(Bytes):
         if not human:
             return text
 
-        # Convert to Unicode
-        if self._charset:
-            try:
-                text = unicode(text, self._charset)
-            except UnicodeDecodeError, err:
-                # On error, use 'str' type
-                self.warning("Unable to convert string to Unicode: " + unicode(err))
-                self._charset = None
-                text = unicode(text, "ISO-8859-1")
-        else:
-            text = unicode(text, "ISO-8859-1")
+        # Convert text to Unicode
+        text = self._convertText(text)
 
         # Truncate
         if self._truncate:
