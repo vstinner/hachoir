@@ -16,10 +16,12 @@ from hachoir_core.tools import humanFilesize, makePrintable
 from hachoir_core.i18n import _, getTerminalCharset
 from hachoir_parser import createParser
 from optparse import OptionGroup, OptionParser
+from hachoir_core.stream import StringOutputStream, readStringOutputContent
 import hachoir_core
 import sys
 
 # File formats
+from hachoir_parser.archive import TarFile
 from hachoir_parser.audio import AuFile
 from hachoir_parser.image import PngFile, JpegFile
 from hachoir_parser.container import RiffFile
@@ -39,6 +41,14 @@ class BasicStripper:
         self.editor = editor
         self.level = level
         self.verbose = verbose
+        self._is_dirty = False
+        self._removed_bytes = 0
+
+    def __call__(self):
+        self.stripped_bytes = self.strip()
+        if self.stripped_bytes:
+            self._is_dirty = True
+        return self._is_dirty
 
     def info(self, message):
         if self.verbose:
@@ -149,8 +159,38 @@ class RiffStripper(BasicStripper):
             self.editor["filesize"].value -= (size // 8)
         return size
 
+class MpegAudioStripper(CheckStripper):
+    def checkField(self, field):
+        if self.level & STRIP_METADATA:
+            return field.name in ("id3v1", "id3v2")
+        return False
+
 def usage():
     print "Usage: %s filename" % sys.argv[0]
+
+class TarStripper(BasicStripper):
+    def strip(self):
+        for file in self.editor.array("file"):
+            self.stripFile(file)
+
+    def fixChecksum(self, file):
+        file["check_sum"].value = " " * 8
+        stream = StringOutputStream()
+        file.writeInto(stream)
+        data = readStringOutputContent(stream)[:512]
+        checksum = sum( ord(character) for character in data )
+        file["check_sum"].value = ("0%o\0" % checksum).ljust(8, " ")
+
+    def stripFile(self, file):
+        empty32 = "\0" * 32
+        uid = "0000000\0"
+        file["uid"].value = uid
+        file["gid"].value = uid
+        file["mtime"].value = "00000000000\0"
+        file["uname"].value = empty32
+        file["gname"].value = empty32
+        self.fixChecksum(file)
+        self._is_dirty = True
 
 strippers = {
     AuFile: AuStripper,
@@ -158,26 +198,30 @@ strippers = {
     PngFile: PngStripper,
     JpegFile: JpegStripper,
     MpegAudioFile: MpegAudioStripper,
+    TarFile: TarStripper,
 }
 
 def stripEditor(editor, filename, level, verbose):
     cls = editor.input.__class__
     try:
-        stripper = strippers[cls]
+        stripper_cls = strippers[cls]
     except KeyError:
         print "Don't have stripper for file type: %s" % editor.description
         return False
-    size = stripper(editor, level, verbose).strip()
-    if size:
+    stripper = stripper_cls(editor, level, verbose)
+
+    if stripper():
         filename, realname = unicodeFilename(filename), filename
         output = FileOutputStream(filename, real_filename=realname)
         editor.writeInto(output)
-        percent = "%.1f%%" % (float(size) * 100 / editor.input.size)
-        if size%8 and size < 128:
-            print _("Remove %u.%u bytes (%s)") \
-                % (size//8, size%8, percent)
-        else:
-            print _("Remove %s (%s)") % (humanFilesize(size//8), percent)
+        size = stripper.stripped_bytes
+        if size:
+            percent = "%.1f%%" % (float(size) * 100 / editor.input.size)
+            if size%8 and size < 128:
+                print _("Remove %u.%u bytes (%s)") \
+                    % (size//8, size%8, percent)
+            else:
+                print _("Remove %s (%s)") % (humanFilesize(size//8), percent)
         print _("Save new file into %s") % \
             makePrintable(filename, getTerminalCharset(), to_unicode=True)
     else:
