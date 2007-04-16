@@ -16,7 +16,7 @@ from hachoir_core.tools import humanFilesize, makePrintable
 from hachoir_core.i18n import _, getTerminalCharset
 from hachoir_parser import createParser
 from optparse import OptionGroup, OptionParser
-from hachoir_core.stream import StringOutputStream, readStringOutputContent
+from hachoir_core.stream import StringOutputStream
 import hachoir_core
 import sys
 
@@ -177,7 +177,7 @@ class TarStripper(BasicStripper):
         file["check_sum"].value = " " * 8
         stream = StringOutputStream()
         file.writeInto(stream)
-        data = readStringOutputContent(stream)[:512]
+        data = stream.readBytes(0, 512)
         checksum = sum( ord(character) for character in data )
         file["check_sum"].value = ("0%o\0" % checksum).ljust(8, " ")
 

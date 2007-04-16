@@ -1,5 +1,5 @@
 from hachoir_core.dict import UniqKeyError
-from hachoir_core.field import MissingField, Float32, Float64
+from hachoir_core.field import MissingField, Float32, Float64, FakeArray
 from hachoir_core.compatibility import any
 from hachoir_core.i18n import _
 from hachoir_editor import createEditableField, EditorError
@@ -18,6 +18,10 @@ class EditableFieldSet(object):
         self._deleted = set()  # Names of deleted fields
         self._insered = {}     # Insered field (name => list of field,
                                # where name is the name after)
+
+    def array(self, key):
+        # FIXME: Use cache?
+        return FakeArray(self, key)
 
     def _getParent(self):
         return self._parent
@@ -309,6 +313,7 @@ class EditableFloat(EditableFieldSet):
 
 def createEditableFieldSet(parent, field):
     cls = field.__class__
+    # FIXME: Support Float80
     if cls in (Float32, Float64):
         return EditableFloat(parent, field)
     else:

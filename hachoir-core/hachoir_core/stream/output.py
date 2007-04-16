@@ -2,6 +2,8 @@ from cStringIO import StringIO
 from hachoir_core.endian import BIG_ENDIAN
 from hachoir_core.bits import long2raw
 
+MAX_READ_NBYTES = 2 ** 16
+
 class OutputStreamError(Exception):
     pass
 
@@ -122,6 +124,24 @@ class OutputStream(object):
         if self._bit_pos != 0:
             raise NotImplementedError()
         self._output.write(bytes)
+
+    def readBytes(self, address, nbytes):
+        """
+        Read bytes from the stream at specified address (in bits).
+        Address have to be a multiple of 8.
+        nbytes have to in 1..MAX_READ_NBYTES (64 KB).
+
+        Return read bytes as byte string.
+        """
+        assert (address % 8) == 0
+        assert (1 <= nbytes <= MAX_READ_NBYTES)
+        self._output.flush()
+        oldpos = self._output.tell()
+        try:
+            self._output.seek(0)
+            return self._output.read(nbytes)
+        finally:
+            self._output.seek(oldpos)
 
 def StringOutputStream():
     """
