@@ -179,23 +179,27 @@ class FlvMetadata(MultipleMetadata):
 
     def extractAMF(self, amf):
         for entry in amf.array("item"):
-            key = entry["key"].value
-            if key == "duration":
-                self.duration = timedelta(seconds=entry["value"].value)
-            elif key == "creator":
-                self.producer = entry["value"].value
-            elif key == "audiosamplerate":
-                self.sample_rate = entry["value"].value
-            elif key == "framerate":
-                self.frame_rate = entry["value"].value
-            elif key == "metadatacreator":
-                self.producer = entry["value"].value
-            elif key == "metadatadate":
-                self.creation_date = entry.value
-            elif key == "width":
-                self.width = int(entry["value"].value)
-            elif key == "height":
-                self.height = int(entry["value"].value)
+            self.useAmfEntry(entry)
+
+    @fault_tolerant
+    def useAmfEntry(self, entry):
+        key = entry["key"].value
+        if key == "duration":
+            self.duration = timedelta(seconds=entry["value"].value)
+        elif key == "creator":
+            self.producer = entry["value"].value
+        elif key == "audiosamplerate":
+            self.sample_rate = entry["value"].value
+        elif key == "framerate":
+            self.frame_rate = entry["value"].value
+        elif key == "metadatacreator":
+            self.producer = entry["value"].value
+        elif key == "metadatadate":
+            self.creation_date = entry.value
+        elif key == "width":
+            self.width = int(entry["value"].value)
+        elif key == "height":
+            self.height = int(entry["value"].value)
 
 class MovMetadata(RootMetadata):
     def extract(self, mov):

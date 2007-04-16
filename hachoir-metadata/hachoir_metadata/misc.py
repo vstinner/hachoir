@@ -104,26 +104,31 @@ class OLE2_Metadata(RootMetadata):
         if not summary:
             print "Unable to create summary parser"
 
-        self.os = summary["os"].display
+        if "os" in summary:
+            self.os = summary["os"].display
         if "section[0]" not in summary:
             return
         summary = summary["section[0]"]
         for property in summary.array("property_index"):
-            field = summary.getFieldByAddress(property["offset"].value*8)
-            if not field:
-                continue
-            if not field.hasValue():
-                continue
-            value = field.value
-            try:
-                key, use_prefix = self.SUMMARY_ID_TO_ATTR[property["id"].value]
-            except LookupError:
+            self.useProperty(summary, property)
+
+    @fault_tolerant
+    def useProperty(self, summary, property):
+        field = summary.getFieldByAddress(property["offset"].value*8)
+        if not field:
+            return
+        if not field.hasValue():
+            return
+        value = field.value
+        try:
+            key, use_prefix = self.SUMMARY_ID_TO_ATTR[property["id"].value]
+        except LookupError:
 #                warning("Skip %s[%s]=%s" % (
 #                    property["id"].display, property["id"].value, value))
-                continue
-            if use_prefix:
-                value = "%s: %s" % (property["id"].display, value)
-            setattr(self, key, value)
+            return
+        if use_prefix:
+            value = "%s: %s" % (property["id"].display, value)
+        setattr(self, key, value)
 
 class PcfMetadata(RootMetadata):
     PROP_TO_KEY = {
