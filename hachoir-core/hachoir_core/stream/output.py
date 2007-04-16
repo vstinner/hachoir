@@ -1,6 +1,7 @@
 from cStringIO import StringIO
 from hachoir_core.endian import BIG_ENDIAN
 from hachoir_core.bits import long2raw
+from errno import EBADF
 
 MAX_READ_NBYTES = 2 ** 16
 
@@ -131,6 +132,9 @@ class OutputStream(object):
         Address have to be a multiple of 8.
         nbytes have to in 1..MAX_READ_NBYTES (64 KB).
 
+        This method is only supported for StringOuputStream (not on
+        FileOutputStream).
+
         Return read bytes as byte string.
         """
         assert (address % 8) == 0
@@ -139,7 +143,11 @@ class OutputStream(object):
         oldpos = self._output.tell()
         try:
             self._output.seek(0)
-            return self._output.read(nbytes)
+            try:
+                return self._output.read(nbytes)
+            except IOError, err:
+                if err[0] == EBADF:
+                    raise OutputStreamError("Stream doesn't support read() operation")
         finally:
             self._output.seek(oldpos)
 

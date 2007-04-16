@@ -11,12 +11,11 @@ from hachoir_core.field import MissingField
 from hachoir_core.cmd_line import unicodeFilename
 from hachoir_editor import (createEditor,
     NewFieldSet, EditableInteger, EditableBytes)
-from hachoir_core.stream import FileOutputStream
+from hachoir_core.stream import FileOutputStream, StringOutputStream
 from hachoir_core.tools import humanFilesize, makePrintable
 from hachoir_core.i18n import _, getTerminalCharset
 from hachoir_parser import createParser
 from optparse import OptionGroup, OptionParser
-from hachoir_core.stream import StringOutputStream
 import hachoir_core
 import sys
 
