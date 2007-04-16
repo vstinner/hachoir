@@ -11,7 +11,7 @@ from file_fuzzer import FileFuzzer, MAX_NB_EXTRACT, TRUNCATE_RATE
 import re
 
 # Constants
-SLEEP_SEC = 0.200
+SLEEP_SEC = 0
 MEMORY_LIMIT = 5 * 1024 * 1024
 
 class Fuzzer:

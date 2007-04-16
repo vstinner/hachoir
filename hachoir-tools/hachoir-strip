@@ -88,6 +88,8 @@ class PngStripper(CheckStripper):
 class JpegStripper(CheckStripper):
     def checkField(self, field):
         if self.level & STRIP_METADATA:
+            if field.name.startswith("comment"):
+                return True
             return field.name in ("photoshop", "exif", "adobe")
         return False
 
