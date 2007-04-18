@@ -178,7 +178,7 @@ class Application:
 
     def stop(self):
         """
-        Send SIGINT signal and waiting until nuauth is stopped.
+        Send SIGINT signal and waiting until process is stopped.
         """
         if not self.isRunning():
             return

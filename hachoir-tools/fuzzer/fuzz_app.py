@@ -9,7 +9,7 @@ from hachoir_core.timeout import limitedTime, Timeout
 
 APP = "identify"
 APP_ARGS = ["-v"]
-TIMEOUT = 20.0
+TIMEOUT = 30.0
 
 def cleanupDir(dirname):
     try:
@@ -36,6 +36,10 @@ class Fuzzer:
             limitedTime(TIMEOUT, app.wait)
         except Timeout:
             print "Timeout error!"
+            app.stop()
+            return True
+        except KeyboardInterrupt:
+            print "Interrupt!"
             app.stop()
             return True
         return app.exit_failure
@@ -108,7 +112,9 @@ def main():
     #image = "/home/haypo/testcase/wormux_32x32_16c.ico"
     #image = "/home/haypo/testcase/deja_vu_serif-2.7.ttf"
     #document = "/home/haypo/testcase/eula.exe"
-    document = "/home/haypo/mytestcase/msoffice/002.PPS"
+    #document = "/home/haypo/mytestcase/msoffice/002.PPS"
+    document = "/home/haypo/fuzzing/clamav/002.pps"
+#    document = "/home/haypo/mytestcase/exe/chiencontrechat.exe"
     fuzzer = Fuzzer(document)
     fuzzer.run()
 
