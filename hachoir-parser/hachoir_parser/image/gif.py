@@ -37,8 +37,9 @@ class Image(FieldSet):
             yield PaletteRGB(self, "local_map", nb_color, "Local color map")
 
     def createDescription(self):
-        return "Image: %ux%u pixels at (%u,%u)" \
-            % (self["width"].value, self["height"].value, self["left"].value, self["top"].value)
+        return "Image: %ux%u pixels at (%u,%u)" % (
+            self["width"].value, self["height"].value,
+            self["left"].value, self["top"].value)
 
 DISPOSAL_METHOD = {
     0: "No disposal specified",
@@ -130,7 +131,7 @@ class ScreenDescriptor(FieldSet):
 
     def createDescription(self):
         colors = 1 << (self["bpp"].value+1)
-        return "Screen descriptor: %ux%u, %u colors" \
+        return "Screen descriptor: %ux%u pixels %u colors" \
             % (self["width"].value, self["height"].value, colors)
 
 class GifFile(Parser):
@@ -165,7 +166,7 @@ class GifFile(Parser):
         # Header
         yield String(self, "header", 6, "File header", charset="ASCII")
 
-        yield ScreenDescriptor(self, "screen", "Screen descriptor")
+        yield ScreenDescriptor(self, "screen")
         if self["screen/global_map"].value:
             bpp = (self["screen/bpp"].value+1)
             yield PaletteRGB(self, "color_map", 1 << bpp, "Color map")
