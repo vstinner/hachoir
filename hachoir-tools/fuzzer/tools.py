@@ -1,3 +1,10 @@
+from ConfigParser import RawConfigParser
+
+class ConfigParser(RawConfigParser):
+    def get(self, section, option):
+        value = RawConfigParser.get(self, section, option)
+        return value.strip()
+
 try:
     import sha
     def generateUniqueID(data):

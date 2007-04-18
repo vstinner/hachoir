@@ -1,15 +1,14 @@
+#!/usr/bin/env python
 from os import nice, mkdir, path, unlink, listdir
 from application import Application
 from array import array
 from mangle import mangle
 from time import sleep
 from md5 import md5
+from sys import argv, exit, stderr
 from random import randint
 from hachoir_core.timeout import limitedTime, Timeout
-
-APP = "identify"
-APP_ARGS = ["-v"]
-TIMEOUT = 30.0
+from tools import ConfigParser
 
 def cleanupDir(dirname):
     try:
@@ -21,19 +20,19 @@ def cleanupDir(dirname):
         unlink(filename)
 
 class Fuzzer:
-    def __init__(self, original):
+    def __init__(self, config, original):
         self.original = original
         self.data = open(self.original, 'rb').read()
+        self.program = config.get('application', 'program')
+        self.timeout = config.getfloat('application', 'timeout')
+        self.tmp_dir = config.get('application', 'tmp_dir')
         assert 1 <= len(self.data)
 
     def fuzzFile(self, filename):
-        if True:
-            app = Application("clamscan", filename)
-        else:
-            app = Application("/opt/magick/bin/identify", ["-verbose", filename])
+        app = Application(self.program, filename)
         app.start()
         try:
-            limitedTime(TIMEOUT, app.wait)
+            limitedTime(self.timeout, app.wait)
         except Timeout:
             print "Timeout error!"
             app.stop()
@@ -55,12 +54,12 @@ class Fuzzer:
         self.info("Mangle")
         data = array('B', self.data)
 
-        if randint(0, 4) == 0:
+        if randint(0, 10) == 0:
             size = randint(1, len(self.data)-1)
             print "@@ Truncate to %s bytes" % size
             data = data[:size]
 
-        percent = randint(1, 10) / 100.0
+        percent = 30 / 100.0
         count = mangle(data, percent)
         self.warning("Mangle: %s" % count)
         self.info("Output MD5: %s" % md5(data).hexdigest())
@@ -72,17 +71,21 @@ class Fuzzer:
 
 
     def run(self):
-        ext = self.original[-3:]
-        tmp_name = '/tmp/image.%s' % ext
-        dir = "/tmp/fuzz.clamav"
+        ext = self.original[-4:]
+        MULTIPLE = False
+        if MULTIPLE:
+            dir = path.join(self.tmp_dir, "fuzz.clamav")
+        else:
+            tmp_name = path.join(self.tmp_dir, 'fuzz_app.file%s' % ext)
         try:
-            cleanupDir(dir)
-            try:
-                mkdir(dir)
-            except OSError:
-                pass
+            if MULTIPLE:
+                cleanupDir(dir)
+                try:
+                    mkdir(dir)
+                except OSError:
+                    pass
             while True:
-                if True:
+                if MULTIPLE:
                     files = []
                     for index in xrange(50):
                         tmp_name = path.join(dir, 'image.%u.%s' % (index, ext))
@@ -97,25 +100,28 @@ class Fuzzer:
                     print "Fuzzing error: stop!"
                     break
                 print "Test: ok"
-#                sleep(0.250)
+                if MULTIPLE:
+                    break
         except KeyboardInterrupt:
             print "Interrupt."
 
 def main():
+    global config
+
+    # Read arguments
+    if len(argv) != 3:
+        print >>stderr, "usage: %s config.cfg filename" % argv[0]
+        exit(1)
+    config_file = argv[1]
+    config = ConfigParser()
+    config.read(["defaults.cfg", config_file])
+    document = argv[2]
+
+    # Be nice with CPU
     nice(19)
-    #image = "/home/haypo/testcase/logo-kubuntu.png"
-    #image = "/home/haypo/testcase/jpeg.exif.photoshop.jpg"
-    #image = "/home/haypo/testcase/usa_railroad.jpg"
-    #image = "/home/haypo/testcase/article01.bmp"
-#    image = "/home/haypo/testcase/hero.tga"
-#    image = "/home/haypo/testcase/cross.xcf"
-    #image = "/home/haypo/testcase/wormux_32x32_16c.ico"
-    #image = "/home/haypo/testcase/deja_vu_serif-2.7.ttf"
-    #document = "/home/haypo/testcase/eula.exe"
-    #document = "/home/haypo/mytestcase/msoffice/002.PPS"
-    document = "/home/haypo/fuzzing/clamav/002.pps"
-#    document = "/home/haypo/mytestcase/exe/chiencontrechat.exe"
-    fuzzer = Fuzzer(document)
+
+    # Run fuzzer
+    fuzzer = Fuzzer(config, document)
     fuzzer.run()
 
 if __name__ == "__main__":
