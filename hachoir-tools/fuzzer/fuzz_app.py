@@ -68,6 +68,7 @@ class Fuzzer:
             dir = path.join(self.tmp_dir, "fuzz.clamav")
         else:
             tmp_name = path.join(self.tmp_dir, 'fuzz_app.file%s' % ext)
+        self.safeMkdir(self.tmp_dir)
         try:
             if MULTIPLE:
                 cleanupDir(dir)

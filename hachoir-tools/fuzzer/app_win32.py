@@ -15,6 +15,8 @@ class Application(BaseApplication):
         TerminateProcess(self._getHandle(), -1)
 
     def _wait(self, blocking=True):
+        self.exit_code = None
+        self.exit_failure = False
         if blocking:
             timeout = INFINITE
         else:
@@ -23,6 +25,8 @@ class Application(BaseApplication):
         is_running = (WaitForSingleObject(handle, timeout) != 0)
         if not is_running:
             status = GetExitCodeProcess(handle)
+            self.exit_failure = (status != 0)
+            self.exit_code = status
         else:
             status = None
         return (is_running, status)
