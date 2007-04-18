@@ -57,6 +57,7 @@ if not IMPLEMENTATION:
         from resource import getrlimit, setrlimit, RLIMIT_CPU
 
         # resource.setrlimit(RLIMIT_CPU) implementation
+        # "Bug": timeout is 'CPU' time so sleep() are not part of the timeout
         def limitedTime(second, func, *args, **kw):
             second = fixTimeout(second)
             old_alarm = signal(SIGXCPU, signalHandler)
