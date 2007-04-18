@@ -41,6 +41,8 @@ class Application(BaseApplication):
                 raise
 
     def displayExit(self, status):
+        self.exit_code = None
+
         # Display exit code
         if status is not None:
             log_func = self.warning
@@ -51,15 +53,13 @@ class Application(BaseApplication):
                 log_func = self.error
             if WIFSIGNALED(status):
                 signal = WSTOPSIG(status)
-#                signal = SIGNAME.get(signal, signal)
+                signal = SIGNAME.get(signal, signal)
                 self.exit_failure = True
                 info.append("signal %s" % signal)
             if WIFEXITED(status):
-                code = WEXITSTATUS(status)
-                info.append("exitcode=%s" % code)
-                self.exit_failure = 0
-                # FIXME: identify returns 1 on mangled TTF font
-#                self.exit_failure = (code != 0)
+                self.exit_code = WEXITSTATUS(status)
+                info.append("exitcode=%s" % self.exit_code)
+                self.exit_failure = (self.exit_code != 0)
             if self.exit_failure:
                 if info:
                     log_func("Exit (%s)" % ", ".join(info))
@@ -68,7 +68,6 @@ class Application(BaseApplication):
         else:
             self.exit_failure = True
             self.error("Process exited (ECHILD error)")
-
 
     def interrupt(self):
         self._signal(SIGINT)

@@ -41,7 +41,7 @@ class Fuzzer:
             print "Interrupt!"
             app.stop()
             return True
-        return app.exit_failure
+        return app.exit_failure and app.exit_code is None
 
     def info(self, message):
         if False:

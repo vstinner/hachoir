@@ -121,6 +121,8 @@ class BaseApplication:
             return True
 
         # Log exit code
+        self.exit_failure = True
+        self.exit_code = None
         self.processExit(status)
         self.displayExit(status)
         self.process = None
