@@ -1,4 +1,3 @@
-from os import waitpid, P_NOWAIT
 from subprocess import Popen, PIPE, STDOUT
 from errno import ENOENT, ECHILD
 from select import select

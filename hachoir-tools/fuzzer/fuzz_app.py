@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from os import nice, mkdir, path, unlink, listdir
+from os import path
 from application import Application
 from array import array
 from mangle import mangle
@@ -8,16 +8,7 @@ from md5 import md5
 from sys import argv, exit, stderr
 from random import randint
 from hachoir_core.timeout import limitedTime, Timeout
-from tools import ConfigParser
-
-def cleanupDir(dirname):
-    try:
-        files=listdir(dirname)
-    except OSError:
-        return
-    for file in files:
-        filename = path.join(dirname, file)
-        unlink(filename)
+from tools import ConfigParser, beNice, cleanupDir, safeMkdir
 
 class Fuzzer:
     def __init__(self, config, original):
@@ -80,10 +71,7 @@ class Fuzzer:
         try:
             if MULTIPLE:
                 cleanupDir(dir)
-                try:
-                    mkdir(dir)
-                except OSError:
-                    pass
+                safeMkdir(dir)
             while True:
                 if MULTIPLE:
                     files = []
@@ -118,7 +106,7 @@ def main():
     document = argv[2]
 
     # Be nice with CPU
-    nice(19)
+    beNice()
 
     # Run fuzzer
     fuzzer = Fuzzer(config, document)
