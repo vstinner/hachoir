@@ -1,7 +1,7 @@
 from sys import platform
 
-if platform == 'win32': 
+if platform == 'win32':
     from app_win32 import Application
-else:    
+else:
     from app_unix import Application
 

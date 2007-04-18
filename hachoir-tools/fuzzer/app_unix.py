@@ -75,3 +75,24 @@ class Application(BaseApplication):
     def kill(self):
         self._signal(SIGKILL)
 
+    def _wait(self, blocking):
+        """
+        Wait process end.
+        Return (is_still_running, exit_status).
+        """
+        try:
+            if blocking:
+                option = 0
+            else:
+                option = P_NOWAIT
+            finished, status = waitpid(self.process.pid, option)
+            if finished == 0:
+                return (True, None)
+            else:
+                return (False, status)
+        except OSError, err:
+            if err[0] == ECHILD:
+                return (False, None)
+            else:
+                raise
+

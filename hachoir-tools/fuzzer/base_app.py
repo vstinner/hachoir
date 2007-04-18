@@ -102,23 +102,21 @@ class BaseApplication:
             print "last output line> %r" % line
         return None
 
+    def _wait(self, blocking):
+        """
+        Wait process end.
+        Return (is_still_running, exit_status).
+        """
+        raise NotImplementedError()
+
     def wait(self, blocking=True):
+        """
+        Return True is the process is still running,
+        False otherwise.
+        """
         if not self.process:
             return False
-        try:
-            if blocking:
-                option = 0
-            else:
-                option = P_NOWAIT
-            finished, status = waitpid(self.process.pid, option)
-        except OSError, err:
-            if err[0] == ECHILD:
-                finished = True
-                status = None
-            else:
-                raise
-        if finished == 0:
-            return True
+        is_running, status = self._wait(blocking)
 
         # Log exit code
         self.exit_failure = True
