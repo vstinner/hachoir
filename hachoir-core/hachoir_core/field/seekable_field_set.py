@@ -76,7 +76,7 @@ class RootSeekableFieldSet(BasicFieldSet):
 
         # String key
         if key[0] == "/":
-            current = self._parent.root
+            current = self.root
             key = key[1:]
         else:
             current = self
