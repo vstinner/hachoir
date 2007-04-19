@@ -115,11 +115,11 @@ class BaseApplication:
         """
         if not self.process:
             return False
+        self.exit_failure = True
+        self.exit_code = None
         is_running, status = self._wait(blocking)
 
         # Log exit code
-        self.exit_failure = True
-        self.exit_code = None
         self.processExit(status)
         self.displayExit(status)
         self.process = None
