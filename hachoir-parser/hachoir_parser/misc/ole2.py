@@ -312,10 +312,17 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
             self.ss_fat.append(field)
             start += count
 
+    def createContentSize(self):
+        max_block = -1
+        for fat in self.array("bbfat"):
+            for entry in fat:
+                block = entry.value
+                if 0 < block:
+                    max_block = max(block, max_block)
+        if max_block < 0:
+            return None
+        return HEADER_SIZE + (max_block+1) * self.sector_size
+
     def seekBlock(self, block):
         self.seekBit(HEADER_SIZE + block * self.sector_size)
-
-    def seekSBlock(self, block):
-        # FIXME: Fix the offset
-        self.seekBit(57856*8 + block * self.ss_size)
 
