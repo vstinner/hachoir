@@ -184,7 +184,6 @@ class RealAudioMetadata(RootMetadata):
             if self.has("bit_rate"):
                 sec = float(size) / self.get('bit_rate')
                 self.duration = timedelta(seconds=sec)
-            self.bits_per_sample = 16
             computeComprRate(self, size)
 
     @fault_tolerant
@@ -196,6 +195,7 @@ class RealAudioMetadata(RootMetadata):
 
     @fault_tolerant
     def useRoot(self, real):
+        self.bits_per_sample = 16   # FIXME: Is that correct?
         if real["version"].value != 3:
             self.sample_rate = real["sample_rate"].value
             self.nb_channel = real["channels"].value
