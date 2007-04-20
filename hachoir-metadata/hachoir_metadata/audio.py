@@ -161,12 +161,31 @@ class AuMetadata(RootMetadata):
             computeComprRate(self, audio["data_size"].value*8)
 
 class RealAudioMetadata(RootMetadata):
+    FOURCC_TO_BITRATE = {
+        u"28_8": 15200, # 28.8 kbit/sec (audio bit rate: 15.2 kbit/s)
+        u"14_4": 8000,  # 14.4 kbit/sec
+        u"lpcJ": 8000,  # 14.4 kbit/sec
+    }
+
     def extract(self, real):
+        version = real["version"].value
         if "metadata" in real:
             self.useMetadata(real["metadata"])
-        if real["version"].value == 4:
-            self.useRoot(real)
-        self.format_version = "Real audio version %s" % real["version"].value
+        self.useRoot(real)
+        self.format_version = "Real audio version %s" % version
+        if version == 3:
+            size = getValue(real, "data_size")
+        elif "filesize" in real and "headersize" in real:
+            size = (real["filesize"].value + 40) - (real["headersize"].value + 16)
+        else:
+            size = None
+        if size:
+            size *= 8
+            if self.has("bit_rate"):
+                sec = float(size) / self.get('bit_rate')
+                self.duration = timedelta(seconds=sec)
+            self.bits_per_sample = 16
+            computeComprRate(self, size)
 
     @fault_tolerant
     def useMetadata(self, info):
@@ -177,9 +196,19 @@ class RealAudioMetadata(RootMetadata):
 
     @fault_tolerant
     def useRoot(self, real):
-        self.sample_rate = real["sample_rate"].value
-        self.nb_channel = real["channels"].value
-        self.compression = real["FourCC"].value
+        if real["version"].value != 3:
+            self.sample_rate = real["sample_rate"].value
+            self.nb_channel = real["channels"].value
+        else:
+            self.sample_rate = 8000
+            self.nb_channel = 1
+        fourcc = getValue(real, "FourCC")
+        if fourcc:
+            self.compression = fourcc
+            try:
+                self.bit_rate = self.FOURCC_TO_BITRATE[fourcc]
+            except LookupError:
+                pass
 
 class RealMediaMetadata(MultipleMetadata):
     KEY_TO_ATTR = {
@@ -188,6 +217,7 @@ class RealMediaMetadata(MultipleMetadata):
         "modification date": "last_modification",
         "description": "comment",
     }
+
     def extract(self, media):
         if "file_prop" in media:
             self.useFileProp(media["file_prop"])
