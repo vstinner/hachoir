@@ -4,7 +4,7 @@ Regex regression (repeat)
 Factorisation of (a{n,p}){x,y}:
 -------------------------------
 
->>> from hachoir_core.regex import parse
+>>> from hachoir_regex import parse
 >>> parse("(a{2,3}){4,5}")
 <RegexRepeat 'a{8,15}'>
 >>> parse("(a{2,}){3,4}")
@@ -78,7 +78,7 @@ Do not optimize:
 Regex regression (b)
 ====================
 
->>> from hachoir_core.regex import parse
+>>> from hachoir_regex import parse
 >>> parse("(M(SCF|Thd)|B(MP4|Zh))")
 <RegexOr '(M(SCF|Thd)|B(MP4|Zh))'>
 >>> parse("(FWS1|CWS1|FWS2|CWS2)")

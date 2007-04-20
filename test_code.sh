@@ -22,3 +22,6 @@ $PYTHON $ROOT/hachoir-metadata/test_doc.py
 
 echo "=== hachoir-metadata: testcase ==="
 $PYTHON $ROOT/hachoir-metadata/run_testcase.py $TESTCASE
+
+echo "=== hachoir-regex: tests ==="
+$PYTHON $ROOT/hachoir-regex/test_doc.py

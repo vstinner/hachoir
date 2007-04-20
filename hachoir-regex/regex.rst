@@ -7,7 +7,7 @@ use the API.
 Create regex with string
 ------------------------
 
->>> from hachoir_core.regex import parse
+>>> from hachoir_regex import parse
 >>> parse('')
 <RegexEmpty ''>
 >>> parse('abc')
@@ -28,7 +28,7 @@ Create regex with string
 Create regex with the API
 -------------------------
 
->>> from hachoir_core.regex import createString, createRange
+>>> from hachoir_regex import createString, createRange
 >>> createString('')
 <RegexEmpty ''>
 >>> createString('abc')
@@ -44,7 +44,7 @@ Manipulate regular expressions
 
 Convert to string:
 
->>> from hachoir_core.regex import createRange, createString
+>>> from hachoir_regex import createRange, createString
 >>> str(createString('abc'))
 'abc'
 >>> repr(createString('abc'))
@@ -87,7 +87,7 @@ Group prefix:
 
 Merge ranges:
 
->>> from hachoir_core.regex import createRange
+>>> from hachoir_regex import createRange
 >>> regex = createString("1") | createString("3"); regex
 <RegexRange '[13]'>
 >>> regex = regex | createRange("2"); regex
@@ -108,7 +108,7 @@ Use PatternMaching if you would like to find many strings or regex in a string.
 Use addString() and addRegex() to add your patterns and then don't forget
 to call commit().
 
-    >>> from hachoir_core.regex import PatternMatching
+    >>> from hachoir_regex import PatternMatching
     >>> p = PatternMatching()
     >>> p.addString("a")
     >>> p.addString("b")
