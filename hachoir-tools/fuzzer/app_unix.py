@@ -2,7 +2,7 @@ from os import kill, waitpid, P_NOWAIT, \
     WCOREDUMP, WIFSIGNALED, WSTOPSIG, WIFEXITED, WEXITSTATUS
 from base_app import BaseApplication
 from signal import SIGABRT, SIGFPE, SIGINT, SIGSEGV, SIGHUP, SIGKILL
-from errno import ESRCH
+from errno import ESRCH, ECHILD
 
 SIGNAME = {
     SIGABRT: "SIGABRT",
