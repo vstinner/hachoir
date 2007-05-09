@@ -45,6 +45,7 @@ if not IMPLEMENTATION:
                 alarm(second)
                 return func(*args, **kw)
             finally:
+                alarm(0)
                 signal(SIGALRM, old_alarm)
 
         IMPLEMENTATION = "signal.alarm()"
