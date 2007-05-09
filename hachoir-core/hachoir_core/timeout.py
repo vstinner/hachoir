@@ -62,11 +62,12 @@ if not IMPLEMENTATION:
         def limitedTime(second, func, *args, **kw):
             second = fixTimeout(second)
             old_alarm = signal(SIGXCPU, signalHandler)
+            current = getrlimit(RLIMIT_CPU)
             try:
-                current = getrlimit(RLIMIT_CPU)
                 setrlimit(RLIMIT_CPU, (second, current[1]))
                 return func(*args, **kw)
             finally:
+                setrlimit(RLIMIT_CPU, current)
                 signal(SIGXCPU, old_alarm)
 
         IMPLEMENTATION = "resource.setrlimit(RLIMIT_CPU)"
