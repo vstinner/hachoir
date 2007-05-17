@@ -1,12 +1,4 @@
-from ConfigParser import RawConfigParser
 from sys import platform
-from errno import EEXIST
-from os import mkdir, unlink, listdir, path
-
-class ConfigParser(RawConfigParser):
-    def get(self, section, option):
-        value = RawConfigParser.get(self, section, option)
-        return value.strip()
 
 if platform == 'win32':
     from win32process import (GetCurrentProcess, SetPriorityClass,
@@ -42,22 +34,4 @@ def getFilesize(file):
     size = file.tell()
     file.seek(0, 0)
     return size
-
-def safeMkdir(dirname):
-    try:
-        mkdir(dirname)
-    except OS_ERRORS, err:
-        if err.errno == EEXIST:
-            return
-        else:
-            raise
-
-def cleanupDir(dirname):
-    try:
-        files = listdir(dirname)
-    except OSError:
-        return
-    for file in files:
-        filename = path.join(dirname, file)
-        unlink(filename)
 
