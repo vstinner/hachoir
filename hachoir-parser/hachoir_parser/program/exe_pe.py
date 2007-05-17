@@ -131,11 +131,19 @@ class PE_Header(FieldSet):
 
 class PE_OptHeader(FieldSet):
     SUBSYSTEM_NAME = {
-        1: u"Native",
-        2: u"Windows/GUI",
-        3: u"Windows non-GUI",
-        5: u"OS/2",
-        7: u"POSIX",
+         1: u"Native",
+         2: u"Windows GUI",
+         3: u"Windows CUI",
+         5: u"OS/2 CUI",
+         7: u"POSIX CUI",
+         8: u"Native Windows",
+         9: u"Windows CE GUI",
+        10: u"EFI application",
+        11: u"EFI boot service driver",
+        12: u"EFI runtime driver",
+        13: u"EFI ROM",
+        14: u"XBOX",
+        16: u"Windows boot application",
     }
     DIRECTORY_NAME = {
         0: "export",

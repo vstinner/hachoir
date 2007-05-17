@@ -335,7 +335,7 @@ def checkCercle(parser): return (
 
 def checkEula(parser): return (
     checkDisplay(parser, "/pe_header/cpu", "Intel 80386"),
-    checkDisplay(parser, "/pe_opt_header/subsystem", "Windows/GUI"),
+    checkDisplay(parser, "/pe_opt_header/subsystem", "Windows GUI"),
     checkDisplay(parser, "/pe_opt_header/import/rva", "0x00008314"),
     checkDisplay(parser, "/section_hdr[1]/mem_size", "4632 bytes"),
     checkValue(parser, "/section_hdr[1]/is_readable", True),
