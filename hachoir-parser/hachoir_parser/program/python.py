@@ -238,6 +238,7 @@ class PythonCompiledFile(Parser):
         62101: ("2.5b3", 0x2050000),
         62111: ("2.5b3", 0x2050000),
         62121: ("2.5c1", 0x2050000),
+        62131: ("2.5c2", 0x2050000),
     }
 
     # Dictionnary which associate the pyc signature (4-byte long string)
