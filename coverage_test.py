@@ -9,7 +9,6 @@ def main():
     import doctest, pdb
     if doctest._OutputRedirectingPdb.set_trace == pdb.Pdb.set_trace:
         raise ImportError("Your doctest version is too old")
-    print doctest._OutputRedirectingPdb.set_trace
 
     directory = os.getenv("TESTCASE")
     if not directory:
@@ -26,6 +25,9 @@ def main():
 
     core_doc = imp.load_source("parser", "hachoir-core/test_doc.py")
     core_doc.main()
+
+    metadata_doc = imp.load_source("parser", "hachoir-metadata/test_doc.py")
+    metadata_doc.main()
 
 if __name__ == "__main__":
     main()
