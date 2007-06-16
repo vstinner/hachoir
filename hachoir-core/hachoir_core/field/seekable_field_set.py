@@ -47,9 +47,24 @@ class RootSeekableFieldSet(BasicFieldSet):
 
     def _getField(self, key, const):
         field = Field._getField(self, key, const)
-        if field is not None:
+        if field is None:
+            return self.__getitem__(key, const)
+        else:
             return field
 
+    def __getitem__(self, key, const=True):
+        if isinstance(key, (int, long)):
+            count = len(self._field_array)
+            if key < count:
+                return self._field_array[key]
+            raise MissingField(self, key)
+        if "/" in key:
+            if key == "/":
+                return self.root
+            if key.endswith('/') and key.rstrip('/') in self._field_dict: return self._field_dict[key.rstrip('/')]
+            elif key=='../': return self.parent
+            parent, children = key.split("/", 1)
+            return self[parent][children]
         assert "/" not in key
         if key in self._field_dict:
             return self._field_dict[key]
@@ -67,26 +82,7 @@ class RootSeekableFieldSet(BasicFieldSet):
         raise MissingField(self, key)
 
     def getField(self, key, const=True):
-        if isinstance(key, (int, long)):
-            # Integer key
-            count = len(self._field_array)
-            if key < count:
-                return self._field_array[key]
-            raise MissingField(self, key)
-
-        # String key
-        if key[0] == "/":
-            current = self.root
-            key = key[1:]
-        else:
-            current = self
-        for part in key.split("/"):
-            field = current._getField(part, const)
-            if field is None:
-                raise MissingField(current, part)
-            current = field
-        assert current
-        return current
+        return self.__getitem__(key, const)
 
     def _addField(self, field):
         if field._name.endswith("[]"):
@@ -167,8 +163,12 @@ class RootSeekableFieldSet(BasicFieldSet):
         for field in self._field_array:
             yield field
         if self._generator:
-            for field in self._readFields():
-                yield field
+            try:
+                while True:
+                    yield self._feedOne()
+            except StopIteration:
+                self._stopFeed()
+                raise StopIteration
 
     def __len__(self):
         if self._generator:
