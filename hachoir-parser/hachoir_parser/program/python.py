@@ -9,6 +9,8 @@ Author: Victor Stinner
 Creation: 25 march 2005
 """
 
+DISASSEMBLE = False
+
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet,
     UInt16, Int32, UInt32, UInt64, ParserError, Float64, Enum,
@@ -17,6 +19,12 @@ from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.bits import long2raw
 from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_core.i18n import ngettext
+if DISASSEMBLE:
+    from dis import dis
+
+    def disassembleBytecode(field):
+        bytecode = field.value
+        dis(bytecode)
 
 # --- String and string reference ---
 def parseString(parent):
@@ -24,6 +32,8 @@ def parseString(parent):
     length = parent["length"].value
     if 0 < length:
         yield RawBytes(parent, "text", length, "Content")
+    if DISASSEMBLE and parent.name == "compiled_code":
+        disassembleBytecode(parent["text"])
 
 def parseStringRef(parent):
     yield textHandler(UInt32(parent, "ref"), hexadecimal)
