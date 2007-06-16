@@ -103,6 +103,7 @@ class ExifEntry(BasicIFDEntry):
     TAG_FOCAL = 0x829D
     TAG_BRIGHTNESS = 0x9203
     TAG_APERTURE = 0x9205
+    TAG_USER_COMMENT = 0x9286
 
     TAG_NAME = {
         0x0100: "Image width",
@@ -185,7 +186,7 @@ class ExifEntry(BasicIFDEntry):
         TAG_WIDTH: "Valid image width",
         TAG_HEIGHT: "Valid image height",
         0x927C: "Manufacturer notes",
-        0x9286: "User comments",
+        TAG_USER_COMMENT: "User comments",
         0xA004: "Related audio file",
         0x9003: "Date and time of original data generation",
         0x9004: "Date and time of digital data generation",

@@ -28,6 +28,7 @@ class JpegMetadata(RootMetadata):
         ExifEntry.TAG_FILE_TIMESTAMP: "creation_date",
         ExifEntry.TAG_WIDTH: "width",
         ExifEntry.TAG_HEIGHT: "height",
+        ExifEntry.TAG_USER_COMMENT: "comment",
     }
 
     IPTC_KEY = {
