@@ -79,6 +79,7 @@ testcase_files = (
     (u"anti-arpeggio_tune.ptm", 175557, "34e39f476f48abe5e41d6e9a88af515e"),
     (u"deja_vu_serif-2.7.ttf", 205708, "a1d6d07d9be2ced64cf9b7e3ddadd399"),
     (u"twunk_16.exe", 49680, "f36a271706edd23c94956afb56981184"),
+    (u"vim.lnk", 1510, "9853258788fc67ce406201773d1f4fb5"),
 )
 
 def stringMD5(text):

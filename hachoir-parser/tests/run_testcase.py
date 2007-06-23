@@ -19,6 +19,7 @@ from hachoir_parser import createParser, HachoirParserList, ValidateError
 from hachoir_core.compatibility import all
 from locale import setlocale, LC_ALL
 from array import array
+from datetime import datetime
 import random
 import os
 import sys
@@ -437,6 +438,11 @@ def checkPTM(parser): return (
     checkValue(parser, "/pattern[0]/row[0]/note[0]/effect", 15),
 )
 
+def checkVimLNK(parser): return (
+    checkValue(parser, "/creation_time", datetime(2006, 5, 7, 14, 18, 32)),
+    checkValue(parser, "/target_filesize", 1363968),
+)
+
 testcase_files = (
     (u"yellowdude.3ds", checkYellowdude),
     (u"logo-kubuntu.png", checkLogoUbuntu),
@@ -486,6 +492,7 @@ testcase_files = (
     (u"dontyou.xm", checkXM),
     (u"satellite_one.s3m", checkS3M),
     (u"anti-arpeggio_tune.ptm", checkPTM),
+    (u"vim.lnk", checkVimLNK),
 )
 
 def checkFile(filename, check_parser):
