@@ -5,9 +5,16 @@ Documents:
 - The Windows Shortcut File Format (document version 1.0)
   Reverse-engineered by Jesse Hager
   http://www.i2s-lab.com/Papers/The_Windows_Shortcut_File_Format.pdf
+- Wine source code:
+  http://source.winehq.org/source/include/shlobj.h (SHELL_LINK_DATA_FLAGS enum)
 
-Author: Victor Stinner
-Creation date: 2007-03-15
+Author: Robert Xiao, Victor Stinner
+
+Changes:
+  2007-06-13 - Robert Xiao
+     * XXX
+  2007-03-15 - Victor Stinner
+    * Creation of the parser
 """
 
 from hachoir_parser import Parser
@@ -57,15 +64,25 @@ class LnkFile(Parser):
         yield UInt32(self, "signature", "Shortcut signature (0x0000004C)")
         yield GUID(self, "guid")
 
-#        yield UInt32(self, "flags")
         yield Bit(self, "has_shell_id")
-        yield Bit(self, "target_is_file")
+        yield Bit(self, "target_is_file", "Is a file or a directory?")
         yield Bit(self, "has_description")
         yield Bit(self, "has_rel_path")
         yield Bit(self, "has_working_dir")
         yield Bit(self, "has_cmd_line_args")
         yield Bit(self, "has_custom_icon")
-        yield PaddingBits(self, "reserved[]", 25)
+        yield Bit(self, "has_unicode_names")
+        yield Bit(self, "force_no_linkinfo")
+        yield Bit(self, "has_exp_sz")
+        yield Bit(self, "run_in_separate")
+        yield Bit(self, "has_logo3id")
+        yield Bit(self, "has_darwinid")
+        yield Bit(self, "runas_user")
+        yield Bit(self, "has_exp_icon_sz")
+        yield Bit(self, "no_pidl_alias")
+        yield Bit(self, "force_unc_name")
+        yield Bit(self, "run_with_shim_layer")
+        yield PaddingBits(self, "reserved[]", 14)
 
         yield MSDOSFileAttr32(self, "target_attr")
 
@@ -73,7 +90,7 @@ class LnkFile(Parser):
         yield TimestampWin64(self, "modification_time")
         yield TimestampWin64(self, "last_access_time")
         yield filesizeHandler(UInt32(self, "target_filesize"))
-        yield UInt32(self, "nb_icons")
+        yield UInt32(self, "icon_number")
         yield Enum(UInt32(self, "show_window"), self.SHOW_WINDOW_STATE)
         yield UInt32(self, "hot_key")
         yield NullBytes(self, "reserved[]", 8)
