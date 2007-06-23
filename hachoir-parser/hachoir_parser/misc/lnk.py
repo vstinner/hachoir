@@ -53,6 +53,13 @@ class ItemId(FieldSet):
         0xC3: "Network Share",
     }
 
+    def __init__(self, *args, **kw):
+        FieldSet.__init__(self, *args, **kw)
+        if self["length"].value:
+            self._size = self["length"].value * 8
+        else:
+            self._size = 16
+
     def createFields(self):
         yield UInt16(self, "length", "Length of Item ID Entry")
         if not self["length"].value:
@@ -125,6 +132,204 @@ class ItemId(FieldSet):
         else:
             return "End of Item ID List"
 
+def formatVolumeSerial(field):
+    val = field.value
+    return '%04X-%04X'%(val>>16, val&0xFFFF)
+
+class LocalVolumeTable(FieldSet):
+    VOLUME_TYPE={
+        1: "No root directory",
+        2: "Removable (Floppy, Zip, etc.)",
+        3: "Fixed (Hard disk)",
+        4: "Remote (Network drive)",
+        5: "CD-ROM",
+        6: "Ram drive",
+    }
+
+    def createFields(self):
+        yield UInt32(self, "length", "Length of this structure")
+        yield Enum(UInt32(self, "volume_type", "Volume Type"),self.VOLUME_TYPE)
+        yield textHandler(UInt32(self, "volume_serial", "Volume Serial Number"), formatVolumeSerial)
+
+        yield UInt32(self, "label_offset", "Offset to volume label")
+        padding = self.seekByte(self["label_offset"].value)
+        if padding:
+            yield padding
+        yield CString(self, "drive")
+
+    def createValue(self):
+        return self["drive"].value
+
+class NetworkVolumeTable(FieldSet):
+    def createFields(self):
+        yield UInt32(self, "length", "Length of this structure")
+        yield UInt32(self, "unknown[]")
+        yield UInt32(self, "share_name_offset", "Offset to share name")
+        yield UInt32(self, "unknown[]")
+        yield UInt32(self, "unknown[]")
+        padding = self.seekByte(self["share_name_offset"].value)
+        if padding:
+            yield padding
+        yield CString(self, "share_name")
+
+    def createValue(self): return self["share_name"].value
+
+class FileLocationInfo(FieldSet):
+    def createFields(self):
+        yield UInt32(self, "length", "Length of this structure")
+        if not self["length"].value:
+            return
+
+        yield UInt32(self, "first_offset_pos", "Position of first offset")
+        yield Bit(self, "on_local_volume")
+        yield Bit(self, "on_network_volume")
+        yield PaddingBits(self, "reserved[]", 30)
+        yield UInt32(self, "local_info_offset", "Offset to local volume table; only meaningful if on_local_volume = 1")
+        yield UInt32(self, "local_pathname_offset", "Offset to local base pathname; only meaningful if on_local_volume = 1")
+        yield UInt32(self, "remote_info_offset", "Offset to network volume table; only meaningful if on_network_volume = 1")
+        yield UInt32(self, "pathname_offset", "Offset of remaining pathname")
+        if self["on_local_volume"].value:
+            padding = self.seekByte(self["local_info_offset"].value)
+            if padding:
+                yield padding
+            yield LocalVolumeTable(self, "local_volume_table", "Local Volume Table")
+
+            padding = self.seekByte(self["local_pathname_offset"].value)
+            if padding:
+                yield padding
+            yield CString(self, "local_base_pathname", "Local Base Pathname")
+
+        if self["on_network_volume"].value:
+            padding = self.seekByte(self["remote_info_offset"].value)
+            if padding:
+                yield padding
+            # FIXME: problem of indentation
+            yield CString(self, "local_base_pathname_unicode", "Local Base Pathname in Unicode", charset="UTF-16-LE")
+            yield NetworkVolumeTable(self, "network_volume_table")
+
+        padding = self.seekByte(self["pathname_offset"].value)
+        if padding:
+            yield padding
+        yield CString(self, "final_pathname", "Final component of the pathname")
+
+        padding=self.seekByte(self["length"].value)
+        if padding:
+            yield PaddingBits(self, "padding[]", 8)
+            yield CString(self, "final_pathname_unicode", "Final component of the pathname in Unicode", charset="UTF-16-LE")
+
+class LnkString(FieldSet):
+    def createFields(self):
+        yield UInt16(self, "length", "Length of this string")
+        if self.root.hasUnicodeNames():
+            yield String(self, "data", self["length"].value*2, charset="UTF-16-LE")
+        else:
+            yield String(self, "data", self["length"].value, charset="ASCII")
+
+    def createValue(self):
+        return self["data"].value
+
+    # FIXME: use self.root.hasUnicodeNames()
+#    def createDisplay(self):
+#        return self.parent.unicode_str*'u'+self["data"].display
+
+class ExtraInfo(FieldSet):
+    INFO_TYPE={
+        0xA0000003: "Hostname and Other Stuff",
+        0xA0000005: "Special Folder Info",
+        0xA0000007: "Custom Icon Details",
+    }
+    SPECIAL_FOLDER = {
+         0: "DESKTOP",
+         1: "INTERNET",
+         2: "PROGRAMS",
+         3: "CONTROLS",
+         4: "PRINTERS",
+         5: "PERSONAL",
+         6: "FAVORITES",
+         7: "STARTUP",
+         8: "RECENT",
+         9: "SENDTO",
+        10: "BITBUCKET",
+        11: "STARTMENU",
+        16: "DESKTOPDIRECTORY",
+        17: "DRIVES",
+        18: "NETWORK",
+        19: "NETHOOD",
+        20: "FONTS",
+        21: "TEMPLATES",
+        22: "COMMON_STARTMENU",
+        23: "COMMON_PROGRAMS",
+        24: "COMMON_STARTUP",
+        25: "COMMON_DESKTOPDIRECTORY",
+        26: "APPDATA",
+        27: "PRINTHOOD",
+        28: "LOCAL_APPDATA",
+        29: "ALTSTARTUP",
+        30: "COMMON_ALTSTARTUP",
+        31: "COMMON_FAVORITES",
+        32: "INTERNET_CACHE",
+        33: "COOKIES",
+        34: "HISTORY",
+        35: "COMMON_APPDATA",
+        36: "WINDOWS",
+        37: "SYSTEM",
+        38: "PROGRAM_FILES",
+        39: "MYPICTURES",
+        40: "PROFILE",
+        41: "SYSTEMX86",
+        42: "PROGRAM_FILESX86",
+        43: "PROGRAM_FILES_COMMON",
+        44: "PROGRAM_FILES_COMMONX86",
+        45: "COMMON_TEMPLATES",
+        46: "COMMON_DOCUMENTS",
+        47: "COMMON_ADMINTOOLS",
+        48: "ADMINTOOLS",
+        49: "CONNECTIONS",
+        53: "COMMON_MUSIC",
+        54: "COMMON_PICTURES",
+        55: "COMMON_VIDEO",
+        56: "RESOURCES",
+        57: "RESOURCES_LOCALIZED",
+        58: "COMMON_OEM_LINKS",
+        59: "CDBURN_AREA",
+        61: "COMPUTERSNEARME",
+    }
+
+    def __init__(self, *args, **kw):
+        FieldSet.__init__(self, *args, **kw)
+        if self["length"].value:
+            self._size = self["length"].value * 8
+        else:
+            self._size = 32
+
+    def createFields(self):
+        yield UInt32(self, "length", "Length of this structure")
+        if not self["length"].value:
+            return
+
+        yield Enum(textHandler(UInt32(self, "flags", "Flags determining the function of this structure"),hexadecimal),self.INFO_TYPE)
+        if self["flags"].value == 0xA0000003:
+            yield UInt32(self, "remaining_length")
+            yield UInt32(self, "unknown[]")
+            yield String(self, "hostname", 16, "Computer hostname on which shortcut was last modified")
+            yield RawBytes(self, "unknown[]", 32)
+            yield RawBytes(self, "unknown[]", 32)
+        elif self["flags"].value == 0xA0000005:
+            yield Enum(UInt32(self, "special_folder_id", "ID of the special folder"),self.SPECIAL_FOLDER)
+            yield UInt32(self, "offset", "Some kind of offset (?)")
+        elif self["flags"].value == 0xA0000007:
+            yield CString(self, "file_path", "Path to icon")
+            yield RawBytes(self, "raw", self["length"].value-self.current_size/8)
+        else:
+            # FIXME: return 0
+            return
+
+    def createDisplay(self):
+        if self["length"].value:
+            return "Item ID Entry: "+self.ITEM_TYPE.get(self["type"].value,"Unknown")
+        else:
+            return "End of Item ID List"
+
 class LnkFile(Parser):
     MAGIC = "\x4C\0\0\0\x01\x14\x02\x00\x00\x00\x00\x00\xc0\x00\x00\x00\x00\x00\x00\x46"
     tags = {
@@ -133,7 +338,7 @@ class LnkFile(Parser):
         "file_ext": ("lnk",),
         "mime": (u"application/x-ms-shortcut",),
         "magic": ((MAGIC, 0),),
-        "min_size": 32, # FIXME
+        "min_size": len(MAGIC)*8,   # signature + guid = 20 bytes
         "description": "Windows Shortcut (.lnk)",
     }
     endian = LITTLE_ENDIAN
@@ -199,13 +404,24 @@ class LnkFile(Parser):
 
         if self["has_shell_id"].value:
             yield UInt16(self, "item_idlist_size", "size of item ID list")
-            item=ItemId(self, "item_idlist[]")
+            item = ItemId(self, "item_idlist[]")
             yield item
             while item["length"].value:
-                item=ItemId(self, "item_idlist[]")
+                item = ItemId(self, "item_idlist[]")
                 yield item
+        if self["target_is_file"].value:
+            yield FileLocationInfo(self, "file_location_info", "File Location Info")
+        if self["has_description"].value:
+            yield LnkString(self, "description")
+        if self["has_rel_path"].value:
+            yield LnkString(self, "relative_path", "Relative path to target")
+        if self["has_working_dir"].value:
+            yield LnkString(self, "working_dir", "Working directory (dir to start target in)")
+        if self["has_cmd_line_args"].value:
+            yield LnkString(self, "cmd_line_args", "Command Line Arguments")
+        if self["has_custom_icon"].value:
+            yield LnkString(self, "custom_icon", "Custom Icon Path")
 
-        size = (self.size - self.current_size) // 8
-        if size:
-            yield RawBytes(self, "raw_end", size)
+        while not self.eof:
+            yield ExtraInfo(self, "extra_info[]")
 
