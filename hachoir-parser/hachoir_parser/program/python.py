@@ -13,7 +13,7 @@ DISASSEMBLE = False
 
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet,
-    UInt16, Int32, UInt32, UInt64, ParserError, Float64, Enum,
+    UInt16, Int32, UInt32, Int64, ParserError, Float64, Enum,
     Character, Bytes, RawBytes, PascalString8, TimestampUnix32)
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.bits import long2raw
@@ -42,14 +42,14 @@ def createStringRefDesc(parent):
 
 # --- Integers ---
 def parseInt32(parent):
-    yield UInt32(parent, "value")
+    yield Int32(parent, "value")
 
 def parseInt64(parent):
-    yield UInt64(parent, "value")
+    yield Int64(parent, "value")
 
 def parseLong(parent):
     yield UInt32(parent, "digit_count")
-    for i in xrange( parent["digit_count"].value ):
+    for index in xrange( parent["digit_count"].value ):
         yield UInt16(parent, "digit[]")
 
 
@@ -135,7 +135,7 @@ class Object(FieldSet):
         'T': ("true", None, "True", None),
         'S': ("stop_iter", None, "StopIter", None),
         '.': ("ellipsis", None, "ELLIPSIS", None),
-        '?': ("unknow", None, "Unknow", None),
+        '?': ("unknown", None, "Unknown", None),
 
         'i': ("int32", parseInt32, "Int32", None),
         'I': ("int64", parseInt64, "Int64", None),
