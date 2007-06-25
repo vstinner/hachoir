@@ -15,6 +15,7 @@ Jason Gorski <jgorski AT gmail.com> - Author of zsnes parser
 Mickaël Kenikssi <k DOT mickael AT gmail DOT com> - Write CDDA parser
 Mike Melanson <mike AT multimedia.cx> - Write RealMedia and SpiderMan video parser
 Olivier SCHWAB <le.poulpe303 AT laposte.net> - Write 7-zip parser
+Robert Xiao aka nneonneo - improve LNK parser
 Romain Hérault <romain DOT herault AT gmail DOT com> - Author of iTunesDB parser
 Thomas de Grenier de Latour aka TGL <degrenier AT easyconnect DOT fr> - Java class parser
 
