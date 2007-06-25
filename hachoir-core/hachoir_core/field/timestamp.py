@@ -1,5 +1,5 @@
 from hachoir_core.tools import (humanDatetime,
-    timestampUNIX, timestampMac32, timestampWin64)
+    timestampUNIX, timestampMac32, timestampUUID60, timestampWin64)
 from hachoir_core.field import Bits, FieldSet
 from datetime import datetime
 
@@ -28,6 +28,7 @@ def timestampFactory(cls_name, handler, size):
 
 TimestampUnix32 = timestampFactory("TimestampUnix32", timestampUNIX, 32)
 TimestampMac32 = timestampFactory("TimestampUnix32", timestampMac32, 32)
+TimestampUUID60 = timestampFactory("TimestampUUID60", timestampUUID60, 60)
 TimestampWin64 = timestampFactory("TimestampWin64", timestampWin64, 64)
 
 class TimeDateMSDOS32(FieldSet):

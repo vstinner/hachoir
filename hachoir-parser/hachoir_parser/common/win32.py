@@ -1,13 +1,9 @@
 from hachoir_core.field import (FieldSet,
-    UInt16, UInt32, Enum, String, Bytes, Bits)
+    UInt16, UInt32, Enum, String, Bytes, Bits, TimestampUUID60)
 from hachoir_parser.video.fourcc import video_fourcc_name
 from hachoir_core.bits import str2hex
 from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_parser.network.common import OrganizationallyUniqueIdentifier, MAC48_Address
-from hachoir_core.tools import timestampUUID60
-
-def formatTimestamp(field):
-    return timestampUUID60(field.value)
 
 class PascalStringWin32(FieldSet):
     def __init__(self, parent, name, description=None, strip=None, charset="UTF-16-LE"):
@@ -62,7 +58,7 @@ class GUID(FieldSet):
 
     def createFields(self):
         if self.version == 1:
-            yield textHandler(Bits(self, "time", 60), formatTimestamp)
+            yield TimestampUUID60(self, "time")
             yield Enum(Bits(self, "version", 4), self.VERSION_NAME)
             yield Enum(Bits(self, "variant", 3), self.VARIANT_NAME)
             yield textHandler(Bits(self, "clock", 13), hexadecimal)
