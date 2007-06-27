@@ -1,8 +1,8 @@
+# -*- coding: UTF-8 -*-
 """
 Object to manage regular expressions, try to optimize the result:
  - '(a|b)' => '[ab]'
  - '(color red|color blue)' => 'color (red|blue)'
- - '(red color|blue color)' => '(red|blue) color'
  - '([ab]|c)' => '[abc]'
  - 'ab' + 'cd' => 'abcd' (one long string)
  - [a-z]|[b] => [a-z]
@@ -18,6 +18,10 @@ Operation:
  - a | b: a or b, eg. "dog" | "cat" => "dog|cat"
  - minLength(): minimum length of matching pattern, "(cat|horse)".minLength() => 3
  - maxLength(): maximum length of matching pattern, "(cat|horse)".maxLength() => 5
+
+Utilities:
+ - createString(): create a regex matching a string
+ - createRange(): create a regex matching character ranges
 
 TODO:
  - Support Unicode regex (avoid mixing str and unicode types)
@@ -60,7 +64,10 @@ def matchSingleValue(regex):
     return False
 
 def escapeRegex(text):
-    # Escape >> ^.+*?{}[]|()\$ <<, prefix them with >> \ <<
+    """
+    Escape string to use it in a regular expression:
+    prefix special characters « ^.+*?{}[]|()\$ » by an antislash.
+    """
     return re.sub(r"([][^.+*?{}|()\\$])", r"\\\1", text)
 
 def _join(func, regex_list):
@@ -98,6 +105,9 @@ def createRange(*text, **kw):
     return RegexRange(ranges, kw.get('exclude', False))
 
 class Regex:
+    """
+    Abstract class defining a regular expression atom
+    """
     def minLength(self):
         """
         Maximum length in characters of the regex.
