@@ -78,7 +78,7 @@ def parseTuple(parent):
 def createTupleDesc(parent):
     count = parent["count"].value
     items = ngettext("%s item", "%s items", count) % count
-    return "%s: %s" % (parent.info[2], items)
+    return "%s: %s" % (parent.code_info[2], items)
 
 
 # --- Dict ---
@@ -156,14 +156,14 @@ class Object(FieldSet):
         'c': ("code", parseCode, "Code", None),
     }
 
-    def __init__(self, parent, name=None, **kw):
+    def __init__(self, parent, name, **kw):
         FieldSet.__init__(self, parent, name, **kw)
         code = self["bytecode"].value
         if code not in self.bytecode_info:
             raise ParserError('Unknown bytecode: "%s"' % code)
-        self.info = self.bytecode_info[code]
+        self.code_info = self.bytecode_info[code]
         if not name:
-            self._name = self.info[0]
+            self._name = self.code_info[0]
         if code == "l":
             self.createValue = self.createValueLong
         elif code in ("i", "I", "f", "g"):
@@ -205,17 +205,17 @@ class Object(FieldSet):
 
     def createFields(self):
         yield Character(self, "bytecode", "Bytecode")
-        parser = self.info[1]
+        parser = self.code_info[1]
         if parser:
             for field in parser(self):
                 yield field
 
     def createDescription(self):
-        create = self.info[3]
+        create = self.code_info[3]
         if create:
             return create(self)
         else:
-            return self.info[2]
+            return self.code_info[2]
 
 class PythonCompiledFile(Parser):
     tags = {
@@ -276,5 +276,5 @@ class PythonCompiledFile(Parser):
     def createFields(self):
         yield Enum(Bytes(self, "signature", 4, "Python file signature and version"), self.STR_MAGIC)
         yield TimestampUnix32(self, "timestamp", "Timestamp")
-        yield Object(self)
+        yield Object(self, "root")
 
