@@ -48,8 +48,8 @@ def parseInt64(parent):
     yield Int64(parent, "value")
 
 def parseLong(parent):
-    yield UInt32(parent, "digit_count")
-    for index in xrange( parent["digit_count"].value ):
+    yield Int32(parent, "digit_count")
+    for index in xrange( abs(parent["digit_count"].value) ):
         yield UInt16(parent, "digit[]")
 
 
@@ -191,11 +191,14 @@ class Object(FieldSet):
             return "(empty)"
 
     def createValueLong(self):
-        count = self["digit_count"].value
+        is_negative = self["digit_count"].value < 0
+        count = abs(self["digit_count"].value)
         total = 0
         for index in xrange(count-1, -1, -1):
             total <<= 15
             total += self["digit[%u]" % index].value
+        if is_negative:
+            total = -total
         return total
 
     def createValueComplex(self):
@@ -276,5 +279,5 @@ class PythonCompiledFile(Parser):
     def createFields(self):
         yield Enum(Bytes(self, "signature", 4, "Python file signature and version"), self.STR_MAGIC)
         yield TimestampUnix32(self, "timestamp", "Timestamp")
-        yield Object(self, "root")
+        yield Object(self, "content")
 
