@@ -210,12 +210,12 @@ def checkCACertClass3(parser): return (
 )
 
 def checkPYC(parser): return (
-    checkValue(parser, "/code/consts/item[0]", 42),
-    checkValue(parser, "/code/stack_size", 4),
-    checkValue(parser, "/code/consts/item[1]", 2535301200456458802993406410752L),
-    checkValue(parser, "/code/consts/item[4]", 0.3j),
-    checkValue(parser, "/code/consts/item[8]", "abc"),
-    checkValue(parser, "/code/filename", "pyc_example.py"))
+    checkValue(parser, "/content/consts/item[0]", 42),
+    checkValue(parser, "/content/stack_size", 4),
+    checkValue(parser, "/content/consts/item[1]", 2535301200456458802993406410752L),
+    checkValue(parser, "/content/consts/item[4]", 0.3j),
+    checkValue(parser, "/content/consts/item[8]", "abc"),
+    checkValue(parser, "/content/filename", "pyc_example.py"))
 
 def checkReferenceMapClass(parser): return (
     checkValue(parser, "/minor_version", 3),
