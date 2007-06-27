@@ -12,8 +12,10 @@ Documents:
 Author: Robert Xiao, Victor Stinner
 
 Changes:
+  2007-06-27 - Robert Xiao
+    * Fixes to FileLocationInfo to correctly handle Unicode paths
   2007-06-13 - Robert Xiao
-     * XXX
+    * ItemID, FileLocationInfo and ExtraInfo structs, correct Unicode string handling
   2007-03-15 - Victor Stinner
     * Creation of the parser
 """
@@ -181,6 +183,7 @@ class FileLocationInfo(FieldSet):
             return
 
         yield UInt32(self, "first_offset_pos", "Position of first offset")
+        has_unicode_paths = (self["first_offset_pos"].value == 0x24)
         yield Bit(self, "on_local_volume")
         yield Bit(self, "on_network_volume")
         yield PaddingBits(self, "reserved[]", 30)
@@ -188,6 +191,9 @@ class FileLocationInfo(FieldSet):
         yield UInt32(self, "local_pathname_offset", "Offset to local base pathname; only meaningful if on_local_volume = 1")
         yield UInt32(self, "remote_info_offset", "Offset to network volume table; only meaningful if on_network_volume = 1")
         yield UInt32(self, "pathname_offset", "Offset of remaining pathname")
+        if has_unicode_paths:
+            yield UInt32(self, "local_pathname_unicode_offset", "Offset to Unicode version of local base pathname; only meaningful if on_local_volume = 1")
+            yield UInt32(self, "pathname_unicode_offset", "Offset to Unicode version of remaining pathname")
         if self["on_local_volume"].value:
             padding = self.seekByte(self["local_info_offset"].value)
             if padding:
@@ -198,13 +204,16 @@ class FileLocationInfo(FieldSet):
             if padding:
                 yield padding
             yield CString(self, "local_base_pathname", "Local Base Pathname")
+            if has_unicode_paths:
+                padding = self.seekByte(self["local_pathname_unicode_offset"].value)
+                if padding:
+                    yield padding
+                yield CString(self, "local_base_pathname_unicode", "Local Base Pathname in Unicode", charset="UTF-16-LE")
 
         if self["on_network_volume"].value:
             padding = self.seekByte(self["remote_info_offset"].value)
             if padding:
                 yield padding
-            # FIXME: problem of indentation
-            yield CString(self, "local_base_pathname_unicode", "Local Base Pathname in Unicode", charset="UTF-16-LE")
             yield NetworkVolumeTable(self, "network_volume_table")
 
         padding = self.seekByte(self["pathname_offset"].value)
@@ -212,10 +221,15 @@ class FileLocationInfo(FieldSet):
             yield padding
         yield CString(self, "final_pathname", "Final component of the pathname")
 
+        if has_unicode_paths:
+            padding = self.seekByte(self["pathname_unicode_offset"].value)
+            if padding:
+                yield padding
+            yield CString(self, "final_pathname_unicode", "Final component of the pathname in Unicode", charset="UTF-16-LE")
+
         padding=self.seekByte(self["length"].value)
         if padding:
-            yield PaddingBits(self, "padding[]", 8)
-            yield CString(self, "final_pathname_unicode", "Final component of the pathname in Unicode", charset="UTF-16-LE")
+            yield padding
 
 class LnkString(FieldSet):
     def createFields(self):
@@ -227,10 +241,6 @@ class LnkString(FieldSet):
 
     def createValue(self):
         return self["data"].value
-
-    # FIXME: use self.root.hasUnicodeNames()
-#    def createDisplay(self):
-#        return self.parent.unicode_str*'u'+self["data"].display
 
 class ExtraInfo(FieldSet):
     INFO_TYPE={
@@ -321,8 +331,7 @@ class ExtraInfo(FieldSet):
             yield CString(self, "file_path", "Path to icon")
             yield RawBytes(self, "raw", self["length"].value-self.current_size/8)
         else:
-            # FIXME: return 0
-            return
+            yield RawBytes(self, "raw", self["length"].value-self.current_size/8)
 
     def createDisplay(self):
         if self["length"].value:
