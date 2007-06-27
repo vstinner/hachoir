@@ -23,3 +23,8 @@ def format_name(field):
         name += '/'
 
     return name
+
+def format_desc(field):
+    if field.description:
+        return str(field.description)
+    return ''

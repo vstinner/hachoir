@@ -16,7 +16,7 @@ class field_view_t(ListCtrl, ListCtrlAutoWidthMixin):
     def post_init(self):
         ListCtrlAutoWidthMixin.__init__(self)
 
-        columns = [_('address'), _('name'), _('type'), _('size'), _('data')]
+        columns = [_('address'), _('name'), _('type'), _('size'), _('data'), _('description')]
         for name in columns:
             self.append_column(name)
 

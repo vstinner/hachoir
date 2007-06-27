@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from hachoir_wx.field_view.format import format_addr_hex, format_addr_dec, format_size, format_data, format_name
+from hachoir_wx.field_view.format import format_addr_hex, format_addr_dec, format_size, format_data, format_name, format_desc
 from hachoir_core.i18n import _
 
 class field_view_imp_t:
@@ -71,7 +71,8 @@ class field_view_imp_t:
                 _('name') : format_name(field),
                 _('type') : field.__class__.__name__,
                 _('size') : format_size(field._getSize()),
-                _('data') : format_data(field)
+                _('data') : format_data(field),
+                _('description'): format_desc(field)
                 }
 
             self.view.append_row(map)
