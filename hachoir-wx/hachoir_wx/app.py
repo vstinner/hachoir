@@ -3,7 +3,8 @@
 from wx import App, EVT_MENU, ID_OK
 from wx.xrc import XRCID
 
-from hachoir_parser.guess import createParser
+from hachoir_parser.guess import createParser, guessParser
+from hachoir_core.stream import FileInputStream
 from hachoir_wx.dispatcher import dispatcher_t
 from hachoir_wx import frame_view, field_view, hex_view
 from hachoir_wx.dialogs import file_open_dialog
@@ -11,10 +12,10 @@ from hachoir_wx.unicode import force_unicode
 from hachoir_wx import __version__ as VERSION
 
 class app_t(App):
-    def __init__(self, filename=None, real_filename=None):
+    def __init__(self, filename=None, real_filename=None, stream=None):
         print "[+] Run hachoir-wx version %s" % VERSION
         if filename:
-            self.init_filename = (filename, real_filename)
+            self.init_filename = (filename, real_filename, stream)
         else:
             self.init_filename = None
         App.__init__(self, False)
@@ -33,9 +34,12 @@ class app_t(App):
         self.Bind(EVT_MENU, self.on_file_menu_close_window,
                   id=XRCID('file_menu_close_window'))
 
-    def load_file(self, filename, realname):
+    def load_file(self, filename, realname, stream=None):
         print '[+] Load file "%s"' % filename
-        parser = createParser(filename, real_filename=realname)
+        if not stream:
+            parser = createParser(filename, real_filename=realname)
+        else:
+            parser = guessParser(stream)
         if parser:
             dispatcher = dispatcher_t()
             dispatcher.add_receiver(self)
@@ -46,8 +50,10 @@ class app_t(App):
 
             dispatcher.trigger('file_ready', open(realname, 'rb'))
             dispatcher.trigger('field_set_ready', parser)
+            dispatcher.trigger('filename_update', filename.replace('\\','/'))
             frame.ready()
             hex_view_widget.ready()
+            dispatcher.trigger('app_update', self)
 
             frame.Show()
             print '[+] GUI ready'

@@ -5,6 +5,9 @@
 #
 
 from hachoir_core.tools import alignValue
+from hachoir_core.stream.input import FileFromInputStream
+from hachoir_wx.unicode import force_unicode
+import hachoir_wx.app
 
 def field_index(field_set, field):
     return field_set._fields.index(field._getName())
@@ -38,3 +41,17 @@ def save_field_to_disk(field, src_stream, dest_path):
     dest_stream = open(dest_path, 'wb')
     src_stream.seek(field._getAbsoluteAddress() / 8)
     dest_stream.write(src_stream.read(alignValue(field._getSize(), 8) / 8))
+    dest_stream.close()
+
+def save_substream_to_disk(field, dest_path):
+    dest_stream = open(dest_path, 'wb')
+    f = FileFromInputStream(field.getSubIStream())
+    dest_stream.write(f.read())
+    dest_stream.close()
+
+def parse_substream(field, dest_path, app):
+    substream = field.getSubIStream()
+    f=open(dest_path,'wb')
+    f.write(FileFromInputStream(substream).read())
+    f.close()
+    app.load_file(force_unicode(field.path), dest_path, substream)

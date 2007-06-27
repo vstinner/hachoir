@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from hachoir_wx.field_view.stubs import save_field_to_disk
+from hachoir_wx.field_view.stubs import save_field_to_disk, save_substream_to_disk, parse_substream
 from hachoir_core.i18n import _
+import os
 
 class field_menu_imp_t:
     def on_field_set_ready(self, dispatcher, fields):
@@ -13,19 +14,22 @@ class field_menu_imp_t:
         assert view is not None
         self.view = view
 
+    def on_app_update(self, dispatcher, app):
+        self.app=app
+
     def on_field_show_ops(self, dispatcher, field):
         self.view.show_opts()
 
-    def on_addr_rel(self):
+    def on_addr_rel(self, event):
         self.dispatcher.trigger('address_relative')
 
-    def on_addr_abs(self):
+    def on_addr_abs(self, event):
         self.dispatcher.trigger('address_absolute')
 
-    def on_addr_hex(self):
+    def on_addr_hex(self, event):
         self.dispatcher.trigger('address_hexadecimal')
 
-    def on_addr_dec(self):
+    def on_addr_dec(self, event):
         self.dispatcher.trigger('address_decimal')
 
     def on_split_bits(self):
@@ -40,7 +44,15 @@ class field_menu_imp_t:
     def on_file_ready(self, dispatcher, file):
         self.file = file
 
-    def on_dump_to_disk(self):
+    def on_dump_to_disk(self, event):
         dump_path = self.view.ask_for_dump_file(_('Dump "' + self.selected._getPath() + '" To Disk...'))
         if dump_path is not None:
             save_field_to_disk(self.selected, self.file, dump_path)
+
+    def on_dump_stream_to_disk(self, event):
+        dump_path = self.view.ask_for_dump_file(_('Dump Substream of "' + self.selected._getPath() + '" To Disk...'))
+        if dump_path is not None:
+            save_substream_to_disk(self.selected, dump_path)
+
+    def on_parse_substream(self, event):
+        parse_substream(self.selected, os.tempnam(None,'hachoir_wx_temp_'), self.app)

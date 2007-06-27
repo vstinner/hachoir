@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import os
-
 class frame_view_imp_t:
     def on_frame_view_ready(self, dispatcher, frame_view):
         assert frame_view is not None
@@ -11,9 +9,12 @@ class frame_view_imp_t:
         assert file is not None
         self.filename = file.name
 
+    def on_filename_update(self, dispatcher, filename):
+        self.filename = filename
+
     def format_title(self, field):
         field_path = field._getPath()
-        return os.path.join(self.filename, field_path[1:])
+        return self.filename+'/'+field_path[1:]
 
     def on_field_activated(self, dispatcher, field):
         self.view.SetTitle(self.format_title(field))
