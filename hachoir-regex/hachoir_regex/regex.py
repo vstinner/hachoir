@@ -205,15 +205,18 @@ class Regex:
             return other
 
         # Try to optimize (a|b)
-        new_regex = self._or_(other, False)
-        if new_regex:
-            return new_regex
+        if self.__class__ != other.__class__:
+            new_regex = self._or_(other, False)
+            if new_regex:
+                return new_regex
 
-        # Try to optimize (b|a)
-        new_regex = other._or_(self, True)
-        if new_regex:
-            return new_regex
-        return None
+            # Try to optimize (b|a)
+            new_regex = other._or_(self, True)
+            if new_regex:
+                return new_regex
+            return None
+        else:
+            return self._or_(other, False)
 
     def _or_(self, other, reverse):
         """
