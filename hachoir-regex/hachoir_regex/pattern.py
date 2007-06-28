@@ -140,16 +140,29 @@ class PatternMatching:
         Search patterns in data.
         Return a generator of tuples: (start, end, item)
         """
-        if self._need_commit:
-            self._commit()
-        for match in self._compiled_regex.finditer(data):
+        for match in self.compiled_regex.finditer(data):
             item = self.getPattern(match.group(0))
             yield (match.start(0), match.end(0), item)
 
     def __str__(self):
+        return makePrintable(str(self.regex), 'ASCII', to_unicode=True)
+
+    def _getAttribute(self, name):
         if self._need_commit:
             self._commit()
-        return makePrintable(str(self._regex), 'ASCII', to_unicode=True)
+        return getattr(self, name)
+
+    def _getRegex(self):
+        return self._getAttribute("_regex")
+    regex = property(_getRegex)
+
+    def _getCompiledRegex(self):
+        return self._getAttribute("_compiled_regex")
+    compiled_regex = property(_getCompiledRegex)
+
+    def _getMaxLength(self):
+        return self._getAttribute("_max_length")
+    max_length = property(_getMaxLength)
 
 if __name__ == "__main__":
     import doctest, sys
