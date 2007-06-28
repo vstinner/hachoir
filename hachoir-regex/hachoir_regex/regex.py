@@ -665,8 +665,6 @@ class RegexOr(Regex):
             return total
         for index, item in enumerate(self.content):
             new_item = item.or_(other)
-            if not new_item:
-                new_item = other.or_(item)
             if new_item:
                 content = list(self.content)
                 content = content[:index] + [new_item] + content[index+1:]
