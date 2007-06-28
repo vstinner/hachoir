@@ -7,7 +7,7 @@ a regex using classes or using the plain text parser.
 Regexs are "optimized" during their creation. See documentation to get
 more details.
 
-Website: http://hachoir.org/wiki/hachoir-regex/
+Website: http://hachoir.org/wiki/hachoir-regex
 
 Installation
 ============
