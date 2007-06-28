@@ -145,7 +145,7 @@ class Regex:
     def match(self, other):
         """
         Guess if self may matchs regex.
-        May returns False even if self does match other.
+        May returns False even if self does match regex.
         """
         if self == other:
             return True
@@ -186,27 +186,31 @@ class Regex:
     def __add__(self, regex):
         return self.__and__(regex)
 
-    def or_(self, regex):
+    def or_(self, other):
         """
         Create new optimized version of a|b.
         Returns None if there is no interesting optimization.
         """
-        # (a|b) where a match b => a
-        # eg. ([a-z|[a-b]) => [a-z]
-        if self.match(regex):
+
+        # (a|a) => a
+        if self == other:
             return self
 
-        # (b|a) where b match a => a
-        if regex.match(self):
-            return regex
+        # a matchs b => a
+        if self._match(other):
+            return self
+
+        # b matchs a => b
+        if other._match(self):
+            return other
 
         # Try to optimize (a|b)
-        new_regex = self._or_(regex, False)
+        new_regex = self._or_(other, False)
         if new_regex:
             return new_regex
 
         # Try to optimize (b|a)
-        new_regex = regex._or_(self, True)
+        new_regex = other._or_(self, True)
         if new_regex:
             return new_regex
         return None
