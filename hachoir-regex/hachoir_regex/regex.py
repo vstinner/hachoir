@@ -152,6 +152,12 @@ class Regex:
         return self._match(regex)
 
     def _match(self, regex):
+        """
+        Does regex match other regex?
+        Eg. "." matchs "0" or "[a-z]" but "0" doesn't match ".".
+
+        This function is used by match() which already check regex identity.
+        """
         return False
 
     def _and(self, regex):
@@ -209,6 +215,11 @@ class Regex:
         return None
 
     def __or__(self, regex):
+        """
+        Public method of OR operator: a|b. It call or_() internal method.
+        If or_() returns None: RegexOr object is used (and otherwise,
+        use or_() result).
+        """
         # Try to optimize (a|b)
         new_regex = self.or_(regex)
         if new_regex:
@@ -225,6 +236,12 @@ class Regex:
         return re.compile(self.__str__(**kw))
 
     def findPrefix(self, regex):
+        """
+        Try to create a common prefix between two regex.
+        Eg. "abc" and "abd" => "ab"
+
+        Return None if no prefix can be found.
+        """
         return None
 
     def __iter__(self):
