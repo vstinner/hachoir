@@ -1,8 +1,10 @@
+from hotshot import Profile
+from hotshot.stats import load as loadStats
+from os import unlink
+
 def runProfiler(func, args=tuple(), kw={}, verbose=True, nb_func=25, sort_by=('cumulative', 'calls')):
-    import hotshot, hotshot.stats
-    from os import unlink
     profile_filename = "/tmp/profiler"
-    prof = hotshot.Profile(profile_filename)
+    prof = Profile(profile_filename)
     try:
         if verbose:
             print "[+] Run profiler"
@@ -11,7 +13,7 @@ def runProfiler(func, args=tuple(), kw={}, verbose=True, nb_func=25, sort_by=('c
         if verbose:
             print "[+] Stop profiler"
             print "[+] Process data..."
-        stat = hotshot.stats.load(profile_filename)
+        stat = loadStats(profile_filename)
         if verbose:
             print "[+] Strip..."
         stat.strip_dirs()
