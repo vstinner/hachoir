@@ -116,9 +116,7 @@ PatternMaching class
 ====================
 
 Use PatternMaching if you would like to find many strings or regex in a string.
-
-Use addString() and addRegex() to add your patterns and then don't forget
-to call commit().
+Use addString() and addRegex() to add your patterns.
 
     >>> from hachoir_regex import PatternMatching
     >>> p = PatternMatching()

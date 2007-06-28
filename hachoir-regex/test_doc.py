@@ -27,6 +27,7 @@ def testModule(name):
 
 def main():
     # Test documentation in doc/*.rst files
+    testDoc('README')
     testDoc('regex.rst')
     testDoc('regression.rst')
 

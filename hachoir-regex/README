@@ -1,13 +1,86 @@
 Hachoir regex
 =============
 
-This library contains classes to manipulate regular expressions. You can built
+This library contains classes to manipulate regular expressions. You can build
 a regex using classes or using the plain text parser.
 
 Regexs are "optimized" during their creation. See documentation to get
 more details.
 
 Website: http://hachoir.org/wiki/hachoir-regex
+
+Regex examples
+==============
+
+Regex are optimized during their creation:
+
+   >>> from hachoir_regex import parse, createRange, createString
+   >>> createString("bike") + createString("motor")
+   <RegexString 'bikemotor'>
+   >>> parse('(foo|fooo|foot|football)')
+   <RegexAnd 'foo(|[ot]|tball)'>
+
+Create character range:
+
+   >>> regex = createString("1") | createString("3")
+   >>> regex
+   <RegexRange '[13]'>
+   >>> regex |= createRange("2", "4")
+   >>> regex
+   <RegexRange '[1-4]'>
+
+As you can see, you can use classic "a|b" (or) and "a+b" (and)
+Python operators. Example of regular expressions using repetition:
+
+   >>> parse("(a{2,}){3,4}")
+   <RegexRepeat 'a{6,}'>
+   >>> parse("(a*|b)*")
+   <RegexRepeat '[ab]*'>
+   >>> parse("(a*|b|){4,5}")
+   <RegexRepeat '(a+|b){0,5}'>
+
+Compute minimum/maximum matched pattern:
+
+   >>> r=parse('(cat|horse)')
+   >>> r.minLength(), r.maxLength()
+   (3, 5)
+   >>> r=parse('(a{2,}|b+)')
+   >>> r.minLength(), r.maxLength()
+   (1, None)
+
+Pattern maching
+===============
+
+Use PatternMaching if you would like to find many strings or regex in a string.
+Use addString() and addRegex() to add your patterns.
+
+    >>> from hachoir_regex import PatternMatching
+    >>> p = PatternMatching()
+    >>> p.addString("a")
+    >>> p.addString("b")
+    >>> p.addRegex("[cd]")
+
+And then use search() to find all patterns:
+
+    >>> for start, end, item in p.search("a b c d"):
+    ...    print "%s..%s: %s" % (start, end, item)
+    ...
+    0..1: a
+    2..3: b
+    4..5: [cd]
+    6..7: [cd]
+
+You can also attach an objet to a pattern with 'user' (user data) argument:
+
+    >>> p = PatternMatching()
+    >>> p.addString("un", 1)
+    >>> p.addString("deux", 2)
+    >>> for start, end, item in p.search("un deux"):
+    ...    print "%r at %s: user=%r" % (item, start, item.user)
+    ...
+    <StringPattern 'un'> at 0: user=1
+    <StringPattern 'deux'> at 3: user=2
+
 
 Installation
 ============
