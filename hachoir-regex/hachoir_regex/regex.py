@@ -668,7 +668,7 @@ class RegexOr(Regex):
             if new_item:
                 content = list(self.content)
                 content = content[:index] + [new_item] + content[index+1:]
-                return RegexOr.join(content)
+                return RegexOr(content, optimize=False)
         if not reverse:
             content = list(self.content) + [other]
         else:
