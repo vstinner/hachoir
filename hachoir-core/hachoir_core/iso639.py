@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
+"""
+ISO639-2 standart: the module only contains the dictionary ISO639_2
+which maps a language code in three letters (eg. "fre") to a language
+name in english (eg. "French").
+"""
 
 # ISO-639, the list comes from:
 # http://www.loc.gov/standards/iso639-2/php/English_list.php
-ISO639 = (
+_ISO639 = (
     (u"Abkhazian", "abk", "ab"),
     (u"Achinese", "ace", None),
     (u"Acoli", "ach", None),
@@ -546,7 +551,8 @@ ISO639 = (
 
 # Bibliographic ISO-639-2 form (eg. "fre" => "French")
 ISO639_2 = {}
-for line in ISO639:
+for line in _ISO639:
     for key in line[1].split("/"):
         ISO639_2[key] = line[0]
+del _ISO639
 
