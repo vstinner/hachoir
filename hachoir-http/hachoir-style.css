@@ -1,0 +1,110 @@
+div#status
+{
+    background: #32CD32;
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    font-size: 18pt;
+    padding: 3px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    opacity: 0.7;
+    filter:alpha(opacity=70);
+    -moz-opacity:0.7;
+}
+
+div#maincontent
+{
+    border-color: black;
+    border-width: 1;
+    border-style: dotted;
+}
+
+table#maintable
+{
+}
+
+div#settings
+{
+}
+
+input#showraw
+{
+}
+
+.error
+{
+    color: red;
+}
+
+.warning
+{
+    font-weight: bold;
+}
+
+.notice
+{
+}
+
+span.path
+{
+    font-weight: bold;
+}
+
+tr.header
+{
+}
+
+th.headertext
+{
+}
+
+form.fileform
+{
+}
+
+pre.parseerror
+{
+    color: red;
+}
+
+tr.data
+{
+}
+
+td.fldaddress
+{
+}
+
+td.fldname
+{
+}
+
+td.fldtype
+{
+}
+
+td.fldsize
+{
+}
+
+td.flddesc
+{
+}
+
+td.flddisplay
+{
+}
+
+td.flddownload
+{
+}
+
+span.pathlink, span.fieldlink
+{
+    cursor:pointer;
+    color: blue;
+    text-decoration: underline;
+}

@@ -1,0 +1,4 @@
+hachoir-client.js and hachoir-style.css go in the root of the server, or
+else update the links in cgi-bin/hachoir.py to match.  hachoir.py goes in
+the /cgi-bin/ folder, though it can basically go anywhere where CGI
+execution is enabled (it does not rely on cgi-bin being the parent folder).
