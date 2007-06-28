@@ -142,14 +142,14 @@ class Regex:
     def __contains__(self, item):
         raise NotImplementedError()
 
-    def match(self, regex):
+    def match(self, other):
         """
         Guess if self may matchs regex.
-        May returns False even if self does match regex.
+        May returns False even if self does match other.
         """
-        if self == regex:
+        if self == other:
             return True
-        return self._match(regex)
+        return self._match(other)
 
     def _match(self, other):
         """
@@ -212,6 +212,10 @@ class Regex:
         return None
 
     def _or_(self, other, reverse):
+        """
+        Try to create optimized version of self|other if reverse if False,
+        or of other|self if reverse if True.
+        """
         return None
 
     def __or__(self, other):
