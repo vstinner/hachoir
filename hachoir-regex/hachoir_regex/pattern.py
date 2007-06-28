@@ -77,10 +77,12 @@ class PatternMatching:
         self._compiled_regex = None
         self._max_length = None
 
-    def _commit(self):
+    def commit(self):
         """
         Generate whole regex merging all (string and regex) patterns
         """
+        if not self._need_commit:
+            return
         self._need_commit = False
         length = 0
         regex = None
@@ -148,8 +150,7 @@ class PatternMatching:
         return makePrintable(str(self.regex), 'ASCII', to_unicode=True)
 
     def _getAttribute(self, name):
-        if self._need_commit:
-            self._commit()
+        self.commit()
         return getattr(self, name)
 
     def _getRegex(self):
