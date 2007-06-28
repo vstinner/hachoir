@@ -4,7 +4,7 @@
 AUTHORS = 'Victor Stinner'
 DESCRIPTION = "Manipulation of regular expressions (regex)"
 CLASSIFIERS = [
-    'Development Status :: 3 - Alpha',
+    'Development Status :: 5 - Production/Stable',
     'Intended Audience :: Developers',
     'Intended Audience :: Education',
     'License :: OSI Approved :: GNU General Public License (GPL)',

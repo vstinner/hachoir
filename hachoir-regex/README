@@ -1,11 +1,11 @@
 Hachoir regex
 =============
 
-This library contains classes to manipulate regular expressions. You can build
-a regex using classes or using the plain text parser.
-
-Regexs are "optimized" during their creation. See documentation to get
-more details.
+hachoir-regex is a Python library for regular expression (regex or regexp)
+manupulation. You can use a|b (or) and a+b (and) operators. Expressions are
+optimized during the construction: merge ranges, simplify repetitions, etc.
+It also contains a class for pattern matching allowing to search multiple
+strings and regex at the same time.
 
 Website: http://hachoir.org/wiki/hachoir-regex
 
