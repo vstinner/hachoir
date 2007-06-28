@@ -151,7 +151,7 @@ class Regex:
             return True
         return self._match(regex)
 
-    def _match(self, regex):
+    def _match(self, other):
         """
         Does regex match other regex?
         Eg. "." matchs "0" or "[a-z]" but "0" doesn't match ".".
@@ -211,22 +211,22 @@ class Regex:
             return new_regex
         return None
 
-    def _or_(self, regex, reverse):
+    def _or_(self, other, reverse):
         return None
 
-    def __or__(self, regex):
+    def __or__(self, other):
         """
         Public method of OR operator: a|b. It call or_() internal method.
         If or_() returns None: RegexOr object is used (and otherwise,
         use or_() result).
         """
         # Try to optimize (a|b)
-        new_regex = self.or_(regex)
+        new_regex = self.or_(other)
         if new_regex:
             return new_regex
 
         # Else use (a|b)
-        return RegexOr( (self, regex) )
+        return RegexOr( (self, other) )
 
     def __eq__(self, regex):
         # TODO: Write better/faster code...
@@ -285,10 +285,10 @@ class RegexDot(Regex):
     def _str(self, **kw):
         return '.'
 
-    def _match(self, regex):
-        if regex.__class__ == RegexRange:
+    def _match(self, other):
+        if other.__class__ == RegexRange:
             return True
-        if regex.__class__ == RegexString and len(regex.text) == 1:
+        if other.__class__ == RegexString and len(other.text) == 1:
             return True
         return False
 
@@ -342,7 +342,7 @@ class RegexString(Regex):
             return None
         return (RegexString(texta[:common]), createString(texta[common:]), createString(textb[common:]))
 
-    def _or_(self, regex, reverse):
+    def _or_(self, other, reverse):
         """
         Remove duplicate:
         >>> RegexString("color") | RegexString("color")
@@ -358,11 +358,11 @@ class RegexString(Regex):
         """
 
         # Don't know any other optimization for str|other
-        if regex.__class__ != RegexString:
+        if other.__class__ != RegexString:
             return None
 
         # Find common prefix
-        common = self.findPrefix(regex)
+        common = self.findPrefix(other)
         if common:
             if not reverse:
                 regex = common[1] | common[2]
@@ -441,17 +441,17 @@ class RegexRange(Regex):
     def minLength(self):
         return 1
 
-    def _match(self, regex):
+    def _match(self, other):
         """
         >>> createRange("a") | createRange("b")
         <RegexRange '[ab]'>
         >>> createRange("a", "b", exclude=True) | createRange("a", "c", exclude=True)
         <RegexRange '[^a-c]'>
         """
-        if not self.exclude and regex.__class__ == RegexString and len(regex.text) == 1:
-            branges = (RegexRangeCharacter(regex.text),)
-        elif regex.__class__ == RegexRange and self.exclude == regex.exclude:
-            branges = regex.ranges
+        if not self.exclude and other.__class__ == RegexString and len(other.text) == 1:
+            branges = (RegexRangeCharacter(other.text),)
+        elif other.__class__ == RegexRange and self.exclude == other.exclude:
+            branges = other.ranges
         else:
             return None
         for itemb in branges:
@@ -459,17 +459,17 @@ class RegexRange(Regex):
                 return False
         return True
 
-    def _or_(self, regex, reverse):
+    def _or_(self, other, reverse):
         """
         >>> createRange("a") | createRange("b")
         <RegexRange '[ab]'>
         >>> createRange("a", "b", exclude=True) | createRange("a", "c", exclude=True)
         <RegexRange '[^a-c]'>
         """
-        if not self.exclude and regex.__class__ == RegexString and len(regex.text) == 1:
-            branges = (RegexRangeCharacter(regex.text),)
-        elif regex.__class__ == RegexRange and self.exclude == regex.exclude:
-            branges = regex.ranges
+        if not self.exclude and other.__class__ == RegexString and len(other.text) == 1:
+            branges = (RegexRangeCharacter(other.text),)
+        elif other.__class__ == RegexRange and self.exclude == other.exclude:
+            branges = other.ranges
         else:
             return None
         ranges = list(self.ranges)
@@ -524,11 +524,11 @@ class RegexAnd(Regex):
         """
         return self._minmaxLength( regex.maxLength() for regex in self.content )
 
-    def _or_(self, regex, reverse):
-        if regex.__class__ == RegexString:
-            contentb = [regex]
-        elif regex.__class__ == RegexAnd:
-            contentb = regex.content
+    def _or_(self, other, reverse):
+        if other.__class__ == RegexString:
+            contentb = [other]
+        elif other.__class__ == RegexAnd:
+            contentb = other.content
         else:
             return None
 
@@ -620,30 +620,30 @@ class RegexOr(Regex):
                 return True
         return False
 
-    def _or_(self, regex, reverse):
+    def _or_(self, other, reverse):
         """
         >>> (RegexString("abc") | RegexString("123")) | (RegexString("plop") | RegexString("456"))
         <RegexOr '(abc|123|plop|456)'>
         >>> RegexString("mouse") | createRange('a') | RegexString("2006") | createRange('z')
         <RegexOr '(mouse|[az]|2006)'>
         """
-        if regex.__class__ == RegexOr:
+        if other.__class__ == RegexOr:
             total = self
-            for item in regex.content:
+            for item in other.content:
                 total = total | item
             return total
         for index, item in enumerate(self.content):
-            new_item = item.or_(regex)
+            new_item = item.or_(other)
             if not new_item:
-                new_item = regex.or_(item)
+                new_item = other.or_(item)
             if new_item:
                 content = self.content[:index] + [new_item] \
                     + self.content[index+1:]
                 return RegexOr.join(content)
         if not reverse:
-            content = self.content + [regex]
+            content = self.content + [other]
         else:
-            content = [regex] + self.content
+            content = [other] + self.content
         return RegexOr(content)
 
     def _str(self, **kw):
