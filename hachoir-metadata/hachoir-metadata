@@ -10,6 +10,7 @@ try:
     from hachoir_core.stream import InputStreamError
     from hachoir_core.tools import makePrintable
     from hachoir_parser import createParser, ParserList
+    from hachoir_core.profiler import runProfiler
 except ImportError, err:
     raise
     print >>sys.stderr, "Unable to import an Hachoir module: %s" % err
@@ -134,28 +135,8 @@ def benchmarkMetadata(values, filenames):
     bench = Benchmark()
     bench.run(processFiles, values, filenames, display=False)
 
-def runProfiler(values, filenames):
-    import hotshot, hotshot.stats
-    from os import unlink
-    profile_filename = "/tmp/hachoir-metadata.hotshot"
-    prof = hotshot.Profile(profile_filename)
-    try:
-        print "[+] Run profiler"
-        prof.runcall(processFiles, values, filenames, display=False)
-        prof.close()
-        print "[+] Stop profiler"
-        print "[+] Process data..."
-        stat = hotshot.stats.load(profile_filename)
-        print "[+] Strip..."
-        stat.strip_dirs()
-        print "[+] Sort data..."
-        stat.sort_stats('time', 'calls')
-        print
-        print "[+] Display statistics"
-        print
-        stat.print_stats(50)
-    finally:
-        unlink(profile_filename)
+def profile(values, filenames):
+    return runProfiler(processFiles, (values, filenames), {'display': False})
 
 def main():
     try:
@@ -163,7 +144,7 @@ def main():
         values, filenames = parseOptions()
         configureHachoir(values)
         if values.profiler:
-            ok = runProfiler(values, filenames)
+            ok = profile(values, filenames)
         elif values.bench:
             ok = benchmarkMetadata(values, filenames)
         else:

@@ -64,7 +64,9 @@ class SearchSubfile:
         self.output = Output(directory)
 
     def loadParsers(self, categories=None, parser_ids=None):
+        before = time()
         self.patterns = PatternMatching(categories, parser_ids)
+        print "COMPILATION TIME: %.2f sec" % (time() - before)
         if self.debug:
             print "Use regex: %s" % self.patterns
 

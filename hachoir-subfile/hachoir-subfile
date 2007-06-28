@@ -4,6 +4,7 @@ from hachoir_core.stream import FileInputStream
 from hachoir_core.i18n import _
 from hachoir_core import config
 from hachoir_subfile.search import SearchSubfile
+from hachoir_core.profiler import runProfiler
 import hachoir_core
 from sys import exit
 from optparse import OptionGroup, OptionParser
@@ -33,6 +34,8 @@ def parseOptions():
     common.add_option("--version", help=_("Display version and exit"),
         action="callback", callback=displayVersion)
     common.add_option("--quiet", help=_("Be quiet"),
+        action="store_true", default=False)
+    common.add_option("--profiler", help=_("Run profiler"),
         action="store_true", default=False)
     common.add_option("--debug", help=_("Enable debug mode"),
         action="store_true", default=False)
@@ -66,18 +69,8 @@ def displaySearchStat(subfile):
         print "(no match)"
     print "Total: %u hit/%u valid" % (total_hit, total_valid)
 
-def main():
-    # Initialize
-    values, filename, output = parseOptions()
-    config.quiet = True
-    stream = FileInputStream(unicodeFilename(filename), real_filename=filename)
-    subfile = SearchSubfile(stream, values.offset, values.size)
-    subfile.verbose = not(values.quiet)
-    subfile.debug = values.debug
-    if output:
-        subfile.setOutput(output)
-
-    # Select and load parsers
+def runSearch(subfile, values):
+    # Load categories and parsers
     categories = values.category
     if categories:
         categories = categories.split(",")
@@ -89,8 +82,25 @@ def main():
     # Search subfiles
     ok = subfile.main()
 
+    # Dump statistics on debug mode
     if values.debug:
         displaySearchStat(subfile)
+    return ok
+
+def main():
+    # Initialize
+    values, filename, output = parseOptions()
+    config.quiet = True
+    stream = FileInputStream(unicodeFilename(filename), real_filename=filename)
+    subfile = SearchSubfile(stream, values.offset, values.size)
+    subfile.verbose = not(values.quiet)
+    subfile.debug = values.debug
+    if output:
+        subfile.setOutput(output)
+    if values.profiler:
+        ok = runProfiler(runSearch, (subfile, values))
+    else:
+        ok = runSearch(subfile, values)
     exit(int(not ok))
 
 if __name__ == "__main__":
