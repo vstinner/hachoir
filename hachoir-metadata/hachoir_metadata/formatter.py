@@ -1,6 +1,8 @@
 from hachoir_core.i18n import _
 from datetime import date, datetime
 import re
+from hachoir_metadata.safe import fault_tolerant
+from hachoir_core.language import Language
 
 NORMALIZE_REGEX = re.compile("[-/.: ]+")
 YEAR_REGEX1 = re.compile("^([0-9]{4})$")
@@ -75,4 +77,8 @@ def humanFrameRate(value):
 
 def humanComprRate(rate):
     return u"%.1fx" % rate
+
+@fault_tolerant
+def setLanguage(meta, key, value):
+    meta.language = Language(value)
 

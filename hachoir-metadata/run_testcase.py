@@ -15,6 +15,7 @@ from hachoir_core.error import HachoirError
 from hachoir_core.stream import InputStreamError
 from hachoir_parser import createParser
 from hachoir_core.compatibility import all
+from hachoir_core.language import Language
 from hachoir_metadata import extractMetadata
 from datetime import date, timedelta, datetime
 from locale import setlocale, LC_ALL
@@ -100,6 +101,7 @@ def checkPng331_90_8Meta(metadata): return (
 def checkFlashMobInfo(metadata): return (
     checkAttr(metadata, "copyright", u"© dadaprod, licence Creative Commons by-nc-sa 2.0 fr"),
     checkAttr(metadata, "video[1]/width", 384),
+    checkAttr(metadata, "video[1]/language", Language('fre')),
     checkAttr(metadata, "duration", timedelta(seconds=17, milliseconds=844)),
 )
 

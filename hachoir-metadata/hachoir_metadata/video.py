@@ -13,6 +13,7 @@ from hachoir_core.tools import (makeUnicode, makePrintable,
     durationWin64, timedelta2seconds)
 from hachoir_core.error import warning
 from datetime import timedelta
+from hachoir_metadata.formatter import setLanguage
 
 class MkvMetadata(MultipleMetadata):
     tag_key = {
@@ -64,7 +65,7 @@ class MkvMetadata(MultipleMetadata):
             meta.title = track["Name/unicode"].value
         if "Language/string" in track \
         and track["Language/string"].value not in ("mis", "und"):
-            meta.language = track["Language/string"].display
+            setLanguage(meta, "language", track["Language/string"].value)
 
     def processVideo(self, track):
         video = Metadata(self)

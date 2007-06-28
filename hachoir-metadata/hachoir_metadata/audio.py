@@ -7,6 +7,7 @@ from hachoir_core.tools import makePrintable, timedelta2seconds, humanBitRate
 from datetime import timedelta, date
 from hachoir_metadata.metadata_item import QUALITY_FAST, QUALITY_NORMAL, QUALITY_BEST
 from hachoir_metadata.safe import fault_tolerant, getValue
+from hachoir_metadata.formatter import setLanguage
 
 def setTrackTotal(meta, key, total):
     try:
@@ -283,7 +284,7 @@ class MpegAudioMetadata(RootMetadata):
         "TYER": ("creation_date", None),
         "WXXX": ("url", None),
         "TCON": ("music_genre", None),
-        "TLAN": ("language", None),
+        "TLAN": ("language", setLanguage),
     }
 
     def processID3v2(self, field):
