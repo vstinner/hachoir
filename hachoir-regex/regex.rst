@@ -4,6 +4,18 @@ Create regular expressions
 There is two ways to create regular expressions: use string or directly
 use the API.
 
+Atom classes:
+
+ * RegexEmpty: empty regex (match nothing)
+ * RegexStart, RegexEnd, RegexDot: symbols ^, $ and .
+ * RegexString
+ * RegexRange: character range like [a-z] or [^0-9]
+ * RegexAnd
+ * RegexOr
+ * RegexRepeat
+
+All classes are based on Regex class.
+
 Create regex with string
 ------------------------
 
