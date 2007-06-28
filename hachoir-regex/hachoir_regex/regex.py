@@ -254,15 +254,12 @@ class RegexEmpty(Regex):
     def _str(self, **kw):
         return ''
 
-    def _and(self, regex):
-        return regex
+    def _and(self, other):
+        return other
 
-class RegexStart(Regex):
-    def minLength(self):
-        return 0
-
-    def _and(self, regex):
-        if regex.__class__ == RegexStart:
+class RegexStart(RegexEmpty):
+    def _and(self, other):
+        if other.__class__ == RegexStart:
             return self
         return None
 
@@ -270,8 +267,8 @@ class RegexStart(Regex):
         return '^'
 
 class RegexEnd(RegexStart):
-    def _and(self, regex):
-        if regex.__class__ == RegexEnd:
+    def _and(self, other):
+        if other.__class__ == RegexEnd:
             return self
         return None
 
