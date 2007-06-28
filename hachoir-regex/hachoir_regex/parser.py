@@ -39,7 +39,7 @@ def parseRange(text, start):
         if index+3 < len(text) \
         and text[index+1] == '-' \
         and text[index+2] != ']':
-            char_range.append(RegexRangeItem(text[index], text[index+2]))
+            char_range.append(RegexRangeItem(ord(text[index]), ord(text[index+2])))
             index += 3
         else:
             char_range.append(RegexRangeCharacter(text[index]))

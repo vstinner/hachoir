@@ -390,11 +390,11 @@ class RegexString(Regex):
         return self.text == other.text
 
 class RegexRangeItem:
-    def __init__(self, cmin, cmax):
+    def __init__(self, cmin, cmax=None):
         try:
-            self.cmin = ord(cmin)
+            self.cmin = cmin
             if cmax is not None:
-                self.cmax = ord(cmax)
+                self.cmax = cmax
             else:
                 self.cmax = cmin
         except TypeError:
@@ -426,14 +426,17 @@ class RegexRangeItem:
 
 class RegexRangeCharacter(RegexRangeItem):
     def __init__(self, char):
-        RegexRangeItem.__init__(self, char, char)
+        RegexRangeItem.__init__(self, ord(char), ord(char))
 
 class RegexRange(Regex):
-    def __init__(self, ranges, exclude=False):
-        self.ranges = []
-        for item in ranges:
-            RegexRange.rangeAdd(self.ranges, item)
-        self.ranges.sort(key=lambda item: item.cmin)
+    def __init__(self, ranges, exclude=False, optimize=True):
+        if optimize:
+            self.ranges = []
+            for item in ranges:
+                RegexRange.rangeAdd(self.ranges, item)
+            self.ranges.sort(key=lambda item: item.cmin)
+        else:
+            self.ranges = tuple(ranges)
         self.exclude = exclude
 
     @staticmethod
@@ -442,19 +445,29 @@ class RegexRange(Regex):
         Add a value in a RegexRangeItem() list:
         remove duplicates and merge ranges when it's possible.
         """
+        new = None
         for index, itema in enumerate(ranges):
             if itema in itemb:
-                ranges[index] = itemb
-                return
+                # [b] + [a-c] => [a-c]
+                new = itemb
+                break
             elif itemb in itema:
+                # [a-c] + [b] => [a-c]
                 return
             elif (itemb.cmax+1) == itema.cmin:
-                ranges[index] = RegexRangeItem(chr(itemb.cmin),chr(itema.cmax))
-                return
+                # [d-f] + [a-c] => [a-f]
+                new = RegexRangeItem(itemb.cmin, itema.cmax)
+                break
             elif (itema.cmax+1) == itemb.cmin:
-                ranges[index] = RegexRangeItem(chr(itema.cmin),chr(itemb.cmax))
-                return
-        ranges.append(itemb)
+                # [a-c] + [d-f] => [a-f]
+                new = RegexRangeItem(itema.cmin, itemb.cmax)
+                break
+        if new:
+            del ranges[index]
+            RegexRange.rangeAdd(ranges, new)
+            return
+        else:
+            ranges.append(itemb)
 
     def minLength(self):
         return 1
@@ -493,7 +506,7 @@ class RegexRange(Regex):
         ranges = list(self.ranges)
         for itemb in branges:
             RegexRange.rangeAdd(ranges, itemb)
-        return RegexRange(ranges, self.exclude)
+        return RegexRange(ranges, self.exclude, optimize=False)
 
     def _str(self, **kw):
         content = [str(item) for item in self.ranges]
@@ -618,12 +631,15 @@ class RegexAnd(Regex):
         return all( item[0] == item[1] for item in itertools.izip(self.content, other.content) )
 
 class RegexOr(Regex):
-    def __init__(self, items):
-        self.content = []
-        for item in items:
-            if item in self:
-                continue
-            self.content.append(item)
+    def __init__(self, items, optimize=True):
+        if optimize:
+            self.content = []
+            for item in items:
+                if item in self:
+                    continue
+                self.content.append(item)
+        else:
+            self.content = tuple(items)
         assert 2 <= len(self.content)
 
     def __contains__(self, regex):
@@ -649,14 +665,14 @@ class RegexOr(Regex):
             if not new_item:
                 new_item = other.or_(item)
             if new_item:
-                content = self.content[:index] + [new_item] \
-                    + self.content[index+1:]
+                content = list(self.content)
+                content = content[:index] + [new_item] + content[index+1:]
                 return RegexOr.join(content)
         if not reverse:
-            content = self.content + [other]
+            content = list(self.content) + [other]
         else:
-            content = [other] + self.content
-        return RegexOr(content)
+            content = [other] + list(self.content)
+        return RegexOr(content, optimize=False)
 
     def _str(self, **kw):
         content = '|'.join( item.__str__(**kw) for item in self.content )
@@ -727,7 +743,7 @@ def optimizeRepeatOr(rmin, rmax, regex):
                         item = item.regex
                     else:
                         # (a{0,p}|b){x,} => (a{1,p}|b){x,}
-                        item = RegexRepeat(item.regex, 1, item.max)
+                        item = RegexRepeat(item.regex, 1, item.max, optimize=False)
             elif item.min == 1:
                 if rmax == item.max == None:
                     # (a+|b){x,} => (a|b){x,}
@@ -735,7 +751,7 @@ def optimizeRepeatOr(rmin, rmax, regex):
             else:
                 if rmax == item.max == None:
                     # (a{n,}|b){x,} => (a{n}|b){x,}
-                    item = RegexRepeat(item.regex, item.min, item.min)
+                    item = RegexRepeat(item.regex, item.min, item.min, optimize=False)
         content.append(item)
     regex = RegexOr.join(content)
     return (rmin, rmax, regex)
@@ -755,20 +771,21 @@ class RegexRepeat(Regex):
     <RegexRepeat 'a{1,3}'>
     """
 
-    def __init__(self, regex, rmin, rmax):
+    def __init__(self, regex, rmin, rmax, optimize=True):
         # Optimisations
-        cls = regex.__class__
-        if cls == RegexRepeat:
-            # (a{n,p}){x,y) => a{n*x,p*y}
-            if not (rmin == 0 and rmax == 1):
-                rmin *= regex.min
-                if regex.max and rmax:
-                    rmax *= regex.max
-                else:
-                    rmax = None
-                regex = regex.regex
-        elif cls == RegexOr:
-            rmin, rmax, regex = optimizeRepeatOr(rmin, rmax, regex)
+        if optimize:
+            cls = regex.__class__
+            if cls == RegexRepeat:
+                # (a{n,p}){x,y) => a{n*x,p*y}
+                if not (rmin == 0 and rmax == 1):
+                    rmin *= regex.min
+                    if regex.max and rmax:
+                        rmax *= regex.max
+                    else:
+                        rmax = None
+                    regex = regex.regex
+            elif cls == RegexOr:
+                rmin, rmax, regex = optimizeRepeatOr(rmin, rmax, regex)
 
         # Store attributes
         self.regex = regex
