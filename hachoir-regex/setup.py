@@ -24,11 +24,6 @@ from os import path
 import sys
 
 def main():
-    # Check Python version!
-    if sys.hexversion < 0x2040000:
-        print "Sorry, you need Python 2.4 or greater to run (install) Hachoir regex!"
-        sys.exit(1)
-
     if "--setuptools" in sys.argv:
         sys.argv.remove("--setuptools")
         from setuptools import setup
