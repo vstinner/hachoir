@@ -47,7 +47,7 @@ Factorisation of (a|b){x,}:
 <RegexRepeat '(a{2}|b){3,}'>
 
 Factorisation of (a|b){x,y}:
----------------------------
+----------------------------
 
 >>> parse("(a*|b|){4,5}")
 <RegexRepeat '(a+|b){0,5}'>
