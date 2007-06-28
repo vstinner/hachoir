@@ -147,7 +147,7 @@ class Regex:
         Guess if self may matchs regex.
         May returns False even if self does match regex.
         """
-        if str(self) == str(regex):
+        if self == regex:
             return True
         return self._match(regex)
 
@@ -229,8 +229,15 @@ class Regex:
         return RegexOr( (self, other) )
 
     def __eq__(self, regex):
-        # TODO: Write better/faster code...
-        return str(self) == str(regex)
+        if self.__class__ != regex.__class__:
+            return False
+        return self._eq(regex)
+
+    def _eq(self, other):
+        """
+        Check if two objects of the same class are equals
+        """
+        raise NotImplementedError("Class %s has no method _eq()" % self.__class__.__name__)
 
     def compile(self, **kw):
         return re.compile(self.__str__(**kw))
@@ -256,6 +263,9 @@ class RegexEmpty(Regex):
 
     def _and(self, other):
         return other
+
+    def _eq(self, other):
+        return True
 
 class RegexStart(RegexEmpty):
     def _and(self, other):
@@ -367,6 +377,9 @@ class RegexString(Regex):
                 regex = common[2] | common[1]
             return common[0] + regex
         return None
+
+    def _eq(self, other):
+        return self.text == other.text
 
 class RegexRangeItem:
     def __init__(self, cmin, cmax):
@@ -492,6 +505,11 @@ class RegexRange(Regex):
         else:
             return "[%s]" % text
 
+    def _eq(self, other):
+        if self.exclude != other.exclude:
+            return False
+        return self.ranges == other.ranges
+
 class RegexAnd(Regex):
     def __init__(self, items):
         self.content = list(items)
@@ -586,20 +604,10 @@ class RegexAnd(Regex):
     def __iter__(self):
         return iter(self.content)
 
-# TODO: Remove this code or use it
-def firstCharacter(regex):
-    cls = regex.__class__
-    if cls == RegexString:
-        return regex.text[0]
-    if cls == RegexRange:
-        return chr(regex.ranges[0].cmin)
-    if cls in (RegexOr, RegexAnd):
-        return firstCharacter(regex.content[0])
-    x = str(regex)
-    if x:
-        return x[0]
-    else:
-        return "\0"
+    def _eq(self, other):
+        if len(self.content) != len(other.content):
+            return False
+        return all( item[0] == item[1] for item in itertools.izip(self.content, other.content) )
 
 class RegexOr(Regex):
     def __init__(self, items):
@@ -609,7 +617,6 @@ class RegexOr(Regex):
                 continue
             self.content.append(item)
         assert 2 <= len(self.content)
-#        self.content.sort(key=firstCharacter)
 
     def __contains__(self, regex):
         for item in self.content:
@@ -679,6 +686,11 @@ class RegexOr(Regex):
 
     def __iter__(self):
         return iter(self.content)
+
+    def _eq(self, other):
+        if len(self.content) != len(other.content):
+            return False
+        return all( item[0] == item[1] for item in itertools.izip(self.content, other.content) )
 
 def optimizeRepeatOr(rmin, rmax, regex):
     # Fix rmin/rmax
@@ -801,6 +813,13 @@ class RegexRepeat(Regex):
             else:
                 return "%s{%u,}" % (text, self.min)
         return "%s{%u,%u}" % (text, self.min, self.max)
+
+    def _eq(self, other):
+        if self.min != other.min:
+            return False
+        if self.max != other.max:
+            return False
+        return (self.regex == other.regex)
 
 if __name__ == "__main__":
     import doctest
