@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from math import log
 from sys import exit, argv, stderr
 from time import time
