@@ -121,10 +121,10 @@ EXTENSIONS = {
          "..Fd": (UInt32, 1, "Flags"),
          "..OF": (UInt32, 1, "Fade out"),
          "..VG": (UInt32, 1, "Global Volume"),
-         "...P": (UInt32, 1, "Paning"),
-         "..EV": (UInt32, 1, "Volument Enveloppe"),
-         "..EP": (UInt32, 1, "Panning Envelopped"),
-         ".EiP": (UInt32, 1, "Pitch envelopped"),
+         "...P": (UInt32, 1, "Panning"),
+         "..EV": (UInt32, 1, "Volume Envelope"),
+         "..EP": (UInt32, 1, "Panning Envelope"),
+         ".EiP": (UInt32, 1, "Pitch Envelope"),
          ".SLV": (UInt8, 1, "Volume Loop Start"),
          ".ELV": (UInt8, 1, "Volume Loop End"),
          ".BSV": (UInt8, 1, "Volume Sustain Begin"),
@@ -140,7 +140,7 @@ EXTENSIONS = {
          ".ANN": (UInt8, 1, "NNA"),
          ".TCD": (UInt8, 1, "DCT"),
          ".AND": (UInt8, 1, "DNA"),
-         "..SP": (UInt8, 1, "Pannning Swing"),
+         "..SP": (UInt8, 1, "Panning Swing"),
          "..SV": (UInt8, 1, "Volume Swing"),
          ".CFI": (UInt8, 1, "IFC"),
          ".RFI": (UInt8, 1, "IFR"),
@@ -161,14 +161,14 @@ EXTENSIONS = {
          "..[n": (String, 32, "Name"),
          ".[nf": (String, 12, "Filename"),
          ".PiM": (UInt8, 1, "MixPlug"),
-         "..RV": (UInt16, 1, "Volume ramping"),
+         "..RV": (UInt16, 1, "Volume Ramping"),
          "...R": (UInt16, 1, "Resampling"),
          "..SC": (UInt8, 1, "Cut Swing"),
          "..SR": (UInt8, 1, "Res Swing"),
          "..MF": (UInt8, 1, "Filter Mode"),
     },
 
-    # See after "CODE tag dictionnary", same place, elements with [EXT]
+    # See after "CODE tag dictionary", same place, elements with [EXT]
     "STPM": {
          "...C": (UInt32, 1, "Channels"),
          ".VWC": (None, 0, "CreatedWith version"),
@@ -179,7 +179,7 @@ EXTENSIONS = {
          ".MMP": (None, 0, "Plugin Mix mode"),
          ".BPR": (None, 0, "Rows per beat"),
          ".MPR": (None, 0, "Rows per measure"),
-         "@PES": (None, 0, "Chunk separaror"),
+         "@PES": (None, 0, "Chunk separator"),
          ".APS": (None, 0, "Song Pre-amplification"),
          "..MT": (None, 0, "Tempo mode"),
          "VTSV": (None, 0, "VSTi volume"),
@@ -244,7 +244,7 @@ class ModplugBlock(FieldSet):
         "TEXT": ("comment", True, "Comment", parseComments),
         "MIDI": ("midi_config", True, "Midi configuration", parseMidiConfig),
         "XFHC": ("channel_settings", True, "Channel settings", parseChannelSettings),
-        "XTPM": ("instrument_ext", False, "Instruement extensions", parseFields),
+        "XTPM": ("instrument_ext", False, "Instrument extensions", parseFields),
         "STPM": ("song_ext", False, "Song extensions", parseFields),
     }
     def __init__(self, parent, name, desc=None):
@@ -275,7 +275,7 @@ class ModplugBlock(FieldSet):
         if self.has_size:
             size = self["block_size"].value - (self.current_size//8)
             if size > 0:
-                yield RawBytes(self, "data", size, "Unknow data")
+                yield RawBytes(self, "data", size, "Unknown data")
 
 def ParseModplugMetadata(parser):
     while not parser.eof:

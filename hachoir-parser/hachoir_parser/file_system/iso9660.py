@@ -40,7 +40,7 @@ class PrimaryVolumeDescriptor(FieldSet):
         yield String(self, "copyright", 37, "Copyright file identifier", strip=" ")
         yield String(self, "abstract", 37, "Abstract file identifier", strip=" ")
         yield String(self, "biographic", 37, "Biographic file identifier", strip=" ")
-        yield String(self, "creation_ts", 17, "Creatation date and time", strip=" ")
+        yield String(self, "creation_ts", 17, "Creation date and time", strip=" ")
         yield String(self, "modification_ts", 17, "Modification date and time", strip=" ")
         yield String(self, "expiration_ts", 17, "Expiration date and time", strip=" ")
         yield String(self, "effective_ts", 17, "Effective date and time", strip=" ")

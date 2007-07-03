@@ -126,7 +126,7 @@ class StartOfFrame(FieldSet):
         yield UInt16(self, "width")
         yield UInt8(self, "nr_components")
         if self["nr_components"].value not in (1, 3):
-            raise ParserError("JPEG error: Only gray or true-color JPGS supported")
+            raise ParserError("JPEG error: Only gray or true-color JPEGS supported")
 
         for index in range(self["nr_components"].value):
             yield UInt8(self, "component_id[]")
@@ -145,7 +145,7 @@ class AdobeChunk(FieldSet):
         yield String(self, "adobe", 5, "\"Adobe\" string", charset="ASCII")
         yield UInt16(self, "version", "DCT encoder version")
         yield Enum(Bit(self, "flag00"),
-            {False: "Chop down- or subsmapling", True: "Blend"})
+            {False: "Chop down or subsampling", True: "Blend"})
         yield NullBits(self, "flags0_reserved", 15)
         yield NullBytes(self, "flags1", 2)
         yield Enum(UInt8(self, "color_transform", "Colorspace transformation code"), self.COLORSPACE_TRANSFORMATION)
@@ -166,7 +166,7 @@ class StartOfScan(FieldSet):
 
 class RestartInterval(FieldSet):
     def createFields(self):
-        yield UInt16(self, "interval", "Restart inteval")
+        yield UInt16(self, "interval", "Restart interval")
 
 class QuantizationTable(FieldSet):
     def createFields(self):

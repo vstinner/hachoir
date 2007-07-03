@@ -120,7 +120,7 @@ def fileHeader(self):
     yield textHandler(UInt32(self, "file_crc32", "CRC32 checksum over the compressed file)"), hexadecimal)
     yield Enum(UInt8(self, "compression_type", "Type of compression"), COMPRESSION_TYPE)
     yield Enum(UInt8(self, "compression_mode", "Quality of compression"), COMPRESSION_MODE)
-    yield textHandler(UInt16(self, "parameters", "Compression paramters"), hexadecimal)
+    yield textHandler(UInt16(self, "parameters", "Compression parameters"), hexadecimal)
     yield textHandler(UInt16(self, "reserved", "Reserved data"), hexadecimal)
     # Filename
     yield PascalString16(self, "filename", "Filename")
@@ -145,7 +145,7 @@ def recoveryHeader(self):
     yield textHandler(UInt32(self, "relative_start",
          "Relative start (to this block) of the data this block is mode of"),
          hexadecimal)
-    yield UInt32(self, "num_blocks", "Number of blocks the data is splitten in")
+    yield UInt32(self, "num_blocks", "Number of blocks the data is split into")
     yield UInt32(self, "size_blocks", "Size of these blocks")
     yield UInt16(self, "crc16_blocks", "CRC16 over recovery data")
     # size_blocks blocks of size size_blocks follow

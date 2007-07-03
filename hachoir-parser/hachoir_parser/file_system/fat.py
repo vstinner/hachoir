@@ -54,7 +54,7 @@ class FSInfo(StaticFieldSet):
     format = (
         (String, "lead_sig", 4, 'Signature ("RRaA")'),
         (NullBytes,  "reserved[]", 480),
-        (String, "struc_sig", 4, 'Signature ("rrAa")'),
+        (String, "struct_sig", 4, 'Signature ("rrAa")'),
         (UInt32, "free_count", "Last known free cluster count on the volume"),
         (UInt32, "nxt_free",),
         (NullBytes,  "reserved[]", 12),

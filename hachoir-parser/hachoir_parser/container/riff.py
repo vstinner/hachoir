@@ -61,7 +61,7 @@ def parseVideoFormat(self, size):
     yield UInt32(self, "xpels_meter", "Video format: XPelsPerMeter")
     yield UInt32(self, "ypels_meter", "Video format: YPelsPerMeter")
     yield UInt32(self, "clr_used", "Video format: ClrUsed")
-    yield UInt32(self, "clr_importand", "Video format: ClrImportant")
+    yield UInt32(self, "clr_important", "Video format: ClrImportant")
 
 def parseAudioFormat(self, size):
     yield Enum(UInt16(self, "codec", "Audio format: Codec id"), audio_codec_name)
@@ -104,7 +104,7 @@ def parseAVIStreamHeader(self):
         yield field
     yield UInt32(self, "flags", "Stream flags")
     yield UInt16(self, "priority", "Stream priority")
-    yield String(self, "langage", 2, "Stream language", charset="ASCII", strip="\0")
+    yield String(self, "language", 2, "Stream language", charset="ASCII", strip="\0")
     yield UInt32(self, "init_frames", "InitialFrames")
     yield UInt32(self, "scale", "Time scale")
     yield UInt32(self, "rate", "Divide by scale to give frame rate")
@@ -303,9 +303,9 @@ class ChunkWAVE(Chunk):
     })
 
 def parseAnimationHeader(self):
-    yield UInt32(self, "sizeof", "Size of header (36 bytes)")
-    if self["sizeof"].value != 36:
-        self.warning("Animation header with unknown size (%s)" % self["sizeof"].value)
+    yield UInt32(self, "size", "Size of header (36 bytes)")
+    if self["size"].value != 36:
+        self.warning("Animation header with unknown size (%s)" % self["size"].value)
     yield UInt32(self, "nb_frame", "Number of unique Icons in this cursor")
     yield UInt32(self, "nb_step", "Number of Blits before the animation cycles")
     yield UInt32(self, "cx")
@@ -357,7 +357,7 @@ class RiffFile(Parser):
         "description": "Microsoft RIFF container"
     }
     VALID_TYPES = {
-        "WAVE": (ChunkWAVE, u"audio/x-wav",     u"Microft WAVE audio", ".wav"),
+        "WAVE": (ChunkWAVE, u"audio/x-wav",     u"Microsoft WAVE audio", ".wav"),
         "CDDA": (ChunkCDDA, u"audio/x-cda",     u"Microsoft Windows audio CD file (cda)", ".cda"),
         "AVI ": (ChunkAVI,  u"video/x-msvideo", u"Microsoft AVI video", ".avi"),
         "ACON": (ChunkACON,  None, u"Microsoft Windows animated cursor", ".ani"),

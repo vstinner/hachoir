@@ -24,7 +24,7 @@ class IFDEntry(BasicIFDEntry):
         258: ("bits_per_sample", "Bits per sample"),
         259: ("compression", "Compression method"),
         262: ("photo_interpret", "Photometric interpretation"),
-        263: ("thres", "Threshholding"),
+        263: ("thres", "Thresholding"),
         264: ("cell_width", "Cellule width"),
         265: ("cell_height", "Cellule height"),
         266: ("fill_order", "Fill order"),

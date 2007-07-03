@@ -122,7 +122,7 @@ class Command(FieldSet):
                     yield RawBytes(self, "data", size)
         else:
             if command not in self.COMMAND_PARSER:
-                raise ParserError("Unkown command: %s" % self["command"].display)
+                raise ParserError("Unknown command: %s" % self["command"].display)
             parser = self.COMMAND_PARSER[command]
             for field in parser(self):
                 yield field

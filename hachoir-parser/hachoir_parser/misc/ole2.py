@@ -224,13 +224,13 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
         while True:
             try:
                 block = chain.next()
-                contigious = False
+                contiguous = False
                 if not first:
                     first = block
-                    contigious = True
+                    contiguous = True
                 if previous and block == (previous+1):
-                    contigious = True
-                if contigious:
+                    contiguous = True
+                if contiguous:
                     previous = block
                     size += self.sector_size
                     continue

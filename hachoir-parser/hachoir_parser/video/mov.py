@@ -47,7 +47,7 @@ class TrackHeader(FieldSet):
         # TrackInPoster = 8
         yield RawBytes(self, "flags", 3)
 
-        yield TimestampMac32(self, "creat_date")
+        yield TimestampMac32(self, "creation_date")
         yield TimestampMac32(self, "lastmod_date")
         yield UInt32(self, "track_id")
         yield PaddingBytes(self, "reserved[]", 8)
@@ -84,7 +84,7 @@ class MediaHeader(FieldSet):
     def createFields(self):
         yield textHandler(UInt8(self, "version"), hexadecimal)
         yield RawBytes(self, "flags", 3)
-        yield TimestampMac32(self, "creat_date")
+        yield TimestampMac32(self, "creation_date")
         yield TimestampMac32(self, "lastmod_date")
         yield UInt32(self, "time_scale")
         yield UInt32(self, "duration")
@@ -111,7 +111,7 @@ class MovieHeader(FieldSet):
     def createFields(self):
         yield textHandler(UInt8(self, "version"), hexadecimal)
         yield RawBytes(self, "flags", 3)
-        yield TimestampMac32(self, "creat_date")
+        yield TimestampMac32(self, "creation_date")
         yield TimestampMac32(self, "lastmod_date")
         yield UInt32(self, "time_scale")
         yield UInt32(self, "duration")

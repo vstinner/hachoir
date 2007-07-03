@@ -37,7 +37,7 @@ class MSDosHeader(FieldSet):
         yield textHandler(UInt32(self, "init_cs_ip", "Initial value of CS:IP registers"), hexadecimal)
         yield UInt16(self, "reloc_offset", "Offset in file to relocation table")
         yield UInt16(self, "overlay_number", "Overlay number")
-        yield PaddingBytes(self, "reserved[]", 8, "Reserverd")
+        yield PaddingBytes(self, "reserved[]", 8, "Reserved")
         yield UInt16(self, "oem_id", "OEM id")
         yield UInt16(self, "oem_info", "OEM info")
         yield PaddingBytes(self, "reserved[]", 20, "Reserved")
@@ -174,7 +174,7 @@ class ExeFile(Parser):
                 self._is_ne = True
         return self._is_ne
 
-    def getRessource(self):
+    def getResource(self):
         # MS-DOS program: no resource
         if not self.isPE():
             return None

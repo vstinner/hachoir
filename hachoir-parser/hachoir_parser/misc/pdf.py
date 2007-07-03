@@ -108,7 +108,7 @@ class PDFName(Field):
     def __init__(self, parent, name, desc=None):
         Field.__init__(self, parent, name, description=desc)
         if parent.stream.readBytes(self.absolute_address, 1) != '/':
-            raise ParserError("Unknow PDFName '%s'" %
+            raise ParserError("Unknown PDFName '%s'" %
                               parent.stream.readBytes(self.absolute_address, 10))
         size = getElementEnd(parent, offset=1)
         #other_size = getElementEnd(parent, '[')-1
@@ -426,7 +426,7 @@ class PDFDocument(Parser):
 
     def validate(self):
         if self.stream.readBytes(0, len(MAGIC)) != MAGIC:
-            return "Invalild magic string"
+            return "Invalid magic string"
         return True
 
     # Size is not always determined by position of "%%EOF":

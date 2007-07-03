@@ -104,7 +104,7 @@ class Mesh(FieldSet):
 class Geoset(FieldSet):
     def createFields(self):
         yield UInt32(self, "count")
-        for indeex in xrange(self["count"].value):
+        for index in xrange(self["count"].value):
             yield Mesh(self, "mesh[]")
 
     def createDescription(self):

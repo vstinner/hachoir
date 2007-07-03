@@ -21,13 +21,13 @@ class Version(FieldSet):
 class Photoshop8BIM(FieldSet):
     TAG_INFO = {
         0x03ed: ("res_info", None, "Resolution information"),
-        0x03f3: ("print_flg", None, "Print flags: labels, crop marks, colour bars, etc."),
+        0x03f3: ("print_flag", None, "Print flags: labels, crop marks, colour bars, etc."),
         0x03f5: ("col_half_info", None, "Colour half-toning information"),
         0x03f8: ("color_trans_func", None, "Colour transfer function"),
         0x0404: ("iptc", IPTC, "IPTC/NAA"),
         0x0406: ("jpeg_qual", None, "JPEG quality"),
         0x0408: ("grid_guide", None, "Grid guides informations"),
-        0x040a: ("copyright_flg", None, "Copyright flag"),
+        0x040a: ("copyright_flag", None, "Copyright flag"),
         0x040c: ("thumb_res2", None, "Thumbnail resource (2)"),
         0x040d: ("glob_angle", None, "Global lighting angle for effects"),
         0x0411: ("icc_tagged", None, "ICC untagged (1 means intentionally untagged)"),
@@ -36,7 +36,7 @@ class Photoshop8BIM(FieldSet):
         0x041a: ("slices", None, "Slices"),
         0x041e: ("url_list", None, "Unicode URL's"),
         0x0421: ("version", Version, "Version information"),
-        0x2710: ("print_flg2", None, "Print flags (2)"),
+        0x2710: ("print_flag2", None, "Print flags (2)"),
     }
     TAG_NAME = createDict(TAG_INFO, 0)
     CONTENT_HANDLER = createDict(TAG_INFO, 1)

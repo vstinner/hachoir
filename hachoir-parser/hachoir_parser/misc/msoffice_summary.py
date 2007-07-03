@@ -87,7 +87,7 @@ class PropertyIndex(FieldSet):
         yield UInt32(self, "offset")
 
     def createDescription(self):
-        return "Propery: %s" % self["id"].display
+        return "Property: %s" % self["id"].display
 
 class Bool(Int8):
     def createValue(self):

@@ -91,7 +91,7 @@ class ZipGeneralFlags(FieldSet):
         yield Bit(self, "has_descriptor",
                   "Compressed data followed by descriptor?")
         if method == 6:
-            yield Bit(self, "use_8k_sliding", "Use 8K sliding dictionnary (instead of 4K)")
+            yield Bit(self, "use_8k_sliding", "Use 8K sliding dictionary (instead of 4K)")
             yield Bit(self, "use_3shannon", "Use a 3 Shannon-Fano tree (instead of 2 Shannon-Fano)")
         elif method in (8, 9):
             NAME = {
@@ -148,7 +148,7 @@ def ZipStartCommonFields(self):
     yield ZipGeneralFlags(self, "flags", "General purpose flag")
     yield Enum(UInt16(self, "compression", "Compression method"),
                COMPRESSION_METHOD)
-    yield TimeDateMSDOS32(self, "last_mod", "Last moditication file time")
+    yield TimeDateMSDOS32(self, "last_mod", "Last modification file time")
     yield textHandler(UInt32(self, "crc32", "CRC-32"), hexadecimal)
     yield UInt32(self, "compressed_size", "Compressed size")
     yield UInt32(self, "uncompressed_size", "Uncompressed size")
@@ -200,7 +200,7 @@ class Zip64EndCentralDirectory(FieldSet):
                      "Number of the disk with the start of the central directory")
         yield UInt64(self, "number_entries",
                      "Total number of entries in the central directory on this disk")
-        yield UInt64(self, "number_entrie2",
+        yield UInt64(self, "number_entries2",
                      "Total number of entries in the central directory")
         yield UInt64(self, "size", "Size of the central directory")
         yield UInt64(self, "offset", "Offset of start of central directory")

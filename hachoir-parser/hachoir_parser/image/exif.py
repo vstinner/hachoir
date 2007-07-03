@@ -29,7 +29,7 @@ class BasicIFDEntry(FieldSet):
          5: ((2, UInt32), "RATIONAL (2x LONG, 64 bits)"),
          7: ((1, Bytes), "UNDEFINED (8 bits)"),
          9: ((1, Int32), "SIGNED LONG (32 bits)"),
-        10: ((2, Int32), "SRATIONTAL (2x SIGNED LONGs, 64 bits)"),
+        10: ((2, Int32), "SRATIONAL (2x SIGNED LONGs, 64 bits)"),
     }
     ENTRY_FORMAT = createDict(TYPE_INFO, 0)
     TYPE_NAME = createDict(TYPE_INFO, 1)

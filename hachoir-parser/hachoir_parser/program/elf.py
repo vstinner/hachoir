@@ -18,8 +18,8 @@ class ElfHeader(FieldSet):
         1: u"AT&T WE 32100",
         2: u"SPARC",
         3: u"Intel 80386",
-        4: u"Motorolla 68000",
-        5: u"Motorolla 88000",
+        4: u"Motorola 68000",
+        5: u"Motorola 88000",
         7: u"Intel 80860",
         8: u"MIPS RS3000"
     }
@@ -29,7 +29,7 @@ class ElfHeader(FieldSet):
     }
     TYPE_NAME = {
              0: u"No file type",
-             1: u"Relocable file",
+             1: u"Relocatable file",
              2: u"Executable file",
              3: u"Shared object file",
              4: u"Core file",
@@ -107,7 +107,7 @@ class ProgramHeader32(FieldSet):
         yield textHandler(UInt32(self, "paddr", "P. address"), hexadecimal)
         yield UInt32(self, "file_size", "File size")
         yield UInt32(self, "mem_size", "Memory size")
-        yield UInt32(self, "align", "Alignement")
+        yield UInt32(self, "align", "Alignment")
         yield UInt32(self, "xxx", "???")
 
     def createDescription(self):

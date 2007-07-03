@@ -265,7 +265,7 @@ class SuperBlock(FieldSet):
         yield Enum(UInt32(self, "creator_os", "Creator OS"), self.os_name)
         yield UInt32(self, "rev_level", "Revision level")
         yield UInt16(self, "def_resuid", "Default uid for reserved blocks")
-        yield UInt16(self, "def_resgid", "Default guid for reserverd blocks")
+        yield UInt16(self, "def_resgid", "Default gid for reserved blocks")
         yield UInt32(self, "first_ino", "First non-reserved inode")
         yield UInt16(self, "inode_size", "Size of inode structure")
         yield UInt16(self, "block_group_nr", "Block group # of this superblock")

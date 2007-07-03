@@ -20,7 +20,7 @@ class SectionHeader(FieldSet):
         yield NullBits(self, "reserved[]", 1)
         yield Bit(self, "has_code", "Contains code")
         yield Bit(self, "has_init_data", "Contains initialized data")
-        yield Bit(self, "has_uinit_data", "Contains uninitialized data")
+        yield Bit(self, "has_uninit_data", "Contains uninitialized data")
         # 0x00000#00
         yield NullBits(self, "reserved[]", 1)
         yield Bit(self, "has_comment", "Contains comments?")
@@ -82,7 +82,7 @@ class PE_Header(FieldSet):
         0x014D: u"Intel 80486",
         0x014E: u"Intel Pentium",
         0x0200: u"Intel IA64",
-        0x0268: u"Motorolla 68000",
+        0x0268: u"Motorola 68000",
         0x0266: u"MIPS",
         0x0284: u"Alpha AXP 64 bits",
         0x0366: u"MIPS with FPU",
@@ -113,7 +113,7 @@ class PE_Header(FieldSet):
         yield UInt16(self, "opt_hdr_size", "Optional header size")
 
         yield Bit(self, "reloc_stripped", "If true, don't contain base relocations.")
-        yield Bit(self, "exec_image", "Exectuable image?")
+        yield Bit(self, "exec_image", "Executable image?")
         yield Bit(self, "line_nb_stripped", "COFF line numbers stripped?")
         yield Bit(self, "local_sym_stripped", "COFF symbol table entries stripped?")
         yield Bit(self, "aggr_ws", "Aggressively trim working set")

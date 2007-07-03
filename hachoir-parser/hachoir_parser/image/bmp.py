@@ -159,7 +159,7 @@ class BmpFile(Parser):
     def createFields(self):
         yield String(self, "signature", 2, "Header (\"BM\")", charset="ASCII")
         yield UInt32(self, "file_size", "File size (bytes)")
-        yield PaddingBytes(self, "reserved", 4, "Reseved")
+        yield PaddingBytes(self, "reserved", 4, "Reserved")
         yield UInt32(self, "data_start", "Data start position")
         yield BmpHeader(self, "header")
 

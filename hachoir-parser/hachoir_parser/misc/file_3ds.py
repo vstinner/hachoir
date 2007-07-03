@@ -70,7 +70,7 @@ class Chunk(FieldSet):
         0x4130: "Object material",
         0xAFFF: "New material",
         0xA000: "Material name",
-        0xA010: "Material ambiant",
+        0xA010: "Material ambient",
         0xA020: "Material diffuse",
         0xA030: "Texture specular",
         0xA200: "Texture",

@@ -52,7 +52,7 @@ class GzipParser(Parser):
         if self["signature"].value != '\x1F\x8B':
             return "Invalid signature"
         if self["compression"].value not in self.COMPRESSION_NAME:
-            return "Unkown compression method (%u)" % self["compression"].value
+            return "Unknown compression method (%u)" % self["compression"].value
         if self["reserved[0]"].value != 0:
             return "Invalid reserved[0] value"
         if self["reserved[1]"].value != 0:

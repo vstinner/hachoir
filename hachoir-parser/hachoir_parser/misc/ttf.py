@@ -48,7 +48,7 @@ NAMEID_NAME = {
     13: u"License Description",
     14: u"License info URL",
     16: u"Preferred Family",
-    17: u"Prefrred Subfamily",
+    17: u"Preferred Subfamily",
     18: u"Compatible Full",
     19: u"Sample text",
     20: u"PostScript CID findfont name",
@@ -148,7 +148,7 @@ def parseFontHeader(self):
     yield Bit(self, "outline")
     yield Bit(self, "shadow")
     yield Bit(self, "condensed", "(narrow)")
-    yield Bit(self, "extensed")
+    yield Bit(self, "expanded")
     yield PaddingBits(self, "reserved[]", 9)
 
     yield UInt16(self, "lowest", "Smallest readable size in pixels")

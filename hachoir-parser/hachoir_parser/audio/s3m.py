@@ -119,7 +119,7 @@ class S3MFlags(StaticFieldSet):
         (Bit, "st2_tempo", "Tempo (File version 1/ScreamTrack 2)"),
         (Bit, "amiga_slides", "Amiga slides (File version 1/ScreamTrack 2)"),
         (Bit, "zero_vol_opt", "Automatically turn off looping notes whose volume is zero for >2 note rows"),
-        (Bit, "amiga_limits", "Disallow notes beyong Amiga hardware specs"),
+        (Bit, "amiga_limits", "Disallow notes beyond Amiga hardware specs"),
         (Bit, "sb_processing", "Enable filter/SFX with SoundBlaster"),
         (Bit, "vol_slide", "Volume slide also performed on first row"),
         (Bit, "extended", "Special custom data in file"),
@@ -134,7 +134,7 @@ def parseChannelType(val):
         return "Right Sample Channel %u" % (val-8)
     if val<32:
         return "Adlib channel %u" % (val-16)
-    return "Value %u unhandled" % val
+    return "Value %u unknown" % val
 
 class ChannelSettings(FieldSet):
     static_size = 8
@@ -470,7 +470,7 @@ class S3MInstrument(Instrument):
         yield SampleFlags(self, "flags")
         yield UInt32(self, "c4_speed", "Frequency for middle C note")
         yield UInt32(self, "reserved[]", 4)
-        yield UInt16(self, "internal[]", "Sample addresss in GUS memory")
+        yield UInt16(self, "internal[]", "Sample address in GUS memory")
         yield UInt16(self, "internal[]", "Flags for SoundBlaster loop expansion")
         yield UInt32(self, "internal[]", "Last used position (SB)")
 

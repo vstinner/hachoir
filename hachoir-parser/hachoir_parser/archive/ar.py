@@ -38,7 +38,7 @@ class ArchiveFile(Parser):
 
     def validate(self):
         if self.stream.readBytes(0, len(self.MAGIC)) != self.MAGIC:
-            return "Invalild magic string"
+            return "Invalid magic string"
         return True
 
     def createFields(self):

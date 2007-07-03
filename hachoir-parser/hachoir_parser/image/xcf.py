@@ -57,7 +57,7 @@ class LayerMode(FieldSet):
          9: u"Darken only",
         10: u"Lighten only",
         11: u"Hue",
-        12: u"Saturatin",
+        12: u"Saturation",
         13: u"Color",
         14: u"Value",
         15: u"Divide",
@@ -113,7 +113,7 @@ class XcfLevel(FieldSet):
             yield RawBytes(self, "data[]", size, "Data content of %s" % chunk.name)
             previous = data_offset
 
-class XcfHierarchie(FieldSet):
+class XcfHierarchy(FieldSet):
     def createFields(self):
         yield UInt32(self, "width", "Width")
         yield UInt32(self, "height", "Height")
@@ -140,8 +140,8 @@ class XcfChannel(FieldSet):
         yield PascalString32(self, "name", "Channel name", strip="\0", charset="UTF-8")
         for field in readProperties(self):
             yield field
-        yield UInt32(self, "hierarchie_ofs", "Hierarchie offset")
-        yield XcfHierarchie(self, "hierarchie", "Hierarchie")
+        yield UInt32(self, "hierarchy_ofs", "Hierarchy offset")
+        yield XcfHierarchy(self, "hierarchy", "Hierarchy")
 
     def createDescription(self):
          return 'Channel "%s"' % self["name"].value
@@ -159,12 +159,12 @@ class XcfLayer(FieldSet):
         # TODO: Hack for Gimp 1.2 files
         # --
 
-        yield UInt32(self, "hierarchie_ofs", "Hierarchie offset")
+        yield UInt32(self, "hierarchy_ofs", "Hierarchy offset")
         yield UInt32(self, "mask_ofs", "Layer mask offset")
-        padding = self.seekByte(self["hierarchie_ofs"].value, relative=False)
+        padding = self.seekByte(self["hierarchy_ofs"].value, relative=False)
         if padding is not None:
             yield padding
-        yield XcfHierarchie(self, "hierarchie", "Hierarchie")
+        yield XcfHierarchy(self, "hierarchy", "Hierarchy")
         # TODO: Read layer mask if needed: self["mask_ofs"].value != 0
 
     def createDescription(self):

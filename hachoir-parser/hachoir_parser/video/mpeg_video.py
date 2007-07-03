@@ -145,7 +145,7 @@ class Video(FieldSet):
         yield Bits(self, "sync[]", 2) # =2
         if self["sync[0]"].value != 2:
             raise ParserError("Unknown video elementary data")
-        yield Bits(self, "is_scambled", 2)
+        yield Bits(self, "is_scrambled", 2)
         yield Bits(self, "priority", 1)
         yield Bit(self, "alignment")
         yield Bit(self, "is_copyrighted")

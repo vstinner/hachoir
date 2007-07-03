@@ -83,7 +83,7 @@ class InstrumentSecondHeader(FieldSet):
         yield UInt8(self, "volume_loop_end_point")
         yield UInt8(self, "panning_sustain_point")
         yield UInt8(self, "panning_loop_start_point")
-        yield UInt8(self, "panning_loop_startwend_point")
+        yield UInt8(self, "panning_loop_end_point")
         yield StuffType(self, "volume_type")
         yield StuffType(self, "panning_type")
         yield UInt8(self, "vibrato_type")
@@ -188,12 +188,12 @@ class NoteInfo(StaticFieldSet):
     )
 
 EFFECT_NAME = (
-    "Appregio", "Porta up", "Porta down", "Tone porta", "Vibrato",
+    "Arppegio", "Porta up", "Porta down", "Tone porta", "Vibrato",
     "Tone porta+Volume slide", "Vibrato+Volume slide", "Tremolo",
     "Set panning", "Sample offset", "Volume slide", "Position jump",
     "Set volume", "Pattern break", None, "Set tempo/BPM",
     "Set global volume", "Global volume slide", "Unused", "Unused",
-    "Unused", "Set envelope position", "Unused""Unused",
+    "Unused", "Set envelope position", "Unused", "Unused",
     "Panning slide", "Unused", "Multi retrig note", "Unused",
     "Tremor", "Unused", "Unused", "Unused", None)
 

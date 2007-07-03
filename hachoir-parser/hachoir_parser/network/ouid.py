@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-List of registered IEEE 24-bit Organizationally unique identifiers.
+List of registered IEEE 24-bit Organizationally Unique IDentifiers.
 
 Original data file:
 http://standards.ieee.org/regauth/oui/oui.txt
