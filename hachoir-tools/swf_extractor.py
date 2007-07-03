@@ -2,7 +2,7 @@
 from hachoir_core.cmd_line import unicodeFilename
 from hachoir_parser import createParser
 from hachoir_parser.container.swf import SOUND_CODEC_MP3
-import sys
+from sys import stderr, exit, argv
 
 class JpegExtractor:
     def __init__(self):
@@ -58,7 +58,12 @@ class JpegExtractor:
                     output.write(data)
 
     def main(self):
-        filename, realname = unicodeFilename(sys.argv[1]), sys.argv[1]
+        if len(argv) != 2:
+            print >>stderr, "usage: %s document.swf" % argv[0]
+            exit(1)
+
+        realname = argv[1]
+        filename = unicodeFilename(realname)
         parser = createParser(filename, real_filename=realname)
 
         if "jpg_table/data" in parser:

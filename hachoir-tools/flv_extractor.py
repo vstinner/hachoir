@@ -9,17 +9,18 @@ from hachoir_parser import createParser
 from hachoir_core.stream import FileOutputStream
 from hachoir_core.i18n import getTerminalCharset
 from hachoir_parser.video.flv import AUDIO_CODEC_MP3
-import sys
+from sys import stderr, exit, argv
 
 def main():
-    if len(sys.argv) != 2:
-        print >>sys.stderr, "usage: %s input" % sys.argv[0]
+    if len(argv) != 2:
+        print >>stderr, "usage: %s video.flv" % argv[0]
+        exit(1)
 
     # Open input video
-    inputname = unicode(sys.argv[1], getTerminalCharset())
+    inputname = unicode(argv[1], getTerminalCharset())
     parser = createParser(inputname)
     if parser["audio[0]/codec"].value != AUDIO_CODEC_MP3:
-        print >>sys.stderr, "Unknown audio codec: %s" % parser["audio[0]/codec"].display
+        print >>stderr, "Unknown audio codec: %s" % parser["audio[0]/codec"].display
 
     # Extract audio
     print "Extractor audio from: %s" % inputname
