@@ -14,7 +14,7 @@ To split data we first need is to get data :-) So this section presents the
 "hachoir.stream" API.
 
 In most cases we work on files using the FileInputStream function. This function
-takes one argument: a Unicode filename. But for pratical reasons
+takes one argument: a Unicode filename. But for practical reasons
 we will use StringInputStream function in this documentation.
 
    >>> data = "point\0\3\0\2\0"
@@ -49,8 +49,8 @@ We will parse the data used in the last section.
    ...     endian = LITTLE_ENDIAN
    ...     def createFields(self):
    ...         yield CString(self, "name", "Point name")
-   ...         yield UInt16(self, "x", "X coordonate")
-   ...         yield UInt16(self, "y", "Y coordonate")
+   ...         yield UInt16(self, "x", "X coordinate")
+   ...         yield UInt16(self, "y", "Y coordinate")
    ...
    >>> point = Point(stream)
    >>> for field in point:
@@ -71,7 +71,7 @@ display attributes. But a field has more attributes:
    >>> x.parent == point
    True
    >>> x.description
-   'X coordonate'
+   'X coordinate'
    >>> x.index
    1
    >>> x.address, x.absolute_address
@@ -83,7 +83,7 @@ the second since the index starts at zero.
 Parser with sub-field sets
 --------------------------
 
-After learning basic API, let's see aa more complex parser: parser with
+After learning basic API, let's see a more complex parser: parser with
 sub-field sets.
 
    >>> from hachoir_core.field import FieldSet, UInt8, Character, String
@@ -104,7 +104,7 @@ sub-field sets.
    >>> stream = StringInputStream(data)
    >>> root = MyFormat(stream)
 
-This example present many interresting features of Hachoir. First of all, you
+This example presents many interesting features of Hachoir. First of all, you
 can see that you can have two or more levels of fields. Here we have a tree
 with two levels:
 
@@ -168,10 +168,10 @@ Number:
 
 * Bit: one bit (True/False) ;
 * Bits: unsigned number with a size in bits ;
-* Bytes: vector of know bytes (eg. file signature) ;
+* Bytes: vector of know bytes (e.g. file signature) ;
 * UInt8, UInt16, UInt24, UInt32, UInt64: unsigned number (size: 8, 16, ... bits) ;
 * Int8, Int16, Int24, Int32, Int64: signed number (size: 8, 16, ... bits) ;
-* Float32, Float64, Float80: IEEE 754 floatting point number (32, 64, 80 bits) ;
+* Float32, Float64, Float80: IEEE 754 floating point number (32, 64, 80 bits) ;
 
 Text:
 
@@ -184,10 +184,10 @@ Text:
 
 Timestamp:
 
-* TimestampMSDOS32: 32-bit MS-DOS, since 1st january 1980 ;
-* TimestampUnix32: 32-bit UNIX, seconds since 1st january 1970 ;
-* TimestampMac32: 32-bit Mac, seconds since 1st january 1904 ;
-* TimestampWin64: 64-bit Windows, nanoseconds since 1st january 1600.
+* TimestampMSDOS32: 32-bit MS-DOS, since January 1st 1980 ;
+* TimestampUnix32: 32-bit UNIX, seconds since January 1st 1970 ;
+* TimestampMac32: 32-bit Mac, seconds since January 1st 1904 ;
+* TimestampWin64: 64-bit Windows, nanoseconds since January 1st 1600.
 
 Padding and raw bytes:
 
@@ -241,7 +241,7 @@ Aliases (method):
 Other methods:
 
 * static_size: helper to compute field size. If the value is an integer, the
-  type has contant size. If it's a function, the size depends of the arguments.
+  type has constant size. If it's a function, the size depends of the arguments.
 * hasValue(): check if the field has a value or not (default: self.value is not None)
 * getField(key, const=True): get the field with specified key,
   if const is True the field set will not be changed
@@ -280,7 +280,7 @@ Methods:
 * seekByte(address, ...): create a field to seek to specified address or
   returns None if we are already there
 * replaceField(name, fields): replace a field with
-  one or more fields <~~~ i don't like this method :-(
+  one or more fields <~~~ I don't like this method :-(
 * getFieldByAddress(address, feed=True): get the field at the
   specified address
 * writeFieldsIn(old, address, new): helper for replaceField() <~~~ can be an helper?

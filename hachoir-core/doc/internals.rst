@@ -61,7 +61,7 @@ The size attribute also interact with field list creation, but it's mechanism
 is little bit more complex. By default, the whole field list have to be built
 before size value can be read. But you can specify field list size:
 
-* if field list is not dynamic (eg. don't depends on flag), use class
+* if field list is not dynamic (e.g. doesn't depend on flag), use class
   attribute ``static_size`` ;
 * otherwise you can set _size instance attribute in the constructor.
 
@@ -106,10 +106,10 @@ Details about field name
 
 The name of a field have to be unique in a field set because it is used as
 key in the field list. The argument 'name' of the Field constructor can be
-changed in the the constructor, but should not (and can no) be changed after
+changed in the constructor, but should not (and cannot) be changed after
 that.
 
-For arrays, you can use the 'magic' prefix « [] » (eg. "item[]") which will
+For arrays, you can use the 'magic' suffix « [] » (e.g. "item[]") which will
 be replaced by « [index] » where the number index is a counter starting a
 zero.
 
@@ -120,7 +120,7 @@ The "endian" is the way in which ''bytes'' are stored. There are two important
 orders:
 
 * « Big endian » in which *most* significant byte (*big* number) are
-  written first (PowerPC / Motorola CPUs). It's the order choosed in network ;
+  written first (PowerPC / Motorola CPUs). It's also the network byte order ;
 * « Little endian » in which *least* significant byte (*little* number)
   are written first (Intel x86 CPUs).
 
@@ -145,13 +145,13 @@ For sub-field sets, if endian is not specified, parent endian will be used.
 Explore a field set using it's path
 -----------------------------------
 
-Fields are stored in a tree. To explore the tree you have differents tools:
+Fields are stored in a tree. To explore the tree you have different tools:
 
 * attribute *root* of a field which go to tree root ;
 * attribute *parent* go to field parent (is None for tree root) ;
 * and you can specify a path in *__getitem__()* argument.
 
-There are differents valid syntax of a path:
+There are different valid syntaxes for a path:
 
 * path to a child of current node: ``field["content"]`` ;
 * path to a child of the parent: ``field["../brother"]`` ;

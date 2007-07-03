@@ -6,7 +6,7 @@ Python objects. Each object has a type, a value, an address, etc. The goal is
 to be able to know the meaning of each bit in a file.
 
 Why using slow Python code instead of fast hardcoded C code? Hachoir has many
-interresting features:
+interesting features:
 
  * Autofix: Hachoir is able to open invalid / truncated files
  * Lazy: Open a file is very fast since no information is read from file,
@@ -16,7 +16,7 @@ interresting features:
  * Addresses and sizes are stored in bit, so flags are stored as classic fields
  * Endian: You have to set endian once, and then number are converted in the
    right endian
- * Editor: Using Hachoir reprensentation of data, you can edit, insert, remove
+ * Editor: Using Hachoir representation of data, you can edit, insert, remove
    data and then save in a new file.
 
 Website: http://hachoir.org/wiki/hachoir-core
@@ -58,7 +58,7 @@ Changes:
  * SeekableFieldSet: add getField(), _getField(), __getitem()__,
    current_size and size attributes
  * SeekableFieldSet: seekBit()/seekByte() checks address and field
-   creation check higger limit (address+size)
+   creation check bigger limit (address+size)
  * String: support "CP037" charset
 
 Bug fixes:
@@ -80,13 +80,13 @@ What's new in hachoir-core 0.8?
 New features:
 
  * Field value and display attributes are fault tolerant
- * New type:
+ * New types:
    * Int24 and UInt24: signed/unsigned 24-bit integer ;
-   * Float80: 80-bit flotting point number ;
-   * TimestampMSDOS32: 32-bit MS-DOS, since 1st january 1980 ;
-   * TimestampUnix32: 32-bit UNIX, seconds since 1st january 1970 ;
-   * TimestampMac32: 32-bit Mac, seconds since 1st january 1904 ;
-   * TimestampWin64: 64-bit Windows, nanoseconds since 1st january 1600 ;
+   * Float80: 80-bit floating point number ;
+   * TimestampMSDOS32: 32-bit MS-DOS, since January 1st 1980 ;
+   * TimestampUnix32: 32-bit UNIX, seconds since January 1st 1970 ;
+   * TimestampMac32: 32-bit Mac, seconds since January 1st 1904 ;
+   * TimestampWin64: 64-bit Windows, nanoseconds since January 1st 1600.
  * Function createOrphanField(): allow to create a field at any address
  * String: add "MacRoman" charset, and rename "UTF-16LE" to "UTF-16-LE"
    (and UTF-16BE to UTF-16-BE) for IronPython compatibility
@@ -141,7 +141,7 @@ Important changes:
  * Floats are now field set: it's possible
    to read sign, exponent and mantissa
  * New type EncodedFile to parse "encoded" subfile:
-   compressed, crypted, encoded in base64, etc.
+   compressed, encrypted, encoded in base64, etc.
  * New types GenericVector and UserVector to parse vectors
  * Raw display is now closer to hexadecimal reprensentation for many types
  * Rewrite documentation (hachoir-api.txt)
@@ -193,19 +193,19 @@ Improvements:
 Minor changes:
 
  * Add class documentation to all types (PaddingBits, Float32, ...)
- * Fix reversed() code and __all__ constant in hachoir.compatiblity
+ * Fix reversed() code and __all__ constant in hachoir.compatibility
  * Add available_types variable to hachoir.field (used by hachoir-wx)
 
 What's new in Hachoir 0.6?
 ==========================
 
-First of all, Hachoir projet is splitted in backend: hachoir core and
+First of all, Hachoir project is split in backend: hachoir-core and
 hachoir-parser, and in frontends: hachoir-console, hachoir-urwid,
-hachoir-metadata, etc. Changes listed here are only about hachoir core.
+hachoir-metadata, etc. Changes listed here are only about hachoir-core.
 
  * Hachoir is able to edit a file: edit field value, delete field, insert
    new field
- * Suppport of piped input: use small data cache and try to do the most
+ * Support of piped input: use small data cache and try to do the most
    without knowing stream size
  * Better autofix feature to be able to open invalid / truncated files
  * Support charset UTF-16 (and UTF-32) for strings

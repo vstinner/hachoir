@@ -80,9 +80,9 @@ class BasicFieldSet(Field):
             # Called when field size is already set
             "field-resized",
 
-            # A new field has been insered in the field set
+            # A new field has been inserted in the field set
             # Callback prototype: def f(index, new_field)
-            "field-insered",
+            "field-inserted",
 
             # Callback prototype: def f(old_field, new_field)
             # Called when new field is already in field set

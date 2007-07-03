@@ -482,7 +482,7 @@ class GenericFieldSet(BasicFieldSet):
                         "Unable to replace %s: name \"%s\" is already used!"
                         % (name, field.name))
                 self._fields.insert(index, field.name, field)
-                self.raiseEvent("field-insered", index, field)
+                self.raiseEvent("field-inserted", index, field)
                 index += 1
                 address += field.size
 
