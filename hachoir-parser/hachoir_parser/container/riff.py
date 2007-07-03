@@ -81,13 +81,13 @@ def parseAudioFormat(self, size):
 def parseAVIStreamFormat(self):
     size = self["size"].value
     strtype = self["../stream_hdr/stream_type"].value
-    type_handler = {
+    TYPE_HANDLER = {
         "vids": (parseVideoFormat, 40),
         "auds": (parseAudioFormat, 16)
     }
     handler = parseRawFormat
-    if strtype in type_handler:
-        info = type_handler[strtype]
+    if strtype in TYPE_HANDLER:
+        info = TYPE_HANDLER[strtype]
         if info[1] <= size:
             handler = info[0]
     for field in handler(self, size):
@@ -202,7 +202,7 @@ def parseODML(self):
         yield NullBytes(self, "padding[]", padding)
 
 class Chunk(FieldSet):
-    tag_info = {
+    TAG_INFO = {
         # This dictionnary is edited by RiffFile.validate()
 
         "LIST": ("list[]", None, "Sub-field list"),
@@ -238,17 +238,17 @@ class Chunk(FieldSet):
         FieldSet.__init__(self, *args, **kw)
         self._size = (8 + alignValue(self["size"].value, 2)) * 8
         tag = self["tag"].value
-        if tag in self.tag_info:
-            self.info = self.tag_info[tag]
+        if tag in self.TAG_INFO:
+            self.tag_info = self.TAG_INFO[tag]
             if tag == "LIST":
                 subtag = self["subtag"].value
                 if subtag in self.subtag_info:
                     info = self.subtag_info[subtag]
-                    self.info = (info[0], None, info[1])
-            self._name = self.info[0]
-            self._description = self.info[2]
+                    self.tag_info = (info[0], None, info[1])
+            self._name = self.tag_info[0]
+            self._description = self.tag_info[2]
         else:
-            self.info = ("field[]", None, None)
+            self.tag_info = ("field[]", None, None)
 
     def createFields(self):
         yield String(self, "tag", 4, "Tag", charset="ASCII")
@@ -257,14 +257,14 @@ class Chunk(FieldSet):
             return
         if self["tag"].value == "LIST":
             yield String(self, "subtag", 4, "Sub-tag", charset="ASCII")
-            handler = self.info[1]
+            handler = self.tag_info[1]
             while 8 < (self.size - self.current_size)/8:
                 field = self.__class__(self, "field[]")
                 yield field
                 if (field.size/8) % 2 != 0:
                     yield UInt8(self, "padding[]", "Padding")
         else:
-            handler = self.info[1]
+            handler = self.tag_info[1]
             if handler:
                 for field in handler(self):
                     yield field
@@ -279,8 +279,8 @@ class Chunk(FieldSet):
         return u"Chunk (tag %s)" % tag
 
 class ChunkAVI(Chunk):
-    tag_info = Chunk.tag_info.copy()
-    tag_info.update({
+    TAG_INFO = Chunk.TAG_INFO.copy()
+    TAG_INFO.update({
         "strh": ("stream_hdr", parseAVIStreamHeader, "Stream header"),
         "strf": ("stream_fmt", parseAVIStreamFormat, "Stream format"),
         "avih": ("avi_hdr", parseAviHeader, "AVI header"),
@@ -289,14 +289,14 @@ class ChunkAVI(Chunk):
     })
 
 class ChunkCDDA(Chunk):
-    tag_info = Chunk.tag_info.copy()
-    tag_info.update({
+    TAG_INFO = Chunk.TAG_INFO.copy()
+    TAG_INFO.update({
         'fmt ': ("cdda", parseCDDA, "CD audio informations"),
     })
 
 class ChunkWAVE(Chunk):
-    tag_info = Chunk.tag_info.copy()
-    tag_info.update({
+    TAG_INFO = Chunk.TAG_INFO.copy()
+    TAG_INFO.update({
         'fmt ': ("format", parseWAVFormat, "Audio format"),
         'fact': ("nb_sample", parseWAVFact, "Number of samples"),
         'data': ("audio_data", None, "Audio stream data"),
@@ -332,8 +332,8 @@ def parseIcon(self):
     yield SubFile(self, "icon_file", self["size"].value, parser_class=IcoFile)
 
 class ChunkACON(Chunk):
-    tag_info = Chunk.tag_info.copy()
-    tag_info.update({
+    TAG_INFO = Chunk.TAG_INFO.copy()
+    TAG_INFO.update({
         'anih': ("anim_hdr", parseAnimationHeader, "Animation header"),
         'seq ': ("anim_seq", parseAnimationSequence, "Animation sequence"),
         'rate': ("anim_rate", parseAnimationRate, "Animation sequence"),
