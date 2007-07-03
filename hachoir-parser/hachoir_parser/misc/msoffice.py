@@ -1,3 +1,13 @@
+"""
+Parsers for the different streams and fragments found in an OLE2 file.
+
+Documents:
+ - goffice source code
+
+Author: Robert Xiao, Victor Stinner
+Creation: 2006-04-23
+"""
+
 from hachoir_parser import HachoirParser
 from hachoir_core.field import FieldSet, RootSeekableFieldSet, RawBytes
 from hachoir_core.endian import LITTLE_ENDIAN

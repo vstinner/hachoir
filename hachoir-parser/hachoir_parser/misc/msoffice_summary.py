@@ -12,6 +12,7 @@ from hachoir_parser.common.win32 import GUID, PascalStringWin32
 from hachoir_parser.image.bmp import BmpHeader, parseImageData
 
 MAX_SECTION_COUNT = 100
+OS_MAC = 1
 
 class OSConfig:
     def __init__(self, big_endian):
@@ -249,7 +250,6 @@ class Summary(HachoirParser, RootSeekableFieldSet):
     }
     endian = LITTLE_ENDIAN
 
-    OS_MAC = 1
     OS_NAME = {
         0: "Windows 16-bit",
         1: "Macintosh",
@@ -265,7 +265,7 @@ class Summary(HachoirParser, RootSeekableFieldSet):
             self.endian = LITTLE_ENDIAN
         else:
             raise ParserError("OLE2: Invalid endian value")
-        self.osconfig = OSConfig(self["os"].value == self.OS_MAC)
+        self.osconfig = OSConfig(self["os_type"].value == OS_MAC)
 
     def validate(self):
         return True
@@ -274,8 +274,9 @@ class Summary(HachoirParser, RootSeekableFieldSet):
     def createFields(self):
         yield Bytes(self, "endian", 2, "Endian (0xFF 0xFE for Intel)")
         yield UInt16(self, "format", "Format (0)")
-        yield textHandler(UInt16(self, "os_version"), hexadecimal)
-        yield Enum(UInt16(self, "os"), self.OS_NAME)
+        yield UInt8(self, "os_version")
+        yield UInt8(self, "os_revision")
+        yield Enum(UInt16(self, "os_type"), self.OS_NAME)
         yield GUID(self, "format_id")
         yield UInt32(self, "section_count")
         if MAX_SECTION_COUNT < self["section_count"].value:
@@ -303,7 +304,9 @@ class CompObj(FieldSet):
         # Header
         yield UInt16(self, "version", "Version (=1)")
         yield textHandler(UInt16(self, "endian", "Endian (0xFF 0xFE for Intel)"), hexadecimal)
-        yield Enum(UInt32(self, "os_version"), self.OS_VERSION)
+        yield UInt8(self, "os_version")
+        yield UInt8(self, "os_revision")
+        yield Enum(UInt16(self, "os_type"), self.OS_NAME)
         yield Int32(self, "unused", "(=-1)")
         yield GUID(self, "clsid")
 
@@ -311,7 +314,11 @@ class CompObj(FieldSet):
         yield PascalString32(self, "user_type", strip="\0")
 
         # Clipboard format
-        yield PascalString32(self, "clipboard_format", strip="\0")
+        if self["os_type"].value == OS_MAC:
+            yield Int32(self, "unused[]", "(=-2)")
+            yield String(self, "clipboard_format", 4)
+        else:
+            yield PascalString32(self, "clipboard_format", strip="\0")
         if self.current_size == self.size:
             return
 
@@ -320,7 +327,7 @@ class CompObj(FieldSet):
         # Program ID
         yield PascalString32(self, "prog_id", strip="\0")
 
-        if True:
+        if self["os_type"].value != OS_MAC:
             # Magic number
             yield textHandler(UInt32(self, "magic", "Magic number (0x71B239F4)"), hexadecimal)
 

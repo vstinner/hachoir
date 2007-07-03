@@ -16,7 +16,7 @@ Informations:
   http://www.aafassociation.org/html/specs/aafcontainerspec-v1.0.1.pdf
 
 Author: Victor Stinner
-Creation: 8 january 2005
+Creation: 2006-04-23
 """
 
 from hachoir_parser import HachoirParser
@@ -325,4 +325,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
 
     def seekBlock(self, block):
         self.seekBit(HEADER_SIZE + block * self.sector_size)
+
+    def seekSBlock(self, block):
+        self.seekBit(block * self.ss_size)
 
