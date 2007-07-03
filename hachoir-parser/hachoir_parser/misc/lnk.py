@@ -8,6 +8,8 @@ Documents:
 - Wine source code:
   http://source.winehq.org/source/include/shlobj.h (SHELL_LINK_DATA_FLAGS enum)
   http://source.winehq.org/source/dlls/shell32/pidl.h
+- Microsoft:
+  http://msdn2.microsoft.com/en-us/library/ms538128.aspx
 
 Author: Robert Xiao, Victor Stinner
 
@@ -23,7 +25,7 @@ Changes:
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, GenericString,
     SeekableFieldSet, CString, PascalString16,
-    UInt32, UInt16, UInt8, String, TimestampWin64, Bit,
+    UInt32, UInt16, UInt8, String, TimestampWin64, Bit, Bits,
     NullBytes, PaddingBits, PaddingBytes, Enum, RawBytes, DateTimeMSDOS32)
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.text_handler import textHandler, hexadecimal
@@ -32,6 +34,19 @@ from hachoir_parser.common.msdos import MSDOSFileAttr16, MSDOSFileAttr32
 from hachoir_core.text_handler import filesizeHandler
 
 from hachoir_core.tools import paddingSize
+
+class ItemIdList(FieldSet):
+    def __init__(self, *args, **kw):
+        FieldSet.__init__(self, *args, **kw)
+        self._size = (self["size"].value+2) * 8
+
+    def createFields(self):
+        yield UInt16(self, "size", "Size of item ID list")
+        while True:
+            item = ItemId(self, "itemid[]")
+            yield item
+            if not item["length"].value:
+                break
 
 class ItemId(FieldSet):
     ITEM_TYPE = {
@@ -122,13 +137,7 @@ class ItemId(FieldSet):
         else:
             yield RawBytes(self, "raw", self["length"].value-3)
 
-    def createValue(self):
-        if self["length"].value:
-            return self["type"].value
-        else:
-            return 0
-
-    def createDisplay(self):
+    def createDescription(self):
         if self["length"].value:
             return "Item ID Entry: "+self.ITEM_TYPE.get(self["type"].value,"Unknown")
         else:
@@ -159,6 +168,9 @@ class LocalVolumeTable(FieldSet):
             yield padding
         yield CString(self, "drive")
 
+    def hasValue(self):
+        return bool(self["drive"].value)
+
     def createValue(self):
         return self["drive"].value
 
@@ -174,7 +186,8 @@ class NetworkVolumeTable(FieldSet):
             yield padding
         yield CString(self, "share_name")
 
-    def createValue(self): return self["share_name"].value
+    def createValue(self):
+        return self["share_name"].value
 
 class FileLocationInfo(FieldSet):
     def createFields(self):
@@ -242,11 +255,36 @@ class LnkString(FieldSet):
     def createValue(self):
         return self["data"].value
 
+class ColorRef(FieldSet):
+    ''' COLORREF struct, 0x00bbggrr '''
+    static_size=32
+    def createFields(self):
+        yield UInt8(self, "red", "Red")
+        yield UInt8(self, "green", "Green")
+        yield UInt8(self, "blue", "Blue")
+        yield PaddingBytes(self, "pad", 1, "Padding (must be 0)")
+    def createDescription(self):
+        rgb = self["red"].value, self["green"].value, self["blue"].value
+        return "RGB Color: #%02X%02X%02X" % rgb
+
+class ColorTableIndex(Bits):
+    def __init__(self, parent, name, size, description=None):
+        Bits.__init__(self, parent, name, size, None)
+        self.desc=description
+    def createDescription(self):
+        assert hasattr(self, 'parent') and hasattr(self, 'value')
+        return "%s: %s"%(self.desc,
+                         self.parent["color[%i]"%self.value].description)
+
 class ExtraInfo(FieldSet):
     INFO_TYPE={
+        0xA0000001: "Link Target Information", # EXP_SZ_LINK_SIG
+        0xA0000002: "Console Window Properties", # NT_CONSOLE_PROPS_SIG
         0xA0000003: "Hostname and Other Stuff",
-        0xA0000005: "Special Folder Info",
-        0xA0000007: "Custom Icon Details",
+        0xA0000004: "Console Codepage Information", # NT_FE_CONSOLE_PROPS_SIG
+        0xA0000005: "Special Folder Info", # EXP_SPECIAL_FOLDER_SIG
+        0xA0000006: "DarwinID (Windows Installer ID) Information", # EXP_DARWIN_ID_SIG
+        0xA0000007: "Custom Icon Details", # EXP_LOGO3_ID_SIG or EXP_SZ_ICON_SIG
     }
     SPECIAL_FOLDER = {
          0: "DESKTOP",
@@ -304,6 +342,10 @@ class ExtraInfo(FieldSet):
         59: "CDBURN_AREA",
         61: "COMPUTERSNEARME",
     }
+    BOOL_ENUM = {
+        0: "False",
+        1: "True",
+    }
 
     def __init__(self, *args, **kw):
         FieldSet.__init__(self, *args, **kw)
@@ -317,27 +359,130 @@ class ExtraInfo(FieldSet):
         if not self["length"].value:
             return
 
-        yield Enum(textHandler(UInt32(self, "flags", "Flags determining the function of this structure"),hexadecimal),self.INFO_TYPE)
-        if self["flags"].value == 0xA0000003:
+        yield Enum(textHandler(UInt32(self, "signature", "Signature determining the function of this structure"),hexadecimal),self.INFO_TYPE)
+
+        if self["signature"].value == 0xA0000003:
+            # Hostname and Other Stuff
             yield UInt32(self, "remaining_length")
             yield UInt32(self, "unknown[]")
-            yield String(self, "hostname", 16, "Computer hostname on which shortcut was last modified")
+            yield String(self, "hostname", 16, "Computer hostname on which shortcut was last modified", strip="\0")
             yield RawBytes(self, "unknown[]", 32)
             yield RawBytes(self, "unknown[]", 32)
-        elif self["flags"].value == 0xA0000005:
+
+        elif self["signature"].value == 0xA0000005:
+            # Special Folder Info
             yield Enum(UInt32(self, "special_folder_id", "ID of the special folder"),self.SPECIAL_FOLDER)
-            yield UInt32(self, "offset", "Some kind of offset (?)")
-        elif self["flags"].value == 0xA0000007:
-            yield CString(self, "file_path", "Path to icon")
-            yield RawBytes(self, "raw", self["length"].value-self.current_size/8)
+            yield UInt32(self, "offset", "Offset to Item ID entry")
+
+        elif self["signature"].value in (0xA0000001, 0xA0000006, 0xA0000007):
+            if self["signature"].value == 0xA0000001: # Link Target Information
+                object_name="target"
+            elif self["signature"].value == 0xA0000006: # DarwinID (Windows Installer ID) Information
+                object_name="darwinID"
+            else: # Custom Icon Details
+                object_name="icon_path"
+            yield CString(self, object_name, "Data (ASCII format)", charset="ASCII")
+            remaining = self["length"].value - self.current_size/8 - 260*2 # 260*2 = size of next part
+            if remaining:
+                yield RawBytes(self, "slack_space[]", remaining, "Data beyond end of string")
+            yield CString(self, object_name+'_unicode', "Data (Unicode format)", charset="UTF-16-LE", truncate="\0")
+            remaining = self["length"].value - self.current_size/8
+            if remaining:
+                yield RawBytes(self, "slack_space[]", remaining, "Data beyond end of string")
+
+        elif self["signature"].value == 0xA0000002:
+            # Console Window Properties
+            yield ColorTableIndex(self, "color_text", 4, "Screen text color index")
+            yield ColorTableIndex(self, "color_bg", 4, "Screen background color index")
+            yield NullBytes(self, "reserved[]", 1)
+            yield ColorTableIndex(self, "color_popup_text", 4, "Pop-up text color index")
+            yield ColorTableIndex(self, "color_popup_bg", 4, "Pop-up background color index")
+            yield NullBytes(self, "reserved[]", 1)
+            yield UInt16(self, "buffer_width", "Screen buffer width (character cells)")
+            yield UInt16(self, "buffer_height", "Screen buffer height (character cells)")
+            yield UInt16(self, "window_width", "Window width (character cells)")
+            yield UInt16(self, "window_height", "Window height (character cells)")
+            yield UInt16(self, "position_left", "Window distance from left edge (screen coords)")
+            yield UInt16(self, "position_top", "Window distance from top edge (screen coords)")
+            yield UInt32(self, "font_number")
+            yield UInt32(self, "input_buffer_size")
+            yield UInt16(self, "font_width", "Font width in pixels; 0 for a non-raster font")
+            yield UInt16(self, "font_height", "Font height in pixels; equal to the font size for non-raster fonts")
+            yield UInt32(self, "font_family")
+            yield UInt32(self, "font_weight")
+            yield String(self, "font_name_unicode", 64, "Font Name (Unicode format)", charset="UTF-16-LE", truncate="\0")
+            yield UInt32(self, "cursor_size", "Relative size of cursor (% of character size)")
+            yield Enum(UInt32(self, "full_screen", "Run console in full screen?"), self.BOOL_ENUM)
+            yield Enum(UInt32(self, "quick_edit", "Console uses quick-edit feature (using mouse to cut & paste)?"), self.BOOL_ENUM)
+            yield Enum(UInt32(self, "insert_mode", "Console uses insertion mode?"), self.BOOL_ENUM)
+            yield Enum(UInt32(self, "auto_position", "System automatically positions window?"), self.BOOL_ENUM)
+            yield UInt32(self, "history_size", "Size of the history buffer (in lines)")
+            yield UInt32(self, "history_count", "Number of history buffers (each process gets one up to this limit)")
+            yield Enum(UInt32(self, "history_no_dup", "Automatically eliminate duplicate lines in the history buffer?"), self.BOOL_ENUM)
+            for index in xrange(16):
+                yield ColorRef(self, "color[]")
+
+        elif self["signature"].value == 0xA0000004:
+            # Console Codepage Information
+            yield UInt32(self, "codepage", "Console's code page")
+
         else:
             yield RawBytes(self, "raw", self["length"].value-self.current_size/8)
 
-    def createDisplay(self):
+    def createDescription(self):
         if self["length"].value:
-            return "Item ID Entry: "+self.ITEM_TYPE.get(self["type"].value,"Unknown")
+            return "Extra Info Entry: "+self["signature"].display
         else:
-            return "End of Item ID List"
+            return "End of Extra Info"
+
+HOT_KEYS = {
+    0x00: u'None',
+    0x13: u'Pause',
+    0x14: u'Caps Lock',
+    0x21: u'Page Up',
+    0x22: u'Page Down',
+    0x23: u'End',
+    0x24: u'Home',
+    0x25: u'Left',
+    0x26: u'Up',
+    0x27: u'Right',
+    0x28: u'Down',
+    0x2d: u'Insert',
+    0x2e: u'Delete',
+    0x6a: u'Num *',
+    0x6b: u'Num +',
+    0x6d: u'Num -',
+    0x6e: u'Num .',
+    0x6f: u'Num /',
+    0x90: u'Num Lock',
+    0x91: u'Scroll Lock',
+    0xba: u';',
+    0xbb: u'=',
+    0xbc: u',',
+    0xbd: u'-',
+    0xbe: u'.',
+    0xbf: u'/',
+    0xc0: u'`',
+    0xdb: u'[',
+    0xdc: u'\\',
+    0xdd: u']',
+    0xde: u"'",
+}
+
+def text_hot_key(field):
+    assert hasattr(field, "value")
+    val=field.value
+    if 0x30 <= val <= 0x39:
+        return unichr(val)
+    elif 0x41 <= val <= 0x5A:
+        return unichr(val)
+    elif 0x60 <= val <= 0x69:
+        return u'Numpad %c' % unichr(val-0x30)
+    elif 0x70 <= val <= 0x87:
+        return 'F%i'%(val-0x6F)
+    elif val in HOT_KEYS:
+        return HOT_KEYS[val]
+    return str(val)
 
 class LnkFile(Parser):
     MAGIC = "\x4C\0\0\0\x01\x14\x02\x00\x00\x00\x00\x00\xc0\x00\x00\x00\x00\x00\x00\x46"
@@ -353,17 +498,17 @@ class LnkFile(Parser):
     endian = LITTLE_ENDIAN
 
     SHOW_WINDOW_STATE = {
-         0: "Hide",
-         1: "Normal",
-         2: "Show minimized",
-         3: "Show maximized",
-         4: "Show no activate",
-         5: "Show",
-         6: "Minimize",
-         7: "Show min no active",
-         8: "Show NA",
-         9: "Restore",
-        10: "Show default",
+         0: u"Hide",
+         1: u"Show Normal",
+         2: u"Show Minimized",
+         3: u"Show Maximized",
+         4: u"Show Normal, not activated",
+         5: u"Show",
+         6: u"Minimize",
+         7: u"Show Minimized, not activated",
+         8: u"Show, not activated",
+         9: u"Restore",
+        10: u"Show Default",
     }
 
     def validate(self):
@@ -378,27 +523,27 @@ class LnkFile(Parser):
 
     def createFields(self):
         yield UInt32(self, "signature", "Shortcut signature (0x0000004C)")
-        yield GUID(self, "guid")
+        yield GUID(self, "guid", "Shortcut GUID (00021401-0000-0000-C000-000000000046)")
 
-        yield Bit(self, "has_shell_id")
+        yield Bit(self, "has_shell_id", "Is the Item ID List present?")
         yield Bit(self, "target_is_file", "Is a file or a directory?")
-        yield Bit(self, "has_description")
-        yield Bit(self, "has_rel_path")
-        yield Bit(self, "has_working_dir")
-        yield Bit(self, "has_cmd_line_args")
-        yield Bit(self, "has_custom_icon")
-        yield Bit(self, "has_unicode_names")
+        yield Bit(self, "has_description", "Is the Description field present?")
+        yield Bit(self, "has_rel_path", "Is the relative path to the target available?")
+        yield Bit(self, "has_working_dir", "Is there a working directory?")
+        yield Bit(self, "has_cmd_line_args", "Are there any command line arguments?")
+        yield Bit(self, "has_custom_icon", "Is there a custom icon?")
+        yield Bit(self, "has_unicode_names", "Are Unicode names used?")
         yield Bit(self, "force_no_linkinfo")
         yield Bit(self, "has_exp_sz")
         yield Bit(self, "run_in_separate")
-        yield Bit(self, "has_logo3id")
-        yield Bit(self, "has_darwinid")
-        yield Bit(self, "runas_user")
-        yield Bit(self, "has_exp_icon_sz")
+        yield Bit(self, "has_logo3id", "Is LOGO3 ID info present?")
+        yield Bit(self, "has_darwinid", "Is the DarwinID info present?")
+        yield Bit(self, "runas_user", "Is the target run as another user?")
+        yield Bit(self, "has_exp_icon_sz", "Is custom icon information available?")
         yield Bit(self, "no_pidl_alias")
         yield Bit(self, "force_unc_name")
         yield Bit(self, "run_with_shim_layer")
-        yield PaddingBits(self, "reserved[]", 14)
+        yield PaddingBits(self, "reserved[]", 14, "Flag bits reserved for future use")
 
         yield MSDOSFileAttr32(self, "target_attr")
 
@@ -408,16 +553,15 @@ class LnkFile(Parser):
         yield filesizeHandler(UInt32(self, "target_filesize"))
         yield UInt32(self, "icon_number")
         yield Enum(UInt32(self, "show_window"), self.SHOW_WINDOW_STATE)
-        yield UInt32(self, "hot_key")
+        yield textHandler(UInt8(self, "hot_key", "Hot key used for quick access"),text_hot_key)
+        yield Bit(self, "hot_key_shift", "Hot key: is Shift used?")
+        yield Bit(self, "hot_key_ctrl", "Hot key: is Ctrl used?")
+        yield Bit(self, "hot_key_alt", "Hot key: is Alt used?")
+        yield PaddingBits(self, "hot_key_reserved", 21, "Hot key: (reserved)")
         yield NullBytes(self, "reserved[]", 8)
 
         if self["has_shell_id"].value:
-            yield UInt16(self, "item_idlist_size", "size of item ID list")
-            item = ItemId(self, "item_idlist[]")
-            yield item
-            while item["length"].value:
-                item = ItemId(self, "item_idlist[]")
-                yield item
+            yield ItemIdList(self, "item_idlist", "Item ID List")
         if self["target_is_file"].value:
             yield FileLocationInfo(self, "file_location_info", "File Location Info")
         if self["has_description"].value:
