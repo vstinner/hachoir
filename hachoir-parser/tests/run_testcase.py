@@ -443,6 +443,17 @@ def checkVimLNK(parser): return (
     checkValue(parser, "/target_filesize", 1363968),
 )
 
+def checkSevenzipCHM(parser): return (
+    checkValue(parser, "/itsf/version", 3),
+    checkDisplay(parser, "/itsf/lang_id", u"Russian"),
+    checkDisplay(parser, "/itsf/dir_uuid/time", u"1997-01-31 20:42:14.890625"),
+    checkDisplay(parser, "/itsf/stream_uuid/variant", u"Microsoft Corporation"),
+    checkDisplay(parser, "/itsf/stream_uuid/mac", u'INTEL CORPORATION - HF1-06 [22:e6:ec]'),
+    checkDisplay(parser, "/file_size/file_size", u"75.6 KB"),
+    checkDisplay(parser, "/dir/itsp/lang_id", u"English United States"),
+    checkValue(parser, "/dir/pmgl[0]/entry[1]/name", u"/#IDXHDR"),
+)
+
 testcase_files = (
     (u"yellowdude.3ds", checkYellowdude),
     (u"logo-kubuntu.png", checkLogoUbuntu),
@@ -493,6 +504,7 @@ testcase_files = (
     (u"satellite_one.s3m", checkS3M),
     (u"anti-arpeggio_tune.ptm", checkPTM),
     (u"vim.lnk", checkVimLNK),
+    (u"7zip.chm", checkSevenzipCHM),
 )
 
 def checkFile(filename, check_parser):
