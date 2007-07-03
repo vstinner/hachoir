@@ -16,7 +16,7 @@ class EditableFieldSet(object):
         self.input = fieldset  # original FieldSet
         self._fields = {}      # cache of editable fields
         self._deleted = set()  # Names of deleted fields
-        self._insered = {}     # Insered field (name => list of field,
+        self._inserted = {}    # Inserted field (name => list of field,
                                # where name is the name after)
 
     def array(self, key):
@@ -28,7 +28,7 @@ class EditableFieldSet(object):
     parent = property(_getParent)
 
     def _isAltered(self):
-        if self._insered:
+        if self._inserted:
             return True
         if self._deleted:
             return True
@@ -47,18 +47,18 @@ class EditableFieldSet(object):
     def __len__(self):
         return len(self.input) \
             - len(self._deleted) \
-            + sum( len(new) for new in self._insered.itervalues() )
+            + sum( len(new) for new in self._inserted.itervalues() )
 
     def __iter__(self):
         for field in self.input:
             name = field.name
-            if name in self._insered:
-                for newfield in self._insered[name]:
+            if name in self._inserted:
+                for newfield in self._inserted[name]:
                     yield weakref.proxy(newfield)
             if name not in self._deleted:
                 yield self[name]
-        if None in self._insered:
-            for newfield in self._insered[None]:
+        if None in self._inserted:
+            for newfield in self._inserted[None]:
                 yield weakref.proxy(newfield)
 
     def insertBefore(self, name, *new_fields):
@@ -73,7 +73,7 @@ class EditableFieldSet(object):
     def _insert(self, key, new_fields, next):
         """
         key is the name of the field before which new_fields
-        will be insered. If next is True, the fields will be insered
+        will be inserted. If next is True, the fields will be inserted
         _after_ this field.
         """
         # Set unique field name
@@ -81,12 +81,12 @@ class EditableFieldSet(object):
             if field._name.endswith("[]"):
                 self.input.setUniqueFieldName(field)
 
-        # Check that there is no duplicate in insered fields
+        # Check that there is no duplicate in inserted fields
         new_names = list(field.name for field in new_fields)
         names_set = set(new_names)
         if len(names_set) != len(new_fields):
             duplicates = (name for name in names_set if 1 < new_names.count(name))
-            raise UniqKeyError(_("Duplicates in insered fields: %s") % ", ".join(duplicates))
+            raise UniqKeyError(_("Duplicates in inserted fields: %s") % ", ".join(duplicates))
 
         # Check that field names are not in input
         if self.input: # Write special version for NewFieldSet?
@@ -94,23 +94,23 @@ class EditableFieldSet(object):
                 if name in self.input and name not in self._deleted:
                     raise UniqKeyError(_("Field name '%s' already exists") % name)
 
-        # Check that field names are not in insered fields
-        for fields in self._insered.itervalues():
+        # Check that field names are not in inserted fields
+        for fields in self._inserted.itervalues():
             for field in fields:
                 if field.name in new_names:
                     raise UniqKeyError(_("Field name '%s' already exists") % field.name)
 
-        # Input have already insered field?
-        if key in self._insered:
+        # Input have already inserted field?
+        if key in self._inserted:
             if next:
-                self._insered[key].extend( reversed(new_fields) )
+                self._inserted[key].extend( reversed(new_fields) )
             else:
-                self._insered[key].extendleft( reversed(new_fields) )
+                self._inserted[key].extendleft( reversed(new_fields) )
             return
 
-        # Whould like to insert in insered fields?
+        # Whould like to insert in inserted fields?
         if key:
-            for fields in self._insered.itervalues():
+            for fields in self._inserted.itervalues():
                 names = [item.name for item in fields]
                 try:
                     pos = names.index(key)
@@ -137,7 +137,7 @@ class EditableFieldSet(object):
                 raise MissingField(self, key)
 
         # Insert in original input
-        self._insered[key]= deque(new_fields)
+        self._inserted[key]= deque(new_fields)
 
     def _getDescription(self):
         return self.input.description
@@ -326,8 +326,8 @@ class NewFieldSet(EditableFieldSet):
         self._endian = parent.endian
 
     def __iter__(self):
-        if None in self._insered:
-            return iter(self._insered[None])
+        if None in self._inserted:
+            return iter(self._inserted[None])
         else:
             raise StopIteration()
 

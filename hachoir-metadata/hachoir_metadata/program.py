@@ -41,10 +41,10 @@ class ExeMetadata(RootMetadata):
         if "pe_opt_header" in exe:
             self.usePE_OptHeader(exe["pe_opt_header"])
 
-        # Use PE ressource
-        ressource = exe.getRessource()
-        if ressource and "version_info/node[0]" in ressource:
-            for node in ressource.array("version_info/node[0]/node"):
+        # Use PE resource
+        resource = exe.getResource()
+        if resource and "version_info/node[0]" in resource:
+            for node in resource.array("version_info/node[0]/node"):
                 if getValue(node, "name") == "StringFileInfo" \
                 and "node[0]" in node:
                     self.readVersionInfo(node["node[0]"])

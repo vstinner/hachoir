@@ -10,12 +10,11 @@ video, but also archives. It supports most common file formats:
  * Video: ASF format (WMV video), AVI, Matroska (MKV), Quicktime (MOV),
    Ogg/Theora, Real media (RM)
 
-It tries to give the more informations as possible. For some file formats,
-it gives really more informations then libextractor for example. RIFF parser
-is really good for example, it can extract creation date, software used to
-generate the file, etc. But hachoir-metadata can not guess informations. The
-most complex operation is just to compute duration of a music using frame size
-and file size.
+It tries to give as much information as possible. For some file formats,
+it gives more information than libextractor for example, such as the RIFF
+parser, which can extract creation date, software used to generate the file,
+etc. But hachoir-metadata cannot guess informations. The most complex operation
+is just to compute duration of a music using frame size and file size.
 
 hachoir-metadata has three modes:
 

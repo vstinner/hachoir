@@ -45,7 +45,7 @@ def parseOptions():
     common.add_option("--mime", help=_("Only display MIME type"),
         action="store_true", default=False)
     common.add_option("--level",
-        help=_("Quantify of information to display from 1 to 9 (9 is the maximum)"),
+        help=_("Quantity of information to display from 1 to 9 (9 is the maximum)"),
         action="store", default="9", type="choice",
         choices=[ str(choice) for choice in xrange(1,9+1) ])
     common.add_option("--raw", help=_("Raw output"),

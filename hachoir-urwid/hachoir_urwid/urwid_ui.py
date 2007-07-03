@@ -133,7 +133,7 @@ class Walker(ListWalker):
         assert preload_fields > 0
         self.preload_fields = preload_fields
         self.focus = root
-        for event in ("field-value-changed", "field-resized", "field-insered", "field-replaced", "set-field-value"):
+        for event in ("field-value-changed", "field-resized", "field-inserted", "field-replaced", "set-field-value"):
             root.field.connectEvent(event, self.onEvent, False)
         self.keypress(None, 'enter')
         if focus:
