@@ -18,7 +18,10 @@ try:
             self.bzip2 = BZ2Decompressor()
 
         def __call__(self, size, data=''):
-            return self.bzip2.decompress(data)
+            try:
+                return self.bzip2.decompress(data)
+            except EOFError:
+                return ''
 
     has_deflate = True
 except ImportError:
