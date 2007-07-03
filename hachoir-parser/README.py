@@ -18,10 +18,12 @@ def main():
         print
 
     # Write parser list
-    print "Parser list"
-    print "==========="
-    print
-    HachoirParserList().print_(format="rest")
+    format = "rest"
+    if format == "rest":
+        print "Parser list"
+        print "==========="
+        print
+    HachoirParserList().print_(format=format)
 
 if __name__ == "__main__":
     main()

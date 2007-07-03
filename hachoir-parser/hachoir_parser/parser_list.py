@@ -84,20 +84,53 @@ class ParserList(object):
     def __iter__(self):
         return iter(self.parser_list)
 
-    def print_(self, title=None, verbose=False, format="default"):
+    def print_(self, title=None, verbose=False, format="one-line"):
         """Display a list of parser with its title
          * title : title of the list to display
-         * format: "rest", "trac", "one_line" or "default"
+         * format: "rest", "trac", "file-ext", "mime" or "one_line" (default)
         """
 
-        if format != "rest":
+        if format in ("file-ext", "mime"):
+            # Create file extension set
+            extensions = set()
+            for parser in self:
+                file_ext = parser.getTags().get(format, ())
+                file_ext = list(file_ext)
+                try:
+                    file_ext.remove("")
+                except ValueError:
+                    pass
+                extensions |= set(file_ext)
+
+            # Remove empty extension
+            extensions -= set(('',))
+
+            # Convert to list and sort by ASCII order
+            extensions = list(extensions)
+            extensions.sort()
+
+            # Print list
+            text = ", ".join( str(item) for item in extensions )
+            if format == "file-ext":
+                print "File extensions: %s." % text
+                print
+                print "Total: %s file extensions." % len(extensions)
+            else:
+                print "MIME types: %s." % text
+                print
+                print "Total: %s MIME types." % len(extensions)
+            return
+
+        if format == "trac":
+            print "== List of parsers =="
+            print
+            print "Total: %s parsers" % len(self.parser_list)
+            print
+        elif format == "one_line":
             if title:
                 print title
             else:
                 print _("List of Hachoir parsers.")
-            print
-        if format == "trac":
-            print "Total: %s metadata extractors" % len(self.parser_list)
             print
 
         # Create parser list sorted by module
