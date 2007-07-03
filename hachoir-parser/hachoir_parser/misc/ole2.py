@@ -23,7 +23,7 @@ from hachoir_parser import HachoirParser
 from hachoir_core.field import (
     FieldSet, ParserError, SeekableFieldSet, RootSeekableFieldSet,
     UInt8, UInt16, Int32, UInt32, UInt64, TimestampWin64, Enum,
-    Bytes, RawBytes, PaddingBytes, NullBytes, String)
+    Bytes, RawBytes, NullBytes, String)
 from hachoir_core.text_handler import textHandler, hexadecimal, filesizeHandler
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_parser.common.win32 import GUID
@@ -89,7 +89,7 @@ class Property(FieldSet):
         yield SECT(self, "start", "Starting SECT of the stream (valid for stream and root types)")
         if self["/"]["/header/bb_shift"].value == 9:
             yield filesizeHandler(UInt32(self, "size", "Size in bytes (valid for stream and root types)"))
-            yield PaddingBytes(self, "padding")
+            yield NullBytes(self, "padding", 4)
         else:
             yield filesizeHandler(UInt64(self, "size", "Size in bytes (valid for stream and root types)"))
 
