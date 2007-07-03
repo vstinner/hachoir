@@ -56,6 +56,11 @@ class BootRecord(FieldSet):
         yield String(self, "boot_id", 31, "Boot identifier", strip="\0")
         yield RawBytes(self, "system_use", 1979, "Boot system use")
 
+class Terminator(FieldSet):
+    static_size = 2041*8
+    def createFields(self):
+        yield NullBytes(self, "null", 2041)
+
 class Volume(FieldSet):
     endian = BIG_ENDIAN
     TERMINATOR = 255
@@ -64,12 +69,13 @@ class Volume(FieldSet):
         1: "Primary Volume Descriptor",
         2: "Supplementary Volume Descriptor",
         3: "Volume Partition Descriptor",
-        TERMINATOR: "Volume Descriptor Set Terminator"
+        TERMINATOR: "Volume Descriptor Set Terminator",
     }
     static_size = 2048 * 8
     content_handler = {
         0: BootRecord,
-        1: PrimaryVolumeDescriptor
+        1: PrimaryVolumeDescriptor,
+        TERMINATOR: Terminator,
     }
 
     def createFields(self):
