@@ -46,26 +46,6 @@ class RootSeekableFieldSet(BasicFieldSet):
     size = property(_getSize)
 
     def _getField(self, key, const):
-        field = Field._getField(self, key, const)
-        if field is None:
-            return self.__getitem__(key, const)
-        else:
-            return field
-
-    def __getitem__(self, key, const=True):
-        if isinstance(key, (int, long)):
-            count = len(self._field_array)
-            if key < count:
-                return self._field_array[key]
-            raise MissingField(self, key)
-        if "/" in key:
-            if key == "/":
-                return self.root
-            if key.endswith('/') and key.rstrip('/') in self._field_dict: return self._field_dict[key.rstrip('/')]
-            elif key=='../': return self.parent
-            parent, children = key.split("/", 1)
-            return self[parent][children]
-        assert "/" not in key
         if key in self._field_dict:
             return self._field_dict[key]
         if self._generator:
@@ -82,7 +62,15 @@ class RootSeekableFieldSet(BasicFieldSet):
         raise MissingField(self, key)
 
     def getField(self, key, const=True):
-        return self.__getitem__(key, const)
+        if isinstance(key, (int, long)):
+            if key < 0:
+                raise KeyError("Key must be positive!")
+            if not const:
+                self.readFirstFields(key+1)
+            if len(self._field_array) <= key:
+                raise MissingField(self, key)
+            return self._field_array[key]
+        return Field.getField(self, key, const)
 
     def _addField(self, field):
         if field._name.endswith("[]"):

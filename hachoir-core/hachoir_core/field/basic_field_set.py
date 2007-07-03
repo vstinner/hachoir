@@ -118,6 +118,18 @@ class BasicFieldSet(Field):
             self._field_array_count[key] = 0
         field._name = key + "[%u]" % self._field_array_count[key]
 
+    def readFirstFields(self, number):
+        """
+        Read first number fields if they are not read yet.
+
+        Returns number of new added fields.
+        """
+        number = number - self.current_length
+        if 0 < number:
+            return self.readMoreFields(number)
+        else:
+            return 0
+
     def createFields(self):
         raise NotImplementedError()
     def __iter__(self):
@@ -129,5 +141,7 @@ class BasicFieldSet(Field):
     def nextFieldAddress(self):
         raise NotImplementedError()
     def getFieldIndex(self, field):
+        raise NotImplementedError()
+    def readMoreFields(self, number):
         raise NotImplementedError()
 

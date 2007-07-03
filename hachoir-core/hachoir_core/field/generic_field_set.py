@@ -335,20 +335,6 @@ class GenericFieldSet(BasicFieldSet):
             self._stopFeeding()
         return None
 
-    def readFirstFields(self, number):
-        """
-        Read first number fields if they are not read yet.
-
-        Returns number of new added fields.
-        """
-        if self._field_generator is None:
-            return
-        number = number - len(self._fields)
-        if 0 < number:
-            return self.readMoreFields(number)
-        else:
-            return 0
-
     def readMoreFields(self, number):
         """
         Read more number fields, or do nothing if parsing is done.
