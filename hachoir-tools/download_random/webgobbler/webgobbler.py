@@ -60,7 +60,7 @@ webGobbler:
 IMPORTANT - READ
 
 This program downloads random images from the internet, which may include
-pornography or any morally objectionnable or illegal material.
+pornography or any morally objectionable or illegal material.
 Due to the random nature of this program, the author of webGobbler cannot be
 held responsible for any URL this program has tried to reach, nor the images
 downloaded, stored or displayed on the computer.
@@ -541,7 +541,7 @@ in HKEY_CURRENT_USER\Software\sebsauvage.net\webGobbler)
   Acceleration ranges from x2 to x100 without a single modification in code.
   If psyco is installed, this program will automatically use it to run faster.
   Don't worry if you don't have psyco: webGobbler will still be fully
-  functionnal and will run as usual.
+  functional and will run as usual.
 
 * WebGobbler does not create a nice collage of my photos !
   WebGobbler is *NOT INTENDED* to create a nice collage of your photos.
@@ -1282,7 +1282,7 @@ subject to the following restrictions:
 DISCLAIMER='''IMPORTANT - READ
 
 This program downloads random images from the internet, which may include
-pornography or any morally objectionnable or illegal material.
+pornography or any morally objectionable or illegal material.
 Due to the random nature of this program, the author of webGobbler cannot be
 held responsible for any URL this program has tried to reach, nor the images
 downloaded, stored or displayed on the computer.
@@ -1336,12 +1336,12 @@ ACCEPTED_MIME_TYPES = { 'image/jpeg': '.jpg',
 # ---------------------------------------------------------------------------------------
 
 class applicationConfig(dict):
-    ''' An object capable of storing program configuration (in the form of a dictionnary).
+    ''' An object capable of storing program configuration (in the form of a dictionary).
         This class is not generic and is tailored to webGobbler.
 
-        It behaves like a dictionnary object, but it also has
+        It behaves like a dictionary object, but it also has
         methods to save/load to/from .INI, file and Windows registry.
-        Note that this dictionnary only supports:
+        Note that this dictionary only supports:
           - key which are strings.
           - values which are strings, integers or booleans.
         Using other types will raise errors.
@@ -1361,7 +1361,7 @@ class applicationConfig(dict):
     '''
 
     # Default configuration:
-    # This dictionnary contains the default configuration of the whole program.
+    # This dictionary contains the default configuration of the whole program.
     # Each class/thread will read an instance of this class to get its parameters.
     # The instance will be altered by the main() according to command-line parameters.
     # (key=parameter name, value=value of this parameter)
@@ -1375,7 +1375,7 @@ class applicationConfig(dict):
             "network.http.proxy.auth.password": "",         # (string)  Password for proxy.
             "network.http.useragent"     : "webGobbler/1.2.6",# (string) User-agent passed in HTTP requests.
             "collector.maximumimagesize" : 2000000,         # (integer) Maximum image file size in bytes. If a picture is bigger than this, it will not be downloaded.
-            "collector.acceptedmimetypes": ACCEPTED_MIME_TYPES, # (dictionnary)  List of image types which will be downloaded.
+            "collector.acceptedmimetypes": ACCEPTED_MIME_TYPES, # (dictionary)  List of image types which will be downloaded.
             "collector.localonly"        : False,           # (boolean) If true, will collect images from local disk instead of internet (--localonly)
             "collector.localonly.startdir" : "/",           # (string) When using local disk only, the directory to scan for images (default="/"=Whole disk.)
             "collector.keywords.enabled" : False,           # (boolean) Use keywords for image search. If False, random generated words will be used.
@@ -1400,13 +1400,13 @@ class applicationConfig(dict):
             "persistencedirectory"       : ".",             # (string) Directory where classes save their data between program runs
             "program.every"              : 60,              # (integer) Generate a new image every n seconds (--every)
             "debug"                      : False,           # (boolean) debug mode (True will display various activity on screen and log into the file webGobbler.log) (--debug)
-            "blacklist.imagesha1"        : BLACKLIST_IMAGESHA1, # (dictionnary: key=hex SHA1 (string), value=0) List of images to blacklist (based on their content)
+            "blacklist.imagesha1"        : BLACKLIST_IMAGESHA1, # (dictionary: key=hex SHA1 (string), value=0) List of images to blacklist (based on their content)
             "blacklist.url"              : BLACKLIST_URL,   # (list of strings) List of blacklisted URLs.
             "blacklist.url_re"           : []               # (list of regular expression objets) Same as blacklist.url, but compiled as regular expressions.
                                                             # (blacklist.url_re is automatically compiled from blacklist.url)
             }
 
-    # FIXME: Add explanations on each parameter ? (in another dictionnary with the same keys ? CONFIG_HELP ?))
+    # FIXME: Add explanations on each parameter ? (in another dictionary with the same keys ? CONFIG_HELP ?))
 
     # The following parameters will not be exported to INI or registry, nor imported.
     # (Mostly because they are code dependant.)
@@ -1513,7 +1513,7 @@ class applicationConfig(dict):
                         else: obj = False
                     elif isinstance(defaultvalue,int):  obj = int(value)
                     elif isinstance(defaultvalue,float):  obj = float(value)
-                    elif isinstance(value,dict): raise NotImplementedError,"applicationConfig.fromINI() : serialization of dictionnary objects is not implemented."
+                    elif isinstance(value,dict): raise NotImplementedError,"applicationConfig.fromINI() : serialization of dictionary objects is not implemented."
                     elif isinstance(value,list): raise NotImplementedError,"applicationConfig.fromINI() : serialization of list objects is not implemented."
                     else:  raise ValueError, "Could not convert parameter %s. Oops. Looks like an error in the program." % name
                 except ValueError:
@@ -1789,16 +1789,16 @@ class collector(threading.Thread):
             (ideally get only one picture)
         Used by: imagePool
     '''
-    def __init__(self,config,dictionnaryFile=None):
+    def __init__(self,config,dictionaryFile=None):
         ''' Download random images
               config (an applicationConfig object) : the program configuration
-              dictionnaryFile (string): A filename+path to an optionnal word dictionnary.
+              dictionaryFile (string): A filename+path to an optional word dictionary.
         '''
         threading.Thread.__init__(self)
         self.inputCommandQueue = Queue.Queue()   # Input commands (commandToken objects)
         self.numberOfImagesToGet = 0     # By default, do not start to collect images.
         self.continuousCollect = False
-        self.dictionnaryFile = dictionnaryFile  # Optional word dictionnary
+        self.dictionaryFile = dictionaryFile  # Optional word dictionary
         self.name="collector"
         self.CONFIG=config
         self.statusLock = threading.RLock()  # A lock to access collector status.
@@ -1910,8 +1910,8 @@ class collector(threading.Thread):
     def _generateRandomWord(self):
         ''' Generates a random word.
             This method can be used by all derived classes.
-            Usefull to get random result from search engines when you do not have
-            a dictionnary at hand.
+            Useful to get random result from search engines when you do not have
+            a dictionary at hand.
             The generated word can be a number (containing only digits),
             a word (containing only letters) or both mixed.
             Output: string (a random word)
@@ -1919,8 +1919,8 @@ class collector(threading.Thread):
             Example: word = self._generateRandomWord()
         '''
         # FIXME: To implement
-        #if self.dictionnaryFile:
-        #     ...get word from dictionnary...
+        #if self.dictionaryFile:
+        #     ...get word from dictionary...
         #else:
         #     ...the old standalone method below...
         word = '1'
@@ -2251,12 +2251,12 @@ class collector_askjeevesimages(collector):
                 if len(results) > 0:
                     for imageurl in results:
                         # Keep some of those URLs in memory.
-                        # (and put the URLs in a dictionnary to remove duplicates)
+                        # (and put the URLs in a dictionary to remove duplicates)
                         if random.randint(0,1)==1:
                             imageurl = urllib.unquote_plus(urllib.unquote_plus(imageurl))
                             if not imageurl.startswith("http://"):
                                 imageurl = "http://"+imageurl
-                            self.imageurls[imageurl] = 0  # Put in the dictionnary to remove duplicates
+                            self.imageurls[imageurl] = 0  # Put in the dictionary to remove duplicates
                 else:
                     if ("did not match with any Picture results." in htmlpage) or ("did not match with any Image results." in htmlpage):
                         self._logDebug("No results for this word.") # Our search was unsuccessfull.  Nevermind... we'll try another one later.
@@ -2340,7 +2340,7 @@ class collector_yahooimagesearch(collector):
                 if len(results) > 0:
                     for imageurl in results:
                         # Keep some of those URLs in memory.
-                        # (and put the URLs in a dictionnary to remove duplicates)
+                        # (and put the URLs in a dictionary to remove duplicates)
                         if random.randint(0,1)==1:
                             imageurl = urllib.unquote_plus(imageurl)
                             if not imageurl.startswith("http://"):
@@ -2428,12 +2428,12 @@ class collector_googleimages(collector):
                 if len(results) > 0:
                     for imageurl in results:
                         # Keep some of those URLs in memory.
-                        # (and put the URLs in a dictionnary to remove duplicates)
+                        # (and put the URLs in a dictionary to remove duplicates)
                         if random.randint(0,1)==1:
                             imageurl = urllib.unquote_plus(imageurl)
                             if not imageurl.startswith("http://"):
                                 imageurl = "http://"+imageurl
-                            self.imageurls[imageurl] = 0  # Put in the dictionnary to remove duplicates
+                            self.imageurls[imageurl] = 0  # Put in the dictionary to remove duplicates
                 else:
                     if "did not match any documents" in htmlpage:
                         self._logDebug("No results for this word.") # Our search was unsuccessfull.  Nevermind... we'll try another one later.
@@ -2527,13 +2527,13 @@ class collector_flickr(collector):
                 results = collector_flickr.RE_IMAGEURL.findall(htmlpage)
                 if len(results) > 0:
                     for imageurl in results:
-                        # Keep some of those URLs in memory (and put the URLs in a dictionnary to remove duplicates)
+                        # Keep some of those URLs in memory (and put the URLs in a dictionary to remove duplicates)
                         if random.randint(0,3)==1:
                             if not imageurl.startswith("http://"):
                                 imageurl = "http://"+imageurl
                             imageurl = imageurl.replace("_t.jpg","_o.jpg").replace("_m.jpg","_o.jpg")
                             # _t is for "Thumbnail", "_m" is for "medium size", "_o" is for "original size".
-                            self.imageurls[imageurl] = 0  # Put in the dictionnary to remove duplicates
+                            self.imageurls[imageurl] = 0  # Put in the dictionary to remove duplicates
                 else:
                     self._logWarning("Found no image URL in this page. Website changed ?")
                     self._setCurrentStatus('Error','Found no image URL in this page. Website changed ?')
@@ -2842,7 +2842,7 @@ class assembler_mosaic(assembler):
             a.saveImageTo('mosaic.bmp')
     '''
     def __init__(self,**keywords):
-        ''' Additionnal parameters:
+        ''' Additional parameters:
             nbX (integer): number of images to stack horizontally.
             nbY (integer): number of images to stack vertically.
         '''
@@ -3722,7 +3722,7 @@ If no running mode is specified, webGobbler will start as a GUI application
 and will try to load configuration from registry of .ini file.
 
 
-Options (optionnal):
+Options (optional):
 
   --resolution AAAxBBB
       Resolution to generate (default:1024x768)

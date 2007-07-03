@@ -10,7 +10,7 @@ class field_menu_imp_t:
         self.fields = fields
         self.selected = None
 
-    def on_field_menu_ready(self, dispacher, view):
+    def on_field_menu_ready(self, dispatcher, view):
         assert view is not None
         self.view = view
 

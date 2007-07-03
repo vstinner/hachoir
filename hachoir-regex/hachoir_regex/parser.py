@@ -135,7 +135,7 @@ def _parse(text, start=0, until=None):
             elif char in CHAR_TO_REPEAT:
                 rmin, rmax = CHAR_TO_REPEAT[char]
                 if last is None:
-                    raise SyntaxError('Repeatition character (%s) without previous expression' % text[index])
+                    raise SyntaxError('Repetition character (%s) without previous expression' % text[index])
                 new_regex = RegexRepeat(last, rmin, rmax)
                 last = None
                 index += 1
