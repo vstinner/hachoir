@@ -1,13 +1,13 @@
 #!/usr/bin/env python2.4
 
-from hachoir.editor import (createEditor as hachoirCreateEditor,
+from hachoir_editor import (createEditor as hachoirCreateEditor,
     NewFieldSet, EditableInteger, EditableString, EditableBytes)
-from hachoir.stream import FileOutputStream
-from hachoir.error import HachoirError
+from hachoir_core.stream import FileOutputStream
+from hachoir_core.error import HachoirError
 from hachoir_parser import createParser
 from hachoir_parser.image import PngFile
 from hachoir_parser.audio import MpegAudioFile
-import sys
+from sys import argv, stdin, stdout, stderr, exit
 import zlib
 
 class InjecterError(HachoirError):
@@ -123,7 +123,11 @@ injecter_cls = {
 }
 
 def main():
-    filename = unicode(sys.argv[1])
+    if len(argv) != 2:
+        print >>stderr, "usage: %s music.mp3" % argv[0]
+        exit(1)
+
+    filename = unicode(argv[1])
     editor = createEditor(filename)
 #    injecter = injecter_cls[editor.input.__class__]
     injecter = MpegAudioInjecter(editor, packet_size=16)
@@ -131,14 +135,16 @@ def main():
     if False:
         data = injecter.read()
         if data:
-            sys.stdout.write(data)
-            sys.exit(0)
+            stdout.write(data)
+            exit(0)
         else:
-            print >>sys.stderr, "No data"
-            sys.exit(1)
+            print >>stderr, "No data"
+            exit(1)
     else:
         out_filename = filename + ".msg"
-        data = sys.stdin.read()
+        print "Write your message and valid with CTRL+D:"
+        stdout.flush()
+        data = stdin.read()
 
         print "Hide message"
         injecter.write(data)
