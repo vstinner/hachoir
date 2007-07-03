@@ -108,7 +108,7 @@ class ISO9660(Parser):
         return True
 
     def createFields(self):
-        yield self.seekByte(self.NULL_BYTES)
+        yield self.seekByte(self.NULL_BYTES, null=True)
 
         while True:
             volume = Volume(self, "volume[]")
