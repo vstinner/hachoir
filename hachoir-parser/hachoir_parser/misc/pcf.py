@@ -129,7 +129,7 @@ class PcfFile(Parser):
     tags = {
         "id": "pcf",
         "category": "misc",
-        "file_ext": (".pcf",),
+        "file_ext": ("pcf",),
         "magic": ((MAGIC, 0),),
         "min_size": 32, # FIXME
         "description": "X11 Portable Compiled Font (pcf)",

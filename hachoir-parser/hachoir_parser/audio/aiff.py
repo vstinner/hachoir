@@ -94,7 +94,7 @@ class AiffFile(Parser):
     tags = {
         "id": "aiff",
         "category": "audio",
-        "file_ext": ("aif", "aiff", ".aifc"),
+        "file_ext": ("aif", "aiff", "aifc"),
         "mime": (u"audio/x-aiff",),
         "magic_regex": (("FORM.{4}AIF[CF]", 0),),
         "min_size": 12*8,
