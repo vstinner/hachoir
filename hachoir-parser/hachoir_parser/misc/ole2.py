@@ -21,9 +21,9 @@ Creation: 2006-04-23
 
 from hachoir_parser import HachoirParser
 from hachoir_core.field import (
-    FieldSet, ParserError, RootSeekableFieldSet,
+    FieldSet, ParserError, SeekableFieldSet, RootSeekableFieldSet,
     UInt8, UInt16, Int32, UInt32, UInt64, TimestampWin64, Enum,
-    Bytes, RawBytes, NullBytes, String)
+    Bytes, RawBytes, PaddingBytes, NullBytes, String)
 from hachoir_core.text_handler import textHandler, hexadecimal, filesizeHandler
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_parser.common.win32 import GUID
@@ -36,19 +36,19 @@ MAX_BIG_BLOCK_LOG2 = 14  # 64 kB
 # Number of items in DIFAT
 NB_DIFAT = 109
 
-class SECT(Int32):
-    END_OF_CHAIN = -2
-    UNUSED = -1
+class SECT(UInt32):
+    END_OF_CHAIN = 0xFFFFFFFE
+    UNUSED = 0xFFFFFFFF
 
     special_value_name = {
-        UNUSED: "none",
-        END_OF_CHAIN: "end of a chain",
-        -4: "DIFAT sector (in a FAT)",
-        -3: "FAT sector (in a FAT)",
+        UNUSED: "none",                        # -1
+        END_OF_CHAIN: "end of a chain",        # -2
+        0xFFFFFFFD: "FAT sector (in a FAT)",   # -3
+        0xFFFFFFFC: "DIFAT sector (in a FAT)", # -4
     }
 
     def __init__(self, parent, name, description=None):
-        Int32.__init__(self, parent, name, description)
+        UInt32.__init__(self, parent, name, description)
 
     def createDisplay(self):
         val = self.value
@@ -75,24 +75,44 @@ class Property(FieldSet):
             charset = "UTF-16-BE"
         else:
             charset = "UTF-16-LE"
-        yield String(self, "name", 64, charset=charset, strip="\0")
+        yield String(self, "name", 64, charset=charset, truncate="\0")
         yield UInt16(self, "namelen", "Length of the name")
         yield Enum(UInt8(self, "type", "Property type"), self.TYPE_NAME)
         yield Enum(UInt8(self, "decorator", "Decorator"), self.DECORATOR_NAME)
         yield SECT(self, "left")
         yield SECT(self, "right")
-        yield SECT(self, "child")
-        yield GUID(self, "clsid", "CLSID of this storage")
+        yield SECT(self, "child", "Child node (valid for storage and root types)")
+        yield GUID(self, "clsid", "CLSID of this storage (valid for storage and root types)")
         yield NullBytes(self, "flags", 4, "User flags")
-        yield TimestampWin64(self, "creation", "Creation timestamp")
-        yield TimestampWin64(self, "lastmod", "Modify timestamp")
-        yield SECT(self, "start", "Starting SECT of the stream")
-        yield filesizeHandler(UInt64(self, "size", "Size in bytes"))
+        yield TimestampWin64(self, "creation", "Creation timestamp(valid for storage and root types)")
+        yield TimestampWin64(self, "lastmod", "Modify timestamp (valid for storage and root types)")
+        yield SECT(self, "start", "Starting SECT of the stream (valid for stream and root types)")
+        if self["/"]["/header/bb_shift"].value == 9:
+            yield filesizeHandler(UInt32(self, "size", "Size in bytes (valid for stream and root types)"))
+            yield PaddingBytes(self, "padding")
+        else:
+            yield filesizeHandler(UInt64(self, "size", "Size in bytes (valid for stream and root types)"))
 
     def createDescription(self):
         name = self["name"].display
         size = self["size"].display
         return "Property: %s (%s)" % (name, size)
+
+class DIFat(SeekableFieldSet):
+    def __init__(self, parent, name, db_start, db_count, description=None):
+        SeekableFieldSet.__init__(self, parent, name, description)
+        self.start=db_start
+        self.count=db_count
+
+    def createFields(self):
+        for index in xrange(NB_DIFAT):
+            yield SECT(self, "index[%u]" % index)
+
+        for index in xrange(self.count):
+            # this is relative to real DIFAT start
+            self.seekBit(NB_DIFAT * SECT.static_size+self.parent.sector_size*(self.start+index))
+            for sect_index in xrange(NB_DIFAT*(index+1),NB_DIFAT*(index+2)):
+                yield SECT(self, "index[%u]" % sect_index)
 
 class Header(FieldSet):
     static_size = 68 * 8
@@ -100,10 +120,10 @@ class Header(FieldSet):
         yield GUID(self, "clsid", "16 bytes GUID used by some apps")
         yield UInt16(self, "ver_min", "Minor version")
         yield UInt16(self, "ver_maj", "Minor version")
-        yield textHandler(UInt16(self, "endian", "Endian (0xFFFE for Intel)"), hexadecimal)
+        yield Bytes(self, "endian", 2, "Endian (0xFFFE for Intel)")
         yield UInt16(self, "bb_shift", "Log, base 2, of the big block size")
         yield UInt16(self, "sb_shift", "Log, base 2, of the small block size")
-        yield NullBytes(self, "reserverd[]", 6, "(reserved)")
+        yield NullBytes(self, "reserved[]", 6, "(reserved)")
         yield UInt32(self, "csectdir", "Number of SECTs in directory chain for 4 KB sectors (version 4)")
         yield UInt32(self, "bb_count", "Number of Big Block Depot blocks")
         yield SECT(self, "bb_start", "Root start block")
@@ -134,11 +154,14 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
         "file_ext": (
             "doc", "dot",                # Microsoft Word
             "ppt", "ppz", "pps", "pot",  # Microsoft Powerpoint
-            "xls", "xla"),               # Microsoft Excel
+            "xls", "xla",                # Microsoft Excel
+            "msi",                       # Windows installer
+        ),
         "mime": (
             u"application/msword",
             u"application/msexcel",
-            u"application/mspowerpoint"),
+            u"application/mspowerpoint",
+        ),
         "min_size": 512*8,
         "description": "Microsoft Office document",
         "magic": (("\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1", 0),),
@@ -154,8 +177,8 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
             return "Invalid magic"
         if self["header/ver_maj"].value not in (3, 4):
             return "Unknown major version (%s)" % self["header/ver_maj"].value
-        if self["header/endian"].value != 0xFFFE:
-            return "Unknown endian (0x%x)" % self["header/endian"].value
+        if self["header/endian"].value not in ("\xFF\xFE", "\xFE\xFF"):
+            return "Unknown endian (%s)" % self["header/endian"].raw_display
         if not(MIN_BIG_BLOCK_LOG2 <= self["header/bb_shift"].value <= MAX_BIG_BLOCK_LOG2):
             return "Invalid (log 2 of) big block size (%s)" % self["header/bb_shift"].value
         if self["header/bb_shift"].value < self["header/sb_shift"].value:
@@ -177,7 +200,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
         self.ss_size = (8 << header["sb_shift"].value)
 
         # Read DIFAT (one level of indirection)
-        yield SectFat(self, "difat", 0, NB_DIFAT, "Double Indirection FAT")
+        yield DIFat(self, "difat",  header["db_start"].value, header["db_count"].value, "Double Indirection FAT")
 
         # Read FAT (one level of indirection)
         for field in self.readBFAT():
