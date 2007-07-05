@@ -142,11 +142,17 @@ class Dict(object):
                 % (index, len(self._value_list)))
         del self._value_list[index]
         del self._key_list[index]
-        for k, i in self._index.items():
-            if i > index:
-                self._index[k] -= 1
-            elif i == index:
-                del self._index[k]
+
+        # First loop which may alter self._index
+        for key, item_index in self._index.iteritems():
+            if item_index == index:
+                del self._index[key]
+                break
+
+        # Second loop update indexes
+        for key, item_index in self._index.iteritems():
+            if index < item_index:
+                self._index[key] -= 1
 
     def insert(self, index, key, value):
         """
