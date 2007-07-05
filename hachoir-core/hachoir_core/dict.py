@@ -170,9 +170,9 @@ class Dict(object):
             index += len(self._value_list)
         if not(0 <= index <= len(self._value_list)):
             raise IndexError(_("Insert error: index '%s' is invalid") % _index)
-        for k, i in self._index.items():
-            if i >= index:
-                self._index[k] += 1
+        for item_key, item_index in self._index.iteritems():
+            if item_index >= index:
+                self._index[item_key] += 1
         self._index[key] = index
         self._key_list.insert(index, key)
         self._value_list.insert(index, value)
