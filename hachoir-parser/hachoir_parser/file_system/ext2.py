@@ -18,6 +18,7 @@ from hachoir_core.tools import (alignValue,
     humanDuration, humanFilesize)
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.text_handler import textHandler
+from itertools import izip
 
 class DirectoryEntry(FieldSet):
     file_type = {
@@ -111,7 +112,7 @@ class Inode(FieldSet):
         mode = [ "-"  for index in xrange(10) ]
         index = 1
         for loop in xrange(3):
-            for name, letter in zip(names[loop], letters):
+            for name, letter in izip(names[loop], letters):
                 if self[name].value:
                     mode[index] = letter
                 index += 1
@@ -119,7 +120,6 @@ class Inode(FieldSet):
         if file_type in self.file_type_letter:
             mode[0] = self.file_type_letter[file_type]
         return "".join(mode)
-
 
     def createFields(self):
         # File mode

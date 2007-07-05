@@ -541,6 +541,7 @@ class EBML(FieldSet):
                     yield EBML(self, val)
 
 class MkvFile(Parser):
+    EBML_SIGNATURE = 0x1A45DFA3
     tags = {
         "id": "matroska",
         "category": "container",
@@ -553,7 +554,7 @@ class MkvFile(Parser):
     endian = BIG_ENDIAN
 
     def validate(self):
-        if self.stream.readBits(0, 32, self.endian) != ebml.keys()[0]:
+        if self.stream.readBits(0, 32, self.endian) != self.EBML_SIGNATURE:
             return False
         try:
             first = self[0]

@@ -262,6 +262,7 @@ def checkExt2(parser): return (
     checkValue(parser, "/group_desc/group[0]/free_blocks_count", 44),
     checkValue(parser, "/group[0]/block_bitmap/item[9]", False),
     checkDisplay(parser, "/group[0]/inode_table/inode[1]/file_type", "Directory"),
+    checkDesc(parser, "/group[0]/inode_table/inode[10]", u"Inode 11: file, size=1024 bytes, mode=drwxr-xr-x"),
     checkValue(parser, "/group[0]/inode_table/inode[11]/size", 1816),
     checkDisplay(parser, "/group[0]/inode_table/inode[11]/ctime", u'2006-12-04 23:22:00'),
 )
