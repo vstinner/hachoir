@@ -32,6 +32,8 @@ class RiffMetadata(MultipleMetadata):
         elif type == "AVI ":
             if "headers" in riff:
                 self.extractAVI(riff["headers"])
+        elif type == "ACON":
+            self.extractAnim(riff)
         if "info" in riff:
             self.extractInfo(riff["info"])
 
@@ -152,6 +154,21 @@ class RiffMetadata(MultipleMetadata):
         if "/index" in headers:
             self.comment = _("Has audio/video index (%s)") \
                 % humanFilesize(headers["/index"].size/8)
+
+    @fault_tolerant
+    def extractAnim(self, riff):
+        if "anim_rate/rate[0]" in riff:
+            count = 0
+            total = 0
+            for rate in riff.array("anim_rate/rate"):
+                count += 1
+                if 100 < count:
+                    break
+                total += rate.value / 60.0
+            if count and total:
+                self.frame_rate = count / total
+        if not self.has("frame_rate") and "anim_hdr/jiffie_rate" in riff:
+            self.frame_rate = 60.0 / riff["anim_hdr/jiffie_rate"].value
 
 registerExtractor(RiffFile, RiffMetadata)
 

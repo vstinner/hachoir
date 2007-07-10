@@ -303,8 +303,8 @@ class ChunkWAVE(Chunk):
     })
 
 def parseAnimationHeader(self):
-    yield UInt32(self, "size", "Size of header (36 bytes)")
-    if self["size"].value != 36:
+    yield UInt32(self, "hdr_size", "Size of header (36 bytes)")
+    if self["hdr_size"].value != 36:
         self.warning("Animation header with unknown size (%s)" % self["size"].value)
     yield UInt32(self, "nb_frame", "Number of unique Icons in this cursor")
     yield UInt32(self, "nb_step", "Number of Blits before the animation cycles")
@@ -360,7 +360,7 @@ class RiffFile(Parser):
         "WAVE": (ChunkWAVE, u"audio/x-wav",     u"Microsoft WAVE audio", ".wav"),
         "CDDA": (ChunkCDDA, u"audio/x-cda",     u"Microsoft Windows audio CD file (cda)", ".cda"),
         "AVI ": (ChunkAVI,  u"video/x-msvideo", u"Microsoft AVI video", ".avi"),
-        "ACON": (ChunkACON,  None, u"Microsoft Windows animated cursor", ".ani"),
+        "ACON": (ChunkACON, u"image/x-ani",     u"Microsoft Windows animated cursor", ".ani"),
     }
     endian = LITTLE_ENDIAN
 
