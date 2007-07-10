@@ -28,6 +28,11 @@ Search all subfiles and store them in /tmp/subfiles/:
 
     hachoir-subfile input /tmp/subfiles/
 
+Other options:
+
+ * --offset: start search at specified offset in bytes
+ * --size: limit search to specified size in bytes
+
 Search speed is proportional to the number of used parsers.
 
 Examples
