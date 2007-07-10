@@ -55,9 +55,9 @@ def main():
     if use_setuptools:
         install_options["zip_safe"] = True
         install_options["install_requires"] = (
-            "hachoir-core>=0.7.2",
-            "hachoir-parser>=0.8.1",
-            "hachoir-regex>=0.0.0")
+            "hachoir-core>=1.0",
+            "hachoir-parser>=1.0",
+            "hachoir-regex>=1.0")
 
     # Call main() setup function
     setup(**install_options)
