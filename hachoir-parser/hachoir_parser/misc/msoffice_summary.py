@@ -2,7 +2,7 @@ from hachoir_parser import HachoirParser
 from hachoir_core.field import (FieldSet, ParserError,
     RootSeekableFieldSet, SeekableFieldSet,
     Bit, Bits, NullBits,
-    UInt16, UInt32, TimestampWin64, Enum,
+    UInt8, UInt16, UInt32, TimestampWin64, Enum,
     Bytes, RawBytes, NullBytes, String,
     Int8, Int16, Int32, Float32, Float64, PascalString32)
 from hachoir_core.text_handler import textHandler, hexadecimal, filesizeHandler
