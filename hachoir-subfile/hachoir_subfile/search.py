@@ -9,7 +9,8 @@ from sys import stderr
 from time import time
 
 def skipSubfile(parser):
-    return ("subfile" in parser.tags) and (parser.tags["subfile"] == "skip")
+    subfile = parser.getParserTags().get("subfile", "")
+    return (subfile == "skip")
 
 FILE_MAX_SIZE = 100 * 1024 * 1024   # Max. file size in bytes (100 MB)
 SLICE_SIZE = 64*1024                # Slice size in bytes (64 KB)

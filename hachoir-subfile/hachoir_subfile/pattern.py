@@ -14,12 +14,12 @@ class HachoirPatternMatching(PatternMatching):
 
         # Create string patterns
         for parser in parser_list:
-            for (magic, offset) in parser.getTags().get("magic",()):
+            for (magic, offset) in parser.getParserTags().get("magic",()):
                 self.addString(magic, (offset, parser))
 
         # Create regex patterns
         for parser in parser_list:
-            for (regex, offset) in parser.getTags().get("magic_regex",()):
+            for (regex, offset) in parser.getParserTags().get("magic_regex",()):
                 self.addRegex(regex, (offset, parser))
         self.commit()
 
