@@ -2,7 +2,15 @@ hachoir-subfile is a tool based on hachoir-parser to find subfiles in any binary
 
 Website: http://hachoir.org/wiki/hachoir-subfile
 
-== Usage ==
+Changelog
+=========
+
+2007-07-12:
+
+ * First public version
+
+Usage
+=====
 
 # Just search JPEG images
 $ hachoir-subfile input --parser=jpeg
