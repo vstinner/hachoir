@@ -43,7 +43,7 @@ def main():
         "package_dir": PACKAGES,
     }
     if use_setuptools:
-        install_options["install_requires"] = "hachoir-core>=0.9.0"
+        install_options["install_requires"] = "hachoir-core>=1.0"
         install_options["zip_safe"] = True
     setup(**install_options)
 

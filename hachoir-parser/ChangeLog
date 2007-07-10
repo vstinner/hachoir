@@ -1,3 +1,32 @@
+What's new in hachoir-parser 1.0?
+=================================
+
+Changes:
+
+ * OLE2: Support file bigger than 6 MB (support many DIFAT blocks)
+ * OLE2: Add ".msi" file extension
+ * OLE2: Add createContentSize() to guess content size
+ * OLE2: Fix to support documents generated on Mac
+ * LNK: Improve parser a lot
+ * Fix many spelling mistakes
+ * EXE PE: Add more subsystem names
+ * PYC: Support new version (2.5c2), fix long integer parser (support
+   negative number), add (disabled) code to disassemble bytecode, use
+   self.code_info to avoid replacing self.info
+
+Minor changes:
+
+ * EXIF: set max IFD entry count to 1000 (instead of 200)
+ * EXIF: don't limit BYTE/UNDEFINED IFD entry count
+ * EXIF: add "User comment" tag
+ * GIF: fix image and screen description
+ * bzip2: catch decompressor error to be able to read trailing data
+ * Fix file extensions of AIFF
+ * Windows GUID use new TimestampUUID60 field type
+ * RIFF: convert class constant names to upper case
+ * Fix RIFF: don't replace self.info method
+ * ISO9660: Write parser for terminator content
+
 What's new in hachoir-parser 0.10?
 ==================================
 
