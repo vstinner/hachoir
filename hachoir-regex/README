@@ -9,6 +9,12 @@ strings and regex at the same time.
 
 Website: http://hachoir.org/wiki/hachoir-regex
 
+Changelog
+=========
+
+ * 2007-06-28: Version 1.0.1: fix PatternMatching without any pattern
+ * 2007-06-28: Version 1.0 released
+
 Regex examples
 ==============
 
