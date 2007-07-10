@@ -414,7 +414,7 @@ class Trailer(FieldSet):
 
 class PDFDocument(Parser):
     endian = LITTLE_ENDIAN
-    tags = {
+    PARSER_TAGS = {
         "id": "pdf",
         "category": "misc",
         "file_ext": ("pdf",),

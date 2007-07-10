@@ -221,7 +221,7 @@ class Object(FieldSet):
             return self.code_info[2]
 
 class PythonCompiledFile(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "python",
         "category": "program",
         "file_ext": ("pyc", "pyo"),

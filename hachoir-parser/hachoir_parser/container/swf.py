@@ -332,7 +332,7 @@ class Tag(FieldSet):
 
 class SwfFile(Parser):
     VALID_VERSIONS = set(xrange(1, 8+1))
-    tags = {
+    PARSER_TAGS = {
         "id": "swf",
         "category": "container",
         "file_ext": ["swf"],
@@ -340,10 +340,10 @@ class SwfFile(Parser):
         "min_size": 64,
         "description": u"Macromedia Flash data"
     }
-    tags["magic"] = []
+    PARSER_TAGS["magic"] = []
     for version in VALID_VERSIONS:
-        tags["magic"].append(("FWS%c" % version, 0))
-        tags["magic"].append(("CWS%c" % version, 0))
+        PARSER_TAGS["magic"].append(("FWS%c" % version, 0))
+        PARSER_TAGS["magic"].append(("CWS%c" % version, 0))
     endian = LITTLE_ENDIAN
     SWF_SCALE_FACTOR = 1.0 / 20
 

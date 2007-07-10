@@ -59,7 +59,7 @@ class ParserList(object):
         return ""
 
     def add(self, parser):
-        tags = parser.getTags()
+        tags = parser.getParserTags()
         err = self.validParser(parser, tags)
         if err:
             error("Skip parser %s: %s" % (parser.__name__, err))
@@ -94,7 +94,7 @@ class ParserList(object):
             # Create file extension set
             extensions = set()
             for parser in self:
-                file_ext = parser.getTags().get(format, ())
+                file_ext = parser.getParserTags().get(format, ())
                 file_ext = list(file_ext)
                 try:
                     file_ext.remove("")
@@ -137,7 +137,7 @@ class ParserList(object):
         bycategory = self.bytag["category"]
         for category in sorted(bycategory.iterkeys()):
             if format == "one_line":
-                parser_list = [ parser.tags["id"] for parser in bycategory[category] ]
+                parser_list = [ parser.PARSER_TAGS["id"] for parser in bycategory[category] ]
                 parser_list.sort()
                 print "- %s: %s" % (category.title(), ", ".join(parser_list))
             else:
@@ -151,14 +151,14 @@ class ParserList(object):
                 else:
                     print "[%s]" % category
                 parser_list = sorted(bycategory[category],
-                    key=lambda parser: parser.tags["id"])
+                    key=lambda parser: parser.PARSER_TAGS["id"])
                 if format == "rest":
                     for parser in parser_list:
-                        tags = parser.getTags()
+                        tags = parser.getParserTags()
                         print "* %s: %s" % (tags["id"], tags["description"])
                 elif format == "trac":
                     for parser in parser_list:
-                        tags = parser.getTags()
+                        tags = parser.getParserTags()
                         desc = tags["description"]
                         desc = re.sub(r"([A-Z][a-z]+[A-Z][^ ]+)", r"!\1", desc)
                         print " * %s: %s" % (tags["id"], desc)

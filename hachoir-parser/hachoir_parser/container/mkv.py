@@ -542,7 +542,7 @@ class EBML(FieldSet):
 
 class MkvFile(Parser):
     EBML_SIGNATURE = 0x1A45DFA3
-    tags = {
+    PARSER_TAGS = {
         "id": "matroska",
         "category": "container",
         "file_ext": ("mka", "mkv"),

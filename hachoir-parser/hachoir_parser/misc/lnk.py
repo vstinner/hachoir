@@ -486,7 +486,7 @@ def text_hot_key(field):
 
 class LnkFile(Parser):
     MAGIC = "\x4C\0\0\0\x01\x14\x02\x00\x00\x00\x00\x00\xc0\x00\x00\x00\x00\x00\x00\x46"
-    tags = {
+    PARSER_TAGS = {
         "id": "lnk",
         "category": "misc",
         "file_ext": ("lnk",),

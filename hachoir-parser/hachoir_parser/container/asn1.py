@@ -232,7 +232,7 @@ class Object(FieldSet):
                 yield RawBytes(self, "raw", size)
 
 class ASN1File(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "asn1",
         "category": "container",
         "file_ext": ("der",),

@@ -243,7 +243,7 @@ class Chunk(FieldSet):
         return "Chunk: tag %s" % self["tag"].display
 
 class MPEGVideoFile(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "mpeg_video",
         "category": "video",
         "file_ext": ("mpeg", "mpg", "mpe", "vob"),

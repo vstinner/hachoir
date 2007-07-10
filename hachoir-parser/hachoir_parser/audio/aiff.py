@@ -91,7 +91,7 @@ class Chunk(FieldSet):
                 yield RawBytes(self, "data", size)
 
 class AiffFile(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "aiff",
         "category": "audio",
         "file_ext": ("aif", "aiff", "aifc"),

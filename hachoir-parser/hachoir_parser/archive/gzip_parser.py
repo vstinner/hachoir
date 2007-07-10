@@ -15,7 +15,7 @@ from hachoir_parser.common.deflate import Deflate
 
 class GzipParser(Parser):
     endian = LITTLE_ENDIAN
-    tags = {
+    PARSER_TAGS = {
         "id": "gzip",
         "category": "archive",
         "file_ext": ("gz",),

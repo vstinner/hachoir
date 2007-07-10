@@ -142,7 +142,7 @@ def Entry(parent, name):
 class TorrentFile(Parser):
     endian = LITTLE_ENDIAN
     MAGIC = "d8:announce"
-    tags = {
+    PARSER_TAGS = {
         "id": "torrent",
         "category": "misc",
         "file_ext": ("torrent",),

@@ -57,7 +57,7 @@ class MSDosHeader(FieldSet):
         return ""
 
 class ExeFile(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "exe",
         "category": "program",
         "file_ext": ("exe", "dll", "ocx"),

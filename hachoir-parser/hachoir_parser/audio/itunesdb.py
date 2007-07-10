@@ -396,7 +396,7 @@ class DataBase(FieldSet):
 #    def createFields(self):
 
 class ITunesDBFile(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "itunesdb",
         "category": "audio",
         "min_size": 44*8,

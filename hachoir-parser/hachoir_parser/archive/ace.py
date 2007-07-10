@@ -248,7 +248,7 @@ class Block(FieldSet):
 
 class AceFile(Parser):
     endian = LITTLE_ENDIAN
-    tags = {
+    PARSER_TAGS = {
         "id": "ace",
         "category": "archive",
         "file_ext": ("ace",),

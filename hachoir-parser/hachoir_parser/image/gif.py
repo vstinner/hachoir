@@ -141,7 +141,7 @@ class GifFile(Parser):
         ",": "Image",
         ";": "Terminator"
     }
-    tags = {
+    PARSER_TAGS = {
         "id": "gif",
         "category": "image",
         "file_ext": ("gif",),

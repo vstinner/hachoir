@@ -155,7 +155,7 @@ class Chunk(FieldSet):
 
 class File3ds(Parser):
     endian = LITTLE_ENDIAN
-    tags = {
+    PARSER_TAGS = {
         "id": "3ds",
         "category": "misc",
         "file_ext": ("3ds",),

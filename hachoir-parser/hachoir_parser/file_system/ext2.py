@@ -390,7 +390,7 @@ class EXT2_FS(Parser):
        * superblock: Most important block, store most important informations
        * ...
     """
-    tags = {
+    PARSER_TAGS = {
         "id": "ext2",
         "category": "file_system",
         "description": "EXT2/EXT3 file system",

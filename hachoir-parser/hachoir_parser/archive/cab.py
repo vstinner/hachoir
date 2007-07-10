@@ -69,7 +69,7 @@ class Flags(FieldSet):
 class CabFile(Parser):
     endian = LITTLE_ENDIAN
     MAGIC = "MSCF"
-    tags = {
+    PARSER_TAGS = {
         "id": "cab",
         "category": "archive",
         "file_ext": ("cab",),

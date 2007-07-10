@@ -23,7 +23,7 @@ class Config(FieldSet):
 
 class PsdFile(Parser):
     endian = BIG_ENDIAN
-    tags = {
+    PARSER_TAGS = {
         "id": "psd",
         "category": "image",
         "file_ext": ("psd",),

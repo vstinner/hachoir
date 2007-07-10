@@ -265,7 +265,7 @@ class JpegChunk(FieldSet):
 
 class JpegFile(Parser):
     endian = BIG_ENDIAN
-    tags = {
+    PARSER_TAGS = {
         "id": "jpeg",
         "category": "image",
         "file_ext": ("jpg", "jpeg"),

@@ -126,7 +126,7 @@ class Properties(GlyphNames):
 
 class PcfFile(Parser):
     MAGIC = "\1fcp"
-    tags = {
+    PARSER_TAGS = {
         "id": "pcf",
         "category": "misc",
         "file_ext": ("pcf",),

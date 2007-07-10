@@ -175,7 +175,7 @@ class Materials(FieldSet):
         return 'Material file names (%s)' % self["count"].value
 
 class File3do(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "3do",
         "category": "misc",
         "file_ext": ("3do",),

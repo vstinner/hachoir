@@ -27,7 +27,7 @@ class FileIndex(FieldSet):
 
 class MarFile(Parser):
     MAGIC = "MARC"
-    tags = {
+    PARSER_TAGS = {
         "id": "mar",
         "category": "archive",
         "file_ext": ("mar",),

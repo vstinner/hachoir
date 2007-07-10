@@ -208,7 +208,7 @@ class ZSTppu(FieldSet):
         yield PaddingBytes(self, "tempdat", 477, "Reserved/Unused")
 
 class ZSNESFile(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "zsnes",
         "category": "game",
         "description": "ZSNES Save State File (only version 143)",

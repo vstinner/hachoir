@@ -323,7 +323,7 @@ class Block(FieldSet):
 
 class RarFile(Parser):
     MAGIC = "Rar!\x1A\x07\x00"
-    tags = {
+    PARSER_TAGS = {
         "id": "rar",
         "category": "archive",
         "file_ext": ("rar",),

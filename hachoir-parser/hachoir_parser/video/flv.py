@@ -122,7 +122,7 @@ class Chunk(FieldSet):
             return None
 
 class FlvFile(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "flv",
         "category": "video",
         "file_ext": ("flv",),

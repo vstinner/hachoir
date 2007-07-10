@@ -184,7 +184,7 @@ class Atom(FieldSet):
         return "Atom: %s" % self["tag"].value
 
 class MovFile(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "mov",
         "category": "video",
         "file_ext": ("mov", "qt", "mp4", "m4v", "m4a", "m4p", "m4b"),

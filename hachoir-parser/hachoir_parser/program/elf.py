@@ -130,7 +130,7 @@ def sortSection(a, b):
 #            chunk.description = "ELF section (in file: %s..%s)" % (ofs, ofs+size)
 
 class ElfFile(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "elf",
         "category": "program",
         "file_ext": ("so", ""),

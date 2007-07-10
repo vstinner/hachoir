@@ -486,7 +486,7 @@ class EMF_Header(FieldSet):
             yield RawBytes(self, "padding", size)
 
 class WMF_File(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "wmf",
         "category": "image",
         "file_ext": ("wmf", "apm", "emf"),

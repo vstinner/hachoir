@@ -245,7 +245,7 @@ class SummaryIndex(FieldSet):
         yield UInt32(self, "offset")
 
 class Summary(HachoirParser, RootSeekableFieldSet):
-    tags = {
+    PARSER_TAGS = {
         "description": "Microsoft Office document subfragments",
     }
     endian = LITTLE_ENDIAN

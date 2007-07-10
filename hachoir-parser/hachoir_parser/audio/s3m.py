@@ -636,7 +636,7 @@ class Module(Parser):
 
 
 class S3MModule(Module):
-    tags = {
+    PARSER_TAGS = {
         "id": "s3m",
         "category": "audio",
         "file_ext": ("s3m",),
@@ -658,7 +658,7 @@ class S3MModule(Module):
 ##            addr = self.absolute_address + 8*offset
 
 class PTMModule(Module):
-    tags = {
+    PARSER_TAGS = {
         "id": "ptm",
         "category": "audio",
         "file_ext": ("ptm",),

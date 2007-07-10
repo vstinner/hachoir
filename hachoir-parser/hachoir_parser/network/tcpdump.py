@@ -426,7 +426,7 @@ class Packet(FieldSet):
         return "".join(text)
 
 class TcpdumpFile(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "tcpdump",
         "category": "misc",
         "min_size": 24*8,

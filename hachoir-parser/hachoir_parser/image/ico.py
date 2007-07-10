@@ -62,7 +62,7 @@ class IconData(FieldSet):
 
 class IcoFile(Parser):
     endian = LITTLE_ENDIAN
-    tags = {
+    PARSER_TAGS = {
         "id": "ico",
         "category": "image",
         "file_ext": ("ico", "cur"),

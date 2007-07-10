@@ -65,7 +65,7 @@ class Packet(FieldSet):
         return ""
 
 class MPEG_TS(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "mpeg_ts",
         "category": "video",
         "file_ext": ("ts",),

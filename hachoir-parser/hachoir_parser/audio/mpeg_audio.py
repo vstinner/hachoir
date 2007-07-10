@@ -271,7 +271,7 @@ def createMpegAudioMagic():
     return magics
 
 class MpegAudioFile(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "mpeg_audio",
         "category": "audio",
         "file_ext": ("mpa", "mp1", "mp2", "mp3"),

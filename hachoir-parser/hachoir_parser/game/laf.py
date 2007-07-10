@@ -45,7 +45,7 @@ class CharInfo(FieldSet):
     yield UInt32(self, "height_pixels")
 
 class LafFile(Parser):
-  tags = {
+  PARSER_TAGS = {
     "id": "lucasarts_font",
     "category": "game",
     "file_ext" : ("laf",),

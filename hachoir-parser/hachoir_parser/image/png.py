@@ -228,7 +228,7 @@ class Chunk(FieldSet):
             return "Chunk: %s" % self["tag"].display
 
 class PngFile(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "png",
         "category": "image",
         "file_ext": ("png",),

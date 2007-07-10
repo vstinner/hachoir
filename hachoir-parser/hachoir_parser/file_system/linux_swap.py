@@ -38,7 +38,7 @@ class UUID(Bytes):
             text[:8], text[8:12], text[12:16], text[16:20], text[20:])
 
 class LinuxSwapFile(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "linux_swap",
         "file_ext": ("",),
         "category": "file_system",

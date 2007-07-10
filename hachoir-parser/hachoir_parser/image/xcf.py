@@ -253,7 +253,7 @@ def readProperties(parser):
             return
 
 class XcfFile(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "xcf",
         "category": "image",
         "file_ext": ("xcf",),

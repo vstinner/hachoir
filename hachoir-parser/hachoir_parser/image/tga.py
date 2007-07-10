@@ -33,7 +33,7 @@ class Pixels(FieldSet):
             yield Line(self, "line[%u]" % y)
 
 class TargaFile(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "targa",
         "category": "image",
         "file_ext": ("tga",),

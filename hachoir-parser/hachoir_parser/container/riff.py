@@ -341,7 +341,7 @@ class ChunkACON(Chunk):
     })
 
 class RiffFile(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "riff",
         "category": "container",
         "file_ext": ("avi", "cda", "wav", "ani"),

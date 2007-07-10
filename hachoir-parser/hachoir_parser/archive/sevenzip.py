@@ -372,7 +372,7 @@ class SignatureHeader(FieldSet):
         yield StartHeader(self, "start_hdr", "Start header")
 
 class SevenZipParser(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "7zip",
         "category": "archive",
         "file_ext": ("7z",),

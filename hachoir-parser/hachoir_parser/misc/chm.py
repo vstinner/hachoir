@@ -165,7 +165,7 @@ class Directory(FieldSet):
             yield PMGI(self, "pmgi", size=block_size)
 
 class ChmFile(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "chm",
         "category": "misc",
         "file_ext": ("chm",),

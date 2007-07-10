@@ -32,7 +32,7 @@ class HachoirParser(object):
         validate = args.pop("validate", False)
         self._mime_type = None
         while validate:
-            nbits = self.getTags()["min_size"]
+            nbits = self.getParserTags()["min_size"]
             if stream.sizeGe(nbits):
                 res = self.validate()
                 if res is True:
@@ -48,7 +48,7 @@ class HachoirParser(object):
         """
         Create an Unicode description
         """
-        return self.tags["description"]
+        return self.PARSER_TAGS["description"]
 
     def createMimeType(self):
         """
@@ -56,8 +56,8 @@ class HachoirParser(object):
 
         If it returns None, "application/octet-stream" is used.
         """
-        if "mime" in self.tags:
-            return self.tags["mime"][0]
+        if "mime" in self.PARSER_TAGS:
+            return self.PARSER_TAGS["mime"][0]
         return None
 
     def validate(self):
@@ -79,7 +79,7 @@ class HachoirParser(object):
             except HACHOIR_ERRORS, err:
                 error("Error getting description of %s: %s" \
                     % (self.path, unicode(err)))
-                self._description = self.tags["description"]
+                self._description = self.PARSER_TAGS["description"]
         return self._description
     description = property(_getDescription,
     doc="Description of the parser")
@@ -112,10 +112,10 @@ class HachoirParser(object):
 
     def createFilenameSuffix(self):
         """
-        Create filename suffix: "." + first value of self.tags["file_ext"],
-        or None if self.tags["file_ext"] doesn't exist.
+        Create filename suffix: "." + first value of self.PARSER_TAGS["file_ext"],
+        or None if self.PARSER_TAGS["file_ext"] doesn't exist.
         """
-        file_ext = self.getTags().get("file_ext")
+        file_ext = self.getParserTags().get("file_ext")
         if isinstance(file_ext, (tuple, list)):
             file_ext = file_ext[0]
         return file_ext and '.' + file_ext
@@ -126,16 +126,16 @@ class HachoirParser(object):
     filename_suffix = property(_getFilenameSuffix)
 
     @classmethod
-    def getTags(cls):
+    def getParserTags(cls):
         tags = {}
         for cls in reversed(getmro(cls)):
-            if hasattr(cls,"tags"):
-                tags.update(cls.tags)
+            if hasattr(cls, "PARSER_TAGS"):
+                tags.update(cls.PARSER_TAGS)
         return tags
 
     @classmethod
     def print_(cls, verbose):
-        tags = cls.getTags()
+        tags = cls.getParserTags()
         print "- %s: %s" % (tags["id"], tags["description"])
         if verbose:
             if "mime" in tags:

@@ -217,7 +217,7 @@ class PropertySet(FieldSet):
             yield NullBytes(self, "padding[]", size)
 
 class RpmFile(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "rpm",
         "category": "archive",
         "file_ext": ("rpm",),

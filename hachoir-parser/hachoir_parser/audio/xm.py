@@ -338,7 +338,7 @@ class Header(FieldSet):
             self["title"].value, self["tracker_name"].value)
 
 class XMModule(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "fasttracker2",
         "category": "audio",
         "file_ext": ("xm",),

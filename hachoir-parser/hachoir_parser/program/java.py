@@ -618,7 +618,7 @@ class JavaCompiledClassFile(Parser):
 
     endian = BIG_ENDIAN
 
-    tags = {
+    PARSER_TAGS = {
         "id": "java_class",
         "category": "program",
         "file_ext": ("class",),

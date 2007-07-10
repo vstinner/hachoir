@@ -315,7 +315,7 @@ class InodeGen:
 
 class FAT_FS(Parser):
     endian = LITTLE_ENDIAN
-    tags = {
+    PARSER_TAGS = {
         "category": "file_system",
         "min_size": 512*8,
         "file_ext": ("",),
@@ -398,7 +398,7 @@ class FAT_FS(Parser):
 
 
 class FAT12(FAT_FS):
-    tags = {
+    PARSER_TAGS = {
         "id": "fat12",
         "description": "FAT12 filesystem",
         "magic": (("FAT12   ", 54*8),),
@@ -410,7 +410,7 @@ class FAT12(FAT_FS):
 
 
 class FAT16(FAT_FS):
-    tags = {
+    PARSER_TAGS = {
         "id": "fat16",
         "description": "FAT16 filesystem",
         "magic": (("FAT16   ", 54*8),),
@@ -422,7 +422,7 @@ class FAT16(FAT_FS):
 
 
 class FAT32(FAT_FS):
-    tags = {
+    PARSER_TAGS = {
         "id": "fat32",
         "description": "FAT32 filesystem",
         "magic": (("FAT32   ", 82*8),),

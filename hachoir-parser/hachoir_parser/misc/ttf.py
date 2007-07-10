@@ -234,7 +234,7 @@ class Table(FieldSet):
 
 class TrueTypeFontFile(Parser):
     endian = BIG_ENDIAN
-    tags = {
+    PARSER_TAGS = {
         "id": "ttf",
         "category": "misc",
         "file_ext": ("ttf",),

@@ -211,7 +211,7 @@ class Partition(FieldSet):
 class MSDos_HardDrive(Parser, Partition):
     endian = LITTLE_ENDIAN
     MAGIC = "\x55\xAA"
-    tags = {
+    PARSER_TAGS = {
         "id": "msdos_harddrive",
         "category": "file_system",
         "description": "MS-DOS hard drive with Master Boot Record (MBR)",

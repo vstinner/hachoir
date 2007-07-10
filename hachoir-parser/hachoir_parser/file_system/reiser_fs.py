@@ -89,7 +89,7 @@ class SuperBlock(FieldSet):
         return "Superblock: ReiserFs Filesystem"
 
 class REISER_FS(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "reiserfs",
         "category": "file_system",
         # 130 blocks before the journal +

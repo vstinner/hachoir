@@ -23,7 +23,7 @@ class ArchiveFileEntry(FieldSet):
 class ArchiveFile(Parser):
     endian = BIG_ENDIAN
     MAGIC = '!<arch>\n'
-    tags = {
+    PARSER_TAGS = {
         "id": "unix_archive",
         "category": "archive",
         "file_ext": ("a", "deb"),

@@ -84,7 +84,7 @@ class FileEntry(FieldSet):
 
 class TarFile(Parser):
     endian = BIG_ENDIAN
-    tags = {
+    PARSER_TAGS = {
         "id": "tar",
         "category": "archive",
         "file_ext": ("tar",),

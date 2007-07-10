@@ -46,7 +46,7 @@ class Chunk(FieldSet):
                 yield RawBytes(self, "data", size)
 
 class SpiderManVideoFile(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "spiderman_video",
         "category": "game",
         "file_ext": ("bin",),

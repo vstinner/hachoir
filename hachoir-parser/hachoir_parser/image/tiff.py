@@ -87,7 +87,7 @@ class IFD(FieldSet):
             yield IFDEntry(self, "entry[]")
 
 class TiffFile(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "tiff",
         "category": "image",
         "file_ext": ("tif", "tiff"),

@@ -244,7 +244,7 @@ class OggPage(FieldSet):
         return ""
 
 class OggFile(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "ogg",
         "category": "container",
         "file_ext": ("ogg", "ogm"),
@@ -332,7 +332,7 @@ class OggFile(Parser):
 
 
 class OggStream(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "ogg_stream",
         "category": "container",
         "subfile": "skip",

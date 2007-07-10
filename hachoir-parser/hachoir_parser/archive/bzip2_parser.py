@@ -28,7 +28,7 @@ except ImportError:
     has_deflate = False
 
 class Bzip2Parser(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "bzip2",
         "category": "archive",
         "file_ext": ("bz2",),

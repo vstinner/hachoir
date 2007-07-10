@@ -148,7 +148,7 @@ class SectFat(FieldSet):
             yield SECT(self, "index[%u]" % i)
 
 class OLE2_File(HachoirParser, RootSeekableFieldSet):
-    tags = {
+    PARSER_TAGS = {
         "id": "ole2",
         "category": "misc",
         "file_ext": (

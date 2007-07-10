@@ -19,7 +19,7 @@ from hachoir_core.field import (ParserError,
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 
 class TODOFile(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "TODO",
         "category": "TODO",    # "archive", "audio", "container", ...
         "file_ext": ("TODO",), # TODO: Example ("bmp",) to parse the file "image.bmp"

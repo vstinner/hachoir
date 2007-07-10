@@ -109,7 +109,7 @@ class Pattern(FieldSet):
             yield Row(self, "row[]", self.channels)
 
 class AmigaModule(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "mod",
         "category": "audio",
         "file_ext": ("mod", "nst", "wow", "oct", "sd0" ),

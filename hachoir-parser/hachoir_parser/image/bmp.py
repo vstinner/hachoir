@@ -123,7 +123,7 @@ def parseImageData(parent, name, size, header):
     return RawBytes(parent, name, size)
 
 class BmpFile(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "bmp",
         "category": "image",
         "file_ext": ("bmp",),

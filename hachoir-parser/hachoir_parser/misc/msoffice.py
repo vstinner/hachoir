@@ -20,7 +20,7 @@ PROPERTY_NAME = {
 }
 
 class OfficeRootEntry(HachoirParser, RootSeekableFieldSet):
-    tags = {
+    PARSER_TAGS = {
         "description": "Microsoft Office document subfragments",
     }
     endian = LITTLE_ENDIAN

@@ -12,7 +12,7 @@ from hachoir_core.text_handler import displayHandler, filesizeHandler
 from hachoir_core.tools import createDict, humanFrequency
 
 class AuFile(Parser):
-    tags = {
+    PARSER_TAGS = {
         "id": "sun_next_snd",
         "category": "audio",
         "file_ext": ("au", "snd"),

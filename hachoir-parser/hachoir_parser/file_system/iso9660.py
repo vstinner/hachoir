@@ -94,7 +94,7 @@ class ISO9660(Parser):
     endian = LITTLE_ENDIAN
     MAGIC = "\x01CD001"
     NULL_BYTES = 0x8000
-    tags = {
+    PARSER_TAGS = {
         "id": "iso9660",
         "category": "file_system",
         "description": "ISO 9660 file system",

@@ -354,7 +354,7 @@ class ZipFile(Parser):
         u"application/vnd.oasis.opendocument.spreadsheet-template": "ots",
         u"application/vnd.oasis.opendocument.text-template": "ott",
     }
-    tags = {
+    PARSER_TAGS = {
         "id": "zip",
         "category": "archive",
         "file_ext": tuple(MIME_TYPES.itervalues()),
