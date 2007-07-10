@@ -46,9 +46,12 @@ class RootSeekableFieldSet(BasicFieldSet):
     size = property(_getSize)
 
     def _getField(self, key, const):
+        field = Field._getField(self, key, const)
+        if field is not None:
+            return field
         if key in self._field_dict:
             return self._field_dict[key]
-        if self._generator:
+        if self._generator and not const:
             try:
                 while True:
                     field = self._feedOne()
@@ -59,7 +62,7 @@ class RootSeekableFieldSet(BasicFieldSet):
             except HACHOIR_ERRORS, err:
                 self.error("Error: %s" % makeUnicode(err))
                 self._stopFeed()
-        raise MissingField(self, key)
+        return None
 
     def getField(self, key, const=True):
         if isinstance(key, (int, long)):
