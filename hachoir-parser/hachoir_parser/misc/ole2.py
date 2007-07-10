@@ -87,7 +87,7 @@ class Property(FieldSet):
         yield TimestampWin64(self, "creation", "Creation timestamp(valid for storage and root types)")
         yield TimestampWin64(self, "lastmod", "Modify timestamp (valid for storage and root types)")
         yield SECT(self, "start", "Starting SECT of the stream (valid for stream and root types)")
-        if self["/"]["/header/bb_shift"].value == 9:
+        if self["/header/bb_shift"].value == 9:
             yield filesizeHandler(UInt32(self, "size", "Size in bytes (valid for stream and root types)"))
             yield NullBytes(self, "padding", 4)
         else:
