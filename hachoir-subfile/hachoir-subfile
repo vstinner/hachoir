@@ -9,12 +9,10 @@ import hachoir_core
 from sys import exit
 from optparse import OptionGroup, OptionParser
 
-WEBSITE = "http://hachoir.org/wiki/hachoir-subfile"
-__version__ = "0.0.1"
-
 def displayVersion(*args):
-    print _("Hachoir subfile version %s") % __version__
-    print _("Hachoir library version %s") % hachoir_core.__version__
+    from hachoir_subfile.version import VERSION, WEBSITE
+    print _("Hachoir subfile version %s") % VERSION
+    print _("hachoir-core version %s") % hachoir_core.__version__
     print
     print _("Website: %s") % WEBSITE
     exit(0)

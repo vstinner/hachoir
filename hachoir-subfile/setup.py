@@ -40,7 +40,7 @@ def main():
 
     install_options = {
         "name": hachoir_subfile.PACKAGE,
-        "version": hachoir_subfile.__version__,
+        "version": hachoir_subfile.VERSION,
         "url": hachoir_subfile.WEBSITE,
         "download_url": hachoir_subfile.WEBSITE,
         "license": hachoir_subfile.LICENSE,
