@@ -26,6 +26,24 @@ Installation
 
 For the installation, use setup.py or see: http://hachoir.org/wiki/Install
 
+What's new in hachoir-core 1.0?
+===============================
+
+Visible changes:
+ * New field type: TimestampUUID60
+ * SeekableFieldSet: fix __getitem__() method and implement __iter__()
+   and __len__() methods, so it can now be used in hachoir-wx
+ * String value is always Unicode, even on conversion error: use
+ * OutputStream: add readBytes() method
+ * Create Language class using ISO-639-2
+ * Add hachoir_core.profiler module to run a profiler on a function
+ * Add hachoir_core.timeout module to call a function with a timeout
+
+Minor changes:
+ * Fix many spelling mistakes
+ * Dict: use iteritems() instead of items() for faster operations on
+   huge dictionaries
+
 What's new in hachoir-core 0.9?
 ===============================
 
