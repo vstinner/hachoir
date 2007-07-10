@@ -142,6 +142,9 @@ class PatternMatching:
         Search patterns in data.
         Return a generator of tuples: (start, end, item)
         """
+        if not self._max_length:
+            # No pattern: returns nothing
+            return
         for match in self.compiled_regex.finditer(data):
             item = self.getPattern(match.group(0))
             yield (match.start(0), match.end(0), item)
