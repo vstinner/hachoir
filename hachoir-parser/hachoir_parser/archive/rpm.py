@@ -11,6 +11,7 @@ from hachoir_core.field import (FieldSet, ParserError,
     Character, CString, String)
 from hachoir_core.endian import BIG_ENDIAN
 from hachoir_parser.archive.gzip_parser import GzipParser
+from hachoir_parser.archive.bzip2_parser import Bzip2Parser
 
 class ItemContent(FieldSet):
     format_type = {
@@ -259,5 +260,8 @@ class RpmFile(Parser):
 
         size = (self._size - self.current_size) // 8
         if size:
-            yield SubFile(self, "gz_content", size, "gzip content", parser=GzipParser)
+            if 3 <= size and self.stream.readBytes(self.current_size, 3) == "BZh":
+                yield SubFile(self, "content", size, "bzip2 content", parser=Bzip2Parser)
+            else:
+                yield SubFile(self, "content", size, "gzip content", parser=GzipParser)
 
