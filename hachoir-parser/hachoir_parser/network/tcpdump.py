@@ -270,8 +270,10 @@ class ICMP(FieldSet):
             return "ICMP (%s)" % self["type"].display
 
     def parseNext(self, parent):
-        # TODO: Parse rejected IPv4 packet (if type == self.REJECT)
-        return None
+        if self["type"].value == self.REJECT:
+            return IPv4(parent, "rejected_ipv4")
+        else:
+            return None
 
 class IPv4(Layer):
     endian = NETWORK_ENDIAN
@@ -413,12 +415,12 @@ class Packet(FieldSet):
         ts = self.getTimestamp() - t0
         #text = ["%1.6f: " % ts]
         text = ["%s: " % ts]
-        if "tcp" in self:
+        if "icmp" in self:
+            text.append(self["icmp"].description)
+        elif "tcp" in self:
             text.append(self["tcp"].description)
         elif "udp" in self:
             text.append(self["udp"].description)
-        elif "icmp" in self:
-            text.append(self["icmp"].description)
         elif "arp" in self:
             text.append(self["arp"].description)
         else:
