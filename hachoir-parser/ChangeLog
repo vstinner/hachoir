@@ -4,18 +4,18 @@ What's new in hachoir-parser 1.0?
 Changes:
 
  * OLE2: Support file bigger than 6 MB (support many DIFAT blocks)
- * OLE2: Add ".msi" file extension
  * OLE2: Add createContentSize() to guess content size
- * OLE2: Fix to support documents generated on Mac
- * LNK: Improve parser a lot
- * Fix many spelling mistakes
+ * LNK: Improve parser (now able to parse the whole file)
  * EXE PE: Add more subsystem names
- * PYC: Support new version (2.5c2), fix long integer parser (support
-   negative number), add (disabled) code to disassemble bytecode, use
-   self.code_info to avoid replacing self.info
+ * PYC: Support Python 2.5c2
+ * Fix many spelling mistakes
 
 Minor changes:
 
+ * PYC: Fix long integer parser (negative number), add (disabled) code
+   to disassemble bytecode, use self.code_info to avoid replacing self.info
+ * OLE2: Add ".msi" file extension
+ * OLE2: Fix to support documents generated on Mac
  * EXIF: set max IFD entry count to 1000 (instead of 200)
  * EXIF: don't limit BYTE/UNDEFINED IFD entry count
  * EXIF: add "User comment" tag
