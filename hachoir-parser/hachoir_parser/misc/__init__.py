@@ -7,4 +7,5 @@ from hachoir_parser.misc.lnk import LnkFile
 from hachoir_parser.misc.pcf import PcfFile
 from hachoir_parser.misc.ole2 import OLE2_File
 from hachoir_parser.misc.pdf import PDFDocument
+from hachoir_parser.misc.pifv import PIFVFile
 
