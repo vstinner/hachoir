@@ -142,7 +142,7 @@ class PatternMatching:
         Search patterns in data.
         Return a generator of tuples: (start, end, item)
         """
-        if not self._max_length:
+        if not self.max_length:
             # No pattern: returns nothing
             return
         for match in self.compiled_regex.finditer(data):
