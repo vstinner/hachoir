@@ -219,21 +219,18 @@ class ExifIFD(FieldSet):
         yield UInt16(self, "count", "Number of entries")
         entries = []
         next_chunk_offset = None
-        while True:
+        count = self["count"].value
+        while count:
             addr = self.absolute_address + self.current_size
             next = self.stream.readBits(addr, 32, NETWORK_ENDIAN)
             if next in (0, 0xF0000000):
                 break
             entry = ExifEntry(self, "entry[]")
             yield entry
-            if entry["tag"].value in (entry.EXIF_IFD_POINTER, entry.OFFSET_JPEG_SOI):
-                next_chunk_offset = entry["value"].value + offset_diff
-                if entry["tag"].value == entry.OFFSET_JPEG_SOI:
-                   self.parent.jpeg_soi = next_chunk_offset
-                break
 
             if 32 < entry.getSizes()[0]:
                 entries.append(entry)
+            count -= 1
         yield UInt32(self, "next", "Next IFD offset")
         try:
             entries.sort( sortExifEntry )
@@ -266,11 +263,6 @@ class ExifIFD(FieldSet):
             padding = self.seek(next_chunk_offset)
             if padding is not None:
                 yield padding
-        else:
-            next_addr = (self.address + self.current_size)/8 + 2
-            if (next_addr % 4) != 0 and self["../whatsthis"].value == 8:
-                size = paddingSize(next_addr, 4)
-                yield PaddingBytes(self, "padding", 2)
 
     def createDescription(self):
         return "Exif IFD (id %s)" % self["id"].value
