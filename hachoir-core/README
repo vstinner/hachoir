@@ -29,6 +29,10 @@ For the installation, use setup.py or see: http://hachoir.org/wiki/Install
 What's new in hachoir-core 1.0?
 ===============================
 
+Version 1.0.1 changelog:
+ * Rename parser.tags to parser.PARSER_TAGS to be compatible
+   with future hachoir-parser 1.0
+
 Visible changes:
  * New field type: TimestampUUID60
  * SeekableFieldSet: fix __getitem__() method and implement __iter__()
