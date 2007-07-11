@@ -19,7 +19,7 @@ class SubFile(Bytes):
             if parser_class:
                 tags.append(( "class", parser_class ))
             if parser is not None:
-                tags.append(( "id", parser.tags["id"] ))
+                tags.append(( "id", parser.PARSER_TAGS["id"] ))
             if mime_type:
                 tags.append(( "mime", mime_type ))
             if filename:
