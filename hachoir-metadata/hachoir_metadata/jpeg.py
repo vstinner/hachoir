@@ -92,7 +92,7 @@ class JpegMetadata(RootMetadata):
         self.bits_per_pixel = 8 * nb_components
         if nb_components == 3:
             self.pixel_format = _("YCbCr")
-        else:
+        elif nb_components == 1:
             self.pixel_format = _("Grayscale")
             self.nb_colors = 256
 
