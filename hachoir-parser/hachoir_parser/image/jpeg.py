@@ -119,14 +119,10 @@ class JpegChunkApp0(FieldSet):
 class StartOfFrame(FieldSet):
     def createFields(self):
         yield UInt8(self, "precision")
-        if self["precision"].value != 8:
-            raise ParserError("JPEG error: Only 8-bit precision is supported")
 
         yield UInt16(self, "height")
         yield UInt16(self, "width")
         yield UInt8(self, "nr_components")
-        if self["nr_components"].value not in (1, 3):
-            raise ParserError("JPEG error: Only gray or true-color JPEGS supported")
 
         for index in range(self["nr_components"].value):
             yield UInt8(self, "component_id[]")
@@ -153,8 +149,6 @@ class AdobeChunk(FieldSet):
 class StartOfScan(FieldSet):
     def createFields(self):
         yield UInt8(self, "nr_components")
-        if self["nr_components"].value not in (1, 3):
-            raise ParserError("JPEG error: Invalid SOS marker")
 
         for index in range(self["nr_components"].value):
             comp_id = UInt8(self, "component_id[]")
