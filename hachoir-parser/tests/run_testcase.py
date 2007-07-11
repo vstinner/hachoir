@@ -551,14 +551,14 @@ def testRandom(seed=0, tests=(1,8)):
     random.seed(seed)
     a = array('L')
     parser_list = HachoirParserList()
-    n = max(tests) * max(parser.getTags()["min_size"] for parser in parser_list)
+    n = max(tests) * max(parser.getParserTags()["min_size"] for parser in parser_list)
     k = 8 * a.itemsize
     for i in xrange((n - 1) // k + 1):
         a.append(random.getrandbits(k))
     a = StringInputStream(a.tostring(), source="<random data>")
     ok = True
     for parser in parser_list:
-        size = parser.getTags()["min_size"]
+        size = parser.getParserTags()["min_size"]
         for test in tests:
             a._size = a._current_size = size * test
             try:
