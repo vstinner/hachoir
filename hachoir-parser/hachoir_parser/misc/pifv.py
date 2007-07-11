@@ -6,13 +6,12 @@ Creation date: 08 jul 2007
 """
 
 from hachoir_parser import Parser
-from hachoir_core.bits import str2hex
 from hachoir_core.field import (FieldSet, ParserError,
     UInt8, UInt16, UInt24, UInt32, UInt64, Enum,
-    CString, String, Bytes, PaddingBytes, RawBytes)
-from hachoir_core.text_handler import textHandler, hexadecimal
+    CString, String, PaddingBytes, RawBytes, NullBytes)
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.tools import paddingSize
+from hachoir_core.tools import paddingSize, humanFilesize
+from hachoir_parser.common.win32 import GUID
 
 # defines
 EFI_SECTION_COMPRESSION = "Encapsulation section where other sections are" \
@@ -85,20 +84,6 @@ for x in xrange(0xe0, 0xf0):
 for x in xrange(0xf1, 0x100):
     EFI_FV_FILETYPE[x] = EFI_FV_FILETYPE_FFS
 
-class EfiGuid(FieldSet):
-    static_size = 16*8
-    def createFields(self):
-        yield UInt32(self, "data1")
-        yield UInt16(self, "data2")
-        yield UInt16(self, "data3")
-        yield Bytes(self, "data4", 8)
-
-    def createValue(self):
-        return "%08X-%04X-%04X-%s-%s" % (
-            self["data1"].value, self["data2"].value, self["data3"].value,
-            str2hex(self["data4"].value[:2]),
-            str2hex(self["data4"].value[2:]))
-
 class BlockMap(FieldSet):
     static_size = 8*8
     def createFields(self):
@@ -106,8 +91,8 @@ class BlockMap(FieldSet):
         yield UInt32(self, "len")
 
     def createDescription(self):
-        return "%d blocks of %d bytes" % (self["num_blocks"].value,
-            self["len"].value)
+        return "%d blocks of %s" % (
+            self["num_blocks"].value, humanFilesize(self["len"].value))
 
 class FileSectionHeader(FieldSet):
     def createFields(self):
@@ -121,9 +106,9 @@ class FileSectionHeader(FieldSet):
             yield UInt32(self, "uncomp_len")
             yield UInt8(self, "comp_type")
         elif section_type_label == EFI_SECTION_FREEFORM_SUBTYPE_GUID:
-            yield EfiGuid(self, "sub_type_guid")
+            yield GUID(self, "sub_type_guid")
         elif section_type_label == EFI_SECTION_GUID_DEFINED:
-            yield EfiGuid(self, "section_definition_guid")
+            yield GUID(self, "section_definition_guid")
             yield UInt16(self, "data_offset")
             yield UInt16(self, "attributes")
         elif section_type_label == EFI_SECTION_USER_INTERFACE:
@@ -135,8 +120,7 @@ class FileSectionHeader(FieldSet):
 class FileSection(FieldSet):
     def __init__(self, *args, **kw):
         FieldSet.__init__(self, *args, **kw)
-        if not self._size:
-            self._size = self["section_header/size"].value * 8
+        self._size = self["section_header/size"].value * 8
 
     def createFields(self):
         yield FileSectionHeader(self, "section_header")
@@ -160,7 +144,7 @@ class FileSection(FieldSet):
 class FileHeader(FieldSet):
     static_size = 24*8
     def createFields(self):
-        yield EfiGuid(self, "name")
+        yield GUID(self, "name")
         yield UInt16(self, "integrity_check")
         yield Enum(UInt8(self, "type"), EFI_FV_FILETYPE)
         yield UInt8(self, "attributes")
@@ -170,31 +154,27 @@ class FileHeader(FieldSet):
 class File(FieldSet):
     def __init__(self, *args, **kw):
         FieldSet.__init__(self, *args, **kw)
-        if not self._size:
-            self._size = self["file_header/size"].value * 8
+        self._size = self["file_header/size"].value * 8
 
     def createFields(self):
         yield FileHeader(self, "file_header")
-
-        while self.current_size < self.size:
+        while not self.eof:
             yield FileSection(self, "section[]")
 
     def createDescription(self):
-        file_type = EFI_FV_FILETYPE.get(self["file_header/type"].value,
-            EFI_FV_FILETYPE_UNKNOWN)
         return "%s: %s containing %d section(s)" % (
-            self["file_header/name"].value, file_type,
+            self["file_header/name"].value,
+            self["file_header/type"].display,
             len(self.array("section")))
 
 class FirmwareVolumeHeader(FieldSet):
     def __init__(self, *args, **kw):
         FieldSet.__init__(self, *args, **kw)
-        if not self._size:
-            self._size = self["header_len"].value * 8
+        self._size = self["header_len"].value * 8
 
     def createFields(self):
-        yield Bytes(self, "zero_vector", 16)
-        yield EfiGuid(self, "fs_guid")
+        yield NullBytes(self, "zero_vector", 16)
+        yield GUID(self, "fs_guid")
         yield UInt64(self, "volume_len")
         yield String(self, "signature", 4)
         yield UInt32(self, "attributes")
@@ -218,37 +198,35 @@ class FirmwareVolume(FieldSet):
 
     def createFields(self):
         yield FirmwareVolumeHeader(self, "volume_header")
-
-        while self.current_size < self.size:
+        while not self.eof:
             padding = paddingSize(self.current_size // 8, 8)
             if padding:
                 yield PaddingBytes(self, "padding[]", padding)
             yield File(self, "file[]")
 
     def createDescription(self):
-        return "Firmware Volume containing %d file(s)" % \
-            len(self.array("file"))
+        return "Firmware Volume containing %d file(s)" % len(self.array("file"))
 
 class PIFVFile(Parser):
     endian = LITTLE_ENDIAN
-    MAGIC = '\x00' * 16
+    MAGIC = '_FVH'
     PARSER_TAGS = {
         "id": "pifv",
         "category": "program",
         "file_ext": ("bin", ""),
-        "mime": (u"application/octet-stream",),
-        "min_size": 40*8, # smallest possible header
-        "magic": ((MAGIC, 0),),
+        "min_size": 44*8, # smallest possible header
+        "magic": ((MAGIC, 40*8),),
         "description": "EFI Platform Initialization Firmware Volume",
     }
 
     def validate(self):
+        if self.stream.readBytes(40*8, 4) != self.MAGIC:
+            return "Invalid magic number"
+        if self.stream.readBytes(0, 16) != "\0"*16:
+            return "Invalid zero vector"
         return True
-        return len(self.array('firmware_volume')) and \
-            self['firmware_volume[0]/volume_header/zero_vector'].value == \
-            self.MAGIC
 
     def createFields(self):
-        while self.current_size < self.size:
+        while not self.eof:
             yield FirmwareVolume(self, "firmware_volume[]")
 
