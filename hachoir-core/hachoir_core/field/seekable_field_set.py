@@ -2,6 +2,7 @@ from hachoir_core.field import Field, BasicFieldSet, FakeArray, MissingField, Pa
 from hachoir_core.tools import lowerBound, makeUnicode
 from hachoir_core.error import HACHOIR_ERRORS
 from itertools import repeat
+import hachoir_core.config as config
 
 class RootSeekableFieldSet(BasicFieldSet):
     def __init__(self, parent, name, stream, description, size):
@@ -78,6 +79,8 @@ class RootSeekableFieldSet(BasicFieldSet):
     def _addField(self, field):
         if field._name.endswith("[]"):
             self.setUniqueFieldName(field)
+        if config.debug:
+            self.info("[+] DBG: _addField(%s)" % field.name)
 
         if field._address != self._offset:
             self.warning("Set field %s address to %s (was %s)" % (
