@@ -37,14 +37,17 @@ MAX_BIG_BLOCK_LOG2 = 14  # 64 kB
 NB_DIFAT = 109
 
 class SECT(UInt32):
-    END_OF_CHAIN = 0xFFFFFFFE
-    UNUSED = 0xFFFFFFFF
+    END_OF_CHAIN = 0xFFFFFFFE   # -1
+    UNUSED       = 0xFFFFFFFF   # -2
+    BFAT_SECTOR  = 0xFFFFFFFD   # -3
+    DIFAT_SECTOR = 0xFFFFFFFC   # -4
+    SPECIALS = set((0, END_OF_CHAIN, UNUSED, BFAT_SECTOR, DIFAT_SECTOR))
 
     special_value_name = {
-        UNUSED: "none",                        # -1
-        END_OF_CHAIN: "end of a chain",        # -2
-        0xFFFFFFFD: "FAT sector (in a FAT)",   # -3
-        0xFFFFFFFC: "DIFAT sector (in a FAT)", # -4
+        UNUSED: "none",
+        END_OF_CHAIN: "end of a chain",
+        BFAT_SECTOR: "BFAT sector (in a FAT)",
+        DIFAT_SECTOR: "DIFAT sector (in a FAT)",
     }
 
     def __init__(self, parent, name, description=None):
@@ -288,8 +291,8 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
         block_set = set()
         previous = block
         while block not in (None, SECT.END_OF_CHAIN):
-            if block < 0:
-                raise ParserError("FAT chain: Invalid block index (negative: %s)" % block)
+            if block in SECT.SPECIALS:
+                raise ParserError("FAT chain: Invalid block index (0x%08x)" % block)
             if block in block_set:
                 raise ParserError("FAT chain: Found a loop (%s=>%s)" % (previous, block))
             block_set.add(block)
@@ -336,15 +339,16 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
             start += count
 
     def createContentSize(self):
-        max_block = -1
+        max_block = 0
         for fat in self.array("bbfat"):
             for entry in fat:
                 block = entry.value
-                if 0 < block:
+                if block not in SECT.SPECIALS:
                     max_block = max(block, max_block)
-        if max_block < 0:
+        if max_block in SECT.SPECIALS:
             return None
-        return HEADER_SIZE + (max_block+1) * self.sector_size
+        else:
+            return HEADER_SIZE + (max_block+1) * self.sector_size
 
     def seekBlock(self, block):
         self.seekBit(HEADER_SIZE + block * self.sector_size)
