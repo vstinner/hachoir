@@ -78,7 +78,7 @@ Version 1.0.1
 
  * Only use hachoir_core.profiler with --profiler command line option
    so 'profiler' Python module is now optional
- * Set shebang to « #!/usr/bin/python »
+ * Set shebang to "#!/usr/bin/python"
 
 Version 1.0
 -----------
