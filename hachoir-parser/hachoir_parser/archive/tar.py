@@ -90,9 +90,9 @@ class TarFile(Parser):
         "file_ext": ("tar",),
         "mime": (u"application/x-tar", u"application/x-gtar"),
         "min_size": 512*8,
-# FIME: Re-enable that
-#        "magic": (("ustar  \0", 257*8),),
-        "description": "TAR archive"
+        "magic": (("ustar  \0", 257*8),),
+        "subfile": "skip",
+        "description": "TAR archive",
     }
     _sign = re.compile("ustar *\0|[ \0]*$")
 
@@ -118,4 +118,7 @@ class TarFile(Parser):
             yield field
         if self.current_size < self._size:
             yield self.seekBit(self._size, "end")
+
+    def createContentSize(self):
+        return self["terminator"].address + self["terminator"].size
 
