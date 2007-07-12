@@ -6,7 +6,6 @@ from hachoir_core.i18n import _
 from hachoir_parser import guessParser, HachoirParserList
 from hachoir_urwid import exploreFieldSet
 from hachoir_urwid.version import VERSION, WEBSITE
-from hachoir_core.profiler import runProfiler
 from optparse import OptionGroup, OptionParser
 import hachoir_core
 import sys
@@ -60,6 +59,7 @@ def parseOptions():
     return values, arguments[0]
 
 def profile(func, *args):
+    from hachoir_core.profiler import runProfiler
     runProfiler(func, args)
 
 def openParser(parser_id, filename, offset, size):
