@@ -5,6 +5,14 @@ Website: http://hachoir.org/wiki/hachoir-subfile
 Changelog
 =========
 
+2007-07-13:
+
+ * Version 0.5.2
+ * Fix shebang: use « #!/usr/bin/python »
+ * Only import hachoir_core.profiler with --profiler command line
+   option is used, so hachoir-subfile do not depends on 'profiler'
+   Python module
+
 2007-07-12:
 
  * Version 0.5.1
