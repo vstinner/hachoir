@@ -7,7 +7,12 @@ Changelog
 
 2007-07-12:
 
- * First public version
+ * Version 0.5.1
+ * Fix setup.py: also install script 'hachoir-subfile'
+
+2007-07-11:
+
+ * Publication of version 0.5, first public version
 
 Usage
 =====

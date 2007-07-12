@@ -50,6 +50,7 @@ def main():
         "packages": PACKAGES.keys(),
         "package_dir": PACKAGES,
         "long_description": open('README').read(),
+        "scripts": ["hachoir-subfile"],
     }
 
     if use_setuptools:
