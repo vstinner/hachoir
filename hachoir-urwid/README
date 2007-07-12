@@ -51,6 +51,12 @@ Command line options: use --help option.
 
 In hachoir-use, use F1 key to get help (keyboard keys).
 
+What's new in hachoir-urwid 1.0?
+================================
+
+ * Compatible with hachoir-core 1.0 and hachoir-parser 1.0
+ * Set default of preload to 15 (instead of 3)
+
 What's new in hachoir-urwid 0.9.0?
 ==================================
 
