@@ -54,6 +54,16 @@ In hachoir-use, use F1 key to get help (keyboard keys).
 What's new in hachoir-urwid 1.0?
 ================================
 
+Version 1.0.1
+-------------
+
+ * Only use hachoir_core.profiler with --profiler command line option
+   so 'profiler' Python module is now optional
+ * Set shebang to « #!/usr/bin/python »
+
+Version 1.0
+-----------
+
  * Compatible with hachoir-core 1.0 and hachoir-parser 1.0
  * Set default of preload to 15 (instead of 3)
 
