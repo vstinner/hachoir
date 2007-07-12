@@ -220,6 +220,8 @@ class ExifIFD(FieldSet):
         entries = []
         next_chunk_offset = None
         count = self["count"].value
+        if not count:
+            return
         while count:
             addr = self.absolute_address + self.current_size
             next = self.stream.readBits(addr, 32, NETWORK_ENDIAN)
@@ -227,7 +229,8 @@ class ExifIFD(FieldSet):
                 break
             entry = ExifEntry(self, "entry[]")
             yield entry
-
+            if entry["tag"].value in (ExifEntry.EXIF_IFD_POINTER, ExifEntry.OFFSET_JPEG_SOI):
+                next_chunk_offset = entry["value"].value + offset_diff
             if 32 < entry.getSizes()[0]:
                 entries.append(entry)
             count -= 1
@@ -270,7 +273,6 @@ class ExifIFD(FieldSet):
 class Exif(FieldSet):
     def createFields(self):
         # Headers
-        self.jpeg_soi = None
         yield String(self, "header", 6, "Header (Exif\\0\\0)", charset="ASCII")
         if self["header"].value != "Exif\0\0":
             raise ParserError("Invalid EXIF signature!")
