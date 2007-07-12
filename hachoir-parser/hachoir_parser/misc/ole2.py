@@ -37,14 +37,14 @@ MAX_BIG_BLOCK_LOG2 = 14  # 64 kB
 NB_DIFAT = 109
 
 class SECT(UInt32):
-    END_OF_CHAIN = 0xFFFFFFFE   # -1
-    UNUSED       = 0xFFFFFFFF   # -2
+    UNUSED       = 0xFFFFFFFF   # -1
+    END_OF_CHAIN = 0xFFFFFFFE   # -2
     BFAT_SECTOR  = 0xFFFFFFFD   # -3
     DIFAT_SECTOR = 0xFFFFFFFC   # -4
     SPECIALS = set((0, END_OF_CHAIN, UNUSED, BFAT_SECTOR, DIFAT_SECTOR))
 
     special_value_name = {
-        UNUSED: "none",
+        UNUSED: "unused",
         END_OF_CHAIN: "end of a chain",
         BFAT_SECTOR: "BFAT sector (in a FAT)",
         DIFAT_SECTOR: "DIFAT sector (in a FAT)",
