@@ -26,7 +26,7 @@ class GzipParser(Parser):
             # (magic, compression=deflate, <flags>, <mtime>, )
             ('\x1F\x8B\x08.{5}[\0\2\4\6][\x00-\x0D]', 0),
         ),
-        "description": u"gzip archive"
+        "description": u"gzip archive",
     }
     os_name = {
          0: u"FAT filesystem",
@@ -117,7 +117,7 @@ class GzipParser(Parser):
         yield filesizeHandler(UInt32(self, "size", "Uncompressed size"))
 
     def createDescription(self):
-        desc = self.tags["description"]
+        desc = u"gzip archive"
         info = []
         if "filename" in self:
             info.append('filename "%s"' % self["filename"].value)
