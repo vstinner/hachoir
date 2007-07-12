@@ -377,7 +377,7 @@ class SwfFile(Parser):
                 def createInputStream(cis, source=None, **args):
                     stream = cis(source=source)
                     header = StringInputStream("FWS" + self.stream.readBytes(3*8, 5))
-                    args.setdefault("tags",[]).append(("id", self.tags["id"]))
+                    args.setdefault("tags",[]).append(("class", SwfFile))
                     return ConcatStream((header, stream), source=stream.source, **args)
                 data.setSubIStream(createInputStream)
                 yield data
