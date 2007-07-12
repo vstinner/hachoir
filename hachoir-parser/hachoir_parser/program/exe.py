@@ -206,8 +206,24 @@ class ExeFile(Parser):
             return u"MS-DOS executable"
 
     def createContentSize(self):
-        if self.isPE() or self.isNE():
-            # TODO: Guess PE size
+        if self.isPE():
+            size = 0
+            for index in xrange(self["pe_header/nb_section"].value):
+                section = self["section_hdr[%u]" % index]
+                section_size = section["phys_size"].value
+                if not section_size:
+                    continue
+                section_size = (section_size + section["phys_off"].value) * 8
+                if size:
+                    size = max(size, section_size)
+                else:
+                    size = section_size
+            if size:
+                return size
+            else:
+                return None
+        elif self.isNE():
+            # TODO: Guess NE size
             return None
         else:
             size = self["msdos/size_mod_512"].value + (self["msdos/size_div_512"].value-1) * 512
