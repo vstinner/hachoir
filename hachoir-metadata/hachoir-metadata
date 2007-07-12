@@ -10,7 +10,6 @@ try:
     from hachoir_core.stream import InputStreamError
     from hachoir_core.tools import makePrintable
     from hachoir_parser import createParser, ParserList
-    from hachoir_core.profiler import runProfiler
 except ImportError, err:
     raise
     print >>sys.stderr, "Unable to import an Hachoir module: %s" % err
@@ -136,6 +135,7 @@ def benchmarkMetadata(values, filenames):
     bench.run(processFiles, values, filenames, display=False)
 
 def profile(values, filenames):
+    from hachoir_core.profiler import runProfiler
     return runProfiler(processFiles, (values, filenames), {'display': False})
 
 def main():
