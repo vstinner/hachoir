@@ -41,7 +41,7 @@ class SECT(UInt32):
     END_OF_CHAIN = 0xFFFFFFFE   # -2
     BFAT_SECTOR  = 0xFFFFFFFD   # -3
     DIFAT_SECTOR = 0xFFFFFFFC   # -4
-    SPECIALS = set((0, END_OF_CHAIN, UNUSED, BFAT_SECTOR, DIFAT_SECTOR))
+    SPECIALS = set((END_OF_CHAIN, UNUSED, BFAT_SECTOR, DIFAT_SECTOR))
 
     special_value_name = {
         UNUSED: "unused",
