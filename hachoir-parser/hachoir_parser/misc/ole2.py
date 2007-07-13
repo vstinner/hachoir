@@ -290,7 +290,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
         block = start
         block_set = set()
         previous = block
-        while block not in (None, SECT.END_OF_CHAIN):
+        while block != SECT.END_OF_CHAIN:
             if block in SECT.SPECIALS:
                 raise ParserError("FAT chain: Invalid block index (0x%08x)" % block)
             if block in block_set:
@@ -303,6 +303,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
                 block = fat[index]["index[%u]" % block].value
             except LookupError, err:
                 self.error("FAT chain: %s" % err)
+                break
 
     def readBFAT(self):
         self.bb_fat = []
