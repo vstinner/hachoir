@@ -36,9 +36,6 @@ class ChunkIndexer:
     def canHouse(self, chunk, index):
         if index > 1:
             if chunk.offset + chunk.size > self.chunks[index-1].offset:
-                print "Chunk: offset %u + size %u > next offset %u for '%s'!" % \
-                      (chunk.offset, chunk.size,
-                       self.chunks[index-1].offset, self.chunks[index-1].name)
                 return False
         # We could test now that it fits in the memory
         return True
@@ -52,15 +49,11 @@ class ChunkIndexer:
             if offset < new_chunk.offset:
                 if not self.canHouse(new_chunk, index):
                     raise ParserError("Chunk '%s' doesn't fit!" % new_chunk.name)
-                    ## print "Added element %u: size=%u position=%u>%u" % \
-                    ##       (index, new_chunk.size, new_chunk.offset, offset)
                 self.chunks.insert(index, new_chunk)
                 return
             index += 1
 
         # Not found or empty
-        ##print "Appended element %u of size %u at position %u" % \
-        ##      (len(self.chunks)+1, new_chunk.size, new_chunk.offset)
         # We could at least check that it fits in the memory
         self.chunks.append(new_chunk)
 
