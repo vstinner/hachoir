@@ -1,5 +1,10 @@
-// Wikipedia really has everything...
-// from http://en.wikipedia.org/wiki/XMLHttpRequest
+/* Client-side Javascript for hachoir-http.
+
+Author: Robert Xiao
+Creation date: June 28 2007
+
+*/
+// ajax from http://en.wikipedia.org/wiki/XMLHttpRequest
 function ajax($url, $vars, $object){
 
         if (XMLHttpRequest){
@@ -28,6 +33,7 @@ function ajax($url, $vars, $object){
 function updateHTML(dat){
     document.getElementById("maincontent").innerHTML=dat;
     status(0);
+    initOpts(); // in case things have changed...
 }
 
 var opts;
@@ -56,34 +62,62 @@ function doPost(){
 
 function setOpt(s){
     opts[s]=document.getElementById('check_'+s).checked*1;
-    set_cookie(s,opts[s],3600*24*365*10); // save for 10 years
+    saveOpts();
     doPost();
 }
 
-function getOpt(s){
+function getOpt(s, check){
     v=get_cookie(s);
     if (v)
     {
         v=v.replace(/"(.+)"/,"$1");
         opts[s]=v;
-        if (v == '1' || v == '0')
+        if (check)
             document.getElementById('check_'+s).checked=(v=='1')?true:false;
     }
 }
 
-function doInit(){
-    opts={'hpath':'/'};
+function saveOpts(){
+    for(s in opts)
+        set_cookie(s,opts[s],3600*24*365*10); // save for 10 years
+}
+
+function initOpts(){
     getOpt('hpath');
-    getOpt('raw');
-    getOpt('hex');
-    getOpt('rel');
+    getOpt('stream');
+    getOpt('raw',true);
+    getOpt('hex',true);
+    getOpt('rel',true);
+}
+
+function doInit(){
+    opts={'hpath':'/','stream':'0'};
+    initOpts();
     doPost();
 }
 
 function goPath(s){
-    set_cookie('hpath',s);
-    opts['hpath']=s;
+    paths=opts.hpath.split(':');
+    paths[parseInt(opts.stream)]=s;
+    opts.hpath=paths.join(':');
     doPost();
+    saveOpts();
+}
+
+function addStream(spath){
+    // set command, post, remove command from options
+    opts.addStream=spath;
+    doPost();
+    delete opts.addStream;
+    saveOpts();
+}
+
+function delStream(n){
+    // set command, post, remove command from options
+    opts.delStream=n.toString();
+    doPost();
+    delete opts.delStream;
+    saveOpts();
 }
 
 function set_cookie( name, value, expires, path, domain, secure )
