@@ -81,6 +81,7 @@ testcase_files = (
     (u"twunk_16.exe", 49680, "f36a271706edd23c94956afb56981184"),
     (u"vim.lnk", 1510, "9853258788fc67ce406201773d1f4fb5"),
     (u"7zip.chm", 77414, "2ac9ef6c4f4a770b27bc3471c1ee1d31"),
+    (u'green_fire.jpg', 2455, '13775aa085ed3fd6da07cf5c6dd8cfe9'),
 )
 
 def stringMD5(text):

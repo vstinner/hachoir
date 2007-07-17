@@ -296,6 +296,12 @@ def checkDebianTorrent(meta): return (
     checkAttr(meta, "creation_date", datetime(2006, 11, 16, 21, 44, 37)),
 )
 
+def checkGreenFire(meta): return (
+    checkAttr(meta, 'height', 64),
+    checkAttr(meta, 'bits_per_pixel', 32),
+    checkAttr(meta, 'comment', (u"Intel(R) JPEG Library, version 1,5,4,36", u"JPEG quality: 80%")),
+)
+
 def checkFile(filename, check_metadata, quality=1.0):
     sys.stdout.write("  - Create parser: ")
     sys.stdout.flush()
@@ -398,6 +404,7 @@ testcase_files = (
     (u"deja_vu_serif-2.7.ttf", checkDejaVu),
     (u"twunk_16.exe", checkTwunk16),
     (u"debian-31r4-i386-binary-1.iso.torrent", checkDebianTorrent),
+    (u"green_fire.jpg", checkGreenFire),
 )
 
 if __name__ == "__main__":
