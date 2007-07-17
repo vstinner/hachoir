@@ -8,12 +8,24 @@ def ip2name(addr):
     try:
         if addr in ip2name.cache:
             return ip2name.cache[addr]
-        name = gethostbyaddr(addr)[0]
+        if ip2name.resolve:
+            # FIXME: Workaround Python bug
+            # Need double try/except to catch the bug
+            try:
+                name = gethostbyaddr(addr)[0]
+            except KeyboardInterrupt:
+                raise
+        else:
+            name = addr
+    except (socket_host_error, ValueError):
+        name = addr
     except (socket_host_error, KeyboardInterrupt, ValueError):
+        ip2name.resolve = False
         name = addr
     ip2name.cache[addr] = name
     return name
 ip2name.cache = {}
+ip2name.resolve = True
 
 class IPv4_Address(Field):
     def __init__(self, parent, name, description=None):
