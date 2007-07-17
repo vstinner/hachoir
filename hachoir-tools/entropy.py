@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 from math import log
 from sys import exit, argv, stderr
 from time import time

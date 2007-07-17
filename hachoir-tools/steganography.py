@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.4
+#!/usr/bin/python
 
 from hachoir_editor import (createEditor as hachoirCreateEditor,
     NewFieldSet, EditableInteger, EditableString, EditableBytes)

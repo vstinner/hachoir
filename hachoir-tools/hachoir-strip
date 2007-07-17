@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 """
 Binary striper: remove metadata, producer information, useless padding, etc.
 from binary files.

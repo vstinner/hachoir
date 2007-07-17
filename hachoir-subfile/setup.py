@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 
 # Constants
 AUTHORS = 'Victor Stinner'
