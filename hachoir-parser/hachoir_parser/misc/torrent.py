@@ -103,27 +103,28 @@ class DictionaryItem(FieldSet):
             return
         key = key.value
         self._name = str(key).replace(" ", "_")
-        if self["value"].hasValue() and self["value"].value != None:
-            if key == "creation date":
-                self.createValue = self.createTimestampValue
-            elif key in ("length", "piece length"):
-                self.createValue = self.createDefaultValue
-                self.createDisplay = self.createFilesizeDisplay
-            else:
-                self.createValue = self.createDefaultValue
+
+    def createDisplay(self):
+        if not self["value"].hasValue():
+            return None
+        if self._name in ("length", "piece_length"):
+            return humanFilesize(self.value)
+        return FieldSet.createDisplay(self)
+
+    def createValue(self):
+        if not self["value"].hasValue():
+            return None
+        if self._name == "creation_date":
+            return self.createTimestampValue()
+        else:
+            return self["value"].value
 
     def createFields(self):
         yield Entry(self, "key")
         yield Entry(self, "value")
 
-    def createDefaultValue(self):
-        return self["value"].value
-
     def createTimestampValue(self):
         return timestampUNIX(self["value"].value)
-
-    def createFilesizeDisplay(self):
-        return humanFilesize(self.value)
 
 # Map first chunk byte => type
 TAGS = {'d': Dictionary, 'i': Integer, 'l': List}
