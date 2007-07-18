@@ -6,7 +6,8 @@ from hachoir_core.language import Language
 from hachoir_metadata.filter import Filter, NumberFilter
 from datetime import date, datetime, timedelta
 from hachoir_metadata.formatter import (
-    humanAudioChannel, humanFrameRate, humanComprRate,
+    humanAudioChannel, humanFrameRate, humanComprRate)
+from hachoir_metadata.setter import (
     setDatetime, setTrackNumber, setTrackTotal, setLanguage)
 from hachoir_metadata.metadata_item import Data
 
