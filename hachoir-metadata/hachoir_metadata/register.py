@@ -5,8 +5,9 @@ from hachoir_core.tools import (
 from hachoir_core.language import Language
 from hachoir_metadata.filter import Filter, NumberFilter
 from datetime import date, datetime, timedelta
-from hachoir_metadata.formatter import (humanAudioChannel,
-    humanFrameRate, setDatetime, humanComprRate)
+from hachoir_metadata.formatter import (
+    humanAudioChannel, humanFrameRate, humanComprRate,
+    setDatetime, setTrackNumber, setTrackTotal, setLanguage)
 from hachoir_metadata.metadata_item import Data
 
 MIN_SAMPLE_RATE = 1000              # 1 kHz
@@ -38,9 +39,11 @@ def registerAllItems(meta):
         type=timedelta, text_handler=humanDuration, filter=DURATION_FILTER))
     meta.register(Data("nb_page", 202, _("Nb page"), filter=NumberFilter(1, MAX_NB_PAGE)))
     meta.register(Data("music_genre", 203, _("Music genre"), type=unicode))
-    meta.register(Data("language", 204, _("Language"), type=Language))
-    meta.register(Data("track_number", 205, _("Track number"), filter=NumberFilter(1, MAX_TRACK), type=(int, long)))
-    meta.register(Data("track_total", 206, _("Track total"), filter=NumberFilter(1, MAX_TRACK), type=(int, long)))
+    meta.register(Data("language", 204, _("Language"), conversion=setLanguage, type=Language))
+    meta.register(Data("track_number", 205, _("Track number"), conversion=setTrackNumber,
+        filter=NumberFilter(1, MAX_TRACK), type=(int, long)))
+    meta.register(Data("track_total", 206, _("Track total"), conversion=setTrackTotal,
+        filter=NumberFilter(1, MAX_TRACK), type=(int, long)))
     meta.register(Data("organization", 210, _("Organization"), type=unicode))
     meta.register(Data("version", 220, _("Version")))
 

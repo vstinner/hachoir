@@ -7,7 +7,6 @@ from hachoir_core.tools import makePrintable, timedelta2seconds, humanBitRate
 from datetime import timedelta, date
 from hachoir_metadata.metadata_item import QUALITY_FAST, QUALITY_NORMAL, QUALITY_BEST
 from hachoir_metadata.safe import fault_tolerant, getValue
-from hachoir_metadata.formatter import setLanguage, setTrackNumber, setTrackTotal
 
 def computeComprRate(meta, size):
     if not meta.has("duration") \
@@ -28,22 +27,22 @@ def computeBitRate(meta):
 
 class OggMetadata(MultipleMetadata):
     KEY_TO_ATTR = {
-        "ARTIST": ("artist", None),
-        "ALBUM": ("album", None),
-        "TRACKNUMBER": ("track_number", setTrackNumber),
-        "TRACKTOTAL": ("track_total", setTrackTotal),
-        "ENCODER": ("producer", None),
-        "TITLE": ("title", None),
-        "DATE": ("creation_date", None),
-        "ORGANIZATION": ("organization", None),
-        "GENRE": ("music_genre", None),
-        "": ("comment", None),
-        "COMPOSER": ("music_composer", None),
-        "DESCRIPTION": ("comment", None),
-        "COMMENT": ("comment", None),
-        "WWW": ("url", None),
-        "WOAF": ("url", None),
-        "LICENSE": ("copyright", None),
+        "ARTIST": "artist",
+        "ALBUM": "album",
+        "TRACKNUMBER": "track_number",
+        "TRACKTOTAL": "track_total",
+        "ENCODER": "producer",
+        "TITLE": "title",
+        "DATE": "creation_date",
+        "ORGANIZATION": "organization",
+        "GENRE": "music_genre",
+        "": "comment",
+        "COMPOSER": "music_composer",
+        "DESCRIPTION": "comment",
+        "COMMENT": "comment",
+        "WWW": "url",
+        "WOAF": "url",
+        "LICENSE": "copyright",
     }
 
     def extract(self, ogg):
@@ -120,11 +119,8 @@ class OggMetadata(MultipleMetadata):
                 key, value = metadata.value.split("=", 1)
                 key = key.upper()
                 if key in self.KEY_TO_ATTR:
-                    key, setter = self.KEY_TO_ATTR[key]
-                    if setter:
-                        setter(self, key, value)
-                    else:
-                        setattr(self, key, value)
+                    key = self.KEY_TO_ATTR[key]
+                    setattr(self, key, value)
                 elif value:
                     self.warning("Skip Ogg comment %s: %s" % (key, value))
 
@@ -247,26 +243,26 @@ class RealMediaMetadata(MultipleMetadata):
 class MpegAudioMetadata(RootMetadata):
     TAG_TO_KEY = {
         # ID3 version 2.2
-        "TP1": ("author", None),
-        "COM": ("comment", None),
-        "TEN": ("producer", None),
-        "TRK": ("track_number", setTrackNumber),
-        "TAL": ("album", None),
-        "TT2": ("title", None),
-        "TYE": ("creation_date", None),
-        "TCO": ("music_genre", None),
+        "TP1": "author",
+        "COM": "comment",
+        "TEN": "producer",
+        "TRK": "track_number",
+        "TAL": "album",
+        "TT2": "title",
+        "TYE": "creation_date",
+        "TCO": "music_genre",
 
         # ID3 version 2.3+
-        "TPE1": ("author", None),
-        "COMM": ("comment", None),
-        "TENC": ("producer", None),
-        "TRCK": ("track_number", setTrackNumber),
-        "TALB": ("album", None),
-        "TIT2": ("title", None),
-        "TYER": ("creation_date", None),
-        "WXXX": ("url", None),
-        "TCON": ("music_genre", None),
-        "TLAN": ("language", setLanguage),
+        "TPE1": "author",
+        "COMM": "comment",
+        "TENC": "producer",
+        "TRCK": "track_number",
+        "TALB": "album",
+        "TIT2": "title",
+        "TYER": "creation_date",
+        "WXXX": "url",
+        "TCON": "music_genre",
+        "TLAN": "language",
     }
 
     def processID3v2(self, field):
@@ -289,11 +285,8 @@ class MpegAudioMetadata(RootMetadata):
                     tag = makePrintable(tag, "ISO-8859-1", to_unicode=True)
                 self.warning("Skip ID3v2 tag %s: %s" % (tag, value))
             return
-        key, setter = self.TAG_TO_KEY[tag]
-        if setter:
-            setter(self, key, value)
-        else:
-            setattr(self, key, value)
+        key = self.TAG_TO_KEY[tag]
+        setattr(self, key, value)
 
     def readID3v2(self, id3):
         for field in id3:
@@ -321,7 +314,7 @@ class MpegAudioMetadata(RootMetadata):
             if id3["year"].value != "0":
                 self.creation_date = id3["year"].value
             if "track_nb" in id3:
-                setTrackNumber(self, "track_number", id3["track_nb"].value)
+                self.track_number = id3["track_nb"].value
         if "id3v2" in mp3:
             self.readID3v2(mp3["id3v2"])
         if "frames" in mp3:

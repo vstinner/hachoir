@@ -1,4 +1,5 @@
 from hachoir_core.tools import makeUnicode, normalizeNewline
+from hachoir_core.error import HACHOIR_ERRORS
 
 MIN_PRIORITY = 100
 MAX_PRIORITY = 999
@@ -66,7 +67,12 @@ class Data:
 
         # Convert string to Unicode string using charset ISO-8859-1
         if self.conversion:
-            new_value = self.conversion(self.key, value)
+            try:
+                new_value = self.conversion(self.metadata, self.key, value)
+            except HACHOIR_ERRORS, err:
+                self.metadata.warning("Error during conversion of %r value: %s" % (
+                    self.key, err))
+                return
             if not new_value:
                 dest_types = " or ".join(str(item.__name__) for item in self.type)
                 self.metadata.warning("Unable to convert %r (%s) to %s" % (

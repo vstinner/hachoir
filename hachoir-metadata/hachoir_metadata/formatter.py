@@ -57,7 +57,7 @@ def parseDatetime(value):
         except ValueError:
             pass
 
-def setDatetime(key, value):
+def setDatetime(meta, key, value):
     if isinstance(value, (str, unicode)):
         return parseDatetime(value)
     elif isinstance(value, (date, datetime)):
@@ -78,25 +78,25 @@ def humanFrameRate(value):
 def humanComprRate(rate):
     return u"%.1fx" % rate
 
-@fault_tolerant
 def setLanguage(meta, key, value):
-    meta.language = Language(value)
+    return Language(value)
 
 def setTrackTotal(meta, key, total):
     try:
-        meta.track_total = int(total)
+        return int(total)
     except ValueError:
         meta.warning("Invalid track total: %r" % total)
+        return None
 
 def setTrackNumber(meta, key, number):
     if isinstance(number, (int, long)):
-        meta.track_number = number
-        return
+        return number
     if "/" in number:
         number, total = number.split("/", 1)
-        setTrackTotal(meta, "track_total", total)
+        meta.track_total = total
     try:
-        meta.track_number = int(number)
+        return int(number)
     except ValueError:
         meta.warning("Invalid track number: %r" % number)
+        return None
 
