@@ -18,20 +18,26 @@ class TorrentMetadata(RootMetadata):
 
     def extract(self, torrent):
         for field in torrent[0]:
-            if field.name in self.KEY_TO_ATTR:
-                key = self.KEY_TO_ATTR[field.name]
-                value = field.value
-                setattr(self, key, value)
-            elif field.name == "info" and "value" in field:
-                self.processInfo(field["value"])
-    def processInfo(self, info):
-        for field in info:
-            if field.name in self.INFO_TO_ATTR:
-                key = self.INFO_TO_ATTR[field.name]
-                value = field.value
-                setattr(self, key, value)
-            elif field.name == "piece_length":
-                self.comment = "Piece length: %s" % field.display
+            self.processRoot(field)
+
+    @fault_tolerant
+    def processRoot(self, field):
+        if field.name in self.KEY_TO_ATTR:
+            key = self.KEY_TO_ATTR[field.name]
+            value = field.value
+            setattr(self, key, value)
+        elif field.name == "info" and "value" in field:
+            for field in field["value"]:
+                self.processInfo(field)
+
+    @fault_tolerant
+    def processInfo(self, field):
+        if field.name in self.INFO_TO_ATTR:
+            key = self.INFO_TO_ATTR[field.name]
+            value = field.value
+            setattr(self, key, value)
+        elif field.name == "piece_length":
+            self.comment = "Piece length: %s" % field.display
 
 class TTF_Metadata(RootMetadata):
     NAMEID_TO_ATTR = {
