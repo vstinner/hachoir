@@ -7,25 +7,7 @@ from hachoir_core.tools import makePrintable, timedelta2seconds, humanBitRate
 from datetime import timedelta, date
 from hachoir_metadata.metadata_item import QUALITY_FAST, QUALITY_NORMAL, QUALITY_BEST
 from hachoir_metadata.safe import fault_tolerant, getValue
-from hachoir_metadata.formatter import setLanguage
-
-def setTrackTotal(meta, key, total):
-    try:
-        meta.track_total = int(total)
-    except ValueError:
-        meta.warning("Invalid track total: %r" % total)
-
-def setTrackNumber(meta, key, number):
-    if isinstance(number, (int, long)):
-        meta.track_number = number
-        return
-    if "/" in number:
-        number, total = number.split("/", 1)
-        setTrackTotal(meta, "track_total", total)
-    try:
-        meta.track_number = int(number)
-    except ValueError:
-        meta.warning("Invalid track number: %r" % number)
+from hachoir_metadata.formatter import setLanguage, setTrackNumber, setTrackTotal
 
 def computeComprRate(meta, size):
     if not meta.has("duration") \

@@ -82,3 +82,21 @@ def humanComprRate(rate):
 def setLanguage(meta, key, value):
     meta.language = Language(value)
 
+def setTrackTotal(meta, key, total):
+    try:
+        meta.track_total = int(total)
+    except ValueError:
+        meta.warning("Invalid track total: %r" % total)
+
+def setTrackNumber(meta, key, number):
+    if isinstance(number, (int, long)):
+        meta.track_number = number
+        return
+    if "/" in number:
+        number, total = number.split("/", 1)
+        setTrackTotal(meta, "track_total", total)
+    try:
+        meta.track_number = int(number)
+    except ValueError:
+        meta.warning("Invalid track number: %r" % number)
+

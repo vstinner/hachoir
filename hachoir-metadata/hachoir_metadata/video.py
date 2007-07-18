@@ -13,7 +13,7 @@ from hachoir_core.tools import (makeUnicode, makePrintable,
     durationWin64, timedelta2seconds)
 from hachoir_core.error import warning
 from datetime import timedelta
-from hachoir_metadata.formatter import setLanguage
+from hachoir_metadata.formatter import setLanguage, setTrackNumber
 
 class MkvMetadata(MultipleMetadata):
     tag_key = {
@@ -271,7 +271,10 @@ class AsfMetadata(MultipleMetadata):
                         key = makePrintable(key, "ISO-8859-1", to_unicode=True)
                     value = "%s=%s" % (key, value)
                     key = "comment"
-                setattr(self, key, value)
+                if key == "track_number":
+                    setTrackNumber(self, key, value)
+                else:
+                    setattr(self, key, value)
 
         if "file_prop/content" in header:
             self.useFileProp(header["file_prop/content"], is_vbr)
