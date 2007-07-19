@@ -277,13 +277,13 @@ class MpegAudioFile(Parser):
         "file_ext": ("mpa", "mp1", "mp2", "mp3"),
         "mime": (u"audio/mpeg",),
         "min_size": 4*8,
-#        "magic": createMpegAudioMagic(),
+#        "magic": createMpegAudioMagic(), + "ID3" + "TAG"
         "description": "MPEG audio version 1, 2, 2.5"
     }
     endian = BIG_ENDIAN
 
     def validate(self):
-        if self[0].name == "id3v2":
+        if self[0].name in ("id3v2", "id3v1"):
             return True
 
         if not self.stream.checked: # TODO: is it possible to handle piped input?
@@ -339,6 +339,13 @@ class MpegAudioFile(Parser):
             yield ID3v1(self, "id3v1")
 
     def createDescription(self):
-        frame = self["frames/frame[0]"]
-        return "%s, %s" % (frame.description, frame["channel_mode"].display)
+        if "frames" in self:
+            frame = self["frames/frame[0]"]
+            return "%s, %s" % (frame.description, frame["channel_mode"].display)
+        elif "id3v2" in self:
+            return self["id3v2"].description
+        elif "id3v1" in self:
+            return self["id3v1"].description
+        else:
+            return "MPEG audio"
 
