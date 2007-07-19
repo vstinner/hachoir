@@ -18,6 +18,9 @@ from hachoir_core.bits import long2raw
 from hachoir_core.error import HACHOIR_ERRORS
 from hachoir_core.stream import InputStreamError
 
+# Max MP3 filesize: 200 MB
+MAX_FILESIZE = 200*1024*1024*8
+
 class Frame(FieldSet):
     VERSION_NAME = { 0: "2.5", 2: "2", 3: "1" }
     MPEG_I = 3
@@ -260,12 +263,22 @@ class Frames(FieldSet):
         return "Frames: %s" % text
 
 def createMpegAudioMagic():
-    sync = 2047
-    magics = [("ID3", 0)]
+
+    # ID3v1 magic
+    magics = [("TAG", 0)]
+
+    # ID3v2 magics
+    for ver_major in ID3v2.VALID_MAJOR_VERSIONS:
+       magic = "ID3%c\x00" % ver_major
+       magics.append( (magic,0) )
+
+    # MPEG frame magic
+    # TODO: Use longer magic: 32 bits instead of 16 bits
+    SYNC_BITS = 2047
     for version in Frame.VERSION_NAME.iterkeys():
         for layer in Frame.LAYER_NAME.iterkeys():
             for crc16 in (0, 1):
-                magic = (sync << 5) | (version << 3) | (layer << 1) | crc16
+                magic = (SYNC_BITS << 5) | (version << 3) | (layer << 1) | crc16
                 magic = long2raw(magic, BIG_ENDIAN, 2)
                 magics.append( (magic, 0) )
     return magics
@@ -277,8 +290,9 @@ class MpegAudioFile(Parser):
         "file_ext": ("mpa", "mp1", "mp2", "mp3"),
         "mime": (u"audio/mpeg",),
         "min_size": 4*8,
-#        "magic": createMpegAudioMagic(), + "ID3" + "TAG"
-        "description": "MPEG audio version 1, 2, 2.5"
+#        "magic": createMpegAudioMagic(),
+        "description": "MPEG audio version 1, 2, 2.5",
+        "subfile": "skip",
     }
     endian = BIG_ENDIAN
 
@@ -348,4 +362,45 @@ class MpegAudioFile(Parser):
             return self["id3v1"].description
         else:
             return "MPEG audio"
+
+    def createContentSize(self):
+        # Get "frames" field
+        field = self[0]
+        if field.name != "frames":
+            try:
+                field = self[1]
+            except MissingField:
+                # File only contains ID3v1 or ID3v2
+                return field.size
+
+            # Error: second field are not the frames"?
+            if field.name != "frames":
+                return None
+
+        # Go to last frame
+        frames = field
+        frame = frames["frame[0]"]
+        address0 = field.absolute_address
+        size = address0 + frame.size
+        while True:
+            try:
+                # Parse one MPEG audio frame
+                frame = createOrphanField(frames, size - address0, Frame, "frame")
+
+                # Check frame 32 bits header
+                if not frame.isValid():
+                    break
+            except HACHOIR_ERRORS:
+                break
+            if MAX_FILESIZE < (size + frame.size):
+                break
+            size += frame.size
+
+        # ID3v1 at the end?
+        try:
+            if self.stream.readBytes(size, 3) == "TAG":
+                size += ID3v1.static_size
+        except InputStreamError, err:
+            pass
+        return size
 

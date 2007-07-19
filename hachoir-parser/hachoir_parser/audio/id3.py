@@ -445,6 +445,7 @@ class ID3_Size(Bits):
 
 class ID3v2(FieldSet):
     endian = NETWORK_ENDIAN
+    VALID_MAJOR_VERSIONS = (2, 3, 4)
 
     def __init__(self, parent, name, size=None):
         FieldSet.__init__(self, parent, name, size=size)
@@ -464,7 +465,7 @@ class ID3v2(FieldSet):
         # Check format
         if self["header"].value != "ID3":
             raise MatchError("Signature error, should be \"ID3\".")
-        if self["ver_major"].value not in (2,3,4) \
+        if self["ver_major"].value not in self.VALID_MAJOR_VERSIONS \
         or self["ver_minor"].value != 0:
             raise MatchError(
                 "Unknown ID3 metadata version (2.%u.%u)"
