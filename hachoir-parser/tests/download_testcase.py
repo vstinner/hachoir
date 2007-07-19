@@ -83,6 +83,7 @@ testcase_files = (
     (u"7zip.chm", 77414, "2ac9ef6c4f4a770b27bc3471c1ee1d31"),
     (u'green_fire.jpg', 2455, '13775aa085ed3fd6da07cf5c6dd8cfe9'),
     (u"marc_kravetz.mp3", 62208, "b1b133498d3e5a807a361ae8931adbc8"),
+    (u"pentax_320x240.mov", 1938, "e23aae570cf3a30294e7630ece397d33"),
 )
 
 def stringMD5(text):

@@ -317,6 +317,14 @@ def checkMarcKravetz(meta): return (
     checkAttr(meta, 'format_version', u"MPEG version 1 layer III"),
 )
 
+def checkPentax320(meta): return (
+    checkAttr(meta, 'width', 320),
+    checkAttr(meta, 'height', 240),
+    checkAttr(meta, 'duration', timedelta(0, 4, 966667)),
+    checkAttr(meta, 'creation_date', datetime(2005, 8, 11, 14, 3, 54)),
+    checkAttr(meta, 'last_modification', datetime(2005, 8, 11, 14, 3, 54)),
+)
+
 def checkFile(filename, check_metadata, quality=1.0):
     sys.stdout.write("  - Create parser: ")
     sys.stdout.flush()
@@ -421,6 +429,7 @@ testcase_files = (
     (u"debian-31r4-i386-binary-1.iso.torrent", checkDebianTorrent),
     (u"green_fire.jpg", checkGreenFire),
     (u"marc_kravetz.mp3", checkMarcKravetz),
+    (u"pentax_320x240.mov", checkPentax320),
 )
 
 if __name__ == "__main__":
