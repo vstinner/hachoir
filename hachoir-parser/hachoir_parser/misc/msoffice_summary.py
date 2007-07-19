@@ -12,7 +12,13 @@ from hachoir_parser.common.win32 import GUID, PascalStringWin32
 from hachoir_parser.image.bmp import BmpHeader, parseImageData
 
 MAX_SECTION_COUNT = 100
+
 OS_MAC = 1
+OS_NAME = {
+    0: "Windows 16-bit",
+    1: "Macintosh",
+    2: "Windows 32-bit",
+}
 
 class OSConfig:
     def __init__(self, big_endian):
@@ -250,12 +256,6 @@ class Summary(HachoirParser, RootSeekableFieldSet):
     }
     endian = LITTLE_ENDIAN
 
-    OS_NAME = {
-        0: "Windows 16-bit",
-        1: "Macintosh",
-        2: "Windows 32-bit",
-    }
-
     def __init__(self, stream, **args):
         RootSeekableFieldSet.__init__(self, None, "root", stream, None, stream.askSize(self))
         HachoirParser.__init__(self, stream, **args)
@@ -276,7 +276,7 @@ class Summary(HachoirParser, RootSeekableFieldSet):
         yield UInt16(self, "format", "Format (0)")
         yield UInt8(self, "os_version")
         yield UInt8(self, "os_revision")
-        yield Enum(UInt16(self, "os_type"), self.OS_NAME)
+        yield Enum(UInt16(self, "os_type"), OS_NAME)
         yield GUID(self, "format_id")
         yield UInt32(self, "section_count")
         if MAX_SECTION_COUNT < self["section_count"].value:
@@ -306,7 +306,7 @@ class CompObj(FieldSet):
         yield textHandler(UInt16(self, "endian", "Endian (0xFF 0xFE for Intel)"), hexadecimal)
         yield UInt8(self, "os_version")
         yield UInt8(self, "os_revision")
-        yield Enum(UInt16(self, "os_type"), self.OS_NAME)
+        yield Enum(UInt16(self, "os_type"), OS_NAME)
         yield Int32(self, "unused", "(=-1)")
         yield GUID(self, "clsid")
 
