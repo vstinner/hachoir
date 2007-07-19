@@ -16,7 +16,7 @@ from hachoir_core.endian import NETWORK_ENDIAN
 
 class ID3v1(FieldSet):
     static_size = 128 * 8
-    genre_name = {
+    GENRE_NAME = {
           0: u"Blues",
           1: u"Classic Rock",
           2: u"Country",
@@ -167,6 +167,7 @@ class ID3v1(FieldSet):
         146: u"JPop",
         147: u"Synthpop"
     }
+
     def createFields(self):
         yield String(self, "signature", 3, "IDv1 signature (\"TAG\")", charset="ASCII")
         if self["signature"].value != "TAG":
@@ -178,20 +179,38 @@ class ID3v1(FieldSet):
         yield String(self, "year", 4, "Year", strip=" \0", charset="ISO-8859-1")
 
         # TODO: Write better algorithm to guess ID3v1 version
-        addr = self.absolute_address + self.current_size
-        bytes = self.stream.readBytes(addr+29*8, 2)
-        if bytes[1] != ' ':
-            if bytes[0] != 0x00:
+        version = self.getVersion()
+        if version in ("v1.1", "v1.1b"):
+            if version == "v1.1b":
                 # ID3 v1.1b
                 yield String(self, "comment", 29, "Comment", strip=" \0", charset="ISO-8859-1")
                 yield UInt8(self, "track_nb", "Track number")
             else:
                 # ID3 v1.1
                 yield String(self, "comment", 30, "Comment", strip=" \0", charset="ISO-8859-1")
-            yield Enum(UInt8(self, "genre", "Genre"), self.genre_name)
+            yield Enum(UInt8(self, "genre", "Genre"), self.GENRE_NAME)
         else:
             # ID3 v1.0
             yield String(self, "comment", 31, "Comment", strip=" \0", charset="ISO-8859-1")
+
+    def getVersion(self):
+        addr = self.absolute_address + 126*8
+        bytes = self.stream.readBytes(addr, 2)
+
+        # last byte (127) is not space?
+        if bytes[1] != ' ':
+            # byte 126 is nul?
+            if bytes[0] == 0x00:
+                return "v1.1"
+            else:
+                return "v1.1b"
+        else:
+            return "1.0"
+
+    def createDescription(self):
+        version = self.getVersion()
+        return "ID 3%s: author=%s, song=%s" % (
+            version, self["author"].value, self["song"].value)
 
 def getCharset(field):
     try:
