@@ -1,5 +1,6 @@
 from hachoir_core.cmd_line import unicodeFilename
-from hachoir_core.stream import FileOutputStream
+from hachoir_core.stream import FileOutputStream, StreamError
+from hachoir_core.error import error
 from errno import EEXIST
 from os import mkdir, path
 
@@ -41,6 +42,9 @@ class Output:
         output = FileOutputStream(filename, real_filename=real_filename)
 
         # Write output
-        output.copyBytesFrom(stream, offset, size//8)
+        try:
+            output.copyBytesFrom(stream, offset, size//8)
+        except StreamError, err:
+            error(u"copyBytesFrom() error: %s" % err)
         return filename
 
