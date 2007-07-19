@@ -263,6 +263,9 @@ class MpegAudioMetadata(RootMetadata):
         "WXXX": "url",
         "TCON": "music_genre",
         "TLAN": "language",
+        "TCOP": "copyright",
+        "TDAT": "creation_date",
+        "TRDA": "creation_date",
     }
 
     def processID3v2(self, field):

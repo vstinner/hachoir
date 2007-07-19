@@ -3,7 +3,7 @@ from hachoir_core.tools import (
     humanDuration, makePrintable, humanBitRate,
     humanFrequency, humanBitSize, humanFilesize)
 from hachoir_core.language import Language
-from hachoir_metadata.filter import Filter, NumberFilter
+from hachoir_metadata.filter import Filter, NumberFilter, DATETIME_FILTER
 from datetime import date, datetime, timedelta
 from hachoir_metadata.formatter import (
     humanAudioChannel, humanFrameRate, humanComprRate)
@@ -19,16 +19,15 @@ MAX_BIT_RATE = 500 * 1024 * 1024    # 500 Mbit/s
 MAX_HEIGHT = MAX_WIDTH
 MAX_NB_COLOR = 2 ** 24              # 16 million of color
 MAX_BITS_PER_PIXEL = 256            # 256 bits/pixel
-MIN_YEAR = 1900                     # Year in 1900..2030
-MAX_YEAR = 2030
 MAX_FRAME_RATE = 150                # 150 frame/sec
 MAX_NB_PAGE = 20000
 MAX_COMPR_RATE = 1000.0
 MIN_COMPR_RATE = 0.001
 MAX_TRACK = 999
 
-DATETIME_FILTER = Filter(datetime, datetime(MIN_YEAR, 1, 1), datetime(MAX_YEAR, 12, 31))
-DURATION_FILTER = Filter(timedelta, timedelta(milliseconds=1), timedelta(days=365))
+DURATION_FILTER = Filter(timedelta,
+    timedelta(milliseconds=1),
+    timedelta(days=365))
 
 def registerAllItems(meta):
     meta.register(Data("title", 100, _("Title"), type=unicode))

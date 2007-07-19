@@ -157,10 +157,7 @@ class PngMetadata(RootMetadata):
         if "header" in png:
             self.useHeader(png["header"])
         if "time" in png:
-            try:
-                self.creation_date = png["time"].value
-            except HACHOIR_ERRORS:
-                pass
+            self.useTime(png["time"])
         for comment in png.array("text"):
             if "text" not in comment:
                 continue
@@ -176,6 +173,10 @@ class PngMetadata(RootMetadata):
                     self.comment = text
         compr_size = sum( data.size for data in png.array("data") )
         computeComprRate(self, compr_size)
+
+    @fault_tolerant
+    def useTime(self, field):
+        self.creation_date = field.value
 
     @fault_tolerant
     def useHeader(self, header):

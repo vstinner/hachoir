@@ -24,6 +24,7 @@ def main():
 
     # Test documentation of some functions/classes
     testModule("hachoir_metadata.metadata")
+    testModule("hachoir_metadata.setter")
 
 if __name__ == "__main__":
     main()

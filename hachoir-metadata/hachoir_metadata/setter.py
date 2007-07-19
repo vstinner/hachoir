@@ -1,19 +1,49 @@
 from datetime import date, datetime
 import re
 from hachoir_core.language import Language
+from locale import setlocale, LC_ALL
+from time import strptime
+from hachoir_metadata.timezone import createTimezone
 
 NORMALIZE_REGEX = re.compile("[-/.: ]+")
 YEAR_REGEX1 = re.compile("^([0-9]{4})$")
-DATE_REGEX1 = re.compile("^([0-9]{4})-([01][0-9])-([0-9]{2})$")
 
 # Date regex: YYYY-MM-DD (US format)
-DATETIME_REGEX1 = re.compile("^([0-9]{4})-([01][0-9])-([0-9]{2})-([0-9]{1,2})-([0-9]{2})-([0-9]{2})$")
+DATE_REGEX1 = re.compile("^([0-9]{4})~([01][0-9])~([0-9]{2})$")
 
-# Date regex: "MM-DD-YYYY HH:MM:SS" (FR format)
-DATETIME_REGEX2 = re.compile("^([01]?[0-9])-([0-9]{2})-([0-9]{4})-([0-9]{1,2})-([0-9]{2})-([0-9]{2})$")
+# Date regex: YYYY-MM-DD HH:MM:SS (US format)
+DATETIME_REGEX1 = re.compile("^([0-9]{4})~([01][0-9])~([0-9]{2})~([0-9]{1,2})~([0-9]{2})~([0-9]{2})$")
+
+# Datetime regex: "MM-DD-YYYY HH:MM:SS" (FR format)
+DATETIME_REGEX2 = re.compile("^([01]?[0-9])~([0-9]{2})~([0-9]{4})~([0-9]{1,2})~([0-9]{2})~([0-9]{2})$")
+
+# Timezone regex: "(...) +0200"
+TIMEZONE_REGEX = re.compile("^(.*)~([+-][0-9]{2})00$")
+
+# Timestmap: 'Thu, 19 Jul 2007 09:03:57'
+ISO_TIMESTAMP = "%a,~%d~%b~%Y~%H~%M~%S"
 
 def parseDatetime(value):
-    value = NORMALIZE_REGEX.sub("-", value.strip())
+    """
+    Year and date:
+    >>> parseDatetime("2000")
+    (datetime.date(2000, 1, 1), u'2000')
+    >>> parseDatetime("2004-01-02")
+    datetime.date(2004, 1, 2)
+
+    Timestamp:
+    >>> parseDatetime("2004-01-02 18:10:45")
+    datetime.datetime(2004, 1, 2, 18, 10, 45)
+    >>> parseDatetime("2004-01-02 18:10:45")
+    datetime.datetime(2004, 1, 2, 18, 10, 45)
+
+    Timestamp with timezone:
+    >>> parseDatetime(u'Thu, 19 Jul 2007 09:03:57 +0000')
+    datetime.datetime(2007, 7, 19, 9, 3, 57, tzinfo=<TimezoneUTC delta=0, name=u'UTC'>)
+    >>> parseDatetime(u'Thu, 19 Jul 2007 09:03:57 +0200')
+    datetime.datetime(2007, 7, 19, 9, 3, 57, tzinfo=<Timezone delta=2:00:00, name='+0200'>)
+    """
+    value = NORMALIZE_REGEX.sub("~", value.strip())
     regs = YEAR_REGEX1.match(value)
     if regs:
         try:
@@ -54,6 +84,25 @@ def parseDatetime(value):
             return datetime(year, month, day, hour, min, sec)
         except ValueError:
             pass
+    current_locale = setlocale(LC_ALL, "C")
+    try:
+        match = TIMEZONE_REGEX.match(value)
+        if match:
+            without_timezone = match.group(1)
+            delta = int(match.group(2))
+            delta = createTimezone(delta)
+        else:
+            without_timezone = value
+            delta = 0
+        try:
+            timestamp = strptime(without_timezone, ISO_TIMESTAMP)
+            arguments = list(timestamp[0:6]) + [0, delta]
+            return datetime(*arguments)
+        except ValueError:
+            pass
+    finally:
+        setlocale(LC_ALL, current_locale)
+    return None
 
 def setDatetime(meta, key, value):
     if isinstance(value, (str, unicode)):
@@ -63,9 +112,19 @@ def setDatetime(meta, key, value):
     return None
 
 def setLanguage(meta, key, value):
+    """
+    >>> setLanguage(None, None, "fre")
+    <Language 'French', code='fre'>
+    >>> setLanguage(None, None, u"ger")
+    <Language 'German', code='ger'>
+    """
     return Language(value)
 
 def setTrackTotal(meta, key, total):
+    """
+    >>> setTrackTotal(None, None, "10")
+    10
+    """
     try:
         return int(total)
     except ValueError:
