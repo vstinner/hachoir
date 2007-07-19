@@ -215,10 +215,26 @@ class MovMetadata(RootMetadata):
         self.comment = _("Play speed: %.1f%%") % (hdr["play_speed"].value*100)
         self.comment = _("User volume: %.1f%%") % (float(hdr["volume"].value)*100//255)
 
+    @fault_tolerant
+    def processTrackHeader(self, hdr):
+        width = int(hdr["frame_size_width"].value)
+        height = int(hdr["frame_size_height"].value)
+        if width and height:
+            self.width = width
+            self.height = height
+
+    def processTrack(self, atom):
+        for field in atom:
+            if "track_hdr" in field:
+                self.processTrackHeader(field["track_hdr"])
+
     def processMovie(self, atom):
         for field in atom:
+            if "track" in field:
+                self.processTrack(field["track"])
             if "movie_hdr" in field:
                 self.processMovieHeader(field["movie_hdr"])
+
 
 class AsfMetadata(MultipleMetadata):
     EXT_DESC_TO_ATTR = {
