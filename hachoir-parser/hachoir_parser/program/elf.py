@@ -10,10 +10,12 @@ from hachoir_core.field import (FieldSet, ParserError,
     UInt8, UInt16, UInt32, Enum,
     String, Bytes)
 from hachoir_core.text_handler import textHandler, hexadecimal
-from hachoir_core.endian import LITTLE_ENDIAN
+from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 
 class ElfHeader(FieldSet):
     static_size = 52*8
+    LITTLE_ENDIAN_ID = 1
+    BIG_ENDIAN_ID = 2
     MACHINE_NAME = {
         1: u"AT&T WE 32100",
         2: u"SPARC",
@@ -36,15 +38,15 @@ class ElfHeader(FieldSet):
         0xFF00: u"Processor-specific (0xFF00)",
         0xFFFF: u"Processor-specific (0xFFFF)"
     }
-    ENCODING_NAME = {
-        1: "Little endian",
-        2: "Big endian"
+    ENDIAN_NAME = {
+        LITTLE_ENDIAN_ID: "Little endian",
+        BIG_ENDIAN_ID: "Big endian",
     }
 
     def createFields(self):
         yield Bytes(self, "signature", 4, r'ELF signature ("\x7fELF")')
         yield Enum(UInt8(self, "class", "Class"), self.CLASS_NAME)
-        yield Enum(UInt8(self, "encoding", "Encoding"), self.ENCODING_NAME)
+        yield Enum(UInt8(self, "endian", "Endian"), self.ENDIAN_NAME)
         yield UInt8(self, "file_version", "File version")
         yield String(self, "pad", 8, "Pad")
         yield UInt8(self, "nb_ident", "Size of ident[]")
@@ -67,8 +69,8 @@ class ElfHeader(FieldSet):
             return "Wrong ELF signature"
         if self["class"].value not in self.CLASS_NAME:
             return "Unknown class"
-        if self["encoding"].value not in self.ENCODING_NAME:
-            return "Unknown encoding"
+        if self["endian"].value not in self.ENDIAN_NAME:
+            return "Unknown endian (%s)" % self["endian"].value
         return ""
 
 class SectionHeader32(FieldSet):
@@ -153,6 +155,13 @@ class ElfFile(Parser):
         return True
 
     def createFields(self):
+        # Choose the right endian depending on endian specified in header
+        if self.stream.readBits(5*8, 8, BIG_ENDIAN) == ElfHeader.BIG_ENDIAN_ID:
+            self.endian = BIG_ENDIAN
+        else:
+            self.endian = LITTLE_ENDIAN
+
+        # Parse header and program headers
         yield ElfHeader(self, "header", "Header")
         for index in xrange(self["header/phnum"].value):
             yield ProgramHeader32(self, "prg_header[]")
