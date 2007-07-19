@@ -82,6 +82,7 @@ testcase_files = (
     (u"vim.lnk", 1510, "9853258788fc67ce406201773d1f4fb5"),
     (u"7zip.chm", 77414, "2ac9ef6c4f4a770b27bc3471c1ee1d31"),
     (u'green_fire.jpg', 2455, '13775aa085ed3fd6da07cf5c6dd8cfe9'),
+    (u"marc_kravetz.mp3", 62208, "b1b133498d3e5a807a361ae8931adbc8"),
 )
 
 def stringMD5(text):

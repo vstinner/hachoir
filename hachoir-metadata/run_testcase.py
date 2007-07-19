@@ -17,6 +17,7 @@ from hachoir_parser import createParser
 from hachoir_core.compatibility import all
 from hachoir_core.language import Language
 from hachoir_metadata import extractMetadata
+from hachoir_metadata.timezone import createTimezone
 from datetime import date, timedelta, datetime
 from locale import setlocale, LC_ALL
 import os
@@ -302,6 +303,20 @@ def checkGreenFire(meta): return (
     checkAttr(meta, 'comment', (u"Intel(R) JPEG Library, version 1,5,4,36", u"JPEG quality: 80%")),
 )
 
+def checkMarcKravetz(meta): return (
+    checkAttr(meta, 'creation_date', datetime(2007, 7, 19, 9, 3, 57, tzinfo=createTimezone(2))),
+    checkAttr(meta, 'sample_rate', 48000),
+    checkAttr(meta, 'compr_rate', 12.0),
+    checkAttr(meta, 'album', u"France Culture - Le portrait du jour par Marc Kravetz"),
+    checkAttr(meta, 'author', u"Marc Kravetz"),
+    checkAttr(meta, 'duration', timedelta(0, 2, 400000)),
+    checkAttr(meta, 'bit_rate', 128000),
+    checkAttr(meta, 'track_number', 32),
+    checkAttr(meta, 'bits_per_sample', 16),
+    checkAttr(meta, 'copyright', u"Radio France"),
+    checkAttr(meta, 'format_version', u"MPEG version 1 layer III"),
+)
+
 def checkFile(filename, check_metadata, quality=1.0):
     sys.stdout.write("  - Create parser: ")
     sys.stdout.flush()
@@ -405,6 +420,7 @@ testcase_files = (
     (u"twunk_16.exe", checkTwunk16),
     (u"debian-31r4-i386-binary-1.iso.torrent", checkDebianTorrent),
     (u"green_fire.jpg", checkGreenFire),
+    (u"marc_kravetz.mp3", checkMarcKravetz),
 )
 
 if __name__ == "__main__":
