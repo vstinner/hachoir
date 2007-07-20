@@ -61,6 +61,11 @@ def main():
     filename, realname = unicodeFilename(filename), filename
     fieldset = createParser(filename, realname)
 
+    # test if there is a least one tree
+    if  fieldset is  None :
+        print "No fields to display in this file. This is probably a text file."
+        return
+
     # Create window and gtk event loop
     interface = Interface(fieldset)
     interface.display_tree(fieldset)
