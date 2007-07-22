@@ -1,4 +1,4 @@
-from hachoir_core.i18n import _
+from hachoir_core.i18n import _, ngettext
 
 NB_CHANNEL_NAME = {1: _("mono"), 2: _("stereo")}
 
@@ -13,4 +13,7 @@ def humanFrameRate(value):
 
 def humanComprRate(rate):
     return u"%.1fx" % rate
+
+def humanAltitude(value):
+    return ngettext("%.1f meter", "%.1f meters", value) % value
 

@@ -6,7 +6,7 @@ from hachoir_core.language import Language
 from hachoir_metadata.filter import Filter, NumberFilter, DATETIME_FILTER
 from datetime import date, datetime, timedelta
 from hachoir_metadata.formatter import (
-    humanAudioChannel, humanFrameRate, humanComprRate)
+    humanAudioChannel, humanFrameRate, humanComprRate, humanAltitude)
 from hachoir_metadata.setter import (
     setDatetime, setTrackNumber, setTrackTotal, setLanguage)
 from hachoir_metadata.metadata_item import Data
@@ -73,6 +73,7 @@ def registerAllItems(meta):
         filter=DATETIME_FILTER, type=(datetime, date), conversion=setDatetime))
     meta.register(Data("latitude", 510, _("Latitude"), type=float))
     meta.register(Data("longitude", 511, _("Longitude"), type=float))
+    meta.register(Data("altitude", 511, _("Altitude"), type=float, text_handler=humanAltitude))
     meta.register(Data("city", 530, _("City"), type=unicode))
     meta.register(Data("country", 532, _("Country"), type=unicode))
     meta.register(Data("charset", 540, _("Charset"), type=unicode))

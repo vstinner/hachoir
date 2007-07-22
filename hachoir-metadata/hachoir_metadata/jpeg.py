@@ -190,6 +190,10 @@ class JpegMetadata(RootMetadata):
         longitude_ref = None
         latitude = None
         longitude = None
+        altitude_ref = 1
+        altitude = None
+        timestamp = None
+        datestamp = None
         for entry in ifd.array("entry"):
             tag = entry["tag"].value
             if tag == ExifEntry.TAG_GPS_LATITUDE_REF:
@@ -202,10 +206,24 @@ class JpegMetadata(RootMetadata):
                     longitude_ref = 1
                 else:
                     longitude_ref = -1
+            elif tag == ExifEntry.TAG_GPS_ALTITUDE_REF:
+                if entry["value"].value == 1:
+                    altitude_ref = -1
+                else:
+                    altitude_ref = 1
             elif tag == ExifEntry.TAG_GPS_LATITUDE:
                 latitude = [ifd["value_%s[%u]" % (entry.name, index)].value for index in xrange(3)]
             elif tag == ExifEntry.TAG_GPS_LONGITUDE:
                 longitude = [ifd["value_%s[%u]" % (entry.name, index)].value for index in xrange(3)]
+            elif tag == ExifEntry.TAG_GPS_ALTITUDE:
+                altitude = ifd["value_%s" % entry.name].value
+            elif tag == ExifEntry.TAG_GPS_DATESTAMP:
+                datestamp = ifd["value_%s" % entry.name].value
+            elif tag == ExifEntry.TAG_GPS_TIMESTAMP:
+                items = [ifd["value_%s[%u]" % (entry.name, index)].value for index in xrange(3)]
+                items = map(int, items)
+                items = map(str, items)
+                timestamp = ":".join(items)
         if latitude_ref and latitude:
             value = deg2float(*latitude)
             if latitude_ref < 0:
@@ -216,6 +234,15 @@ class JpegMetadata(RootMetadata):
             if longitude_ref < 0:
                 value = -value
             self.longitude = value
+        if altitude:
+            value = altitude
+            if altitude_ref < 0:
+                value = -value
+            self.altitude = value
+        if datestamp:
+            if timestamp:
+                datestamp += " " + timestamp
+            self.creation_date = datestamp
 
     def parseIPTC(self, iptc):
         datestr = hourstr = None
