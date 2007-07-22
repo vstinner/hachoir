@@ -6,7 +6,7 @@ Creation date: 08 jul 2007
 """
 
 from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet, ParserError,
+from hachoir_core.field import (FieldSet,
     UInt8, UInt16, UInt24, UInt32, UInt64, Enum,
     CString, String, PaddingBytes, RawBytes, NullBytes)
 from hachoir_core.endian import LITTLE_ENDIAN

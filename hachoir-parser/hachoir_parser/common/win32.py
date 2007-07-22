@@ -3,7 +3,7 @@ from hachoir_core.field import (FieldSet,
 from hachoir_parser.video.fourcc import video_fourcc_name
 from hachoir_core.bits import str2hex
 from hachoir_core.text_handler import textHandler, hexadecimal
-from hachoir_parser.network.common import OrganizationallyUniqueIdentifier, MAC48_Address
+from hachoir_parser.network.common import MAC48_Address
 
 class PascalStringWin32(FieldSet):
     def __init__(self, parent, name, description=None, strip=None, charset="UTF-16-LE"):

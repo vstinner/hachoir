@@ -23,10 +23,12 @@ Changes:
 """
 
 from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet, GenericString,
-    SeekableFieldSet, CString, PascalString16,
-    UInt32, UInt16, UInt8, String, TimestampWin64, Bit, Bits,
-    NullBytes, PaddingBits, PaddingBytes, Enum, RawBytes, DateTimeMSDOS32)
+from hachoir_core.field import (FieldSet,
+    CString, String,
+    UInt32, UInt16, UInt8,
+    Bit, Bits, PaddingBits,
+    TimestampWin64, DateTimeMSDOS32,
+    NullBytes, PaddingBytes, RawBytes, Enum)
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_parser.common.win32 import GUID

@@ -19,7 +19,7 @@ from hachoir_core.field import (FieldSet, Fragment,
 from hachoir_parser.image.common import RGB
 from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_core.endian import NETWORK_ENDIAN
-from hachoir_core.tools import humanFilesize, humanDatetime
+from hachoir_core.tools import humanFilesize
 from datetime import datetime
 
 MAX_FILESIZE = 500 * 1024 * 1024

@@ -11,7 +11,7 @@ from hachoir_core.field import (FieldSet, ParserError,
     TimeDateMSDOS32, SubFile,
     UInt8, UInt16, UInt32, UInt64,
     String, PascalString16,
-    RawBytes, SubFile, CompressedField)
+    RawBytes, SubFile)
 from hachoir_core.text_handler import textHandler, filesizeHandler, hexadecimal
 from hachoir_core.error import HACHOIR_ERRORS
 from hachoir_core.tools import makeUnicode

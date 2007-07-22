@@ -13,7 +13,7 @@ from hachoir_core.field import (FieldSet, ParserError, Enum,
     Bit, Bits, SeekableFieldSet,
     UInt16, UInt32, TimestampUnix32,
     RawBytes, PaddingBytes, NullBytes, NullBits,
-    CString, String, PascalString16)
+    CString, String)
 from hachoir_core.text_handler import textHandler, filesizeHandler, hexadecimal
 from hachoir_core.tools import createDict, paddingSize, alignValue, makePrintable
 from hachoir_core.error import HACHOIR_ERRORS

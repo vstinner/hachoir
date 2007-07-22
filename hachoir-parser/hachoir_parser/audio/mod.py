@@ -19,13 +19,11 @@ Creation: 18th February 2007
 
 from math import log10
 from hachoir_parser import Parser
-from hachoir_core.field import (StaticFieldSet, FieldSet,
-    Bit, RawBits, Bits,
-    UInt32, UInt16, UInt8, Int8, Enum,
+from hachoir_core.field import (FieldSet,
+    Bits, UInt16, UInt8,
     RawBytes, String, GenericVector)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
-from hachoir_core.text_handler import textHandler, filesizeHandler, hexadecimal
-from hachoir_parser.audio.modplug import ParseModplugMetadata
+from hachoir_core.text_handler import textHandler
 from hachoir_parser.common.tracker import NOTE_NAME
 
 # Old NoiseTracker 15-samples modules can have anything here.

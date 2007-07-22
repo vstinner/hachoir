@@ -13,7 +13,7 @@ Creation date: 2007-02-08
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
     UInt16, UInt32, Bit, Bits,
-    PaddingBits, NullBits, NullBytes,
+    PaddingBits, NullBytes,
     String, RawBytes, Bytes, Enum,
     TimestampMac32)
 from hachoir_core.endian import BIG_ENDIAN

@@ -1,7 +1,7 @@
 """
 ====================== 8< ============================
 This file is an Hachoir parser template. Make a copy
-of it, and adapt it to you needs.
+of it, and adapt it to your needs.
 
 You have to replace all "TODO" with you code.
 ====================== 8< ============================

@@ -11,7 +11,6 @@ from hachoir_core.field import (FieldSet, ParserError,
     PaddingBytes, createPaddingField)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN, NETWORK_ENDIAN
 from hachoir_core.text_handler import textHandler, hexadecimal
-from hachoir_core.tools import paddingSize
 from hachoir_core.tools import createDict
 
 MAX_COUNT = 1000

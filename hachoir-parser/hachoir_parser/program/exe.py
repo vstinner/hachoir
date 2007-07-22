@@ -12,7 +12,7 @@ Creation date: 2006-08-13
 from hachoir_parser import Parser
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.field import (FieldSet,
-    UInt16, UInt32, Bytes, String,
+    UInt16, UInt32, String,
     RawBytes, PaddingBytes)
 from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_parser.program.exe_ne import NE_Header
