@@ -16,20 +16,37 @@ from hachoir_core.tools import createDict
 
 MAX_COUNT = 1000
 
+def rationalFactory(class_name, size, field_class):
+    class Rational(FieldSet):
+        static_size = size
+
+        def createFields(self):
+            yield field_class(self, "numerator")
+            yield field_class(self, "denominator")
+
+        def createValue(self):
+            return float(self["numerator"].value) / self["denominator"].value
+    cls = Rational
+    cls.__name__ = class_name
+    return cls
+
+RationalInt32 = rationalFactory("RationalInt32", 64, Int32)
+RationalUInt32 = rationalFactory("RationalUInt32", 64, UInt32)
+
 class BasicIFDEntry(FieldSet):
     TYPE_BYTE = 0
     TYPE_UNDEFINED = 7
     TYPE_RATIONAL = 5
     TYPE_SIGNED_RATIONAL = 10
     TYPE_INFO = {
-         1: ((1, UInt8), "BYTE (8 bits)"),
-         2: ((1, String), "ASCII (8 bits)"),
-         3: ((1, UInt16), "SHORT (16 bits)"),
-         4: ((1, UInt32), "LONG (32 bits)"),
-         5: ((2, UInt32), "RATIONAL (2x LONG, 64 bits)"),
-         7: ((1, Bytes), "UNDEFINED (8 bits)"),
-         9: ((1, Int32), "SIGNED LONG (32 bits)"),
-        10: ((2, Int32), "SRATIONAL (2x SIGNED LONGs, 64 bits)"),
+         1: (UInt8, "BYTE (8 bits)"),
+         2: (String, "ASCII (8 bits)"),
+         3: (UInt16, "SHORT (16 bits)"),
+         4: (UInt32, "LONG (32 bits)"),
+         5: (RationalUInt32, "RATIONAL (2x LONG, 64 bits)"),
+         7: (Bytes, "UNDEFINED (8 bits)"),
+         9: (Int32, "SIGNED LONG (32 bits)"),
+        10: (RationalInt32, "SRATIONAL (2x SIGNED LONGs, 64 bits)"),
     }
     ENTRY_FORMAT = createDict(TYPE_INFO, 0)
     TYPE_NAME = createDict(TYPE_INFO, 1)
@@ -74,11 +91,10 @@ class BasicIFDEntry(FieldSet):
         array_size in number of items.
         """
         # Create format
-        format = self.ENTRY_FORMAT.get(self["type"].value, (1, Bytes))
-        count = self["count"].value * format[0]
+        count = self["count"].value
         if count == 0:
             raise ParserError("Invalid count value")
-        self.value_cls = format[1]
+        self.value_cls = self.ENTRY_FORMAT.get(self["type"].value, Bytes)
 
         # Set size
         if self.value_cls in (String, Bytes):
@@ -93,6 +109,11 @@ class ExifEntry(BasicIFDEntry):
     TAG_WIDTH = 0xA002
     TAG_HEIGHT = 0xA003
 
+    TAG_GPS_LATITUDE_REF = 0x0001
+    TAG_GPS_LATITUDE = 0x0002
+    TAG_GPS_LONGITUDE_REF = 0x0003
+    TAG_GPS_LONGITUDE = 0x0004
+
     TAG_IMG_TITLE = 0x010e
     TAG_FILE_TIMESTAMP = 0x0132
     TAG_SOFTWARE = 0x0131
@@ -106,6 +127,39 @@ class ExifEntry(BasicIFDEntry):
     TAG_USER_COMMENT = 0x9286
 
     TAG_NAME = {
+        # GPS
+        0x0000: "GPS version ID",
+        0x0001: "GPS latitude ref",
+        0x0002: "GPS latitude",
+        0x0003: "GPS longitude ref",
+        0x0004: "GPS longitude",
+        0x0005: "GPS altitude ref",
+        0x0006: "GPS altitude",
+        0x0007: "GPS timestamp",
+        0x0008: "GPS satellites",
+        0x0009: "GPS status",
+        0x000a: "GPS measure mode",
+        0x000b: "GPS DOP",
+        0x000c: "GPS speed ref",
+        0x000d: "GPS speed",
+        0x000e: "GPS track ref",
+        0x000f: "GPS track",
+        0x0010: "GPS img direction ref",
+        0x0011: "GPS img direction",
+        0x0012: "GPS map datum",
+        0x0013: "GPS dest latitude ref",
+        0x0014: "GPS dest latitude",
+        0x0015: "GPS dest longitude ref",
+        0x0016: "GPS dest longitude",
+        0x0017: "GPS dest bearing ref",
+        0x0018: "GPS dest bearing",
+        0x0019: "GPS dest distance ref",
+        0x001a: "GPS dest distance",
+        0x001b: "GPS processing method",
+        0x001c: "GPS area information",
+        0x001d: "GPS datestamp",
+        0x001e: "GPS differential",
+
         0x0100: "Image width",
         0x0101: "Image height",
         0x0102: "Number of bits per component",

@@ -71,10 +71,12 @@ def registerAllItems(meta):
         filter=DATETIME_FILTER, type=(datetime, date), conversion=setDatetime))
     meta.register(Data("last_modification", 501, _("Last modification"),
         filter=DATETIME_FILTER, type=(datetime, date), conversion=setDatetime))
-    meta.register(Data("country", 502, _("Country"), type=unicode))
-    meta.register(Data("charset", 503, _("Charset"), type=unicode))
-    meta.register(Data("font_weight", 503, _("Font weight")))
-    meta.register(Data("city", 504, _("City"), type=unicode))
+    meta.register(Data("latitude", 510, _("Latitude"), type=float))
+    meta.register(Data("longitude", 511, _("Longitude"), type=float))
+    meta.register(Data("city", 530, _("City"), type=unicode))
+    meta.register(Data("country", 532, _("Country"), type=unicode))
+    meta.register(Data("charset", 540, _("Charset"), type=unicode))
+    meta.register(Data("font_weight", 550, _("Font weight")))
 
     meta.register(Data("camera_aperture", 520, _("Camera aperture")))
     meta.register(Data("camera_focal", 521, _("Camera focal")))

@@ -10,9 +10,13 @@ from hachoir_core.i18n import _
 from hachoir_core.tools import makeUnicode
 from hachoir_metadata.safe import fault_tolerant, getValue
 from datetime import datetime
+import operator
+
+def deg2float(degree, minute, second):
+    return degree + (float(minute) + float(second) / 60.0) / 60.0
 
 class JpegMetadata(RootMetadata):
-    exif_key = {
+    EXIF_KEY = {
         # Exif metadatas
         ExifEntry.TAG_CAMERA_MANUFACTURER: "camera_manufacturer",
         ExifEntry.TAG_CAMERA_MODEL: "camera_model",
@@ -63,6 +67,7 @@ class JpegMetadata(RootMetadata):
             for ifd in jpeg.array("exif/content/ifd"):
                 for entry in ifd.array("entry"):
                     self.processIfdEntry(ifd, entry)
+                self.readGPS(ifd)
         if "photoshop/content" in jpeg:
             psd = jpeg["photoshop/content"]
             if "version/content/reader_name" in psd:
@@ -149,9 +154,9 @@ class JpegMetadata(RootMetadata):
     def processIfdEntry(self, ifd, entry):
         # Skip unknown tags
         tag = entry["tag"].value
-        if tag not in self.exif_key:
+        if tag not in self.EXIF_KEY:
             return
-        key = self.exif_key[tag]
+        key = self.EXIF_KEY[tag]
         if key in ("width", "height") and self.has(key):
             # EXIF "valid size" are sometimes not updated when the image is scaled
             # so we just ignore it
@@ -161,13 +166,6 @@ class JpegMetadata(RootMetadata):
         rational = False
         if "value" in entry:
             value = entry["value"].value
-        elif entry["type"].value in (ExifEntry.TYPE_RATIONAL, ExifEntry.TYPE_SIGNED_RATIONAL):
-            denominator = ifd[ "value_%s[1]" % entry.name ].value
-            if not denominator:
-                return
-            value  = float(ifd[ "value_%s[0]" % entry.name ].value)
-            value /= denominator
-            rational = True
         else:
             value = ifd["value_%s" % entry.name].value
 
@@ -178,12 +176,46 @@ class JpegMetadata(RootMetadata):
             if not value:
                 return
             if isinstance(value, float):
-                value = u"1/%g" % (1/value)
-        elif rational:
-            value = u"%.3g" % value
+                value = (value, u"1/%g" % (1/value))
+        elif entry["type"].value in (ExifEntry.TYPE_RATIONAL, ExifEntry.TYPE_SIGNED_RATIONAL):
+            value = (value, u"%.3g" % value)
 
         # Store information
         setattr(self, key, value)
+
+    @fault_tolerant
+    def readGPS(self, ifd):
+        # Read latitude and longitude
+        latitude_ref = None
+        longitude_ref = None
+        latitude = None
+        longitude = None
+        for entry in ifd.array("entry"):
+            tag = entry["tag"].value
+            if tag == ExifEntry.TAG_GPS_LATITUDE_REF:
+                if entry["value"].value == "N":
+                    latitude_ref = 1
+                else:
+                    latitude_ref = -1
+            elif tag == ExifEntry.TAG_GPS_LONGITUDE_REF:
+                if entry["value"].value == "E":
+                    longitude_ref = 1
+                else:
+                    longitude_ref = -1
+            elif tag == ExifEntry.TAG_GPS_LATITUDE:
+                latitude = [ifd["value_%s[%u]" % (entry.name, index)].value for index in xrange(3)]
+            elif tag == ExifEntry.TAG_GPS_LONGITUDE:
+                longitude = [ifd["value_%s[%u]" % (entry.name, index)].value for index in xrange(3)]
+        if latitude_ref and latitude:
+            value = deg2float(*latitude)
+            if latitude_ref < 0:
+                value = -value
+            self.latitude = value
+        if longitude and longitude_ref:
+            value = deg2float(*longitude)
+            if longitude_ref < 0:
+                value = -value
+            self.longitude = value
 
     def parseIPTC(self, iptc):
         datestr = hourstr = None
