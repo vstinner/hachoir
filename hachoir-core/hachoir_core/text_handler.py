@@ -2,7 +2,6 @@
 Utilities used to convert a field to human classic reprentation of data.
 """
 
-from datetime import datetime, MAXYEAR
 from hachoir_core.tools import (
     humanDuration, humanFilesize, alignValue,
     durationWin64 as doDurationWin64)

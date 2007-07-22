@@ -145,14 +145,14 @@ class GenericFieldSet(BasicFieldSet):
 
         May raise a StopIteration() on error
         """
-        if config.debug:
-            self.info("[+] DBG: _addField(%s)" % field.name)
         if not issubclass(field.__class__, Field):
             raise ParserError("Field type (%s) is not a subclass of 'Field'!"
                 % field.__class__.__name__)
         assert isinstance(field._name, str)
         if field._name.endswith("[]"):
             self.setUniqueFieldName(field)
+        if config.debug:
+            self.info("[+] DBG: _addField(%s)" % field.name)
 
         # required for the msoffice parser
         if field._address != self._current_size:
