@@ -8,7 +8,6 @@ from hachoir_core.i18n import _, ngettext
 import re
 import stat
 from datetime import datetime, timedelta, MAXYEAR
-from hachoir_core.i18n import ngettext
 
 def paddingSize(value, align):
     """
