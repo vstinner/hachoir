@@ -325,6 +325,21 @@ def checkPentax320(meta): return (
     checkAttr(meta, 'last_modification', datetime(2005, 8, 11, 14, 3, 54)),
 )
 
+def checkGPS(meta): return (
+    checkAttr(meta, 'altitude', 78.0),
+    checkAttr(meta, 'creation_date', datetime(2003, 5, 24, 22, 29, 14)),
+    checkAttr(meta, 'latitude', 35.616019444444447),
+    checkAttr(meta, 'longitude', 139.69731666666667),
+    checkAttr(meta, 'camera_model', u'A5301T'),
+    checkAttr(meta, 'camera_manufacturer', u'KDDI-TS'),
+)
+
+def checkAngelBear(meta): return (
+    checkAttr(meta, 'title', u"Angel Bear"),
+    checkAttr(meta, 'artist', u"Copyright ©Loraine Wauer-Ferus http://www.billybear4kids.com"),
+    checkAttr(meta, 'frame_rate', 4.0),
+)
+
 def checkFile(filename, check_metadata, quality=1.0):
     sys.stdout.write("  - Create parser: ")
     sys.stdout.flush()
@@ -430,6 +445,8 @@ testcase_files = (
     (u"green_fire.jpg", checkGreenFire),
     (u"marc_kravetz.mp3", checkMarcKravetz),
     (u"pentax_320x240.mov", checkPentax320),
+    (u"gps.jpg", checkGPS),
+    (u"angle-bear-48x48.ani", checkAngelBear),
 )
 
 if __name__ == "__main__":

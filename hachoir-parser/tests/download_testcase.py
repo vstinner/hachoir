@@ -84,6 +84,8 @@ testcase_files = (
     (u'green_fire.jpg', 2455, '13775aa085ed3fd6da07cf5c6dd8cfe9'),
     (u"marc_kravetz.mp3", 62208, "b1b133498d3e5a807a361ae8931adbc8"),
     (u"pentax_320x240.mov", 1938, "e23aae570cf3a30294e7630ece397d33"),
+    (u"gps.jpg", 8271, "15262738e24b85ad4f6199df348e867e"),
+    (u"angle-bear-48x48.ani", 29658, "9aa43520cf430bd996c4c318b905bc7f"),
 )
 
 def stringMD5(text):

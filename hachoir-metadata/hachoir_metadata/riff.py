@@ -17,7 +17,7 @@ class RiffMetadata(MultipleMetadata):
         "IART": "artist",
         "ICMT": "comment",
         "ICOP": "copyright",
-        "IENG": "author",
+        "IENG": "author",    # (engineer)
         "ISFT": "producer",
         "ICRD": "creation_date",
     }
