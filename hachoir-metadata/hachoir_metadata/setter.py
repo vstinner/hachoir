@@ -20,6 +20,9 @@ DATETIME_REGEX2 = re.compile("^([01]?[0-9])~([0-9]{2})~([0-9]{4})~([0-9]{1,2})~(
 # Timezone regex: "(...) +0200"
 TIMEZONE_REGEX = re.compile("^(.*)~([+-][0-9]{2})00$")
 
+# Timestmap: 'February 2007'
+MONTH_YEAR = "%B~%Y"
+
 # Timestmap: 'Thu, 19 Jul 2007 09:03:57'
 ISO_TIMESTAMP = "%a,~%d~%b~%Y~%H~%M~%S"
 
@@ -98,6 +101,13 @@ def parseDatetime(value):
             timestamp = strptime(without_timezone, ISO_TIMESTAMP)
             arguments = list(timestamp[0:6]) + [0, delta]
             return datetime(*arguments)
+        except ValueError:
+            pass
+
+        try:
+            timestamp = strptime(value, MONTH_YEAR)
+            arguments = list(timestamp[0:3])
+            return date(*arguments)
         except ValueError:
             pass
     finally:

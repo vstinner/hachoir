@@ -33,6 +33,7 @@ class OggMetadata(MultipleMetadata):
         "TRACKTOTAL": "track_total",
         "ENCODER": "producer",
         "TITLE": "title",
+        "LOCATION": "location",
         "DATE": "creation_date",
         "ORGANIZATION": "organization",
         "GENRE": "music_genre",
