@@ -14,6 +14,9 @@ class GenericTimestamp(Bits):
         value = Bits.createValue(self)
         return unicode(value)
 
+    def __nonzero__(self):
+        return Bits.createValue(self) != 0
+
 def timestampFactory(cls_name, handler, size):
     class Timestamp(GenericTimestamp):
         def __init__(self, parent, name, description=None):

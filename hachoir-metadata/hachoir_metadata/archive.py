@@ -39,10 +39,13 @@ class GzipMetadata(RootMetadata):
     @fault_tolerant
     def useHeader(self, gzip):
         self.compression = gzip["compression"].display
-        self.last_modification = gzip["mtime"].value
+        if gzip["mtime"]:
+            self.last_modification = gzip["mtime"].value
         self.os = gzip["os"].display
-        self.filename = getValue(gzip, "filename")
-        self.comment = getValue(gzip, "comment")
+        if gzip["has_filename"].value:
+            self.filename = getValue(gzip, "filename")
+        if gzip["has_comment"].value:
+            self.comment = getValue(gzip, "comment")
         self.compr_size = gzip["file"].size/8
         self.file_size = gzip["size"].value
 
