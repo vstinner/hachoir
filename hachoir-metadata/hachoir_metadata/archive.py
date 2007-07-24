@@ -96,7 +96,8 @@ class TarMetadata(MultipleMetadata):
         meta.file_attr = humanUnixAttributes(field.getOctal("mode"))
         meta.file_size = field.getOctal("size")
         try:
-            meta.last_modification = field.getDatetime()
+            if field.getOctal("mtime"):
+                meta.last_modification = field.getDatetime()
         except ValueError:
             pass
         meta.file_type = field["type"].display
