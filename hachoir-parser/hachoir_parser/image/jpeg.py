@@ -129,6 +129,10 @@ class StartOfFrame(FieldSet):
             yield UInt8(self, "high[]")
             yield UInt8(self, "low[]")
 
+class Comment(FieldSet):
+    def createFields(self):
+        yield String(self, "comment", self.size//8, strip="\0")
+
 class AdobeChunk(FieldSet):
     COLORSPACE_TRANSFORMATION = {
         1: "YCbCr (converted from RGB)",
@@ -202,7 +206,7 @@ class JpegChunk(FieldSet):
         0xE0: ("app0", "APP0", JpegChunkApp0),
         0xED: ("photoshop", "Photoshop", PhotoshopMetadata),
         0xEE: ("adobe", "Image encoding information for DCT filters (Adobe)", AdobeChunk),
-        0xFE: ("comment[]", "Comment", None),
+        0xFE: ("comment[]", "Comment", Comment),
     }
     START_OF_FRAME = {
         0xC0: u"Baseline",
