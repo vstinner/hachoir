@@ -18,7 +18,7 @@ Note: For PascalStringXX, prefixed value is the number of bytes and not
 from hachoir_core.field import FieldError, Bytes
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_core.tools import alignValue, makePrintable
-from hachoir_core.i18n import _
+from hachoir_core.i18n import guessBytesCharset, _
 from hachoir_core import config
 
 # Default charset used to convert byte string to Unicode
@@ -198,14 +198,16 @@ class GenericString(Bytes):
             self._format, self._charset, self._parent.endian)
     suffix_str = property(_getSuffixStr)
 
-    def _convertText(self, text):
+    def _convertText(self, text, charset):
         # No charset: use fallback charset
-        if not self._charset:
-            return unicode(text, FALLBACK_CHARSET, "strict")
+        if not charset:
+            charset = guessBytesCharset(text, default=None)
+            if not charset:
+                return unicode(text, FALLBACK_CHARSET, "strict")
 
         # Try to convert to Unicode
         try:
-            return unicode(text, self._charset, "strict")
+            return unicode(text, charset, "strict")
         except UnicodeDecodeError, err:
             pass
 
@@ -215,17 +217,16 @@ class GenericString(Bytes):
         # => Add missing nul byte: 'B\0e\0' (4 bytes)
         if err.reason == "truncated data" \
         and err.end == len(text) \
-        and self._charset == "UTF-16-LE":
+        and charset == "UTF-16-LE":
             try:
-                text = unicode(text+"\0", self._charset, "strict")
-                self.warning("Fix truncated %s string: add missing nul byte" % self._charset)
+                text = unicode(text+"\0", charset, "strict")
+                self.warning("Fix truncated %s string: add missing nul byte" % charset)
                 return text
             except UnicodeDecodeError, err:
                 pass
 
-        # On error, use "ISO-8859-1"
-        self.warning("Unable to convert string to Unicode: " + unicode(err))
-        self._charset = None
+        # On error, use FALLBACK_CHARSET
+        self.warning(u"Unable to convert string to Unicode: %s" % err)
         return unicode(text, FALLBACK_CHARSET, "strict")
 
     def createValue(self, human=True):
@@ -248,7 +249,7 @@ class GenericString(Bytes):
             return text
 
         # Convert text to Unicode
-        text = self._convertText(text)
+        text = self._convertText(text, self._charset)
 
         # Truncate
         if self._truncate:
