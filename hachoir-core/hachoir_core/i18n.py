@@ -149,7 +149,7 @@ UTF_BOMS = (
 
 # Set of valid characters for specific charset
 CHARSET_CHARACTERS = (
-    # U+00E0: a accent grave
+    # U+00E0: LATIN SMALL LETTER A WITH GRAVE
     (set(u"©®éêè\xE0ç".encode("ISO-8859-1")), "ISO-8859-1"),
     (set(u"©®éêè\xE0ç€".encode("ISO-8859-15")), "ISO-8859-15"),
     (set(u"©®".encode("MacRoman")), "MacRoman"),
