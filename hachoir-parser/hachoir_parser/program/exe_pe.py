@@ -50,9 +50,12 @@ class SectionHeader(FieldSet):
         return self["phys_off"].value + (rva - self["rva"].value)
 
     def createDescription(self):
+        rva = self["rva"].value
+        size = self["mem_size"].value
         info = [
-            "rva=%s" % self["rva"].display,
-            "size=%s" % self["mem_size"].display]
+            "rva=0x%08x..0x%08x" % (rva, rva+size),
+            "size=%s" % self["mem_size"].display,
+        ]
         if self["is_executable"].value:
             info.append("exec")
         if self["is_readable"].value:
@@ -193,4 +196,9 @@ class PE_OptHeader(FieldSet):
             except KeyError:
                 name = "data_dir[%u]" % index
             yield DataDirectory(self, name)
+
+    def createDescription(self):
+        return "PE optional header: %s, entry point %s" % (
+            self["subsystem"].display,
+            self["entry_point"].display)
 
