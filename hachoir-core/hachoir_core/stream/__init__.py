@@ -5,7 +5,7 @@ from hachoir_core.stream.input import (
         InputStream, InputIOStream, StringInputStream,
         InputSubStream, InputFieldStream,
         FragmentedStream, ConcatStream)
-from hachoir_core.stream.input_helper import FileInputStream
+from hachoir_core.stream.input_helper import FileInputStream, guessStreamCharset
 from hachoir_core.stream.output import (OutputStreamError,
         FileOutputStream, StringOutputStream, OutputStream)
 

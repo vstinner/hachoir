@@ -1,4 +1,4 @@
-from hachoir_core.i18n import getTerminalCharset, _
+from hachoir_core.i18n import getTerminalCharset, guessBytesCharset, _
 from hachoir_core.stream import InputIOStream, InputSubStream, InputStreamError
 
 def FileInputStream(filename, real_filename=None, **args):
@@ -30,3 +30,9 @@ def FileInputStream(filename, real_filename=None, **args):
     else:
         args.setdefault("tags",[]).append(("filename", filename))
         return InputIOStream(inputio, source=source, **args)
+
+def guessStreamCharset(stream, address, size, default=None):
+    size = min(size, 1024*8)
+    bytes = stream.readBytes(address, size//8)
+    return guessBytesCharset(bytes, default)
+

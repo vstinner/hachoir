@@ -45,6 +45,7 @@ def main():
     testModule("hachoir_core.bits")
     testModule("hachoir_core.compatibility")
     testModule("hachoir_core.dict")
+    testModule("hachoir_core.i18n")
     testModule("hachoir_core.text_handler")
     testModule("hachoir_core.tools")
 

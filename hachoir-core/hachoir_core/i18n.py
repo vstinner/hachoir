@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 """
 Functions to manage internationalisation (i18n):
 - initLocale(): setup locales and install Unicode compatible stdout and
@@ -56,9 +57,7 @@ def getTerminalCharset():
     3. Try sys.stdout.encoding
     4. Otherwise, returns "ASCII"
 
-    WARNING: Call initLocale() before calling this function, or:
-    >>> import locale
-    >>> locale.setlocale(locale.LC_ALL, "")
+    WARNING: Call initLocale() before calling this function.
     """
     try:
         return getTerminalCharset.value
@@ -141,6 +140,61 @@ def _initGettext():
     unicode_ngettext = lambda singular, plural, count: \
         unicode(ngettext(singular, plural, count), charset)
     return (unicode_gettext, unicode_ngettext)
+
+UTF_BOMS = (
+    ("\xEF\xBB\xBF", "UTF-8"),
+    ("\xFF\xFE", "UTF-16-LE"),
+    ("\xFE\xFF", "UTF-16-BE"),
+)
+
+# Set of valid characters for specific charset
+CHARSET_CHARACTERS = (
+    # U+00E0: a accent grave
+    (set(u"©®éêè\xE0ç".encode("ISO-8859-1")), "ISO-8859-1"),
+    (set(u"©®éêè\xE0ç€".encode("ISO-8859-15")), "ISO-8859-15"),
+    (set(u"©®".encode("MacRoman")), "MacRoman"),
+)
+
+def guessBytesCharset(bytes, default=None):
+    r"""
+    >>> guessBytesCharset("abc")
+    'ASCII'
+    >>> guessBytesCharset("\xEF\xBB\xBFabc")
+    'UTF-8'
+    >>> guessBytesCharset("abc\xC3\xA9")
+    'UTF-8'
+    >>> guessBytesCharset("File written by Adobe Photoshop\xA8 4.0\0")
+    'MacRoman'
+    >>> guessBytesCharset("\xE9l\xE9phant")
+    'ISO-8859-1'
+    >>> guessBytesCharset("100 \xA4")
+    'ISO-8859-15'
+    """
+    # Check for UTF BOM
+    for bom_bytes, charset in UTF_BOMS:
+        if bytes.startswith(bom_bytes):
+            return charset
+
+    # Pure ASCII?
+    try:
+        text = unicode(bytes, 'ASCII', 'strict')
+        return 'ASCII'
+    except UnicodeDecodeError:
+        pass
+
+    # Valid UTF-8?
+    try:
+        text = unicode(bytes, 'UTF-8', 'strict')
+        return 'UTF-8'
+    except UnicodeDecodeError:
+        pass
+
+    # Create a set of non-ASCII characters
+    non_ascii_set = set( byte for byte in bytes if ord(byte) >= 128 )
+    for characters, charset in CHARSET_CHARACTERS:
+        if characters.issuperset(non_ascii_set):
+            return charset
+    return default
 
 # Initialize _(), gettext() and ngettext() functions
 gettext, ngettext = _initGettext()
