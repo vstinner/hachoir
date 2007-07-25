@@ -74,8 +74,9 @@ class JpegMetadata(RootMetadata):
                 self.producer = psd["version/content/reader_name"].value
             if "iptc/content" in psd:
                 self.parseIPTC(psd["iptc/content"])
-        for comment in jpeg.array("comment"):
-            self.comment = getValue(comment, "content/comment")
+        for field in jpeg.array("comment"):
+            if "content/comment" in field:
+                self.comment = field["content/comment"].value
         self.computeQuality(jpeg)
         if "data" in jpeg:
             computeComprRate(self, jpeg["data"].size)
