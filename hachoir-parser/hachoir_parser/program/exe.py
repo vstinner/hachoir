@@ -124,8 +124,11 @@ class ExeFile(Parser):
 
         # Read PE optional header
         size = self["pe_header/opt_hdr_size"].value
+        rsrc_rva = None
         if size:
             yield PE_OptHeader(self, "pe_opt_header", size=size*8)
+            if "pe_opt_header/resource/rva" in self:
+                rsrc_rva = self["pe_opt_header/resource/rva"].value
 
         # Read section headers
         sections = []
@@ -144,12 +147,11 @@ class ExeFile(Parser):
             size = section["phys_size"].value
             if size:
                 name = str(section["name"].value.strip("."))
-                is_res = name.lower() == "rsrc"
                 if name:
                     name = "section_%s" % name
                 else:
                     name =  "section[]"
-                if is_res:
+                if rsrc_rva is not None and section["rva"].value == rsrc_rva:
                     yield PE_Resource(self, name, section, size=size*8)
                 else:
                     yield RawBytes(self, name, size)
