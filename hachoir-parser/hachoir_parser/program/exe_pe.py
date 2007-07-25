@@ -67,11 +67,11 @@ class SectionHeader(FieldSet):
 
     def createSectionName(self):
         try:
-            name = str(section["name"].value.strip("."))
+            name = str(self["name"].value.strip("."))
             if name:
-                name = "section_%s" % name
+                return "section_%s" % name
         except HACHOIR_ERRORS, err:
-            self.warning(err)
+            self.warning(unicode(err))
             return "section[]"
 
 class DataDirectory(FieldSet):
@@ -168,7 +168,7 @@ class PE_OptHeader(FieldSet):
          6: "debug",
          7: "description",
          8: "global_ptr",
-         9: "tls",
+         9: "tls",   # Thread local storage
         10: "load_config",
         11: "bound_import",
         12: "import_address",
