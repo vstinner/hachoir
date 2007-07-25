@@ -3,6 +3,7 @@ from hachoir_core.field import (FieldSet, ParserError,
     Bytes, String, Enum,
     PaddingBytes, PaddingBits, NullBytes, NullBits)
 from hachoir_core.text_handler import textHandler, hexadecimal, filesizeHandler
+from hachoir_core.error import HACHOIR_ERRORS
 
 class SectionHeader(FieldSet):
     static_size = 40 * 8
@@ -149,12 +150,19 @@ class PE_OptHeader(FieldSet):
         16: u"Windows boot application",
     }
     DIRECTORY_NAME = {
-        0: "export",
-        1: "import",
-        2: "resource",
-        3: "exception_table",
-        4: "certificate_table",
+         0: "export",
+         1: "import",
+         2: "resource",
+         3: "exception",
+         4: "certificate",
+         5: "relocation",
+         6: "debug",
+         7: "description",
+         8: "global_ptr",
+         9: "tls",
+        10: "load_config",
         11: "bound_import",
+        12: "import_address",
     }
     def createFields(self):
         yield UInt16(self, "signature", "PE optional header signature (0x010b)")
