@@ -151,7 +151,7 @@ class RootSeekableFieldSet(BasicFieldSet):
         return added
 
     current_length = property(lambda self: len(self._field_array))
-    current_size = property(lambda self: self._current_max_size)
+    current_size = property(lambda self: self._offset)
 
     def __iter__(self):
         for field in self._field_array:
