@@ -60,7 +60,9 @@ class BasicIFDEntry(FieldSet):
         value_size, array_size = self.getSizes()
 
         # Get offset/value
-        if value_size <= 32:
+        if not value_size:
+            yield PaddingBytes(self, "padding", 4)
+        elif value_size <= 32:
             if 1 < array_size:
                 name = "value[]"
             else:
@@ -90,12 +92,10 @@ class BasicIFDEntry(FieldSet):
         array_size in number of items.
         """
         # Create format
-        count = self["count"].value
-        if count == 0:
-            raise ParserError("Invalid count value")
         self.value_cls = self.ENTRY_FORMAT.get(self["type"].value, Bytes)
 
         # Set size
+        count = self["count"].value
         if self.value_cls in (String, Bytes):
             return 8 * count, 1
         else:
@@ -303,6 +303,8 @@ class ExifIFD(FieldSet):
                 yield padding
 
             value_size, array_size = entry.getSizes()
+            if not array_size:
+                continue
             cls = entry.value_cls
             if 1 < array_size:
                 name = "value_%s[]" % entry.name
