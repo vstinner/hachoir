@@ -9,9 +9,9 @@ Author: Victor Stinner
 Creation date: 2006-08-13
 """
 
-from hachoir_parser import Parser
+from hachoir_parser import HachoirParser
 from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.field import (FieldSet,
+from hachoir_core.field import (FieldSet, RootSeekableFieldSet,
     UInt16, UInt32, String,
     RawBytes, PaddingBytes)
 from hachoir_core.text_handler import textHandler, hexadecimal
@@ -56,7 +56,7 @@ class MSDosHeader(FieldSet):
                 return "Invalid value of next_offset"
         return ""
 
-class ExeFile(Parser):
+class ExeFile(HachoirParser, RootSeekableFieldSet):
     PARSER_TAGS = {
         "id": "exe",
         "category": "program",
@@ -68,6 +68,10 @@ class ExeFile(Parser):
         "description": "Microsoft Windows Portable Executable"
     }
     endian = LITTLE_ENDIAN
+
+    def __init__(self, stream, **args):
+        RootSeekableFieldSet.__init__(self, None, "root", stream, None, stream.askSize(self))
+        HachoirParser.__init__(self, stream, **args)
 
     def validate(self):
         if self.stream.readBytes(0, 2) != 'MZ':
@@ -86,9 +90,7 @@ class ExeFile(Parser):
 
         if self.isPE() or self.isNE():
             offset = self["msdos/next_offset"].value
-            code = self.seekByte(offset, "msdos_code", relative=False)
-            if code:
-                yield code
+            self.seekByte(offset, relative=False)
 
         if self.isPE():
             for field in self.parsePortableExecutable():
@@ -98,12 +100,7 @@ class ExeFile(Parser):
                 yield field
         else:
             offset = self["msdos/code_offset"].value * 16
-            raw = self.seekByte(offset, "raw[]", relative=False)
-            if raw:
-                yield raw
-        if self.current_size < self._size:
-            yield self.seekBit(self._size, "footer")
-
+            self.seekByte(offset, relative=False)
 
     def parseNE_Executable(self):
         yield NE_Header(self, "ne_header")
@@ -113,9 +110,7 @@ class ExeFile(Parser):
         start = self.current_size
         addr = self.stream.searchBytes('VS_VERSION_INFO', start)
         if addr:
-            padding = self.seekBit(addr-32)
-            if padding:
-                yield padding
+            self.seekBit(addr-32)
             yield NE_VersionInfoNode(self, "info")
 
     def parsePortableExecutable(self):
@@ -141,9 +136,7 @@ class ExeFile(Parser):
         # Read sections
         sections.sort(key=lambda field: field["phys_off"].value)
         for section in sections:
-            padding = self.seekByte(section["phys_off"].value)
-            if padding:
-                yield padding
+            self.seekByte(section["phys_off"].value)
             size = section["phys_size"].value
             if size:
                 name = str(section["name"].value.strip("."))
