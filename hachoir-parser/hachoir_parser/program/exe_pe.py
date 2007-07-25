@@ -65,6 +65,15 @@ class SectionHeader(FieldSet):
             info.append("write")
         return 'Section "%s": %s' % (self["name"].value, ", ".join(info))
 
+    def createSectionName(self):
+        try:
+            name = str(section["name"].value.strip("."))
+            if name:
+                name = "section_%s" % name
+        except HACHOIR_ERRORS, err:
+            self.warning(err)
+            return "section[]"
+
 class DataDirectory(FieldSet):
     def createFields(self):
         yield textHandler(UInt32(self, "rva", "Virtual address"), hexadecimal)

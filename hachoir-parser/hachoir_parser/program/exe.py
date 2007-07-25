@@ -139,11 +139,7 @@ class ExeFile(HachoirParser, RootSeekableFieldSet):
             self.seekByte(section["phys_off"].value)
             size = section["phys_size"].value
             if size:
-                name = str(section["name"].value.strip("."))
-                if name:
-                    name = "section_%s" % name
-                else:
-                    name =  "section[]"
+                name = section.createSectionName()
                 if rsrc_rva is not None and section["rva"].value == rsrc_rva:
                     yield PE_Resource(self, name, section, size=size*8)
                 else:
@@ -153,7 +149,7 @@ class ExeFile(HachoirParser, RootSeekableFieldSet):
         if not hasattr(self, "_is_pe"):
             self._is_pe = False
             offset = self["msdos/next_offset"].value * 8
-            if 64*8 <= offset \
+            if 2*8 <= offset \
             and (offset+PE_Header.static_size) <= self.size \
             and self.stream.readBytes(offset, 4) == 'PE\0\0':
                 self._is_pe = True
