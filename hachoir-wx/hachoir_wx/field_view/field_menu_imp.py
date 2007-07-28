@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from hachoir_wx.field_view.stubs import save_field_to_disk, save_substream_to_disk, parse_substream
+from hachoir_wx.field_view.stubs import save_field_to_disk, save_substream_to_disk
 from hachoir_core.i18n import _
-import os
 
 class field_menu_imp_t:
     def on_field_set_ready(self, dispatcher, fields):
@@ -13,9 +12,6 @@ class field_menu_imp_t:
     def on_field_menu_ready(self, dispatcher, view):
         assert view is not None
         self.view = view
-
-    def on_app_update(self, dispatcher, app):
-        self.app=app
 
     def on_field_show_ops(self, dispatcher, field):
         self.view.show_opts()
@@ -53,6 +49,3 @@ class field_menu_imp_t:
         dump_path = self.view.ask_for_dump_file(_('Dump Substream of "' + self.selected._getPath() + '" To Disk...'))
         if dump_path is not None:
             save_substream_to_disk(self.selected, dump_path)
-
-    def on_parse_substream(self, event):
-        parse_substream(self.selected, os.tempnam(None,'hachoir_wx_temp_'), self.app)

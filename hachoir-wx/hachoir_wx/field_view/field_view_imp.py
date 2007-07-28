@@ -29,9 +29,8 @@ class field_view_imp_t:
         if field.is_field_set:
             self.fields = field
             self.refill_view()
-
-            self.dispatcher.trigger('field_activated', self.fields)
-
+        self.dispatcher.trigger('field_activated', field)
+     
     def on_field_modified(self, dispatcher, field):
         self.refill_view()
 
