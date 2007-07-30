@@ -1,5 +1,6 @@
 from hachoir_metadata.metadata import RootMetadata, registerExtractor
 from hachoir_metadata.safe import fault_tolerant
+from hachoir_parser.container import SwfFile
 from hachoir_parser.misc import TorrentFile, TrueTypeFontFile, OLE2_File, PcfFile
 from hachoir_core.field import isString
 from hachoir_core.error import warning
@@ -171,8 +172,17 @@ class PcfMetadata(RootMetadata):
             key = self.PROP_TO_KEY[name]
             setattr(self, key, value)
 
+class SwfMetadata(RootMetadata):
+    def extract(self, swf):
+        self.height = swf["rect/ymax"].value # twips
+        self.width = swf["rect/xmax"].value # twips
+        self.format_version = "flash version %s" % swf["version"].value
+        self.frame_rate = swf["frame_rate"].value
+        self.comment = "Frame count: %s" % swf["frame_count"].value
+
 registerExtractor(TorrentFile, TorrentMetadata)
 registerExtractor(TrueTypeFontFile, TTF_Metadata)
 registerExtractor(OLE2_File, OLE2_Metadata)
 registerExtractor(PcfFile, PcfMetadata)
+registerExtractor(SwfFile, SwfMetadata)
 
