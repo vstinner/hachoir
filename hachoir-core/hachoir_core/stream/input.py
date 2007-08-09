@@ -225,7 +225,7 @@ class InputStream(Logger):
         size = max(3 * length, 4096)
         buffer = ''
 
-        if self._size and (self._size < end_address or end_address is None):
+        if self._size and (end_address is None or self._size < end_address):
             end_address = self._size
 
         while True:
