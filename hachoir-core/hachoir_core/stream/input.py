@@ -44,7 +44,7 @@ class FileFromInputStream:
         elif size % 8:
             raise InputStreamError("Invalid size")
         else:
-            self._size = size / 8
+            self._size = size // 8
 
     def tell(self):
         if self._from_end:
@@ -91,7 +91,7 @@ class FileFromInputStream:
             if size <= 0:
                 return ''
             data = '', ''
-            self._offset = max(0, self.stream._current_size / 8 + self._offset)
+            self._offset = max(0, self.stream._current_size // 8 + self._offset)
             self._from_end = False
             bs = max(max_size, 1 << 16)
             while True:
@@ -208,7 +208,7 @@ class InputStream(Logger):
         pos = self.searchBytes(needle, start_address, end_address)
         if pos is None:
             return None
-        length = (pos - start_address) / 8
+        length = (pos - start_address) // 8
         if include_needle:
             length += len(needle)
         return length

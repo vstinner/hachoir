@@ -178,7 +178,7 @@ class GenericFieldSet(BasicFieldSet):
 
         # No more place?
         dsize = self._checkSize(field._address + field.size, False)
-        if None < dsize < 0 or (field.is_field_set and field.size <= 0):
+        if (dsize is not None and dsize < 0) or (field.is_field_set and field.size <= 0):
             if self.autofix and self._current_size:
                 self._fixFieldSize(field, field.size + dsize)
             else:

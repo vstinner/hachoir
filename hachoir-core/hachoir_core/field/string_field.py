@@ -163,7 +163,7 @@ class GenericString(Bytes):
             bomsize, endian  = self.UTF_CHARSET[self._charset]
             if endian == "BOM":
                 # Read the BOM value
-                nbytes = bomsize//8
+                nbytes = bomsize // 8
                 bom = self._parent.stream.readBytes(self.absolute_address, nbytes)
 
                 # Choose right charset using the BOM
@@ -177,7 +177,7 @@ class GenericString(Bytes):
 
         # Compute length in character if possible
         if self._character_size:
-            self._length = self._content_size /  self._character_size
+            self._length = self._content_size //  self._character_size
         else:
             self._length = None
 
@@ -236,7 +236,7 @@ class GenericString(Bytes):
             size = self._content_size
         else:
             addr = self.absolute_address
-            size = self._size/8
+            size = self._size // 8
         if size == 0:
             # Empty string
             return u""
