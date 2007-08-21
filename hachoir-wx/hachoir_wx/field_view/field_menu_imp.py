@@ -40,12 +40,11 @@ class field_menu_imp_t:
     def on_file_ready(self, dispatcher, file):
         self.file = file
 
+    def on_parse_substream(self, dispatcher):
+        self.dispatcher.trigger('field_parse_substream', self.selected)
+
     def on_dump_to_disk(self, event):
         dump_path = self.view.ask_for_dump_file(_('Dump "' + self.selected._getPath() + '" To Disk...'))
         if dump_path is not None:
-            save_field_to_disk(self.selected, self.file, dump_path)
-
-    def on_dump_stream_to_disk(self, event):
-        dump_path = self.view.ask_for_dump_file(_('Dump Substream of "' + self.selected._getPath() + '" To Disk...'))
-        if dump_path is not None:
             save_substream_to_disk(self.selected, dump_path)
+

@@ -84,8 +84,8 @@
       <object class="wxMenuItem" name="field_menu_dump_to_disk">
         <label>Dump To Disk...</label>
       </object>
-      <object class="wxMenuItem" name="field_menu_dump_stream_to_disk">
-        <label>Dump Substream To Disk...</label>
+      <object class="wxMenuItem" name="field_menu_parse_substream">
+        <label>Parse Sub-Stream</label>
       </object>
       <object class="separator"/>
       <object class="wxMenu" name="field_menu_address">

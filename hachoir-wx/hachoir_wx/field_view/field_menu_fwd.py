@@ -11,14 +11,15 @@ class field_menu_fwd_t:
         assert view is not None
 
         view.Bind(EVT_MENU, self.imp.on_addr_rel,
-          id=XRCID('field_menu_address_relative'))
+                  id=XRCID('field_menu_address_relative'))
         view.Bind(EVT_MENU, self.imp.on_addr_abs,
-          id=XRCID('field_menu_address_absolute'))
+                  id=XRCID('field_menu_address_absolute'))
         view.Bind(EVT_MENU, self.imp.on_addr_hex,
-          id=XRCID('field_menu_address_base_hex'))
+                  id=XRCID('field_menu_address_base_hex'))
         view.Bind(EVT_MENU, self.imp.on_addr_dec,
-          id=XRCID('field_menu_address_base_dec'))
+                  id=XRCID('field_menu_address_base_dec'))
         view.Bind(EVT_MENU, self.imp.on_dump_to_disk,
-          id=XRCID('field_menu_dump_to_disk'))
-        view.Bind(EVT_MENU, self.imp.on_dump_stream_to_disk,
-          id=XRCID('field_menu_dump_stream_to_disk'))
+                  id=XRCID('field_menu_dump_to_disk'))
+        view.Bind(EVT_MENU, self.imp.on_parse_substream,
+                  id=XRCID('field_menu_parse_substream'))
+

@@ -35,12 +35,6 @@ def convert_size(from_field, to_type):
     else:
         return from_field._getSize() / 8
 
-def save_field_to_disk(field, src_stream, dest_path):
-    dest_stream = open(dest_path, 'wb')
-    src_stream.seek(field._getAbsoluteAddress() / 8)
-    dest_stream.write(src_stream.read(alignValue(field._getSize(), 8) / 8))
-    dest_stream.close()
-
 def save_substream_to_disk(field, dest_path):
     dest_stream = open(dest_path, 'wb')
     f = FileFromInputStream(field.getSubIStream())

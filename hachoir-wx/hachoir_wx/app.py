@@ -41,9 +41,7 @@ class app_t(App):
         open_dialog.Destroy()
         load_file(self, open_dialog.GetPath())
 
-    def on_field_activated(self, dispatcher, field):
-        if field.__class__.__name__ != 'SubFile':
-            return
+    def on_field_parse_substream(self, dispatcher, field):
         stream = field.getSubIStream()
         parser = guessParser(stream)
         if not parser:

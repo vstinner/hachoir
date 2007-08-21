@@ -16,7 +16,7 @@ def get_charset():
     return charset
 
 def force_unicode(name):
-    if not wx.USE_UNICODE:
+    if not isinstance(name, unicode):
         charset = get_charset()
         name = unicode(name, charset)
 
