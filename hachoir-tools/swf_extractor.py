@@ -1,6 +1,6 @@
 #!/usr/bin/python
 from hachoir_core.cmd_line import unicodeFilename
-from hachoir_parser import createParser
+from hachoir_parser import createParser, guessParser
 from hachoir_parser.container.swf import SOUND_CODEC_MP3
 from sys import stderr, exit, argv
 
@@ -65,6 +65,10 @@ class JpegExtractor:
         realname = argv[1]
         filename = unicodeFilename(realname)
         parser = createParser(filename, real_filename=realname)
+
+        if parser["signature"].value == "CWS":
+            deflate_swf = parser["compressed_data"].getSubIStream()
+            parser = guessParser(deflate_swf)
 
         if "jpg_table/data" in parser:
             # JPEG pictures with common header
