@@ -34,6 +34,7 @@ class RawBits(Field):
         else:
             return _("<%s size=%u>" %
                 (self.__class__.__name__, self._size))
+    createRawDisplay = createDisplay
 
 class Bits(RawBits):
     """
