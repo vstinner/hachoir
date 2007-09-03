@@ -28,6 +28,10 @@ from hachoir_parser.guess import guessParser
 tmp_dir = 'files/'
 prune_age = 3600 # seconds
 prune_freq = 30 # seconds
+# force the use of references for substreams?
+# with this on, disk usage will (probably) decrease, but pages (may) take
+# longer to load. It's up to you :)
+force_substream_ref = True
 
 # global init
 script_name = os.environ.get('SCRIPT_NAME', sys.argv[0])
@@ -85,9 +89,12 @@ def prune_old():
 def save_data(data, sessid):
     """Save the persistent storage variable "data" for a given session."""
     f = open(tmp_dir+sessid+'.sess','wb')
-    cPickle.dump(data, f,-1)
+    try:
+        cPickle.dump(data, f, -1)
+    except Exception:
+        f.close()
+        raise
     f.close()
-
 
 # form utility functions
 def get_sessid():
@@ -102,7 +109,7 @@ def get_sessid():
         return c['sess'].value
     return ''
 
-def get_parser(data, stream_id, sessid):
+def get_parser(data, streamdata, sessid):
     """Guess or retrieve the parser based on the stream.
 
     Streams are retrieved from the "data" persistant storage variable, from
@@ -116,7 +123,6 @@ def get_parser(data, stream_id, sessid):
     # (they contain generators which are currently not pickleable)
     # best I can do here is cache the parser, so at least we're not
     # taking time to re-guess the parser...
-    streamdata = data['streams'][stream_id]
     if streamdata[0] is None: # original file
         stream = FileInputStream(data['filename'],
                             real_filename = unicode(tmp_dir+sessid+'.file'))
@@ -129,6 +135,10 @@ def get_parser(data, stream_id, sessid):
                 return (None, None)
             data['parser_cache'] = parser.__class__
             save_data(data, sessid)
+    elif isinstance(streamdata[0], tuple):
+        prevstream, prevparser = get_parser(data, streamdata[0], sessid)
+        stream = prevparser[streamdata[1]].getSubIStream()
+        parser = guessParser(stream)
     else:
         stream = StringInputStream(streamdata[1])
         stream.tags = streamdata[0]
@@ -315,7 +325,7 @@ def handle_form():
             print_error('Your file was deleted due to inactivity. '
                 'Please upload a new one.')
             return
-        stream, parser = get_parser(data, stream_id, sessid)
+        stream, parser = get_parser(data, data['streams'][stream_id], sessid)
         if parser is None:
             return # sorry, couldn't parse file!
         if 'save' in form:
@@ -355,7 +365,15 @@ def handle_form():
                 tags = getattr(stream,'tags',[])
                 streamname = data['streams'][stream_id][2]+':'
                 data['streams'].append((tags, streamdata, streamname+spath))
-                save_data(data, sessid)
+                try:
+                    if force_substream_ref:
+                        raise Exception("Use references for all substreams")
+                    save_data(data, sessid)
+                except Exception:
+                    # many things could go wrong with pickling
+                    data['streams'][-1] = (data['streams'][stream_id],
+                        spath, streamname+spath)
+                    save_data(data, sessid)
                 path = '/'
                 hpath += ':/'
                 stream_id = len(data['streams'])-1
@@ -375,7 +393,8 @@ def handle_form():
             path = paths[stream_id]
             hpath = ':'.join(paths)
             save_data(data, sessid)
-            stream, parser = get_parser(data, stream_id, sessid)
+            stream, parser = get_parser(data, data['streams'][stream_id],
+                sessid)
         # update client's variables
         c = SimpleCookie()
         c['hpath'] = hpath
