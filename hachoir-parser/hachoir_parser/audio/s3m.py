@@ -13,7 +13,8 @@ from hachoir_parser import Parser
 from hachoir_core.field import (StaticFieldSet, FieldSet, Field,
     Bit, Bits,
     UInt32, UInt16, UInt8, Enum,
-    RawBytes, String, GenericVector, ParserError)
+    PaddingBytes, RawBytes, NullBytes,
+    String, GenericVector, ParserError)
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_core.tools import alignValue
@@ -67,7 +68,7 @@ class ChunkIndexer:
             if size > 0:
                 obj.info("Padding of %u bytes needed: curr=%u offset=%u" % \
                          (size, current_pos, chunk.offset))
-                yield RawBytes(obj, "padding[]", size)
+                yield PaddingBytes(obj, "padding[]", size)
                 current_pos = obj.current_size//8
 
             # Find resynch point if needed
@@ -104,7 +105,6 @@ class ChunkIndexer:
                     self.addChunk(sub_chunk)
 
             # Let missing padding be done by next chunk
-
 
 class S3MFlags(StaticFieldSet):
     format = (
@@ -187,7 +187,7 @@ class SizeFieldSet(FieldSet):
             yield field
         size = (self._size - self.current_size)//8
         if size > 0:
-            yield RawBytes(self, "padding", size)
+            yield PaddingBytes(self, "padding", size)
 
 class Header(SizeFieldSet):
     def createDescription(self):
@@ -308,7 +308,7 @@ class S3MHeader(Header):
         # Padding required for 16B alignment
         size = self._size - self.current_size
         if size > 0:
-            yield RawBytes(self, "padding", size//8)
+            yield PaddingBytes(self, "padding", size//8)
 
     def getSubChunks(self):
         # Instruments -  no warranty that they are concatenated
@@ -552,7 +552,6 @@ class PTMNoteInfo(StaticFieldSet):
 class Note(FieldSet):
     def createFields(self):
         # Used by Row to check if end of Row
-        self.header = self.stream.readBits(self.absolute_address, 8, LITTLE_ENDIAN)
         info = self.NOTE_INFO(self, "info")
         yield info
         if info["has_note"].value:
@@ -571,13 +570,17 @@ class PTMNote(Note):
 
 class Row(FieldSet):
     def createFields(self):
+        addr = self.absolute_address
         while True:
+            # Check empty note
+            byte = self.stream.readBits(addr, 8, self.endian)
+            if not byte:
+                yield NullBytes(self, "terminator", 1)
+                return
+
             note = self.NOTE(self, "note[]")
             yield note
-
-            # Check empty note
-            if note.header == 0:
-                break
+            addr += note.size
 
 class S3MRow(Row):
     NOTE = S3MNote
