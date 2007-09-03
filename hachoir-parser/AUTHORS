@@ -5,7 +5,7 @@ Victor Stinner aka haypo <victor DOT stinner AT haypocalc DOT com>
 
  * Contributors
 
-Alexandre Boeglin <alex AT boeglin DOT org> - PIFC parser
+Alexandre Boeglin <alex AT boeglin DOT org> - PIFV parser
 Aurélien Jacobs <aurel AT gnuage DOT org> - AVI parser big contributor
 Christophe Fergeau <teuf AT gnome.org> - Improve iTunesDB parser
 Christophe Gisquet <christophe.gisquet AT free.fr> - Write RAR parser
