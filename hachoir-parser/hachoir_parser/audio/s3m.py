@@ -265,18 +265,15 @@ class S3MHeader(Header):
         # Deduce size for SizeFieldSet
         self.setCheckedSizes(size)
 
-    def getTrackerVersion(val):
-        val = val.value
-        return "ScreamTracker %X.%02X" % ((val-0x1000)>>8, val&0xFF)
-
     def getFileVersionField(self):
         yield UInt8(self, "type")
         yield RawBytes(self, "reserved[]", 2)
 
     def getFirstProperties(self):
         yield S3MFlags(self, "flags")
-        yield textHandler(UInt16(self, "creation_version"),
-            S3MHeader.getTrackerVersion)
+        yield UInt8(self, "creation_version_minor")
+        yield Bits(self, "creation_version_major", 4)
+        yield Bits(self, "creation_version_unknown", 4, "(=1)")
         yield UInt16(self, "format_version")
 
     def getLastProperties(self):
@@ -303,8 +300,9 @@ class S3MHeader(Header):
             yield GenericVector(self, "pattern_pptr", patterns, UInt16, "offset")
 
         # S3M 3.20 extension
-        if self["creation_version"].value >= 0x1320 and \
-               self["panning_info"].value == 252:
+        if self["creation_version_major"].value >= 3 \
+        and self["creation_version_minor"].value >= 0x20 \
+        and self["panning_info"].value == 252:
             yield GenericVector(self, "channel_panning", 32, ChannelPanning, "channel")
 
         # Padding required for 16B alignment
