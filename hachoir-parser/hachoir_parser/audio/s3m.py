@@ -403,9 +403,14 @@ class Instrument(SizeFieldSet):
     static_size = 8*0x50
 
     def createDescription(self):
-        return "%s, %s, %ubits" % (self["c4_speed"].display, \
-                           ("mono", "stereo")[self["flags/stereo"].value],
-                           self.getSampleBits())
+        info = [self["c4_speed"].display]
+        if "flags/stereo" in self:
+            if self["flags/stereo"].value:
+                info.append("stereo")
+            else:
+                info.append("mono")
+        info.append("%u bits" % self.getSampleBits())
+        return ", ".join(info)
 
     # Structure knows its size and doesn't need padding anyway, so
     # overwrite base member: no need to go through it.
