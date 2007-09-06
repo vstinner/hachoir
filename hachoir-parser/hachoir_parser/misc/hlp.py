@@ -1,6 +1,11 @@
 """
 Microsoft Windows Help (HLP) parser for Hachoir project.
 
+Documents:
+- Windows Help File Format / Annotation File Format / SHG and MRB File Format
+  written by M. Winterhoff (100326.2776@compuserve.com)
+  found on http://www.wotsit.org/
+
 Author: Victor Stinner
 Creation date: 2007-09-03
 """
