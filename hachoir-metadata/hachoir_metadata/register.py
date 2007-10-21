@@ -1,7 +1,8 @@
 from hachoir_core.i18n import _
 from hachoir_core.tools import (
     humanDuration, makePrintable, humanBitRate,
-    humanFrequency, humanBitSize, humanFilesize)
+    humanFrequency, humanBitSize, humanFilesize,
+    humanDatetime)
 from hachoir_core.language import Language
 from hachoir_metadata.filter import Filter, NumberFilter, DATETIME_FILTER
 from datetime import date, datetime, timedelta
@@ -67,9 +68,9 @@ def registerAllItems(meta):
     meta.register(Data("file_type", 401, _("File type")))
     meta.register(Data("subtitle_author", 402, _("Subtitle author"), type=unicode))
 
-    meta.register(Data("creation_date", 500, _("Creation date"),
+    meta.register(Data("creation_date", 500, _("Creation date"), text_handler=humanDatetime,
         filter=DATETIME_FILTER, type=(datetime, date), conversion=setDatetime))
-    meta.register(Data("last_modification", 501, _("Last modification"),
+    meta.register(Data("last_modification", 501, _("Last modification"), text_handler=humanDatetime,
         filter=DATETIME_FILTER, type=(datetime, date), conversion=setDatetime))
     meta.register(Data("latitude", 510, _("Latitude"), type=float))
     meta.register(Data("longitude", 511, _("Longitude"), type=float))

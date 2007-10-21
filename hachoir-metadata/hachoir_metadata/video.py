@@ -241,14 +241,16 @@ class AsfMetadata(MultipleMetadata):
         "Encoder": "producer",
         "ToolName": "producer",
         "AlbumTitle": "album",
-        "Track": "track_total",
-        "TrackNumber": "track_number",
+        "Track": "track_number",
+        "TrackNumber": "track_total",
         "Year": "creation_date",
+        "AlbumArtist": "author",
     }
     SKIP_EXT_DESC = set((
         # Useless informations
         "WMFSDKNeeded", "WMFSDKVersion",
-        "Buffer Average", "VBR Peak",
+        "Buffer Average", "VBR Peak", "EncodingTime",
+        "MediaPrimaryClassID", "UniqueFileIdentifier",
     ))
 
     def extract(self, asf):
@@ -348,6 +350,9 @@ class AsfMetadata(MultipleMetadata):
             # Skip binary data
             return
         key = desc["name"].value
+        if "/" in key:
+            # Replace "WM/ToolName" with "ToolName"
+            key = key.split("/", 1)[1]
         if key in self.SKIP_EXT_DESC:
             # Skip some keys
             return
@@ -355,9 +360,6 @@ class AsfMetadata(MultipleMetadata):
         if not value:
             return
         value = makeUnicode(value)
-        if "/" in key:
-            # Replace "WM/ToolName" with "ToolName"
-            key = key.split("/", 1)[1]
         data[key] = value
 
     @fault_tolerant
