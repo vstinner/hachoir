@@ -515,16 +515,22 @@ def timestampUUID60(value):
     except OverflowError:
         raise ValueError(_("timestampUUID60() overflow (value=%s)") % value)
 
-def humanDatetime(value):
+def humanDatetime(value, strip_microsecond=True):
     """
     Convert a timestamp to Unicode string: use ISO format with space separator.
 
     >>> humanDatetime( datetime(2006, 7, 29, 12, 20, 44) )
     u'2006-07-29 12:20:44'
     >>> humanDatetime( datetime(2003, 6, 30, 16, 0, 5, 370000) )
+    u'2003-06-30 16:00:05'
+    >>> humanDatetime( datetime(2003, 6, 30, 16, 0, 5, 370000), False )
     u'2003-06-30 16:00:05.370000'
     """
-    return unicode(value.isoformat().replace('T', ' '))
+    text = unicode(value.isoformat())
+    text = text.replace('T', ' ')
+    if strip_microsecond and "." in text:
+        text = text.split(".")[0]
+    return text
 
 NEWLINES_REGEX = re.compile("\n+")
 
