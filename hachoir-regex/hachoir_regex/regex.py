@@ -310,6 +310,9 @@ class RegexDot(Regex):
             return True
         return False
 
+    def _eq(self, other):
+        return True
+
 class RegexString(Regex):
     def __init__(self, text=""):
         assert isinstance(text, str)
