@@ -12,6 +12,8 @@ from hachoir_regex import (RegexString, RegexEmpty, RegexRepeat,
     RegexRange, RegexRangeItem, RegexRangeCharacter)
 import re
 
+REGEX_COMMAND_CHARACTERS = '.^$[](){}|+?*\\'
+
 def parseRange(text, start):
     r"""
     >>> parseRange('[a]b', 1)
@@ -122,7 +124,7 @@ def _parse(text, start=0, until=None):
         if until and char in until:
             done = True
             break
-        if char in '.^$[](){}|+?*\\':
+        if char in REGEX_COMMAND_CHARACTERS:
             if char in CHAR_TO_FUNC:
                 new_regex, index = CHAR_TO_FUNC[char] (text, index+1)
             elif char in CHAR_TO_CLASS:
@@ -143,7 +145,10 @@ def _parse(text, start=0, until=None):
                 index += 1
                 if index == len(text):
                     raise SyntaxError("Antislash (\\) without escaped character")
-                new_regex = RegexString(text[index])
+                char = text[index]
+                if char not in REGEX_COMMAND_CHARACTERS:
+                    raise SyntaxError("Operator '\\%s' is not supported" % char)
+                new_regex = RegexString(char)
                 index += 1
             else:
                 raise NotImplementedError("Operator '%s' is not supported" % char)
