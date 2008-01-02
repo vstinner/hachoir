@@ -190,7 +190,7 @@ class MovFile(Parser):
         "file_ext": ("mov", "qt", "mp4", "m4v", "m4a", "m4p", "m4b"),
         "mime": (u"video/quicktime",),
         "min_size": 8*8,
-#        "magic": TODO,
+        "magic": (("moov", 4*8),),
         "description": "Apple QuickTime movie"
     }
     endian = BIG_ENDIAN
