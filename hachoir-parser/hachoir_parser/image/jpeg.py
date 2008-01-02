@@ -204,6 +204,7 @@ class JpegChunk(FieldSet):
         0xDC: ("nb_line", "Define number of Lines (DNL)", None),
         0xDD: ("restart_interval", "Define Restart Interval (DRI)", RestartInterval),
         0xE0: ("app0", "APP0", JpegChunkApp0),
+        0xE1: ("exif", "Exif metadata", Exif),
         0xED: ("photoshop", "Photoshop", PhotoshopMetadata),
         0xEE: ("adobe", "Image encoding information for DCT filters (Adobe)", AdobeChunk),
         0xFE: ("comment[]", "Comment", Comment),
@@ -229,9 +230,8 @@ class JpegChunk(FieldSet):
     def __init__(self, parent, name, description=None):
         FieldSet.__init__(self, parent, name, description)
         tag = self["type"].value
-        if tag in self.TAG_INFO:
-            self._name, self._description, self._parser = self.TAG_INFO[tag]
-        elif tag == 0xE1:
+        if tag == 0xE1:
+            # Hack for Adobe extension: XAP metadata (as XML)
             bytes = self.stream.readBytes(self.absolute_address + 32, 6)
             if bytes == "Exif\0\0":
                 self._name = "exif"
@@ -239,6 +239,8 @@ class JpegChunk(FieldSet):
                 self._parser = Exif
             else:
                 self._parser = None
+        elif tag in self.TAG_INFO:
+            self._name, self._description, self._parser = self.TAG_INFO[tag]
         else:
             self._parser = None
 
@@ -281,7 +283,13 @@ class JpegFile(Parser):
         if self.stream.readBytes(0, 2) != "\xFF\xD8":
             return "Invalid file signature"
         try:
-            self.readFirstFields(3)
+            for index, field in enumerate(self):
+                chunk_type = field["type"].value
+                if chunk_type not in JpegChunk.TAG_INFO:
+                    return "Unknown chunk type: 0x%02X (chunk #%s)" % (chunk_type, index)
+                if index == 2:
+                    # Only check 3 fields
+                    break
         except HachoirError:
             return "Unable to parse at least three chunks"
         return True
