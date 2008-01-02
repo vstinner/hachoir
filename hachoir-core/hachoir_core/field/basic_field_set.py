@@ -91,7 +91,7 @@ class BasicFieldSet(Field):
             # Callback prototype: def f(field, new_value)
             # Called to ask to set new value
             "set-field-value"
-        )
+        ), "Event name %r is invalid" % event_name
         if local:
             if self._event_handler is None:
                 self._event_handler = EventHandler()
