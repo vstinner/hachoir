@@ -7,7 +7,8 @@ from hachoir_core.language import Language
 from hachoir_metadata.filter import Filter, NumberFilter, DATETIME_FILTER
 from datetime import date, datetime, timedelta
 from hachoir_metadata.formatter import (
-    humanAudioChannel, humanFrameRate, humanComprRate, humanAltitude)
+    humanAudioChannel, humanFrameRate, humanComprRate, humanAltitude,
+    humanPixelSize, humanDPI)
 from hachoir_metadata.setter import (
     setDatetime, setTrackNumber, setTrackTotal, setLanguage)
 from hachoir_metadata.metadata_item import Data
@@ -18,6 +19,8 @@ MAX_NB_CHANNEL = 8                  # 8 channels
 MAX_WIDTH = 20000                   # 20 000 pixels
 MAX_BIT_RATE = 500 * 1024 * 1024    # 500 Mbit/s
 MAX_HEIGHT = MAX_WIDTH
+MAX_DPI_WIDTH = 10000
+MAX_DPI_HEIGHT = MAX_DPI_WIDTH
 MAX_NB_COLOR = 2 ** 24              # 16 million of color
 MAX_BITS_PER_PIXEL = 256            # 256 bits/pixel
 MAX_FRAME_RATE = 150                # 150 frame/sec
@@ -50,8 +53,8 @@ def registerAllItems(meta):
 
 
     meta.register(Data("artist", 300, _("Artist"), type=unicode))
-    meta.register(Data("width", 301, _("Image width"), filter=NumberFilter(1, MAX_WIDTH), type=(int, long)))
-    meta.register(Data("height", 302, _("Image height"), filter=NumberFilter(1, MAX_HEIGHT), type=(int, long)))
+    meta.register(Data("width", 301, _("Image width"), filter=NumberFilter(1, MAX_WIDTH), type=(int, long), text_handler=humanPixelSize))
+    meta.register(Data("height", 302, _("Image height"), filter=NumberFilter(1, MAX_HEIGHT), type=(int, long), text_handler=humanPixelSize))
     meta.register(Data("nb_channel", 303, _("Channel"), text_handler=humanAudioChannel, filter=NumberFilter(1, MAX_NB_CHANNEL), type=(int, long)))
     meta.register(Data("sample_rate", 304, _("Sample rate"), text_handler=humanFrequency, filter=NumberFilter(MIN_SAMPLE_RATE, MAX_SAMPLE_RATE), type=(int, long, float)))
     meta.register(Data("bits_per_sample", 305, _("Bits/sample"), text_handler=humanBitSize, filter=NumberFilter(1, 64), type=(int, long)))
@@ -63,6 +66,9 @@ def registerAllItems(meta):
     meta.register(Data("pixel_format", 311, _("Pixel format")))
     meta.register(Data("compr_size", 312, _("Compressed file size"), text_handler=humanFilesize, type=(int, long)))
     meta.register(Data("compr_rate", 313, _("Compression rate"), text_handler=humanComprRate, filter=NumberFilter(MIN_COMPR_RATE, MAX_COMPR_RATE), type=(int, long, float)))
+
+    meta.register(Data("width_dpi", 320, _("Image DPI width"), filter=NumberFilter(1, MAX_DPI_WIDTH), type=(int, long), text_handler=humanDPI))
+    meta.register(Data("height_dpi", 321, _("Image DPI height"), filter=NumberFilter(1, MAX_DPI_HEIGHT), type=(int, long), text_handler=humanDPI))
 
     meta.register(Data("file_attr", 400, _("File attributes")))
     meta.register(Data("file_type", 401, _("File type")))

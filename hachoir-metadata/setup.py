@@ -11,7 +11,6 @@ else:
     from distutils.core import setup
     use_setuptools = False
 
-URL = 'http://hachoir.org/wiki/hachoir-metadata'
 CLASSIFIERS = [
     'Intended Audience :: Developers',
     'Development Status :: 5 - Production/Stable',
@@ -33,7 +32,7 @@ def main():
         "description": "Program to extract metadata using Hachoir library",
         "long_description": open('README').read(),
         "classifiers": CLASSIFIERS,
-        "license": hachoir_metadata.LICENCE,
+        "license": hachoir_metadata.LICENSE,
         "scripts": ["hachoir-metadata"],
         "packages": ["hachoir_metadata"],
         "package_dir": {"hachoir_metadata": "hachoir_metadata"},
