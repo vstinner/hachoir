@@ -40,6 +40,10 @@ class BmpMetadata(RootMetadata):
             self.bits_per_pixel = bpp
         self.compression = hdr["compression"].display
         self.format_version = u"Microsoft Bitmap version %s" % hdr.getFormatVersion()
+
+        self.width_dpi = hdr["horizontal_dpi"].value
+        self.height_dpi = hdr["vertical_dpi"].value
+
         if "pixels" in image:
             computeComprRate(self, image["pixels"].size)
 
@@ -107,9 +111,12 @@ class IcoMetadata(MultipleMetadata):
             self.addGroup("image[%u]" % index, image)
 
 class PcxMetadata(RootMetadata):
+    @fault_tolerant
     def extract(self, pcx):
         self.width = 1 + pcx["xmax"].value
         self.height = 1 + pcx["ymax"].value
+        self.width_dpi = pcx["horiz_dpi"].value
+        self.height_dpi = pcx["vert_dpi"].value
         self.bits_per_pixel = pcx["bpp"].value
         if 1 <= pcx["bpp"].value <= 8:
             self.nb_colors = 2 ** pcx["bpp"].value
@@ -143,6 +150,9 @@ class XcfMetadata(RootMetadata):
                     self.comment = field["data"].value
         elif type == XcfProperty.PROP_COMPRESSION:
             self.compression = prop["data/compression"].display
+        elif type == XcfProperty.PROP_RESOLUTION:
+            self.width_dpi = int(prop["data/xres"].value)
+            self.height_dpi = int(prop["data/yres"].value)
 
     def readProperties(self, xcf):
         for prop in xcf.array("property"):
@@ -158,6 +168,8 @@ class PngMetadata(RootMetadata):
             self.useHeader(png["header"])
         if "time" in png:
             self.useTime(png["time"])
+        if "physical" in png:
+            self.usePhysical(png["physical"])
         for comment in png.array("text"):
             if "text" not in comment:
                 continue
@@ -177,6 +189,11 @@ class PngMetadata(RootMetadata):
     @fault_tolerant
     def useTime(self, field):
         self.creation_date = field.value
+
+    @fault_tolerant
+    def usePhysical(self, field):
+        self.width_dpi = field["pixel_per_unit_x"].value
+        self.height_dpi = field["pixel_per_unit_y"].value
 
     @fault_tolerant
     def useHeader(self, header):

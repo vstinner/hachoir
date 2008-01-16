@@ -150,8 +150,9 @@ class JpegMetadata(RootMetadata):
     def extractAPP0(self, app0):
         self.format_version = u"JFIF %u.%02u" \
             % (app0["ver_maj"].value, app0["ver_min"].value)
-        self.width_dpi = app0["x_density"].value
-        self.height_dpi = app0["y_density"].value
+        if "y_density" in app0:
+            self.width_dpi = app0["x_density"].value
+            self.height_dpi = app0["y_density"].value
 
     @fault_tolerant
     def processIfdEntry(self, ifd, entry):

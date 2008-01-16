@@ -178,6 +178,7 @@ class XcfParasites(FieldSet):
 
 class XcfProperty(FieldSet):
     PROP_COMPRESSION = 17
+    PROP_RESOLUTION = 19
     PROP_PARASITES = 21
     TYPE_NAME = {
          0: u"End",
