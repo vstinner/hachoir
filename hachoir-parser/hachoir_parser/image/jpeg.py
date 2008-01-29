@@ -6,6 +6,8 @@ Information:
 - APP14 documents
   http://partners.adobe.com/public/developer/en/ps/sdk/5116.DCT_Filter.pdf
   http://java.sun.com/j2se/1.5.0/docs/api/javax/imageio/metadata/doc-files/jpeg_metadata.html#color
+- APP12:
+  http://search.cpan.org/~exiftool/Image-ExifTool/lib/Image/ExifTool/TagNames.pod
 
 Author: Victor Stinner
 """
@@ -116,6 +118,32 @@ class JpegChunkApp0(FieldSet):
             yield PaletteRGB(self, "thumb_palette", 256)
             yield RawBytes(self, "thumb_data", thumb_size, "Thumbnail data")
 
+class Ducky(FieldSet):
+    BLOCK_TYPE = {
+        0: "end",
+        1: "Quality",
+        2: "Comment",
+        3: "Copyright",
+    }
+    def createFields(self):
+        yield Enum(UInt16(self, "type"), self.BLOCK_TYPE)
+        if self["type"].value == 0:
+            return
+        yield UInt16(self, "size")
+        size = self["size"].value
+        if size:
+            yield RawBytes(self, "data", size)
+
+class APP12(FieldSet):
+    """
+    The JPEG APP12 "Picture Info" segment was used by some older cameras, and
+    contains ASCII-based meta information.
+    """
+    def createFields(self):
+        yield String(self, "ducky", 5, '"Ducky" string', charset="ASCII")
+        while not self.eof:
+            yield Ducky(self, "item[]")
+
 class StartOfFrame(FieldSet):
     def createFields(self):
         yield UInt8(self, "precision")
@@ -205,6 +233,7 @@ class JpegChunk(FieldSet):
         0xDD: ("restart_interval", "Define Restart Interval (DRI)", RestartInterval),
         0xE0: ("app0", "APP0", JpegChunkApp0),
         0xE1: ("exif", "Exif metadata", Exif),
+        0xEC: ("app12", "APP12", APP12),
         0xED: ("photoshop", "Photoshop", PhotoshopMetadata),
         0xEE: ("adobe", "Image encoding information for DCT filters (Adobe)", AdobeChunk),
         0xFE: ("comment[]", "Comment", Comment),
