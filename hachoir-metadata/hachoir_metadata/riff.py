@@ -106,6 +106,8 @@ class RiffMetadata(MultipleMetadata):
         meta.nb_channel = format["channel"].value
         meta.sample_rate = format["sample_rate"].value
         meta.bit_rate = format["bit_rate"].value * 8
+        if format["bits_per_sample"].value:
+            meta.bits_per_sample = format["bits_per_sample"].value
         if "../stream_hdr" in format:
             header = format["../stream_hdr"]
             if header["rate"].value and header["scale"].value:
@@ -116,6 +118,18 @@ class RiffMetadata(MultipleMetadata):
                     % (format["codec"].display, header["fourcc"].value)
         if not meta.has("compression"):
             meta.compression = format["codec"].display
+
+        self.computeComprRate(format, meta)
+
+    @fault_tolerant
+    def computeComprRate(self, format, meta):
+        uncompr = meta.get('bit_rate', 0)
+        if not uncompr:
+            return
+        compr = meta.get('nb_channel') * meta.get('sample_rate') * meta.get('bits_per_sample', default=16)
+        if not compr:
+            return
+        meta.compr_rate = float(compr) / uncompr
 
     @fault_tolerant
     def useAviHeader(self, header):
