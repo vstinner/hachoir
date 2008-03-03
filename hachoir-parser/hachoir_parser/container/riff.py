@@ -216,6 +216,7 @@ class Chunk(FieldSet):
         "IENG": ("author", parseText, "Author"),
         "ICRD": ("creation_date", parseText, "Creation date"),
         "ISFT": ("producer", parseText, "Producer"),
+        "IDIT": ("datetime", parseText, "Date time"),
 
         # TODO: Todo: see below
         # "strn": Stream description

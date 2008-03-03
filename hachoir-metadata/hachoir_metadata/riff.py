@@ -20,6 +20,7 @@ class RiffMetadata(MultipleMetadata):
         "IENG": "author",    # (engineer)
         "ISFT": "producer",
         "ICRD": "creation_date",
+        "IDIT": "creation_date",
     }
 
     def extract(self, riff):
@@ -32,6 +33,7 @@ class RiffMetadata(MultipleMetadata):
         elif type == "AVI ":
             if "headers" in riff:
                 self.extractAVI(riff["headers"])
+                self.extractInfo(riff["headers"])
         elif type == "ACON":
             self.extractAnim(riff)
         if "info" in riff:
