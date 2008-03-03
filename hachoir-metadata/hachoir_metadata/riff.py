@@ -119,10 +119,10 @@ class RiffMetadata(MultipleMetadata):
         if not meta.has("compression"):
             meta.compression = format["codec"].display
 
-        self.computeComprRate(format, meta)
+        self.computeAudioComprRate(meta)
 
     @fault_tolerant
-    def computeComprRate(self, format, meta):
+    def computeAudioComprRate(self, meta):
         uncompr = meta.get('bit_rate', 0)
         if not uncompr:
             return
