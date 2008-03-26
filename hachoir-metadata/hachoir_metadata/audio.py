@@ -134,11 +134,10 @@ class AuMetadata(RootMetadata):
             self.comment = audio["info"].value
         self.bits_per_sample = audio.getBitsPerSample()
         computeBitRate(self)
-        if "audio_data" in audio \
-        and self.has("bit_rate"):
-            self.duration = timedelta(seconds=float(audio["audio_data"].size) / self.get('bit_rate'))
-        if "data_size" in audio:
-            computeComprRate(self, audio["data_size"].value*8)
+        if "audio_data" in audio:
+            if self.has("bit_rate"):
+                self.duration = timedelta(seconds=float(audio["audio_data"].size) / self.get('bit_rate'))
+            computeComprRate(self, audio["audio_data"].size)
 
 class RealAudioMetadata(RootMetadata):
     FOURCC_TO_BITRATE = {
