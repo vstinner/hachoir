@@ -139,14 +139,14 @@ class MkvMetadata(MultipleMetadata):
 
 class FlvMetadata(MultipleMetadata):
     def extract(self, flv):
-        if "audio[0]" in flv:
-            meta = Metadata(self)
-            self.extractAudio(flv["audio[0]"], meta)
-            self.addGroup("audio", meta)
         if "video[0]" in flv:
             meta = Metadata(self)
             self.extractVideo(flv["video[0]"], meta)
-            self.addGroup("video", meta)
+            self.addGroup("video", meta, "Video stream")
+        if "audio[0]" in flv:
+            meta = Metadata(self)
+            self.extractAudio(flv["audio[0]"], meta)
+            self.addGroup("audio", meta, "Audio stream")
         # TODO: Computer duration
         # One technic: use last video/audio chunk and use timestamp
         # But this is very slow
