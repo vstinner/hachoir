@@ -38,7 +38,10 @@ def parseObjectAttributes(parent):
 def parseMixedArray(parent):
     yield UInt32(parent, "count")
     for index in xrange(parent["count"].value + 1):
-        yield Attribute(parent, "item[]")
+        item = Attribute(parent, "item[]")
+        yield item
+        if not item['key'].value:
+            break
 
 def parseDate(parent):
     yield Float64(parent, "timestamp_microsec")
