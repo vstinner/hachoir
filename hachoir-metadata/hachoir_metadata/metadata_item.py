@@ -73,7 +73,7 @@ class Data:
                 self.metadata.warning("Error during conversion of %r value: %s" % (
                     self.key, err))
                 return
-            if not new_value:
+            if new_value is None:
                 dest_types = " or ".join(str(item.__name__) for item in self.type)
                 self.metadata.warning("Unable to convert %r (%s) to %s" % (
                     value, type(value).__name__, dest_types))
