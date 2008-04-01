@@ -447,7 +447,7 @@ def checkVimLNK(parser): return (
 def checkSevenzipCHM(parser): return (
     checkValue(parser, "/itsf/version", 3),
     checkDisplay(parser, "/itsf/lang_id", u"Russian"),
-    checkDisplay(parser, "/itsf/dir_uuid/time", u"1997-01-31 20:42:14.890625"),
+    checkValue(parser, "/itsf/dir_uuid/time", datetime(1997, 1, 31, 20, 42, 14, 890625)),
     checkDisplay(parser, "/itsf/stream_uuid/variant", u"Microsoft Corporation"),
     checkDisplay(parser, "/itsf/stream_uuid/mac", u'INTEL CORPORATION - HF1-06 [22:e6:ec]'),
     checkDisplay(parser, "/file_size/file_size", u"75.6 KB"),
