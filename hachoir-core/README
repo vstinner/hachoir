@@ -26,6 +26,23 @@ Installation
 
 For the installation, use setup.py or see: http://hachoir.org/wiki/Install
 
+What's new in hachoir-core 1.1?
+===============================
+
+Main change: string values are always encoded as Unicode. Details:
+
+ * Create guessBytesCharset() and guessStreamCharset()
+ * GenericString.createValue() is now always Unicode: if charset is not
+   specified, try to guess it. Otherwise, use default charset (ISO-8859-1)
+ * RawBits: add createRawDisplay() to avoid slow down on huge fields
+ * Fix SeekableFieldSet.current_size (use offset and not current_max_size)
+ * GenericString: fix UTF-16-LE string with missing nul byte
+ * Add __nonzero__() method to GenericTimestamp
+ * All stream errors now inherit from StreamError (instead of HachoirError),
+   and create  and OutputStreamError
+ * humanDatetime(): strip microseconds by default (add optional argument to
+   keep them)
+
 What's new in hachoir-core 1.0?
 ===============================
 
