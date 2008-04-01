@@ -70,6 +70,24 @@ UNIX "file" program)::
     sheep_on_drugs.mp3: MPEG v1 layer III, 128.0 Kbit/sec, 44.1 KHz, Joint stereo
     wormux_32x32_16c.ico: Microsoft Windows icon: 16x16x32
 
+What's new in hachoir-metadata 1.1?
+===================================
+
+ * More extractors are more stable and fault tolerant
+ * Create basic Gtk+ GUI: hachoir-metadata-gtk
+ * Catch error on data conversion
+ * Read width and height DPI for most image formats
+ * JPEG (EXIF): read GPS informations
+ * Each data item can has its own "setter"
+ * Add more ID3 keys (TCOP, TDAT, TRDA, TORY, TIT1)
+ * Create datetime filter supporting timezone
+ * Add "meters", "pixels", "DPI" suffix for human display
+ * Create SWF extractor
+ * RIFF: read also informations from headers field, compute audio
+   compression rate
+ * MOV: read width and height
+ * ASF: read album artist
+
 What's new in hachoir-metadata 1.0?
 ===================================
 

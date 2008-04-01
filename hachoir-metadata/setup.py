@@ -33,7 +33,7 @@ def main():
         "long_description": open('README').read(),
         "classifiers": CLASSIFIERS,
         "license": hachoir_metadata.LICENSE,
-        "scripts": ["hachoir-metadata"],
+        "scripts": ["hachoir-metadata", "hachoir-metadata-gtk"],
         "packages": ["hachoir_metadata"],
         "package_dir": {"hachoir_metadata": "hachoir_metadata"},
     }
