@@ -12,9 +12,22 @@ Website: http://hachoir.org/wiki/hachoir-regex
 Changelog
 =========
 
- * 2007-07-12: Version 1.0.2: refix PatternMatching without any pattern
- * 2007-06-28: Version 1.0.1: fix PatternMatching without any pattern
- * 2007-06-28: Version 1.0 released
+Version 1.0.3
+
+ * Raise SyntaxError on unsupported escape character
+ * Two dot atoms are always equals
+
+Version 1.0.2 (2007-07-12)
+
+ * Refix PatternMatching without any pattern
+
+Version 1.0.1 (2007-06-28)
+
+ * Fix PatternMatching without any pattern
+
+Version 1.0 (2007-06-28)
+
+ * First public version
 
 Regex examples
 ==============
