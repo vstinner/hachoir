@@ -8,6 +8,12 @@ http://hachoir.org/wiki/hachoir-wx
 
 Everyone is very welcome to contribute code =)
 
+hachoir-wx 0.2
+==============
+
+ * hachoir-wx is now able to parse subfield
+ * Display field description
+
 hachoir-wx 0.1.2
 ================
 
