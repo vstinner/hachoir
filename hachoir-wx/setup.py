@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 from imp import load_source
 from os import path
 from sys import argv
