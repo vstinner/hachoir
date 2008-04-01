@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 # Constants
 AUTHORS = 'Victor Stinner'
@@ -56,8 +56,8 @@ def main():
     if use_setuptools:
         install_options["zip_safe"] = True
         install_options["install_requires"] = (
-            "hachoir-core>=1.0.1",
-            "hachoir-parser>=1.0",
+            "hachoir-core>=1.1",
+            "hachoir-parser>=1.1",
             "hachoir-regex>=1.0.1")
 
     # Call main() setup function

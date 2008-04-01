@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 from hachoir_core.cmd_line import unicodeFilename
 from hachoir_core.stream import FileInputStream
 from hachoir_core.i18n import _

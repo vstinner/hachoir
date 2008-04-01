@@ -5,22 +5,25 @@ Website: http://hachoir.org/wiki/hachoir-subfile
 Changelog
 =========
 
-2007-07-13:
+Version 0.5.3 (2008-04-01):
 
- * Version 0.5.2
+ * Catch StreamError on file copy
+ * Use "#!/usr/bin/env python" as shebang for FreeBSD
+
+Version 0.5.2 (2007-07-13):
+
  * Fix shebang: use "#!/usr/bin/python"
  * Only import hachoir_core.profiler with --profiler command line
    option is used, so hachoir-subfile do not depends on 'profiler'
    Python module
 
-2007-07-12:
+Version 0.5.1 (2007-07-12):
 
- * Version 0.5.1
  * Fix setup.py: also install script 'hachoir-subfile'
 
-2007-07-11:
+Version 0.5 (2007-07-11):
 
- * Publication of version 0.5, first public version
+ * Publication of the first public version
 
 Usage
 =====
