@@ -1,3 +1,38 @@
+What's new in hachoir-parser 1.1?
+=================================
+
+Main changes: add "EFI Platform Initialization Firmware
+Volume" (PIFV) and "Microsoft Windows Help" (HLP) parsers. Details:
+
+ * MPEG audio:
+
+   - add createContentSize() to support hachoir-subfile
+   - support file starting with ID3v1
+   - if file doesn't contain any frame, use ID3v1 or ID3v2 to create the
+     description
+
+ * EXIF:
+
+   - use "count" field value
+   - create RationalInt32 and RationalUInt32
+   - fix for empty value
+   - add GPS tags
+
+ * JPEG:
+
+   - support Ducky (APP12) chunk
+   - support Comment chunk
+   - improve validate(): make sure that first 3 chunk types are known
+
+ * RPM: use bzip2 or gzip handler to decompress content
+ * S3M: fix some parser bugs
+ * OLE2: reject negative block index (or special block index)
+ * ip2name(): catch KeybordInterrupt and don't resolve next addresses
+ * ELF: support big endian
+ * PE: createContentSize() works on PE program, improve resource section
+   detection
+ * AMF: stop mixed array parser on empty key
+
 What's new in hachoir-parser 1.0?
 =================================
 
