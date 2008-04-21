@@ -86,6 +86,7 @@ testcase_files = (
     (u"pentax_320x240.mov", 1938, "e23aae570cf3a30294e7630ece397d33"),
     (u"gps.jpg", 8271, "15262738e24b85ad4f6199df348e867e"),
     (u"angle-bear-48x48.ani", 29658, "9aa43520cf430bd996c4c318b905bc7f"),
+    (u"hotel_california.flac", 32768, "ebd87fc310d8958c9d86ef65c7a20e1d"),
 )
 
 def stringMD5(text):

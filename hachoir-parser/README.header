@@ -10,5 +10,8 @@ know *each* bit meaning. Some good (but not perfect ;-)) parsers:
  * PNG picture
  * TAR and ZIP archive
 
+GnomeKeyring parser requires Python Crypto module:
+http://www.amk.ca/python/code/crypto.html
+
 Website: http://hachoir.org/wiki/hachoir-parser
 

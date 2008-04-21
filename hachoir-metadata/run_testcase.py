@@ -340,6 +340,16 @@ def checkAngelBear(meta): return (
     checkAttr(meta, 'frame_rate', 4.0),
 )
 
+def checkHotelCalifornia(meta): return (
+    checkAttr(meta, 'title', u"Hotel California"),
+    checkAttr(meta, 'artist', u"The Eagles"),
+    checkAttr(meta, 'duration', timedelta(seconds=51, microseconds=512834)),
+    checkAttr(meta, 'nb_channel', 2),
+    checkAttr(meta, 'sample_rate', 44100),
+    checkAttr(meta, 'bits_per_sample', 16),
+    checkAttr(meta, 'producer', u'reference libFLAC 1.1.2 20050205'),
+)
+
 def checkFile(filename, check_metadata, quality=1.0):
     sys.stdout.write("  - Create parser: ")
     sys.stdout.flush()
@@ -447,6 +457,7 @@ testcase_files = (
     (u"pentax_320x240.mov", checkPentax320),
     (u"gps.jpg", checkGPS),
     (u"angle-bear-48x48.ani", checkAngelBear),
+    (u"hotel_california.flac", checkHotelCalifornia),
 )
 
 if __name__ == "__main__":
