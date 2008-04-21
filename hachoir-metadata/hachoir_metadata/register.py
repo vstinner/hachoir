@@ -35,8 +35,9 @@ DURATION_FILTER = Filter(timedelta,
 
 def registerAllItems(meta):
     meta.register(Data("title", 100, _("Title"), type=unicode))
-    meta.register(Data("author", 101, _("Author"), type=unicode))
-    meta.register(Data("music_composer", 102, _("Music composer"), type=unicode))
+    meta.register(Data("artist", 101, _("Artist"), type=unicode))
+    meta.register(Data("author", 102, _("Author"), type=unicode))
+    meta.register(Data("music_composer", 103, _("Music composer"), type=unicode))
 
     meta.register(Data("album", 200, _("Album"), type=unicode))
     meta.register(Data("duration", 201, _("Duration"), # integer in milliseconde
@@ -52,7 +53,6 @@ def registerAllItems(meta):
     meta.register(Data("version", 220, _("Version")))
 
 
-    meta.register(Data("artist", 300, _("Artist"), type=unicode))
     meta.register(Data("width", 301, _("Image width"), filter=NumberFilter(1, MAX_WIDTH), type=(int, long), text_handler=humanPixelSize))
     meta.register(Data("height", 302, _("Image height"), filter=NumberFilter(1, MAX_HEIGHT), type=(int, long), text_handler=humanPixelSize))
     meta.register(Data("nb_channel", 303, _("Channel"), text_handler=humanAudioChannel, filter=NumberFilter(1, MAX_NB_CHANNEL), type=(int, long)))
