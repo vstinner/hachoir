@@ -5,16 +5,20 @@ from time import time
 
 BUFFER_SIZE = 4096
 
-def entropy(filename):
+def entropyFile(filename):
     stream = open(filename, 'rb')
     stream.seek(0,2)
     filesize = stream.tell()
-    stream.seek(0,0)
     if filesize == 0:
         print >>stderr, "Empty file"
         exit(1)
     print >>stderr, "Filesize: %s bytes" % filesize
+    stream.seek(0,0)
+    return entropyStream(stream, filesize)
 
+def entropyStream(stream, streamsize):
+    if streamsize <= 0:
+        raise ValueError("Empty stream")
     # Create list of
     count = {}
     for i in range(0, 256):
@@ -29,7 +33,7 @@ def entropy(filename):
         if not raw:
             break
         if next_msg <= time():
-            percent = lastpos * 100.0 / filesize
+            percent = lastpos * 100.0 / streamsize
             print >>stderr, "Progress: %.1f%%" % percent
             next_msg = time() + 1.0
         n += len(raw)
@@ -39,7 +43,7 @@ def entropy(filename):
     for i in range(0, 256):
         i = chr(i)
         if count[i] != 0:
-            p_i = float(count[i]) / filesize
+            p_i = float(count[i]) / streamsize
             h -= p_i * log(p_i, 2)
     return h
 
@@ -47,7 +51,7 @@ def main():
     if len(argv) != 2:
         print >>stderr, "usage: %s filename" % argv[0]
         exit(1)
-    value = entropy(argv[1])
+    value = entropyFile(argv[1])
     print "Entropy: %.4f bit/byte" % value
     exit(0)
 

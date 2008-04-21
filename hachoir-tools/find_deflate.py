@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from zlib import decompress, error as zlib_error
 from sys import argv, stderr, exit
+from time import time
 
 MIN_SIZE = 2
 
@@ -12,7 +13,13 @@ def canDeflate(compressed_data):
         return False
 
 def findDeflateBlocks(data):
-    for index in xrange(len(data)-MIN_SIZE):
+    next_msg = time() + 1.0
+    max_index = len(data)-MIN_SIZE-1
+    for index in xrange(max_index+1):
+        if next_msg < time():
+            next_msg = time() + 1.0
+            print "Progress: %.1f%% (offset %s/%s)" % (
+                index*100.0/max_index, index, max_index)
         if canDeflate(data[index:]):
             yield index
 
