@@ -1,6 +1,6 @@
 from hachoir_metadata.metadata import (registerExtractor,
     Metadata, RootMetadata, MultipleMetadata)
-from hachoir_parser.audio import AuFile, MpegAudioFile, RealAudioFile, AiffFile
+from hachoir_parser.audio import AuFile, MpegAudioFile, RealAudioFile, AiffFile, FlacParser
 from hachoir_parser.container import OggFile, RealMediaFile
 from hachoir_core.i18n import _
 from hachoir_core.tools import makePrintable, timedelta2seconds, humanBitRate
@@ -378,10 +378,26 @@ class AiffMetadata(RootMetadata):
         if "codec" in info:
             self.compression = info["codec"].display
 
+class FlacMetadata(RootMetadata):
+    def extract(self, flac):
+        if "metadata/stream_info/content" in flac:
+            self.useStreamInfo(flac["metadata/stream_info/content"])
+
+    @fault_tolerant
+    def useStreamInfo(self, info):
+        self.nb_channel = info["nb_channel"].value + 1
+        self.bits_per_sample = info["bits_per_sample"].value + 1
+        self.sample_rate = info["sample_hertz"].value
+        sec = info["total_samples"].value
+        if sec:
+            sec = float(sec) / info["sample_hertz"].value
+            self.duration = timedelta(seconds=sec)
+
 registerExtractor(AuFile, AuMetadata)
 registerExtractor(MpegAudioFile, MpegAudioMetadata)
 registerExtractor(OggFile, OggMetadata)
 registerExtractor(RealMediaFile, RealMediaMetadata)
 registerExtractor(RealAudioFile, RealAudioMetadata)
 registerExtractor(AiffFile, AiffMetadata)
+registerExtractor(FlacParser, FlacMetadata)
 

@@ -44,7 +44,7 @@ class Lacing(FieldSet):
             yield field
             size -= field.size
 
-def parseMetadata(parent):
+def parseVorbisComment(parent):
     yield PascalString32(parent, 'vendor', charset="UTF-8")
     yield UInt32(parent, 'count')
     for index in xrange(parent["count"].value):
@@ -113,11 +113,11 @@ def parseVorbisHeader(parent):
 class Chunk(FieldSet):
     tag_info = {
         "vorbis": {
-            3: ("comment", parseMetadata),
+            3: ("comment", parseVorbisComment),
             1: ("vorbis_hdr", parseVorbisHeader),
         }, "theora": {
             128: ("theora_hdr", parseTheoraHeader),
-            129: ("comment", parseMetadata),
+            129: ("comment", parseVorbisComment),
         }, "video\0": {
             1: ("video_hdr", parseVideoHeader),
         },
