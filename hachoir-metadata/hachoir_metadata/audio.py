@@ -8,6 +8,39 @@ from datetime import timedelta, date
 from hachoir_metadata.metadata_item import QUALITY_FAST, QUALITY_NORMAL, QUALITY_BEST
 from hachoir_metadata.safe import fault_tolerant, getValue
 
+VORBIS_KEY_TO_ATTR = {
+    "ARTIST": "artist",
+    "ALBUM": "album",
+    "TRACKNUMBER": "track_number",
+    "TRACKTOTAL": "track_total",
+    "ENCODER": "producer",
+    "TITLE": "title",
+    "LOCATION": "location",
+    "DATE": "creation_date",
+    "ORGANIZATION": "organization",
+    "GENRE": "music_genre",
+    "": "comment",
+    "COMPOSER": "music_composer",
+    "DESCRIPTION": "comment",
+    "COMMENT": "comment",
+    "WWW": "url",
+    "WOAF": "url",
+    "LICENSE": "copyright",
+}
+
+@fault_tolerant
+def readVorbisComment(metadata, comment):
+    metadata.producer = getValue(comment, "vendor")
+    for item in comment.array("metadata"):
+        if "=" in item.value:
+            key, value = item.value.split("=", 1)
+            key = key.upper()
+            if key in VORBIS_KEY_TO_ATTR:
+                key = VORBIS_KEY_TO_ATTR[key]
+                setattr(metadata, key, value)
+            elif value:
+                metadata.warning("Skip Vorbis comment %s: %s" % (key, value))
+
 def computeComprRate(meta, size):
     if not meta.has("duration") \
     or not meta.has("sample_rate") \
@@ -26,26 +59,6 @@ def computeBitRate(meta):
     meta.bit_rate = meta.get('bits_per_sample') * meta.get('nb_channel') * meta.get('sample_rate')
 
 class OggMetadata(MultipleMetadata):
-    KEY_TO_ATTR = {
-        "ARTIST": "artist",
-        "ALBUM": "album",
-        "TRACKNUMBER": "track_number",
-        "TRACKTOTAL": "track_total",
-        "ENCODER": "producer",
-        "TITLE": "title",
-        "LOCATION": "location",
-        "DATE": "creation_date",
-        "ORGANIZATION": "organization",
-        "GENRE": "music_genre",
-        "": "comment",
-        "COMPOSER": "music_composer",
-        "DESCRIPTION": "comment",
-        "COMMENT": "comment",
-        "WWW": "url",
-        "WOAF": "url",
-        "LICENSE": "copyright",
-    }
-
     def extract(self, ogg):
         granule_quotient = None
         for index, page in enumerate(ogg.array("page")):
@@ -69,7 +82,7 @@ class OggMetadata(MultipleMetadata):
                 if not granule_quotient and meta.has("frame_rate"):
                     granule_quotient = meta.get('frame_rate')
             if "comment" in page:
-                self.vorbisComment(page["comment"])
+                readVorbisComment(self, page["comment"])
             if 3 <= index:
                 # Only process pages 0..3
                 break
@@ -112,18 +125,6 @@ class OggMetadata(MultipleMetadata):
         meta.nb_channel = header["audio_channels"].value
         meta.format_version = u"Vorbis version %s" % header["vorbis_version"].value
         meta.bit_rate = header["bitrate_nominal"].value
-
-    def vorbisComment(self, comment):
-        self.producer = getValue(comment, "vendor")
-        for metadata in comment.array("metadata"):
-            if "=" in metadata.value:
-                key, value = metadata.value.split("=", 1)
-                key = key.upper()
-                if key in self.KEY_TO_ATTR:
-                    key = self.KEY_TO_ATTR[key]
-                    setattr(self, key, value)
-                elif value:
-                    self.warning("Skip Ogg comment %s: %s" % (key, value))
 
 class AuMetadata(RootMetadata):
     def extract(self, audio):
@@ -382,6 +383,8 @@ class FlacMetadata(RootMetadata):
     def extract(self, flac):
         if "metadata/stream_info/content" in flac:
             self.useStreamInfo(flac["metadata/stream_info/content"])
+        if "metadata/comment/content" in flac:
+            readVorbisComment(self, flac["metadata/comment/content"])
 
     @fault_tolerant
     def useStreamInfo(self, info):

@@ -51,7 +51,7 @@ class MetadataBlock(FieldSet):
         1: ("padding[]", u"Padding", None),
         2: ("application[]", u"Application", None),
         3: ("seek_table", u"Seek table", SeekTable),
-        4: ("comment[]", u"Vorbis comment", VorbisComment),
+        4: ("comment", u"Vorbis comment", VorbisComment),
         5: ("cue_sheet[]", u"Cue sheet", None),
         6: ("picture[]", u"Picture", None),
     }
