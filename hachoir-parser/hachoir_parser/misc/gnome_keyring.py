@@ -17,8 +17,39 @@ from hachoir_core.field import (FieldSet,
     PascalString32, TimestampUnix64, CompressedField,
     SubFile)
 from hachoir_core.endian import BIG_ENDIAN
-import hashlib
-from Crypto.Cipher import AES
+from sys import hexversion
+
+try:
+    import hashlib
+    def sha256(data):
+        hash = hashlib.new('sha256')
+        hash.update(data)
+        return hash.digest()
+except ImportError:
+    def sha256(data):
+        raise ImportError("hashlib module is missing")
+
+try:
+    from Crypto.Cipher import AES
+    class DeflateStream:
+        def __init__(self, stream):
+            hash_iterations = 1234
+            password = "x" * 8
+            salt = "\0" * 8
+            key, iv = generate_key(password, salt, hash_iterations)
+            self.cipher = AES.new(key, AES.MODE_CBC, iv)
+
+        def __call__(self, size, data=None):
+            if data is None:
+                return ''
+            return self.cipher.decrypt(data)
+
+    def Deflate(field):
+        CompressedField(field, DeflateStream)
+        return field
+except ImportError:
+    def Deflate(field):
+        return field
 
 class KeyringString(FieldSet):
     def createFields(self):
@@ -162,31 +193,9 @@ class GnomeKeyring(Parser):
         yield UInt32(self, "encrypted_size")
         yield Deflate(SubFile(self, "encrypted", self["encrypted_size"].value, "AES128 CBC", parser_class=EncryptedData))
 
-def Deflate(field):
-    CompressedField(field, DeflateStream)
-    return field
-
-def sha256(data):
-    hash = hashlib.new('sha256')
-    hash.update(data)
-    return hash.digest()
-
 def generate_key(password, salt, hash_iterations):
     sha = sha256(password+salt)
     for index in xrange(hash_iterations-1):
         sha = sha256(sha)
     return sha[:16], sha[16:]
-
-class DeflateStream:
-    def __init__(self, stream):
-        hash_iterations = 1234
-        password = "x" * 8
-        salt = "\0" * 8
-        key, iv = generate_key(password, salt, hash_iterations)
-        self.cipher = AES.new(key, AES.MODE_CBC, iv)
-
-    def __call__(self, size, data=None):
-        if data is None:
-            return ''
-        return self.cipher.decrypt(data)
 
