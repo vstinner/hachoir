@@ -24,6 +24,7 @@ from hachoir_parser.image.common import RGB
 from hachoir_parser.image.jpeg import JpegChunk, JpegFile
 from hachoir_core.stream import StringInputStream, ConcatStream
 from hachoir_parser.common.deflate import Deflate, has_deflate
+from hachoir_parser.container.action_script import parseActionScript
 import math
 
 # Maximum file size (50 MB)
@@ -223,7 +224,7 @@ class Tag(FieldSet):
          9: ("bkgd_color[]", "Set background color", parseBackgroundColor),
         10: ("def_font[]", "Define font", None),
         11: ("def_text[]", "Define text", None),
-        12: ("do_action[]", "Do action", None),
+        12: ("action[]", "Action script", parseActionScript),
         13: ("def_font_info[]", "Define font info", None),
 
         # SWF version 2.0
