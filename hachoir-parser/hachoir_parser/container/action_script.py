@@ -12,8 +12,17 @@ Creation date: 26 April 2008
 
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
-    Bit, Bits, UInt8, UInt32, UInt16, Float32, Float64, CString, Enum,
+    Bit, Bits, UInt8, UInt32, Int16, UInt16, Float32, Float64, CString, Enum,
     Bytes, RawBytes, NullBits, String, SubFile, Field)
+from struct import unpack
+
+class Double(FieldSet):
+    def createFields(self):
+        yield RawBytes(self, "packedDouble", 8)
+
+    def createValue(self):
+        s = self["packedDouble"].value
+        return unpack('d', s[4:]+s[0:4])[0]
 
 TYPE_INFO = {
     0x00: (CString, "Cstring[]"),
@@ -22,14 +31,14 @@ TYPE_INFO = {
     0x03: (None, "Undefined[]"),
     0x04: (UInt8, "Register[]"),
     0x05: (UInt8, "Boolean[]"),
-    0x06: (Float64, "Double[]"),
+    0x06: (Double, "Double[]"),
     0x07: (UInt32, "Integer[]"),
     0x08: (UInt8, "Dictionnary_Lookup_Index[]"),
     0x09: (UInt16, "Large_Dictionnary_Lookup_Index[]"),
 }
 
 def parseBranch(parent, size):
-    yield UInt16(parent, "offset")
+    yield Int16(parent, "offset")
 
 def parseDeclareFunction(parent, size):
     yield CString(parent, "name")
@@ -43,7 +52,7 @@ def parseDeclareFunctionV7(parent, size):
     yield CString(parent, "name")
     argCount = UInt16(parent, "arg_count")
     yield argCount
-    yield UInt16(parent, "reg_count")
+    yield UInt8(parent, "reg_count")
     yield Bits(parent, "reserved", 7)
     yield Bit(parent, "preload_global")
     yield Bit(parent, "preload_parent")
@@ -55,6 +64,7 @@ def parseDeclareFunctionV7(parent, size):
     yield Bit(parent, "suppress_this")
     yield Bit(parent, "preload_this")
     for i in range(argCount.value):
+        yield UInt8(parent, "register[]")
         yield CString(parent, "arg[]")
     yield UInt16(parent, "function_length")
 
@@ -192,7 +202,7 @@ class Instruction(FieldSet):
         0x63: ("Shift_Left[]", "Shift Left", None),
         0x64: ("Shift_Right[]", "Shift Right", None),
         0x65: ("Shift_Right_Unsigned[]", "Shift Right Unsigned", None),
-        0x62: ("XOr[]", "XOr", None),
+        0x62: ("Xor[]", "Xor", None),
         # Strings & Characters (See the String Object also)
         0x33: ("Chr[]", "Chr", None),
         0x37: ("Chr_multi-bytes[]", "Chr (multi-bytes)", None),
@@ -276,7 +286,7 @@ class Instruction(FieldSet):
         r = str(self._description)
         for f in self:
             if f.name not in ("action_id", "action_length", "count") and not f.name.startswith("data_type") :
-                r = r + "\n   " + str(f.name) + "=" + str(f.value)
+                r = r + "\n   " + str((self.address+f.address)/8) + " " + str(f.name) + "=" + str(f.value)
         return r
 
 class ActionScript(FieldSet):
@@ -286,10 +296,8 @@ class ActionScript(FieldSet):
 
     def __str__(self):
         r = ""
-        i = 0
         for f in self:
-            r = r + str(i) + " " + str(f) + "\n"
-            i = i + 1
+            r = r + str(f.address/8) + " " + str(f) + "\n"
         return r
 
 def parseActionScript(parent, size):
