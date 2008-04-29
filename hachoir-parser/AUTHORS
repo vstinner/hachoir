@@ -18,6 +18,7 @@ Mike Melanson <mike AT multimedia.cx> - Write RealMedia and SpiderMan video pars
 Olivier SCHWAB <le.poulpe303 AT laposte.net> - Write 7-zip parser
 Robert Xiao aka nneonneo <nneonneo AT gmail.com> - improve LNK parser
 Romain Hérault <romain DOT herault AT gmail DOT com> - Author of iTunesDB parser
+Sebastien Ponce <sebastien.ponce AT cern.ch> - ActionScript (for SWF) parser
 Thomas de Grenier de Latour aka TGL <degrenier AT easyconnect DOT fr> - Java class parser
 
  * Packagers
