@@ -4,7 +4,7 @@ SWF (Macromedia/Adobe Flash) file parser.
 Documentation:
 
  - Alexis' SWF Reference:
-   http://sswf.sourceforge.net/SWFalexref.html
+   http://www.m2osw.com/swf_alexref.html
 
 Author: Sebastien Ponce
 Creation date: 26 April 2008
@@ -12,17 +12,28 @@ Creation date: 26 April 2008
 
 from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
-    Bit, Bits, UInt8, UInt32, Int16, UInt16, Float32, Float64, CString, Enum,
+    Bit, Bits, UInt8, UInt32, Int16, UInt16, Float32, CString, Enum,
     Bytes, RawBytes, NullBits, String, SubFile, Field)
+from hachoir_core.field.float import FloatExponent
 from struct import unpack
 
-class Double(FieldSet):
+class FlashFloat64(FieldSet):
     def createFields(self):
-        yield RawBytes(self, "packedDouble", 8)
+        yield Bits(self, "mantisa_high", 20)
+        yield FloatExponent(self, "exponent", 11)
+        yield Bit(self, "negative")
+        yield Bits(self, "mantisa_low", 32)
 
     def createValue(self):
-        s = self["packedDouble"].value
-        return unpack('d', s[4:]+s[0:4])[0]
+        # Manual computation:
+        # mantisa = mantisa_high * 2^32 + mantisa_low
+        # float = 2^exponent + (1 + mantisa / 2^52)
+        # (and float is negative if negative=True)
+        bytes = self.parent.stream.readBytes(
+            self.absolute_address, self.size//8)
+        # Mix bytes: xxxxyyyy <=> yyyyxxxx
+        bytes = bytes[4:8] + bytes[0:4]
+        return unpack('<d', bytes)[0]
 
 TYPE_INFO = {
     0x00: (CString, "Cstring[]"),
@@ -31,7 +42,7 @@ TYPE_INFO = {
     0x03: (None, "Undefined[]"),
     0x04: (UInt8, "Register[]"),
     0x05: (UInt8, "Boolean[]"),
-    0x06: (Double, "Double[]"),
+    0x06: (FlashFloat64, "Double[]"),
     0x07: (UInt32, "Integer[]"),
     0x08: (UInt8, "Dictionnary_Lookup_Index[]"),
     0x09: (UInt16, "Large_Dictionnary_Lookup_Index[]"),

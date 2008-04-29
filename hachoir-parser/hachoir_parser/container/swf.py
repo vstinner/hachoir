@@ -4,7 +4,7 @@ SWF (Macromedia/Adobe Flash) file parser.
 Documentation:
 
  - Alexis' SWF Reference:
-   http://sswf.sourceforge.net/SWFalexref.html
+   http://www.m2osw.com/swf_alexref.html
  - http://www.half-serious.com/swf/format/
  - http://www.anotherbigidea.com/javaswf/
  - http://www.gnu.org/software/gnash/
