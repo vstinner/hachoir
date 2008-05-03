@@ -622,7 +622,7 @@ def exploreFieldSet(field_set, args, options={}):
                         e = top.keypress(size, e)
                         if e is None:
                             pass
-                        elif e == 'f1':
+                        elif e in ('f1', '?'):
                             try:
                                 body.select(body.tabs.index(help))
                             except ValueError:
