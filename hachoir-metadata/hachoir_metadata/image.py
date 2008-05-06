@@ -229,7 +229,7 @@ class GifMetadata(RootMetadata):
         if self.has("bits_per_pixel"):
             self.nb_colors = (1 << self.get('bits_per_pixel'))
         self.compression = _("LZW")
-        self.format_version =  "GIF version %s" % gif["header"].value[-3:]
+        self.format_version =  "GIF version %s" % gif["version"].value[-3:]
         if "comments" in gif:
             for comment in gif.array("comments/comment"):
                 self.comment = comment.value
