@@ -28,13 +28,23 @@ class Image(FieldSet):
         yield UInt16(self, "height", "Height")
 
         yield Bits(self, "bpp", 3, "Bits / pixel minus one")
-        yield NullBits(self, "nul", 3)
+        yield NullBits(self, "nul", 2)
+        yield Bit(self, "sorted", "Sorted??")
         yield Bit(self, "interlaced", "Interlaced?")
         yield Bit(self, "has_local_map", "Use local color map?")
 
         if self["has_local_map"].value:
             nb_color = 1 << (1 + self["bpp"].value)
             yield PaletteRGB(self, "local_map", nb_color, "Local color map")
+
+        yield UInt8(self, "code_size", "LZW Minimum Code Size")
+        while True:
+            blen = UInt8(self, "block_len[]", "Block Length")
+            yield blen
+            if blen.value != 0:
+                yield RawBytes(self, "data[]", blen.value, "Image Data")
+            else:
+                break
 
     def createDescription(self):
         return "Image: %ux%u pixels at (%u,%u)" % (
@@ -87,6 +97,22 @@ def parseComments(parent):
         if field.length == 0:
             break
 
+def parseTextExtension(parent):
+    yield UInt8(parent, "block_size", "Block Size")
+    yield UInt16(self, "left", "Text Grid Left")
+    yield UInt16(self, "top", "Text Grid Top")
+    yield UInt16(self, "width", "Text Grid Width")
+    yield UInt16(self, "height", "Text Grid Height")
+    yield UInt8(parent, "cell_width", "Character Cell Width")
+    yield UInt8(parent, "cell_height", "Character Cell Height")
+    yield UInt8(parent, "fg_color", "Foreground Color Index")
+    yield UInt8(parent, "bg_color", "Background Color Index")
+    while True:
+        field = PascalString8(parent, "comment[]", strip=" \0\r\n\t")
+        yield field
+        if field.length == 0:
+            break
+         
 def defaultExtensionParser(parent):
     while True:
         size = UInt8(parent, "size[]", "Size (in bytes)")
@@ -98,9 +124,10 @@ def defaultExtensionParser(parent):
 
 class Extension(FieldSet):
     ext_code = {
-        0xf9: ("graphic_ctl", parseGraphicControl, "Graphic control"),
-        0xfe: ("comments", parseComments, "Comments"),
+        0xf9: ("graphic_ctl[]", parseGraphicControl, "Graphic control"),
+        0xfe: ("comments[]", parseComments, "Comments"),
         0xff: ("app_ext[]", parseApplicationExtension, "Application extension"),
+        0x01: ("text_ext[]", parseTextExtension, "Plain text extension")
     }
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
@@ -127,7 +154,7 @@ class ScreenDescriptor(FieldSet):
         yield Bits(self, "color_res", 3, "Color resolution minus one")
         yield Bit(self, "global_map", "Has global map?")
         yield UInt8(self, "background", "Background color")
-        yield UInt8(self, "notused", "Not used (zero)")
+        yield UInt8(self, "pixel_aspect_ratio", "Pixel Aspect Ratio")
 
     def createDescription(self):
         colors = 1 << (self["bpp"].value+1)
@@ -164,7 +191,8 @@ class GifFile(Parser):
 
     def createFields(self):
         # Header
-        yield String(self, "header", 6, "File header", charset="ASCII")
+        yield String(self, "magic", 3, "File magic code", charset="ASCII")
+        yield String(self, "version", 3, "GIF version", charset="ASCII")
 
         yield ScreenDescriptor(self, "screen")
         if self["screen/global_map"].value:
@@ -183,10 +211,6 @@ class GifFile(Parser):
                 yield Extension(self, "extensions[]")
             elif code == ",":
                 yield Image(self, "image[]")
-                # TODO: Write Huffman parser code :-)
-                if self.current_size < self._size:
-                    yield self.seekBit(self._size, "end")
-                return
             elif code == ";":
                 # GIF Terminator
                 break
