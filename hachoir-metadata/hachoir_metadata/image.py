@@ -229,9 +229,9 @@ class GifMetadata(RootMetadata):
         if self.has("bits_per_pixel"):
             self.nb_colors = (1 << self.get('bits_per_pixel'))
         self.compression = _("LZW")
-        self.format_version =  "GIF version %s" % gif["version"].value[-3:]
-        if "comments" in gif:
-            for comment in gif.array("comments/comment"):
+        self.format_version =  "GIF version %s" % gif["version"].value
+        for comments in gif.array("comments"):
+            for comment in gif.array(comments.name + "/comment"):
                 self.comment = comment.value
         if "graphic_ctl/has_transp" in gif and gif["graphic_ctl/has_transp"].value:
             self.pixel_format = _("Color index with transparency")
