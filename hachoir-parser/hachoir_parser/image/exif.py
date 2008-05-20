@@ -71,7 +71,7 @@ class BasicIFDEntry(FieldSet):
             cls = self.value_cls
             if cls is String:
                 args = (self, name, value_size/8, "Value")
-                kw["strip"] = " \0"   # TODO: charset?
+                kw["strip"] = " \0"
                 kw["charset"] = "ISO-8859-1"
             elif cls is Bytes:
                 args = (self, name, value_size/8, "Value")
@@ -342,9 +342,8 @@ class Exif(FieldSet):
            self.endian = LITTLE_ENDIAN
         else:
            self.endian = BIG_ENDIAN
-        yield UInt16(self, "header2", "Header2 (42)")
-        yield UInt16(self, "nb_entry", "Number of entries")
-        yield UInt16(self, "whatsthis", "What's this ??")
+        yield UInt16(self, "version", "TIFF version number")
+        yield UInt32(self, "img_dir_ofs", "Next image directory offset")
         while not self.eof:
             addr = self.absolute_address + self.current_size
             tag = self.stream.readBits(addr, 16, NETWORK_ENDIAN)
