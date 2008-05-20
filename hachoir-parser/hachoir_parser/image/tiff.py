@@ -1,13 +1,13 @@
 """
 TIFF image parser.
 
-Author: Victor Stinner
+Authors: Victor Stinner and Sebastien Ponce
 Creation date: 30 september 2006
 """
 
 from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet, ParserError,
-    UInt16, UInt32, String)
+from hachoir_core.field import (FieldSet, ParserError, RootSeekableFieldSet,
+    UInt16, UInt32, Bytes, String)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_parser.image.exif import BasicIFDEntry
 from hachoir_core.tools import createDict
@@ -19,6 +19,7 @@ class IFDEntry(BasicIFDEntry):
 
     TAG_INFO = {
         254: ("new_subfile_type", "New subfile type"),
+        255: ("subfile_type", "Subfile type"),
         256: ("img_width", "Image width in pixels"),
         257: ("img_height", "Image height in pixels"),
         258: ("bits_per_sample", "Bits per sample"),
@@ -56,12 +57,42 @@ class IFDEntry(BasicIFDEntry):
         301: ("color_respt_curve", "Color response curves"),
         305: ("software", "Software"),
         306: ("date_time", "Date time"),
-        307: ("artist", "Artist"),
-        308: ("host_computer", "Host computer"),
+        315: ("artist", "Artist"),
+        316: ("host_computer", "Host computer"),
         317: ("predicator", "Predicator"),
         318: ("white_pt", "White point"),
         319: ("prim_chomat", "Primary chromaticities"),
         320: ("color_map", "Color map"),
+        321: ("half_tone_hints", "Halftone Hints"),
+        322: ("tile_width", "TileWidth"),
+        323: ("tile_length", "TileLength"),
+        324: ("tile_offsets", "TileOffsets"),
+        325: ("tile_byte_counts", "TileByteCounts"),
+        332: ("ink_set", "InkSet"),
+        333: ("ink_names", "InkNames"),
+        334: ("number_of_inks", "NumberOfInks"),
+        336: ("dot_range", "DotRange"),
+        337: ("target_printer", "TargetPrinter"),
+        338: ("extra_samples", "ExtraSamples"),
+        339: ("sample_format", "SampleFormat"),
+        340: ("smin_sample_value", "SMinSampleValue"),
+        341: ("smax_sample_value", "SMaxSampleValue"),
+        342: ("transfer_range", "TransferRange"),
+        512: ("jpeg_proc", "JPEGProc"),
+        513: ("jpeg_interchange_format", "JPEGInterchangeFormat"),
+        514: ("jpeg_interchange_format_length", "JPEGInterchangeFormatLength"),
+        515: ("jpeg_restart_interval", "JPEGRestartInterval"),
+        517: ("jpeg_lossless_predictors", "JPEGLosslessPredictors"),
+        518: ("jpeg_point_transforms", "JPEGPointTransforms"),
+        519: ("jpeg_qtables", "JPEGQTables"),
+        520: ("jpeg_dctables", "JPEGDCTables"),
+        521: ("jpeg_actables", "JPEGACTables"),
+        529: ("ycbcr_coefficients", "YCbCrCoefficients"),
+        530: ("ycbcr_subsampling", "YCbCrSubSampling"),
+        531: ("ycbcr_positioning", "YCbCrPositioning"),
+        532: ("reference_blackwhite", "ReferenceBlackWhite"),
+        33432: ("copyright", "Copyright"),
+        0x8769: ("ifd_pointer", "Pointer to next IFD entry"),
     }
     TAG_NAME = createDict(TAG_INFO, 0)
 
@@ -77,6 +108,7 @@ class IFD(FieldSet):
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
         self._size = 16 + self["count"].value * IFDEntry.static_size
+        self._has_offset = False
 
     def createFields(self):
         yield UInt16(self, "count")
@@ -86,7 +118,25 @@ class IFD(FieldSet):
         for index in xrange(self["count"].value):
             yield IFDEntry(self, "entry[]")
 
-class TiffFile(Parser):
+class Data(FieldSet):
+
+    def __init__(self, parent, name, desc, type, count):
+        if type != String :
+            size = type.static_size * count
+        else:
+            size = count * 8
+        FieldSet.__init__(self, parent, name, desc, size)
+        self._count = count
+        self._type = type
+
+    def createFields(self):
+        if self._type == String:
+            yield String(self, "value", self._count, strip="\0", charset="ISO-8859-1")
+        else:
+            for i in xrange(self._count):
+                yield self._type(self, "value[]")
+
+class TiffFile(RootSeekableFieldSet, Parser):
     PARSER_TAGS = {
         "id": "tiff",
         "category": "image",
@@ -94,39 +144,68 @@ class TiffFile(Parser):
         "mime": (u"image/tiff",),
         "min_size": 8*8,
 # TODO: Re-enable magic
-#        "magic": (("II\x2A\0", 0), ("MM\0\x2A", 0)),
+        "magic": (("II\x2A\0", 0), ("MM\0\x2A", 0)),
         "description": "TIFF picture"
     }
 
     # Correct endian is set in constructor
     endian = LITTLE_ENDIAN
-#    endian = BIG_ENDIAN
+
+    def __init__(self, stream, **args):
+        RootSeekableFieldSet.__init__(self, None, "root", stream, None, stream.askSize(self))
+        if self.stream.readBytes(0, 2) == "MM":
+            self.endian = BIG_ENDIAN
+        Parser.__init__(self, stream, **args)
 
     def validate(self):
         endian = self.stream.readBytes(0, 2)
-        if endian == "II":
-            self.endian = LITTLE_ENDIAN
-        elif endian == "MM":
-            self.endian = BIG_ENDIAN
-        else:
-            return "Invalid endian"
+        if endian not in ("MM", "II"):
+            return "Invalid endian (%r)" % endian
         if self["version"].value != 42:
             return "Unknown TIFF version"
-        if self["img_dir_ofs"].value % 2:
-            return "Invalid first image directory offset"
         return True
 
     def createFields(self):
         yield String(self, "endian", 2, 'Endian ("II" or "MM")', charset="ASCII")
         yield UInt16(self, "version", "TIFF version number")
-        yield UInt32(self, "img_dir_ofs", "First image directory offset (in bytes from the beginning)")
+        offset = UInt32(self, "img_dir_ofs[]", "Next image directory offset (in bytes from the beginning)")
+        yield offset
+        while True:
+            if offset.value == 0:
+                break
 
-        raw = self.seekByte(self["img_dir_ofs"].value, relative=False)
-        if raw:
-            yield raw
+            self.seekByte(offset.value, relative=False)
+            ifd = IFD(self, "ifd[]", "", None)
+            yield ifd
+            offset = UInt32(self, "img_dir_ofs[]", "Next image directory offset (in bytes from the beginning)")
+            yield offset
 
-        yield IFD(self, "ifd")
+            # EXIF hack
+#            if "ifd_pointer" in ifd:
+#                offset = ifd["ifd_pointer/value"]
 
-        if self.current_size < self._size:
-            yield self.seekBit(self._size, "end")
+            # Now go for the data referenced by the ifd
+            retAddress = self.absolute_address
+            datas = {}
+            for entry in ifd:
+                if type(entry) != IFDEntry:
+                    continue
+                for c in entry:
+                    if c.name != "offset":
+                        continue
+                    self.seekByte(c.value, False)
+                    name = ifd.name + "_" + entry.name + "_data"
+                    desc = "data for ifd entry " + entry.name,
+                    entryType = BasicIFDEntry.ENTRY_FORMAT[entry["type"].value]
+                    count = entry["count"].value
+                    d = Data(self, name, desc, entryType, count)
+                    datas[d.name[d.name.find("_")+1:d.name.rfind("_")]] = d
+                    yield d
+                    break
+
+            # and for the image data if any
+            if "strip_ofs" in datas and "strip_byte" in datas:
+                for i in xrange(datas["strip_byte"]._count):
+                    self.seekByte(datas["strip_ofs"]["value["+str(i)+"]"].value, False)
+                    yield Bytes(self, ifd.name + "_strip[]", datas["strip_byte"]["value["+str(i)+"]"].value)
 
