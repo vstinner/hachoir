@@ -8,7 +8,7 @@ from hachoir_core.field import (FieldSet, ParserError,
     UInt8, UInt16, UInt32,
     Int32, Enum, String,
     Bytes, SubFile,
-    PaddingBytes, createPaddingField)
+    NullBytes, createPaddingField)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN, NETWORK_ENDIAN
 from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_core.tools import createDict
@@ -61,7 +61,7 @@ class BasicIFDEntry(FieldSet):
 
         # Get offset/value
         if not value_size:
-            yield PaddingBytes(self, "padding", 4)
+            yield NullBytes(self, "padding", 4)
         elif value_size <= 32:
             if 1 < array_size:
                 name = "value[]"
@@ -82,7 +82,7 @@ class BasicIFDEntry(FieldSet):
 
             size = array_size * value_size
             if size < 32:
-                yield PaddingBytes(self, "padding", (32-size)//8)
+                yield NullBytes(self, "padding", (32-size)//8)
         else:
             yield UInt32(self, "offset", "Value offset")
 
