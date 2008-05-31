@@ -6,7 +6,7 @@ Creation date: 30 september 2006
 """
 
 from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet, ParserError, RootSeekableFieldSet,
+from hachoir_core.field import (FieldSet, SeekableFieldSet, ParserError, RootSeekableFieldSet,
     UInt16, UInt32, Bytes, String)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_parser.image.exif import BasicIFDEntry
@@ -118,23 +118,48 @@ class IFD(FieldSet):
         for index in xrange(self["count"].value):
             yield IFDEntry(self, "entry[]")
 
+class ImageFile(SeekableFieldSet):
+    def __init__(self, parent, name, description, ifd):
+        SeekableFieldSet.__init__(self, parent, name, description, None)
+        self._has_offset = False
+        self._ifd = ifd
+
+    def createFields(self):
+        datas = {}
+        for entry in self._ifd:
+            if type(entry) != IFDEntry:
+                continue
+            for c in entry:
+                if c.name != "offset":
+                    continue
+                self.seekByte(c.value, False)
+                desc = "data of ifd entry " + entry.name,
+                entryType = BasicIFDEntry.ENTRY_FORMAT[entry["type"].value]
+                count = entry["count"].value
+                if entryType == String:
+                    yield String(self, entry.name, count, desc, "\0", "ISO-8859-1")
+                else:    
+                    d = Data(self, entry.name, desc, entryType, count)
+                    datas[d.name] = d
+                    yield d
+                break
+        # image data
+        if "strip_ofs" in datas and "strip_byte" in datas:
+            for i in xrange(datas["strip_byte"]._count):
+                self.seekByte(datas["strip_ofs"]["value["+str(i)+"]"].value, False)
+                yield Bytes(self, "strip[]", datas["strip_byte"]["value["+str(i)+"]"].value)
+
 class Data(FieldSet):
 
     def __init__(self, parent, name, desc, type, count):
-        if type != String :
-            size = type.static_size * count
-        else:
-            size = count * 8
+        size = type.static_size * count
         FieldSet.__init__(self, parent, name, desc, size)
         self._count = count
         self._type = type
 
     def createFields(self):
-        if self._type == String:
-            yield String(self, "value", self._count, strip="\0", charset="ISO-8859-1")
-        else:
-            for i in xrange(self._count):
-                yield self._type(self, "value[]")
+        for i in xrange(self._count):
+            yield self._type(self, "value[]")
 
 class TiffFile(RootSeekableFieldSet, Parser):
     PARSER_TAGS = {
@@ -170,42 +195,17 @@ class TiffFile(RootSeekableFieldSet, Parser):
         yield UInt16(self, "version", "TIFF version number")
         offset = UInt32(self, "img_dir_ofs[]", "Next image directory offset (in bytes from the beginning)")
         yield offset
+        ifds = []
         while True:
             if offset.value == 0:
                 break
 
             self.seekByte(offset.value, relative=False)
-            ifd = IFD(self, "ifd[]", "", None)
+            ifd = IFD(self, "ifd[]", "Image File Directory", None)
+            ifds.append(ifd)
             yield ifd
             offset = UInt32(self, "img_dir_ofs[]", "Next image directory offset (in bytes from the beginning)")
             yield offset
-
-            # EXIF hack
-#            if "ifd_pointer" in ifd:
-#                offset = ifd["ifd_pointer/value"]
-
-            # Now go for the data referenced by the ifd
-            retAddress = self.absolute_address
-            datas = {}
-            for entry in ifd:
-                if type(entry) != IFDEntry:
-                    continue
-                for c in entry:
-                    if c.name != "offset":
-                        continue
-                    self.seekByte(c.value, False)
-                    name = ifd.name + "_" + entry.name + "_data"
-                    desc = "data for ifd entry " + entry.name,
-                    entryType = BasicIFDEntry.ENTRY_FORMAT[entry["type"].value]
-                    count = entry["count"].value
-                    d = Data(self, name, desc, entryType, count)
-                    datas[d.name[d.name.find("_")+1:d.name.rfind("_")]] = d
-                    yield d
-                    break
-
-            # and for the image data if any
-            if "strip_ofs" in datas and "strip_byte" in datas:
-                for i in xrange(datas["strip_byte"]._count):
-                    self.seekByte(datas["strip_ofs"]["value["+str(i)+"]"].value, False)
-                    yield Bytes(self, ifd.name + "_strip[]", datas["strip_byte"]["value["+str(i)+"]"].value)
-
+        for ifd in ifds:
+            image = ImageFile(self, "image[]", "Image File", ifd)
+            yield image
