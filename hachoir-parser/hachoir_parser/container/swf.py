@@ -332,7 +332,7 @@ class Tag(FieldSet):
         return "Tag: %s (%s)" % (self["code"].display, self["length"].display)
 
 class SwfFile(Parser):
-    VALID_VERSIONS = set(xrange(1, 8+1))
+    VALID_VERSIONS = set(xrange(1, 9+1))
     PARSER_TAGS = {
         "id": "swf",
         "category": "container",
