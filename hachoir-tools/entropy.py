@@ -14,11 +14,10 @@ class Entropy:
 
     def compute(self):
         h = 0
-        for index in xrange(0, 256):
-            index = chr(index)
-            if not self.frequence[index]:
+        for value in self.frequence.itervalues():
+            if not value:
                 continue
-            p_i = float(self.frequence[index]) / self.count
+            p_i = float(value) / self.count
             h -= p_i * log(p_i, 2)
         return h
 
