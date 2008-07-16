@@ -165,7 +165,7 @@ def checkJPEG(parser): return (
     checkValue(parser, "photoshop/content/signature", "Photoshop 3.0"),
     checkValue(parser, "photoshop/content/copyright_flag/content", "\0\0"),
     checkValue(parser, "exif/content/header", "Exif\0\0"),
-    checkValue(parser, "exif/content/header2", 42))
+    checkValue(parser, "exif/content/version", 42))
 
 def checkTAR(parser): return (
     checkDisplay(parser, "file[0]/name", u'"dummy.txt"'),
