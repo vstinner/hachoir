@@ -8,7 +8,7 @@ TODO:
 """
 
 from hachoir_regex import (RegexString, RegexEmpty, RegexRepeat,
-    RegexDot, RegexStart, RegexEnd,
+    RegexDot, RegexWord, RegexStart, RegexEnd,
     RegexRange, RegexRangeItem, RegexRangeCharacter)
 import re
 
@@ -146,9 +146,12 @@ def _parse(text, start=0, until=None):
                 if index == len(text):
                     raise SyntaxError("Antislash (\\) without escaped character")
                 char = text[index]
-                if char not in REGEX_COMMAND_CHARACTERS:
-                    raise SyntaxError("Operator '\\%s' is not supported" % char)
-                new_regex = RegexString(char)
+                if char == 'b':
+                    new_regex = RegexWord()
+                else:
+                    if not(char in REGEX_COMMAND_CHARACTERS or char in " '"):
+                        raise SyntaxError("Operator '\\%s' is not supported" % char)
+                    new_regex = RegexString(char)
                 index += 1
             else:
                 raise NotImplementedError("Operator '%s' is not supported" % char)

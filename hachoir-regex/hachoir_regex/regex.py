@@ -278,6 +278,15 @@ class RegexEmpty(Regex):
     def _eq(self, other):
         return True
 
+class RegexWord(RegexEmpty):
+    def _and(self, other):
+        if other.__class__ == RegexWord:
+            return self
+        return None
+
+    def _str(self, **kw):
+        return r'\b'
+
 class RegexStart(RegexEmpty):
     def _and(self, other):
         if other.__class__ == RegexStart:
