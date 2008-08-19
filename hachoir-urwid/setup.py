@@ -37,7 +37,7 @@ def main():
         "package_dir": {"hachoir_urwid": "hachoir_urwid"},
     }
     if use_setuptools:
-        install_options["install_requires"] = ("hachoir-core>=1.0.1", "hachoir-parser>=1.0", "urwid>=0.9.4")
+        install_options["install_requires"] = ("hachoir-core>=1.2", "hachoir-parser>=1.0", "urwid>=0.9.4")
         install_options["zip_safe"] = True
     setup(**install_options)
 
