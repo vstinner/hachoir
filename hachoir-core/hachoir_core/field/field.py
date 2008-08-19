@@ -255,3 +255,6 @@ class Field(Logger):
         """
         return True
 
+    def getFieldType(self):
+        return self.__class__.__name__
+

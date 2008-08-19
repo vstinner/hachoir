@@ -198,16 +198,14 @@ class GenericString(Bytes):
             self._format, self._charset, self._parent.endian)
     suffix_str = property(_getSuffixStr)
 
-    def _convertText(self, text, charset):
-        # No charset: use fallback charset
-        if not charset:
-            charset = guessBytesCharset(text, default=None)
-            if not charset:
-                return unicode(text, FALLBACK_CHARSET, "strict")
+    def _convertText(self, text):
+        if not self._charset:
+            # charset is still unknown: guess the charset
+            self._charset = guessBytesCharset(text, default=FALLBACK_CHARSET)
 
         # Try to convert to Unicode
         try:
-            return unicode(text, charset, "strict")
+            return unicode(text, self._charset, "strict")
         except UnicodeDecodeError, err:
             pass
 
@@ -217,10 +215,10 @@ class GenericString(Bytes):
         # => Add missing nul byte: 'B\0e\0' (4 bytes)
         if err.reason == "truncated data" \
         and err.end == len(text) \
-        and charset == "UTF-16-LE":
+        and self._charset == "UTF-16-LE":
             try:
-                text = unicode(text+"\0", charset, "strict")
-                self.warning("Fix truncated %s string: add missing nul byte" % charset)
+                text = unicode(text+"\0", self._charset, "strict")
+                self.warning("Fix truncated %s string: add missing nul byte" % self._charset)
                 return text
             except UnicodeDecodeError, err:
                 pass
@@ -228,6 +226,11 @@ class GenericString(Bytes):
         # On error, use FALLBACK_CHARSET
         self.warning(u"Unable to convert string to Unicode: %s" % err)
         return unicode(text, FALLBACK_CHARSET, "strict")
+
+    def _guessCharset(self):
+        addr = self.absolute_address + self._content_offset * 8
+        bytes = self._parent.stream.readBytes(addr, self._content_size)
+        return guessBytesCharset(bytes, default=FALLBACK_CHARSET)
 
     def createValue(self, human=True):
         # Compress data address (in bits) and size (in bytes)
@@ -249,7 +252,7 @@ class GenericString(Bytes):
             return text
 
         # Convert text to Unicode
-        text = self._convertText(text, self._charset)
+        text = self._convertText(text)
 
         # Truncate
         if self._truncate:
@@ -300,6 +303,8 @@ class GenericString(Bytes):
     format = property(_getFormat, doc="String format (eg. 'C')")
 
     def _getCharset(self):
+        if not self._charset:
+            self._charset = self._guessCharset()
         return self._charset
     charset = property(_getCharset, doc="String charset (eg. 'ISO-8859-1')")
 
@@ -310,6 +315,15 @@ class GenericString(Bytes):
     def _getContentOffset(self):
         return self._content_offset
     content_offset = property(_getContentOffset, doc="Content offset in bytes")
+
+    def getFieldType(self):
+        info = self.charset
+        if self._strip:
+            if isinstance(self._strip, (str, unicode)):
+                info += ",strip=%s" % makePrintable(self._strip, "ASCII", quote="'")
+            else:
+                info += ",strip=True"
+        return "%s<%s>" % (Bytes.getFieldType(self), info)
 
 def stringFactory(name, format, doc):
     class NewString(GenericString):
