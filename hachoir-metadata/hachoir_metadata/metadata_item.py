@@ -97,7 +97,8 @@ class Data:
         # Skip empty strings
         if isinstance(value, unicode):
             value = normalizeNewline(value)
-            if config.MAX_STR_LENGTH < len(value):
+            if config.MAX_STR_LENGTH \
+            and config.MAX_STR_LENGTH < len(value):
                 value = value[:config.MAX_STR_LENGTH] + "(...)"
 
         # Skip duplicates
