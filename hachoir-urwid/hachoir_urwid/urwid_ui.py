@@ -272,7 +272,7 @@ class Walker(ListWalker):
         if self.flags & self.display_size and node.field.size or self.flags & self.display_type:
             tmp_text = []
             if self.flags & self.display_type:
-                tmp_text.append(node.field.__class__.__name__)
+                tmp_text.append(node.field.getFieldType())
             if self.flags & self.display_size:
                 if node.field.size % 8:
                     tmp_text.append( humanBitSize(node.field.size) )
