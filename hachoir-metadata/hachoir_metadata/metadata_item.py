@@ -1,9 +1,9 @@
 from hachoir_core.tools import makeUnicode, normalizeNewline
 from hachoir_core.error import HACHOIR_ERRORS
+from hachoir_metadata import config
 
 MIN_PRIORITY = 100
 MAX_PRIORITY = 999
-MAX_STR_LENGTH = 300              # 300 characters
 
 QUALITY_FASTEST = 0.0
 QUALITY_FAST = 0.25
@@ -97,8 +97,8 @@ class Data:
         # Skip empty strings
         if isinstance(value, unicode):
             value = normalizeNewline(value)
-            if MAX_STR_LENGTH < len(value):
-                value = value[:MAX_STR_LENGTH] + "(...)"
+            if config.MAX_STR_LENGTH < len(value):
+                value = value[:config.MAX_STR_LENGTH] + "(...)"
 
         # Skip duplicates
         if value in self:
