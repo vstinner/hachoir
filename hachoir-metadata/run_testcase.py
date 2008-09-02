@@ -350,6 +350,12 @@ def checkHotelCalifornia(meta): return (
     checkAttr(meta, 'producer', u'reference libFLAC 1.1.2 20050205'),
 )
 
+def checkRadpoor(meta): return (
+    checkAttr(meta, 'title', u"\u062a\u0633\u062a"),
+    checkAttr(meta, 'author', u'Soroosh Radpoor'),
+    checkAttr(meta, 'creation_date', datetime(2008, 9, 2, 16, 8, 30)),
+)
+
 def checkFile(filename, check_metadata, quality=1.0):
     sys.stdout.write("  - Create parser: ")
     sys.stdout.flush()
@@ -458,6 +464,7 @@ testcase_files = (
     (u"gps.jpg", checkGPS),
     (u"angle-bear-48x48.ani", checkAngelBear),
     (u"hotel_california.flac", checkHotelCalifornia),
+    (u"radpoor.doc", checkRadpoor),
 )
 
 if __name__ == "__main__":
