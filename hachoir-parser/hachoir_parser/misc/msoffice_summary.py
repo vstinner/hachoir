@@ -26,7 +26,9 @@ class OSConfig:
             self.charset = "MacRoman"
             self.utf16 = "UTF-16-BE"
         else:
-            self.charset = "ISO-8859-1"
+            # FIXME: Don't guess the charset, use ISO-8859-1 or UTF-8
+            #self.charset = "ISO-8859-1"
+            self.charset = None
             self.utf16 = "UTF-16-LE"
 
 class PropertyIndex(FieldSet):
