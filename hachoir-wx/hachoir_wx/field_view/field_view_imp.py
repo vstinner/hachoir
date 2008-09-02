@@ -30,7 +30,7 @@ class field_view_imp_t:
             self.fields = field
             self.refill_view()
         self.dispatcher.trigger('field_activated', field)
-     
+
     def on_field_modified(self, dispatcher, field):
         self.refill_view()
 
@@ -68,7 +68,7 @@ class field_view_imp_t:
             map = {
                 _('address') : self.format_addr(field),
                 _('name') : format_name(field),
-                _('type') : field.__class__.__name__,
+                _('type') : field.getFieldType(),
                 _('size') : format_size(field._getSize()),
                 _('data') : format_data(field),
                 _('description'): format_desc(field)

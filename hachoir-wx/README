@@ -8,6 +8,11 @@ http://hachoir.org/wiki/hachoir-wx
 
 Everyone is very welcome to contribute code =)
 
+hachoir-wx 0.2.1
+================
+
+ * use getFieldType() from hachoir-core 1.2 to get better type information
+
 hachoir-wx 0.2
 ==============
 
