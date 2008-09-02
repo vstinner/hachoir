@@ -26,8 +26,8 @@ Installation
 
 For the installation, use setup.py or see: http://hachoir.org/wiki/Install
 
-What's new in hachoir-core 1.2?
-===============================
+What's new in hachoir-core 1.1.1?
+=================================
 
  * Create Field.getFieldType(): describe a field type and gives some useful
    informations (eg. the charset for a string)

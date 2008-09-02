@@ -50,7 +50,7 @@ def main():
 
     if use_setuptools:
         install_options["install_requires"] = (
-            "hachoir-core>=1.2", "hachoir-parser>=0.7.0",
+            "hachoir-core>=1.1.1", "hachoir-parser>=0.7.0",
             "wxPython>=2.6.3")
         install_options["zip_safe"] = True
         install_options["include_package_data"] = True
