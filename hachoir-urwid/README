@@ -51,14 +51,14 @@ Command line options: use --help option.
 
 In hachoir-use, use F1 key to get help (keyboard keys).
 
-What's new in hachoir-urwid 1.0?
+What's new in hachoir-urwid 1.1?
 ================================
-
-Version 1.1
------------
 
  * Use the new getFieldType() method of hachoir-core 1.2 to display better
    informations about the field type, eg. shows the string charset
+
+What's new in hachoir-urwid 1.0?
+================================
 
 Version 1.0.1
 -------------
