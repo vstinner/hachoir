@@ -12,7 +12,11 @@ Website: http://hachoir.org/wiki/hachoir-regex
 Changelog
 =========
 
-Version 1.0.3
+Version 1.0.4
+
+ * Support \b (match a word)
+
+Version 1.0.3 (2008-04-01)
 
  * Raise SyntaxError on unsupported escape character
  * Two dot atoms are always equals
