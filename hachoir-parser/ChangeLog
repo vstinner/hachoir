@@ -1,3 +1,19 @@
+What's new in hachoir-parser 1.2?
+=================================
+
+ * Create FLAC parser, written by Esteban Loiseau
+ * Create Action Script parser used in Flash parser,
+   written by Sebastien Ponce
+ * Create Gnome Keyring parser: able to parse the stored passwords using
+   Python Crypto if the main password is written in the code :-)
+ * GIF: support text extension field; parse image content
+   (LZW compressed data)
+ * Fix charset of IPTC string (guess it, it's not always ISO-8859-1)
+ * TIFF: Sebastien Ponce improved the parser: parse image data, add many
+   tags, etc.
+ * MS Office: guess the charset for summary strings since it could be
+   ISO-8859-1 or UTF-8
+
 What's new in hachoir-parser 1.1?
 =================================
 
