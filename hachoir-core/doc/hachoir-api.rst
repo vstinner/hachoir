@@ -284,6 +284,8 @@ Methods:
 * getFieldByAddress(address, feed=True): get the field at the
   specified address
 * writeFieldsIn(old, address, new): helper for replaceField() <~~~ can be an helper?
+* getFieldType(): get the field type as a short string. The type may contains
+  extra informations like the string charset.
 
 Lazy methods:
 

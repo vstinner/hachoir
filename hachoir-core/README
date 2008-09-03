@@ -31,6 +31,9 @@ What's new in hachoir-core 1.1.1?
 
  * Create Field.getFieldType(): describe a field type and gives some useful
    informations (eg. the charset for a string)
+ * Create TimestampUnix64
+ * GenericString: only guess the charset once; if the charset attribute
+   if not set, guess it when it's asked by the user.
 
 What's new in hachoir-core 1.1?
 ===============================
