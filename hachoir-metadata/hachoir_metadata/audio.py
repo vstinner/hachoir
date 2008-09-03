@@ -8,6 +8,23 @@ from datetime import timedelta, date
 from hachoir_metadata.metadata_item import QUALITY_FAST, QUALITY_NORMAL, QUALITY_BEST
 from hachoir_metadata.safe import fault_tolerant, getValue
 
+def computeComprRate(meta, size):
+    if not meta.has("duration") \
+    or not meta.has("sample_rate") \
+    or not meta.has("bits_per_sample") \
+    or not meta.has("nb_channel") \
+    or not size:
+        return
+    orig_size = timedelta2seconds(meta.get("duration")) * meta.get('sample_rate') * meta.get('bits_per_sample') * meta.get('nb_channel')
+    meta.compr_rate = float(orig_size) / size
+
+def computeBitRate(meta):
+    if not meta.has("bits_per_sample") \
+    or not meta.has("nb_channel") \
+    or not meta.has("sample_rate"):
+        return
+    meta.bit_rate = meta.get('bits_per_sample') * meta.get('nb_channel') * meta.get('sample_rate')
+
 VORBIS_KEY_TO_ATTR = {
     "ARTIST": "artist",
     "ALBUM": "album",
@@ -40,23 +57,6 @@ def readVorbisComment(metadata, comment):
                 setattr(metadata, key, value)
             elif value:
                 metadata.warning("Skip Vorbis comment %s: %s" % (key, value))
-
-def computeComprRate(meta, size):
-    if not meta.has("duration") \
-    or not meta.has("sample_rate") \
-    or not meta.has("bits_per_sample") \
-    or not meta.has("nb_channel") \
-    or not size:
-        return
-    orig_size = timedelta2seconds(meta.get("duration")) * meta.get('sample_rate') * meta.get('bits_per_sample') * meta.get('nb_channel')
-    meta.compr_rate = float(orig_size) / size
-
-def computeBitRate(meta):
-    if not meta.has("bits_per_sample") \
-    or not meta.has("nb_channel") \
-    or not meta.has("sample_rate"):
-        return
-    meta.bit_rate = meta.get('bits_per_sample') * meta.get('nb_channel') * meta.get('sample_rate')
 
 class OggMetadata(MultipleMetadata):
     def extract(self, ogg):
