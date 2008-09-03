@@ -70,6 +70,16 @@ UNIX "file" program)::
     sheep_on_drugs.mp3: MPEG v1 layer III, 128.0 Kbit/sec, 44.1 KHz, Joint stereo
     wormux_32x32_16c.ico: Microsoft Windows icon: 16x16x32
 
+What's new in hachoir-metadata 1.2?
+===================================
+
+ * Create --maxlen option for hachoir-metadata program: --maxlen=0 disable
+   the arbitrary string length limit
+ * Create FLAC metadata extractor
+ * Create hachoir_metadata.config, especially MAX_STR_LENGTH option
+   (maximum string length)
+ * GIF image may contains multiple comments
+
 What's new in hachoir-metadata 1.1?
 ===================================
 
