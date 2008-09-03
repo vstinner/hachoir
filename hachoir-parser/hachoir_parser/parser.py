@@ -134,16 +134,16 @@ class HachoirParser(object):
         return tags
 
     @classmethod
-    def print_(cls, verbose):
+    def print_(cls, out, verbose):
         tags = cls.getParserTags()
-        print "- %s: %s" % (tags["id"], tags["description"])
+        print >>out, "- %s: %s" % (tags["id"], tags["description"])
         if verbose:
             if "mime" in tags:
-                print "  MIME type: %s" % (", ".join(tags["mime"]))
+                print >>out, "  MIME type: %s" % (", ".join(tags["mime"]))
             if "file_ext" in tags:
                 file_ext = ", ".join(
                     ".%s" % file_ext for file_ext in tags["file_ext"])
-                print "  File extension: %s" % file_ext
+                print >>out, "  File extension: %s" % file_ext
 
     autofix = property(lambda self: self._autofix and config.autofix)
 

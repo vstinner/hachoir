@@ -2,6 +2,8 @@
 from imp import load_source
 from os import path
 from sys import argv
+from README import writeReadme
+from StringIO import StringIO
 
 CLASSIFIERS = [
     'Intended Audience :: Developers',
@@ -15,6 +17,12 @@ MODULES = (
     "archive", "audio", "container", "common", "file_system", "game",
     "image", "misc", "network", "program", "video")
 
+def getLongDescription():
+    out = StringIO()
+    writeReadme(out)
+    out.seek(0)
+    return out.read()
+
 def main():
     if "--setuptools" in argv:
         argv.remove("--setuptools")
@@ -23,6 +31,7 @@ def main():
     else:
         from distutils.core import setup
         use_setuptools = False
+
 
     hachoir_parser = load_source("version", path.join("hachoir_parser", "version.py"))
     PACKAGES = {"hachoir_parser": "hachoir_parser"}
@@ -36,7 +45,7 @@ def main():
         "download_url": hachoir_parser.WEBSITE,
         "author": "Hachoir team (see AUTHORS file)",
         "description": "Package of Hachoir parsers used to open binary files",
-        "long_description": open('README').read(),
+        "long_description": getLongDescription(),
         "classifiers": CLASSIFIERS,
         "license": hachoir_parser.LICENSE,
         "packages": PACKAGES.keys(),

@@ -84,8 +84,9 @@ class ParserList(object):
     def __iter__(self):
         return iter(self.parser_list)
 
-    def print_(self, title=None, verbose=False, format="one-line"):
+    def print_(self, out, title=None, verbose=False, format="one-line"):
         """Display a list of parser with its title
+         * out: output file
          * title : title of the list to display
          * format: "rest", "trac", "file-ext", "mime" or "one_line" (default)
         """
@@ -112,26 +113,26 @@ class ParserList(object):
             # Print list
             text = ", ".join( str(item) for item in extensions )
             if format == "file-ext":
-                print "File extensions: %s." % text
-                print
-                print "Total: %s file extensions." % len(extensions)
+                print >>out, "File extensions: %s." % text
+                print >>out
+                print >>out, "Total: %s file extensions." % len(extensions)
             else:
-                print "MIME types: %s." % text
-                print
-                print "Total: %s MIME types." % len(extensions)
+                print >>out, "MIME types: %s." % text
+                print >>out
+                print >>out, "Total: %s MIME types." % len(extensions)
             return
 
         if format == "trac":
-            print "== List of parsers =="
-            print
-            print "Total: %s parsers" % len(self.parser_list)
-            print
+            print >>out, "== List of parsers =="
+            print >>out
+            print >>out, "Total: %s parsers" % len(self.parser_list)
+            print >>out
         elif format == "one_line":
             if title:
-                print title
+                print >>out, title
             else:
-                print _("List of Hachoir parsers.")
-            print
+                print >>out, _("List of Hachoir parsers.")
+            print >>out
 
         # Create parser list sorted by module
         bycategory = self.bytag["category"]
@@ -139,35 +140,35 @@ class ParserList(object):
             if format == "one_line":
                 parser_list = [ parser.PARSER_TAGS["id"] for parser in bycategory[category] ]
                 parser_list.sort()
-                print "- %s: %s" % (category.title(), ", ".join(parser_list))
+                print >>out, "- %s: %s" % (category.title(), ", ".join(parser_list))
             else:
                 if format == "rest":
-                    print category.replace("_", " ").title()
-                    print "-" * len(category)
-                    print
+                    print >>out, category.replace("_", " ").title()
+                    print >>out, "-" * len(category)
+                    print >>out
                 elif format == "trac":
-                    print "=== %s ===" % category.replace("_", " ").title()
-                    print
+                    print >>out, "=== %s ===" % category.replace("_", " ").title()
+                    print >>out
                 else:
-                    print "[%s]" % category
+                    print >>out, "[%s]" % category
                 parser_list = sorted(bycategory[category],
                     key=lambda parser: parser.PARSER_TAGS["id"])
                 if format == "rest":
                     for parser in parser_list:
                         tags = parser.getParserTags()
-                        print "* %s: %s" % (tags["id"], tags["description"])
+                        print >>out, "* %s: %s" % (tags["id"], tags["description"])
                 elif format == "trac":
                     for parser in parser_list:
                         tags = parser.getParserTags()
                         desc = tags["description"]
                         desc = re.sub(r"([A-Z][a-z]+[A-Z][^ ]+)", r"!\1", desc)
-                        print " * %s: %s" % (tags["id"], desc)
+                        print >>out, " * %s: %s" % (tags["id"], desc)
                 else:
                     for parser in parser_list:
-                        parser.print_(verbose)
-                print
+                        parser.print_(out, verbose)
+                print >>out
         if format != "trac":
-            print "Total: %s parsers" % len(self.parser_list)
+            print >>out, "Total: %s parsers" % len(self.parser_list)
 
 
 class HachoirParserList(ParserList):
