@@ -32,6 +32,8 @@ class OSConfig:
             self.utf16 = "UTF-16-LE"
 
 class PropertyIndex(FieldSet):
+    TAG_CODEPAGE = 1
+
     COMMON_PROPERTY = {
         0: "Dictionary",
         1: "CodePage",
@@ -232,6 +234,11 @@ class PropertyContent(FieldSet):
 PropertyContent.TYPE_INFO[12] = ("VARIANT", PropertyContent)
 
 class SummarySection(SeekableFieldSet):
+    CODEPAGE_CHARSET = {
+        -535: "UTF-8",
+        1252: "WINDOWS-1252",
+    }
+
     def __init__(self, *args):
         SeekableFieldSet.__init__(self, *args)
         self._size = self["size"].value * 8
@@ -241,10 +248,16 @@ class SummarySection(SeekableFieldSet):
         yield UInt32(self, "property_count")
         for index in xrange(self["property_count"].value):
             yield PropertyIndex(self, "property_index[]")
+        osconfig = self.parent.osconfig
         for index in xrange(self["property_count"].value):
             findex = self["property_index[%u]" % index]
             self.seekByte(findex["offset"].value)
-            yield PropertyContent(self, "property[]", findex["id"].display)
+            field = PropertyContent(self, "property[]", findex["id"].display)
+            yield field
+            if not osconfig.charset \
+            and findex['id'].value == PropertyIndex.TAG_CODEPAGE:
+                osconfig.charset = self.CODEPAGE_CHARSET.get(field['value'].value)
+                print repr(osconfig.charset)
 
 class SummaryIndex(FieldSet):
     static_size = 20*8
