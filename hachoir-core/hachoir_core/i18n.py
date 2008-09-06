@@ -153,6 +153,7 @@ CHARSET_CHARACTERS = (
     (set(u"©®éêè\xE0ç".encode("ISO-8859-1")), "ISO-8859-1"),
     (set(u"©®éêè\xE0ç€".encode("ISO-8859-15")), "ISO-8859-15"),
     (set(u"©®".encode("MacRoman")), "MacRoman"),
+    (set(u"εδηιθκμοΡσςυΈί".encode("WINDOWS-1253")), "WINDOWS-1253"),
 )
 
 def guessBytesCharset(bytes, default=None):
@@ -169,6 +170,8 @@ def guessBytesCharset(bytes, default=None):
     'ISO-8859-1'
     >>> guessBytesCharset("100 \xA4")
     'ISO-8859-15'
+    >>> guess#BytesCharset('Word \xb8\xea\xe4\xef\xf3\xe7 - Microsoft Outlook 97 - \xd1\xf5\xe8\xec\xdf\xf3\xe5\xe9\xf2 e-mail')
+    'WINDOWS-1253'
     """
     # Check for UTF BOM
     for bom_bytes, charset in UTF_BOMS:
