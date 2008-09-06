@@ -160,8 +160,8 @@ class PropertyContent(FieldSet):
     TYPE_INFO = {
         0: ("EMPTY", None),
         1: ("NULL", None),
-        2: ("Int16", Int16),
-        3: ("Int32", Int32),
+        2: ("UInt16", UInt16),
+        3: ("UInt32", UInt32),
         4: ("Float32", Float32),
         5: ("Float64", Float64),
         6: ("CY", None),
@@ -235,8 +235,9 @@ PropertyContent.TYPE_INFO[12] = ("VARIANT", PropertyContent)
 
 class SummarySection(SeekableFieldSet):
     CODEPAGE_CHARSET = {
-        -535: "UTF-8",
         1252: "WINDOWS-1252",
+        1253: "WINDOWS-1253",
+        65001: "UTF-8",
     }
 
     def __init__(self, *args):
@@ -256,8 +257,11 @@ class SummarySection(SeekableFieldSet):
             yield field
             if not osconfig.charset \
             and findex['id'].value == PropertyIndex.TAG_CODEPAGE:
-                osconfig.charset = self.CODEPAGE_CHARSET.get(field['value'].value)
-                print repr(osconfig.charset)
+                codepage = field['value'].value
+                if codepage in self.CODEPAGE_CHARSET:
+                    osconfig.charset = self.CODEPAGE_CHARSET.get(codepage)
+                else:
+                    self.warning("Unknown codepage: %r" % codepage)
 
 class SummaryIndex(FieldSet):
     static_size = 20*8
