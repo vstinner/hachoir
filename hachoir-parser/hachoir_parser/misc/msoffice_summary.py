@@ -269,15 +269,10 @@ class SummaryIndex(FieldSet):
         yield String(self, "name", 16)
         yield UInt32(self, "offset")
 
-class Summary(HachoirParser, RootSeekableFieldSet):
-    PARSER_TAGS = {
-        "description": "Microsoft Office document subfragments",
-    }
+class BaseSummary:
     endian = LITTLE_ENDIAN
 
-    def __init__(self, stream, **args):
-        RootSeekableFieldSet.__init__(self, None, "root", stream, None, stream.askSize(self))
-        HachoirParser.__init__(self, stream, **args)
+    def __init__(self):
         if self["endian"].value == "\xFF\xFE":
             self.endian = BIG_ENDIAN
         elif self["endian"].value == "\xFE\xFF":
@@ -285,10 +280,6 @@ class Summary(HachoirParser, RootSeekableFieldSet):
         else:
             raise ParserError("OLE2: Invalid endian value")
         self.osconfig = OSConfig(self["os_type"].value == OS_MAC)
-
-    def validate(self):
-        return True
-
 
     def createFields(self):
         yield Bytes(self, "endian", 2, "Endian (0xFF 0xFE for Intel)")
@@ -314,6 +305,24 @@ class Summary(HachoirParser, RootSeekableFieldSet):
         size = (self.size - self.current_size) // 8
         if 0 < size:
             yield NullBytes(self, "end_padding", size)
+
+class SummaryParser(HachoirParser, RootSeekableFieldSet, BaseSummary):
+    PARSER_TAGS = {
+        "description": "Microsoft Office document subfragments",
+    }
+
+    def __init__(self, stream, **kw):
+        RootSeekableFieldSet.__init__(self, None, "root", stream, None, stream.askSize(self))
+        HachoirParser.__init__(self, stream, **kw)
+        BaseSummary.__init__(self)
+
+    def validate(self):
+        return True
+
+class SummaryFieldSet(BaseSummary, FieldSet):
+    def __init__(self, parent, name, description=None, size=None):
+        FieldSet.__init__(self, parent, name, description=description, size=size)
+        BaseSummary.__init__(self)
 
 class CompObj(FieldSet):
     OS_VERSION = {

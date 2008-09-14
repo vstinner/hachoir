@@ -12,7 +12,7 @@ from hachoir_parser import HachoirParser
 from hachoir_core.field import FieldSet, RootSeekableFieldSet, RawBytes
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.stream import StringInputStream
-from hachoir_parser.misc.msoffice_summary import Summary, CompObj
+from hachoir_parser.misc.msoffice_summary import SummaryFieldSet, CompObj
 
 PROPERTY_NAME = {
     u"\5DocumentSummaryInformation": "doc_summary",
@@ -54,9 +54,8 @@ class OfficeRootEntry(HachoirParser, RootSeekableFieldSet):
         previous = None
         size = 0
         start = property["start"].value
-        chain = ole2.getChain(start, ole2.ss_fat)
+        chain = ole2.getChain(start, True)
         blocksize = ole2.ss_size
-        seek = ole2.seekSBlock
         desc_format = "Small blocks %s..%s (%s)"
         fragment_group = None
         while True:
@@ -74,10 +73,11 @@ class OfficeRootEntry(HachoirParser, RootSeekableFieldSet):
                     continue
             except StopIteration:
                 block = None
-            seek(first)
+            self.seekSBlock(first)
             desc = desc_format % (first, previous, previous-first+1)
+            size = min(size, property["size"].value*8)
             if name_prefix in ("summary", "doc_summary"):
-                yield Summary(self, name, desc, size=size)
+                yield SummaryFieldSet(self, name, desc, size=size)
             elif property_index == 1:
                 yield CompObj(self, "comp_obj", desc, size=size)
             else:
@@ -87,6 +87,9 @@ class OfficeRootEntry(HachoirParser, RootSeekableFieldSet):
             first = block
             previous = block
             size = ole2.sector_size
+
+    def seekSBlock(self, block):
+        self.seekBit(block * self.ole2.ss_size)
 
 class FragmentGroup:
     def __init__(self, parser):

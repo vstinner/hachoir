@@ -28,7 +28,7 @@ from hachoir_core.text_handler import textHandler, hexadecimal, filesizeHandler
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_parser.common.win32 import GUID
 from hachoir_parser.misc.msoffice import CustomFragment, OfficeRootEntry, PROPERTY_NAME
-from hachoir_parser.misc.msoffice_summary import Summary
+from hachoir_parser.misc.msoffice_summary import SummaryParser
 
 MIN_BIG_BLOCK_LOG2 = 6   # 512 bytes
 MAX_BIG_BLOCK_LOG2 = 14  # 64 kB
@@ -201,6 +201,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
         self.fat_count = header["bb_count"].value
         self.items_per_bbfat = self.sector_size / SECT.static_size
         self.ss_size = (8 << header["sb_shift"].value)
+        self.items_per_ssfat = self.items_per_bbfat
 
         # Read DIFAT (one level of indirection)
         yield DIFat(self, "difat",  header["db_start"].value, header["db_count"].value, "Double Indirection FAT")
@@ -239,7 +240,9 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
     def parseProperty(self, property, name_prefix):
         if not property["size"].value:
             return
-        if property["size"].value < self["header/threshold"].value:
+        if property.name != "property[0]" \
+        and (property["size"].value < self["header/threshold"].value):
+            # Field is stored in the ministream, skip it
             return
         name = "%s[]" % name_prefix
         first = None
@@ -266,12 +269,12 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
                 break
             self.seekBlock(first)
             desc = "Big blocks %s..%s (%s)" % (first, previous, previous-first+1)
-            desc += " of %s bytes" % (self.sector_size//8)
+            dest += " of %s bytes" % (self.sector_size // 8)
             if name_prefix in set(("root", "summary", "doc_summary")):
                 if name_prefix == "root":
                     parser = OfficeRootEntry
                 else:
-                    parser = Summary
+                    parser = SummaryParser
                 field = CustomFragment(self, name, size, parser, desc, fragment_group)
                 yield field
                 if not fragment_group:
@@ -284,25 +287,30 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
             previous = block
             size = self.sector_size
 
-    def getChain(self, start, fat=None):
-        if not fat:
+    def getChain(self, start, use_sfat=False):
+        if use_sfat:
+            fat = self.ss_fat
+            items_per_fat = self.items_per_ssfat
+            err_prefix = "SFAT chain"
+        else:
             fat = self.bb_fat
+            items_per_fat = self.items_per_bbfat
+            err_prefix = "BFAT chain"
         block = start
         block_set = set()
         previous = block
         while block != SECT.END_OF_CHAIN:
             if block in SECT.SPECIALS:
-                raise ParserError("FAT chain: Invalid block index (0x%08x)" % block)
+                raise ParserError("%s: Invalid block index (0x%08x), previous=%s" % (err_prefix, block, previous))
             if block in block_set:
-                raise ParserError("FAT chain: Found a loop (%s=>%s)" % (previous, block))
+                raise ParserError("%s: Found a loop (%s=>%s)" % (err_prefix, previous, block))
             block_set.add(block)
             yield block
             previous = block
-            index = block // self.items_per_bbfat
+            index = block // items_per_fat
             try:
                 block = fat[index]["index[%u]" % block].value
             except LookupError, err:
-                self.error("FAT chain: %s" % err)
                 break
 
     def readBFAT(self):
@@ -328,7 +336,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
         chain = self.getChain(self["header/sb_start"].value)
         start = 0
         self.ss_fat = []
-        count = self.items_per_bbfat
+        count = self.items_per_ssfat
         for index, block in enumerate(chain):
             self.seekBlock(block)
             field = SectFat(self, "sfat[]", \
@@ -353,7 +361,4 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
 
     def seekBlock(self, block):
         self.seekBit(HEADER_SIZE + block * self.sector_size)
-
-    def seekSBlock(self, block):
-        self.seekBit(block * self.ss_size)
 
