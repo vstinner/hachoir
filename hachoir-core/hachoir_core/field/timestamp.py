@@ -1,6 +1,6 @@
 from hachoir_core.tools import (humanDatetime,
     timestampUNIX, timestampMac32, timestampUUID60,
-    timestampWin64, timedeltaWin64)
+    timestampWin64, durationWin64)
 from hachoir_core.field import Bits, FieldSet
 from datetime import datetime
 
@@ -82,5 +82,5 @@ class TimedeltaWin64(GenericTimestamp):
 
     def createValue(self):
         value = Bits.createValue(self)
-        return timedeltaWin64(value)
+        return durationWin64(value)
 

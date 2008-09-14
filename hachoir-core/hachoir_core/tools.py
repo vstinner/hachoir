@@ -486,27 +486,10 @@ def timestampMac32(value):
         return _("invalid Mac timestamp (%s)") % value
     return MAC_TIMESTAMP_T0 + timedelta(seconds=value)
 
-def timedeltaWin64(value):
-    """
-    Create a datetime.timedelta() object from a 64 bits Windows value
-    (number of 100ns). See also timestampWin64().
-
-    >>> timedeltaWin64(1072580000)
-    datetime.timedelta(0, 107, 258000)
-    >>> timedeltaWin64(2146280000)
-    datetime.timedelta(0, 214, 628000)
-    """
-    if not isinstance(value, (float, int, long)):
-        raise TypeError("an integer or float is required")
-    if value < 0:
-        raise ValueError("value have to be a positive or nul integer")
-    return timedelta(microseconds=value/10)
-
-@deprecated("Use timedeltaWin64() and humanDuration()")
 def durationWin64(value):
     """
     Convert Windows 64-bit duration to string. The timestamp format is
-    a 64-bit number: number of 100ns. See also timedeltaWin64().
+    a 64-bit number: number of 100ns. See also timestampWin64().
 
     >>> str(durationWin64(1072580000))
     '0:01:47.258000'

@@ -31,6 +31,7 @@ What's new in hachoir-core 1.2.1?
 
  * Create configuration option "unicode_stdout" which avoid replacing
    stdout and stderr by objects supporting unicode string
+ * Create TimedeltaWin64 field type
 
 What's new in hachoir-core 1.2?
 ===============================
