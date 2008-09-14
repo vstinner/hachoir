@@ -305,7 +305,8 @@ class JpegFile(Parser):
             ("\xFF\xD8\xFF\xEE", 0),   # (Start Of Image, Adobe)
         ),
         "min_size": 22*8,
-        "description": "JPEG picture"
+        "description": "JPEG picture",
+        "subfile": "skip",
     }
 
     def validate(self):
