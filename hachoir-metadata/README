@@ -70,6 +70,14 @@ UNIX "file" program)::
     sheep_on_drugs.mp3: MPEG v1 layer III, 128.0 Kbit/sec, 44.1 KHz, Joint stereo
     wormux_32x32_16c.ico: Microsoft Windows icon: 16x16x32
 
+What's new in hachoir-metadata 1.2.1?
+=====================================
+
+ * Using --raw, strings are not normalized (don't strip trailing space, new
+   line, nul byte, etc.)
+ * Extract much more informations from Microsoft Office documents (.doc, .xsl,
+   .pps, etc.)
+
 What's new in hachoir-metadata 1.2?
 ===================================
 

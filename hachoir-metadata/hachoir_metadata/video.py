@@ -9,8 +9,7 @@ from hachoir_parser.video.asf import Descriptor as ASF_Descriptor
 from hachoir_parser.container import MkvFile
 from hachoir_parser.container.mkv import dateToDatetime
 from hachoir_core.i18n import _
-from hachoir_core.tools import (makeUnicode, makePrintable,
-    durationWin64, timedelta2seconds)
+from hachoir_core.tools import makeUnicode, makePrintable, timedelta2seconds
 from hachoir_core.error import warning
 from datetime import timedelta
 
@@ -365,7 +364,7 @@ class AsfMetadata(MultipleMetadata):
     @fault_tolerant
     def useFileProp(self, prop, is_vbr):
         self.creation_date = prop["creation_date"].value
-        self.duration = durationWin64(prop["play_duration"].value)
+        self.duration = prop["play_duration"].value
         if prop["seekable"].value:
             self.comment = u"Is seekable"
         value = prop["max_bitrate"].value

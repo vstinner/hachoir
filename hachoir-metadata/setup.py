@@ -38,7 +38,7 @@ def main():
         "package_dir": {"hachoir_metadata": "hachoir_metadata"},
     }
     if use_setuptools:
-        install_options["install_requires"] = ["hachoir-parser>=1.2"]
+        install_options["install_requires"] = ["hachoir-core>=1.2.1", "hachoir-parser>=1.2.1"]
         install_options["zip_safe"] = True
     setup(**install_options)
 

@@ -76,8 +76,8 @@ class Data:
                 return
             if new_value is None:
                 dest_types = " or ".join(str(item.__name__) for item in self.type)
-                self.metadata.warning("Unable to convert %r (%s) to %s" % (
-                    value, type(value).__name__, dest_types))
+                self.metadata.warning("Unable to convert %s=%r (%s) to %s" % (
+                    self.key, value, type(value).__name__, dest_types))
                 return
             if isinstance(new_value, tuple):
                 if text:
