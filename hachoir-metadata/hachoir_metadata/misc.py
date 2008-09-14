@@ -97,19 +97,35 @@ class OLE2_Metadata(RootMetadata):
     }
 
     def extract(self, ole2):
-        if "summary[0]" in ole2:
-            self.useSummary(ole2["summary[0]"])
+        self._extract(ole2)
 
-    def useSummary(self, summary):
-        # FIXME: Remove this hack
-        # Problem: there is no method to get all fragments from a file
-        summary.parent._feedAll()
-        # ---
+    def _extract(self, fieldset, main_document=True):
+        if main_document:
+            # _feedAll() is needed to make sure that we get all root[*] fragments
+            fieldset._feedAll()
+            if "root[0]" in fieldset:
+                self.useRoot(fieldset["root[0]"])
+        if "summary[0]" in fieldset:
+            # _feedAll() is needed to make sure that we get all summary[*] fragments
+            fieldset._feedAll()
+            self.useSummary(fieldset["summary[0]"], main_document)
 
-        stream = summary.getSubIStream()
-        summary = guessParser(stream)
-        if not summary:
-            print "Unable to create summary parser"
+    @fault_tolerant
+    def useRoot(self, root):
+        stream = root.getSubIStream()
+        ministream = guessParser(stream)
+        if not ministream:
+            warning("Unable to create the OLE2 mini stream parser!")
+            return
+        self._extract(ministream, main_document=False)
+
+    def useSummary(self, summary, main_document):
+        if main_document:
+            stream = summary.getSubIStream()
+            summary = guessParser(stream)
+            if not summary:
+                warning("Unable to create the OLE2 summary parser!")
+                return
 
         if "os" in summary:
             self.os = summary["os"].display
