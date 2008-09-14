@@ -203,6 +203,7 @@ class PropertyContent(FieldSet):
     TYPE_NAME = createDict(TYPE_INFO, 0)
 
     def createFields(self):
+        self.osconfig = self.parent.osconfig
         if True:
             yield Enum(Bits(self, "type", 12), self.TYPE_NAME)
             yield Bit(self, "is_vector")
@@ -214,7 +215,7 @@ class PropertyContent(FieldSet):
         try:
             handler = self.TYPE_INFO[tag][1]
             if handler == PascalString32:
-                osconfig = self["../.."].osconfig
+                osconfig = self.osconfig
                 if tag == self.TYPE_LPSTR:
                     kw["charset"] = osconfig.charset
                 else:
@@ -245,21 +246,21 @@ class SummarySection(SeekableFieldSet):
         self._size = self["size"].value * 8
 
     def createFields(self):
+        self.osconfig = self.parent.osconfig
         yield UInt32(self, "size")
         yield UInt32(self, "property_count")
         for index in xrange(self["property_count"].value):
             yield PropertyIndex(self, "property_index[]")
-        osconfig = self.parent.osconfig
         for index in xrange(self["property_count"].value):
             findex = self["property_index[%u]" % index]
             self.seekByte(findex["offset"].value)
             field = PropertyContent(self, "property[]", findex["id"].display)
             yield field
-            if not osconfig.charset \
+            if not self.osconfig.charset \
             and findex['id'].value == PropertyIndex.TAG_CODEPAGE:
                 codepage = field['value'].value
                 if codepage in self.CODEPAGE_CHARSET:
-                    osconfig.charset = self.CODEPAGE_CHARSET.get(codepage)
+                    self.osconfig.charset = self.CODEPAGE_CHARSET.get(codepage)
                 else:
                     self.warning("Unknown codepage: %r" % codepage)
 
@@ -306,7 +307,7 @@ class BaseSummary:
         if 0 < size:
             yield NullBytes(self, "end_padding", size)
 
-class SummaryParser(HachoirParser, RootSeekableFieldSet, BaseSummary):
+class SummaryParser(BaseSummary, HachoirParser, RootSeekableFieldSet):
     PARSER_TAGS = {
         "description": "Microsoft Office document subfragments",
     }
