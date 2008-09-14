@@ -79,6 +79,7 @@ class UnicodeStdout:
         self.device.write(text)
 
 def initLocale():
+    # Only initialize locale once
     try:
         if initLocale.is_done:
             return
@@ -92,10 +93,14 @@ def initLocale():
     except (locale.Error, IOError):
         pass
 
+    # Get the terminal charset
     charset = getTerminalCharset()
-    sys.stdout = UnicodeStdout(sys.stdout, charset)
-    sys.stderr = UnicodeStdout(sys.stderr, charset)
-    return charset
+
+    if config.unicode_stdout:
+        # Replace stdout and stderr by unicode objet supporting unicode string
+        sys.stdout = UnicodeStdout(sys.stdout, charset)
+        sys.stderr = UnicodeStdout(sys.stderr, charset)
+        return charset
 
 def _dummy_gettext(text):
     return unicode(text)
