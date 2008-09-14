@@ -1,3 +1,12 @@
+"""
+Microsoft Document summaries structures.
+
+Documents
+---------
+
+ - Apache POI (HPSF Internals):
+   http://poi.apache.org/hpsf/internals.html
+"""
 from hachoir_parser import HachoirParser
 from hachoir_core.field import (FieldSet, ParserError,
     RootSeekableFieldSet, SeekableFieldSet,
