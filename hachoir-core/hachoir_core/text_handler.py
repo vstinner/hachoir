@@ -4,7 +4,8 @@ Utilities used to convert a field to human classic reprentation of data.
 
 from hachoir_core.tools import (
     humanDuration, humanFilesize, alignValue,
-    durationWin64 as doDurationWin64)
+    durationWin64 as doDurationWin64,
+    deprecated)
 from types import FunctionType, MethodType
 from hachoir_core.i18n import _
 from hachoir_core.field import Field
@@ -21,6 +22,7 @@ def displayHandler(field, handler):
     field.createDisplay = lambda: handler(field.value)
     return field
 
+@deprecated("Use TimedeltaWin64 field type")
 def durationWin64(field):
     """
     Convert Windows 64-bit duration to string. The timestamp format is

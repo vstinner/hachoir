@@ -35,7 +35,7 @@ from hachoir_core.field.vector import GenericVector, UserVector
 from hachoir_core.field.float import Float32, Float64, Float80
 from hachoir_core.field.timestamp import (GenericTimestamp,
     TimestampUnix32, TimestampUnix64, TimestampMac32, TimestampUUID60, TimestampWin64,
-    DateTimeMSDOS32, TimeDateMSDOS32)
+    DateTimeMSDOS32, TimeDateMSDOS32, TimedeltaWin64)
 
 # Special Field classes
 from hachoir_core.field.link import Link, Fragment

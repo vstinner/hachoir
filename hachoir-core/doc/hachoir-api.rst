@@ -187,7 +187,11 @@ Timestamp:
 * TimestampMSDOS32: 32-bit MS-DOS, since January 1st 1980 ;
 * TimestampUnix32, TimestampUnix64: 32/64 bits UNIX, seconds since January 1st 1970 ;
 * TimestampMac32: 32-bit Mac, seconds since January 1st 1904 ;
-* TimestampWin64: 64-bit Windows, nanoseconds since January 1st 1600.
+* TimestampWin64: 64-bit Windows, number of 1/10 microseconds since January 1st 1600.
+
+Timedelta (duration):
+
+ * TimedeltaWin64: 64-bit Windows, number of 1/10 microseconds
 
 Padding and raw bytes:
 

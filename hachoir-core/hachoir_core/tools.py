@@ -8,6 +8,36 @@ from hachoir_core.i18n import _, ngettext
 import re
 import stat
 from datetime import datetime, timedelta, MAXYEAR
+from warnings import warn
+
+def deprecated(comment=None):
+    """
+    This is a decorator which can be used to mark functions
+    as deprecated. It will result in a warning being emmitted
+    when the function is used.
+
+    Examples: ::
+
+       @deprecated
+       def oldfunc(): ...
+
+       @deprecated("use newfunc()!")
+       def oldfunc2(): ...
+
+    Code from: http://code.activestate.com/recipes/391367/
+    """
+    def _deprecated(func):
+        def newFunc(*args, **kwargs):
+            message = "Call to deprecated function %s" % func.__name__
+            if comment:
+                message += ": " + comment
+            warn(message, category=DeprecationWarning, stacklevel=2)
+            return func(*args, **kwargs)
+        newFunc.__name__ = func.__name__
+        newFunc.__doc__ = func.__doc__
+        newFunc.__dict__.update(func.__dict__)
+        return newFunc
+    return _deprecated
 
 def paddingSize(value, align):
     """
@@ -456,10 +486,27 @@ def timestampMac32(value):
         return _("invalid Mac timestamp (%s)") % value
     return MAC_TIMESTAMP_T0 + timedelta(seconds=value)
 
+def timedeltaWin64(value):
+    """
+    Create a datetime.timedelta() object from a 64 bits Windows value
+    (number of 100ns). See also timestampWin64().
+
+    >>> timedeltaWin64(1072580000)
+    datetime.timedelta(0, 107, 258000)
+    >>> timedeltaWin64(2146280000)
+    datetime.timedelta(0, 214, 628000)
+    """
+    if not isinstance(value, (float, int, long)):
+        raise TypeError("an integer or float is required")
+    if value < 0:
+        raise ValueError("value have to be a positive or nul integer")
+    return timedelta(microseconds=value/10)
+
+@deprecated("Use timedeltaWin64() and humanDuration()")
 def durationWin64(value):
     """
     Convert Windows 64-bit duration to string. The timestamp format is
-    a 64-bit number: number of 100ns. See also timestampWin64().
+    a 64-bit number: number of 100ns. See also timedeltaWin64().
 
     >>> str(durationWin64(1072580000))
     '0:01:47.258000'

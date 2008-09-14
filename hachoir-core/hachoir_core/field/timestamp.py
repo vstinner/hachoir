@@ -1,5 +1,6 @@
 from hachoir_core.tools import (humanDatetime,
-    timestampUNIX, timestampMac32, timestampUUID60, timestampWin64)
+    timestampUNIX, timestampMac32, timestampUUID60,
+    timestampWin64, timedeltaWin64)
 from hachoir_core.field import Bits, FieldSet
 from datetime import datetime
 
@@ -71,4 +72,15 @@ class DateTimeMSDOS32(TimeDateMSDOS32):
         yield Bits(self, "second", 5, "Second/2")
         yield Bits(self, "minute", 6)
         yield Bits(self, "hour", 5)
+
+class TimedeltaWin64(GenericTimestamp):
+    def __init__(self, parent, name, description=None):
+        GenericTimestamp.__init__(self, parent, name, 64, description)
+
+    def createDisplay(self):
+        return humanTimedelta(self.value)
+
+    def createValue(self):
+        value = Bits.createValue(self)
+        return timedeltaWin64(value)
 
