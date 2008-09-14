@@ -74,6 +74,8 @@ def parseOptions():
 
     # Update limits
     config.MAX_STR_LENGTH = values.maxlen
+    if values.raw:
+        config.RAW_OUTPUT = True
 
     return values, filename
 

@@ -1,6 +1,7 @@
 from hachoir_core.tools import makeUnicode, normalizeNewline
 from hachoir_core.error import HACHOIR_ERRORS
 from hachoir_metadata import config
+from hachoir_metadata.setter import normalizeString
 
 MIN_PRIORITY = 100
 MAX_PRIORITY = 999
@@ -61,7 +62,7 @@ class Data:
             return
 
         if isinstance(value, (str, unicode)):
-            value = value.strip(" \t\v\n\r\0")
+            value = normalizeString(value)
             if not value:
                 return
 

@@ -4,6 +4,7 @@ from hachoir_core.language import Language
 from locale import setlocale, LC_ALL
 from time import strptime
 from hachoir_metadata.timezone import createTimezone
+from hachoir_metadata import config
 
 NORMALIZE_REGEX = re.compile("[-/.: ]+")
 YEAR_REGEX1 = re.compile("^([0-9]{4})$")
@@ -162,4 +163,9 @@ def setTrackNumber(meta, key, number):
     except ValueError:
         meta.warning("Invalid track number: %r" % number)
         return None
+
+def normalizeString(text):
+    if config.RAW_OUTPUT:
+        return text
+    return text.strip(" \t\v\n\r\0")
 
