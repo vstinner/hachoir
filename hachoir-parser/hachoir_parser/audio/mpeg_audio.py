@@ -308,7 +308,9 @@ class MpegAudioFile(Parser):
             try:
                 frame = self["frames/frame[%u]" % index]
             except MissingField:
-                if self["frames"].done:
+                # Require a least one valid frame
+                if (1 <= index) \
+                and self["frames"].done:
                     return True
                 return "Unable to get frame #%u" % index
             except (InputStreamError, ParserError):
