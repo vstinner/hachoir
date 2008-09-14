@@ -85,7 +85,6 @@ class TTF_Metadata(RootMetadata):
 class OLE2_Metadata(RootMetadata):
     SUMMARY_ID_TO_ATTR = {
          2: "title",     # Title
-         3: "title",     # Subject
          4: "author",
          6: "comment",
          8: "author",    # Last saved by
@@ -99,6 +98,7 @@ class OLE2_Metadata(RootMetadata):
     ))
 
     DOC_SUMMARY_ID_TO_ATTR = {
+         3: "title",     # Subject
         14: "author",    # Manager
     }
     IGNORE_DOC_SUMMARY = set((
