@@ -269,7 +269,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
                 break
             self.seekBlock(first)
             desc = "Big blocks %s..%s (%s)" % (first, previous, previous-first+1)
-            dest += " of %s bytes" % (self.sector_size // 8)
+            desc += " of %s bytes" % (self.sector_size // 8)
             if name_prefix in set(("root", "summary", "doc_summary")):
                 if name_prefix == "root":
                     parser = OfficeRootEntry
