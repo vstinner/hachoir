@@ -182,12 +182,15 @@ Text:
 * PascalString8, PascalString16 and PascalString32: string prefixed with
   length in a unsigned 8 / 16 / 32 bits integer (use parent endian) ;
 
-Timestamp:
+Timestamp (date and time):
 
-* TimestampMSDOS32: 32-bit MS-DOS, since January 1st 1980 ;
-* TimestampUnix32, TimestampUnix64: 32/64 bits UNIX, seconds since January 1st 1970 ;
-* TimestampMac32: 32-bit Mac, seconds since January 1st 1904 ;
-* TimestampWin64: 64-bit Windows, number of 1/10 microseconds since January 1st 1600.
+* TimestampUnix32, TimestampUnix64: 32/64 bits UNIX, number of seconds since
+  the January 1st 1970 ;
+* TimestampMac32: 32-bit Mac, number of seconds since the January 1st 1904 ;
+* TimestampWin64: 64-bit Windows, number of 1/10 microseconds since
+  the January 1st 1600 ;
+* DateTimeMSDOS3 and TimeDateMSDOS32: 32-bit MS-DOS structure,
+  since the January 1st 1980.
 
 Timedelta (duration):
 
