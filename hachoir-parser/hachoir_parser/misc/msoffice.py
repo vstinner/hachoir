@@ -13,7 +13,7 @@ from hachoir_core.field import FieldSet, RootSeekableFieldSet, RawBytes
 from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_core.stream import StringInputStream
 from hachoir_parser.misc.msoffice_summary import SummaryFieldSet, CompObj
-from hachoir_parser.misc.word_doc import WordDocument
+from hachoir_parser.misc.word_doc import WordDocumentFieldSet
 
 PROPERTY_NAME = {
     u"\5DocumentSummaryInformation": "doc_summary",
@@ -81,7 +81,7 @@ class OfficeRootEntry(HachoirParser, RootSeekableFieldSet):
             if name_prefix in ("summary", "doc_summary"):
                 yield SummaryFieldSet(self, name, desc, size=size)
             elif name_prefix == "word_doc":
-                yield WordDocument(self, name, desc, size=size)
+                yield WordDocumentFieldSet(self, name, desc, size=size)
             elif property_index == 1:
                 yield CompObj(self, "comp_obj", desc, size=size)
             else:

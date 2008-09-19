@@ -1,12 +1,14 @@
+from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet,
     Bit, Bits,
     UInt8, Int16, UInt16, UInt32, Int32,
-    NullBytes, RawBytes, PascalString16,
+    NullBytes, Bytes, RawBytes, PascalString16,
     DateTimeMSDOS32)
+from hachoir_core.endian import LITTLE_ENDIAN
 
-class WordDocument(FieldSet):
+class BaseWordDocument:
     def createFields(self):
-        yield UInt16(self, "magic")
+        yield Bytes(self, "magic", 2, "Magic bytes (EC A5)")
         yield UInt16(self, "nFib")
         yield UInt16(self, "nProduct")
         yield UInt16(self, "lid")
@@ -46,11 +48,27 @@ class WordDocument(FieldSet):
         yield NullBytes(self, "reserved", 12)
         yield Int16(self, "lidFE")
         yield UInt16(self, "clw")
-        yield Int32(self, "rglw")
         yield DateTimeMSDOS32(self, "lProductCreated")
         yield DateTimeMSDOS32(self, "lProductRevised")
 
         tail = (self.size - self.current_size) // 8
         if tail:
             yield RawBytes(self, "tail", tail)
+
+class WordDocumentFieldSet(BaseWordDocument, FieldSet):
+    pass
+
+class WordDocumentParser(BaseWordDocument, Parser):
+    PARSER_TAGS = {
+        "id": "word_document",
+        "min_size": 8,
+        "description": "Microsoft Office Word document",
+    }
+    endian = LITTLE_ENDIAN
+
+    def __init__(self, stream, **kw):
+        Parser.__init__(self, stream, **kw)
+
+    def validate(self):
+        return True
 

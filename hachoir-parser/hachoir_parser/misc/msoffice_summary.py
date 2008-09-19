@@ -321,7 +321,7 @@ class BaseSummary:
 
 class SummaryParser(BaseSummary, HachoirParser, RootSeekableFieldSet):
     PARSER_TAGS = {
-        "description": "Microsoft Office document subfragments",
+        "description": "Microsoft Office summary",
     }
 
     def __init__(self, stream, **kw):

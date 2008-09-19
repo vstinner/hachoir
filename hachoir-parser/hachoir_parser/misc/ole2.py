@@ -28,6 +28,7 @@ from hachoir_core.text_handler import textHandler, hexadecimal, filesizeHandler
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir_parser.common.win32 import GUID
 from hachoir_parser.misc.msoffice import CustomFragment, OfficeRootEntry, PROPERTY_NAME
+from hachoir_parser.misc.word_doc import WordDocumentParser
 from hachoir_parser.misc.msoffice_summary import SummaryParser
 
 MIN_BIG_BLOCK_LOG2 = 6   # 512 bytes
@@ -270,11 +271,14 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
             self.seekBlock(first)
             desc = "Big blocks %s..%s (%s)" % (first, previous, previous-first+1)
             desc += " of %s bytes" % (self.sector_size // 8)
-            if name_prefix in set(("root", "summary", "doc_summary")):
+            if name_prefix in set(("root", "summary", "doc_summary", "word_doc")):
                 if name_prefix == "root":
                     parser = OfficeRootEntry
+                elif name_prefix == "word_doc":
+                    parser = WordDocumentParser
                 else:
                     parser = SummaryParser
+                print name, parser
                 field = CustomFragment(self, name, size, parser, desc, fragment_group)
                 yield field
                 if not fragment_group:
