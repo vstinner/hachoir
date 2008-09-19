@@ -278,7 +278,6 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
                     parser = WordDocumentParser
                 else:
                     parser = SummaryParser
-                print name, parser
                 field = CustomFragment(self, name, size, parser, desc, fragment_group)
                 yield field
                 if not fragment_group:
