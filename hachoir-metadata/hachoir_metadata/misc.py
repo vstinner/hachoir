@@ -157,8 +157,10 @@ class OLE2_Metadata(RootMetadata):
     @fault_tolerant
     def useProperty(self, summary, property, is_doc_summary):
         field = summary.getFieldByAddress(property["offset"].value*8)
-        if not field:
+        if not field \
+        or "value" not in field:
             return
+        field = field["value"]
         if not field.hasValue():
             return
 
@@ -188,7 +190,16 @@ class OLE2_Metadata(RootMetadata):
             key = "comment"
             use_prefix = True
         if use_prefix:
-            value = "%s: %s" % (property["id"].display, value)
+            prefix = property["id"].display
+            if (prefix in ("TotalEditingTime", "LastPrinted")) \
+            and (not field):
+                # Ignore null time delta
+                return
+            value = "%s: %s" % (prefix, value)
+        else:
+            if (key == "last_modification") and (not field):
+                # Ignore null timestamp
+                return
         setattr(self, key, value)
 
 class PcfMetadata(RootMetadata):
