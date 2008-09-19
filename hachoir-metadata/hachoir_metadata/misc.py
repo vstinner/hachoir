@@ -114,12 +114,15 @@ class OLE2_Metadata(RootMetadata):
             fieldset._feedAll()
             if "root[0]" in fieldset:
                 self.useRoot(fieldset["root[0]"])
-        summary = self.getField(fieldset, main_document, "summary[0]")
-        if summary:
-            self.useSummary(summary, False)
         doc_summary = self.getField(fieldset, main_document, "doc_summary[0]")
         if doc_summary:
             self.useSummary(doc_summary, True)
+        word_doc = self.getField(fieldset, main_document, "word_doc[0]")
+        if word_doc:
+            self.useWordDocument(word_doc)
+        summary = self.getField(fieldset, main_document, "summary[0]")
+        if summary:
+            self.useSummary(summary, False)
 
     @fault_tolerant
     def useRoot(self, root):
@@ -145,6 +148,7 @@ class OLE2_Metadata(RootMetadata):
                 return None
         return field
 
+    @fault_tolerant
     def useSummary(self, summary, is_doc_summary):
         if "os" in summary:
             self.os = summary["os"].display
@@ -153,6 +157,10 @@ class OLE2_Metadata(RootMetadata):
         summary = summary["section[0]"]
         for property in summary.array("property_index"):
             self.useProperty(summary, property, is_doc_summary)
+
+    @fault_tolerant
+    def useWordDocument(self, doc):
+        self.comment = "Encrypted: %s" % doc["fEncrypted"].value
 
     @fault_tolerant
     def useProperty(self, summary, property, is_doc_summary):
