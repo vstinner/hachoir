@@ -101,7 +101,13 @@ def createDictDesc(parent):
 
 # --- Code ---
 def parseCode(parent):
-    if 0x2030000 <= parent.root.getVersion():
+    if 0x3000000 <= parent.root.getVersion():
+        yield UInt32(parent, "arg_count", "Argument count")
+        yield UInt32(parent, "kwonlyargcount", "Keyword only argument count")
+        yield UInt32(parent, "nb_locals", "Number of local variables")
+        yield UInt32(parent, "stack_size", "Stack size")
+        yield UInt32(parent, "flags")
+    elif 0x2030000 <= parent.root.getVersion():
         yield UInt32(parent, "arg_count", "Argument count")
         yield UInt32(parent, "nb_locals", "Number of local variables")
         yield UInt32(parent, "stack_size", "Stack size")
@@ -235,7 +241,10 @@ class PythonCompiledFile(Parser):
     # This list comes from CPython source code, see "MAGIC"
     # and "pyc_magic" in file Python/import.c
     MAGIC = {
+        # Python 1.x
         20121: ("1.5", 0x1050000),
+
+        # Python 2.x
         50823: ("2.0", 0x2000000),
         60202: ("2.1", 0x2010000),
         60717: ("2.2", 0x2020000),
@@ -252,6 +261,23 @@ class PythonCompiledFile(Parser):
         62111: ("2.5b3", 0x2050000),
         62121: ("2.5c1", 0x2050000),
         62131: ("2.5c2", 0x2050000),
+
+        # Python 3.x
+        3000:  ("3.0 (3000)",  0x3000000),
+        3010:  ("3.0 (3010)",  0x3000000),
+        3020:  ("3.0 (3020)",  0x3000000),
+        3030:  ("3.0 (3030)",  0x3000000),
+        3040:  ("3.0 (3040)",  0x3000000),
+        3050:  ("3.0 (3050)",  0x3000000),
+        3060:  ("3.0 (3060)",  0x3000000),
+        3070:  ("3.0 (3070)",  0x3000000),
+        3080:  ("3.0 (3080)",  0x3000000),
+        3090:  ("3.0 (3090)",  0x3000000),
+        3100:  ("3.0 (3100)",  0x3000000),
+        3102:  ("3.0 (3102)",  0x3000000),
+        3110:  ("3.0a4",       0x3000000),
+        3130:  ("3.0a5",       0x3000000),
+        3131:  ("3.0a5 unicode",       0x3000000),
     }
 
     # Dictionnary which associate the pyc signature (4-byte long string)
@@ -263,7 +289,7 @@ class PythonCompiledFile(Parser):
     def validate(self):
         signature = self.stream.readBits(0, 16, self.endian)
         if signature not in self.MAGIC:
-            return "Unknown version"
+            return "Unknown version (%s)" % signature
         if self.stream.readBytes(2*8, 2) != "\r\n":
             return r"Wrong signature (\r\n)"
         if self.stream.readBytes(8*8, 1) != 'c':
