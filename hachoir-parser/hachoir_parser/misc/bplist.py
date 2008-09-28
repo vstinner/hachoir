@@ -6,11 +6,11 @@ Note that it will discard unknown objects, nulls and fill values, but should wor
 
 Documents:
 - CFBinaryPList.c
-  hxxp://src.gnu-darwin.org/DarwinSourceArchive/expanded/CF/CF-299/Parsing.subproj/CFBinaryPList.c
+  http://src.gnu-darwin.org/DarwinSourceArchive/expanded/CF/CF-299/Parsing.subproj/CFBinaryPList.c
 - ForFoundationOnly.h (for structure formats)
-  hxxp://src.gnu-darwin.org/DarwinSourceArchive/expanded/CF/CF-299/Base.subproj/ForFoundationOnly.h
+  http://src.gnu-darwin.org/DarwinSourceArchive/expanded/CF/CF-299/Base.subproj/ForFoundationOnly.h
 - XML <-> BPList converter
-  hxxp://scw.us/iPhone/plutil/plutil.pl
+  http://scw.us/iPhone/plutil/plutil.pl
 Author: Robert Xiao
 Created: 2008-09-21
 """
@@ -272,7 +272,7 @@ class BPList(HachoirParser, RootSeekableFieldSet):
 
     def createXML(self, prefix=''):
         return '''<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "hxxp://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 ''' + self['/object[' + str(self['/trailer/topObject'].value) + ']'].createXML(prefix) + '''
 </plist>'''
