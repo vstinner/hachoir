@@ -2,6 +2,7 @@ What's new in NEXT RELEASE?
 ===========================
 
  * Python parser: support Python 3000
+ * Create Apple/NeXT Binary Property List (BPLIST) parser
 
 What's new in hachoir-parser 1.2?
 =================================
