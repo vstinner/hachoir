@@ -23,6 +23,7 @@ CLASSIFIERS = [
 
 def main():
     hachoir_metadata = load_source("version", path.join("hachoir_metadata", "version.py"))
+    long_description = open('README').read() + open('ChangeLog').read()
     install_options = {
         "name": hachoir_metadata.PACKAGE,
         "version": hachoir_metadata.VERSION,
@@ -30,7 +31,7 @@ def main():
         "download_url": hachoir_metadata.WEBSITE,
         "author": "Victor Stinner",
         "description": "Program to extract metadata using Hachoir library",
-        "long_description": open('README').read(),
+        "long_description": long_description,
         "classifiers": CLASSIFIERS,
         "license": hachoir_metadata.LICENSE,
         "scripts": ["hachoir-metadata", "hachoir-metadata-gtk"],
