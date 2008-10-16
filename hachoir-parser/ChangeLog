@@ -1,8 +1,18 @@
-What's new in NEXT RELEASE?
-===========================
+What's new in hachoir-parser 1.2.1?
+===================================
 
- * Python parser: support Python 3000
+ * Improve OLE2 and MS Office parsers:
+   - support small blocks
+   - fix the charset of the summary properties
+   - summary property integers are unsigned
+   - use TimedeltaWin64 for the TotalEditingTime field
+   - create minimum Word document parser
+ * Python parser: support magic numbers of Python 3000
+   with the keyword only arguments
  * Create Apple/NeXT Binary Property List (BPLIST) parser
+ * MPEG audio: reject file with no valid frame nor ID3 header
+ * Skip subfiles in JPEG files
+ * Create Apple/NeXT Binary Property List (BPLIST) parser by Robert Xiao
 
 What's new in hachoir-parser 1.2?
 =================================

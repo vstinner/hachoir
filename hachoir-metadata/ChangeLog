@@ -1,0 +1,193 @@
+What's new in hachoir-metadata 1.2.1?
+=====================================
+
+ * Using --raw, strings are not normalized (don't strip trailing space, new
+   line, nul byte, etc.)
+ * Extract much more informations from Microsoft Office documents (.doc, .xsl,
+   .pps, etc.)
+ * Improve OLE2 (Word) extractor
+ * Fix ASF extractor for hachoir-parser 1.2.1
+
+What's new in hachoir-metadata 1.2?
+===================================
+
+ * Create --maxlen option for hachoir-metadata program: --maxlen=0 disable
+   the arbitrary string length limit
+ * Create FLAC metadata extractor
+ * Create hachoir_metadata.config, especially MAX_STR_LENGTH option
+   (maximum string length)
+ * GIF image may contains multiple comments
+
+What's new in hachoir-metadata 1.1?
+===================================
+
+ * More extractors are more stable and fault tolerant
+ * Create basic Gtk+ GUI: hachoir-metadata-gtk
+ * Catch error on data conversion
+ * Read width and height DPI for most image formats
+ * JPEG (EXIF): read GPS informations
+ * Each data item can has its own "setter"
+ * Add more ID3 keys (TCOP, TDAT, TRDA, TORY, TIT1)
+ * Create datetime filter supporting timezone
+ * Add "meters", "pixels", "DPI" suffix for human display
+ * Create SWF extractor
+ * RIFF: read also informations from headers field, compute audio
+   compression rate
+ * MOV: read width and height
+ * ASF: read album artist
+
+What's new in hachoir-metadata 1.0?
+===================================
+
+Version 1.0.1
+-------------
+
+ * Only use hachoir_core.profiler with --profiler command line option
+   so 'profiler' Python module is now optional
+ * Set shebang to "#!/usr/bin/python"
+
+Version 1.0
+-----------
+
+ * Real audio: read number of channel, bit rate, sample rate and
+   compute compression rate
+ * JPEG: Read user commment
+ * Windows ANI: Read frame rate
+ * Use Language from hachoir_core to store language from ID3 and MKV
+ * OLE2 and FLV: Extractors are now fault tolerant
+
+What's new in hachoir-metadata 0.10.0?
+======================================
+
+hachoir-metadata is now fault tolerant (like hachoir-core and hachoir-parser)!
+It is also robust against fuzzing tests.
+
+New supported formats:
+
+ * Microsoft Archive (.mar)
+ * Microsoft Office documents: Word (.doc), Excel (.xls), Powerpoint (.ppt)
+ * X11 Portable Compiled Font (.pcf)
+ * New-style Executable (Windows 16-bits program)
+
+New features:
+
+ * Make a distinction between the raw value and the formated value, so it's
+   possible to reuse data. Eg. number of channel raw value is 2 (integer) and
+   formated value is "stereo" (string)
+ * Add plugin for Nautilus program (of Gnome project)
+ * Add plugin for Konqueror program (of KDE project)
+ * New API:
+   * hasattr(meta, "key") => meta.has("key")
+   * meta.key[0] => meta.get("key") or meta.getText("key")
+ * "quality" argument to limit extraction complexity (quality=0 is
+   the fastest extraction, quality=1.0 is the best but also the slowest)
+ * Code is now fault tolerant: don't crash on error but just display error
+   message and continue the extraction
+ * creation_date and last_modification value type is datetime.date() or
+   datetime.datetime() (and not a string)
+ * duration type is datetime.timedelta(): precision is now microseconds
+   and not milliseconds
+
+Changes:
+
+ * track_number and track_total raw value type is an integer
+ * MPEG audio: read music genre and language from ID3v2 and compute
+   approximation of bit rate and duration of VBR MP3
+ * JPEG: support progressive JPEG (all start of frame types)
+ * JPEG (IPTC): Support creation date (keys 55 and 60)
+ * Convert more strings to Unicode
+ * Reject sample rate smalller than 1 kHz
+ * MKV: don't read metadata tags ("SimpleTags") if quality<good
+ * ASF: extract album title, track number and create date (year)
+ * Archives: max number of processed files depends on quality argument
+ * Compute compression rate of archive, audio and picture documents (when we
+   have enough informations to do it)
+ * Don't compute Ogg duration with quality < 0.5 (default)
+ * PNG: Fix bits/pixel computation
+
+What's new in hachoir-metadata 0.9.0?
+=====================================
+
+ * Add extractors for EXE program, PSD picture, TTF font and Torrent file
+ * Set limits to value to skip invalid metadata (eg. year in 1900..2030)
+ * Ogg: compute duration and support "video" chunk
+ * Add keys "track_total", "version"
+
+What's new in hachoir-metadata 0.8.2?
+=====================================
+
+New features:
+ * Truncate very long string (more than 800 characters)
+ * setup.py uses distutils by default (and not setuptools) and doesn't depend
+   on hachoir-core nor hachoir-parser
+
+Bugfixes:
+ * AIFF: skip duration computation if rate is nul (to avoid division by zero)
+ * XCF: catch KeyError on bits_per_pixel
+ * JPEG (EXIF): only convert exposure to "1/%g" is value is a float
+ * WAVE: rewrite extractor. Fix bit rate, fix duration computation, support
+   wave with 6 channels and IEEE (32-bit float) codec
+ * AVI: avoid division by zero in duration computation
+ * Matroska: convert string to Unicode if needed
+
+What's new in hachoir-metadata 0.8.1?
+=====================================
+
+ * Fix --version command line option (rename module hachoir to hachoir_core)
+
+What's new in hachoir-metadata 0.8?
+===================================
+
+New formats:
+ * Aldus Placeable Metafile (APM) picture
+ * Audio Interchange File Format (AIFF)
+ * Audio Interchange File Format Compressed (AIFC)
+ * Microsoft Enhanced Metafile (EMF) picture
+ * Microsoft Windows Metafile (WMF) picture
+ * Real audio
+ * Real media
+ * Targa picture
+
+Changes:
+ * For string, strip spaces and then skip empty string
+ * ICO: use 8 bits/pixel if bpp=0
+ * JPEG: format version is "JFIF %u.%02u" (and not "JPEG %s.%s")
+ * JPEG: don't compute JPEG quality if needed fields are missing
+ * RIFF: compute duration of each stream since audio stream may be
+   shorter than video stream
+
+
+What's new in hachoir-metadata 0.7?
+===================================
+
+Important changes:
+ * New extractors: Ogg/Vorbis and Ogg/Theora
+ * JPEG: compute JPEG quality
+ * Matroska: extract subtitle info, support multiple audio and video streams,
+   read audio codec, read audio/video title and language
+ * Audio: extract bits/sample for audio
+ * GIF: read comments and pixel format
+ * RIFF: able to use AVI header, support multiple audio streams
+ * ID3: also extract creation date
+ * IPTC: recognize more tags (author, country, title)
+ * Add --parser-list and --profiler command line options
+
+Small changes:
+ * Strip spaces (space, tab, new line) for all strings
+   keep the longer value
+ * Remove duplicate string and also if you have "verlongtext" and "verylo",
+ * Add warning when a tag is skipped (for ID3, etc.)
+ * Support invalid unicode filenames
+ * Fix all divison to avoid divison by zero
+ * TAR and ZIP archives: only process first 5 files
+ * EXIF: ignore image size if we already know the size since EXIF size is not
+   updated when an image is resized
+ * Bitmap: read format version
+
+Developer changes:
+ * Use array() to simply code
+ * Convert raw string to unicode string using charset ISO-8859-1
+ * Add get() method to Metadata class
+ * Group name can be "name[]": replaced by name[0], name[1], ...
+
+
