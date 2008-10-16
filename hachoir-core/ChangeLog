@@ -1,0 +1,251 @@
+What's new in hachoir-core 1.2.1?
+=================================
+
+ * Create configuration option "unicode_stdout" which avoid replacing
+   stdout and stderr by objects supporting unicode string
+ * Create TimedeltaWin64 file type
+ * Support WINDOWS-1252 and WINDOWS-1253 charsets for GenericString
+ * guessBytesCharset() now supports ISO-8859-7 (greek)
+ * durationWin64() is now deprecated, use TimedeltaWin64 instead
+
+What's new in hachoir-core 1.2?
+===============================
+
+ * Create Field.getFieldType(): describe a field type and gives some useful
+   informations (eg. the charset for a string)
+ * Create TimestampUnix64
+ * GenericString: only guess the charset once; if the charset attribute
+   if not set, guess it when it's asked by the user.
+
+What's new in hachoir-core 1.1?
+===============================
+
+Main change: string values are always encoded as Unicode. Details:
+
+ * Create guessBytesCharset() and guessStreamCharset()
+ * GenericString.createValue() is now always Unicode: if charset is not
+   specified, try to guess it. Otherwise, use default charset (ISO-8859-1)
+ * RawBits: add createRawDisplay() to avoid slow down on huge fields
+ * Fix SeekableFieldSet.current_size (use offset and not current_max_size)
+ * GenericString: fix UTF-16-LE string with missing nul byte
+ * Add __nonzero__() method to GenericTimestamp
+ * All stream errors now inherit from StreamError (instead of HachoirError),
+   and create  and OutputStreamError
+ * humanDatetime(): strip microseconds by default (add optional argument to
+   keep them)
+
+What's new in hachoir-core 1.0?
+===============================
+
+Version 1.0.1 changelog:
+ * Rename parser.tags to parser.PARSER_TAGS to be compatible
+   with future hachoir-parser 1.0
+
+Visible changes:
+ * New field type: TimestampUUID60
+ * SeekableFieldSet: fix __getitem__() method and implement __iter__()
+   and __len__() methods, so it can now be used in hachoir-wx
+ * String value is always Unicode, even on conversion error: use
+ * OutputStream: add readBytes() method
+ * Create Language class using ISO-639-2
+ * Add hachoir_core.profiler module to run a profiler on a function
+ * Add hachoir_core.timeout module to call a function with a timeout
+
+Minor changes:
+ * Fix many spelling mistakes
+ * Dict: use iteritems() instead of items() for faster operations on
+   huge dictionaries
+
+What's new in hachoir-core 0.9?
+===============================
+
+Major changes:
+
+ * String value is ALWAYS unicode, even on charset conversion:
+   use charset ISO-8859-1 on error
+ * Remove text_handler argument to bit and integer fields:
+   use textHandler() instead
+ * Field.raw_display attribute creation is now fault tolerant and use cache
+ * SeekableFieldSet class is near complete and more stable
+ * GenericFieldSet: use a lock to avoid field creation recursion
+ * Add function limitedMemory() to call another function with a memory limit
+ * Add functions durationWin64(), timestampUUID60() and timedelta2seconds()
+ * Add "class" argument to SubFile constructor: specify a parser class
+
+Changes:
+
+ * String classes: add truncate argument to constructor
+ * Rewrite humanDuration() which now accepts float and datetime.timedelta()
+ * BasicFieldSet: only use static_size if size is None (in constructor)
+ * Bit.raw_display is now "0" or "1" (and not "True" or "False")
+ * Float80.createValue() raises ValueError on overflow
+ * humanUnixAttributes() returns unicode string
+ * ISO 639: convert data to Unicode
+ * Field uses parent.nextFieldAddress() to get address and
+   parent.getFieldIndex() to know its index (to be compatible with
+   SeekableFieldSet)
+ * SeekableFieldSet: constructor use size argument
+ * SeekableFieldSet: add getField(), _getField(), __getitem()__,
+   current_size and size attributes
+ * SeekableFieldSet: seekBit()/seekByte() checks address and field
+   creation check bigger limit (address+size)
+ * String: support "CP037" charset
+
+Bug fixes:
+
+ * GenericFieldSet: _addField() raise an ParserError if field type is invalid
+   instead of an assertion
+ * SeekableFieldSet: fix seekBit(), getFieldByAddress() and done attribute
+ * GenericFieldSet: _fixFieldSize() doesn't display warning if the field is
+   not deleted
+ * Fix createOrphanField(): always restore old field set address
+ * Fix Field._getDisplay(), cache wasn't used
+ * RawBytes: create method _createDisplay() to use classic prototype for
+   createDisplay() method (no extra argument)
+ * Fix RawBytes._createDisplay() when string is truncated
+
+What's new in hachoir-core 0.8?
+===============================
+
+New features:
+
+ * Field value and display attributes are fault tolerant
+ * New types:
+   * Int24 and UInt24: signed/unsigned 24-bit integer ;
+   * Float80: 80-bit floating point number ;
+   * TimestampMSDOS32: 32-bit MS-DOS, since January 1st 1980 ;
+   * TimestampUnix32: 32-bit UNIX, seconds since January 1st 1970 ;
+   * TimestampMac32: 32-bit Mac, seconds since January 1st 1904 ;
+   * TimestampWin64: 64-bit Windows, nanoseconds since January 1st 1600.
+ * Function createOrphanField(): allow to create a field at any address
+ * String: add "MacRoman" charset, and rename "UTF-16LE" to "UTF-16-LE"
+   (and UTF-16BE to UTF-16-BE) for IronPython compatibility
+ * Write functions timestampUNIX(), timestampMac32(), timestampWin64(),
+   and humanDatetime() for IronPython compatibility. Functions use UTC and
+   not local timezone
+ * Add methods getSubIStream() and setSubIStream() to Field class
+
+Other changes:
+
+ * Split GenericFieldSet into BasicFieldSet and GenericFieldSet, and create
+   SeekableFieldSet (not working yet) class
+ * Remove EncodedField (replaced by SubFile).
+ * Move hachoir_core.editor to new subproject hachoir_editor
+ * Use ASCII and not ISO-8859-1 charset for raw display
+ * Field class inherits from Logger to have info(), warning() and error() methods
+
+
+What's new in hachoir-core 0.7.2?
+=================================
+
+New features:
+ * Fault tolerant: create HACHOIR_ERRORS constant, a list of minor errors that
+   can be ignored. This list is used in try/except to catch errors when
+   creating field description or new field.
+ * setup.py only uses setuptools when it's asked
+ * GenericString: add truncate optional argument
+ * hexadecimal() text handler now accepts field of any size:
+   align size to 4 bits
+
+Bugfixes:
+ * HachoirError: use makePrintable() to convert string to Unicode (when needed)
+ * GenericInteger: raise error when field size is bigger than 256 bits
+ * Fix humanDuration() for duration bigger than one year
+ * Remove unused function align_nearest()
+
+What's new in hachoir-core 0.7.1?
+=================================
+
+ * New field type Float80 (80-bit flotting point number)
+ * New field type CompressedField (for compressed content)
+ * Create utility function createDict()
+ * Remove (old and unused) unit tests
+
+What's new in hachoir-core 0.7?
+===============================
+
+Important changes:
+
+ * Rename the component "hachoir" to "hachoir-core"
+ * Editor supports Float32, Float64 and Character types
+ * Floats are now field set: it's possible
+   to read sign, exponent and mantissa
+ * New type EncodedFile to parse "encoded" subfile:
+   compressed, encrypted, encoded in base64, etc.
+ * New types GenericVector and UserVector to parse vectors
+ * Raw display is now closer to hexadecimal reprensentation for many types
+ * Rewrite documentation (hachoir-api.txt)
+ * Parser: don't have mime_type or tags attributes anymore
+ * Cleanup some Field methods: getOriginalDisplay() becomes raw_display
+   property, methods _createValue() and _createDescription() become public,
+   etc.
+ * FileInputStream() and FileOutputStream() now have optional "real_filename"
+   to accept invalid unicode filename
+
+Minor changes:
+
+ * Add __repr__() and __unicode__() methods to Field
+ * Use cache for array() method
+ * New types Int24 and UInt24
+ * Field value is now read-only
+ * FieldSet.seekBit()/seekByte() has null optional argument to create
+   nul padding
+ * createPaddingField() raise an exception on invalid size
+   instead of using assertion
+ * str2hex() always returns Unicode string
+ * Remove file export_xml.py (moved to hachoir-console component)
+
+Bugfixes:
+
+ * Use fstat() to get input size instead of seek()+tell() since unusual
+   files on /proc on Linux returns invalid size
+ * GenericString: fix UnixLine, fix UTF-16 with BOM,
+   remove ISO-8859-12 charset (doesn't exist)
+ * Catch seek() error in InputStream and raise InputStreamError()
+ * Fix _fixFieldSize() method for field set with nul size
+ * Fix UnicodeStdout on 8-bit terminal (eg. MS-Dos terminal on Windows)
+ * Fix makePrintable(): quote quote character if needed
+
+what's new in hachoir 0.6.1?
+============================
+
+Bugfixes:
+
+ * Fix GenericString length attribute: wasn't initialized for UTF-* strings
+ * Fix and improve FakeArray (created with fieldset.array("name"))
+
+Improvements:
+
+ * Add text_handler optional argument to Bits and RawBits
+ * On name duplicate error (a field was same name already exists), add "[]"
+   to its name instead and display an error raising an exception
+
+Minor changes:
+
+ * Add class documentation to all types (PaddingBits, Float32, ...)
+ * Fix reversed() code and __all__ constant in hachoir.compatibility
+ * Add available_types variable to hachoir.field (used by hachoir-wx)
+
+What's new in Hachoir 0.6?
+==========================
+
+First of all, Hachoir project is split in backend: hachoir-core and
+hachoir-parser, and in frontends: hachoir-console, hachoir-urwid,
+hachoir-metadata, etc. Changes listed here are only about hachoir-core.
+
+ * Hachoir is able to edit a file: edit field value, delete field, insert
+   new field
+ * Support of piped input: use small data cache and try to do the most
+   without knowing stream size
+ * Better autofix feature to be able to open invalid / truncated files
+ * Support charset UTF-16 (and UTF-32) for strings
+ * Use Unicode strings everywhere (but only for text, not for binary data)
+ * Use gettext to translate messages => but disabled by default since
+   setup.py is not able to compile .po file to .mo...
+
+Changes for developers:
+
+ * Add new field types: NullBits, NullBytes and SubFile
+ * Create array() method for field set: self["name[%u]" % index] is now
+   the same then self.array("name")[index]
+

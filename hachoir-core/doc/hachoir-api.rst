@@ -189,7 +189,7 @@ Timestamp (date and time):
 * TimestampMac32: 32-bit Mac, number of seconds since the January 1st 1904 ;
 * TimestampWin64: 64-bit Windows, number of 1/10 microseconds since
   the January 1st 1600 ;
-* DateTimeMSDOS3 and TimeDateMSDOS32: 32-bit MS-DOS structure,
+* DateTimeMSDOS32 and TimeDateMSDOS32: 32-bit MS-DOS structure,
   since the January 1st 1980.
 
 Timedelta (duration):

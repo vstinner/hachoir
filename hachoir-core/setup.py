@@ -16,7 +16,7 @@ CLASSIFIERS = [
 
 import os
 import sys
-import hachoir_core
+from imp import load_source
 
 def getPackages(hachoir_dir):
     # TODO: Remove this ugly function to use __import__
@@ -30,10 +30,6 @@ def getPackages(hachoir_dir):
     for key in old_packages_dir.iterkeys():
         packages_dir[key] = os.path.join(hachoir_dir, *old_packages_dir[key])
     return packages_dir.keys(), packages_dir
-
-def get_long_description(root_dir):
-    """Read the content of README file"""
-    return open(os.path.join(root_dir, 'README'), 'r').read()
 
 def main():
     # Check Python version!
@@ -51,19 +47,19 @@ def main():
 
     # Set some variables
     root_dir = os.path.dirname(__file__)
-    hachoir_dir = os.path.join(root_dir, "hachoir_core")
-    long_description = get_long_description(root_dir)
+    hachoir_core = load_source("version", path.join("hachoir_core", "version.py"))
+    long_description = open('README').read() + open('ChangeLog').read()
     packages, package_dir = getPackages(hachoir_dir)
 
     install_options = {
         "name": hachoir_core.PACKAGE,
-        "version": hachoir_core.__version__,
+        "version": hachoir_core.VERSION,
         "url": hachoir_core.WEBSITE,
         "download_url": hachoir_core.WEBSITE,
+        "license": hachoir_core.LICENSE,
         "author": AUTHORS,
         "description": DESCRIPTION,
         "classifiers": CLASSIFIERS,
-        "license": hachoir_core.LICENSE,
         "packages": packages,
         "package_dir": package_dir,
         "long_description": long_description,
