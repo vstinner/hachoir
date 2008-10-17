@@ -18,7 +18,7 @@ class QueryParser(object):
         self.validate = True
         self.use_fallback = False
         self.parser_args = None
-        self.db = HachoirParserList()
+        self.db = HachoirParserList.getInstance()
         self.parsers = set(self.db)
         parsers = []
         for tag in tags:

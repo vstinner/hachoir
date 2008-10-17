@@ -1,3 +1,9 @@
+What's new in hachoir-parser 1.2.2?
+===================================
+
+ * HachoirParserList() is no more a singleton:
+   use HachoirParserList.getInstance() to get a singleton
+
 What's new in hachoir-parser 1.2.1?
 ===================================
 
