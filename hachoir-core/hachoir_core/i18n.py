@@ -19,6 +19,7 @@ import hachoir_core
 import locale
 from os import path
 import sys
+from codecs import BOM_UTF8, BOM_UTF16_LE, BOM_UTF16_BE
 
 def _getTerminalCharset():
     """
@@ -147,9 +148,9 @@ def _initGettext():
     return (unicode_gettext, unicode_ngettext)
 
 UTF_BOMS = (
-    ("\xEF\xBB\xBF", "UTF-8"),
-    ("\xFF\xFE", "UTF-16-LE"),
-    ("\xFE\xFF", "UTF-16-BE"),
+    (BOM_UTF8, "UTF-8"),
+    (BOM_UTF16_LE, "UTF-16-LE"),
+    (BOM_UTF16_BE, "UTF-16-BE"),
 )
 
 # Set of valid characters for specific charset
