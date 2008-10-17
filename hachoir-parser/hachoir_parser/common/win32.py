@@ -5,6 +5,25 @@ from hachoir_core.bits import str2hex
 from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_parser.network.common import MAC48_Address
 
+# Dictionary: Windows codepage => Python charset name
+CODEPAGE_CHARSET = {
+      874: "CP874",
+#     932: Japanese Shift-JIS
+#     936: Simplified Chinese GBK
+#     949: Korean
+#     950: Traditional Chinese Big5
+     1250: "WINDOWS-1250",
+     1251: "WINDOWS-1251",
+     1252: "WINDOWS-1252",
+     1253: "WINDOWS-1253",
+     1254: "WINDOWS-1254",
+     1255: "WINDOWS-1255",
+     1256: "WINDOWS-1256",
+     1257: "WINDOWS-1257",
+     1258: "WINDOWS-1258",
+    65001: "UTF-8",
+}
+
 class PascalStringWin32(FieldSet):
     def __init__(self, parent, name, description=None, strip=None, charset="UTF-16-LE"):
         FieldSet.__init__(self, parent, name, description)

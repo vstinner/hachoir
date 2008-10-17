@@ -17,7 +17,7 @@ from hachoir_core.field import (FieldSet, ParserError,
 from hachoir_core.text_handler import textHandler, hexadecimal, filesizeHandler
 from hachoir_core.tools import createDict
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
-from hachoir_parser.common.win32 import GUID, PascalStringWin32
+from hachoir_parser.common.win32 import GUID, PascalStringWin32, CODEPAGE_CHARSET
 from hachoir_parser.image.bmp import BmpHeader, parseImageData
 
 MAX_SECTION_COUNT = 100
@@ -247,12 +247,6 @@ class PropertyContent(FieldSet):
 PropertyContent.TYPE_INFO[12] = ("VARIANT", PropertyContent)
 
 class SummarySection(SeekableFieldSet):
-    CODEPAGE_CHARSET = {
-        1252: "WINDOWS-1252",
-        1253: "WINDOWS-1253",
-        65001: "UTF-8",
-    }
-
     def __init__(self, *args):
         SeekableFieldSet.__init__(self, *args)
         self._size = self["size"].value * 8
@@ -271,8 +265,8 @@ class SummarySection(SeekableFieldSet):
             if not self.osconfig.charset \
             and findex['id'].value == PropertyIndex.TAG_CODEPAGE:
                 codepage = field['value'].value
-                if codepage in self.CODEPAGE_CHARSET:
-                    self.osconfig.charset = self.CODEPAGE_CHARSET.get(codepage)
+                if codepage in CODEPAGE_CHARSET:
+                    self.osconfig.charset = CODEPAGE_CHARSET[codepage]
                 else:
                     self.warning("Unknown codepage: %r" % codepage)
 
