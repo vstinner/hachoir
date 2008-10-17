@@ -1,3 +1,11 @@
+What's new in hachoir-core 1.2.2?
+=================================
+
+ * Add more charsets to GenericString: CP874, WINDOWS-1250, WINDOWS-1251,
+   WINDOWS-1254, WINDOWS-1255, WINDOWS-1256,WINDOWS-1257, WINDOWS-1258,
+   ISO-8859-16
+
+
 What's new in hachoir-core 1.2.1?
 =================================
 
