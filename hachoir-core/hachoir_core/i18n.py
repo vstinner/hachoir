@@ -101,7 +101,7 @@ def initLocale():
         # Replace stdout and stderr by unicode objet supporting unicode string
         sys.stdout = UnicodeStdout(sys.stdout, charset)
         sys.stderr = UnicodeStdout(sys.stderr, charset)
-        return charset
+    return charset
 
 def _dummy_gettext(text):
     return unicode(text)
