@@ -31,8 +31,8 @@ def processFile(counter, filename, charset, output):
         return False
 
     title = metadata.get('title', '')
-    author = metadata.get('author', '')
     creation = metadata.get('creation_date', datetime(1970, 1, 1))
+    author = metadata.get('author', '')
 
     filename = makePrintable(filename, charset, to_unicode=True)
     title = makePrintable(title, charset, to_unicode=True)
