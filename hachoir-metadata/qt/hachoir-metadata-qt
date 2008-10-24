@@ -103,8 +103,7 @@ class Metadata(QDialog, Ui_Form):
                     table.setItem(row, 0, QTableWidgetItem(title))
                     table.setItem(row, 1, QTableWidgetItem(value))
                     row += 1
-        table.resizeColumnToContents(0)
-        table.resizeColumnToContents(1)
+        table.resizeColumnsToContents()
 
     def changeFile(self, name):
         name = unicode(name)
