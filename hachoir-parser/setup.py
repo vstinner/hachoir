@@ -2,8 +2,6 @@
 from imp import load_source
 from os import path
 from sys import argv
-from README import writeReadme
-from StringIO import StringIO
 
 CLASSIFIERS = [
     'Intended Audience :: Developers',
@@ -18,6 +16,12 @@ MODULES = (
     "image", "misc", "network", "program", "video")
 
 def getLongDescription():
+    try:
+        return open('README').read()
+    except IOError:
+        pass
+    from README import writeReadme
+    from StringIO import StringIO
     out = StringIO()
     writeReadme(out)
     out.seek(0)
