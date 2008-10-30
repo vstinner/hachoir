@@ -8,7 +8,7 @@ from os.path import basename
 from hachoir_core import config
 config.quiet = True
 
-from hachoir_core.error import HachoirError
+from hachoir_core.error import HACHOIR_ERRORS
 from hachoir_core.cmd_line import unicodeFilename
 from hachoir_parser import createParser
 from hachoir_core.tools import makePrintable
@@ -32,12 +32,15 @@ class File:
             self.realname = realname
         else:
             self.realname = filename
-        self.parser = createParser(self.name, self.realname)
+        try:
+            self.parser = createParser(self.name, self.realname)
+        except HACHOIR_ERRORS, err:
+            raise MetadataError("Parser error: %s" % unicode(err))
         if not self.parser:
             raise MetadataError("Unable to parse the file: %s" % self.name)
         try:
             self.metadata = extractMetadata(self.parser)
-        except HachoirError, err:
+        except HACHOIR_ERRORS, err:
             raise MetadataError("Metadata extraction error: %s" % unicode(err))
         if not self.metadata:
             file_type = self.parser.mime_type
