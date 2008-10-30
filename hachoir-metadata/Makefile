@@ -1,7 +1,6 @@
 PYUIC = pyuic4
-RCC = rcc
 
-dialog_ui.py: dialog.ui
+hachoir_metadata/qt/dialog_ui.py: hachoir_metadata/qt/dialog.ui
 	$(PYUIC) -o $@ $^
 
 clean:
