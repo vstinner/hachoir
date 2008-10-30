@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from dialog_ui import Ui_Form
+from hachoir_metadata.qt.dialog_ui import Ui_Form
 from PyQt4.QtCore import SIGNAL
 from PyQt4.QtGui import (QApplication, QDialog,
     QTableWidgetItem, QFileDialog, QMessageBox)
