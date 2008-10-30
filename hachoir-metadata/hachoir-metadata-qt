@@ -4,7 +4,7 @@ from PyQt4.QtCore import SIGNAL
 from PyQt4.QtGui import (QApplication, QDialog,
     QTableWidgetItem, QFileDialog, QMessageBox)
 from sys import argv, exit
-from os.path import basename
+from os.path import basename, dirname
 from hachoir_core import config
 config.quiet = True
 
@@ -16,7 +16,7 @@ from hachoir_metadata import extractMetadata
 from hachoir_metadata.metadata import MultipleMetadata
 from hachoir_core.i18n import initLocale, getTerminalCharset
 from sys import argv, stderr, exit
-from os import walk
+from os import walk, getcwd
 from os.path import join as path_join
 from fnmatch import fnmatch
 from datetime import datetime
@@ -52,6 +52,7 @@ class Metadata(QDialog, Ui_Form):
         self.application = application
         self.files = {}
         self.setupWindow()
+        self.current_dir = dirname(getcwd())
 
     def setupWindow(self):
         self.setupUi(self)
@@ -65,10 +66,17 @@ class Metadata(QDialog, Ui_Form):
         self.metadata_table.verticalHeader().hide()
 
     def open(self):
-        filename = QFileDialog.getOpenFileName()
+        filename = QFileDialog.getOpenFileName(
+            self, #parent
+            "Choose a file to open", #caption
+            self.current_dir, #dir name
+            "", #filter
+            "Any type" #filter set
+        )
         if not filename:
             return
         filename = unicode(filename)
+        self.current_dir = dirname(filename)
         self.addFile(filename, change=True)
 
     def quit(self):
