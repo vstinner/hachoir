@@ -23,7 +23,13 @@ from datetime import datetime
 import codecs
 
 class MetadataError(Exception):
-    pass
+    def __init__(self, message):
+        self.unicode_message = message
+        bytes_message = message.encode("ASCII", "replace")
+        Exception.__init__(self, bytes_message)
+
+    def __unicode__(self):
+        return self.unicode_message
 
 class File:
     def __init__(self, filename, realname):
