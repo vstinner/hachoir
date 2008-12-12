@@ -60,7 +60,7 @@ class Gui:
         self.main_vbox.pack_start(self.metadata_table)
 
         if metadata is None:
-                self.metadata_table.attach(gtk.Label("Unknown file"), 0, 1, 0, 1)
+                self.metadata_table.attach(gtk.Label("Unknown file format"), 0, 1, 0, 1)
         else:
             total = 1
             for data in sorted(metadata):
@@ -79,17 +79,21 @@ class Gui:
         gtk.main_quit()
 
     def main(self):
+        has_file = False
+        for arg in sys.argv[1:]:
+            if os.path.isdir(arg):
+                for file in os.listdir(arg):
+                    path = os.path.join(arg, file)
+                    if os.path.isfile(path):
+                        self.add_file(path)
+                        has_file = True
+            elif os.path.isfile(arg):
+                self.add_file(arg)
+                has_file = True
+        if has_file:
+            self.file_combo.set_active(0)
         gtk.main()
 
 if __name__ == "__main__":
-    gui = Gui()
-    for arg in sys.argv[1:]:
-        if os.path.isdir(arg):
-            for file in os.listdir(arg):
-                path = os.path.join(arg, file)
-                if os.path.isfile(path):
-                    gui.add_file(path)
-        elif os.path.isfile(arg):
-            gui.add_file(arg)
-    gui.main()
+    Gui().main()
 
