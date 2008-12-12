@@ -25,7 +25,7 @@ class Gui:
         self.main_vbox.pack_start(self.select_hbox, False)
 
         self.metadata_table = gtk.Table(1, 1)
-        self.metadata_table.attach(gtk.Label("Select a file to view metadata informations ..."), 0, 1, 0, 1)
+        self.metadata_table.attach(gtk.Label("Select a file to view metadata information..."), 0, 1, 0, 1)
         self.main_vbox.pack_start(self.metadata_table)
 
         self.main_window.add(self.main_vbox)
@@ -60,7 +60,7 @@ class Gui:
         self.main_vbox.pack_start(self.metadata_table)
 
         if metadata is None:
-                self.metadata_table.attach(gtk.Label("Unknow file"), 0, 1, 0, 1)
+                self.metadata_table.attach(gtk.Label("Unknown file"), 0, 1, 0, 1)
         else:
             total = 1
             for data in sorted(metadata):
