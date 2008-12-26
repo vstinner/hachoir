@@ -1,0 +1,18 @@
+Known bugs
+==========
+
+ * [All]: Field view "Merge Down" doesn't work.
+
+ * [Windows only]: Hex view only shows a ~4x5 char display of the
+   data. This is believed to be due to a wxWidgets bugs related to text
+   wrapping.
+
+ * [Windows only]: Right-click context menu doesn't work.
+
+ * [Windows only]: Hex view data marking doesn't work.
+
+ * [Gtk only]: Hex view will occasionally show two scrollbars for the
+   hex view if you resize the very quickly. This is likely a bug in
+   wxGtk that (for some reason) ignores the "no vertical scrollbar"
+   directive for text controls.
+

@@ -28,6 +28,12 @@ MODULES = ("field_view", "frame_view", "hex_view", "resource")
 def main():
     hachoir_wx = load_source("version", path.join("hachoir_wx", "version.py"))
 
+    long_description = open('README').read()
+    long_description += '\n'
+    long_description += open('ChangeLog').read()
+    long_description += '\n'
+    long_description += open('BUGS').read()
+
     PACKAGES = {"hachoir_wx": "hachoir_wx"}
     for name in MODULES:
         PACKAGES["hachoir_wx." + name] = path.join("hachoir_wx", name)
@@ -40,7 +46,7 @@ def main():
         "license": hachoir_wx.LICENSE,
         "author": "Cyril Zorin",
         "description": "hachoir-wx is a wxWidgets GUI that's meant to provide a (more) user-friendly interface to the hachoir binary parsing engine",
-        "long_description": open('README').read(),
+        "long_description": long_description,
         "classifiers": CLASSIFIERS,
         "scripts": ["hachoir-wx"],
         "packages": PACKAGES.keys(),
