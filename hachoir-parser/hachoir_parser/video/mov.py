@@ -8,13 +8,15 @@ Documents:
   http://developer.apple.com/documentation/QuickTime/QTFF/qtff.pdf
 - Apple QuickTime:
   http://wiki.multimedia.cx/index.php?title=Apple_QuickTime
+- File type (ftyp):
+  http://www.ftyps.com/
 
 Author: Victor Stinner
 Creation: 2 august 2006
 """
 
 from hachoir_parser import Parser
-from hachoir_core.field import (ParserError, FieldSet,
+from hachoir_core.field import (ParserError, FieldSet, MissingField,
     UInt8, Int16, UInt16, UInt32, TimestampMac32,
     String, PascalString8, CString,
     RawBytes, PaddingBytes)
@@ -135,6 +137,13 @@ class MovieHeader(FieldSet):
         yield UInt32(self, "current_time")
         yield UInt32(self, "next_track")
 
+class FileType(FieldSet):
+    def createFields(self):
+        yield String(self, "brand", 4, "Major brand")
+        yield UInt32(self, "version", "Version")
+        while not self.eof:
+            yield String(self, "compat_brand[]", 4, "Compatible brand")
+
 class Atom(FieldSet):
     tag_info = {
         # TODO: Use dictionnary of dictionnary, like Matroska parser does
@@ -151,7 +160,8 @@ class Atom(FieldSet):
         "hdlr": (HDLR, "hdlr", ""),
         "mdhd": (MediaHeader, "media_hdr", "Media header"),
         "load": (Load, "load", ""),
-        "mvhd": (MovieHeader, "movie_hdr", "Movie header")
+        "mvhd": (MovieHeader, "movie_hdr", "Movie header"),
+        "ftyp": (FileType, "file_type", "File type"),
     }
     tag_handler = [ item[0] for item in tag_info ]
     tag_desc = [ item[1] for item in tag_info ]
@@ -188,10 +198,15 @@ class MovFile(Parser):
         "id": "mov",
         "category": "video",
         "file_ext": ("mov", "qt", "mp4", "m4v", "m4a", "m4p", "m4b"),
-        "mime": (u"video/quicktime",),
+        "mime": (u"video/quicktime", u'video/mp4'),
         "min_size": 8*8,
         "magic": (("moov", 4*8),),
         "description": "Apple QuickTime movie"
+    }
+    BRANDS = {
+        # File type brand => MIME type
+        'mp41': u'video/mp4',
+        'mp42': u'video/mp4',
     }
     endian = BIG_ENDIAN
 
@@ -210,4 +225,22 @@ class MovFile(Parser):
     def createFields(self):
         while not self.eof:
             yield Atom(self, "atom[]")
+
+    def createMimeType(self):
+        first = self[0]
+        try:
+            # Read brands in the file type
+            if first['tag'].value != "ftyp":
+                return None
+            file_type = first["file_type"]
+            brand = file_type["brand"].value
+            if brand in self.BRANDS:
+                return self.BRANDS[brand]
+            for field in file_type.array("compat_brand"):
+                brand = field.value
+                if brand in self.BRANDS:
+                    return self.BRANDS[brand]
+        except MissingField:
+            pass
+        return None
 
