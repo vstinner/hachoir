@@ -243,8 +243,8 @@ class BPList(HachoirParser, RootSeekableFieldSet):
         HachoirParser.__init__(self, stream, **args)
 
     def validate(self):
-        if self["magic"].value != self.MAGIC:
-            return "Invalid magic."
+        if self.stream.readBytes(0, len(self.MAGIC)) != self.MAGIC:
+            return "Invalid magic"
         return True
 
     def createFields(self):
