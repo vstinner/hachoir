@@ -26,5 +26,6 @@ def format_name(field):
 
 def format_desc(field):
     if field.description:
-        return str(field.description)
-    return ''
+        return unicode(field.description)
+    return u''
+
