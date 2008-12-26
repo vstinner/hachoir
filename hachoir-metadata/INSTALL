@@ -1,0 +1,21 @@
+Dependencies
+============
+
+hachoir-metadata:
+ * hachoir-core 1.2.1
+ * hachoir-parser 1.2.2
+
+hachoir-metadata-qt:
+ * PyQt4
+
+To compile hachoir_metadata/qt/dialog.ui, you need pyuic4 which is part of
+PyQt4 development tools.
+
+
+Install
+=======
+
+Run the follow command as root: ::
+
+    ./setup.py install
+
