@@ -3,10 +3,6 @@ What's new in hachoir-metadata 1.3?
 
  * Create hachoir-metadata-qt: a graphical interface (Qt toolkit)
    to display files metadata
-
-What's new in hachoir-metadata 1.2.2?
-=====================================
-
  * Create ISO image extractor
 
 What's new in hachoir-metadata 1.2.1?
