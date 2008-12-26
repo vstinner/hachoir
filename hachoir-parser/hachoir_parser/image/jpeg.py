@@ -233,6 +233,7 @@ class JpegChunk(FieldSet):
         0xDD: ("restart_interval", "Define Restart Interval (DRI)", RestartInterval),
         0xE0: ("app0", "APP0", JpegChunkApp0),
         0xE1: ("exif", "Exif metadata", Exif),
+        0xE2: ("icc", "ICC profile", None),
         0xEC: ("app12", "APP12", APP12),
         0xED: ("photoshop", "Photoshop", PhotoshopMetadata),
         0xEE: ("adobe", "Image encoding information for DCT filters (Adobe)", AdobeChunk),
