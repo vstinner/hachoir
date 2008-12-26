@@ -49,8 +49,8 @@ class BLP1File(Parser):
     endian = LITTLE_ENDIAN
 
     def validate(self):
-        if self["magic"].value != "BLP1":
-            return "Invalid magic!"
+        if self.stream.readBytes(0, 4) != "BLP1":
+            return "Invalid magic"
         return True
 
     def createFields(self):
@@ -201,8 +201,8 @@ class BLP2File(Parser):
     endian = LITTLE_ENDIAN
 
     def validate(self):
-        if self["magic"].value != "BLP2":
-            return "Invalid magic!"
+        if self.stream.readBytes(0, 4) != "BLP2":
+            return "Invalid magic"
         return True
 
     def createFields(self):
