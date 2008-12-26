@@ -356,6 +356,13 @@ def checkRadpoor(meta): return (
     checkAttr(meta, 'creation_date', datetime(2008, 9, 2, 16, 8, 30)),
 )
 
+def checkQuicktime(meta): return (
+    checkAttr(meta, 'width', 190),
+    checkAttr(meta, 'height', 240),
+    checkAttr(meta, 'creation_date', datetime(2005, 10, 28, 17, 46, 46)),
+    checkAttr(meta, 'mime_type', u'video/mp4'),
+)
+
 def checkFile(filename, check_metadata, quality=1.0):
     sys.stdout.write("  - Create parser: ")
     sys.stdout.flush()
@@ -465,6 +472,7 @@ testcase_files = (
     (u"angle-bear-48x48.ani", checkAngelBear),
     (u"hotel_california.flac", checkHotelCalifornia),
     (u"radpoor.doc", checkRadpoor),
+    (u"quicktime.mp4", checkQuicktime),
 )
 
 if __name__ == "__main__":
