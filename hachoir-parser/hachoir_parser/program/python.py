@@ -12,7 +12,7 @@ Creation: 25 march 2005
 DISASSEMBLE = False
 
 from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet,
+from hachoir_core.field import (FieldSet, UInt8,
     UInt16, Int32, UInt32, Int64, ParserError, Float64, Enum,
     Character, Bytes, RawBytes, PascalString8, TimestampUnix32)
 from hachoir_core.endian import LITTLE_ENDIAN
@@ -30,7 +30,19 @@ if DISASSEMBLE:
 def parseString(parent):
     yield UInt32(parent, "length", "Length")
     length = parent["length"].value
-    if 0 < length:
+    if parent.name == "lnotab":
+        bytecode_offset=0
+        line_number=parent['../firstlineno'].value
+        for i in range(0,length,2):
+            bc_off_delta=UInt8(parent, 'bytecode_offset_delta[]')
+            yield bc_off_delta
+            bytecode_offset+=bc_off_delta.value
+            bc_off_delta._description='Bytecode Offset %i'%bytecode_offset
+            line_number_delta=UInt8(parent, 'line_number_delta[]')
+            yield line_number_delta
+            line_number+=line_number_delta.value
+            line_number_delta._description='Line Number %i'%line_number
+    elif 0 < length:
         yield RawBytes(parent, "text", length, "Content")
     if DISASSEMBLE and parent.name == "compiled_code":
         disassembleBytecode(parent["text"])
@@ -183,6 +195,13 @@ class Object(FieldSet):
         elif code in ("s", "t", "u"):
             self.createValue = self.createValueString
             self.createDisplay = self.createDisplayString
+            if code == 't':
+                if not hasattr(self.root,'string_table'):
+                    self.root.string_table=[]
+                self.root.string_table.append(self)
+        elif code == 'R':
+            if hasattr(self.root,'string_table'):
+                self.createValue = self.createValueStringRef
 
     def createValueString(self):
         if "text" in self:
@@ -206,6 +225,12 @@ class Object(FieldSet):
         if is_negative:
             total = -total
         return total
+
+    def createValueStringRef(self):
+        return self.root.string_table[self['ref'].value].value
+
+    def createDisplayStringRef(self):
+        return self.root.string_table[self['ref'].value].display
 
     def createValueComplex(self):
         return complex(
