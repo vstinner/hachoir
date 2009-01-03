@@ -112,7 +112,7 @@ def interp_avg(data_low, data_high, n):
         pairs = zip(data_low, data_high)
         pair_iters = [interp_avg(x, y, n) for x, y in pairs]
         for i in range(1, n):
-            yield [i.next() for i in pair_iters]
+            yield [iter.next() for iter in pair_iters]
 
 def color_name(data, bits):
     """Color names in #RRGGBB format, given the number of bits for each component."""
@@ -130,12 +130,12 @@ class DXT1(FieldSet):
     def createFields(self):
         values = [[], []]
         for i in (0, 1):
-                yield Bits(self, "blue[]", 5)
-                yield Bits(self, "green[]", 6)
-                yield Bits(self, "red[]", 5)
-                values[i] = [self["red[%i]" % i].value,
-                             self["green[%i]" % i].value,
-                             self["blue[%i]" % i].value]
+            yield Bits(self, "blue[]", 5)
+            yield Bits(self, "green[]", 6)
+            yield Bits(self, "red[]", 5)
+            values[i] = [self["red[%i]" % i].value,
+                         self["green[%i]" % i].value,
+                         self["blue[%i]" % i].value]
         if values[0] > values[1] or self.dxt2_mode:
             values += interp_avg(values[0], values[1], 3)
         else:
