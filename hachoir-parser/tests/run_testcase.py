@@ -203,9 +203,9 @@ def checkCornerBMP(parser): return (
 
 def checkCACertClass3(parser): return (
     checkDisplay(parser, "seq[0]/class", u'universal'),
-    checkDesc(parser, "seq[0]/seq[0]/seq[0]/obj_id[0]", "Object identifier: 1.2.840.113549.1.1.4"),
-    checkValue(parser, "seq[0]/seq[0]/seq[1]/set[0]/seq[0]/print_str[0]/value", u"Root CA"),
-    checkValue(parser, "seq[0]/seq[0]/seq[1]/set[3]/seq[0]/ia5_str[0]/value", u"support@cacert.org"),
+    checkDesc(parser, "seq[0]/seq[0]/seq[1]/obj_id[0]", "Object identifier: 1.2.840.113549.1.1.4"),
+    checkValue(parser, "seq[0]/seq[0]/seq[2]/set[0]/seq[0]/print_str[0]/value", u"Root CA"),
+    checkValue(parser, "seq[0]/seq[0]/seq[2]/set[3]/seq[0]/ia5_str[0]/value", u"support@cacert.org"),
     checkValue(parser, "seq[0]/bit_str[0]/size", 513),
 )
 
