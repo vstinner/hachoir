@@ -572,41 +572,63 @@ testcase_files = (
     (u"pyc_example_2.2.3.pyc", checkPYC),
     (u"pyc_example_2.5c1.pyc", checkPYC),
     (u"ftp-0.17-537.i586.rpm", checkRPM),
+    # cross.xcf
     (u"jpeg.exif.photoshop.jpg", checkJPEG),
     (u"small_text.tar", checkTAR),
-    (u"hachoir-core.rar", checkRAR),
-    (u"hachoir-core.ace", checkACE),
     (u"cacert_class3.der", checkCACertClass3),
     (u"kde_haypo_corner.bmp", checkCornerBMP),
+    # png_331x90x8_truncated.png
     (u"steganography.mp3", checkSteganography),
+    # smallville.s03e02.avi
+    # 08lechat_hq_fr.mp3
     (u"ReferenceMap.class", checkReferenceMapClass),
     (u"claque-beignet.swf", checkClaqueBeignet),
+    # interlude_david_aubrun.ogg
     (u"breakdance.flv", checkBreakdance),
     (u"arp_dns_ping_dns.tcpdump", checkArpDnsPingDns),
+    # matrix_ping_pong.wmv
+    # usa_railroad.jpg
     (u"my60k.ext2", checkExt2),
     (u"article01.bmp", checkArticle01),
     (u"reiserfs_v3_332k.bin", checkReiserFS3),
     (u"lara_croft.pcx", checkLaraCroft),
+    # hero.tga
+    # firstrun.rm
     (u"linux_swap_9pages", checkLinuxSwap),
     (u"pikachu.wmf", checkPikachu),
     (u"globe.wmf", checkGlobe),
     (u"indiana.mid", checkIndiana),
+    # 25min.aifc
     (u"grasslogo_vector.emf", checkGrassLogo),
+    (u"ocr10.laf", checkOCR10),
+    (u"kino14s.laf", checkKino14),
+    # ladouce_1h15.wav
+    (u"hachoir-core.ace", checkACE),
+    (u"hachoir-core.rar", checkRAR),
+    (u"debian-31r4-i386-binary-1.iso.torrent", checkDebianTorrent),
     (u"india_map.gif", checkIndiaMap),
     (u"cercle.exe", checkCercle),
     (u"eula.exe", checkEula),
-    (u"ocr10.laf", checkOCR10),
-    (u"kino14s.laf", checkKino14),
     (u"free-software-song.midi.bz2", checkFreeSoftwareSong),
     (u"ping_20020927-3ubuntu2", checkPing),
     (u"georgia.cab", checkGeorgia),
-    (u"debian-31r4-i386-binary-1.iso.torrent", checkDebianTorrent),
+    # hachoir.org.sxw
     (u"dell8.fat16", checkDell8FAT16),
     (u"dontyou.xm", checkXM),
     (u"satellite_one.s3m", checkS3M),
     (u"anti-arpeggio_tune.ptm", checkPTM),
+    # deja_vu_serif-2.7.ttf
+    # twunk_16.exe
     (u"vim.lnk", checkVimLNK),
     (u"7zip.chm", checkSevenzipCHM),
+    # green_fire.jpg
+    # marc_kravetz.mp3
+    # pentax_320x240.mov
+    # gps.jpg
+    # angle-bear-48x48.ani
+    # hotel_california.flac
+    # radpoor.doc
+    # quicktime.mp4
     (u"swat.blp", checkSwat),
 )
 
