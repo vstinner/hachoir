@@ -152,10 +152,8 @@ class ImageData(Fragment):
         self.setLinks(first, next)
 
 def parseTransparency(parent):
-    yield UInt8(parent, "color_index")
-
-def textTransparency(parent):
-    return "Transparency: color #%u" % parent["color_index"].value
+    for i in range(parent["size"].value):
+        yield UInt8(parent, "alpha_value[]", "Alpha value for palette entry %i"%i)
 
 def getBitsPerPixel(header):
     nr_component = 1
@@ -173,7 +171,7 @@ class Chunk(FieldSet):
         "PLTE": ("palette", paletteParse, paletteDescription, None),
         "gAMA": ("gamma", gammaParse, gammaDescription, gammaValue),
         "tEXt": ("text[]", textParse, textDescription, None),
-        "tRNS": ("transparency", parseTransparency, textTransparency, None),
+        "tRNS": ("transparency", parseTransparency, "Transparency Info", None),
 
         "bKGD": ("background", parseBackgroundColor, backgroundColorDesc, None),
         "IDAT": ("data[]", lambda parent: (ImageData(parent),), "Image data", None),
