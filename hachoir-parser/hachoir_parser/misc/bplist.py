@@ -164,20 +164,29 @@ class BPListObject(FieldSet):
         elif markertype == 4:
             # Data
             yield BPListSize(self, "size")
-            yield Bytes(self, "value", self['size'].value)
-            self.xml=lambda prefix:prefix + "<data>\n%s\n%s</data>"%(self['value'].value.encode('base64').strip(),prefix)
+            if self['size'].value:
+                yield Bytes(self, "value", self['size'].value)
+                self.xml=lambda prefix:prefix + "<data>\n%s\n%s</data>"%(self['value'].value.encode('base64').strip(),prefix)
+            else:
+                self.xml=lambda prefix:prefix + '<data></data>'
 
         elif markertype == 5:
             # ASCII String
             yield BPListSize(self, "size")
-            yield String(self, "value", self['size'].value, charset="ASCII")
-            self.xml=lambda prefix:prefix + "<string>%s</string>"%(self['value'].value.encode('iso-8859-1'))
+            if self['size'].value:
+                yield String(self, "value", self['size'].value, charset="ASCII")
+                self.xml=lambda prefix:prefix + "<string>%s</string>"%(self['value'].value.encode('iso-8859-1'))
+            else:
+                self.xml=lambda prefix:prefix + '<string></string>'
 
         elif markertype == 6:
             # UTF-16-BE String
             yield BPListSize(self, "size")
-            yield String(self, "value", self['size'].value*2, charset="UTF-16-BE")
-            self.xml=lambda prefix:prefix + "<string>%s</string>"%(self['value'].value.encode('utf-8'))
+            if self['size'].value:
+                yield String(self, "value", self['size'].value*2, charset="UTF-16-BE")
+                self.xml=lambda prefix:prefix + "<string>%s</string>"%(self['value'].value.encode('utf-8'))
+            else:
+                self.xml=lambda prefix:prefix + '<string></string>'
 
         elif markertype == 8:
             # UID
@@ -206,12 +215,16 @@ class BPListObject(FieldSet):
     def createValue(self):
         if 'value' in self:
             return self['value'].value
+        elif self['marker_type'].value in [4,5,6]:
+            return u''
         else:
             return None
 
     def createDisplay(self):
         if 'value' in self:
             return unicode(self['value'].display)
+        elif self['marker_type'].value in [4,5,6]:
+            return u''
         else:
             return None
 
