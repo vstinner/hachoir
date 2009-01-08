@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from hachoir_metadata.qt.dialog_ui import Ui_Form
 from PyQt4.QtCore import SIGNAL
+from PyQt4.QtCore import Qt
 from PyQt4.QtGui import (QApplication, QDialog,
     QTableWidgetItem, QFileDialog, QMessageBox)
 from sys import argv, exit
@@ -21,6 +22,11 @@ from os.path import join as path_join
 from fnmatch import fnmatch
 from datetime import datetime
 import codecs
+
+class CustomTableWidgetItem(QTableWidgetItem):
+    def __init__(self, parent = None):
+        super(CustomTableWidgetItem, self).__init__(parent)
+        self.setFlags(Qt.ItemIsSelectable |Qt.ItemIsEnabled)
 
 class MetadataError(Exception):
     def __init__(self, message):
@@ -110,15 +116,15 @@ class Metadata(QDialog, Ui_Form):
         for metadata in groups:
             for data in metadata:
                 if isinstance(data, (str, unicode)):
-                    table.setItem(row, 0, QTableWidgetItem("-- group --"))
-                    table.setItem(row, 1, QTableWidgetItem(data))
+                    table.setItem(row, 0, CustomTableWidgetItem("-- group --"))
+                    table.setItem(row, 1, CustomTableWidgetItem(data))
                     row += 1
                     continue
                 title = data.description
                 for item in data.values:
                     value = item.text
-                    table.setItem(row, 0, QTableWidgetItem(title))
-                    table.setItem(row, 1, QTableWidgetItem(value))
+                    table.setItem(row, 0, CustomTableWidgetItem(title))
+                    table.setItem(row, 1, CustomTableWidgetItem(value))
                     row += 1
         table.resizeColumnsToContents()
 
