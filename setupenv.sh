@@ -1,6 +1,9 @@
-#Source this file to use hachoir unpacked right from svn
+# Source this file to use Hachoir unpacked right from svn:
+#   . setupenv.sh
+# or
+#   source setupenv.sh
 
-#Why not erase PYTHONPATH ? Conservative option chosen.
+# Why not erase PYTHONPATH ? Conservative option chosen.
 #PYTHONPATH=""
 
 sub_projects="\
