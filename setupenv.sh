@@ -1,29 +1,38 @@
-# Source this file to use Hachoir unpacked right from svn:
-#   . setupenv.sh
-# or
-#   source setupenv.sh
+#Source this file to use hachoir unpacked right from svn.
 
-# Why not erase PYTHONPATH ? Conservative option chosen.
+#This is an sh script because only sh scripts can be sourced from sh.
+
+#Why not erase PYTHONPATH ? Conservative option chosen.
 #PYTHONPATH=""
 
-sub_projects="\
-hachoir-core \
-hachoir-parser \
-hachoir-editor \
-hachoir-metadata \
-hachoir-regex \
-hachoir-subfile \
-"
+export PYTHONPATH=`cat << EOF | /usr/bin/env python -
+from os import environ, getcwd
 
-H=$(pwd)
+subprojects=[ 
+"hachoir-core",
+"hachoir-parser",
+"hachoir-editor",
+"hachoir-metadata",
+"hachoir-regex",
+"hachoir-subfile"
+]
 
-for dir in $sub_projects; do
-    echo "$H/$dir"
-  if [ "x$PYTHONPATH" = "x" ]; then
-    PYTHONPATH=$H/$dir
-  else
-    PYTHONPATH=$PYTHONPATH:$H/$dir
-  fi
-done
+cur_dir = getcwd()
+path_list = environ["PYTHONPATH"].split(':')
+try:
+  #occurs when the path is set but empty
+  path_list.remove('')
+except ValueError:
+  pass
 
-export PYTHONPATH
+for project in subprojects:
+  path_item = "%s/%s" % (cur_dir, project)
+  if path_item not in path_list:
+    path_list.append(path_item)
+
+#Here, the bash variable is set from Python s stdout
+print ":".join(path_list)
+
+EOF
+`
+
