@@ -4,8 +4,8 @@ MAX_LINE_TEST = 10 * 1024
 
 def get_width_chars(view):
     if not view.GetLineLength(0):
-	padding = ' ' * MAX_LINE_TEST
-	view.SetValue(padding)
+        padding = ' ' * MAX_LINE_TEST
+        view.SetValue(padding)
 
     return view.GetLineLength(0) // 3
     

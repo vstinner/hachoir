@@ -15,8 +15,8 @@ class hex_view_t(TextCtrl):
         pre = PreTextCtrl()
         self.PostCreate(pre)
 
-	self.get_width_chars = lambda: max(get_width_chars(self), 1)
-	self.get_height_chars = lambda: max(get_height_chars(self), 1)
+        self.get_width_chars = lambda: max(get_width_chars(self), 1)
+        self.get_height_chars = lambda: max(get_height_chars(self), 1)
 
     def ready(self):
         self.dispatcher.trigger('hex_view_ready', self)
