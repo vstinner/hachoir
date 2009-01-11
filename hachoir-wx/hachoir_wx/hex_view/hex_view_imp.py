@@ -11,6 +11,7 @@ class hex_view_imp_t:
         self.input = file
         self.field = None
         self.pos = 0
+        self.format_addr = lambda addr: '%08x'%addr
 
     def on_hex_view_ready(self, dispatcher, view):
         assert view is not None
@@ -24,6 +25,7 @@ class hex_view_imp_t:
             size = clamp_range(get_page_size(self.view), 1, MAX_SIZE)
             self.view.display_data(self.input.read(size))
             self.pos = paged_pos
+            self.update_addr_view()
 
     def on_resized(self):
         self.fill_view(self.pos)
@@ -38,6 +40,20 @@ class hex_view_imp_t:
     def on_field_selected(self, dispatcher, field):
         self.fill_view(byte_addr(field._getAbsoluteAddress()))
         self.update_set_mark(field)
+
+    def on_address_decimal(self, dispatcher):
+        self.format_addr = lambda addr: '%08d'%addr
+        self.update_addr_view()
+
+    def on_address_hexadecimal(self, dispatcher):
+        self.format_addr = lambda addr: '%08x'%addr
+        self.update_addr_view()
+
+    def update_addr_view(self):
+        addr_text = ''
+        for i in xrange(self.view.get_height_chars()):
+            addr_text += self.format_addr(self.pos+i*self.view.get_width_chars())+'\n'
+        self.view.addr_view.SetValue(addr_text)
 
     def update_set_mark(self, field):
         self.field = field

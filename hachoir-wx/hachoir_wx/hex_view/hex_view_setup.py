@@ -9,6 +9,7 @@ def setup_hex_view(parent, dispatcher):
     print "[+] Setup hex view"
     hex_view = get_child_control(parent, 'hex_view')
     hex_view.ascii_view = get_child_control(parent, 'ascii_view')
+    hex_view.addr_view = get_child_control(parent, 'addr_view')
     dispatcher.add_sender(hex_view)
 
     imp = hex_view_imp_t()
