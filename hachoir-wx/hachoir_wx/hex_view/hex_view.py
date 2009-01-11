@@ -6,9 +6,11 @@ from hachoir_wx.hex_view import get_width_chars, get_height_chars
 
 class hex_view_t(TextCtrl):
     default_style = TextAttr()
+    default_style.SetBackgroundColour((255, 255, 255))
     default_style.SetTextColour((0, 0, 0))
 
     highlight_style = TextAttr()
+    highlight_style.SetBackgroundColour((220, 220, 220))
     highlight_style.SetTextColour((52, 95, 215))
 
     def __init__(self):
