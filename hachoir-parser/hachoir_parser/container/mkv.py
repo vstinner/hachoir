@@ -56,8 +56,8 @@ def Enum(parent, enum):
     return _Enum(GenericInteger(parent, 'enum', False, parent['size'].value*8), enum)
 
 def Bool(parent):
-    return GenericInteger(parent, 'bool', False, parent['size'].value*8, \
-        text_handler = lambda chunk: str(chunk.value != 0))
+    return textHandler(GenericInteger(parent, 'bool', False, parent['size'].value*8),
+        lambda chunk: str(chunk.value != 0))
 
 def UInt(parent):
     return GenericInteger(parent, 'unsigned', False, parent['size'].value*8)
@@ -219,8 +219,8 @@ class Block(FieldSet):
         size = (self._size - self.current_size) / 8
         lacing = self['lacing'].value
         if lacing:
-            yield GenericInteger(self, 'n_frames', False, 8, \
-                text_handler = lambda chunk: str(chunk.value+1))
+            yield textHandler(GenericInteger(self, 'n_frames', False, 8),
+                lambda chunk: str(chunk.value+1))
             yield Lace(self, lacing - 1, size - 1)
         else:
             yield RawBytes(self,'frame', size)
