@@ -4,6 +4,8 @@
 import wx
 if '__WXGTK__' == wx.Platform:
     from compat_gtk import get_width_chars, get_height_chars
+elif '__WXMSW__' == wx.Platform:
+    from compat_msw import get_width_chars, get_height_chars
 else:
     from compat_all import get_width_chars, get_height_chars
 
