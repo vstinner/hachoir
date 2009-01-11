@@ -24,7 +24,7 @@
           <orient>wxHORIZONTAL</orient>
           <object class="sizeritem">
             <object class="wxTextCtrl" name="hex_view" subclass="hachoir_wx.hex_view.hex_view_t">
-              <style>wxTE_NO_VSCROLL|wxTE_MULTILINE|wxTE_READONLY</style>
+              <style>wxTE_NO_VSCROLL|wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH</style>
               <font>
                 <size>11</size>
                 <family>modern</family>
