@@ -35,7 +35,7 @@ class hex_view_t(TextCtrl):
         self.Refresh()
 
     def display_data(self, data):
-        self.SetValue(to_hex(data))
+        self.SetValue(to_hex(data, self.get_width_chars()))
 
     def get_size(self):
         return len(self.GetValue())

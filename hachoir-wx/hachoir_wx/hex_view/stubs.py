@@ -18,10 +18,14 @@ def get_file_size(file):
 
     return size
 
-def to_hex(data):
+def to_hex(data, width=None):
     hex_data = ''
-    for byte in data:
-        hex_data += "%02x " % ord(byte)
+    for i in xrange(len(data)):
+        hex_data += "%02x" % ord(data[i])
+        if width and (i+1)%width==0:
+            hex_data += '\n'
+        else:
+            hex_data += ' '
 
     return hex_data.rstrip(' ')
 
