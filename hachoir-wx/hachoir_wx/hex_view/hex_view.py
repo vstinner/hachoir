@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from wx import TextCtrl, TextAttr, PreTextCtrl
-from stubs import to_hex, calc_char_range, clamp_range
+from stubs import to_ascii, to_hex, calc_char_range, calc_ascii_range, clamp_range
 from hachoir_wx.hex_view import get_width_chars, get_height_chars
 
 class hex_view_t(TextCtrl):
@@ -23,19 +23,32 @@ class hex_view_t(TextCtrl):
 
     def unmark(self):
         self.SetStyle(0, self.get_size(), self.default_style)
+        self.ascii_view.SetStyle(0, self.get_ascii_size(), self.default_style)
         self.Refresh()
 
     def mark_range(self, start, size):
-        mark_start, mark_end = calc_char_range(start, start + size)
+        mark_start, mark_end = calc_char_range(start, start + size, self.get_width_chars())
 
         mark_start = clamp_range(mark_start, 0, self.get_size())
         mark_end = clamp_range(mark_end, 0, self.get_size())
 
         self.SetStyle(mark_start, mark_end, self.highlight_style)
         self.Refresh()
+        
+        mark_start, mark_end = calc_ascii_range(start, start + size, self.get_width_chars())
+
+        mark_start = clamp_range(mark_start, 0, self.get_ascii_size())
+        mark_end = clamp_range(mark_end, 0, self.get_ascii_size())
+
+        self.ascii_view.SetStyle(mark_start, mark_end, self.highlight_style)
+        self.Refresh()
 
     def display_data(self, data):
         self.SetValue(to_hex(data, self.get_width_chars()))
+        self.ascii_view.SetValue(to_ascii(data, self.get_width_chars()))
+
+    def get_ascii_size(self):
+        return len(self.ascii_view.GetValue())
 
     def get_size(self):
         return len(self.GetValue())

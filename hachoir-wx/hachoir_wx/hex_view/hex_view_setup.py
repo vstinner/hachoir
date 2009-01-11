@@ -8,6 +8,7 @@ from hex_view_scroll_setup import setup_hex_view_scroll
 def setup_hex_view(parent, dispatcher):
     print "[+] Setup hex view"
     hex_view = get_child_control(parent, 'hex_view')
+    hex_view.ascii_view = get_child_control(parent, 'ascii_view')
     dispatcher.add_sender(hex_view)
 
     imp = hex_view_imp_t()
