@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from hachoir_core.tools import alignValue
-from math import floor
 from hachoir_core.error import warning
 
 def byte_addr(bit):
@@ -62,7 +61,7 @@ def calc_char_range(start, end, width=None):
     aligned_start, aligned_end = calc_byte_range(start, end)
 
     char_start = calc_char_pos(aligned_start)
-    char_end = calc_char_pos(aligned_end)
+    char_end = calc_char_pos(aligned_end)-1
 
     return char_start, char_end
 
@@ -85,7 +84,7 @@ def safe_seek(file, where):
     return True
 
 def get_page_num(offset, page_width):
-    return int(floor(offset / float(page_width)))
+    return offset // page_width
 
 def get_page_offset(offset, page_width):
     return get_page_num(offset, page_width) * page_width
