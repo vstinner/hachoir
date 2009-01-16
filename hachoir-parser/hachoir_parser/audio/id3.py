@@ -209,7 +209,7 @@ class ID3v1(FieldSet):
 
     def createDescription(self):
         version = self.getVersion()
-        return "ID 3%s: author=%s, song=%s" % (
+        return "ID3 %s: author=%s, song=%s" % (
             version, self["author"].value, self["song"].value)
 
 def getCharset(field):
