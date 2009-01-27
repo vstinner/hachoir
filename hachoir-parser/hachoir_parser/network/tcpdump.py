@@ -103,7 +103,7 @@ class TCP_Option(FieldSet):
     def createDescription(self):
         return "TCP option: %s" % self["code"].display
 
-class TCP(FieldSet):
+class TCP(Layer):
     port_name = {
         13: "daytime",
         20: "ftp data",
@@ -120,7 +120,6 @@ class TCP(FieldSet):
         1863: "MSNMS",
         6667: "IRC"
     }
-    endian = NETWORK_ENDIAN
 
     def createFields(self):
         yield Enum(UInt16(self, "src"), self.port_name)
@@ -186,7 +185,7 @@ class TCP(FieldSet):
             desc += " [%s]" % (",".join(flags))
         return desc
 
-class UDP(FieldSet):
+class UDP(Layer):
     port_name = {
         12: "daytime",
         22: "ssh",
@@ -198,7 +197,6 @@ class UDP(FieldSet):
         137: "netbios name service",
         138: "netbios datagram service"
     }
-    endian = NETWORK_ENDIAN
 
     def createFields(self):
         yield Enum(UInt16(self, "src"), UDP.port_name)
@@ -206,13 +204,10 @@ class UDP(FieldSet):
         yield UInt16(self, "length")
         yield textHandler(UInt16(self, "checksum"), hexadecimal)
 
-    def parseNext(self, parent):
-        return None
-
     def createDescription(self):
         return "UDP (%s->%s)" % (self["src"].display, self["dst"].display)
 
-class ICMP(FieldSet):
+class ICMP(Layer):
     REJECT = 3
     PONG = 0
     PING = 8
@@ -239,7 +234,6 @@ class ICMP(FieldSet):
         14: "Host precedence violation",
         15: "Precedence cutoff in effect"
     }
-    endian = NETWORK_ENDIAN
 
     def createFields(self):
         # Type
@@ -276,7 +270,6 @@ class ICMP(FieldSet):
             return None
 
 class IPv4(Layer):
-    endian = NETWORK_ENDIAN
     PROTOCOL_INFO = {
         0x01: ("icmp", ICMP, "ICMP"),
         0x06: ("tcp",  TCP, "TCP"),
