@@ -21,7 +21,7 @@ from hachoir_core.endian import NETWORK_ENDIAN, LITTLE_ENDIAN
 from hachoir_core.tools import humanDuration
 from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_core.tools import createDict
-from hachoir_parser.network.common import MAC48_Address, IPv4_Address
+from hachoir_parser.network.common import MAC48_Address, IPv4_Address, IPv6_Address
 
 def diff(field):
     return humanDuration(field.value*1000)
@@ -269,14 +269,47 @@ class ICMP(Layer):
         else:
             return None
 
-class IPv4(Layer):
+class ICMPv6(Layer):
+    ECHO_REQUEST = 128
+    ECHO_REPLY = 129
+    TYPE_DESC = {
+        128: "Echo request",
+        129: "Echo reply",
+    }
+
+    def createFields(self):
+        yield Enum(UInt8(self, "type"), self.TYPE_DESC)
+        yield UInt8(self, "code")
+        yield textHandler(UInt16(self, "checksum"), hexadecimal)
+
+        if self['type'].value in (self.ECHO_REQUEST, self.ECHO_REPLY):
+            yield UInt16(self, "id")
+            yield UInt16(self, "sequence")
+
+    def createDescription(self):
+        if self['type'].value in (self.ECHO_REQUEST, self.ECHO_REPLY):
+            return "%s (num=%s)" % (self["type"].display, self["sequence"].value)
+        else:
+            return "ICMPv6 (%s)" % self["type"].display
+
+class IP(Layer):
     PROTOCOL_INFO = {
         0x01: ("icmp", ICMP, "ICMP"),
         0x06: ("tcp",  TCP, "TCP"),
         0x11: ("udp",  UDP, "UDP"),
+        0x3a: ("icmpv6",  ICMPv6, "ICMPv6"),
     }
     PROTOCOL_NAME = createDict(PROTOCOL_INFO, 2)
 
+    def parseNext(self, parent):
+        proto = self["protocol"].value
+        if proto in self.PROTOCOL_INFO:
+            name, parser, desc = self.PROTOCOL_INFO[proto]
+            return parser(parent, name)
+        else:
+            return None
+
+class IPv4(IP):
     precedence_name = {
         7: "Network Control",
         6: "Internetwork Control",
@@ -321,21 +354,31 @@ class IPv4(Layer):
         if size:
             yield RawBytes(self, "options", size)
 
-    def parseNext(self, parent):
-        proto = self["protocol"].value
-        if proto in self.PROTOCOL_INFO:
-            name, parser, desc = self.PROTOCOL_INFO[proto]
-            return parser(parent, name)
-        else:
-            return None
-
     def createDescription(self):
         return "IPv4 (%s>%s)" % (self["src"].display, self["dst"].display)
+
+class IPv6(IP):
+    static_size = 40 * 8
+    endian = NETWORK_ENDIAN
+
+    def createFields(self):
+        yield Bits(self, "version", 4, "Version (6)")
+        yield Bits(self, "traffic", 8, "Traffic class")
+        yield Bits(self, "flow", 20, "Flow label")
+        yield Bits(self, "length", 16, "Payload length")
+        yield Enum(Bits(self, "protocol", 8, "Next header"), self.PROTOCOL_NAME)
+        yield Bits(self, "hop_limit", 8, "Hop limit")
+        yield IPv6_Address(self, "src")
+        yield IPv6_Address(self, "dst")
+
+    def createDescription(self):
+        return "IPv6 (%s>%s)" % (self["src"].display, self["dst"].display)
 
 class Layer2(Layer):
     PROTO_INFO = {
         0x0800: ("ipv4", IPv4, "IPv4"),
         0x0806: ("arp",  ARP,  "ARP"),
+        0x86dd: ("ipv6", IPv6, "IPv6"),
     }
     PROTO_DESC = createDict(PROTO_INFO, 2)
 
