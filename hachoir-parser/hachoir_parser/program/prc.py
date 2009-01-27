@@ -56,7 +56,7 @@ class PRCFile(Parser):
     endian = BIG_ENDIAN
 
     def validate(self):
-        return True
+        return False
 
     def createFields(self):
         # Parse header and program headers
