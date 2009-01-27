@@ -294,20 +294,22 @@ class ICMPv6(Layer):
 
 class IP(Layer):
     PROTOCOL_INFO = {
-        0x01: ("icmp", ICMP, "ICMP"),
-        0x06: ("tcp",  TCP, "TCP"),
-        0x11: ("udp",  UDP, "UDP"),
-        0x3a: ("icmpv6",  ICMPv6, "ICMPv6"),
+         1: ("icmp", ICMP, "ICMP"),
+        6: ("tcp",  TCP, "TCP"),
+        17: ("udp",  UDP, "UDP"),
+        58: ("icmpv6",  ICMPv6, "ICMPv6"),
+        60: ("ipv6_opts", None, "IPv6 destination option"),
     }
     PROTOCOL_NAME = createDict(PROTOCOL_INFO, 2)
 
     def parseNext(self, parent):
         proto = self["protocol"].value
-        if proto in self.PROTOCOL_INFO:
-            name, parser, desc = self.PROTOCOL_INFO[proto]
-            return parser(parent, name)
-        else:
+        if proto not in self.PROTOCOL_INFO:
             return None
+        name, parser, desc = self.PROTOCOL_INFO[proto]
+        if not parser:
+            return None
+        return parser(parent, name)
 
 class IPv4(IP):
     precedence_name = {
