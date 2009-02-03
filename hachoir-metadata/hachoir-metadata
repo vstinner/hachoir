@@ -3,13 +3,13 @@
 import sys
 try:
     from hachoir_core.error import error, HachoirError
-    from hachoir_core.cmd_line import (getHachoirOptions,
-        configureHachoir, unicodeFilename)
+    from hachoir_core.cmd_line import unicodeFilename
     from hachoir_core.i18n import getTerminalCharset, _
     from hachoir_core.benchmark import Benchmark
     from hachoir_core.stream import InputStreamError
     from hachoir_core.tools import makePrintable
     from hachoir_parser import createParser, ParserList
+    import hachoir_core.config as hachoir_config
     from hachoir_metadata import config
 except ImportError, err:
     raise
@@ -62,10 +62,11 @@ def parseOptions():
         action="store", type="float", default="0.5")
     common.add_option("--maxlen", help=_("Maximum string length in characters, 0 means unlimited (default: %s)" % config.MAX_STR_LENGTH),
         type="int", default=config.MAX_STR_LENGTH)
+    common.add_option("--verbose", help=_("Verbose mode"),
+        default=False, action="store_true")
+    common.add_option("--debug", help=_("Debug mode"),
+        default=False, action="store_true")
     parser.add_option_group(common)
-
-    hachoir = getHachoirOptions(parser)
-    parser.add_option_group(hachoir)
 
     values, filename = parser.parse_args()
     if len(filename) == 0:
@@ -151,7 +152,14 @@ def main():
     try:
         # Parser options and initialize Hachoir
         values, filenames = parseOptions()
-        configureHachoir(values)
+
+        if values.debug:
+            hachoir_config.debug = True
+        elif values.verbose:
+            hachoir_config.verbose = True
+        else:
+            hachoir_config.quiet = True
+
         if values.profiler:
             ok = profile(values, filenames)
         elif values.bench:
