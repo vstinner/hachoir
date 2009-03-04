@@ -109,7 +109,7 @@ def guessParser(stream):
     return QueryParser(stream.tags).parse(stream)
 
 
-def createParser(filename, real_filename=None):
+def createParser(filename, real_filename=None, tags=None):
     """
     Create a parser from a file or returns None on error.
 
@@ -117,4 +117,7 @@ def createParser(filename, real_filename=None):
     - filename (unicode): Input file name ;
     - real_filename (str|unicode): Real file name.
     """
-    return guessParser(FileInputStream(filename, real_filename))
+    if not tags:
+        tags = []
+    stream = FileInputStream(filename, real_filename, tags=tags)
+    return guessParser(stream)
