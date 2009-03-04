@@ -4,6 +4,8 @@ What's new in hachoir-parser 1.2.2?
  * HachoirParserList() is no more a singleton:
    use HachoirParserList.getInstance() to get a singleton
  * createParser() has an option tags argument: can be used to force a parser
+ * Fix ParserList.print_(): first argument is now the title and not 'out'.
+   If out is not specified, use sys.stdout.
 
 What's new in hachoir-parser 1.2.1?
 ===================================
