@@ -50,6 +50,8 @@ def parseOptions():
         action="store_true", default=False)
     parser.add_option("--bench", help=_("Run benchmark"),
         action="store_true", default=False)
+    parser.add_option("--force-parser",help=_("List all parsers then exit"),
+        type="str")
     parser.add_option("--parser-list",help=_("List all parsers then exit"),
         action="callback", callback=displayParserList)
     parser.add_option("--profiler", help=_("Run profiler"),
@@ -84,7 +86,11 @@ display_filename=False, priority=None, human=True, display=True):
 
     # Create parser
     try:
-        parser = createParser(filename, real_filename=real_filename)
+        if values.force_parser:
+            tags = [ ("id", values.force_parser), None ]
+        else:
+            tags = None
+        parser = createParser(filename, real_filename=real_filename, tags=tags)
     except InputStreamError, err:
         error(unicode(err))
         return False
