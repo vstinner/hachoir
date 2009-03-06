@@ -108,5 +108,5 @@ def registerAllItems(meta):
     meta.register(Data("comment", 902, _("Comment"), type=unicode))
     meta.register(Data("format_version", 950, _("Format version"), type=unicode))
     meta.register(Data("mime_type", 951, _("MIME type"), type=unicode))
-    meta.register(Data("endian", 952, _("Endian"), type=unicode))
+    meta.register(Data("endian", 952, _("Endianness"), type=unicode))
 
