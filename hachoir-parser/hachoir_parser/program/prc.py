@@ -56,6 +56,7 @@ class PRCFile(Parser):
     endian = BIG_ENDIAN
 
     def validate(self):
+        # FIXME: Implement the validation function!
         return False
 
     def createFields(self):
