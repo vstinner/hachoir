@@ -24,6 +24,14 @@ from hachoir_core.stream import FileInputStream, StringInputStream
 from hachoir_core.stream.input import FileFromInputStream, InputSubStream
 from hachoir_parser.guess import guessParser
 
+# from http://code.activestate.com/recipes/273844/
+try: # Windows needs stdio set for binary mode.
+    import msvcrt
+    msvcrt.setmode (0, os.O_BINARY) # stdin  = 0
+    msvcrt.setmode (1, os.O_BINARY) # stdout = 1
+except ImportError:
+    pass
+
 # settings
 tmp_dir = 'files/'
 prune_age = 3600 # seconds
@@ -284,6 +292,8 @@ def handle_form():
             sessid = hashlib.md5(rand).hexdigest()
         # write uploaded file
         f = open(tmp_dir+sessid+'.file','wb')
+        if form['file'].done==-1:
+            raise ValueError("File upload canceled?")
         while f.tell()<2**22: # 4MB limit
             chunk = form['file'].file.read(32768) # 32KB chunks
             if not chunk:
