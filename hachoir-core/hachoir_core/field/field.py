@@ -114,7 +114,7 @@ class Field(Logger):
             value = None
         self._getValue = lambda: value
         return value
-    value = property(lambda self: self._getValue(), "Value of field")
+    value = property(lambda self: self._getValue(), doc="Value of field")
 
     def _getParent(self):
         return self._parent
