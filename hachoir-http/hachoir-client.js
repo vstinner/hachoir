@@ -7,33 +7,33 @@ Creation date: June 28 2007
 // ajax from http://en.wikipedia.org/wiki/XMLHttpRequest
 function ajax($url, $vars, $object){
 
-        if (XMLHttpRequest){
-                var $class = new XMLHttpRequest();
-        }else{
-                var $class = new ActiveXObject("MSXML2.XMLHTTP.3.0");
+    if (XMLHttpRequest){
+        var $class = new XMLHttpRequest();
+    } else {
+        var $class = new ActiveXObject("MSXML2.XMLHTTP.3.0");
+    }
+
+    $class.open("POST", $url, true);
+    $class.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    $class.onreadystatechange = function(){
+        // purposefully ignore readyState -- partial updates are welcome,
+        // as a lot of data may be transferred, so a partial update provides
+        // indication of progress.
+        if ($class.responseText){
+            $obj = $class.responseText;
+            $object($obj,$class);
         }
-
-        $class.open("POST", $url, true);
-        $class.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-
-        $class.onreadystatechange = function(){
-
-                if ($class.readyState == 4 && $class.status == 200) {
-
-                        if ($class.responseText){
-
-                                $obj = $class.responseText;
-                                $object($obj);
-                        }
-                }
-        }
-        $class.send($vars);
+    }
+    $class.send($vars);
 }
 
-function updateHTML(dat){
+function updateHTML(dat,$class) {
     document.getElementById("maincontent").innerHTML=dat;
-    status(0);
-    initOpts(); // in case things have changed...
+    if ($class.readyState == 4 && $class.status == 200) {
+        status(0);
+        initOpts(); // in case things have changed...
+    }
 }
 
 var opts;
