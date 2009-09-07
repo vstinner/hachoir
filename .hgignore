@@ -1,0 +1,4 @@
+syntax: glob
+
+# Generate files: .py => .pyc
+*.pyc
