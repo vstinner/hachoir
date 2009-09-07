@@ -19,10 +19,10 @@ interesting features:
  * Editor: Using Hachoir representation of data, you can edit, insert, remove
    data and then save in a new file.
 
-Website: http://hachoir.org/wiki/hachoir-core
+Website: http://bitbucket.org/haypo/hachoir/wiki/hachoir-core
 
 Installation
 ============
 
-For the installation, use setup.py or see: http://hachoir.org/wiki/Install
+For the installation, use setup.py or see: http://bitbucket.org/haypo/hachoir/wiki/Install
 

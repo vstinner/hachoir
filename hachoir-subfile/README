@@ -1,6 +1,6 @@
 hachoir-subfile is a tool based on hachoir-parser to find subfiles in any binary stream.
 
-Website: http://hachoir.org/wiki/hachoir-subfile
+Website: http://bitbucket.org/haypo/hachoir/wiki/hachoir-subfile
 
 Changelog
 =========

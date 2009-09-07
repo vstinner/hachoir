@@ -13,5 +13,5 @@ know *each* bit meaning. Some good (but not perfect ;-)) parsers:
 GnomeKeyring parser requires Python Crypto module:
 http://www.amk.ca/python/code/crypto.html
 
-Website: http://hachoir.org/wiki/hachoir-parser
+Website: http://bitbucket.org/haypo/hachoir/wiki/hachoir-parser
 

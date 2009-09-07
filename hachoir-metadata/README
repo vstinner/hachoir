@@ -27,7 +27,8 @@ The command 'hachoir-metadata --mime' works like 'file --mime',
 and 'hachoir-metadata --type' like 'file'. But today file command supports
 more file formats then hachoir-metadata.
 
-Website: http://hachoir.org/wiki/hachoir-metadata
+Website: http://bitbucket.org/haypo/hachoir/wiki/hachoir-metadata
+
 
 Example
 =======
