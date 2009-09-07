@@ -2,3 +2,6 @@ syntax: glob
 
 # Generate files: .py => .pyc
 *.pyc
+
+# Temporary files (vim backups)
+*.swp
