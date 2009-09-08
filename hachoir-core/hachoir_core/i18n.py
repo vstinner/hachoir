@@ -81,11 +81,8 @@ class UnicodeStdout:
 
 def initLocale():
     # Only initialize locale once
-    try:
-        if initLocale.is_done:
-            return
-    except AttributeError:
-        pass
+    if initLocale.is_done:
+        return getTerminalCharset()
     initLocale.is_done = True
 
     # Setup locales
@@ -102,6 +99,7 @@ def initLocale():
         sys.stdout = UnicodeStdout(sys.stdout, charset)
         sys.stderr = UnicodeStdout(sys.stderr, charset)
     return charset
+initLocale.is_done = False
 
 def _dummy_gettext(text):
     return unicode(text)
