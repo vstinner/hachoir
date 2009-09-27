@@ -79,7 +79,7 @@
         </object>
       </object>
       <object class="wxListCtrl" name="field_view" subclass="hachoir_wx.field_view.field_view_t">
-        <style>wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_HRULES|wxLC_VRULES</style>
+        <style>wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_VIRTUAL|wxLC_HRULES|wxLC_VRULES</style>
         <font>
           <size>11</size>
           <family>modern</family>

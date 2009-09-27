@@ -19,6 +19,7 @@ class field_view_t(ListCtrl, ListCtrlAutoWidthMixin):
         columns = [_('address'), _('name'), _('type'), _('size'), _('data'), _('description')]
         for name in columns:
             self.append_column(name)
+        self.col_min_width = [len(s) for s in columns]
 
         self.Layout()
         self.Fit()
@@ -33,19 +34,24 @@ class field_view_t(ListCtrl, ListCtrlAutoWidthMixin):
         self.cols[name] = index
         self.InsertColumn(col = index, heading = name)
 
-    def append_row(self, col_map):
-        index = self.InsertStringItem(maxint, '')
-        for name, value in col_map.iteritems():
-            col_index = self.cols[name]
-            self.SetStringItem(index, col_index, value)
-            self.autosize_column(col_index, value)
-
     def get_selected(self, name):
         return self.GetItem(self.GetFocusedItem(), self.cols[_('name')]).GetText()
 
     def clear(self):
         self.DeleteAllItems()
 
-    def autosize_column(self, col_index, value):
-        item_width = self.GetCharWidth() * (len(value) + 1)
-        self.SetColumnWidth(col_index, max(item_width, self.GetColumnWidth(col_index)))
+    def register_callback(self, cbGetItemText):
+        self.OnGetItemText_imp = cbGetItemText
+
+    def OnGetItemText(self, item, col):
+        return self.OnGetItemText_imp(item, col)
+
+    def get_col_index(self, name):
+       return self.cols[name]
+
+    def get_col_count(self):
+       return len(self.cols)
+
+    def resize_column(self, col_index, width):
+        width = max(self.col_min_width[col_index], width) + 1
+        self.SetColumnWidth(col_index, self.GetCharWidth() * width)
