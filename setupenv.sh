@@ -8,7 +8,7 @@
 export PYTHONPATH=`cat << EOF | /usr/bin/env python -
 from os import environ, getcwd
 
-subprojects=[ 
+subprojects=[
 "hachoir-core",
 "hachoir-parser",
 "hachoir-editor",
@@ -18,12 +18,17 @@ subprojects=[
 ]
 
 cur_dir = getcwd()
-path_list = environ["PYTHONPATH"].split(':')
+
 try:
-  #occurs when the path is set but empty
-  path_list.remove('')
-except ValueError:
-  pass
+  path_list = environ["PYTHONPATH"].split(':')
+  try:
+    #occurs when the path is set but empty
+    path_list.remove('')
+  except ValueError:
+    pass
+except KeyError:
+  # occurs when PYTHONPATH is not set at all
+  path_list = []
 
 for project in subprojects:
   path_item = "%s/%s" % (cur_dir, project)
