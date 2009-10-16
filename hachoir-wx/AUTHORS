@@ -1,4 +1,14 @@
-Cyril Zorin <cyril DOT zorin AT gmail DOT com>
-Julien Muchembled <jm AT jm10 DOT no-ip DOT com>
-Victor Stinner aka haypo <victor DOT stinner AT haypocalc DOT com>
+Authors
+-------
+
+ * Cyril Zorin <cyril DOT zorin AT gmail DOT com>
+ * Robert Xiao aka nneonneo <nneonneo AT gmail.com>
+ * Julien Muchembled <jm AT jm10 DOT no-ip DOT com>
+
+Contributors
+------------
+
+ * Gentaro Muramatsu aka genta_hgr <genta.hgr AT gmail.com>: Virtual ListCtrl
+   for the field view
+ * Victor Stinner aka haypo <victor DOT stinner AT haypocalc DOT com>: bugfixes
 
