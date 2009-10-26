@@ -7,6 +7,8 @@ hachoir-core 1.2.2
  * Fix initLocale(): return charset even if config.unicode_stdout is False
  * HachoirError: replace "message" attribute by "text" to fix Python 2.6
    compatibility (message attribute is deprecated)
+ * StaticFieldSet: fix Python 2.6 warning, object.__new__() takes one only
+   argument (the class).
 
 hachoir-core 1.2.1 (2008-10)
 ============================
