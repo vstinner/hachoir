@@ -9,6 +9,12 @@ hachoir-core 1.2.2
    compatibility (message attribute is deprecated)
  * StaticFieldSet: fix Python 2.6 warning, object.__new__() takes one only
    argument (the class).
+ * Fix GenericFieldSet.readMoreFields() result: don't count the number of
+   added fields in a loop, use the number of fields before/after the operation
+   using len()
+ * GenericFieldSet.__iter__() supports iterable result for _fixFeedError() and
+   _stopFeeding()
+ * Rewrite RootSeekableFieldSet
 
 hachoir-core 1.2.1 (2008-10)
 ============================
