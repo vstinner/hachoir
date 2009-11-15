@@ -5,6 +5,7 @@
 #Why not erase PYTHONPATH ? Conservative option chosen.
 #PYTHONPATH=""
 
+echo "Set PYTHONPATH"
 export PYTHONPATH=`cat << EOF | /usr/bin/env python -
 from os import environ, getcwd
 
@@ -41,3 +42,5 @@ print ":".join(path_list)
 EOF
 `
 
+echo "Set PATH"
+export PATH=$PWD/hachoir-urwid:$PWD/hachoir-metadata:$PATH
