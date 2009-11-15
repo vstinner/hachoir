@@ -1,14 +1,36 @@
-What's new in hachoir-parser 1.2.2?
-===================================
+hachoir-parser 1.2.2
+====================
+
+ * New parsers:
+
+   - BLP: Blizzard Image
+   - PRC: Palm resource
 
  * HachoirParserList() is no more a singleton:
    use HachoirParserList.getInstance() to get a singleton
- * createParser() has an option tags argument: can be used to force a parser
+ * Add tags optional argument to createParser(), it can be used for example to
+   force a parser
  * Fix ParserList.print_(): first argument is now the title and not 'out'.
    If out is not specified, use sys.stdout.
+ * MP3: support encapsulated objects (GEOB in ID3)
+ * Create a dictionary: Windows codepage => charset name (CODEPAGE_CHARSET)
+ * ASN.1: support boolean and enum types; fix bit string parser
+ * MKV: use textHandler()
+ * AVI: create index parser, use file size header to detect padding at the end
+ * ISO9660: strip nul bytes in application name
+ * JPEG: add ICC profile chunk name
+ * PNG: fix transparency parser (tRNS)
+ * BPLIST: support empty value for markers 4, 5 and 6
+ * Microsoft Office summary: support more codepages (CP874, Windows 1250..1257)
+ * tcpdump: support ICMPv6 and IPv6
+ * Java: add bytecode parser, support JDK 1.6
+ * Python: parse lnotab content, fill a string table for the references
+ * MPEG Video: parse much more chunks
+ * MOV: Parse file type header, create the right MIME type
 
-What's new in hachoir-parser 1.2.1?
-===================================
+
+hachoir-parser 1.2.1
+====================
 
  * Improve OLE2 and MS Office parsers:
    - support small blocks
@@ -23,8 +45,8 @@ What's new in hachoir-parser 1.2.1?
  * Skip subfiles in JPEG files
  * Create Apple/NeXT Binary Property List (BPLIST) parser by Robert Xiao
 
-What's new in hachoir-parser 1.2?
-=================================
+hachoir-parser 1.2
+==================
 
  * Create FLAC parser, written by Esteban Loiseau
  * Create Action Script parser used in Flash parser,
@@ -39,8 +61,8 @@ What's new in hachoir-parser 1.2?
  * MS Office: guess the charset for summary strings since it could be
    ISO-8859-1 or UTF-8
 
-What's new in hachoir-parser 1.1?
-=================================
+hachoir-parser 1.1
+==================
 
 Main changes: add "EFI Platform Initialization Firmware
 Volume" (PIFV) and "Microsoft Windows Help" (HLP) parsers. Details:
@@ -74,8 +96,8 @@ Volume" (PIFV) and "Microsoft Windows Help" (HLP) parsers. Details:
    detection
  * AMF: stop mixed array parser on empty key
 
-What's new in hachoir-parser 1.0?
-=================================
+hachoir-parser 1.0
+==================
 
 Changes:
 
@@ -102,246 +124,4 @@ Minor changes:
  * RIFF: convert class constant names to upper case
  * Fix RIFF: don't replace self.info method
  * ISO9660: Write parser for terminator content
-
-What's new in hachoir-parser 0.10?
-==================================
-
-New parsers:
-
- * Microsoft Archive parser (.mar)
- * Microsoft Windows animated icon (.ani): based on RIFF file format
- * Microsoft's HTML Help (.chm)
- * Windows Shortcut (.lnk)
- * X11 Portable Compiled Font (pcf)
- * Adobe Portable Document Format (PDF)
-
-Major changes:
-
- * Convert many constants to Unicode
- * Set charset to ISO-8859-1 for many strings with no charset. Examples:
-   filename in gzip, strings in ID3v1
- * MIME type is now in Unicode
- * Timestamp are stored as datetime.datetime() object
- * Add MAC48_Address and NIC24 parser
- * Add IEEE 24-bit Organizationally unique identifiers list
-
-Changes:
-
- * Disable QueryParser fallback feature
- * QueryParser accepts "class" tag
- * Split Parser in HachoirParser and Parser classes
- * OLE2:
-   * Rewrite most of the code using SeekableFieldSet
-   * Support FAT block chain
-   * Able to parse fragmented streams
-   * Add parser for component object and document summary
- * MKV: add method to convert date value to datetime.datetime() object
- * OGG: validate() checks magic string
- * Write PascalStringWin32 class
- * Add Win32 LANGUAGE_ID dictionary
- * Rewrite GUID class using RFC 4122:
-
-   * Supports differents GUID format versions
-   * Able to read timestamp
-   * Able to read network address
-
- * iTunesDB: support sort index type and playlist
- * BMP: move code to parse image data in a separated function, so code can be
-   reused; fix magic regex (reserved may be not nul)
- * EXIF/TIFF: reject IFD entry with more than 300 values
- * MPEG audio:
-
-   * Frame.isValid() also checks sync field
-   * Add getNbChannel() method
-   * findSyncrhonizeBits() uses stronger validation to avoid false positive
-   * validate() checks first field name and not just if stream starts with
-     bytes "ID3"
-
- * RIFF: text: truncate to nul byte and use ISO-8859-1 charset
- * JPEG: reject invalid component id or quantization index (instead of using a
-   warning message)
- * JPEG: support all sort of start of scan (especially progressive jpeg)
- * JPEG: add magic string of JPEG starting with Adobe chunk
- * Photoshop metadata: add parser for version information
- * PNG: add method to get number of bits per pixel and use do not format
-   timestamp value
- * PNG: support transparency color
- * TTF: Reject chunk with more than 300 names
- * EXE: Reject PE program with more than 50 sections
- * EXE resource:
-   * PE_Resource now uses SeekableFieldSet
-   * Parse file flags
-   * Read file subtype (for driver or font)
-   * Reject header with more than 300 entries
-   * Stop parser at depth 5
-   * Write version information parser for NE program
-
-Minor changes:
-
- * GIF: replace image marker warning with a parser error
- * IPTC: use charset UTF-8 and not ISO-8859-15
- * CAB: validate() rejects file with more than 30 folders and fix
-   misuse of seekBit()
- * AU: fix end padding size
-
-What's new in hachoir-parser 0.9?
-=================================
-
-New parsers:
-
- * ACE, CAB, RAR, MOD, S3M, XM, PSD, Torrent, TTF, PDF, NE, MPEG TS
-
-Changes:
-
- * Add unique identifier and category to each parser
- * Use tags to choose the right parser
- * Create ParserList and QueryParser classes
- * Support magic string as regex ('magic_regex')
-
-Improved parsers:
-
- * 7-zip: parse a lot of headers, just not start and signature headers
- * ZIP: support file without file size, support 64-bit structures
- * Ogg: support "video" chunk and add function to get last page
-
-What's new in hachoir-parser 0.8.1?
-===================================
-
-New features:
- * Rewrite setup.py: uses distutils by default (instead of setuptools),
-   doesn't depend on hachoir-core
- * ICO parser: fixes to support cursors
- * Parser use new HACHOIR_ERRORS constant
-
-Bugfixes:
- * gzip: fix magic string
- * XCF: remove useless exceptions
- * RIFF: fix fourcc handler (when fourcc is a string and not Unicode)
- * FAT: catch ValueError when using string index() method
- * ASF: don't create empty fields and validate() checks header minimum size
- * EXE: validate() checks size_mod_512 in MSDOS header, add method to compute
-   content size of MSDOS executable (not PE)
-
-What's new in hachoir-parser 0.8?
-=================================
-
-New parsers:
- * 7-zip archive
- * Aldus Placeable Metafile (APM), variant of WMF
- * Audio Interchange File Format (AIFF)
- * Audio Interchange File Format Compressed (AIFC)
- * Linux swap file
- * LucasArts Font
- * New Technology File System (NTFS)
- * Microsoft Enhanced Metafile (EMF)
- * Microsoft Windows Metafile (WMF)
- * Musical Instrument Digital Interface (MIDI) audio file parser
- * Real Audio (.ra)
- * Real Media (.rm)
- * Truevision Targa Graphic (TGA) picture
-
-New features:
- * Add method to compute real content size
- * Add magic string to find file start
- * Add method to get file extension (file name suffix)
- * Add method to choose the best MIME type
- * Really better file validation, sometimes use arbitrary limits to detect
-   invalid file. Examples: 50 MB for maximum SWF file size, 6000 pixels for
-   maximum GIF picture width, etc.
-
-Changes:
- * Lazy decompression for bzip2 and gzip parsers
- * ZIP: add more MIME types and file extensions
- * EXE: better PE detection
- * Set constant name to upper case
- * Always use a tuple for common file extensions
- * Bitmap: add padding to pixels if needed, fix size of pixels field
- * Tcpdump: display ARP layer info (if any) and reject file if link
-   type is unknown
-
-What's new in hachoir-parser 0.7?
-=================================
-
-New parsers:
- * AMF metadata, used in Flash video
- * Flash animation (SWF)
- * Flash video (FLV)
- * Java class
- * Ogg/Vorbis (audio)
- * Ogg/Theora (video)
- * Reiser file system version 3
-
-Important parser improvments:
- * bzip2 and gzip parser are able to decompress file
- * JPEG picture:
-
-   * Parse quantization table and restart interval
-   * Write stronger validate method
-
- * GIF picture: support image comment, graphic control and
-   netscape 2.0 extension
- * ID3v1: support ID3 version 1.1 and 1.1b (track number and genre)
- * MPEG audio:
-
-   * Better file validation (less false positive), don't allow padding
-     between frames anymore
-   * Fix computation of frame size: now works with MPEG version 2 and 2.5
-
- * RIFF: parse AVI and ODML headers
- * Tcpdump: add parser for Unicast (layer 2)
-
-Other parser improvments:
- * Photoshop metadata: fix header, "reserved" is a string not four nul bytes
- * Bitmap: support version 4
- * PNG: add background color parser
- * Sun/NeXT audio: add more codec description
- * Matroska video container: add ISO 639-2 language names
- * EXT2 file system: use bits for file mode (instead of 16-bit integer)
-
-Developer changes:
- * Split run_testcase.py in three: download_testcase.py, run_testcase.py for
-   hachoir-parser and run_testcase.py for hachoir-metadata
- * Update for hachoir-core 0.7:
-
-   * Use NullBits/NullBytes for nul padding
-   * Rename _createDescription() to createDescription()
-   * Rename _createValue() to createValue()
-
- * Create function parseStream() to parse a stream
- * Palette is now PaletteRGB and is based on UserVector class
- * New Parser class based on the simple Parser class from hachoir-core
-
-What's new in hachoir-parser 0.6?
-=================================
-
-News of version 0.6.2:
-
- * Fix Microsoft Office parser: misuse of new array() function
- * Fix SECT.display attribute (convert integer to string)
-
-News of version 0.6.1:
-
- * Fix EXIF parser: SubFile import was missing
-
-News of version 0.6:
-
- * hachoir-parser is now a separated component so it's easier to release
-   new versions and write small bugfix
- * New parsers:
-   * 3DO model (by Cyril Zorin)
-   * Abstract Syntax Notation One (ASN.1)
-   * MPEG video
-   * Spider-Man video (by Mike Melanson)
-   * Tcpdump: Ethernet, IPv4, ARP, ICMP, TCP, UDP
-   * TIFF image
-   * ZSNES save (by Jason Gorski)
- * Better parsers:
-   * MPEG audio: support padding between frames, better file validation, and
-   guess if bit rate is constant (CBR) or variable (VBR)
-   * Python PYC: rewritten from scratch, now support python 1.5 to 2.5
-   * ID3v2: support picture in v2.3.0, safer charset code
- * Many small bugfixes in ID3, MPEG audio and other parsers
-
-Since hachoir core 0.6 is able to "autofix" more bugs, hachoir-parser 0.6 is
-even stronger.
 
