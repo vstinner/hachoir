@@ -1,6 +1,7 @@
-#Source this file to use hachoir unpacked right from svn.
+# Source this file to use hachoir unpacked right from svn.
+# Written by Feth Arezki and Olivier Serres
 
-#This is an sh script because only sh scripts can be sourced from sh.
+# This is an sh script because only sh scripts can be sourced from sh.
 
 #Why not erase PYTHONPATH ? Conservative option chosen.
 #PYTHONPATH=""
@@ -22,12 +23,12 @@ SETUPENV_DIR=` \
 
 	sed  \
 		-e "s,^\([^/].*\),${PWD}/${BASH_SOURCE},"  \
-		-e "s,${MY_NAME}$,,"` 
+		-e "s,${MY_NAME}$,,"`
 
-eval `cat << EOF | /usr/bin/env python - ${SETUPENV_DIR} 
+eval `cat << EOF | /usr/bin/env python - ${SETUPENV_DIR}
 """
 This script fetches PATH and PYTHONPATH. It issues some echo commands to
-tell what's happening, and if needed, extends PATH and PYTHONPATH (also with 
+tell what's happening, and if needed, extends PATH and PYTHONPATH (also with
 "export PATH=..." statements)
 """
 from os import environ
