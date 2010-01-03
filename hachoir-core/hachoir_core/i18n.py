@@ -94,7 +94,8 @@ def initLocale():
     # Get the terminal charset
     charset = getTerminalCharset()
 
-    if config.unicode_stdout:
+    # UnicodeStdout conflicts with the readline module
+    if config.unicode_stdout and ('readline' not in sys.modules):
         # Replace stdout and stderr by unicode objet supporting unicode string
         sys.stdout = UnicodeStdout(sys.stdout, charset)
         sys.stderr = UnicodeStdout(sys.stderr, charset)
