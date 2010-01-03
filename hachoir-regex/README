@@ -15,6 +15,7 @@ Changelog
 Version 1.0.4
 
  * Support \b (match a word)
+ * Fix parser: support backslash in a range, eg. parse(r"[a\]x]")
 
 Version 1.0.3 (2008-04-01)
 

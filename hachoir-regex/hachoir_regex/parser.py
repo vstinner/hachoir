@@ -24,6 +24,10 @@ def parseRange(text, start):
     (<RegexRange '[^a-z-]'>, 7)
     >>> parseRange('[^]-]b', 1)
     (<RegexRange '[^]-]'>, 5)
+    >>> parseRange(r'[\]abc]', 1)
+    (<RegexRange '[]a-c]'>, 7)
+    >>> parseRange(r'[a\-x]', 1)
+    (<RegexRange '[ax-]'>, 6)
     """
     index = start
     char_range = []
@@ -36,9 +40,13 @@ def parseRange(text, start):
         index += 1
     while index < len(text) and text[index] != ']':
         if index+1 < len(text) \
+        and text[index] == '\\':
+            char_range.append(RegexRangeCharacter(text[index+1]))
+            index += 2
+        elif index+1 < len(text) \
         and text[index] == '-' and text[index+1] == ']':
             break
-        if index+3 < len(text) \
+        elif index+3 < len(text) \
         and text[index+1] == '-' \
         and text[index+2] != ']':
             char_range.append(RegexRangeItem(ord(text[index]), ord(text[index+2])))
