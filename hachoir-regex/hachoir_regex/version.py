@@ -3,4 +3,3 @@ PACKAGE = "hachoir-regex"
 WEBSITE = "http://bitbucket.org/haypo/hachoir/wiki/hachoir-regex"
 LICENSE = 'GNU GPL v2'
 
-

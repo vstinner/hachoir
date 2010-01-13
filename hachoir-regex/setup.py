@@ -1,5 +1,20 @@
 #!/usr/bin/env python
 
+# Todo list to prepare a release:
+#  - set version in hachoir_regex/version.py
+#  - set release date in the README file
+#  - create a Mercurial tag
+#  - push the Mercurial
+#  - ./setup.py register sdist bdist_egg upload
+#  - update the website
+#    * http://bitbucket.org/haypo/hachoir/wiki/Install/source
+#    * http://bitbucket.org/haypo/hachoir/wiki/Home
+#
+# After the release:
+#  - set version to n+1
+#  - add a new empty section in the changelog for version n+1
+
+
 # Constants
 AUTHORS = 'Victor Stinner'
 DESCRIPTION = "Manipulation of regular expressions (regex)"
