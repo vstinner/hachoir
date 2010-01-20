@@ -61,8 +61,8 @@ hachoir-parser 1.2 (2008-09-03)
  * MS Office: guess the charset for summary strings since it could be
    ISO-8859-1 or UTF-8
 
-hachoir-parser 1.1  (2008-04-01)
-================================
+hachoir-parser 1.1 (2008-04-01)
+===============================
 
 Main changes: add "EFI Platform Initialization Firmware
 Volume" (PIFV) and "Microsoft Windows Help" (HLP) parsers. Details:
