@@ -8,9 +8,8 @@ from hachoir_parser.image.jpeg import (
 from hachoir_core.field import MissingField
 from hachoir_core.i18n import _
 from hachoir_core.tools import makeUnicode
-from hachoir_metadata.safe import fault_tolerant, getValue
+from hachoir_metadata.safe import fault_tolerant
 from datetime import datetime
-import operator
 
 def deg2float(degree, minute, second):
     return degree + (float(minute) + float(second) / 60.0) / 60.0
@@ -167,7 +166,6 @@ class JpegMetadata(RootMetadata):
             return
 
         # Read value
-        rational = False
         if "value" in entry:
             value = entry["value"].value
         else:

@@ -1,6 +1,6 @@
 from hachoir_core.i18n import _
 from hachoir_core.tools import (
-    humanDuration, makePrintable, humanBitRate,
+    humanDuration, humanBitRate,
     humanFrequency, humanBitSize, humanFilesize,
     humanDatetime)
 from hachoir_core.language import Language

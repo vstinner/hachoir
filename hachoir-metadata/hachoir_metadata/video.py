@@ -1,5 +1,4 @@
 from hachoir_core.field import MissingField
-from hachoir_core.error import HachoirError
 from hachoir_metadata.metadata import (registerExtractor,
     Metadata, RootMetadata, MultipleMetadata)
 from hachoir_metadata.metadata_item import QUALITY_GOOD
@@ -10,7 +9,6 @@ from hachoir_parser.container import MkvFile
 from hachoir_parser.container.mkv import dateToDatetime
 from hachoir_core.i18n import _
 from hachoir_core.tools import makeUnicode, makePrintable, timedelta2seconds
-from hachoir_core.error import warning
 from datetime import timedelta
 
 class MkvMetadata(MultipleMetadata):
@@ -258,7 +256,6 @@ class AsfMetadata(MultipleMetadata):
 
     def processHeader(self, header):
         compression = []
-        bit_rates = []
         is_vbr = None
 
         if "ext_desc/content" in header:
