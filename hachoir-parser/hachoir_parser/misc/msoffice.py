@@ -59,7 +59,6 @@ class OfficeRootEntry(HachoirParser, RootSeekableFieldSet):
         chain = ole2.getChain(start, True)
         blocksize = ole2.ss_size
         desc_format = "Small blocks %s..%s (%s)"
-        fragment_group = None
         while True:
             try:
                 block = chain.next()
