@@ -1,5 +1,16 @@
 #!/usr/bin/env python
 
+# Procedure to release a new version:
+#  - edit hachoir_core/version.py: VERSION = "xxx"
+#  - edit ChangeLog (set release date)
+#  - run test_doc.py
+#  - create a mercurial tag
+#  - hg commit
+#  - hg push
+#  - run this script
+#  - upload the archive
+#  - update the website
+
 # Constants
 AUTHORS = 'Julien Muchembled, Victor Stinner'
 DESCRIPTION = "Core of Hachoir framework: parse and edit binary files"
