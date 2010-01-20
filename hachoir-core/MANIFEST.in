@@ -1,0 +1,5 @@
+include AUTHORS
+include ChangeLog
+include COPYING
+include MANIFEST.in
+include test_doc.py
