@@ -110,9 +110,6 @@
       <object class="wxMenu" name="field_menu_convert_to_core_type">
         <label>Convert to Core Type</label>
       </object>
-      <object class="wxMenuItem" name="field_menu_merge_down">
-        <label>Merge Down</label>
-      </object>
       <object class="wxMenuItem" name="field_menu_dump_to_disk">
         <label>Dump To Disk...</label>
       </object>
