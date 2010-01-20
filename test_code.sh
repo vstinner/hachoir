@@ -7,6 +7,8 @@ set -e
 
 ROOT=$(cd $(dirname $0); pwd)
 
+source $ROOT/setupenv.sh
+
 echo "=== hachoir-core: test doc ==="
 cd $ROOT/hachoir-core
 $PYTHON test_doc.py
