@@ -6,11 +6,10 @@ Creation date: 29 october 2008
 """
 
 from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet, ParserError,
+from hachoir_core.field import (FieldSet,
     UInt16, UInt32, TimestampMac32,
     String, RawBytes)
-from hachoir_core.text_handler import textHandler, hexadecimal
-from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
+from hachoir_core.endian import BIG_ENDIAN
 
 class PRCHeader(FieldSet):
     static_size = 78*8
@@ -64,6 +63,7 @@ class PRCFile(Parser):
         yield PRCHeader(self, "header", "Header")
         lens = []
         firstOne = True
+        poff = 0
         for index in xrange(self["header/num_records"].value):
             r = ResourceHeader(self, "res_header[]")
             if firstOne:

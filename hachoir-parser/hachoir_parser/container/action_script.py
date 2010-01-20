@@ -10,10 +10,10 @@ Author: Sebastien Ponce
 Creation date: 26 April 2008
 """
 
-from hachoir_parser import Parser
 from hachoir_core.field import (FieldSet, ParserError,
-    Bit, Bits, UInt8, UInt32, Int16, UInt16, Float32, CString, Enum,
-    Bytes, RawBytes, NullBits, String, SubFile, Field)
+    Bit, Bits, UInt8, UInt32, Int16, UInt16, Float32, CString,
+    RawBytes)
+#from hachoir_core.field import Field
 from hachoir_core.field.float import FloatExponent
 from struct import unpack
 

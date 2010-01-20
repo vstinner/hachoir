@@ -22,10 +22,10 @@ Creation: 2006-04-23
 from hachoir_parser import HachoirParser
 from hachoir_core.field import (
     FieldSet, ParserError, SeekableFieldSet, RootSeekableFieldSet,
-    UInt8, UInt16, Int32, UInt32, UInt64, TimestampWin64, Enum,
+    UInt8, UInt16, UInt32, UInt64, TimestampWin64, Enum,
     Bytes, RawBytes, NullBytes, String)
-from hachoir_core.text_handler import textHandler, hexadecimal, filesizeHandler
-from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
+from hachoir_core.text_handler import filesizeHandler
+from hachoir_core.endian import LITTLE_ENDIAN
 from hachoir_parser.common.win32 import GUID
 from hachoir_parser.misc.msoffice import CustomFragment, OfficeRootEntry, PROPERTY_NAME
 from hachoir_parser.misc.word_doc import WordDocumentParser
@@ -313,7 +313,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
             index = block // items_per_fat
             try:
                 block = fat[index]["index[%u]" % block].value
-            except LookupError, err:
+            except LookupError:
                 break
 
     def readBFAT(self):

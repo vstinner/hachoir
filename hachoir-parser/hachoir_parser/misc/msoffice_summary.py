@@ -13,7 +13,7 @@ from hachoir_core.field import (FieldSet, ParserError,
     Bit, Bits, NullBits,
     UInt8, UInt16, UInt32, TimestampWin64, TimedeltaWin64, Enum,
     Bytes, RawBytes, NullBytes, String,
-    Int8, Int16, Int32, Float32, Float64, PascalString32)
+    Int8, Int32, Float32, Float64, PascalString32)
 from hachoir_core.text_handler import textHandler, hexadecimal, filesizeHandler
 from hachoir_core.tools import createDict
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN

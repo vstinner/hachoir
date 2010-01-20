@@ -187,7 +187,7 @@ def testFiles(directory, url_prefix):
                 return False
             if not checkFileMD5(fullname, md5sum):
                 return False
-        except OSError, err:
+        except OSError:
             # Error: file doesn't exist
             if not download(url_prefix+filename, filesize, md5sum, fullname):
                 return False
