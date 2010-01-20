@@ -1,4 +1,20 @@
 #!/usr/bin/python
+
+# Procedure to release a new version:
+#  - edit hachoir_metadata/version.py: VERSION = "XXX"
+#  - edit setup.py: install_options["install_requires"] = ["hachoir-core>=1.3", "hachoir-parser>=1.3"]
+#  - edit ChangeLog (set release date)
+#  - run: ./run_testcase.py ~/testcase
+#  - hg commit
+#  - hg tag hachoir-metadata-XXX
+#  - hg push
+#  - run: python2.5 ./setup.py --setuptools register sdist bdist_egg upload
+#  - run: python2.4 ./setup.py --setuptools bdist_egg upload
+#  - run: python2.6 ./setup.py --setuptools bdist_egg upload
+#  - check http://pypi.python.org/pypi/hachoir-metadata
+#  - update the web page:
+#    http://bitbucket.org/haypo/hachoir/wiki/Install/source
+
 from imp import load_source
 from os import path
 import sys
@@ -39,7 +55,7 @@ def main():
         "package_dir": {"hachoir_metadata": "hachoir_metadata"},
     }
     if use_setuptools:
-        install_options["install_requires"] = ["hachoir-core>=1.2.1", "hachoir-parser>=1.2.2"]
+        install_options["install_requires"] = ["hachoir-core>=1.3", "hachoir-parser>=1.3"]
         install_options["zip_safe"] = True
     setup(**install_options)
 
