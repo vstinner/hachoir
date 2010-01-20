@@ -6,7 +6,7 @@ class field_split_menu_fwd_t:
     def __init__(self, imp):
         self.imp = imp
 
-    def on_field_split_menu_ready(self, dispatcher, view):
+    def on_field_menu_ready(self, dispatcher, view):
         assert view is not None
 
         view.Bind(wx.EVT_MENU, self.on_split_bytes,
