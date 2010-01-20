@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 def writeReadme(out):
     from hachoir_parser.parser_list import HachoirParserList
 
@@ -24,7 +23,7 @@ def writeReadme(out):
         print >>out, "Parser list"
         print >>out, "==========="
         print >>out
-    HachoirParserList().print_(out, format=format)
+    HachoirParserList().print_(out=out, format=format)
 
 def main():
     readme = open('README', 'w')

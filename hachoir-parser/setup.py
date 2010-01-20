@@ -8,12 +8,12 @@ from sys import argv
 #  - edit ChangeLog (set release date)
 #  - run tests/run_testcase.py ~/testcase
 #  - hg commit
-#  - hg tag hachoir-core-XXX
+#  - hg tag hachoir-parser-XXX
 #  - hg push
-#  - run python2.5 ./setup.py --setuptools register sdist bdist_egg upload
-#  - run python2.4 ./setup.py --setuptools bdist_egg upload
-#  - run python2.6 ./setup.py --setuptools bdist_egg upload
-#  - check http://pypi.python.org/pypi/hachoir-core
+#  - run: python2.5 ./setup.py --setuptools register sdist bdist_egg upload
+#  - run: python2.4 ./setup.py --setuptools bdist_egg upload
+#  - run: python2.6 ./setup.py --setuptools bdist_egg upload
+#  - check http://pypi.python.org/pypi/hachoir-parser
 #  - update the web page:
 #    http://bitbucket.org/haypo/hachoir/wiki/Install/source
 
@@ -30,10 +30,6 @@ MODULES = (
     "image", "misc", "network", "program", "video")
 
 def getLongDescription():
-    try:
-        return open('README').read()
-    except IOError:
-        pass
     from README import writeReadme
     from StringIO import StringIO
     out = StringIO()
