@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 
 # Procedure to release a new version:
-#  - edit hachoir_core/version.py: VERSION = "xxx"
+#  - edit hachoir_core/version.py: VERSION = "XXX"
 #  - edit ChangeLog (set release date)
 #  - run test_doc.py
-#  - create a mercurial tag
 #  - hg commit
+#  - hg tag hachoir-core-XXX
 #  - hg push
-#  - run ./setup.py --setuptools register sdist bdist_egg upload
+#  - run python2.5 ./setup.py --setuptools register sdist bdist_egg upload
+#  - run python2.4 ./setup.py --setuptools bdist_egg upload
+#  - run python2.6 ./setup.py --setuptools bdist_egg upload
+#  - check http://pypi.python.org/pypi/hachoir-core
 #  - update the web page:
 #    http://bitbucket.org/haypo/hachoir/wiki/Install/source
 
