@@ -7,9 +7,9 @@
 #  - create a mercurial tag
 #  - hg commit
 #  - hg push
-#  - run this script
-#  - upload the archive
-#  - update the website
+#  - run ./setup.py --setuptools register sdist bdist_egg upload
+#  - update the web page:
+#    http://bitbucket.org/haypo/hachoir/wiki/Install/source
 
 # Constants
 AUTHORS = 'Julien Muchembled, Victor Stinner'
