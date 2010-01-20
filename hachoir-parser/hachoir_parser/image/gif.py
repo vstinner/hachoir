@@ -99,10 +99,10 @@ def parseComments(parent):
 
 def parseTextExtension(parent):
     yield UInt8(parent, "block_size", "Block Size")
-    yield UInt16(self, "left", "Text Grid Left")
-    yield UInt16(self, "top", "Text Grid Top")
-    yield UInt16(self, "width", "Text Grid Width")
-    yield UInt16(self, "height", "Text Grid Height")
+    yield UInt16(parent, "left", "Text Grid Left")
+    yield UInt16(parent, "top", "Text Grid Top")
+    yield UInt16(parent, "width", "Text Grid Width")
+    yield UInt16(parent, "height", "Text Grid Height")
     yield UInt8(parent, "cell_width", "Character Cell Width")
     yield UInt8(parent, "cell_height", "Character Cell Height")
     yield UInt8(parent, "fg_color", "Foreground Color Index")
@@ -112,7 +112,7 @@ def parseTextExtension(parent):
         yield field
         if field.length == 0:
             break
-         
+
 def defaultExtensionParser(parent):
     while True:
         size = UInt8(parent, "size[]", "Size (in bytes)")
