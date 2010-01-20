@@ -5,6 +5,7 @@ from sys import argv
 
 # Procedure to release a new version:
 #  - edit hachoir_parser/version.py: __version__ = "XXX"
+#  - edit setup.py: install_options["install_requires"] = "hachoir-core>=XXX"
 #  - edit ChangeLog (set release date)
 #  - run tests/run_testcase.py ~/testcase
 #  - hg commit
@@ -66,7 +67,7 @@ def main():
         "package_dir": PACKAGES,
     }
     if use_setuptools:
-        install_options["install_requires"] = "hachoir-core>=1.2.1"
+        install_options["install_requires"] = "hachoir-core>=1.3"
         install_options["zip_safe"] = True
     setup(**install_options)
 
