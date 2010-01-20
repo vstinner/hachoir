@@ -7,10 +7,10 @@
 #  - hg commit
 #  - hg tag hachoir-core-XXX
 #  - hg push
-#  - run python2.5 ./setup.py --setuptools register sdist bdist_egg upload
-#  - run python2.4 ./setup.py --setuptools bdist_egg upload
-#  - run python2.6 ./setup.py --setuptools bdist_egg upload
-#  - check http://pypi.python.org/pypi/hachoir-core
+#  - run: python2.5 ./setup.py --setuptools register sdist bdist_egg upload
+#  - run: python2.4 ./setup.py --setuptools bdist_egg upload
+#  - run: python2.6 ./setup.py --setuptools bdist_egg upload
+#  - check: http://pypi.python.org/pypi/hachoir-core
 #  - update the web page:
 #    http://bitbucket.org/haypo/hachoir/wiki/Install/source
 
@@ -28,7 +28,6 @@ CLASSIFIERS = [
     'Natural Language :: English',
     'Programming Language :: Python']
 
-import os
 import sys
 from os.path import join as path_join
 from imp import load_source

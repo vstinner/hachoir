@@ -1,5 +1,5 @@
 from hachoir_core.field import Field, BasicFieldSet, FakeArray, MissingField, ParserError
-from hachoir_core.tools import lowerBound, makeUnicode
+from hachoir_core.tools import makeUnicode
 from hachoir_core.error import HACHOIR_ERRORS
 from itertools import repeat
 import hachoir_core.config as config
