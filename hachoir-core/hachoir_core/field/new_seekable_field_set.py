@@ -21,7 +21,7 @@ def getgaps(start, length, blocks):
     if start < end:
         yield (start, end-start)
 
-class RootSeekableFieldSet(GenericFieldSet):
+class NewRootSeekableFieldSet(GenericFieldSet):
     def seekBit(self, address, relative=True):
         if not relative:
             address -= self.absolute_address
@@ -59,7 +59,7 @@ class RootSeekableFieldSet(GenericFieldSet):
             self._fields.append(field.name, field)
             fields.append(field)
             message.append("found unparsed segment: start %s, length %s" % (start, length))
-        
+
         self.seekBit(self._size, relative=False)
         message = ", ".join(message)
         if fields:
@@ -76,7 +76,7 @@ class RootSeekableFieldSet(GenericFieldSet):
         self._field_generator = None
         return new_field
 
-class SeekableFieldSet(RootSeekableFieldSet):
+class NewSeekableFieldSet(NewRootSeekableFieldSet):
     def __init__(self, parent, name, description=None, size=None):
         assert issubclass(parent.__class__, BasicFieldSet)
-        RootSeekableFieldSet.__init__(self, parent, name, parent.stream, description, size)
+        NewRootSeekableFieldSet.__init__(self, parent, name, parent.stream, description, size)
