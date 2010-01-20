@@ -3,6 +3,20 @@ from imp import load_source
 from os import path
 from sys import argv
 
+# Procedure to release a new version:
+#  - edit hachoir_parser/version.py: __version__ = "XXX"
+#  - edit ChangeLog (set release date)
+#  - run tests/run_testcase.py ~/testcase
+#  - hg commit
+#  - hg tag hachoir-core-XXX
+#  - hg push
+#  - run python2.5 ./setup.py --setuptools register sdist bdist_egg upload
+#  - run python2.4 ./setup.py --setuptools bdist_egg upload
+#  - run python2.6 ./setup.py --setuptools bdist_egg upload
+#  - check http://pypi.python.org/pypi/hachoir-core
+#  - update the web page:
+#    http://bitbucket.org/haypo/hachoir/wiki/Install/source
+
 CLASSIFIERS = [
     'Intended Audience :: Developers',
     'Development Status :: 5 - Production/Stable',

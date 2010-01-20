@@ -1,5 +1,5 @@
-hachoir-parser 1.3
-==================
+hachoir-parser 1.3 (2010-01-20)
+===============================
 
  * New parsers:
 
@@ -29,8 +29,8 @@ hachoir-parser 1.3
  * MOV: Parse file type header, create the right MIME type
 
 
-hachoir-parser 1.2.1
-====================
+hachoir-parser 1.2.1 (2008-10-16)
+=================================
 
  * Improve OLE2 and MS Office parsers:
    - support small blocks
@@ -45,8 +45,8 @@ hachoir-parser 1.2.1
  * Skip subfiles in JPEG files
  * Create Apple/NeXT Binary Property List (BPLIST) parser by Robert Xiao
 
-hachoir-parser 1.2
-==================
+hachoir-parser 1.2 (2008-09-03)
+===============================
 
  * Create FLAC parser, written by Esteban Loiseau
  * Create Action Script parser used in Flash parser,
@@ -61,8 +61,8 @@ hachoir-parser 1.2
  * MS Office: guess the charset for summary strings since it could be
    ISO-8859-1 or UTF-8
 
-hachoir-parser 1.1
-==================
+hachoir-parser 1.1  (2008-04-01)
+================================
 
 Main changes: add "EFI Platform Initialization Firmware
 Volume" (PIFV) and "Microsoft Windows Help" (HLP) parsers. Details:
@@ -96,8 +96,8 @@ Volume" (PIFV) and "Microsoft Windows Help" (HLP) parsers. Details:
    detection
  * AMF: stop mixed array parser on empty key
 
-hachoir-parser 1.0
-==================
+hachoir-parser 1.0 (2007-07-11)
+===============================
 
 Changes:
 
