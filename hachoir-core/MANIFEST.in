@@ -1,5 +1,10 @@
 include AUTHORS
 include ChangeLog
 include COPYING
+include doc/adding_fields.graphviz
+include doc/*.css
+include doc/*.dia
+include doc/*.rst
+include doc/*.xmi
 include MANIFEST.in
 include test_doc.py
