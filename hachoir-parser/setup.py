@@ -7,7 +7,7 @@ from sys import argv
 #  - edit hachoir_parser/version.py: __version__ = "XXX"
 #  - edit setup.py: install_options["install_requires"] = "hachoir-core>=XXX"
 #  - edit ChangeLog (set release date)
-#  - run tests/run_testcase.py ~/testcase
+#  - run: tests/run_testcase.py ~/testcase
 #  - hg commit
 #  - hg tag hachoir-parser-XXX
 #  - hg push
@@ -17,6 +17,7 @@ from sys import argv
 #  - check http://pypi.python.org/pypi/hachoir-parser
 #  - update the web page:
 #    http://bitbucket.org/haypo/hachoir/wiki/Install/source
+#  - set version to N+1 in hachoir_parser/version.py
 
 CLASSIFIERS = [
     'Intended Audience :: Developers',
