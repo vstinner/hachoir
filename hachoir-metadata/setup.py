@@ -1,9 +1,19 @@
 #!/usr/bin/python
 
+# Script to install hachoir-metadata module and programs
+#
+# Options:
+#   --setuptools: use setuptools instead of distutils
+#   --disable-qt: don't install hachoir-metadata-qt
+#
+#---------------
+#
 # Procedure to release a new version:
 #  - edit hachoir_metadata/version.py: VERSION = "XXX"
 #  - edit setup.py: install_options["install_requires"] = ["hachoir-core>=1.3", "hachoir-parser>=1.3"]
+#  - edit INSTALL: Dependencies section
 #  - edit ChangeLog (set release date)
+#  - run: ./test_doc.py
 #  - run: ./run_testcase.py ~/testcase
 #  - hg commit
 #  - hg tag hachoir-metadata-XXX
@@ -14,18 +24,11 @@
 #  - check http://pypi.python.org/pypi/hachoir-metadata
 #  - update the web page:
 #    http://bitbucket.org/haypo/hachoir/wiki/Install/source
+#  - set version to N+1 in hachoir_metadata/version.py
 
 from imp import load_source
 from os import path
 import sys
-
-if "--setuptools" in sys.argv:
-    sys.argv.remove("--setuptools")
-    from setuptools import setup
-    use_setuptools = True
-else:
-    from distutils.core import setup
-    use_setuptools = False
 
 CLASSIFIERS = [
     'Intended Audience :: Developers',
@@ -38,6 +41,29 @@ CLASSIFIERS = [
     'Programming Language :: Python']
 
 def main():
+    if "--setuptools" in sys.argv:
+        sys.argv.remove("--setuptools")
+        from setuptools import setup
+        use_setuptools = True
+    else:
+        from distutils.core import setup
+        use_setuptools = False
+
+    SCRIPTS = ["hachoir-metadata", "hachoir-metadata-gtk"]
+    if "--disable-qt" not in sys.argv:
+        from subprocess import call
+        SCRIPTS.append("hachoir-metadata-qt")
+        command = ["pyuic4", "-o", "hachoir_metadata/qt/dialog_ui.py", "hachoir_metadata/qt/dialog.ui"]
+        exitcode = call(command)
+        if exitcode:
+            print
+            print >>sys.stderr, "Unable to compile dialog.ui to dialog_ui.py using pyuic4"
+            print >>sys.stderr, 'Use command "%s --disable-qt" to skip hachoir-metadata-qt' % ' '.join(sys.argv)
+            print >>sys.stderr, 'pyuic4 is included in the PyQt4 development package'
+            sys.exit(1)
+    else:
+        sys.argv.remove("--disable-qt")
+
     hachoir_metadata = load_source("version", path.join("hachoir_metadata", "version.py"))
     long_description = open('README').read() + open('ChangeLog').read()
     install_options = {
@@ -50,7 +76,7 @@ def main():
         "long_description": long_description,
         "classifiers": CLASSIFIERS,
         "license": hachoir_metadata.LICENSE,
-        "scripts": ["hachoir-metadata", "hachoir-metadata-gtk"],
+        "scripts": SCRIPTS,
         "packages": ["hachoir_metadata"],
         "package_dir": {"hachoir_metadata": "hachoir_metadata"},
     }
