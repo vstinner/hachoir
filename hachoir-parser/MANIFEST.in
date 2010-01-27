@@ -1,0 +1,11 @@
+include AUTHORS
+include ChangeLog
+include COPYING
+include INSTALL
+include MANIFEST.in
+include metadata_csv.py
+include README
+include README.header
+include README.py
+include tests/download_testcase.py
+include tests/run_testcase.py

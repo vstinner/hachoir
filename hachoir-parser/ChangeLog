@@ -1,7 +1,8 @@
 hachoir-parser 1.3.1
 ====================
 
-XXX
+ * Create MANIFEST.in to include extra files: README.py, README.header,
+   tests/run_testcase.py, etc.
 
 hachoir-parser 1.3 (2010-01-20)
 ===============================
