@@ -3,7 +3,7 @@
 # Procedure to release a new version:
 #  - edit hachoir_core/version.py: VERSION = "XXX"
 #  - edit ChangeLog (set release date)
-#  - run test_doc.py
+#  - run: ./test_doc.py
 #  - hg commit
 #  - hg tag hachoir-core-XXX
 #  - hg push
