@@ -13,6 +13,7 @@
 #  - check: http://pypi.python.org/pypi/hachoir-core
 #  - update the web page:
 #    http://bitbucket.org/haypo/hachoir/wiki/Install/source
+#  - set version to N+1 in hachoir_core/version.py
 
 # Constants
 AUTHORS = 'Julien Muchembled, Victor Stinner'
