@@ -1,0 +1,14 @@
+include AUTHORS
+include ChangeLog
+include COPYING
+include gnome/hachoir
+include gnome/README
+include INSTALL
+include kde/hachoir.desktop
+include kde/hachoir-metadata-kde
+include kde/README
+include MANIFEST.in
+include metadata_csv.py
+include README
+include run_testcase.py
+include test_doc.py
