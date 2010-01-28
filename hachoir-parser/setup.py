@@ -7,8 +7,8 @@ from sys import argv
 #  - edit hachoir_parser/version.py: __version__ = "XXX"
 #  - edit setup.py: install_options["install_requires"] = "hachoir-core>=XXX"
 #  - edit INSTALL: update Dependencies
-#  - edit ChangeLog (set release date)
 #  - run: ./tests/run_testcase.py ~/testcase
+#  - edit ChangeLog (set release date)
 #  - run: hg commit
 #  - run: hg tag hachoir-parser-XXX
 #  - run: hg push
