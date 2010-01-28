@@ -1,19 +1,22 @@
 #!/usr/bin/env python
 
 # Todo list to prepare a release:
-#  - set version in hachoir_regex/version.py
-#  - set release date in the README file
-#  - create a Mercurial tag
-#  - push the Mercurial
-#  - ./setup.py register sdist bdist_egg upload
+#  - edit hachoir_regex/version.py: VERSION = "XXX"
+#  - edit README: set release date
+#  - run: ./test_doc.py
+#  - run: hg commit
+#  - run: hg tag hachoir-regex-XXX
+#  - run: hg push
+#  - run: python2.5 ./setup.py --setuptools register sdist bdist_egg upload
+#  - run: python2.4 ./setup.py --setuptools bdist_egg upload
+#  - run: python2.6 ./setup.py --setuptools bdist_egg upload
+#  - check http://pypi.python.org/pypi/hachoir-regex
 #  - update the website
 #    * http://bitbucket.org/haypo/hachoir/wiki/Install/source
 #    * http://bitbucket.org/haypo/hachoir/wiki/Home
-#
-# After the release:
-#  - set version to n+1
-#  - add a new empty section in the changelog for version n+1
-
+#  - set version to N+1 in hachoir_regex/version.py
+#  - edit README: add a new "hachoir-metadata N+1" subsection in the ChangeLog
+#    with the text "XXX"
 
 # Constants
 AUTHORS = 'Victor Stinner'
