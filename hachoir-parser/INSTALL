@@ -1,0 +1,15 @@
+Dependencies
+============
+
+hachoir-parser:
+ * hachoir-core 1.3
+
+
+Install
+=======
+
+Run the follow command as root: ::
+
+    ./setup.py install
+
+

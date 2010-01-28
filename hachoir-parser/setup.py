@@ -6,6 +6,7 @@ from sys import argv
 # Procedure to release a new version:
 #  - edit hachoir_parser/version.py: __version__ = "XXX"
 #  - edit setup.py: install_options["install_requires"] = "hachoir-core>=XXX"
+#  - edit Dependencies in INSTALL file
 #  - edit ChangeLog (set release date)
 #  - run: tests/run_testcase.py ~/testcase
 #  - hg commit
