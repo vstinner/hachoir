@@ -4,17 +4,18 @@
 #  - edit hachoir_core/version.py: VERSION = "XXX"
 #  - edit ChangeLog (set release date)
 #  - run: ./test_doc.py
-#  - hg commit
-#  - hg tag hachoir-core-XXX
-#  - hg push
+#  - run: hg commit
+#  - run: hg tag hachoir-core-XXX
+#  - run: hg push
 #  - run: python2.5 ./setup.py --setuptools register sdist bdist_egg upload
 #  - run: python2.4 ./setup.py --setuptools bdist_egg upload
 #  - run: python2.6 ./setup.py --setuptools bdist_egg upload
 #  - check: http://pypi.python.org/pypi/hachoir-core
-#  - update the web page:
-#    http://bitbucket.org/haypo/hachoir/wiki/Install/source
-#  - set version to N+1 in hachoir_core/version.py
-#  - add a new "hachoir-core N+1" section in ChangeLog with text XXX
+#  - update the website
+#    * http://bitbucket.org/haypo/hachoir/wiki/Install/source
+#    * http://bitbucket.org/haypo/hachoir/wiki/Home
+#  - edit hachoir_core/version.py: set version to N+1
+#  - edit ChangeLog: add a new "hachoir-core N+1" section with text XXX
 
 # Constants
 AUTHORS = 'Julien Muchembled, Victor Stinner'

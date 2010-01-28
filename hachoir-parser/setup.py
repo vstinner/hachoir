@@ -6,19 +6,21 @@ from sys import argv
 # Procedure to release a new version:
 #  - edit hachoir_parser/version.py: __version__ = "XXX"
 #  - edit setup.py: install_options["install_requires"] = "hachoir-core>=XXX"
-#  - edit Dependencies in INSTALL file
+#  - edit INSTALL: update Dependencies
 #  - edit ChangeLog (set release date)
-#  - run: tests/run_testcase.py ~/testcase
-#  - hg commit
-#  - hg tag hachoir-parser-XXX
-#  - hg push
+#  - run: ./tests/run_testcase.py ~/testcase
+#  - run: hg commit
+#  - run: hg tag hachoir-parser-XXX
+#  - run: hg push
 #  - run: python2.5 ./setup.py --setuptools register sdist bdist_egg upload
 #  - run: python2.4 ./setup.py --setuptools bdist_egg upload
 #  - run: python2.6 ./setup.py --setuptools bdist_egg upload
 #  - check http://pypi.python.org/pypi/hachoir-parser
-#  - update the web page:
-#    http://bitbucket.org/haypo/hachoir/wiki/Install/source
-#  - set version to N+1 in hachoir_parser/version.py
+#  - update the website
+#    * http://bitbucket.org/haypo/hachoir/wiki/Install/source
+#    * http://bitbucket.org/haypo/hachoir/wiki/Home
+#  - edit hachoir_parser/version.py: set version to N+1
+#  - edit ChangeLog: add a new "hachoir-parser N+1" section with text XXX
 
 CLASSIFIERS = [
     'Intended Audience :: Developers',
