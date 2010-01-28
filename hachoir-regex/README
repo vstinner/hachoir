@@ -12,9 +12,10 @@ Website: http://bitbucket.org/haypo/hachoir/wiki/hachoir-regex
 Changelog
 =========
 
-Version 1.0.5
+Version 1.0.5 (2010-01-28)
 
  * Create a MANIFEST.in to include extra files: regex.rst, test_doc.py, etc.
+ * Create an INSTALL file
 
 Version 1.0.4 (2010-01-13)
 

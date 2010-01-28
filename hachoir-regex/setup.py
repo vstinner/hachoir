@@ -2,8 +2,8 @@
 
 # Todo list to prepare a release:
 #  - edit hachoir_regex/version.py: VERSION = "XXX"
-#  - edit README: set release date
 #  - run: ./test_doc.py
+#  - edit README: set release date
 #  - run: hg commit
 #  - run: hg tag hachoir-regex-XXX
 #  - run: hg push
