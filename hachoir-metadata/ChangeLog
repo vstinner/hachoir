@@ -1,5 +1,5 @@
-hachoir-metadata 1.3.1
-======================
+hachoir-metadata 1.3.1 (2010-01-28)
+===================================
 
  * setup.py compiles dialog.ui to dialog_ui.py and install
    hachoir-metadata-qt. Create --disable-qt option to skip
