@@ -12,6 +12,10 @@ Website: http://bitbucket.org/haypo/hachoir/wiki/hachoir-regex
 Changelog
 =========
 
+Version 1.0.5
+
+ * Create a MANIFEST.in to include extra files: regex.rst, test_doc.py, etc.
+
 Version 1.0.4 (2010-01-13)
 
  * Support \b (match a word)

@@ -1,0 +1,7 @@
+include AUTHORS
+include COPYING
+include INSTALL
+include MANIFEST.in
+include README
+include *.rst
+include test_doc.py
