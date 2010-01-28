@@ -1,0 +1,7 @@
+Install
+=======
+
+Run the follow command as root: ::
+
+    ./setup.py install
+
