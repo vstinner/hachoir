@@ -14,6 +14,7 @@
 #  - update the web page:
 #    http://bitbucket.org/haypo/hachoir/wiki/Install/source
 #  - set version to N+1 in hachoir_core/version.py
+#  - add a new "hachoir-core N+1" section in ChangeLog with text XXX
 
 # Constants
 AUTHORS = 'Julien Muchembled, Victor Stinner'
