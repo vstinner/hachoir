@@ -1,7 +1,8 @@
 syntax: glob
 
-# Generate files: .py => .pyc
+# Generated files: .py => .pyc
 *.pyc
+hachoir-metadata/hachoir_metadata/qt/dialog_ui.py
 
 # Temporary files (vim backups)
 *.swp
