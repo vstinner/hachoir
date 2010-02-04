@@ -52,17 +52,29 @@ def main():
         use_setuptools = False
 
     SCRIPTS = ["hachoir-metadata", "hachoir-metadata-gtk"]
+    PACKAGES = ["hachoir_metadata"]
+
     if "--disable-qt" not in sys.argv:
         from subprocess import call
         SCRIPTS.append("hachoir-metadata-qt")
-        command = ["pyuic4", "-o", "hachoir_metadata/qt/dialog_ui.py", "hachoir_metadata/qt/dialog.ui"]
-        exitcode = call(command)
+        dialog = "hachoir_metadata/qt/dialog"
+        dialog_python = dialog + "_ui.py"
+        command = ["pyuic4", "-o", dialog_python, dialog + ".ui"]
+        try:
+            exitcode = call(command)
+        except OSError, err:
+            exitcode = 1
         if exitcode:
-            print
-            print >>sys.stderr, "Unable to compile dialog.ui to dialog_ui.py using pyuic4"
-            print >>sys.stderr, 'Use command "%s --disable-qt" to skip hachoir-metadata-qt' % ' '.join(sys.argv)
-            print >>sys.stderr, 'pyuic4 is included in the PyQt4 development package'
-            sys.exit(1)
+            if path.exists(dialog_python):
+                print >>sys.stderr, "Warning: unable to recompile dialog.ui to dialog_ui.py using pyuic4"
+                print >>sys.stderr, '(use command "%s --disable-qt" to disable this warning)' % ' '.join(sys.argv)
+                print >>sys.stderr
+            else:
+                print >>sys.stderr, "ERROR: Unable to compile dialog.ui to dialog_ui.py using pyuic4"
+                print >>sys.stderr, 'Use command "%s --disable-qt" to skip hachoir-metadata-qt' % ' '.join(sys.argv)
+                print >>sys.stderr, 'pyuic4 is included in the PyQt4 development package'
+                sys.exit(1)
+        PACKAGES.append("hachoir_metadata.qt")
     else:
         sys.argv.remove("--disable-qt")
 
@@ -79,8 +91,7 @@ def main():
         "classifiers": CLASSIFIERS,
         "license": hachoir_metadata.LICENSE,
         "scripts": SCRIPTS,
-        "packages": ["hachoir_metadata"],
-        "package_dir": {"hachoir_metadata": "hachoir_metadata"},
+        "packages": PACKAGES,
     }
     if use_setuptools:
         install_options["install_requires"] = ["hachoir-core>=1.3", "hachoir-parser>=1.3"]

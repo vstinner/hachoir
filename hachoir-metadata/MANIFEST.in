@@ -3,6 +3,7 @@ include ChangeLog
 include COPYING
 include gnome/hachoir
 include gnome/README
+include hachoir_metadata/qt/dialog.ui
 include INSTALL
 include kde/hachoir.desktop
 include kde/hachoir-metadata-kde
