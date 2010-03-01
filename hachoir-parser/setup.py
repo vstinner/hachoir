@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import with_statement
 from imp import load_source
 from os import path
 from sys import argv
@@ -12,9 +13,11 @@ from sys import argv
 #  - run: hg commit
 #  - run: hg tag hachoir-parser-XXX
 #  - run: hg push
+#  - run: ./README.py
 #  - run: python2.5 ./setup.py --setuptools register sdist bdist_egg upload
 #  - run: python2.4 ./setup.py --setuptools bdist_egg upload
 #  - run: python2.6 ./setup.py --setuptools bdist_egg upload
+#  - run: rm README
 #  - check http://pypi.python.org/pypi/hachoir-parser
 #  - update the website
 #    * http://bitbucket.org/haypo/hachoir/wiki/Install/source
@@ -34,14 +37,6 @@ MODULES = (
     "archive", "audio", "container", "common", "file_system", "game",
     "image", "misc", "network", "program", "video")
 
-def getLongDescription():
-    from README import writeReadme
-    from StringIO import StringIO
-    out = StringIO()
-    writeReadme(out)
-    out.seek(0)
-    return out.read()
-
 def main():
     if "--setuptools" in argv:
         argv.remove("--setuptools")
@@ -57,6 +52,9 @@ def main():
     for name in MODULES:
         PACKAGES["hachoir_parser." + name] = "hachoir_parser/" + name
 
+    with open('README') as readme:
+        long_description = readme.read()
+
     install_options = {
         "name": hachoir_parser.PACKAGE,
         "version": hachoir_parser.__version__,
@@ -64,7 +62,7 @@ def main():
         "download_url": hachoir_parser.WEBSITE,
         "author": "Hachoir team (see AUTHORS file)",
         "description": "Package of Hachoir parsers used to open binary files",
-        "long_description": getLongDescription(),
+        "long_description": long_description,
         "classifiers": CLASSIFIERS,
         "license": hachoir_parser.LICENSE,
         "packages": PACKAGES.keys(),

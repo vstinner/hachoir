@@ -1,7 +1,9 @@
 hachoir-parser 1.3.2
 ====================
 
-XXX
+ * Include the README file in the tarball
+ * setup.py reads the README file instead of using README.py to break the
+   build dependency on hachoir-core
 
 hachoir-parser 1.3.1 (2010-01-28)
 =================================

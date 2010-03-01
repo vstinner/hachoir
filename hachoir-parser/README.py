@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import with_statement
 
 def writeReadme(out):
     from hachoir_parser.parser_list import HachoirParserList
@@ -26,9 +27,8 @@ def writeReadme(out):
     HachoirParserList().print_(out=out, format=format)
 
 def main():
-    readme = open('README', 'w')
-    writeReadme(readme)
-    readme.close()
+    with open('README', 'w') as readme:
+        writeReadme(readme)
     print "README updated."
 
 if __name__ == "__main__":
