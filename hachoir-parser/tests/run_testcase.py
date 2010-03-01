@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.4
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 DOWNLOAD_SCRIPT = "download_testcase.py"
 """
