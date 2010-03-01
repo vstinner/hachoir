@@ -66,7 +66,7 @@ def getTerminalCharset():
         getTerminalCharset.value = _getTerminalCharset()
         return getTerminalCharset.value
 
-class UnicodeStdout:
+class UnicodeStdout(object):
     def __init__(self, old_device, charset):
         self.device = old_device
         self.charset = charset
@@ -78,6 +78,10 @@ class UnicodeStdout:
         if isinstance(text, unicode):
             text = text.encode(self.charset, 'replace')
         self.device.write(text)
+
+    def writelines(self, lines):
+        for text in lines:
+            self.write(text)
 
 def initLocale():
     # Only initialize locale once
