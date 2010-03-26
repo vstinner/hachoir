@@ -74,9 +74,9 @@ def paletteDescription(parent):
     return "Palette: %u colors" % (parent["size"].value // 3)
 
 def gammaParse(parent):
-    yield UInt32(parent, "gamma", "Gamma (x10,000)")
+    yield UInt32(parent, "gamma", "Gamma (x100,000)")
 def gammaValue(parent):
-    return float(parent["gamma"].value) / 10000
+    return float(parent["gamma"].value) / 100000
 def gammaDescription(parent):
     return "Gamma: %.3f" % parent.value
 
