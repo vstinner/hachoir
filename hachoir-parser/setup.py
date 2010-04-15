@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from __future__ import with_statement
 from imp import load_source
 from os import path
 from sys import argv
@@ -52,8 +51,9 @@ def main():
     for name in MODULES:
         PACKAGES["hachoir_parser." + name] = "hachoir_parser/" + name
 
-    with open('README') as readme:
-        long_description = readme.read()
+    readme = open('README')
+    long_description = readme.read()
+    readme.close()
 
     install_options = {
         "name": hachoir_parser.PACKAGE,
