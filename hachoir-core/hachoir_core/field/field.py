@@ -166,7 +166,7 @@ class Field(Logger):
             return '/'
         names = []
         field = self
-        while field:
+        while field is not None:
             names.append(field._name)
             field = field._parent
         names[-1] = ''
