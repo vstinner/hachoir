@@ -111,17 +111,19 @@ class MkvMetadata(MultipleMetadata):
         value = tag["TagString/unicode"].value
         setattr(self, key, value)
 
+    # Catch OverflowError for timedelta (long int too large to convert to int)
+    @fault_tolerant
+    def readDuration(self, duration, timecode_scale):
+        seconds = duration * timecode_scale
+        self.duration = timedelta(seconds=seconds)
+
     def processInfo(self, info):
-        if "Duration/float" in info \
-        and "TimecodeScale/unsigned" in info \
-        and 0 < info["Duration/float"].value:
-            try:
-                seconds = info["Duration/float"].value * info["TimecodeScale/unsigned"].value * 1e-9
-                self.duration = timedelta(seconds=seconds)
-            except OverflowError:
-                # Catch OverflowError for timedelta
-                # (long int too large to convert to int)
-                pass
+        if "TimecodeScale/unsigned" in info:
+            timecode_scale = info["TimecodeScale/unsigned"].value * 1e-9
+            if "Duration/float" in info:
+                self.readDuration(info["Duration/float"].value, timecode_scale)
+            elif "Duration/double" in info:
+                self.readDuration(info["Duration/double"].value, timecode_scale)
         if "DateUTC/date" in info:
             try:
                 self.creation_date = dateToDatetime(info["DateUTC/date"].value)
