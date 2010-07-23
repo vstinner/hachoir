@@ -54,6 +54,7 @@ exe_dirs = """
 hachoir-urwid
 hachoir-metadata
 hachoir-qt
+hachoir-tools
 """
 
 def _realpaths(partials):
