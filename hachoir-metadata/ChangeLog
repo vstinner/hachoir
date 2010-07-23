@@ -1,7 +1,7 @@
 hachoir-metadata 1.3.3
 ======================
 
- * fix matroska to extract webm video duration
+ * fix matroska to extract webm video duration and audio bits per sample
 
 hachoir-metadata 1.3.2 (2010-02-04)
 ===================================

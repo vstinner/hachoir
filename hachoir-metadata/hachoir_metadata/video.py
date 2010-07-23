@@ -65,8 +65,8 @@ class MkvMetadata(MultipleMetadata):
 
     def processVideo(self, track):
         video = Metadata(self)
+        self.trackCommon(track, video)
         try:
-            self.trackCommon(track, video)
             video.compression = track["CodecID/string"].value
             if "Video" in track:
                 video.width = track["Video/PixelWidth/unsigned"].value
@@ -75,22 +75,34 @@ class MkvMetadata(MultipleMetadata):
             pass
         self.addGroup("video[]", video, "Video stream")
 
+    def getDouble(self, field, parent):
+        float_key = '%s/float' % parent
+        if float_key in field:
+            return field[float_key].value
+        double_key = '%s/double' % parent
+        if double_key in field:
+            return field[double_key].value
+        return None
+
     def processAudio(self, track):
         audio = Metadata(self)
-        try:
-            self.trackCommon(track, audio)
-            if "Audio" in track:
-                audio.sample_rate = track["Audio/SamplingFrequency/float"].value
+        self.trackCommon(track, audio)
+        if "Audio" in track:
+            frequency = self.getDouble(track, "Audio/SamplingFrequency")
+            if frequency is not None:
+                audio.sample_rate = frequency
+            if "Audio/Channels/unsigned" in track:
                 audio.nb_channel = track["Audio/Channels/unsigned"].value
+            if "Audio/BitDepth/unsigned" in track:
+                audio.bits_per_sample = track["Audio/BitDepth/unsigned"].value
+        if "CodecID/string" in track:
             audio.compression = track["CodecID/string"].value
-        except MissingField:
-            pass
         self.addGroup("audio[]", audio, "Audio stream")
 
     def processSubtitle(self, track):
         sub = Metadata(self)
+        self.trackCommon(track, sub)
         try:
-            self.trackCommon(track, sub)
             sub.compression = track["CodecID/string"].value
         except MissingField:
             pass
@@ -111,19 +123,17 @@ class MkvMetadata(MultipleMetadata):
         value = tag["TagString/unicode"].value
         setattr(self, key, value)
 
-    # Catch OverflowError for timedelta (long int too large to convert to int)
-    @fault_tolerant
-    def readDuration(self, duration, timecode_scale):
-        seconds = duration * timecode_scale
-        self.duration = timedelta(seconds=seconds)
-
     def processInfo(self, info):
         if "TimecodeScale/unsigned" in info:
-            timecode_scale = info["TimecodeScale/unsigned"].value * 1e-9
-            if "Duration/float" in info:
-                self.readDuration(info["Duration/float"].value, timecode_scale)
-            elif "Duration/double" in info:
-                self.readDuration(info["Duration/double"].value, timecode_scale)
+            duration = self.getDouble(info, "Duration")
+            if duration is not None:
+                try:
+                    seconds = duration * info["TimecodeScale/unsigned"].value * 1e-9
+                    self.duration = timedelta(seconds=seconds)
+                except OverflowError:
+                    # Catch OverflowError for timedelta (long int too large
+                    # to be converted to an int)
+                    pass
         if "DateUTC/date" in info:
             try:
                 self.creation_date = dateToDatetime(info["DateUTC/date"].value)
