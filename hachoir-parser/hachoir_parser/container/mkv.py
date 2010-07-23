@@ -545,7 +545,7 @@ class MkvFile(Parser):
     PARSER_TAGS = {
         "id": "matroska",
         "category": "container",
-        "file_ext": ("mka", "mkv"),
+        "file_ext": ("mka", "mkv", "webm"),
         "mime": (u"video/x-matroska", u"audio/x-matroska"),
         "min_size": 5*8,
         "magic": (("\x1A\x45\xDF\xA3", 0),),
@@ -561,14 +561,14 @@ class MkvFile(Parser):
         except ParserError:
             return False
         if None < self._size < first._size:
-            return False
-        return self.stream.searchBytes('\x42\x82\x88matroska', 5*8, first._size) is not None
+            return "First chunk size is invalid"
+        if self[0]['DocType/string'].value not in ('matroska', 'webm'):
+            return "Stream isn't a matroska document."
+        return True
 
     def createFields(self):
         hdr = EBML(self, ebml)
         yield hdr
-        if hdr['DocType/string'].value != 'matroska':
-            raise ParserError("Stream isn't a matroska document.")
 
         while not self.eof:
             yield EBML(self, { 0x18538067: ('Segment[]', segment) })
