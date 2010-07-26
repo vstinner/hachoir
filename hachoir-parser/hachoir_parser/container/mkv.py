@@ -546,12 +546,19 @@ class MkvFile(Parser):
         "id": "matroska",
         "category": "container",
         "file_ext": ("mka", "mkv", "webm"),
-        "mime": (u"video/x-matroska", u"audio/x-matroska"),
+        "mime": (
+            u"video/x-matroska",
+            u"audio/x-matroska",
+            u"video/webm",
+            u"audio/webm"),
         "min_size": 5*8,
         "magic": (("\x1A\x45\xDF\xA3", 0),),
         "description": "Matroska multimedia container"
     }
     endian = BIG_ENDIAN
+
+    def _getDoctype(self):
+        return self[0]['DocType/string'].value
 
     def validate(self):
         if self.stream.readBits(0, 32, self.endian) != self.EBML_SIGNATURE:
@@ -562,7 +569,7 @@ class MkvFile(Parser):
             return False
         if None < self._size < first._size:
             return "First chunk size is invalid"
-        if self[0]['DocType/string'].value not in ('matroska', 'webm'):
+        if self._getDoctype() not in ('matroska', 'webm'):
             return "Stream isn't a matroska document."
         return True
 
@@ -576,4 +583,16 @@ class MkvFile(Parser):
     def createContentSize(self):
         field = self["Segment[0]/size"]
         return field.absolute_address + field.value * 8 + field.size
+
+    def createDescription(self):
+        if self._getDoctype() == 'webm':
+            return 'WebM video'
+        else:
+            return 'Matroska video'
+
+    def createMimeType(self):
+        if self._getDoctype() == 'webm':
+            return u"video/webm"
+        else:
+            return u"video/x-matroska"
 
