@@ -149,16 +149,75 @@ class META(FieldSet):
         yield UInt32(self, "unk")
         yield AtomList(self, "tags")
 
+class STCO(FieldSet):
+    def createFields(self):
+        yield textHandler(UInt8(self, "version"), hexadecimal)
+        yield RawBytes(self, "flags", 3)
+        yield UInt32(self, "count", description="Total entries in offset table")
+        for i in xrange(self['count'].value):
+            yield UInt32(self, "chunk_offset[]")
+
+class SampleDescription(FieldSet):
+    def createFields(self):
+        yield UInt32(self, "size", "Sample Description Size")
+        yield RawBytes(self, "format", 4, "Data Format (codec)")
+        yield RawBytes(self, "reserved", 6, "Reserved")
+        yield UInt16(self, "index", "Data Reference Index")
+        yield UInt16(self, "version")
+        yield UInt16(self, "revision_level")
+        yield RawBytes(self, "vendor_id", 4)
+        yield UInt32(self, "temporal_quality")
+        yield UInt32(self, "spatial_quality")
+        yield UInt16(self, "width", "Width (pixels)")
+        yield UInt16(self, "height", "Height (pixels)")
+        yield UInt32(self, "horizontal_resolution")
+        yield UInt32(self, "vertical resolution")
+        yield UInt32(self, "data_size")
+        yield UInt16(self, "frame_count")
+        size = self['size'].value - self.current_size//8
+        if size > 0:
+            yield RawBytes(self, "extra_data", size)
+
+class STSD(FieldSet):
+    def createFields(self):
+        yield textHandler(UInt8(self, "version"), hexadecimal)
+        yield RawBytes(self, "flags", 3)
+        yield UInt32(self, "count", description="Total entries in table")
+        for i in xrange(self['count'].value):
+            yield SampleDescription(self, "sample_description[]")
+
+class STSS(FieldSet):
+    def createFields(self):
+        yield textHandler(UInt8(self, "version"), hexadecimal)
+        yield RawBytes(self, "flags", 3)
+        yield UInt32(self, "count", description="Number of sync samples")
+        for i in xrange(self['count'].value):
+            yield UInt32(self, "sync_sample[]")
+
+class STSZ(FieldSet):
+    def createFields(self):
+        yield textHandler(UInt8(self, "version"), hexadecimal)
+        yield RawBytes(self, "flags", 3)
+        yield UInt32(self, "uniform_size", description="Uniform size of each sample (0 if non-uniform)")
+        yield UInt32(self, "count", description="Number of samples")
+        if self['uniform_size'].value == 0:
+            for i in xrange(self['count'].value):
+                yield UInt32(self, "sample_size[]")
+
 class Atom(FieldSet):
     tag_info = {
-        # TODO: Use dictionnary of dictionnary, like Matroska parser does
+        # TODO: Use dictionary of dictionaries, like Matroska parser does
         # "elst" is a child of "edts", but not of "moov" for example
         "moov": (AtomList, "movie", "Movie"),
         "trak": (AtomList, "track", "Track"),
         "mdia": (AtomList, "media", "Media"),
         "edts": (AtomList, "edts", ""),
         "minf": (AtomList, "minf", ""),
-        "stbl": (AtomList, "stbl", ""),
+        "stbl": (AtomList, "stbl", "Sample Table"),
+        "stco": (STCO, "stsd", "Sample Table Chunk Offset"),
+        "stsd": (STSD, "stsd", "Sample Table Sample Description"),
+        "stss": (STSS, "stss", "Sample Table Sync Samples"),
+        "stsz": (STSZ, "stsz", "Sample Table Sizes"),
         "dinf": (AtomList, "dinf", ""),
         "udta": (AtomList, "udta", ""),
         "ilst": (AtomList, "ilst", ""),
