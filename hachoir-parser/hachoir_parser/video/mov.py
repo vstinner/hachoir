@@ -144,6 +144,11 @@ class FileType(FieldSet):
         while not self.eof:
             yield String(self, "compat_brand[]", 4, "Compatible brand")
 
+class META(FieldSet):
+    def createFields(self):
+        yield UInt32(self, "unk")
+        yield AtomList(self, "tags")
+
 class Atom(FieldSet):
     tag_info = {
         # TODO: Use dictionnary of dictionnary, like Matroska parser does
@@ -155,6 +160,23 @@ class Atom(FieldSet):
         "minf": (AtomList, "minf", ""),
         "stbl": (AtomList, "stbl", ""),
         "dinf": (AtomList, "dinf", ""),
+        "udta": (AtomList, "udta", ""),
+        "ilst": (AtomList, "ilst", ""),
+        "trkn": (AtomList, "trkn", "Metadata: Track number"),
+        "disk": (AtomList, "disk", "Metadata: Disk number"),
+        "tmpo": (AtomList, "tempo", "Metadata: Tempo"),
+        "cpil": (AtomList, "cpil", "Metadata: Compilation"),
+        "gnre": (AtomList, "gnre", "Metadata: Genre"),
+        "\xa9alb": (AtomList, "album", "Metadata: Album name"),
+        "\xa9ART": (AtomList, "artist", "Metadata: Artist name"),
+        "\xa9cmt": (AtomList, "comment", "Metadata: Comment"),
+        "\xa9nam": (AtomList, "name", "Metadata: Track name"),
+        "\xa9too": (AtomList, "tool", "Metadata: Creator program"),
+        "\xa9wrt": (AtomList, "composer", "Metadata: Composer name"),
+        "\xa9day": (AtomList, "date", "Metadata: Date of creation"),
+        "covr": (AtomList, "cover", "Metadata: Cover art"),
+        "----": (AtomList, "misc", "Metadata: Miscellaneous"),
+        "meta": (META, "meta", "File metadata"),
         "elst": (ELST, "edts", ""),
         "tkhd": (TrackHeader, "track_hdr", "Track header"),
         "hdlr": (HDLR, "hdlr", ""),
@@ -168,7 +190,7 @@ class Atom(FieldSet):
 
     def createFields(self):
         yield UInt32(self, "size")
-        yield String(self, "tag", 4)
+        yield RawBytes(self, "tag", 4)
         size = self["size"].value
         if size == 1:
             raise ParserError("Extended size is not supported!")
