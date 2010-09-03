@@ -3,6 +3,8 @@
 from hachoir_wx.field_view.format import format_addr_hex, format_addr_dec, format_size, format_data, format_name, format_desc
 from hachoir_core.i18n import _
 
+MAXITEMS = 1000
+
 class field_view_imp_t:
     def __init__(self):
         self.addr_func = lambda field: field._getAbsoluteAddress()
@@ -74,12 +76,18 @@ class field_view_imp_t:
         self.refill_view()
 
     def fill_view(self):
+        field_count = 0
+        for field in self.fields:
+            field_count += 1
+            if field_count > MAXITEMS:
+                break
+
         if self.fields._getParent() is not None:
             self.has_parent = True
-            self.view.SetItemCount(len(self.fields) + 1)
+            self.view.SetItemCount(field_count + 1)
         else:
             self.has_parent = False
-            self.view.SetItemCount(len(self.fields))
+            self.view.SetItemCount(field_count)
 
         # autosize columns, based on a sample of the rows
         for col in xrange(self.view.get_col_count()):
@@ -87,12 +95,11 @@ class field_view_imp_t:
             func = self.col_str_table[col]
             # when fields has more than 20 rows, they are probably similar.
             # Therefore this routine only checks the first 10 rows and last 10 rows.
-            field_count = len(self.fields)
 
             if field_count <= 20:
-              field_range = [(0, field_count)]
+                field_range = [(0, field_count)]
             else:
-              field_range = [(0, 10), (field_count - 10, field_count)]
+                field_range = [(0, 10), (field_count - 10, field_count)]
 
             for begin, end in field_range:
                 for i in xrange(begin, end):
@@ -109,7 +116,16 @@ class field_view_imp_t:
                     return ''
             else:
                 item = item - 1
-
+            parent_count = 1
+        else:
+            parent_count = 0
+        try:
+            self.fields[item+MAXITEMS]
+            if item+MAXITEMS+parent_count > self.view.GetItemCount():
+                self.view.SetItemCount(item+MAXITEMS+parent_count)
+        except:
+            if len(self.fields) + parent_count != self.view.GetItemCount():
+                self.view.SetItemCount(len(self.fields)+parent_count)
         field = self.fields[item]
         return self.col_str_table[col](field)
 
