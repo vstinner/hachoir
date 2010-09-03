@@ -50,10 +50,10 @@ class hex_view_imp_t:
         self.update_addr_view()
 
     def update_addr_view(self):
-        addr_text = ''
+        addr_text_list = []
         for i in xrange(self.view.get_height_chars()):
-            addr_text += self.format_addr(self.pos+i*self.view.get_width_chars())+'\n'
-        self.view.addr_view.SetValue(addr_text)
+            addr_text_list.append( self.format_addr(self.pos+i*self.view.get_width_chars())+'\n')
+        self.view.addr_view.SetValue(''.join(addr_text_list))
 
     def update_set_mark(self, field):
         self.field = field
