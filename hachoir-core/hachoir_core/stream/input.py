@@ -5,7 +5,6 @@ from hachoir_core.bits import str2long
 from hachoir_core.i18n import getTerminalCharset
 from hachoir_core.tools import lowerBound
 from hachoir_core.i18n import _
-from os import dup, fdopen
 from errno import ESPIPE
 from weakref import ref as weakref_ref
 from hachoir_core.stream import StreamError
@@ -404,6 +403,7 @@ class InputIOStream(InputStream):
 
     def file(self):
         if hasattr(self._input, "fileno"):
+            from os import dup, fdopen
             new_fd = dup(self._input.fileno())
             new_file = fdopen(new_fd, "r")
             new_file.seek(0)
