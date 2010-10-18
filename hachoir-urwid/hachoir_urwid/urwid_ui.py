@@ -268,7 +268,10 @@ class Walker(ListWalker):
                 smart_display = False
             text += "= %s" % display
         if node.field.description and self.flags & self.display_description:
-            text += ": %s" % node.field.description
+            description = node.field.description
+            if not(self.flags & self.human_size):
+                description = makePrintable(description, "ASCII")
+            text += ": %s" % description
         if self.flags & self.display_size and node.field.size or self.flags & self.display_type:
             tmp_text = []
             if self.flags & self.display_type:
