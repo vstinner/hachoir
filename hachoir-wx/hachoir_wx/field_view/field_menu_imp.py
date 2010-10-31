@@ -43,6 +43,9 @@ class field_menu_imp_t:
     def on_parse_substream(self, dispatcher):
         self.dispatcher.trigger('field_parse_substream', self.selected)
 
+    def on_open_window_here(self, dispatcher):
+        self.dispatcher.trigger('field_open_window_here', self.selected)
+
     def on_dump_to_disk(self, event):
         dump_path = self.view.ask_for_dump_file(_('Dump "' + self.selected._getPath() + '" To Disk...'))
         if dump_path is not None:

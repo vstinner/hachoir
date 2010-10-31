@@ -22,4 +22,6 @@ class field_menu_fwd_t:
                   id=XRCID('field_menu_dump_to_disk'))
         view.Bind(EVT_MENU, self.imp.on_parse_substream,
                   id=XRCID('field_menu_parse_substream'))
+        view.Bind(EVT_MENU, self.imp.on_open_window_here,
+                  id=XRCID('field_menu_open_window_here'))
 

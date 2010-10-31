@@ -116,6 +116,9 @@
       <object class="wxMenuItem" name="field_menu_parse_substream">
         <label>Parse Sub-Stream</label>
       </object>
+      <object class="wxMenuItem" name="field_menu_open_window_here">
+        <label>Open New Window Here</label>
+      </object>
       <object class="separator"/>
       <object class="wxMenu" name="field_menu_address">
         <label>Address Offset</label>

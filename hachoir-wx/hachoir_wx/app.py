@@ -50,6 +50,9 @@ class app_t(App):
         subfile.name = field.path
         new_window(self, subfile, parser, subfile.name)
 
+    def on_field_open_window_here(self, dispatcher, field):
+        new_window(self, dispatcher.top_file, field, dispatcher.top_filename)
+
     def on_frame_activated(self, dispatcher, frame):
         self.SetTopWindow(frame)
 
@@ -69,6 +72,8 @@ def new_window(app, file, parser, filename):
 
     dispatcher = dispatcher_t()
     dispatcher.add_receiver(app)
+    dispatcher.top_file = file
+    dispatcher.top_filename = filename
 
     frame = frame_view.setup_frame_view(dispatcher)
     field_view.setup_field_view(frame, dispatcher)
