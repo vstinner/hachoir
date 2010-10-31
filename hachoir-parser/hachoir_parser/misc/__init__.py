@@ -12,3 +12,5 @@ from hachoir_parser.misc.hlp import HlpFile
 from hachoir_parser.misc.gnome_keyring import GnomeKeyring
 from hachoir_parser.misc.bplist import BPList
 from hachoir_parser.misc.dsstore import DSStore
+from hachoir_parser.misc.word_doc import WordDocumentParser
+from hachoir_parser.misc.word_2 import Word2DocumentParser
