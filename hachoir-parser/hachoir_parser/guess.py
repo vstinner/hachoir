@@ -8,6 +8,7 @@ from hachoir_core.error import warning, info, HACHOIR_ERRORS
 from hachoir_parser import ValidateError, HachoirParserList
 from hachoir_core.stream import FileInputStream
 from hachoir_core.i18n import _
+import weakref
 
 
 class QueryParser(object):
@@ -80,6 +81,20 @@ class QueryParser(object):
         return parsers
 
     def parse(self, stream, fallback=True):
+        if hasattr(stream, "_cached_parser"):
+            parser = stream._cached_parser()
+        else:
+            parser = None
+        if parser is not None:
+            if parser.__class__ in self.parsers:
+                return parser
+            if self.use_fallback and parser.__class__ == fb:
+                return parser
+        parser = self.doparse(stream, fallback)
+        stream._cached_parser = weakref.ref(parser)
+        return parser
+
+    def doparse(self, stream, fallback=True):
         fb = None
         warn = warning
         for parser in self.parsers:
