@@ -222,7 +222,7 @@ class MovMetadata(RootMetadata):
         self.last_modification = hdr["lastmod_date"].value
         self.duration = timedelta(seconds=float(hdr["duration"].value) / hdr["time_scale"].value)
         self.comment = _("Play speed: %.1f%%") % (hdr["play_speed"].value*100)
-        self.comment = _("User volume: %.1f%%") % (float(hdr["volume"].value)*100//255)
+        self.comment = _("User volume: %.1f%%") % (float(hdr["volume"].value)*100)
 
     @fault_tolerant
     def processTrackHeader(self, hdr):
