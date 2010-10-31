@@ -371,7 +371,7 @@ def checkPing(parser): return (
     checkDisplay(parser, "/header/type", u"Executable file"),
     checkDisplay(parser, "/header/machine", u"Intel 80386"),
     checkValue(parser, "/header/phentsize", 32),
-    checkDisplay(parser, "/prg_header[1]/type", u"Dynamic library"),
+    checkDisplay(parser, "/prg_header[1]/type", u"Program interpreter"),
 )
 
 def checkGeorgia(parser): return (
