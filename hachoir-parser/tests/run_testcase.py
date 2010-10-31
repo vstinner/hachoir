@@ -361,8 +361,8 @@ def checkKino14(parser): return (
 )
 
 def checkFreeSoftwareSong(parser): return (
-    checkDisplay(parser, "blocksize", u"'9'"),
-    checkDisplay(parser, "crc32", u"0x7b1b3c8c"),
+    checkDisplay(parser, "/blocksize", u"'9'"),
+    checkDisplay(parser, "/file/crc32", u"0x8c3c1b7b"),
 )
 
 def checkPing(parser): return (
