@@ -11,4 +11,4 @@ from hachoir_parser.misc.pifv import PIFVFile
 from hachoir_parser.misc.hlp import HlpFile
 from hachoir_parser.misc.gnome_keyring import GnomeKeyring
 from hachoir_parser.misc.bplist import BPList
-
+from hachoir_parser.misc.dsstore import DSStore
