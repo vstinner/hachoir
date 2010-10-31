@@ -375,7 +375,8 @@ def checkPing(parser): return (
 )
 
 def checkGeorgia(parser): return (
-    checkDisplay(parser, "/cab_version", "0x0103"),
+    checkDisplay(parser, "/minor_version", "3"),
+    checkDisplay(parser, "/major_version", "1"),
     checkDesc(parser, "/file[0]", u'File "fontinst.inf" (64 bytes)'),
     checkValue(parser, "/file[1]/filename", u"Georgiaz.TTF"),
 )
