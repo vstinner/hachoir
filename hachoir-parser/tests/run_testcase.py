@@ -163,7 +163,7 @@ def checkJPEG(parser): return (
     checkValue(parser, "app0/content/jfif", "JFIF\x00"),
     checkValue(parser, "app0/content/ver_maj", 1),
     checkValue(parser, "photoshop/content/signature", "Photoshop 3.0"),
-    checkValue(parser, "photoshop/content/copyright_flag/content", "\0\0"),
+    checkValue(parser, "photoshop/content/copyright_flag/content", 0),
     checkValue(parser, "exif/content/header", "Exif\0\0"),
     checkValue(parser, "exif/content/version", 42))
 
