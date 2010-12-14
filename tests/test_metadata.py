@@ -271,6 +271,19 @@ class TestMetadata(unittest.TestCase):
         # Check IPTC parser
         self.check_attr(meta, "author", "Ian Britton")
         self.check_attr(meta, "copyright", "FreeFoto.com")
+        self.check_attr(meta, "thumbnail_size", 4196),
+        self.check_attr(meta, "iso_speed_ratings", 160),
+        self.check_attr(meta, "exif_version", "0220"),
+        self.check_attr(meta, "date_time_original", "2003:08:06 17:52:54"),
+        self.check_attr(meta, "date_time_digitized", "2003:08:06 17:52:54"),
+        self.check_attr(meta, "compressed_bits_per_pixel", 3.2),
+        self.check_attr(meta, "aperture_value", 6),
+        self.check_attr(meta, "exposure_bias_value", -0.5),
+        self.check_attr(meta, "focal_length", 137),
+        self.check_attr(meta, "flashpix_version", u"0100"),
+        self.check_attr(meta, "focal_plane_x_resolution", 1322.0),
+        self.check_attr(meta, "focal_plane_y_resolution", 1322.0),
+        self.check_attr(meta, "focal_length_in_35mm_film", 205),
 
     def test_tga(self):
         meta = self.extract("hero.tga")
@@ -474,6 +487,9 @@ class TestMetadataCommandLine(unittest.TestCase):
 - Camera model: A5301T
 - Camera manufacturer: KDDI-TS
 - Compression: JPEG (Baseline)
+- EXIF version: 0220
+- Date-time original: 2003-05-24 22:21:01
+- Flashpix version: 0100
 - Comment: JPEG quality: 90%
 - MIME type: image/jpeg
 - Endianness: Big endian""")
