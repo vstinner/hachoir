@@ -325,7 +325,8 @@ class IFD(SeekableFieldSet):
         for i in xrange(count):
             yield self.EntryClass(self, "entry[]")
         yield UInt32(self, "next", "Offset to next IFD")
-        for i, entry in enumerate(self.array('entry')):
+        for i in xrange(count):
+            entry = self['entry[%d]'%i]
             if 'offset' not in entry:
                 continue
             self.seekByte(entry['offset'].value+self.base_addr//8, relative=False)
@@ -400,10 +401,13 @@ class Exif(SeekableFieldSet):
         if self["header"].value != "Exif\0\0":
             raise ParserError("Invalid EXIF signature!")
         iff_start = self.absolute_address + self.current_size
+        ifds = []
         for field in TIFF(self):
             yield field
+            if isinstance(field, IFD):
+                ifds.append(field)
 
-        for ifd in self.array('ifd'):
+        for ifd in ifds:
             data = {}
             for i, entry in enumerate(ifd.array('entry')):
                 data[entry['tag'].display] = entry
