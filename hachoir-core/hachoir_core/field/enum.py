@@ -23,4 +23,3 @@ def Enum(field, enum, key_func=None):
     field.createDisplay = createDisplay
     field.getEnum = lambda: enum
     return field
-

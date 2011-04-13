@@ -12,8 +12,8 @@ class GenericFieldSet(BasicFieldSet):
     document).
 
     Class attributes:
-    - endian: Bytes order (L{BIG_ENDIAN} or L{LITTLE_ENDIAN}). Optional if the
-      field set has a parent ;
+    - endian: Bytes order (L{BIG_ENDIAN}, L{LITTLE_ENDIAN} or L{MIDDLE_ENDIAN}).
+      Optional if the field set has a parent ;
     - static_size: (optional) Size of FieldSet in bits. This attribute should
       be used in parser of constant size.
 
