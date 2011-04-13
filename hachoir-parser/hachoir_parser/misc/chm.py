@@ -89,7 +89,7 @@ class ITSF(FieldSet):
         yield UInt32(self, "version")
         yield UInt32(self, "header_size", "Total header length (in bytes)")
         yield UInt32(self, "one")
-        yield UInt32(self, "last_modified")
+        yield UInt32(self, "last_modified", "Lower 32 bits of the time expressed in units of 0.1 us")
         yield Enum(UInt32(self, "lang_id", "Windows Language ID"), LANGUAGE_ID)
         yield GUID(self, "dir_uuid", "{7C01FD10-7BAA-11D0-9E0C-00A0-C922-E6EC}")
         yield GUID(self, "stream_uuid", "{7C01FD11-7BAA-11D0-9E0C-00A0-C922-E6EC}")
