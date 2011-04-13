@@ -52,6 +52,8 @@ class HuffmanCode(Field):
 
         value = 0
         while (self.size, value) not in tree:
+            if self.size > 256:
+                raise ParserError("Huffman code too long!")
             bit = stream.readBits(addr, 1, endian)
             value <<= 1
             value += bit
