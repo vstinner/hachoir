@@ -68,7 +68,7 @@ def bin2long(text, endian):
     bits = [ (ord(character)-ord("0")) \
         for character in text if character in "01" ]
     if endian is not BIG_ENDIAN:
-        bits = reversed(bits)
+        bits = bits[::-1]
     size = len(bits)
     assert 0 < size
     value = 0
