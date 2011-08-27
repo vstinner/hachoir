@@ -255,6 +255,11 @@ class EditableFieldSet(object):
         Remove a field from the field set. May raise an MissingField exception
         if the field has already been deleted.
         """
+        parts = name.partition('/')
+        if parts[2]:
+            fieldset = self[parts[0]]
+            del fieldset[parts[2]]
+            return
         if name in self._deleted:
             raise MissingField(self, name)
         self._deleted.add(name)
