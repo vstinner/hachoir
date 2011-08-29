@@ -409,6 +409,63 @@ class FileType(FieldSet):
         while not self.eof:
             yield String(self, "compat_brand[]", 4, "Compatible brand")
 
+class MovieFragmentHeader(FieldSet):
+    def createFields(self):
+        yield UInt8(self, "version", "Version")
+        yield NullBits(self, "flags", 24)
+        yield UInt32(self, "sequence_number")
+
+class TrackFragmentRandomAccess(FieldSet):
+    def createFields(self):
+        yield UInt8(self, "version", "Version")
+        yield NullBits(self, "flags", 24)
+        yield UInt32(self, "track_id")
+        yield NullBits(self, "reserved", 26)
+        yield Bits(self, "length_size_of_traf_num", 2)
+        yield Bits(self, "length_size_of_trun_num", 2)
+        yield Bits(self, "length_size_of_sample_num", 2)
+        yield UInt32(self, "number_of_entry")
+        for i in xrange(self['number_of_entry'].value):
+            if self['version'].value == 1:
+                yield UInt64(self, "time[%i]" % i)
+                yield UInt64(self, "moof_offset[%i]" %i)
+            else:
+                yield UInt32(self, "time[%i]" %i)
+                yield UInt32(self, "moof_offset[%i]" %i)
+
+            if self['length_size_of_traf_num'].value == 3:
+                yield UInt64(self, "traf_number[%i]" %i) 
+            elif self['length_size_of_traf_num'].value == 2:
+                yield UInt32(self, "traf_number[%i]" %i) 
+            elif self['length_size_of_traf_num'].value == 1:
+                yield UInt16(self, "traf_number[%i]" %i) 
+            else:
+                yield UInt8(self, "traf_number[%i]" %i) 
+
+            if self['length_size_of_trun_num'].value == 3:
+                yield UInt64(self, "trun_number[%i]" %i) 
+            elif self['length_size_of_trun_num'].value == 2:
+                yield UInt32(self, "trun_number[%i]" %i) 
+            elif self['length_size_of_trun_num'].value == 1:
+                yield UInt16(self, "trun_number[%i]" %i) 
+            else:
+                yield UInt8(self, "trun_number[%i]" %i) 
+
+            if self['length_size_of_sample_num'].value == 3:
+                yield UInt64(self, "sample_number[%i]" %i) 
+            elif self['length_size_of_sample_num'].value == 2:
+                yield UInt32(self, "sample_number[%i]" %i) 
+            elif self['length_size_of_sample_num'].value == 1:
+                yield UInt16(self, "sample_number[%i]" %i) 
+            else:
+                yield UInt8(self, "sample_number[%i]" %i) 
+
+class MovieFragmentRandomAccessOffset(FieldSet):
+    def createFields(self):
+        yield UInt8(self, "version", "Version")
+        yield NullBits(self, "flags", 24)
+        yield UInt32(self, "size")
+
 def findHandler(self):
     ''' find the handler corresponding to this fieldset '''
     while self:
@@ -659,17 +716,17 @@ class Atom(FieldSet):
                 # mehd: movie extends header
                 # trex: track extends defaults
             # ipmc: IPMP control
-        # moof: movie fragment
-            # mfhd: movie fragment header
+        "moof": (AtomList, "moof", "movie fragment"),
+            "mfhd": (MovieFragmentHeader, "mfhd", "movie fragment header"),
             # traf: track fragment
                 # tfhd: track fragment header
                 # trun: track fragment run
                 # sdtp: independent and disposable samples
                 # sbgp: sample-to-group
                 # subs: sub-sample information
-        # mfra: movie fragment random access
-            # tfra: track fragment random access
-            # mfro: movie fragment random access offset
+        "mfra": (AtomList, "mfra", "movie fragment random access"),
+            "tfra": (TrackFragmentRandomAccess, "tfra", "track fragment random access"),
+            "mfro": (MovieFragmentRandomAccessOffset, "mfro", "movie fragment random access offset"),
         # mdat: media data container
         # free: free space (unparsed)
         # skip: free space (unparsed)
