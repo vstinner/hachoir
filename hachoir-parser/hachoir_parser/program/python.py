@@ -316,6 +316,7 @@ class PythonCompiledFile(Parser):
         3160:  ("3.2a0",       0x3020000),
         3170:  ("3.2a1",       0x3020000),
         3180:  ("3.2a2",       0x3020000),
+        3190:  ("Python 3.3a0",       0x3030000),
     }
 
     # Dictionnary which associate the pyc signature (4-byte long string)
