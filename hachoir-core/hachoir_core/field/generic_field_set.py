@@ -2,7 +2,7 @@ from hachoir_core.field import (MissingField, BasicFieldSet, Field, ParserError,
     createRawField, createNullField, createPaddingField, FakeArray)
 from hachoir_core.dict import Dict, UniqKeyError
 from hachoir_core.error import HACHOIR_ERRORS
-from hachoir_core.tools import lowerBound
+from hachoir_core.tools import lowerBound, makeUnicode
 import hachoir_core.config as config
 
 class GenericFieldSet(BasicFieldSet):
@@ -310,7 +310,7 @@ class GenericFieldSet(BasicFieldSet):
         """
         if self._size is None or not self.autofix:
             return False
-        self.warning(unicode(exception))
+        self.warning(makeUnicode(exception))
         return self._fixLastField()
 
     def _feedUntil(self, field_name):
