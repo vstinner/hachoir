@@ -91,7 +91,8 @@ class QueryParser(object):
             if self.use_fallback and parser.__class__ == fb:
                 return parser
         parser = self.doparse(stream, fallback)
-        stream._cached_parser = weakref.ref(parser)
+        if parser is not None:
+            stream._cached_parser = weakref.ref(parser)
         return parser
 
     def doparse(self, stream, fallback=True):
