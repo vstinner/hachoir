@@ -7,6 +7,14 @@ from hachoir_core.field import (ParserError,
     UInt8, UInt16, UInt32, UInt64, String, RawBytes, FieldSet, NullBits, Bit, Bits)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 
+class FileNameDirTable(FieldSet):
+    def createFields(self):
+        yield UInt32(self, "entry_start")
+        yield UInt16(self, "entry_file_id")
+        yield UInt16(self, "parent_id")
+        if self["entry_start"].value < self.parent.firstEntryOffset:
+            self.parent.firstEntryOffset = self["entry_start"].value
+
 class FileNameEntry(FieldSet):
     def createFields(self):
         yield Bits(self, "name_len", 7)
@@ -23,11 +31,12 @@ class FileNameEntry(FieldSet):
 
 class FileNameTable(FieldSet):
     def createFields(self):
-        yield UInt32(self, "entry_start")
-        yield UInt16(self, "entry_file_id")
-        yield UInt16(self, "parent_id")
-        if self["entry_start"].value - 8 > 0:
-            yield RawBytes(self, "pad[]", self["entry_start"].value - 8)
+        self.firstEntryOffset = 2**32
+
+        while True:
+            yield FileNameDirTable(self, "dir_table[]")
+            if (self.current_size / 8) >= self.firstEntryOffset:
+                break
 
         while True:
             fne = FileNameEntry(self, "entry[]")
