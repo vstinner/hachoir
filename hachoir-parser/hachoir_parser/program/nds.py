@@ -61,6 +61,23 @@ class FileNameTable(FieldSet):
             yield Directory(self, "directory[]")
 
 
+class FATFileEntry(FieldSet):
+    static_size = 2*4*8
+    def createFields(self):
+        yield UInt32(self, "start")
+        yield UInt32(self, "end")
+
+    def createDescription(self):
+        return "start: %d; size: %d" % (self["start"].value, self["end"].value - self["start"].value)
+
+class FATContent(FieldSet):
+    def createFields(self):
+        num_entries = self.parent["fat_size"].value / 8
+        for i in range(0, num_entries):
+            yield FATFileEntry(self, "entry[]")
+
+
+
 class NdsColor(FieldSet):
     def createFields(self):
         yield Bits(self, "red", 5)
@@ -175,7 +192,7 @@ class NdsFile(Parser):
         if self["fat_size"].value > 0:
             if self["fat_offset"].value - (self.current_size / 8) > 0:
                 yield RawBytes(self, "pad[]", self["fat_offset"].value - (self.current_size / 8))
-            yield RawBytes(self, "fat_data", self["fat_size"].value)
+            yield FATContent(self, "fat_content")
 
         # banner
         if self["banner_offset"].value > 0:
