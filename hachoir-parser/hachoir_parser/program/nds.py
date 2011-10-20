@@ -104,6 +104,12 @@ class NdsFile(Parser):
             yield RawBytes(self, "pad2", self["arm7_source"].value - (self.current_size / 8))
         yield RawBytes(self, "arm7_bin", self["arm7_bin_size"].value)
 
+        # FAT
+        if self["fat_size"].value > 0:
+            if self["fat_offset"].value - (self.current_size / 8) > 0:
+                yield RawBytes(self, "pad3", self["fat_offset"].value - (self.current_size / 8))
+            yield RawBytes(self, "fat_data", self["fat_size"].value)
+
         # banner
         if self["banner_offset"].value > 0:
             if self["banner_offset"].value - (self.current_size / 8) > 0:
