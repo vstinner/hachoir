@@ -4,8 +4,36 @@ Nintendo DS .nds game file parser
 
 from hachoir_parser import Parser
 from hachoir_core.field import (ParserError,
-    UInt8, UInt16, UInt32, UInt64, String, RawBytes, FieldSet, NullBits, Bits)
+    UInt8, UInt16, UInt32, UInt64, String, RawBytes, FieldSet, NullBits, Bit, Bits)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
+
+class FileNameEntry(FieldSet):
+    def createFields(self):
+        yield Bits(self, "name_len", 7)
+        yield Bit(self, "is_directory")
+        yield String(self, "name", self["name_len"].value)
+        if self["is_directory"].value:
+            yield UInt16(self, "dir_id")
+
+    def createDescription(self):
+        s = ""
+        if self["is_directory"].value:
+            s = "[D] "
+        return s + self["name"].value
+
+class FileNameTable(FieldSet):
+    def createFields(self):
+        yield UInt32(self, "entry_start")
+        yield UInt16(self, "entry_file_id")
+        yield UInt16(self, "parent_id")
+        if self["entry_start"].value - 8 > 0:
+            yield RawBytes(self, "pad[]", self["entry_start"].value - 8)
+
+        while True:
+            fne = FileNameEntry(self, "entry[]")
+            if fne["name_len"].value == 0:
+                break
+            yield fne
 
 class NdsColor(FieldSet):
     def createFields(self):
@@ -115,7 +143,7 @@ class NdsFile(Parser):
         # File Name Table
         if self["filename_table_offset"].value - (self.current_size / 8) > 0:
             yield RawBytes(self, "pad[]", self["filename_table_offset"].value - (self.current_size / 8))
-        yield RawBytes(self, "filename_table", self["filename_table_size"].value)
+        yield FileNameTable(self, "filename_table")
 
         # FAT
         if self["fat_size"].value > 0:
