@@ -93,6 +93,8 @@ class NdsColor(FieldSet):
         yield Bits(self, "blue", 5)
         yield NullBits(self, "pad", 1)
 
+    def createDescription(self):
+        return "#%02x%02x%02x" % (self["red"].value << 3, self["green"].value << 3, self["blue"].value << 3)
 
 class Banner(FieldSet):
     def createFields(self):
