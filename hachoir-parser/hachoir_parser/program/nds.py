@@ -80,7 +80,7 @@ class FATFileEntry(FieldSet):
 
 class FATContent(FieldSet):
     def createFields(self):
-        num_entries = self.parent["fat_size"].value / 8
+        num_entries = self.parent["header"]["fat_size"].value / 8
         for i in range(0, num_entries):
             yield FATFileEntry(self, "entry[]")
 
@@ -110,24 +110,9 @@ class Banner(FieldSet):
         yield String(self, "title_es", 256, charset="UTF-16-LE", truncate="\0")
 
 
-class NdsFile(Parser):
-    PARSER_TAGS = {
-        "id": "nds_file",
-        "category": "program",
-        "file_ext": ("nds",),
-        "mime": (u"application/octet-stream",),
-        "min_size": 12,
-        "description": "Nintendo DS game file",
-    }
-
-    endian = LITTLE_ENDIAN
-
-    def validate(self):
-        # TODO: improve detection (candidates: rom_size, header_size, various CRCs; game_title and game_code always must start with character)
-        return self.stream.readBytes(0, 1) != "\0" and ((self["device_code"].value & 7) == 0) and self.size >= 512 * 8
-
+class Header(FieldSet):
+    static_size = 512 * 8
     def createFields(self):
-        # Header
         yield String(self, "game_title", 12, truncate="\0")
         yield String(self, "game_code", 4)
         yield String(self, "maker_code", 2)
@@ -182,31 +167,51 @@ class NdsFile(Parser):
         yield RawBytes(self, "reserved", 160)
 
 
+class NdsFile(Parser):
+    PARSER_TAGS = {
+        "id": "nds_file",
+        "category": "program",
+        "file_ext": ("nds",),
+        "mime": (u"application/octet-stream",),
+        "min_size": 12,
+        "description": "Nintendo DS game file",
+    }
+
+    endian = LITTLE_ENDIAN
+
+    def validate(self):
+        # TODO: improve detection (candidates: rom_size, header_size, various CRCs; game_title and game_code always must start with character)
+        return self.stream.readBytes(0, 1) != "\0" and ((self["header"]["device_code"].value & 7) == 0) and self.size >= 512 * 8
+
+    def createFields(self):
+        # Header
+        yield Header(self, "header")
+
         # ARM9 binary
-        if self["arm9_source"].value - (self.current_size / 8) > 0:
-            yield RawBytes(self, "pad[]", self["arm9_source"].value - (self.current_size / 8))
-        yield RawBytes(self, "arm9_bin", self["arm9_bin_size"].value)
+        if self["header"]["arm9_source"].value - (self.current_size / 8) > 0:
+            yield RawBytes(self, "pad[]", self["header"]["arm9_source"].value - (self.current_size / 8))
+        yield RawBytes(self, "arm9_bin", self["header"]["arm9_bin_size"].value)
 
         # ARM7 binary
-        if self["arm7_source"].value - (self.current_size / 8) > 0:
-            yield RawBytes(self, "pad[]", self["arm7_source"].value - (self.current_size / 8))
-        yield RawBytes(self, "arm7_bin", self["arm7_bin_size"].value)
+        if self["header"]["arm7_source"].value - (self.current_size / 8) > 0:
+            yield RawBytes(self, "pad[]", self["header"]["arm7_source"].value - (self.current_size / 8))
+        yield RawBytes(self, "arm7_bin", self["header"]["arm7_bin_size"].value)
 
         # File Name Table
-        if self["filename_table_offset"].value - (self.current_size / 8) > 0:
-            yield RawBytes(self, "pad[]", self["filename_table_offset"].value - (self.current_size / 8))
+        if self["header"]["filename_table_offset"].value - (self.current_size / 8) > 0:
+            yield RawBytes(self, "pad[]", self["header"]["filename_table_offset"].value - (self.current_size / 8))
         yield FileNameTable(self, "filename_table")
 
         # FAT
-        if self["fat_size"].value > 0:
-            if self["fat_offset"].value - (self.current_size / 8) > 0:
-                yield RawBytes(self, "pad[]", self["fat_offset"].value - (self.current_size / 8))
+        if self["header"]["fat_size"].value > 0:
+            if self["header"]["fat_offset"].value - (self.current_size / 8) > 0:
+                yield RawBytes(self, "pad[]", self["header"]["fat_offset"].value - (self.current_size / 8))
             yield FATContent(self, "fat_content")
 
         # banner
-        if self["banner_offset"].value > 0:
-            if self["banner_offset"].value - (self.current_size / 8) > 0:
-                yield RawBytes(self, "pad[]", self["banner_offset"].value - (self.current_size / 8))
+        if self["header"]["banner_offset"].value > 0:
+            if self["header"]["banner_offset"].value - (self.current_size / 8) > 0:
+                yield RawBytes(self, "pad[]", self["header"]["banner_offset"].value - (self.current_size / 8))
             yield Banner(self, "banner")
 
         # Read rest of the file (if any)
