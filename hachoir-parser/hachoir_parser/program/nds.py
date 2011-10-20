@@ -104,29 +104,29 @@ class NdsFile(Parser):
 
         # ARM9 binary
         if self["arm9_source"].value - (self.current_size / 8) > 0:
-            yield RawBytes(self, "pad1", self["arm9_source"].value - (self.current_size / 8))
+            yield RawBytes(self, "pad[]", self["arm9_source"].value - (self.current_size / 8))
         yield RawBytes(self, "arm9_bin", self["arm9_bin_size"].value)
 
         # ARM7 binary
         if self["arm7_source"].value - (self.current_size / 8) > 0:
-            yield RawBytes(self, "pad2", self["arm7_source"].value - (self.current_size / 8))
+            yield RawBytes(self, "pad[]", self["arm7_source"].value - (self.current_size / 8))
         yield RawBytes(self, "arm7_bin", self["arm7_bin_size"].value)
 
         # File Name Table
         if self["filename_table_offset"].value - (self.current_size / 8) > 0:
-            yield RawBytes(self, "pad2_2", self["filename_table_offset"].value - (self.current_size / 8))
+            yield RawBytes(self, "pad[]", self["filename_table_offset"].value - (self.current_size / 8))
         yield RawBytes(self, "filename_table", self["filename_table_size"].value)
 
         # FAT
         if self["fat_size"].value > 0:
             if self["fat_offset"].value - (self.current_size / 8) > 0:
-                yield RawBytes(self, "pad3", self["fat_offset"].value - (self.current_size / 8))
+                yield RawBytes(self, "pad[]", self["fat_offset"].value - (self.current_size / 8))
             yield RawBytes(self, "fat_data", self["fat_size"].value)
 
         # banner
         if self["banner_offset"].value > 0:
             if self["banner_offset"].value - (self.current_size / 8) > 0:
-                yield RawBytes(self, "pad4", self["banner_offset"].value - (self.current_size / 8))
+                yield RawBytes(self, "pad[]", self["banner_offset"].value - (self.current_size / 8))
             yield Banner(self, "banner")
 
         # Read rest of the file (if any)
