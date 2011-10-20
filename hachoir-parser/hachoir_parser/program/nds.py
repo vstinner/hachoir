@@ -4,8 +4,24 @@ Nintendo DS .nds game file parser
 
 from hachoir_parser import Parser
 from hachoir_core.field import (ParserError,
-    UInt8, UInt16, UInt32, UInt64, String, RawBytes)
+    UInt8, UInt16, UInt32, UInt64, String, RawBytes, FieldSet)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
+
+
+class Banner(FieldSet):
+    def createFields(self):
+        yield UInt16(self, "version")
+        yield UInt16(self, "crc")
+        yield RawBytes(self, "reserved", 28)
+        yield RawBytes(self, "tile_data", 512)
+        yield RawBytes(self, "palette", 32)
+        yield String(self, "title_jp", 256, charset="UTF-16-LE", truncate="\0")
+        yield String(self, "title_en", 256, charset="UTF-16-LE", truncate="\0")
+        yield String(self, "title_fr", 256, charset="UTF-16-LE", truncate="\0")
+        yield String(self, "title_de", 256, charset="UTF-16-LE", truncate="\0")
+        yield String(self, "title_it", 256, charset="UTF-16-LE", truncate="\0")
+        yield String(self, "title_es", 256, charset="UTF-16-LE", truncate="\0")
+
 
 class NdsFile(Parser):
     PARSER_TAGS = {
@@ -56,7 +72,7 @@ class NdsFile(Parser):
 
         yield UInt32(self, "ctl_read_flags")
         yield UInt32(self, "ctl_init_flags")
-        yield UInt32(self, "icons")
+        yield UInt32(self, "banner_offset")
         yield UInt16(self, "secure_crc16")
         yield UInt16(self, "rom_timeout")
 
@@ -88,6 +104,11 @@ class NdsFile(Parser):
             yield RawBytes(self, "pad2", self["arm7_source"].value - (self.current_size / 8))
         yield RawBytes(self, "arm7_bin", self["arm7_bin_size"].value)
 
+        # banner
+        if self["banner_offset"].value > 0:
+            if self["banner_offset"].value - (self.current_size / 8) > 0:
+                yield RawBytes(self, "pad4", self["banner_offset"].value - (self.current_size / 8))
+            yield Banner(self, "banner")
 
         # Read rest of the file (if any)
         if self.current_size < self._size:
