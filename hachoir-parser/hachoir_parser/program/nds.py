@@ -156,9 +156,9 @@ class Header(FieldSet):
         yield UInt32(self, "rom_size")
         yield UInt32(self, "header_size")
 
-        yield RawBytes(self, "unknown_5_1", 36)
+        yield RawBytes(self, "unknown[]", 36)
         yield String(self, "passme_autoboot_detect", 4)
-        yield RawBytes(self, "unknown_5_2", 16)
+        yield RawBytes(self, "unknown[]", 16)
 
         yield RawBytes(self, "gba_logo", 156)
         yield UInt16(self, "logo_crc16")
