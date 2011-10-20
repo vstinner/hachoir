@@ -173,7 +173,7 @@ class NdsFile(Parser):
         "category": "program",
         "file_ext": ("nds",),
         "mime": (u"application/octet-stream",),
-        "min_size": 12,
+        "min_size": 12 * 8,
         "description": "Nintendo DS game file",
     }
 
