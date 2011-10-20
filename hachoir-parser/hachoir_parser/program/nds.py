@@ -4,8 +4,15 @@ Nintendo DS .nds game file parser
 
 from hachoir_parser import Parser
 from hachoir_core.field import (ParserError,
-    UInt8, UInt16, UInt32, UInt64, String, RawBytes, FieldSet)
+    UInt8, UInt16, UInt32, UInt64, String, RawBytes, FieldSet, NullBits, Bits)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
+
+class NdsColor(FieldSet):
+    def createFields(self):
+        yield Bits(self, "red", 5)
+        yield Bits(self, "green", 5)
+        yield Bits(self, "blue", 5)
+        yield NullBits(self, "pad", 1)
 
 
 class Banner(FieldSet):
@@ -14,7 +21,8 @@ class Banner(FieldSet):
         yield UInt16(self, "crc")
         yield RawBytes(self, "reserved", 28)
         yield RawBytes(self, "tile_data", 512)
-        yield RawBytes(self, "palette", 32)
+        for i in range(0, 16):
+            yield NdsColor(self, "palette_color[]")
         yield String(self, "title_jp", 256, charset="UTF-16-LE", truncate="\0")
         yield String(self, "title_en", 256, charset="UTF-16-LE", truncate="\0")
         yield String(self, "title_fr", 256, charset="UTF-16-LE", truncate="\0")
