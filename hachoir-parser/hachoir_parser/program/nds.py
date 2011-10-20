@@ -1,5 +1,10 @@
 """
 Nintendo DS .nds game file parser
+
+File format references:
+- http://www.bottledlight.com/ds/index.php/FileFormats/NDSFormat
+- http://imrannazar.com/The-Smallest-NDS-File
+- http://darkfader.net/ds/files/ndstool.cpp
 """
 
 from hachoir_parser import Parser
