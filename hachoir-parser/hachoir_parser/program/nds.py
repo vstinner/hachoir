@@ -123,6 +123,7 @@ class NdsFile(Parser):
     endian = LITTLE_ENDIAN
 
     def validate(self):
+        # TODO: improve detection (candidates: rom_size, header_size, various CRCs; game_title and game_code always must start with character)
         return self.stream.readBytes(0, 1) != "\0" and ((self["device_code"].value & 7) == 0) and self.size >= 512 * 8
 
     def createFields(self):
