@@ -15,6 +15,9 @@ class FileNameDirTable(FieldSet):
         if self["entry_start"].value < self.parent.firstEntryOffset:
             self.parent.firstEntryOffset = self["entry_start"].value
 
+    def createDescription(self):
+        return "first file id: %d; parent directory id: %d (%d)" % (self["entry_file_id"].value, self["parent_id"].value, self["parent_id"].value & 0xFFF)
+
 class FileNameEntry(FieldSet):
     def createFields(self):
         yield Bits(self, "name_len", 7)
