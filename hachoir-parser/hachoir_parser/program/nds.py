@@ -29,20 +29,37 @@ class FileNameEntry(FieldSet):
             s = "[D] "
         return s + self["name"].value
 
-class FileNameTable(FieldSet):
+class Directory(FieldSet):
     def createFields(self):
-        self.firstEntryOffset = 2**32
-
-        while True:
-            yield FileNameDirTable(self, "dir_table[]")
-            if (self.current_size / 8) >= self.firstEntryOffset:
-                break
-
         while True:
             fne = FileNameEntry(self, "entry[]")
             if fne["name_len"].value == 0:
+                yield UInt8(self, "end_marker")
                 break
             yield fne
+
+
+class FileNameTable(FieldSet):
+    def createFields(self):
+        self.start_offsets = []
+        self.firstEntryOffset = 2**32
+
+        # read all directory tables (until the first directory offset is reached):
+        while True:
+            dt = FileNameDirTable(self, "dir_table[]")
+            self.start_offsets.append(dt["entry_start"].value)
+            yield dt
+            if (self.current_size / 8) >= self.firstEntryOffset:
+                break
+
+        # read content of all directories for which we found directory tables:
+        for offset in self.start_offsets:
+            # insert padding, if necessary:
+            if (self.current_size / 8 < offset):
+                padding = offset - self.current_size / 8
+                yield RawBytes(self, "pad[]", padding)
+            yield Directory(self, "directory[]")
+
 
 class NdsColor(FieldSet):
     def createFields(self):
