@@ -15,12 +15,11 @@ from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 
 class FileNameDirTable(FieldSet):
+    static_size = (4+2+2)*8
     def createFields(self):
         yield UInt32(self, "entry_start")
         yield UInt16(self, "entry_file_id")
         yield UInt16(self, "parent_id")
-        if self["entry_start"].value < self.parent.firstEntryOffset:
-            self.parent.firstEntryOffset = self["entry_start"].value
 
     def createDescription(self):
         return "first file id: %d; parent directory id: %d (%d)" % (self["entry_file_id"].value, self["parent_id"].value, self["parent_id"].value & 0xFFF)
@@ -49,25 +48,22 @@ class Directory(FieldSet):
             yield fne
 
 
-class FileNameTable(FieldSet):
+class FileNameTable(SeekableFieldSet):
     def createFields(self):
-        self.start_offsets = []
-        self.firstEntryOffset = 2**32
+        self.startOffset = self.absolute_address / 8
 
-        # read all directory tables (until the first directory offset is reached):
-        while True:
-            dt = FileNameDirTable(self, "dir_table[]")
-            self.start_offsets.append(dt["entry_start"].value)
-            yield dt
-            if (self.current_size / 8) >= self.firstEntryOffset:
-                break
+        # parent_id of first FileNameDirTable contains number of directories:
+        dt = FileNameDirTable(self, "dir_table[]")
+        numDirs = dt["parent_id"].value
+        yield dt
 
-        # read content of all directories for which we found directory tables:
-        for offset in self.start_offsets:
-            # insert padding, if necessary:
-            if (self.current_size / 8 < offset):
-                padding = offset - self.current_size / 8
-                yield RawBytes(self, "pad[]", padding)
+        for i in range(1, numDirs):
+            yield FileNameDirTable(self, "dir_table[]")
+
+        for i in range(0, numDirs):
+            dt = self["dir_table[%d]" % i]
+            offset = self.startOffset + dt["entry_start"].value
+            self.seekByte(offset, relative=False)
             yield Directory(self, "directory[]")
 
 
