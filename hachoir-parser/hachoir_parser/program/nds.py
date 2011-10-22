@@ -113,7 +113,6 @@ class Banner(FieldSet):
 
 
 class Header(FieldSet):
-    static_size = 512 * 8
     def createFields(self):
         yield String(self, "game_title", 12, truncate="\0")
         yield String(self, "game_code", 4)
@@ -166,8 +165,6 @@ class Header(FieldSet):
         yield UInt16(self, "logo_crc16")
         yield UInt16(self, "header_crc16")
 
-        yield RawBytes(self, "reserved", 160)
-
 
 class NdsFile(Parser):
     PARSER_TAGS = {
@@ -175,7 +172,7 @@ class NdsFile(Parser):
         "category": "program",
         "file_ext": ("nds",),
         "mime": (u"application/octet-stream",),
-        "min_size": 512 * 8, # just a minimal header
+        "min_size": 352 * 8, # just a minimal header
         "description": "Nintendo DS game file",
     }
 
@@ -184,7 +181,7 @@ class NdsFile(Parser):
     def validate(self):
         return (self.stream.readBytes(0, 1) != "\0"
             and ((self["header"]["device_code"].value & 7) == 0)
-            and self["header"]["header_size"].value >= 512
+            and self["header"]["header_size"].value >= 352
             and self["header"]["arm9_bin_size"].value > 0
             and self["header"]["arm7_bin_size"].value > 0
             and self["header"]["arm9_source"].value + self["header"]["arm9_bin_size"].value < self._size
