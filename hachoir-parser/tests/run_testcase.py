@@ -467,6 +467,7 @@ def checkNds(parser): return (
     checkValue(parser, "/header/game_title", '.'),
     checkValue(parser, "/header/header_crc16", 29398),
     checkValue(parser, "/filename_table/directory[4]/entry[0]/name", "file2.txt"),
+    checkValue(parser, "/file[1]", "Hello from file2.txt\n\n"),
 )
 
 def checkFile(filename, check_parser):
