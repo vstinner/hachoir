@@ -463,6 +463,12 @@ def checkSwat(parser): return (
     checkValue(parser, "jpeg_header_len", 10),
 )
 
+def checkNds(parser): return (
+    checkValue(parser, "/header/game_title", '.'),
+    checkValue(parser, "/header/header_crc16", 29398),
+    checkValue(parser, "/filename_table/directory[4]/entry[0]/name", "file2.txt"),
+)
+
 def checkFile(filename, check_parser):
     sys.stdout.write("  - Create parser: ")
     sys.stdout.flush()
@@ -631,6 +637,7 @@ testcase_files = (
     # radpoor.doc
     # quicktime.mp4
     (u"swat.blp", checkSwat),
+    (u"nitrodir.nds", checkNds),
 )
 
 if __name__ == "__main__":
