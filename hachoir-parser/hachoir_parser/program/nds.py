@@ -6,6 +6,7 @@ File format references:
 - http://imrannazar.com/The-Smallest-NDS-File
 - http://darkfader.net/ds/files/ndstool.cpp
 - http://crackerscrap.com/docs/dsromstructure.html
+- http://nocash.emubase.de/gbatek.htm
 """
 
 from hachoir_parser import Parser
@@ -127,6 +128,23 @@ class Banner(FieldSet):
         yield String(self, "title_es", 256, charset="UTF-16-LE", truncate="\0")
 
 
+class Overlay(FieldSet):
+    static_size = 8*4*8
+    def createFields(self):
+        yield UInt32(self, "id")
+        yield textHandler(UInt32(self, "ram_address"), hexadecimal)
+        yield UInt32(self, "ram_size")
+        yield UInt32(self, "bss_size")
+        yield textHandler(UInt32(self, "init_start_address"), hexadecimal)
+        yield textHandler(UInt32(self, "init_end_address"), hexadecimal)
+        yield UInt32(self, "file_id")
+        yield RawBytes(self, "reserved[]", 4)
+
+    def createDescription(self):
+        return "file #%d, %d (+%d) bytes to 0x%08x" % (
+            self["file_id"].value, self["ram_size"].value, self["bss_size"].value, self["ram_address"].value)
+
+
 class DeviceSize(UInt8):
     def createDescription(self):
         return "%d Mbit" % ((2**(20+self.value)) / (1024*1024))
@@ -236,6 +254,13 @@ class NdsFile(Parser, RootSeekableFieldSet):
         if self["header"]["banner_offset"].value > 0:
             self.seekByte(self["header"]["banner_offset"].value, relative=False)
             yield Banner(self, "banner")
+
+        # ARM9 overlays
+        if self["header"]["arm9_overlay_src"].value > 0:
+            self.seekByte(self["header"]["arm9_overlay_src"].value, relative=False)
+            numOvls = self["header"]["arm9_overlay_size"].value / (8*4)
+            for i in range(numOvls):
+                yield Overlay(self, "arm9_overlay[]")
 
         # files
         if self["header"]["fat_size"].value > 0:
