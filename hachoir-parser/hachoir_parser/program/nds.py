@@ -5,6 +5,7 @@ File format references:
 - http://www.bottledlight.com/ds/index.php/FileFormats/NDSFormat
 - http://imrannazar.com/The-Smallest-NDS-File
 - http://darkfader.net/ds/files/ndstool.cpp
+- http://crackerscrap.com/docs/dsromstructure.html
 """
 
 from hachoir_parser import Parser
@@ -84,7 +85,22 @@ class FATContent(FieldSet):
 
 
 
+class BannerTile(FieldSet):
+    static_size = 32*8
+    def createFields(self):
+        for y in range(8):
+            for x in range(8):
+                yield Bits(self, "pixel[%d,%d]" % (x,y), 4)
+
+class BannerIcon(FieldSet):
+    static_size = 16*32*8
+    def createFields(self):
+        for y in range(4):
+            for x in range(4):
+                yield BannerTile(self, "tile[%d,%d]" % (x,y))
+
 class NdsColor(FieldSet):
+    static_size = 16
     def createFields(self):
         yield Bits(self, "red", 5)
         yield Bits(self, "green", 5)
@@ -95,11 +111,12 @@ class NdsColor(FieldSet):
         return "#%02x%02x%02x" % (self["red"].value << 3, self["green"].value << 3, self["blue"].value << 3)
 
 class Banner(FieldSet):
+    static_size = 2112*8
     def createFields(self):
         yield UInt16(self, "version")
         yield UInt16(self, "crc")
         yield RawBytes(self, "reserved", 28)
-        yield RawBytes(self, "tile_data", 512)
+        yield BannerIcon(self, "icon_data")
         for i in range(0, 16):
             yield NdsColor(self, "palette_color[]")
         yield String(self, "title_jp", 256, charset="UTF-16-LE", truncate="\0")
