@@ -11,6 +11,7 @@ from hachoir_parser import Parser
 from hachoir_core.field import (ParserError,
     UInt8, UInt16, UInt32, UInt64, String, RawBytes, SubFile, FieldSet, NullBits, Bit, Bits,
     SeekableFieldSet, RootSeekableFieldSet)
+from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 
 class FileNameDirTable(FieldSet):
@@ -113,6 +114,10 @@ class Banner(FieldSet):
         yield String(self, "title_es", 256, charset="UTF-16-LE", truncate="\0")
 
 
+class DeviceSize(UInt8):
+    def createDescription(self):
+        return "%d Mbit" % ((2**(20+self.value)) / (1024*1024))
+
 class Header(FieldSet):
     def createFields(self):
         yield String(self, "game_title", 12, truncate="\0")
@@ -121,19 +126,22 @@ class Header(FieldSet):
         yield UInt8(self, "unit_code")
         yield UInt8(self, "device_code")
 
-        yield UInt8(self, "card_size")
-        yield String(self, "card_info", 10)
-        yield UInt8(self, "flags")
+        yield DeviceSize(self, "card_size")
+        yield String(self, "card_info", 9)
+        yield UInt8(self, "rom_version")
+        yield Bits(self, "unknown_flags[]", 2)
+        yield Bit(self, "autostart_flag")
+        yield Bits(self, "unknown_flags[]", 5)
 
-        yield UInt32(self, "arm9_source")
-        yield UInt32(self, "arm9_execute_addr")
-        yield UInt32(self, "arm9_copy_to_addr")
-        yield UInt32(self, "arm9_bin_size")
+        yield UInt32(self, "arm9_source", "ARM9 ROM offset")
+        yield textHandler(UInt32(self, "arm9_execute_addr", "ARM9 entry address"), hexadecimal)
+        yield textHandler(UInt32(self, "arm9_copy_to_addr", "ARM9 RAM address"), hexadecimal)
+        yield UInt32(self, "arm9_bin_size", "ARM9 code size")
 
-        yield UInt32(self, "arm7_source")
-        yield UInt32(self, "arm7_execute_addr")
-        yield UInt32(self, "arm7_copy_to_addr")
-        yield UInt32(self, "arm7_bin_size")
+        yield UInt32(self, "arm7_source", "ARM7 ROM offset")
+        yield textHandler(UInt32(self, "arm7_execute_addr", "ARM7 entry address"), hexadecimal)
+        yield textHandler(UInt32(self, "arm7_copy_to_addr", "ARM7 RAM address"), hexadecimal)
+        yield UInt32(self, "arm7_bin_size", "ARM7 code size")
 
         yield UInt32(self, "filename_table_offset")
         yield UInt32(self, "filename_table_size")
@@ -145,8 +153,8 @@ class Header(FieldSet):
         yield UInt32(self, "arm7_overlay_src")
         yield UInt32(self, "arm7_overlay_size")
 
-        yield UInt32(self, "ctl_read_flags")
-        yield UInt32(self, "ctl_init_flags")
+        yield textHandler(UInt32(self, "ctl_read_flags"), hexadecimal)
+        yield textHandler(UInt32(self, "ctl_init_flags"), hexadecimal)
         yield UInt32(self, "banner_offset")
         yield UInt16(self, "secure_crc16")
         yield UInt16(self, "rom_timeout")
