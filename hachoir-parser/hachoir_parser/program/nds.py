@@ -175,15 +175,21 @@ class NdsFile(Parser):
         "category": "program",
         "file_ext": ("nds",),
         "mime": (u"application/octet-stream",),
-        "min_size": 12 * 8,
+        "min_size": 512 * 8, # just a minimal header
         "description": "Nintendo DS game file",
     }
 
     endian = LITTLE_ENDIAN
 
     def validate(self):
-        # TODO: improve detection (candidates: rom_size, header_size, various CRCs; game_title and game_code always must start with character)
-        return self.stream.readBytes(0, 1) != "\0" and ((self["header"]["device_code"].value & 7) == 0) and self.size >= 512 * 8
+        return (self.stream.readBytes(0, 1) != "\0"
+            and ((self["header"]["device_code"].value & 7) == 0)
+            and self["header"]["header_size"].value >= 512
+            and self["header"]["arm9_bin_size"].value > 0
+            and self["header"]["arm7_bin_size"].value > 0
+            and self["header"]["arm9_source"].value + self["header"]["arm9_bin_size"].value < self._size
+            and self["header"]["arm7_source"].value + self["header"]["arm7_bin_size"].value < self._size
+            )
 
     def createFields(self):
         # Header

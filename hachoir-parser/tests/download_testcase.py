@@ -90,6 +90,7 @@ testcase_files = (
     (u"radpoor.doc", 103936, "114835a03be92e02029c74ece1162c3e"),
     (u"quicktime.mp4", 245779, "dc77a8de8c091c19d86df74280f6feb7"),
     (u"swat.blp", 55753, "a47a2d6ef61c9005c3f5faf1bca253af"),
+    (u"nitrodir.nds", 217624, "4d81b4dec82e0abbdf6c793ed3280f70"),
 )
 
 def stringMD5(text):
