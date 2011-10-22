@@ -9,7 +9,8 @@ File format references:
 
 from hachoir_parser import Parser
 from hachoir_core.field import (ParserError,
-    UInt8, UInt16, UInt32, UInt64, String, RawBytes, FieldSet, NullBits, Bit, Bits)
+    UInt8, UInt16, UInt32, UInt64, String, RawBytes, SubFile, FieldSet, NullBits, Bit, Bits,
+    SeekableFieldSet, RootSeekableFieldSet)
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 
 class FileNameDirTable(FieldSet):
@@ -166,7 +167,7 @@ class Header(FieldSet):
         yield UInt16(self, "header_crc16")
 
 
-class NdsFile(Parser):
+class NdsFile(Parser, RootSeekableFieldSet):
     PARSER_TAGS = {
         "id": "nds_file",
         "category": "program",
@@ -193,32 +194,31 @@ class NdsFile(Parser):
         yield Header(self, "header")
 
         # ARM9 binary
-        if self["header"]["arm9_source"].value - (self.current_size / 8) > 0:
-            yield RawBytes(self, "pad[]", self["header"]["arm9_source"].value - (self.current_size / 8))
+        self.seekByte(self["header"]["arm9_source"].value, relative=False)
         yield RawBytes(self, "arm9_bin", self["header"]["arm9_bin_size"].value)
 
         # ARM7 binary
-        if self["header"]["arm7_source"].value - (self.current_size / 8) > 0:
-            yield RawBytes(self, "pad[]", self["header"]["arm7_source"].value - (self.current_size / 8))
+        self.seekByte(self["header"]["arm7_source"].value, relative=False)
         yield RawBytes(self, "arm7_bin", self["header"]["arm7_bin_size"].value)
 
         # File Name Table
-        if self["header"]["filename_table_offset"].value - (self.current_size / 8) > 0:
-            yield RawBytes(self, "pad[]", self["header"]["filename_table_offset"].value - (self.current_size / 8))
-        yield FileNameTable(self, "filename_table")
+        if self["header"]["filename_table_size"].value > 0:
+            self.seekByte(self["header"]["filename_table_offset"].value, relative=False)
+            yield FileNameTable(self, "filename_table", size=self["header"]["filename_table_size"].value*8)
 
         # FAT
         if self["header"]["fat_size"].value > 0:
-            if self["header"]["fat_offset"].value - (self.current_size / 8) > 0:
-                yield RawBytes(self, "pad[]", self["header"]["fat_offset"].value - (self.current_size / 8))
-            yield FATContent(self, "fat_content")
+            self.seekByte(self["header"]["fat_offset"].value, relative=False)
+            yield FATContent(self, "fat_content", size=self["header"]["fat_size"].value*8)
 
         # banner
         if self["header"]["banner_offset"].value > 0:
-            if self["header"]["banner_offset"].value - (self.current_size / 8) > 0:
-                yield RawBytes(self, "pad[]", self["header"]["banner_offset"].value - (self.current_size / 8))
+            self.seekByte(self["header"]["banner_offset"].value, relative=False)
             yield Banner(self, "banner")
 
-        # Read rest of the file (if any)
-        if self.current_size < self._size:
-            yield self.seekBit(self._size, "end")
+        # files
+        if self["header"]["fat_size"].value > 0:
+            for field in self["fat_content"]:
+                if field["end"].value > field["start"].value:
+                    self.seekByte(field["start"].value, relative=False)
+                    yield SubFile(self, "file[]", field["end"].value - field["start"].value)
