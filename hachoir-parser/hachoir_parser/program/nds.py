@@ -300,10 +300,15 @@ class NdsFile(Parser, RootSeekableFieldSet):
         return (self.stream.readBytes(0, 1) != "\0"
             and (header["device_code"].value & 7) == 0
             and header["header_size"].value >= 352
+            and header["card_size"].value < 15 # arbitrary limit at 32Gbit
             and header["arm9_bin_size"].value > 0 and header["arm9_bin_size"].value <= 0x3bfe00
             and header["arm7_bin_size"].value > 0 and header["arm7_bin_size"].value <= 0x3bfe00
             and header["arm9_source"].value + header["arm9_bin_size"].value < self._size
             and header["arm7_source"].value + header["arm7_bin_size"].value < self._size
+            and header["arm9_execute_addr"].value >= 0x02000000 and header["arm9_execute_addr"].value <= 0x023bfe00
+            and header["arm9_copy_to_addr"].value >= 0x02000000 and header["arm9_copy_to_addr"].value <= 0x023bfe00
+            and header["arm7_execute_addr"].value >= 0x02000000 and header["arm7_execute_addr"].value <= 0x03807e00
+            and header["arm7_copy_to_addr"].value >= 0x02000000 and header["arm7_copy_to_addr"].value <= 0x03807e00
             )
 
     def createFields(self):
