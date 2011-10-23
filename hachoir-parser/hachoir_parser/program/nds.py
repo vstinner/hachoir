@@ -11,7 +11,7 @@ File format references:
 
 from hachoir_parser import Parser
 from hachoir_core.field import (ParserError,
-    UInt8, UInt16, UInt32, UInt64, String, RawBytes, SubFile, FieldSet, NullBits, Bit, Bits,
+    UInt8, UInt16, UInt32, UInt64, String, RawBytes, SubFile, FieldSet, NullBits, Bit, Bits, Bytes,
     SeekableFieldSet, RootSeekableFieldSet)
 from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
@@ -201,6 +201,19 @@ class Overlay(FieldSet):
             self["file_id"].value, self["ram_size"].value, self["bss_size"].value, self["ram_address"].value)
 
 
+class SecureArea(FieldSet):
+    static_size=2048*8
+    def createFields(self):
+        yield textHandler(UInt64(self, "id"), hexadecimal)
+        if self["id"].value == 0xe7ffdeffe7ffdeff: # indicates that secure area is decrypted
+            yield Bytes(self, "fixed[]", 6) # always \xff\xde\xff\xe7\xff\xde
+            yield Crc16(self, "header_crc16", self.stream.readBytes(self.absolute_address+(16*8), 2048-16))
+            yield RawBytes(self, "unknown[]", 2048-16-2)
+            yield Bytes(self, "fixed[]", 2) # always \0\0
+        else:
+            yield RawBytes(self, "encrypted[]", 2048-8)
+
+
 class DeviceSize(UInt8):
     def createDescription(self):
         return "%d Mbit" % ((2**(20+self.value)) / (1024*1024))
@@ -291,6 +304,12 @@ class NdsFile(Parser, RootSeekableFieldSet):
     def createFields(self):
         # Header
         yield Header(self, "header")
+
+        # Secure Area
+        if self["header"]["arm9_source"].value >= 0x4000 and self["header"]["arm9_source"].value < 0x8000:
+            secStart = self["header"]["arm9_source"].value & 0xfffff000
+            self.seekByte(secStart, relative=False)
+            yield SecureArea(self, "secure_area", size=0x8000-secStart)
 
         # ARM9 binary
         self.seekByte(self["header"]["arm9_source"].value, relative=False)
