@@ -466,7 +466,12 @@ def checkSwat(parser): return (
 def checkNds(parser): return (
     checkValue(parser, "/header/game_title", '.'),
     checkValue(parser, "/header/header_crc16", 29398),
+    checkValue(parser, "/banner/icon_data/tile[3,3]/pixel[7,6]", 5),
+    checkValue(parser, "/banner/palette_color[13]/blue", 28),
+    checkValue(parser, "/filename_table/directory[3]/entry[1]/name", "subsubdir1"),
+    checkValue(parser, "/filename_table/directory[3]/entry[1]/dir_id", 61444),
     checkValue(parser, "/filename_table/directory[4]/entry[0]/name", "file2.txt"),
+    checkValue(parser, "/filename_table/directory[4]/entry[0]/is_directory", False),
     checkValue(parser, "/file[1]", "Hello from file2.txt\n\n"),
 )
 
