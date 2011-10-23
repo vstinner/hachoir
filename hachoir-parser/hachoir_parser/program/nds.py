@@ -261,6 +261,10 @@ class Header(FieldSet):
         yield Crc16(self, "logo_crc16", self.stream.readBytes(0xc0*8, 156))
         yield Crc16(self, "header_crc16", self.stream.readBytes(0, 350))
 
+        yield UInt32(self, "debug_rom_offset")
+        yield UInt32(self, "debug_size")
+        yield textHandler(UInt32(self, "debug_ram_address"), hexadecimal)
+
 
 class NdsFile(Parser, RootSeekableFieldSet):
     PARSER_TAGS = {
