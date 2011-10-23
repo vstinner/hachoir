@@ -292,13 +292,18 @@ class NdsFile(Parser, RootSeekableFieldSet):
     endian = LITTLE_ENDIAN
 
     def validate(self):
+        try:
+            header = self["header"]
+        except Exception, e:
+            return False
+
         return (self.stream.readBytes(0, 1) != "\0"
-            and ((self["header"]["device_code"].value & 7) == 0)
-            and self["header"]["header_size"].value >= 352
-            and self["header"]["arm9_bin_size"].value > 0
-            and self["header"]["arm7_bin_size"].value > 0
-            and self["header"]["arm9_source"].value + self["header"]["arm9_bin_size"].value < self._size
-            and self["header"]["arm7_source"].value + self["header"]["arm7_bin_size"].value < self._size
+            and (header["device_code"].value & 7) == 0
+            and header["header_size"].value >= 352
+            and header["arm9_bin_size"].value > 0 and header["arm9_bin_size"].value <= 0x3bfe00
+            and header["arm7_bin_size"].value > 0 and header["arm7_bin_size"].value <= 0x3bfe00
+            and header["arm9_source"].value + header["arm9_bin_size"].value < self._size
+            and header["arm7_source"].value + header["arm7_bin_size"].value < self._size
             )
 
     def createFields(self):
