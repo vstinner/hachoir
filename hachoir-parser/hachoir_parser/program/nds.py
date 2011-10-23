@@ -16,6 +16,61 @@ from hachoir_core.field import (ParserError,
 from hachoir_core.text_handler import textHandler, hexadecimal
 from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 
+
+"""
+CRC16 Calculation
+
+Modified from:
+http://www.mail-archive.com/python-list@python.org/msg47844.html
+
+Original License:
+crc16.py by Bryan G. Olson, 2005
+This module is free software and may be used and
+distributed under the same terms as Python itself.
+"""
+class CRC16:
+    _table = None
+
+    def _initTable (self):
+        from array import array
+
+        # CRC-16 poly: p(x) = x**16 + x**15 + x**2 + 1
+        # top bit implicit, reflected
+        poly = 0xa001
+        CRC16._table = array('H')
+        for byte in range(256):
+             crc = 0
+             for bit in range(8):
+                 if (byte ^ crc) & 1:
+                     crc = (crc >> 1) ^ poly
+                 else:
+                     crc >>= 1
+                 byte >>= 1
+             CRC16._table.append(crc)
+
+    def checksum (self, string, value):
+        if CRC16._table is None:
+            self._initTable()
+
+        for ch in string:
+            value = self._table[ord(ch) ^ (value & 0xff)] ^ (value >> 8)
+        return value
+
+
+class Crc16(UInt16):
+    "16 bit field for calculating and comparing CRC-16 of specified string"
+    def __init__(self, parent, name, targetBytes):
+        UInt16.__init__(self, parent, name)
+        self.targetBytes = targetBytes
+
+    def createDescription(self):
+        crc = CRC16().checksum(self.targetBytes, 0xffff)
+        if crc == self.value:
+            return "matches CRC of %d bytes" % len(self.targetBytes)
+        else:
+            return "mismatch (calculated CRC %d for %d bytes)" % (crc, len(self.targetBytes))
+
+
 class FileNameDirTable(FieldSet):
     static_size = (4+2+2)*8
     def createFields(self):
@@ -115,7 +170,8 @@ class Banner(FieldSet):
     static_size = 2112*8
     def createFields(self):
         yield UInt16(self, "version")
-        yield UInt16(self, "crc")
+        # CRC of this structure, excluding first 32 bytes:
+        yield Crc16(self, "crc", self.stream.readBytes(self.absolute_address+(32*8), (2112-32)))
         yield RawBytes(self, "reserved", 28)
         yield BannerIcon(self, "icon_data")
         for i in range(0, 16):
@@ -187,7 +243,7 @@ class Header(FieldSet):
         yield textHandler(UInt32(self, "ctl_read_flags"), hexadecimal)
         yield textHandler(UInt32(self, "ctl_init_flags"), hexadecimal)
         yield UInt32(self, "banner_offset")
-        yield UInt16(self, "secure_crc16")
+        yield Crc16(self, "secure_crc16", self.stream.readBytes(0x4000*8, 0x4000))
         yield UInt16(self, "rom_timeout")
 
         yield UInt32(self, "arm9_unk_addr")
@@ -202,8 +258,8 @@ class Header(FieldSet):
         yield RawBytes(self, "unknown[]", 16)
 
         yield RawBytes(self, "gba_logo", 156)
-        yield UInt16(self, "logo_crc16")
-        yield UInt16(self, "header_crc16")
+        yield Crc16(self, "logo_crc16", self.stream.readBytes(0xc0*8, 156))
+        yield Crc16(self, "header_crc16", self.stream.readBytes(0, 350))
 
 
 class NdsFile(Parser, RootSeekableFieldSet):
