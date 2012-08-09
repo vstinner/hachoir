@@ -36,7 +36,9 @@ class PRSPakFile(Parser):
     endian = LITTLE_ENDIAN
 
     def validate(self):
-        return (self.stream.readBytes(0, 4) == b'PACK')
+        return (self.stream.readBytes(0, 4) == b'PACK'
+          and self["file[0]/size"].value >= 0
+          and len(self["file[0]/filename"].value) > 0)
 
     def createFields(self):
         yield String(self, "magic", 4)
