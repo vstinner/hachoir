@@ -48,10 +48,10 @@ class Interface:
     def fill_tree(self, parent, treeparent, treeStore):
         for field in parent:
             if field.hasValue():
-                #value = field.display
-                value = field.raw_display
+                value = field.display
+                #value = field.raw_display
             else:
-                value = ""
+                value = field.description
             newparent = treeStore.append(treeparent,(field.name,value))
             if field.is_field_set:
                 self.fill_tree(field, newparent, treeStore)
