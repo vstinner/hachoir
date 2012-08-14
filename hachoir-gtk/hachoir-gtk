@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 import pygtk
 import sys
+import os
 pygtk.require ('2.0') # 2.2 for Clipboard
 import gtk.glade
 from hachoir_core.cmd_line import unicodeFilename
 from hachoir_parser import createParser
 
-UI_FILENAME = "hachoir.glade"
+UI_FILENAME = os.path.dirname( __file__ ) + "/hachoir.glade"
 
 class Interface:
     def __init__(self, fieldset):
