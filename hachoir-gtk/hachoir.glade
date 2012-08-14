@@ -4,8 +4,8 @@
 <glade-interface>
 
 <widget class="GtkWindow" id="main_window">
-  <property name="width_request">450</property>
-  <property name="height_request">400</property>
+  <property name="width_request">550</property>
+  <property name="height_request">650</property>
   <property name="visible">True</property>
   <property name="title" translatable="yes">Hachoir</property>
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
