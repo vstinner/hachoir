@@ -18,6 +18,8 @@ class Interface:
 
         self.xml.get_widget("main_window").set_title("Hachoir - %s" % filename)
 
+        self.table.set_search_equal_func(resultSearchCb)
+
     def quit(self):
         gtk.main_quit()
 
@@ -53,6 +55,25 @@ class Interface:
             newparent = treeStore.append(treeparent,(field.name,value))
             if field.is_field_set:
                 self.fill_tree(field, newparent, treeStore)
+
+def resultSearchCb (model, column, key, it):
+    """Callback function for searching in treeview"""
+    plainText = model.get_value(it, column)
+
+    # if search text contains only lower-case characters, do case-insensitive matching:
+    if key.islower():
+        plainText = plainText.lower()
+
+    # if the line contains the search text, it matches:
+    if plainText.find(key) >= 0:
+        return False
+
+    # line doesn't match:
+    return True
+
+
+#import cProfile
+# import profile
 
 def main():
     if(len(sys.argv)!=2 ):
