@@ -10,11 +10,13 @@ from hachoir_parser import createParser
 UI_FILENAME = os.path.dirname( __file__ ) + "/hachoir.glade"
 
 class Interface:
-    def __init__(self, fieldset):
+    def __init__(self, fieldset, filename):
         self.xml = gtk.glade.XML(UI_FILENAME, "main_window")
         self.xml.signal_autoconnect(self)
         self.fieldset = fieldset
         self.table = self.xml.get_widget("table")
+
+        self.xml.get_widget("main_window").set_title("Hachoir - %s" % filename)
 
     def quit(self):
         gtk.main_quit()
@@ -68,7 +70,7 @@ def main():
         return
 
     # Create window and gtk event loop
-    interface = Interface(fieldset)
+    interface = Interface(fieldset, filename)
     interface.display_tree(fieldset)
     gtk.main()
 
