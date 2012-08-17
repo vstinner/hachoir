@@ -16,6 +16,7 @@ ROW_NORMAL = 1
 ROW_SUBTREE_DUMMY = 2
 ROW_SUBFILE = 3
 ROW_SUBFILE_DUMMY = 4
+ROW_SHOW_MORE = 5
 
 
 class Interface:
@@ -26,6 +27,7 @@ class Interface:
 
         self.table.connect("row-expanded", self.on_row_expanded)
         self.table.connect("button-press-event", self.on_button_press)
+        self.table.connect("cursor-changed", self.on_cursor_changed)
 
         self.xml.get_widget("main_window").set_title("Hachoir - %s" % filename)
 
@@ -151,6 +153,21 @@ class Interface:
 
                 model.append(it,(None, "new_dummy", stream, ROW_SUBFILE_DUMMY))
 
+    def on_cursor_changed (self, treeview):
+        pathTuple = treeview.get_cursor()
+        path = pathTuple[0]
+        rowType = treeview.get_model()[path][3]
+
+        if rowType == ROW_SHOW_MORE:
+            (parentParser, lastIndex) = treeview.get_model()[path][2]
+            model = treeview.get_model()
+            thisIt = model.get_iter(path)
+            parentIt = model.iter_parent(thisIt)
+            self.fill_tree(parentParser, parentIt, model, lastIndex)
+
+            model.remove(thisIt)
+            treeview.set_cursor(path)
+
     def treeview_add_column(self, treeview, name, num):
         col = gtk.TreeViewColumn(name)
         treeview.append_column(col)
@@ -173,8 +190,18 @@ class Interface:
         topPath = treeStore.get_path(topItem)
         self.table.expand_row(topPath, False)
 
-    def fill_tree(self, parent, treeparent, treeStore):
+    def fill_tree(self, parent, treeparent, treeStore, start=0):
+        index = 0
+        fieldsAdded = 0
         for field in parent:
+            if index < start:
+                index+=1
+                continue
+
+            if fieldsAdded > 100:
+                treeStore.append(treeparent,(None, "(show more)", (parent, index), ROW_SHOW_MORE))
+                break
+
             if field.hasValue():
                 value = field.display
                 #value = field.raw_display
@@ -188,6 +215,9 @@ class Interface:
                 treeStore[newparent][3] = ROW_SUBFILE
                 treeStore[newparent][2] = stream
                 treeStore.append(newparent,(None, "dummy_subfile", stream, ROW_SUBFILE_DUMMY))
+
+            index+=1
+            fieldsAdded+=1
 
 def resultSearchCb (model, column, key, it):
     """Callback function for searching in treeview"""
