@@ -6,7 +6,7 @@ pygtk.require ('2.0') # 2.2 for Clipboard
 import gtk.glade
 from hachoir_core.cmd_line import unicodeFilename
 from hachoir_parser import createParser
-from hachoir_parser import guessParser
+from hachoir_parser import guessParser, HachoirParserList
 from hachoir_core.field import SubFile
 from hachoir_core.stream import FileInputStream
 
@@ -25,10 +25,26 @@ class Interface:
         self.table = self.xml.get_widget("table")
 
         self.table.connect("row-expanded", self.on_row_expanded)
+        self.table.connect("button-press-event", self.on_button_press)
 
         self.xml.get_widget("main_window").set_title("Hachoir - %s" % filename)
 
         self.table.set_search_equal_func(resultSearchCb)
+
+        self.selectedParsers = {}
+
+        self.parserDb = HachoirParserList.getInstance()
+        self.categories = {}
+        for p in self.parserDb:
+            tags = p.getParserTags()
+            if tags.has_key('category'):
+                cat = tags['category']
+            else:
+                cat = 'misc'
+            if not self.categories.has_key(cat):
+                self.categories[cat] = []
+            self.categories[cat].append(tags)
+
 
     def quit(self):
         gtk.main_quit()
@@ -53,7 +69,17 @@ class Interface:
                 # SubFile
                 assert(rowType == ROW_SUBFILE_DUMMY)
                 stream = model.get_value(childIt, 2)
-                parser = guessParser(stream)
+                selectedParser = None
+                if self.selectedParsers.has_key(path):
+                    selectedParser = self.selectedParsers[path]
+
+                    parser = None
+                    for p in self.parserDb:
+                        tags = p.getParserTags()
+                        if tags['id'] == selectedParser:
+                            parser = p(stream)
+                else:
+                    parser = guessParser(stream)
 
                 if not parser:
                     print "no parser found for %s" % stream.source
@@ -61,6 +87,69 @@ class Interface:
                 else:
                     self.fill_tree(parser, it, model)
                     model[childIt] = ("Subfile", parser.description, stream, ROW_SUBFILE_DUMMY)
+
+    def on_button_press (self, treeview, event):
+        if event.button == 3:
+            pathTuple = treeview.get_path_at_pos(int(event.x), int(event.y))
+            if pathTuple is not None:
+                path = pathTuple[0]
+                model = treeview.get_model()
+
+                # show parser selection menu only for Subfile entries:
+                childIter = model.iter_children(model.get_iter(path))
+                if childIter and treeview.get_model()[childIter][3] == ROW_SUBFILE_DUMMY:
+                    menu = gtk.Menu()
+
+                    selectedParser = None
+                    if self.selectedParsers.has_key(path):
+                        selectedParser = self.selectedParsers[path]
+
+                    treeview.grab_focus()
+                    treeview.set_cursor(path, pathTuple[1], False)
+
+                    mi = gtk.RadioMenuItem(None, "Auto", use_underline=False)
+                    if selectedParser is None:
+                        mi.set_active(True)
+                    mi.connect("activate", self.on_select_parser, model, path, None)
+                    menu.append(mi)
+                    firstMi = mi
+
+                    for cat in sorted(self.categories.keys()):
+                        submenu = gtk.Menu()
+                        selectedSubmenu = False
+                        for tags in self.categories[cat]:
+                            mi = gtk.RadioMenuItem(firstMi, tags['id'] + ": " + tags['description'], use_underline=False)
+                            if selectedParser == tags['id']:
+                                mi.set_active(True)
+                                selectedSubmenu = True
+                            mi.connect("activate", self.on_select_parser, model, path, tags['id'])
+                            submenu.append(mi)
+
+                        itemName = cat
+                        if selectedSubmenu:
+                            itemName += " (*)"
+                        mi = gtk.MenuItem(itemName, use_underline=False)
+                        mi.set_submenu(submenu)
+                        menu.append(mi)
+
+                    menu.show_all()
+                    menu.popup(None, None, None, event.button, event.time)
+
+    def on_select_parser (self, menuitem, model, path, name):
+        if menuitem.get_active():
+            if name is None:
+                del(self.selectedParsers[path])
+            else:
+                self.selectedParsers[path] = name
+
+            # remove any existing parsed children for this menu item:
+            it = model.get_iter(path)
+            childIt = model.iter_children(it)
+            if childIt:
+                stream = model.get_value(childIt, 2)
+                while model.remove(childIt): pass
+
+                model.append(it,(None, "new_dummy", stream, ROW_SUBFILE_DUMMY))
 
     def treeview_add_column(self, treeview, name, num):
         col = gtk.TreeViewColumn(name)
