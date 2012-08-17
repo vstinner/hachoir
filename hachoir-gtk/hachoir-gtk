@@ -8,14 +8,20 @@ from hachoir_core.cmd_line import unicodeFilename
 from hachoir_parser import createParser
 from hachoir_parser import guessParser
 from hachoir_core.field import SubFile
+from hachoir_core.stream import FileInputStream
 
 UI_FILENAME = os.path.dirname( __file__ ) + "/hachoir.glade"
 
+ROW_NORMAL = 1
+ROW_SUBTREE_DUMMY = 2
+ROW_SUBFILE = 3
+ROW_SUBFILE_DUMMY = 4
+
+
 class Interface:
-    def __init__(self, fieldset, filename):
+    def __init__(self, filename):
         self.xml = gtk.glade.XML(UI_FILENAME, "main_window")
         self.xml.signal_autoconnect(self)
-        self.fieldset = fieldset
         self.table = self.xml.get_widget("table")
 
         self.table.connect("row-expanded", self.on_row_expanded)
@@ -37,15 +43,24 @@ class Interface:
         model = treeview.get_model()
         childIt = model.iter_children(it)
         if childIt and model.get_value(childIt, 0) is None:
-            stream = model.get_value(childIt, 2)
-
-            parser = guessParser(stream)
-            if not parser:
-                print "no parser found for %s" % stream.source
+            rowType = model.get_value(childIt, 3)
+            if rowType == ROW_SUBTREE_DUMMY:
+                # normal subtree
+                field = model.get_value(childIt, 2)
+                self.fill_tree(field, it, model)
                 model.remove(childIt)
             else:
-                self.fill_tree(parser, it, model)
-                model[childIt] = ("Subfile", parser.description, None)
+                # SubFile
+                assert(rowType == ROW_SUBFILE_DUMMY)
+                stream = model.get_value(childIt, 2)
+                parser = guessParser(stream)
+
+                if not parser:
+                    print "no parser found for %s" % stream.source
+                    model[childIt] = ("Subfile", "(unrecognized)", stream, ROW_SUBFILE_DUMMY)
+                else:
+                    self.fill_tree(parser, it, model)
+                    model[childIt] = ("Subfile", parser.description, stream, ROW_SUBFILE_DUMMY)
 
     def treeview_add_column(self, treeview, name, num):
         col = gtk.TreeViewColumn(name)
@@ -56,12 +71,18 @@ class Interface:
         treeview.set_search_column(num)
         return num+1
 
-    def display_tree(self, parent):
-        treeStore = gtk.TreeStore(str, str, object)
+    def display_tree(self, stream):
+        treeStore = gtk.TreeStore(str, str, object, int)
+
+        topItem = treeStore.append(None, ("File", stream.source, stream, ROW_SUBFILE))
+        treeStore.append(topItem, (None, "dummy-top", stream, ROW_SUBFILE_DUMMY))
+
         self.table.set_model(treeStore)
         self.treeview_add_column(self.table, "name", 0)
         self.treeview_add_column(self.table, "value", 1)
-        self.fill_tree(parent,None,treeStore)
+
+        topPath = treeStore.get_path(topItem)
+        self.table.expand_row(topPath, False)
 
     def fill_tree(self, parent, treeparent, treeStore):
         for field in parent:
@@ -70,12 +91,14 @@ class Interface:
                 #value = field.raw_display
             else:
                 value = field.description
-            newparent = treeStore.append(treeparent,(field.name,value,None))
+            newparent = treeStore.append(treeparent,(field.name, value, None, ROW_NORMAL))
             if field.is_field_set:
-                self.fill_tree(field, newparent, treeStore)
+                treeStore.append(newparent,(None, "dummy_tree", field, ROW_SUBTREE_DUMMY))
             elif type(field) == SubFile:
                 stream = field.getSubIStream()
-                treeStore.append(newparent,(None, "dummy", stream))
+                treeStore[newparent][3] = ROW_SUBFILE
+                treeStore[newparent][2] = stream
+                treeStore.append(newparent,(None, "dummy_subfile", stream, ROW_SUBFILE_DUMMY))
 
 def resultSearchCb (model, column, key, it):
     """Callback function for searching in treeview"""
@@ -102,18 +125,12 @@ def main():
         return
     filename = sys.argv[1]
 
-    # Create parser
     filename, realname = unicodeFilename(filename), filename
-    fieldset = createParser(filename, realname)
-
-    # test if there is a least one tree
-    if  fieldset is  None :
-        print "No fields to display in this file. This is probably a text file."
-        return
+    topStream = FileInputStream(filename, realname)
 
     # Create window and gtk event loop
-    interface = Interface(fieldset, filename)
-    interface.display_tree(fieldset)
+    interface = Interface(filename)
+    interface.display_tree(topStream)
     gtk.main()
 
 if __name__ == "__main__":
