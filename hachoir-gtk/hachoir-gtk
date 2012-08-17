@@ -6,6 +6,8 @@ pygtk.require ('2.0') # 2.2 for Clipboard
 import gtk.glade
 from hachoir_core.cmd_line import unicodeFilename
 from hachoir_parser import createParser
+from hachoir_parser import guessParser
+from hachoir_core.field import SubFile
 
 UI_FILENAME = os.path.dirname( __file__ ) + "/hachoir.glade"
 
@@ -15,6 +17,8 @@ class Interface:
         self.xml.signal_autoconnect(self)
         self.fieldset = fieldset
         self.table = self.xml.get_widget("table")
+
+        self.table.connect("row-expanded", self.on_row_expanded)
 
         self.xml.get_widget("main_window").set_title("Hachoir - %s" % filename)
 
@@ -29,6 +33,20 @@ class Interface:
     def on_window_destroy(self, widget, data=None):
         self.quit()
 
+    def on_row_expanded (self, treeview, it, path):
+        model = treeview.get_model()
+        childIt = model.iter_children(it)
+        if childIt and model.get_value(childIt, 0) is None:
+            stream = model.get_value(childIt, 2)
+
+            parser = guessParser(stream)
+            if not parser:
+                print "no parser found for %s" % stream.source
+                model.remove(childIt)
+            else:
+                self.fill_tree(parser, it, model)
+                model[childIt] = ("Subfile", parser.description, None)
+
     def treeview_add_column(self, treeview, name, num):
         col = gtk.TreeViewColumn(name)
         treeview.append_column(col)
@@ -39,7 +57,7 @@ class Interface:
         return num+1
 
     def display_tree(self, parent):
-        treeStore = gtk.TreeStore(str, str)
+        treeStore = gtk.TreeStore(str, str, object)
         self.table.set_model(treeStore)
         self.treeview_add_column(self.table, "name", 0)
         self.treeview_add_column(self.table, "value", 1)
@@ -52,9 +70,12 @@ class Interface:
                 #value = field.raw_display
             else:
                 value = field.description
-            newparent = treeStore.append(treeparent,(field.name,value))
+            newparent = treeStore.append(treeparent,(field.name,value,None))
             if field.is_field_set:
                 self.fill_tree(field, newparent, treeStore)
+            elif type(field) == SubFile:
+                stream = field.getSubIStream()
+                treeStore.append(newparent,(None, "dummy", stream))
 
 def resultSearchCb (model, column, key, it):
     """Callback function for searching in treeview"""
