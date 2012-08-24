@@ -299,7 +299,7 @@ class MapsforgeMapFile(Parser, RootSeekableFieldSet):
         "id": "mapsforge_map",
         "category": "misc",
         "file_ext": ("map",),
-        "min_size": 1,
+        "min_size": 62*8,
         "description": "Mapsforge map file",
     }
 
