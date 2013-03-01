@@ -59,9 +59,10 @@ class MkvMetadata(MultipleMetadata):
     def trackCommon(self, track, meta):
         if "Name/unicode" in track:
             meta.title = track["Name/unicode"].value
-        if "Language/string" in track \
-        and track["Language/string"].value not in ("mis", "und"):
+        if "Language/string" in track:
             meta.language = track["Language/string"].value
+        else:
+            meta.language = "eng"
 
     def processVideo(self, track):
         video = Metadata(self)
