@@ -268,7 +268,7 @@ class PropertyContent(FieldSet):
         except LookupError:
             handler = None
         if not handler:
-            log.warning("OLE2: Unable to parse property of type %s" \
+            self.warning("OLE2: Unable to parse property of type %s" \
                 % self["type"].display)
             # raise ParserError(
         elif self["is_vector"].value:
