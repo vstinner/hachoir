@@ -11,3 +11,4 @@ from hachoir.parser.archive.sevenzip import SevenZipParser  # noqa
 from hachoir.parser.archive.mar import MarFile  # noqa
 from hachoir.parser.archive.mozilla_ar import MozillaArchive  # noqa
 from hachoir.parser.archive.zlib import ZlibData  # noqa
+from hachoir.parser.archive.prs_pak import PRSPakFile  # noqa
