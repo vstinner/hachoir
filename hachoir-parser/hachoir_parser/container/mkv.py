@@ -66,7 +66,7 @@ def SInt(parent):
     return GenericInteger(parent, 'signed', True, parent['size'].value*8)
 
 def String(parent):
-    return _String(parent, 'string', parent['size'].value, charset="ASCII")
+    return _String(parent, 'string', parent['size'].value, charset="ASCII", strip="\0")
 
 def EnumString(parent, enum):
     return _Enum(String(parent), enum)
