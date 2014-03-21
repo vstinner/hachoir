@@ -88,14 +88,14 @@ class GenericString(Bytes):
     # Suffix format: value is suffix (string)
     SUFFIX_FORMAT = {
         "C": {
-             8: {LITTLE_ENDIAN: "\0",       BIG_ENDIAN: "\0"},
-            16: {LITTLE_ENDIAN: "\0\0",     BIG_ENDIAN: "\0\0"},
-            32: {LITTLE_ENDIAN: "\0\0\0\0", BIG_ENDIAN: "\0\0\0\0"},
+             8: {LITTLE_ENDIAN: b"\0",       BIG_ENDIAN: b"\0"},
+            16: {LITTLE_ENDIAN: b"\0\0",     BIG_ENDIAN: b"\0\0"},
+            32: {LITTLE_ENDIAN: b"\0\0\0\0", BIG_ENDIAN: b"\0\0\0\0"},
         },
         "UnixLine": {
-             8: {LITTLE_ENDIAN: "\n",       BIG_ENDIAN: "\n"},
-            16: {LITTLE_ENDIAN: "\n\0",     BIG_ENDIAN: "\0\n"},
-            32: {LITTLE_ENDIAN: "\n\0\0\0", BIG_ENDIAN: "\0\0\0\n"},
+             8: {LITTLE_ENDIAN: b"\n",       BIG_ENDIAN: b"\n"},
+            16: {LITTLE_ENDIAN: b"\n\0",     BIG_ENDIAN: b"\0\n"},
+            32: {LITTLE_ENDIAN: b"\n\0\0\0", BIG_ENDIAN: b"\0\0\0\n"},
         },
 
     }
@@ -298,16 +298,16 @@ class GenericString(Bytes):
         if not human:
             if self._raw_value is None:
                 self._raw_value = GenericString.createValue(self, False)
-            value = makePrintable(self._raw_value, "ASCII", to_unicode=True)
+            value = makePrintable(self._raw_value, "ASCII")
         elif self._charset:
-            value = makePrintable(self.value, "ISO-8859-1", to_unicode=True)
+            value = makePrintable(self.value, "ISO-8859-1")
         else:
             value = self.value
         if config.max_string_length < len(value):
             # Truncate string if needed
             value = "%s(...)" % value[:config.max_string_length]
         if not self._charset or not human:
-            return makePrintable(value, "ASCII", quote='"', to_unicode=True)
+            return makePrintable(value, "ASCII", quote='"')
         else:
             if value:
                 return '"%s"' % value.replace('"', '\\"')

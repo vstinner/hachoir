@@ -97,10 +97,10 @@ sub-field sets.
    ...     def createFields(self):
    ...         yield String(self, "signature", 3, charset="ASCII")
    ...         yield UInt8(self, "count")
-   ...         for index in xrange(self["count"].value):
+   ...         for index in range(self["count"].value):
    ...             yield Entry(self, "point[]")
    ...
-   >>> data = "MYF\3a\0b\2c\0"
+   >>> data = b"MYF\3a\0b\2c\0"
    >>> stream = StringInputStream(data)
    >>> root = MyFormat(stream)
 
@@ -144,7 +144,7 @@ behaviour, you can watch "current_length" (number of read fields) and
    >>> root = MyFormat(stream)  # Rebuild our parser
    >>> (root.current_length, root.current_size)
    (0, 0)
-   >>> root["signature"].display
+   >>> print(root["signature"].display)
    "MYF"
    >>> (root.current_length, root.current_size, root["signature"].size)
    (1, 24, 24)
@@ -153,7 +153,7 @@ Just after its creation, a parser is empty (0 fields). When we read the first
 field, its size becomes the size of the first field. Some operations requires
 to read more fields:
 
-   >>> root["point[0]/letter"].display
+   >>> print(root["point[0]/letter"].display)
    'a'
    >>> (root.current_length, root.current_size)
    (3, 48)

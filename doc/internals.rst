@@ -30,7 +30,7 @@ In the constructor, the field "color" is asked. So the field list will
 contains one field (color):
 
 >>> from hachoir.core.stream import StringInputStream
->>> stream = StringInputStream("\x2A\x00\x04\x05")
+>>> stream = StringInputStream(b"\x2A\x00\x04\x05")
 >>> p = Point(stream)
 >>> p.current_length
 1

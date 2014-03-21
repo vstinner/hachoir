@@ -23,4 +23,4 @@ class Character(Bits):
         return str(Bits.createValue(self))
 
     def createDisplay(self):
-        return makePrintable(self.value, "ASCII", quote="'", to_unicode=True)
+        return makePrintable(self.value, "ASCII", quote="'")
