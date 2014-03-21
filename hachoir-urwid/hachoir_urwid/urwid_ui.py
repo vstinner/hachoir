@@ -286,7 +286,7 @@ class Walker(ListWalker):
                     else:
                         tmp_text.append( humanFilesize(size) )
             text += " (%s)" % ", ".join(tmp_text)
-        text = makePrintable(text, self.charset, to_unicode=True, smart=smart_display)
+        text = makePrintable(text, self.charset, smart=smart_display)
         node.setText(text, self.flags)
 
     def _get(self, pos):
@@ -600,7 +600,7 @@ def exploreFieldSet(field_set, args, options={}):
 
     # awful way to allow the user to hide the log widget
     log.render = lambda size, focus=False: BoxAdapter.render(log, size[:1], focus)
-    footer.render = lambda (maxcol,), focus=False: Pile.render(footer, (maxcol, sep.rows((maxcol,))+log.height), focus)
+    footer.render = lambda arg, focus=False: Pile.render(footer, (arg[0], sep.rows(arg)+log.height), focus)
 
     top = Frame(body, None, footer)
 

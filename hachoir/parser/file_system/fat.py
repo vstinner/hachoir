@@ -176,7 +176,7 @@ class FileEntry(FieldSet):
     def getFilename(self):
         name = self["name"].value
         if isinstance(name, str):
-            name = makePrintable(name, "ASCII", to_unicode=True)
+            name = makePrintable(name, "ASCII")
         ext = self["ext"].value
         if ext:
             name += "." + ext

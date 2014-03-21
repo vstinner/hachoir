@@ -288,7 +288,7 @@ class MpegAudioMetadata(RootMetadata):
         if tag not in self.TAG_TO_KEY:
             if tag:
                 if isinstance(tag, str):
-                    tag = makePrintable(tag, "ISO-8859-1", to_unicode=True)
+                    tag = makePrintable(tag, "ISO-8859-1")
                 self.warning("Skip ID3v2 tag %s: %s" % (tag, value))
             return
         key = self.TAG_TO_KEY[tag]

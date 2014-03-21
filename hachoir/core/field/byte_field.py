@@ -39,7 +39,7 @@ class RawBytes(Field):
         if human:
             if truncated:
                 display += "(...)"
-            return makePrintable(display, "latin-1", quote='"', to_unicode=True)
+            return makePrintable(display, "latin-1", quote='"')
         else:
             display = str2hex(display, format=r"\x%02x")
             if truncated:

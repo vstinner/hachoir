@@ -64,11 +64,11 @@ class Extractor:
             print("Unable to extract metadata", file=stderr)
             return None
 
-        filename = makePrintable(filename, self.charset, to_unicode=True)
+        filename = makePrintable(filename, self.charset)
         line = [filename]
         for field in self.fields:
             value = metadata.getText(field, '')
-            value = makePrintable(value, self.charset, to_unicode=True)
+            value = makePrintable(value, self.charset)
             line.append(value)
         return '; '.join(line)
 

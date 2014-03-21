@@ -294,7 +294,7 @@ class AsfMetadata(MultipleMetadata):
                     key = self.EXT_DESC_TO_ATTR[key]
                 else:
                     if isinstance(key, str):
-                        key = makePrintable(key, "ISO-8859-1", to_unicode=True)
+                        key = makePrintable(key, "ISO-8859-1")
                     value = "%s=%s" % (key, value)
                     key = "comment"
                 setattr(self, key, value)

@@ -87,7 +87,7 @@ class Field(Logger):
                 self._description = self.createDescription()
                 if isinstance(self._description, str):
                     self._description = makePrintable(
-                        self._description, "ISO-8859-1", to_unicode=True)
+                        self._description, "ISO-8859-1")
             except HACHOIR_ERRORS as err:
                 self.error("Error getting description: " + str(err))
                 self._description = ""
@@ -137,7 +137,7 @@ class Field(Logger):
     def createRawDisplay(self):
         value = self.value
         if isinstance(value, str):
-            return makePrintable(value, "ASCII", to_unicode=True)
+            return makePrintable(value, "ASCII")
         else:
             return str(value)
     def _getRawDisplay(self):

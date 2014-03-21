@@ -56,7 +56,7 @@ class TorrentString(FieldSet):
         except ValueError:
             len = -1
         if len < 0:
-            raise ParserError("Invalid string length (%s)" % makePrintable(val.value, "ASCII", to_unicode=True))
+            raise ParserError("Invalid string length (%s)" % makePrintable(val.value, "ASCII"))
         yield String(self, "separator", 1, "String length/value separator")
         if not len:
             self.info("Empty string: len=%i" % len)

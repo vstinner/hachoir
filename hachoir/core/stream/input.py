@@ -441,7 +441,7 @@ class InputSubStream(InputStream):
             offset = 0
         if size is None and stream.size is not None:
             size = stream.size - offset
-        if None < size <= 0:
+        if size <= 0:
             raise ValueError("InputSubStream: offset is outside input stream")
         self.stream = stream
         self._offset = offset

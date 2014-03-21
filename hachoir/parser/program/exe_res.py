@@ -178,7 +178,7 @@ class WindowsString(FieldSet):
             return ""
 
     def createDisplay(self):
-        return makePrintable(self.value, "UTF-8", to_unicode=True, quote='"')
+        return makePrintable(self.value, "UTF-8", quote='"')
 
 def parseStringTable(parent):
     while not parent.eof:

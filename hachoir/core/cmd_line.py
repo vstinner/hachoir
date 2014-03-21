@@ -41,5 +41,5 @@ def unicodeFilename(filename, charset=None):
     try:
         return str(filename, charset)
     except UnicodeDecodeError:
-        return makePrintable(filename, charset, to_unicode=True)
+        return makePrintable(filename, charset)
 
