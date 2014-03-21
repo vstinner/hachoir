@@ -66,23 +66,6 @@ def getTerminalCharset():
         getTerminalCharset.value = _getTerminalCharset()
         return getTerminalCharset.value
 
-class UnicodeStdout(object):
-    def __init__(self, old_device, charset):
-        self.device = old_device
-        self.charset = charset
-
-    def flush(self):
-        self.device.flush()
-
-    def write(self, text):
-        if isinstance(text, str):
-            text = text.encode(self.charset, 'replace')
-        self.device.write(text)
-
-    def writelines(self, lines):
-        for text in lines:
-            self.write(text)
-
 def initLocale():
     # Only initialize locale once
     if initLocale.is_done:
@@ -96,14 +79,7 @@ def initLocale():
         pass
 
     # Get the terminal charset
-    charset = getTerminalCharset()
-
-    # UnicodeStdout conflicts with the readline module
-    if config.unicode_stdout and ('readline' not in sys.modules):
-        # Replace stdout and stderr by unicode objet supporting unicode string
-        sys.stdout = UnicodeStdout(sys.stdout, charset)
-        sys.stderr = UnicodeStdout(sys.stderr, charset)
-    return charset
+    return getTerminalCharset()
 initLocale.is_done = False
 
 def _dummy_gettext(text):
@@ -144,10 +120,9 @@ def _initGettext():
 
     # TODO: translate_unicode lambda function really sucks!
     # => find native function to do that
-    unicode_gettext = lambda text: \
-        str(translate(text), charset)
-    unicode_ngettext = lambda singular, plural, count: \
-        str(ngettext(singular, plural, count), charset)
+    unicode_gettext = lambda text: translate(text)
+    unicode_ngettext = (lambda singular, plural, count:
+                                            ngettext(singular, plural, count))
     return (unicode_gettext, unicode_ngettext)
 
 UTF_BOMS = (
