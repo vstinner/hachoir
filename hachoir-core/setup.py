@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Procedure to release a new version:
 #  - edit hachoir.core/version.py: VERSION = "XXX"

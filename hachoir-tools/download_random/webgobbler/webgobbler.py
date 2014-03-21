@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- coding: iso-8859-1 -*-
 '''
 webGobbler 1.2.6

@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 DOWNLOAD_SCRIPT = "download_testcase.py"
 """
 Test hachoir-parser using the testcase.
@@ -12,7 +11,6 @@ config.use_i18n = False  # Don't use i18n
 config.quiet = True      # Don't display warnings
 
 from hachoir.core.field import FieldError
-from hachoir.core.i18n import getTerminalCharset
 from hachoir.core.error import HACHOIR_ERRORS, error
 from hachoir.core.stream import InputStreamError, StringInputStream
 from hachoir.parser import createParser, HachoirParserList, ValidateError
@@ -542,8 +540,7 @@ def main():
     if len(sys.argv) != 2:
         print("usage: %s testcase_directory" % sys.argv[0], file=sys.stderr)
         sys.exit(1)
-    charset = getTerminalCharset()
-    directory = str(sys.argv[1], charset)
+    directory = sys.argv[1]
 
     print("Test hachoir-parser using random data.")
     print()

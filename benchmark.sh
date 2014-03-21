@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "x$PYTHON" = "x" ]; then
-   PYTHON=`which python2.4`
+   PYTHON=`which python3`
 fi
 PYTHON=$PYTHON
 ROOT=$(cd `dirname $0`; pwd)

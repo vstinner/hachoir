@@ -155,7 +155,7 @@ class InputStream(Logger):
 
     def sizeGe(self, size, const=False):
         return self._current_size >= size or \
-            not (None < self._size < size or const or self._feed(size))
+            not (0 < self._size < size or const or self._feed(size))
 
     def _feed(self, size):
         return self.read(size-1,1)[2]

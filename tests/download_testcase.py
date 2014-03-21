@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.4
+#!/usr/bin/env python3
 """
 Download and check Hachoir testcase. Files are downloaded from:
   http://hachoir.tuxfamily.org/testcase/

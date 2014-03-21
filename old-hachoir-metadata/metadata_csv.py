@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 from hachoir.core.error import HachoirError
 from hachoir.core.cmd_line import unicodeFilename
 from hachoir.parser import createParser

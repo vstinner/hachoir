@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 from hachoir.core.cmd_line import unicodeFilename
 from hachoir.parser import createParser, guessParser
 from hachoir.parser.container.swf import SOUND_CODEC_MP3

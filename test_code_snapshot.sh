@@ -3,7 +3,7 @@
 # Script to test all Hachoir programs
 # You can specify your testcase directory or your Python version with:
 #
-# PYTHON=python2.5 TESTCASE=~/testcase ./testall.sh
+# PYTHON=python3 TESTCASE=~/testcase ./testall.sh
 
 ROOT=$(cd $(dirname $0); pwd)
 export PYTHONPATH=$PYTHONPATH:$ROOT

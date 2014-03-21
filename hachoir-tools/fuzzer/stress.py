@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 from os import path, getcwd, nice, mkdir
 from sys import exit, argv, stderr
 from glob import glob

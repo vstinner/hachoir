@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Todo list to prepare a release:
 #  - edit hachoir_regex/version.py: VERSION = "XXX"

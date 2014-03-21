@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 from zlib import decompress, error as zlib_error
 from sys import argv, stderr, exit
 from time import time

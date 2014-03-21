@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 """CGI Script performing main functions of hachoir-http.
 
 Author: Robert Xiao

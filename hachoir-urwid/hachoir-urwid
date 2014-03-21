@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 from hachoir.core.cmd_line import (getHachoirOptions,
     configureHachoir, unicodeFilename)
 from hachoir.core.stream import InputStreamError, FileInputStream
