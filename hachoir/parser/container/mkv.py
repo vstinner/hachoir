@@ -39,7 +39,7 @@ class Unsigned(RawInt):
     def hasValue(self):
         return True
     def createValue(self):
-        header = 1 << self._size / 8 * 7
+        header = 1 << self._size // 8 * 7
         value = RawInt.createValue(self) - header
         if value + 1 == header:
             return None
@@ -47,7 +47,7 @@ class Unsigned(RawInt):
 
 class Signed(Unsigned):
     def createValue(self):
-        header = 1 << self._size / 8 * 7 - 1
+        header = 1 << self._size // 8 * 7 - 1
         value = RawInt.createValue(self) - 3 * header + 1
         if value == header:
             return None
@@ -171,7 +171,7 @@ class Lace(FieldSet):
             yield XiphInt(self, 'size[]')
         for i in range(self.n_frames):
             yield RawBytes(self, 'frame[]', self['size['+str(i)+']'].value)
-        yield RawBytes(self,'frame[]', (self._size - self.current_size) / 8)
+        yield RawBytes(self,'frame[]', (self._size - self.current_size) // 8)
 
     def parseEBML(self):
         yield Unsigned(self, 'size')
@@ -182,11 +182,11 @@ class Lace(FieldSet):
         for i in range(self.n_frames-1):
             size += self['dsize['+str(i)+']'].value
             yield RawBytes(self, 'frame[]', size)
-        yield RawBytes(self,'frame[]', (self._size - self.current_size) / 8)
+        yield RawBytes(self,'frame[]', (self._size - self.current_size) // 8)
 
     def parseFixed(self):
         n = self.n_frames + 1
-        size = self._size / 8 / n
+        size = self._size // 8 // n
         for i in range(n):
             yield RawBytes(self, 'frame[]', size)
 
@@ -217,7 +217,7 @@ class Block(FieldSet):
             yield NullBits(self, 'reserved', 8)
             return
 
-        size = (self._size - self.current_size) / 8
+        size = (self._size - self.current_size) // 8
         lacing = self['lacing'].value
         if lacing:
             yield textHandler(GenericInteger(self, 'n_frames', False, 8),
@@ -568,7 +568,7 @@ class MkvFile(Parser):
             first = self[0]
         except ParserError:
             return False
-        if None < self._size < first._size:
+        if 0 < self._size < first._size:
             return "First chunk size is invalid"
         if self._getDoctype() not in ('matroska', 'webm'):
             return "Stream isn't a matroska document."
