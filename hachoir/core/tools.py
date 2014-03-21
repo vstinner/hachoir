@@ -312,7 +312,7 @@ def makePrintable(data, charset, quote=None, to_unicode=False, smart=True):
     data = data.encode(charset, "backslashreplace")
     if smart:
         # Replace \x00\x01 by \0\1
-        data = re.sub(r"\\x0([0-7])(?=[^0-7]|$)", r"\\\1", data)
+        data = re.sub(br"\\x0([0-7])(?=[^0-7]|$)", r"\\\1", data)
     if to_unicode:
         data = str(data, charset)
     return data
@@ -327,7 +327,7 @@ def makeUnicode(text):
     >>> makeUnicode('a\xe9')
     u'a\xe9'
     """
-    if isinstance(text, str):
+    if isinstance(text, bytes):
         text = str(text, "ISO-8859-1")
     elif not isinstance(text, str):
         try:
