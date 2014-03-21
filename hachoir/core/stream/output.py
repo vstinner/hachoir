@@ -97,7 +97,7 @@ class OutputStream(object):
 
     def copyBitsFrom(self, input, address, nb_bits, endian):
         if (nb_bits % 8) == 0:
-            self.copyBytesFrom(input, address, nb_bits/8)
+            self.copyBytesFrom(input, address, nb_bits//8)
         else:
             # Arbitrary limit (because we should use a buffer, like copyBytesFrom(),
             # but with endianess problem

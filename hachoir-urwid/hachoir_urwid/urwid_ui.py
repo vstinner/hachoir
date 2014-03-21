@@ -247,14 +247,14 @@ class Walker(ListWalker):
 
             if self.flags & self.hex_address:
                 if display_bits:
-                    text += "%04x.%x" % (address/8, address%8)
+                    text += "%04x.%x" % (address//8, address%8)
                 else:
-                    text += "%04x" % (address/8)
+                    text += "%04x" % (address//8)
             else:
                 if display_bits:
-                    text += "%u.%u" % (address/8, address%8)
+                    text += "%u.%u" % (address//8, address%8)
                 else:
-                    text += "%u" % (address/8)
+                    text += "%u" % (address//8)
             text += ") " + name
         else:
             text += "-> " + name

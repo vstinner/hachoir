@@ -328,7 +328,7 @@ class Group(FieldSet):
         self.uniq_id = index
 
     def createDescription(self):
-        desc = "Group %s: %s" % (self.uniq_id, humanFilesize(self.size/8))
+        desc = "Group %s: %s" % (self.uniq_id, humanFilesize(self.size//8))
         if "superblock_copy" in self:
             desc += " (with superblock copy)"
         return desc
@@ -427,7 +427,7 @@ class EXT2_FS(Parser):
         self.block_size = 1024 << superblock["log_block_size"].value # in bytes
 
         # Read groups' descriptor
-        field = self.seekByte(((1023 + superblock.size/8) // self.block_size + 1) * self.block_size, null=True)
+        field = self.seekByte(((1023 + superblock.size//8) // self.block_size + 1) * self.block_size, null=True)
         if field:
             yield field
         groups = GroupDescriptors(self, "group_desc", superblock.group_count)

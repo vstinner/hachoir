@@ -82,7 +82,7 @@ def gammaDescription(parent):
 
 def textParse(parent):
     yield CString(parent, "keyword", "Keyword", charset="ISO-8859-1")
-    length = parent["size"].value - parent["keyword"].size/8
+    length = parent["size"].value - parent["keyword"].size//8
     if length:
         yield String(parent, "text", length, "Text", charset="ISO-8859-1")
 

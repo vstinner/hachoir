@@ -62,7 +62,7 @@ class PcxFile(Parser):
             raise NotImplementedError
 
         nb_colors = 256
-        size = (self._size - self.current_size)/8
+        size = (self._size - self.current_size)//8
         has_palette = self["bpp"].value == 8
         if has_palette:
             size -= nb_colors*3

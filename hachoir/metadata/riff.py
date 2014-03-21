@@ -169,7 +169,7 @@ class RiffMetadata(MultipleMetadata):
         # Video has index?
         if "/index" in headers:
             self.comment = _("Has audio/video index (%s)") \
-                % humanFilesize(headers["/index"].size/8)
+                % humanFilesize(headers["/index"].size//8)
 
     @fault_tolerant
     def extractAnim(self, riff):

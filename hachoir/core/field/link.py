@@ -106,5 +106,5 @@ class Fragment(FieldSet):
     def createFields(self):
         if self._size is None:
             self._size = self._getSize()
-        yield Bytes(self, "data", self._size/8)
+        yield Bytes(self, "data", self._size//8)
 

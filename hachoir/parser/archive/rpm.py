@@ -206,14 +206,14 @@ class PropertySet(FieldSet):
         items.sort( sortRpmItem )
 
         # Read item content
-        start = self.current_size/8
+        start = self.current_size//8
         for item in items:
             offset = item["offset"].value
-            diff = offset - (self.current_size/8 - start)
+            diff = offset - (self.current_size//8 - start)
             if 0 < diff:
                 yield NullBytes(self, "padding[]", diff)
             yield ItemContent(self, "content[]", item)
-        size = start + self["size"].value - self.current_size/8
+        size = start + self["size"].value - self.current_size//8
         if 0 < size:
             yield NullBytes(self, "padding[]", size)
 

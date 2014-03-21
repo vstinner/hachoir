@@ -108,7 +108,7 @@ class DataObject(FieldSet):
         elif (self["type"].value<17):
             yield UInt32(self, "unknown[]")
             yield UInt32(self, "unknown[]")
-            yield String(self, "string", self._size/8-self["header_length"].value, "String Data", charset="UTF-8")
+            yield String(self, "string", self._size//8-self["header_length"].value, "String Data", charset="UTF-8")
         elif (self["type"].value == 52):
             yield UInt32(self, "unknown[]", "unk1")
             yield UInt32(self, "unknown[]", "unk2")
@@ -243,7 +243,7 @@ class TrackItem(FieldSet):
         if padding:
             yield padding
 
-        #while ((self.stream.readBytes(0, 4) == 'mhod') and  ((self.current_size/8) < self["entry_length"].value)):
+        #while ((self.stream.readBytes(0, 4) == 'mhod') and  ((self.current_size//8) < self["entry_length"].value)):
         for i in range(self["string_number"].value):
             yield DataObject(self, "data[]")
         padding = self.seekBit(self._size, "entry padding")

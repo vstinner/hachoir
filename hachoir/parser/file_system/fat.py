@@ -45,7 +45,7 @@ class Boot(FieldSet):
         yield textHandler(UInt32(self, "serial", "ID (serial number)"), hexadecimal)
         yield String(self, "label", 11, "Volume Label", strip=' ', charset="ASCII")
         yield String(self, "fs_type", 8, "FAT file system type", strip=' ', charset="ASCII")
-        yield Bytes(self, "code", 510-self.current_size/8, "Operating system boot code")
+        yield Bytes(self, "code", 510-self.current_size//8, "Operating system boot code")
         yield Bytes(self, "trail_sig", 2, "Signature (0x55 0xAA)")
 
 
@@ -266,7 +266,7 @@ class File(Fragment):
     def _getData(self):
         return self["data"]
     def createFields(self):
-        yield Bytes(self, "data", self.datasize/8)
+        yield Bytes(self, "data", self.datasize//8)
         padding = self._size - self.current_size
         if padding:
             yield createPaddingField(self, padding)

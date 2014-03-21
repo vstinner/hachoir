@@ -74,7 +74,7 @@ class PaddingBytes(Bytes):
         if self.pattern is None:
             return False
 
-        if self.MAX_SIZE < self._size/8:
+        if self.MAX_SIZE < self._size//8:
             self.info("only check first %s of padding" % humanFilesize(self.MAX_SIZE))
             content = self._parent.stream.readBytes(
                 self.absolute_address, self.MAX_SIZE)

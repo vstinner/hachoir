@@ -342,8 +342,8 @@ def handle_form():
             # "Download Raw"
             f = FileFromInputStream(stream)
             fld = parser[path]
-            f.seek(fld.absolute_address/8)
-            size = alignValue(fld.size, 8)/8
+            f.seek(fld.absolute_address//8)
+            size = alignValue(fld.size, 8)//8
             sys.stdout.write('Content-Type: application/octet-stream\r\n')
             sys.stdout.write('Content-Length: %i\r\n'%size)
             sys.stdout.write('Content-Disposition: attachment; '

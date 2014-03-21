@@ -289,7 +289,7 @@ class Object(FieldSet):
         yield GUID(self, "guid")
         yield filesizeHandler(UInt64(self, "size"))
 
-        size = self["size"].value - self.current_size/8
+        size = self["size"].value - self.current_size//8
         if 0 < size:
             if self.handler:
                 yield self.handler(self, "content", size=size*8)

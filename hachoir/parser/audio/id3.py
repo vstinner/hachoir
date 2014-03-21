@@ -223,7 +223,7 @@ def getCharset(field):
 class ID3_String(FieldSet):
     STRIP = " \0"
     def createFields(self):
-        yield String(self, "text", self._size/8, "Text", charset="ISO-8859-1", strip=self.STRIP)
+        yield String(self, "text", self._size//8, "Text", charset="ISO-8859-1", strip=self.STRIP)
 
 class ID3_StringCharset(ID3_String):
     STRIP = " \0"
@@ -241,7 +241,7 @@ class ID3_StringCharset(ID3_String):
     }
     def createFields(self):
         yield Enum(UInt8(self, "charset"), self.charset_desc)
-        size = (self.size - self.current_size)/8
+        size = (self.size - self.current_size) // 8
         if not size:
             return
         charset = getCharset(self["charset"])
@@ -277,14 +277,14 @@ class ID3_StringTitle(ID3_StringCharset):
             return
         charset = getCharset(self["charset"])
         yield CString(self, "title", "Title", charset=charset, strip=self.STRIP)
-        size = (self.size - self.current_size)/8
+        size = (self.size - self.current_size) // 8
         if not size:
             return
         yield String(self, "text", size, "Text", charset=charset, strip=self.STRIP)
 
 class ID3_Private(FieldSet):
     def createFields(self):
-        size = self._size/8
+        size = self._size // 8
         # TODO: Strings charset?
         if self.stream.readBytes(self.absolute_address, 9) == "PeakValue":
             yield String(self, "text", 9, "Text")
@@ -294,7 +294,7 @@ class ID3_Private(FieldSet):
 class ID3_TrackLength(FieldSet):
     def createFields(self):
         yield NullBytes(self, "zero", 1)
-        yield textHandler(String(self, "length", self._size/8 - 1,
+        yield textHandler(String(self, "length", self._size//8 - 1,
             "Length in ms", charset="ASCII"), self.computeLength)
 
     def computeLength(self, field):
@@ -424,7 +424,7 @@ class ID3_Chunk(FieldSet):
             # ID3 v2.2
             yield Enum(String(self, "tag", 3, "Tag", charset="ASCII", strip="\0"), ID3_Chunk.tag22_name)
             yield UInt24(self, "size")
-            size = self["size"].value - self.current_size/8 + 6
+            size = self["size"].value - self.current_size//8 + 6
             is_compressed = False
 
         if size:

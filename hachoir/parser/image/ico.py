@@ -57,7 +57,7 @@ class IconData(FieldSet):
             yield PaletteRGBA(self, "palette", nb_color)
 
         # Read pixels
-        size = self.header["size"].value - self.current_size/8
+        size = self.header["size"].value - self.current_size//8
         yield RawBytes(self, "pixels", size, "Image pixels")
 
 class IcoFile(Parser):

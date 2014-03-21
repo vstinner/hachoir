@@ -332,7 +332,7 @@ class Instruction(FieldSet):
         r = str(self._description)
         for f in self:
             if f.name not in ("action_id", "action_length", "count") and not f.name.startswith("data_type") :
-                r = r + "\n   " + str((self.address+f.address)/8) + " " + str(f.name) + "=" + str(f.value)
+                r = r + "\n   " + str((self.address+f.address)//8) + " " + str(f.name) + "=" + str(f.value)
         return r
 
 class ActionScript(FieldSet):
@@ -343,7 +343,7 @@ class ActionScript(FieldSet):
     def __str__(self):
         r = ""
         for f in self:
-            r = r + str(f.address/8) + " " + str(f) + "\n"
+            r = r + str(f.address//8) + " " + str(f) + "\n"
         return r
 
 def parseActionScript(parent, size):

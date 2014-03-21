@@ -415,11 +415,11 @@ class ExtraInfo(FieldSet):
             else: # Custom Icon Details
                 object_name="icon_path"
             yield CString(self, object_name, "Data (ASCII format)", charset="ASCII")
-            remaining = self["length"].value - self.current_size/8 - 260*2 # 260*2 = size of next part
+            remaining = self["length"].value - self.current_size//8 - 260*2 # 260*2 = size of next part
             if remaining:
                 yield RawBytes(self, "slack_space[]", remaining, "Data beyond end of string")
             yield CString(self, object_name+'_unicode', "Data (Unicode format)", charset="UTF-16-LE", truncate="\0")
-            remaining = self["length"].value - self.current_size/8
+            remaining = self["length"].value - self.current_size//8
             if remaining:
                 yield RawBytes(self, "slack_space[]", remaining, "Data beyond end of string")
 
@@ -460,7 +460,7 @@ class ExtraInfo(FieldSet):
             yield UInt32(self, "codepage", "Console's code page")
 
         else:
-            yield RawBytes(self, "raw", self["length"].value-self.current_size/8)
+            yield RawBytes(self, "raw", self["length"].value-self.current_size//8)
 
     def createDescription(self):
         if self["length"].value:

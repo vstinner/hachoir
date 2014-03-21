@@ -203,7 +203,7 @@ class Bzip2Parser(Parser):
         if self._size is None: # TODO: is it possible to handle piped input?
             raise NotImplementedError
 
-        size = (self._size - self.current_size)/8
+        size = (self._size - self.current_size)//8
         if size:
             for tag, filename in self.stream.tags:
                 if tag == "filename" and filename.endswith(".bz2"):

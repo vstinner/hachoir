@@ -72,7 +72,7 @@ class PRCFile(Parser):
                 lens.append(r["offset"].value - poff)
             poff = r["offset"].value
             yield r
-        lens.append(self.size/8 - poff)
+        lens.append(self.size//8 - poff)
         yield UInt16(self, "placeholder", "Place holder bytes")
         for i in range(len(lens)):
             yield RawBytes(self, "res[]", lens[i], '"'+self["res_header["+str(i)+"]/name"].value+"\" Resource")
