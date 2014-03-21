@@ -86,7 +86,7 @@ class Data:
                     value, text = new_value
             else:
                 value = new_value
-        elif isinstance(value, str):
+        elif isinstance(value, bytes):
             value = str(value, "ISO-8859-1")
 
         if self.type and not isinstance(value, self.type):
@@ -140,7 +140,3 @@ class Data:
             if value == item.value:
                 return True
         return False
-
-    def __cmp__(self, other):
-        return cmp(self.priority, other.priority)
-

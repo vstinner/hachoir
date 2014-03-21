@@ -176,7 +176,7 @@ class Metadata(Logger):
         if not title:
             title = self.header
         text = ["%s:" % title]
-        for data in sorted(self):
+        for data in sorted(self, key=lambda data: data.priority):
             if priority < data.priority:
                 break
             if not data.values:
