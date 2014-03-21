@@ -36,6 +36,8 @@ def configureHachoir(option):
 def unicodeFilename(filename, charset=None):
     if not charset:
         charset = getTerminalCharset()
+    if isinstance(filename, str):
+        return filename
     try:
         return str(filename, charset)
     except UnicodeDecodeError:
