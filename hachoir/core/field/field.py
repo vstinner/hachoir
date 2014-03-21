@@ -2,7 +2,6 @@
 Parent of all (field) classes in Hachoir: Field.
 """
 
-from hachoir.core.compatibility import reversed
 from hachoir.core.stream import InputFieldStream
 from hachoir.core.error import HachoirError, HACHOIR_ERRORS
 from hachoir.core.log import Logger

@@ -43,7 +43,6 @@ def main():
 
     # Test documentation of some functions/classes
     testModule("hachoir.core.bits")
-    testModule("hachoir.core.compatibility")
     testModule("hachoir.core.dict")
     testModule("hachoir.core.i18n")
     testModule("hachoir.core.text_handler")

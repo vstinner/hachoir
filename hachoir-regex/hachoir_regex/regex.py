@@ -33,7 +33,6 @@ See also CPAN Regexp::Assemble (Perl module):
    http://search.cpan.org/~dland/Regexp-Assemble-0.28/Assemble.pm
 """
 
-from hachoir_regex.compatibility import all, any
 from hachoir_regex.tools import makePrintable
 import re
 import itertools

@@ -16,7 +16,6 @@ from hachoir.core.i18n import getTerminalCharset
 from hachoir.core.error import HACHOIR_ERRORS, error
 from hachoir.core.stream import InputStreamError, StringInputStream
 from hachoir.parser import createParser, HachoirParserList, ValidateError
-from hachoir.core.compatibility import all
 from locale import setlocale, LC_ALL
 from array import array
 from datetime import datetime

@@ -14,7 +14,6 @@ from hachoir.core.i18n import getTerminalCharset
 from hachoir.core.error import HachoirError
 from hachoir.core.stream import InputStreamError
 from hachoir.parser import createParser
-from hachoir.core.compatibility import all
 from hachoir.core.language import Language
 from hachoir.metadata import extractMetadata
 from hachoir.metadata.timezone import createTimezone

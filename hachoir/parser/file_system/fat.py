@@ -1,4 +1,3 @@
-from hachoir.core.compatibility import sorted
 from hachoir.parser import Parser
 from hachoir.core.field import (FieldSet, StaticFieldSet,
     RawBytes, PaddingBytes, createPaddingField, Link, Fragment,

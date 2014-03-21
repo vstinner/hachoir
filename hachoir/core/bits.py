@@ -4,7 +4,6 @@ string, number, hexadecimal, etc.
 """
 
 from hachoir.core.endian import BIG_ENDIAN, LITTLE_ENDIAN, MIDDLE_ENDIAN
-from hachoir.core.compatibility import reversed
 from itertools import chain, repeat
 from struct import calcsize, unpack, error as struct_error
 
