@@ -14,13 +14,12 @@ from hachoir.core.endian import MIDDLE_ENDIAN, LITTLE_ENDIAN
 from hachoir.core.tools import paddingSize, alignValue
 from hachoir.parser.archive.zlib import build_tree, HuffmanCode, extend_data
 from hachoir.core.bits import str2long
-import new # for instancemethod
 
 class LZXPreTreeEncodedTree(FieldSet):
     def __init__(self, parent, name, num_elements, *args, **kwargs):
         FieldSet.__init__(self, parent, name, *args, **kwargs)
         self.num_elements = num_elements
-        
+
     def createFields(self):
         for i in range(20):
             yield Bits(self, "pretree_lengths[]", 4)
