@@ -96,7 +96,7 @@ class Frame(FieldSet):
         yield Bit(self, "original", "Is original?")
         yield Enum(Bits(self, "emphasis", 2, "Emphasis"), self.EMPHASIS_NAME)
 
-        size = (self.size - self.current_size) / 8
+        size = (self.size - self.current_size) // 8
         if size:
             yield RawBytes(self, "data", size)
 
@@ -154,7 +154,7 @@ class Frame(FieldSet):
             else:
                 return (frame_size * 72)  // sample_rate + padding
         elif self["layer"].value == self.LAYER_II:
-            return (frame_size * 144) / sample_rate + padding
+            return (frame_size * 144) // sample_rate + padding
         else: # self.LAYER_I:
             frame_size = (frame_size * 12) // sample_rate
             return (frame_size + padding) * 4
@@ -251,7 +251,7 @@ class Frames(FieldSet):
 #                yield padding
 
         # Read raw bytes at the end (if any)
-        size = (self.size - self.current_size) / 8
+        size = (self.size - self.current_size) // 8
         if size:
             yield RawBytes(self, "raw", size)
 

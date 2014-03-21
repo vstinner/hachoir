@@ -31,7 +31,7 @@ def convert_size(from_field, to_type):
     elif 'Byte' in field_type_name(from_field):
         return from_field._getSize() * 8
     else:
-        return from_field._getSize() / 8
+        return from_field._getSize() // 8
 
 def save_substream_to_disk(field, dest_path):
     dest_stream = open(dest_path, 'wb')

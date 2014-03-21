@@ -107,7 +107,7 @@ class IPTC(FieldSet):
     def createFields(self):
         while 5 <= (self._size - self.current_size)/8:
             yield IPTC_Chunk(self, "chunk[]")
-        size = (self._size - self.current_size) / 8
+        size = (self._size - self.current_size) // 8
         if 0 < size:
             yield NullBytes(self, "padding", size)
 

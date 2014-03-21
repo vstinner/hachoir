@@ -334,7 +334,7 @@ class ID3_Picture23(FieldSet):
         yield String(self, "img_fmt", 3, charset="ASCII")
         yield Enum(UInt8(self, "pict_type"), self.pict_type_name)
         yield CString(self, "text", "Text", charset=charset, strip=" \0")
-        size = (self._size - self._current_size) / 8
+        size = (self._size - self._current_size) // 8
         if size:
             yield RawBytes(self, "img_data", size)
 
@@ -345,7 +345,7 @@ class ID3_Picture24(FieldSet):
         yield CString(self, "mime", "MIME type", charset=charset)
         yield Enum(UInt8(self, "pict_type"), ID3_Picture23.pict_type_name)
         yield CString(self, "description", charset=charset)
-        size = (self._size - self._current_size) / 8
+        size = (self._size - self._current_size) // 8
         if size:
             yield RawBytes(self, "img_data", size)
 

@@ -229,7 +229,7 @@ class Data(FieldSet):
         yield GUID(self, "file_id")
         yield UInt64(self, "packet_count")
         yield PaddingBytes(self, "reserved", 2)
-        size = (self.size - self.current_size) / 8
+        size = (self.size - self.current_size) // 8
         yield RawBytes(self, "data", size)
 
 class StreamProperty(FieldSet):

@@ -375,7 +375,7 @@ class Group(FieldSet):
         yield InodeTable(self, "inode_table", inode_index, inode_count)
 
         # Add padding if needed
-        addr = min(self.parent.size / 8,
+        addr = min(self.parent.size // 8,
             (self.uniq_id+1) * superblock["blocks_per_group"].value * block_size)
         yield self.seekByte(addr, "data", relative=False)
 
@@ -427,7 +427,7 @@ class EXT2_FS(Parser):
         self.block_size = 1024 << superblock["log_block_size"].value # in bytes
 
         # Read groups' descriptor
-        field = self.seekByte(((1023 + superblock.size/8) / self.block_size + 1) * self.block_size, null=True)
+        field = self.seekByte(((1023 + superblock.size/8) // self.block_size + 1) * self.block_size, null=True)
         if field:
             yield field
         groups = GroupDescriptors(self, "group_desc", superblock.group_count)

@@ -166,6 +166,6 @@ class PhotoshopMetadata(FieldSet):
             while not self.eof:
                 yield Photoshop8BIM(self, "item[]")
         else:
-            size = (self._size - self.current_size) / 8
+            size = (self._size - self.current_size) // 8
             yield RawBytes(self, "rawdata", size)
 

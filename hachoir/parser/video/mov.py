@@ -434,31 +434,31 @@ class TrackFragmentRandomAccess(FieldSet):
                 yield UInt32(self, "moof_offset[%i]" %i)
 
             if self['length_size_of_traf_num'].value == 3:
-                yield UInt64(self, "traf_number[%i]" %i) 
+                yield UInt64(self, "traf_number[%i]" %i)
             elif self['length_size_of_traf_num'].value == 2:
-                yield UInt32(self, "traf_number[%i]" %i) 
+                yield UInt32(self, "traf_number[%i]" %i)
             elif self['length_size_of_traf_num'].value == 1:
-                yield UInt16(self, "traf_number[%i]" %i) 
+                yield UInt16(self, "traf_number[%i]" %i)
             else:
-                yield UInt8(self, "traf_number[%i]" %i) 
+                yield UInt8(self, "traf_number[%i]" %i)
 
             if self['length_size_of_trun_num'].value == 3:
-                yield UInt64(self, "trun_number[%i]" %i) 
+                yield UInt64(self, "trun_number[%i]" %i)
             elif self['length_size_of_trun_num'].value == 2:
-                yield UInt32(self, "trun_number[%i]" %i) 
+                yield UInt32(self, "trun_number[%i]" %i)
             elif self['length_size_of_trun_num'].value == 1:
-                yield UInt16(self, "trun_number[%i]" %i) 
+                yield UInt16(self, "trun_number[%i]" %i)
             else:
-                yield UInt8(self, "trun_number[%i]" %i) 
+                yield UInt8(self, "trun_number[%i]" %i)
 
             if self['length_size_of_sample_num'].value == 3:
-                yield UInt64(self, "sample_number[%i]" %i) 
+                yield UInt64(self, "sample_number[%i]" %i)
             elif self['length_size_of_sample_num'].value == 2:
-                yield UInt32(self, "sample_number[%i]" %i) 
+                yield UInt32(self, "sample_number[%i]" %i)
             elif self['length_size_of_sample_num'].value == 1:
-                yield UInt16(self, "sample_number[%i]" %i) 
+                yield UInt16(self, "sample_number[%i]" %i)
             else:
-                yield UInt8(self, "sample_number[%i]" %i) 
+                yield UInt8(self, "sample_number[%i]" %i)
 
 class MovieFragmentRandomAccessOffset(FieldSet):
     def createFields(self):
@@ -608,7 +608,7 @@ class SampleEntry(FieldSet):
         elif handler['subtype'].value == 'hint':
             # Hint sample entry
             pass
-        
+
         size = self['size'].value - self.current_size//8
         if size > 0:
             yield RawBytes(self, "extra_data", size)
@@ -801,9 +801,9 @@ class Atom(FieldSet):
         elif size == 0:
             # Unbounded atom
             if self._size is None:
-                size = (self.parent.size - self.parent.current_size) / 8 - 8
+                size = (self.parent.size - self.parent.current_size) // 8 - 8
             else:
-                size = (self.size - self.current_size) / 8
+                size = (self.size - self.current_size) // 8
         else:
             size = size - 8
         if self['tag'].value == 'uuid':

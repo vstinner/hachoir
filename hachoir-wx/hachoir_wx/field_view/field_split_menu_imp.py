@@ -11,7 +11,7 @@ class field_split_menu_imp_t:
         self.field = field
 
     def on_split_bytes(self):
-        if self.split_field(_('Split Bytes...'), self.field, RawBytes, lambda field: field._getSize() / 8):
+        if self.split_field(_('Split Bytes...'), self.field, RawBytes, lambda field: field._getSize() // 8):
             self.dispatcher.trigger('field_was_split_bytes', self.field)
 
     def on_split_bits(self):

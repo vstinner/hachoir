@@ -133,11 +133,11 @@ class PackInfo(FieldSet):
 
 def lzmaParams(value):
     param = value.value
-    remainder = param / 9
+    remainder = param // 9
     # Literal coder context bits
     lc = param % 9
     # Position state bits
-    pb = remainder / 5
+    pb = remainder // 5
     # Literal coder position bits
     lp = remainder % 5
     return "lc=%u pb=%u lp=%u" % (lc, lp, pb)

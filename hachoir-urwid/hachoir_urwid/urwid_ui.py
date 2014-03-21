@@ -280,7 +280,7 @@ class Walker(ListWalker):
                 if node.field.size % 8:
                     tmp_text.append( humanBitSize(node.field.size) )
                 else:
-                    size = node.field.size / 8
+                    size = node.field.size // 8
                     if not self.flags & self.human_size:
                         tmp_text.append( ngettext("%u byte", "%u bytes", size) % size)
                     else:

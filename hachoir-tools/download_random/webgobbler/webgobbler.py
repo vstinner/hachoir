@@ -2867,8 +2867,8 @@ class assembler_mosaic(assembler):
         '''
         self._logInfo("Generating image and saving to %s" % destinationFilename )
         finalImage = Image.new('RGB',(self.CONFIG["assembler.sizex"],self.CONFIG["assembler.sizey"]))
-        imageSizeX = self.CONFIG["assembler.sizex"] / self.nbX
-        imageSizeY = self.CONFIG["assembler.sizex"] / self.nbY
+        imageSizeX = self.CONFIG["assembler.sizex"] // self.nbX
+        imageSizeY = self.CONFIG["assembler.sizex"] // self.nbY
         for y in range(self.nbY):
             for x in range(self.nbX):
                 image = self.pool.getImageB()

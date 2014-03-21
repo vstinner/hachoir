@@ -107,7 +107,7 @@ class Directory(FieldSet):
 
 class FileNameTable(SeekableFieldSet):
     def createFields(self):
-        self.startOffset = self.absolute_address / 8
+        self.startOffset = self.absolute_address // 8
 
         # parent_id of first FileNameDirTable contains number of directories:
         dt = FileNameDirTable(self, "dir_table[]")
@@ -135,7 +135,7 @@ class FATFileEntry(FieldSet):
 
 class FATContent(FieldSet):
     def createFields(self):
-        num_entries = self.parent["header"]["fat_size"].value / 8
+        num_entries = self.parent["header"]["fat_size"].value // 8
         for i in range(0, num_entries):
             yield FATFileEntry(self, "entry[]")
 
@@ -216,7 +216,7 @@ class SecureArea(FieldSet):
 
 class DeviceSize(UInt8):
     def createDescription(self):
-        return "%d Mbit" % ((2**(20+self.value)) / (1024*1024))
+        return "%d Mbit" % ((2**(20+self.value)) // (1024*1024))
 
 class Header(FieldSet):
     def createFields(self):
@@ -347,7 +347,7 @@ class NdsFile(Parser, RootSeekableFieldSet):
         # ARM9 overlays
         if self["header"]["arm9_overlay_src"].value > 0:
             self.seekByte(self["header"]["arm9_overlay_src"].value, relative=False)
-            numOvls = self["header"]["arm9_overlay_size"].value / (8*4)
+            numOvls = self["header"]["arm9_overlay_size"].value // (8*4)
             for i in range(numOvls):
                 yield Overlay(self, "arm9_overlay[]")
 

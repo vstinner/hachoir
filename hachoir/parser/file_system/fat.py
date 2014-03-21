@@ -101,7 +101,7 @@ class Date(FieldSet):
         }[name] * 8)
 
     def createFields(self):
-        size = self.size / 8
+        size = self.size // 8
         if size > 2:
             if size > 4:
                 yield UInt8(self, "cs", "10ms units, values from 0 to 199")
@@ -114,13 +114,13 @@ class Date(FieldSet):
 
     def createDescription(self):
         date = [ self["year"].value, self["month"].value, self["day"].value ]
-        size = self.size / 8
+        size = self.size // 8
         if size > 2:
             mkdate = datetime.datetime
             cs = 200 * self["2sec"].value
             if size > 4:
                 cs += self["cs"].value
-            date += [ self["hour"].value, self["min"].value, cs / 100, cs % 100 * 10000 ]
+            date += [ self["hour"].value, self["min"].value, cs // 100, cs % 100 * 10000 ]
         else:
             mkdate = datetime.date
         if date == [ 0 for i in date ]:

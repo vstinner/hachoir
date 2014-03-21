@@ -401,7 +401,7 @@ class TableParsers(object):
                 return
             if size is None:
                 size = chunk_parser.static_size // 8
-            n = (self.size / 8 - 4) / (4 + size)
+            n = (self.size // 8 - 4) // (4 + size)
             for i in range(n+1):
                 yield UInt32(self, "cp_fc[]", "CP or FC value")
             for i in range(n):

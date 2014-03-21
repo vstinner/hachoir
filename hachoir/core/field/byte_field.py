@@ -32,7 +32,7 @@ class RawBytes(Field):
         else:
             if self._display is None:
                 address = self.absolute_address
-                length = min(self._size / 8, max_bytes)
+                length = min(self._size // 8, max_bytes)
                 self._display = self._parent.stream.readBytes(address, length)
             display = self._display
         truncated = (8 * len(display) < self._size)

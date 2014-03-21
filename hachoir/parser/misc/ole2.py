@@ -113,7 +113,7 @@ class DIFat(SeekableFieldSet):
 
         difat_sect = self.start
         index = NB_DIFAT
-        entries_per_sect = self.parent.sector_size / 32 - 1
+        entries_per_sect = self.parent.sector_size // 32 - 1
         for ctr in range(self.count):
             # this is relative to real DIFAT start
             self.seekBit(NB_DIFAT*SECT.static_size + self.parent.sector_size*difat_sect)
@@ -207,7 +207,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
         # Configure values
         self.sector_size = (8 << header["bb_shift"].value)
         self.fat_count = header["bb_count"].value
-        self.items_per_bbfat = self.sector_size / SECT.static_size
+        self.items_per_bbfat = self.sector_size // SECT.static_size
         self.ss_size = (8 << header["sb_shift"].value)
         self.items_per_ssfat = self.items_per_bbfat
 
