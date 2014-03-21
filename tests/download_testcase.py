@@ -8,10 +8,7 @@ from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
 from hachoir.core.i18n import getTerminalCharset
 from hachoir.core.tools import humanFilesize
-try:
-    from md5 import md5
-except ImportError:
-    md5 = None
+from hashlib import md5
 import os
 import sys
 import stat
@@ -90,7 +87,7 @@ testcase_files = (
     ("radpoor.doc", 103936, "114835a03be92e02029c74ece1162c3e"),
     ("quicktime.mp4", 245779, "dc77a8de8c091c19d86df74280f6feb7"),
     ("swat.blp", 55753, "a47a2d6ef61c9005c3f5faf1bca253af"),
-    ("nitrodir.nds", 217624, "4d81b4dec82e0abbdf6c793ed3280f70"),
+    #("nitrodir.nds", 217624, "4d81b4dec82e0abbdf6c793ed3280f70"),
 )
 
 def stringMD5(text):
@@ -198,14 +195,13 @@ def main():
     if len(sys.argv) != 2:
         print("usage: %s directory" % sys.argv[0], file=sys.stderr)
         sys.exit(1)
-    charset = getTerminalCharset()
-    directory = str(sys.argv[1], charset)
+    directory = sys.argv[1]
 
     print("Download and check Hachoir testcase.")
     print()
     print("Use directory: %s" % directory)
     ok = testFiles(directory, TESTCASE_URL)
-    if not stringMD5("abc"):
+    if not stringMD5(b"abc"):
         print()
         for index in range(3):
             print("!!! Warning: Python module md5 is missing, unable to check MD5 hash")
