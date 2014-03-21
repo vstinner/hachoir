@@ -134,7 +134,7 @@ class Chunk(FieldSet):
         return "Chunk: %s" % self["tag"].display
 
 class RealMediaFile(Parser):
-    MAGIC = '.RMF\0\0\0\x12\0\1'    # (magic, size=18, version=1)
+    MAGIC = b'.RMF\0\0\0\x12\0\1'    # (magic, size=18, version=1)
     PARSER_TAGS = {
         "id": "real_media",
         "category": "container",

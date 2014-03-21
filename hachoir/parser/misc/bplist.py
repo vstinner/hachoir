@@ -248,7 +248,7 @@ class BPListObject(FieldSet):
 
 class BPList(HachoirParser, RootSeekableFieldSet):
     endian = BIG_ENDIAN
-    MAGIC = "bplist00"
+    MAGIC = b"bplist00"
     PARSER_TAGS = {
         "id": "bplist",
         "category": "misc",

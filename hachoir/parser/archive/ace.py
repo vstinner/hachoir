@@ -21,7 +21,7 @@ from hachoir.core.text_handler import textHandler, filesizeHandler, hexadecimal
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.parser.common.msdos import MSDOSFileAttr32
 
-MAGIC = "**ACE**"
+MAGIC = b"**ACE**"
 
 OS_MSDOS = 0
 OS_WIN32 = 2

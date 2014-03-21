@@ -151,7 +151,7 @@ class BTNode(FieldSet):
 
 class DSStore(HachoirParser, RootSeekableFieldSet):
     endian = BIG_ENDIAN
-    MAGIC = '\0\0\0\1Bud1'
+    MAGIC = b'\0\0\0\1Bud1'
     PARSER_TAGS = {
         "id": "dsstore",
         "category": "misc",

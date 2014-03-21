@@ -205,7 +205,7 @@ class Segments(Fragment):
                 yield Chunk(self, "chunk[]", size=segment_size*8)
 
 class OggPage(FieldSet):
-    MAGIC = "OggS"
+    MAGIC = b"OggS"
 
     def __init__(self, *args):
         FieldSet.__init__(self, *args)

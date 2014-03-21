@@ -54,7 +54,7 @@ class LinuxSwapFile(Parser):
 
     def validate(self):
         magic = self.stream.readBytes((PAGE_SIZE-10)*8, 10)
-        if magic not in ("SWAP-SPACE", "SWAPSPACE2", "S1SUSPEND\0"):
+        if magic not in (b"SWAP-SPACE", b"SWAPSPACE2", b"S1SUSPEND\0"):
             return "Unknown magic string"
         if MAX_SWAP_BADPAGES < self["nb_badpage"].value:
             return "Invalid number of bad page (%u)" % self["nb_badpage"].value

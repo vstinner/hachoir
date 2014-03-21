@@ -322,7 +322,7 @@ class Block(FieldSet):
             yield RawBytes(self, "body", size, "Body data")
 
 class RarFile(Parser):
-    MAGIC = "Rar!\x1A\x07\x00"
+    MAGIC = b"Rar!\x1A\x07\x00"
     PARSER_TAGS = {
         "id": "rar",
         "category": "archive",

@@ -248,7 +248,7 @@ class File(FieldSet):
         return text
 
 class NTFS(Parser):
-    MAGIC = "\xEB\x52\x90NTFS    "
+    MAGIC = b"\xEB\x52\x90NTFS    "
     PARSER_TAGS = {
         "id": "ntfs",
         "category": "file_system",

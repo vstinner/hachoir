@@ -376,7 +376,7 @@ class RiffFile(Parser):
     endian = LITTLE_ENDIAN
 
     def validate(self):
-        if self.stream.readBytes(0, 4) != "RIFF":
+        if self.stream.readBytes(0, 4) != b"RIFF":
             return "Wrong signature"
         if self["type"].value not in self.VALID_TYPES:
             return "Unknown RIFF content type"

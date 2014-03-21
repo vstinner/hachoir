@@ -482,7 +482,7 @@ class TcpdumpFile(Parser):
     LINK_TYPE_DESC = createDict(LINK_TYPE, 0)
 
     def validate(self):
-        if self["id"].value != "\xd4\xc3\xb2\xa1":
+        if self["id"].value != b"\xd4\xc3\xb2\xa1":
             return "Wrong file signature"
         if self["link_type"].value not in self.LINK_TYPE:
             return "Unknown link type"

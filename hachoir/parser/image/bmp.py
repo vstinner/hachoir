@@ -148,7 +148,7 @@ class BmpFile(Parser):
     }
 
     def validate(self):
-        if self.stream.readBytes(0, 2) != 'BM':
+        if self.stream.readBytes(0, 2) != b'BM':
             return "Wrong file signature"
         if self["header/header_size"].value not in (12, 40, 108):
             return "Unknown header size (%s)" % self["header_size"].value

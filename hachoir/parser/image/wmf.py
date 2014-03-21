@@ -436,7 +436,7 @@ class PlaceableHeader(FieldSet):
     Header of Placeable Metafile (file extension .APM),
     created by Aldus Corporation
     """
-    MAGIC = "\xD7\xCD\xC6\x9A\0\0"   # (magic, handle=0x0000)
+    MAGIC = b"\xD7\xCD\xC6\x9A\0\0"   # (magic, handle=0x0000)
 
     def createFields(self):
         yield textHandler(UInt32(self, "signature", "Placeable Metafiles signature (0x9AC6CDD7)"), hexadecimal)
@@ -447,7 +447,7 @@ class PlaceableHeader(FieldSet):
         yield textHandler(UInt16(self, "checksum"), hexadecimal)
 
 class EMF_Header(FieldSet):
-    MAGIC = "\x20\x45\x4D\x46\0\0"   # (magic, min_ver=0x0000)
+    MAGIC = b"\x20\x45\x4D\x46\0\0"   # (magic, min_ver=0x0000)
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
         self._size = self["size"].value * 8

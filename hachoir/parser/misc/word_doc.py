@@ -93,7 +93,7 @@ class FCLCBArray(FieldSet):
     def createFields(self):
         yield UInt16(self, "cfclcb", "Count of fields in the array of FC/LCB pairs")
         self._size = self['cfclcb'].value*64+16
-        
+
         yield FCLCB(self, "StshfOrig", "Original STSH allocation")
         yield FCLCB(self, "Stshf", "Current STSH allocation")
         yield FCLCB(self, "PlcffndRef", "Footnote reference (FRD) PLC")
@@ -248,7 +248,7 @@ def getOLE2Parser(ole2, path):
     return guessParser(fragment.getSubIStream())
 
 class WordDocumentParser(OLE2FragmentParser):
-    MAGIC='\xec\xa5' # 42476
+    MAGIC = b'\xec\xa5' # 42476
     PARSER_TAGS = {
         "id": "word_document",
         "min_size": 8,
@@ -274,7 +274,7 @@ class WordDocumentParser(OLE2FragmentParser):
         padding = (self['FIB/fcMin'].value - self.current_size//8)
         if padding:
             yield NullBytes(self, "padding[]", padding)
-        
+
         # Guess whether the file uses UTF16 encoding.
         is_unicode = False
         if self['FIB/array2/ccpText'].value*2 == self['FIB/fcMax'].value - self['FIB/fcMin'].value:
@@ -297,7 +297,7 @@ class WidePascalString16(String):
     def __init__(self, parent, name, description=None,
     strip=None, nbytes=None, truncate=None):
         Bytes.__init__(self, parent, name, 1, description)
-        
+
         self._format = "WidePascalString16"
         self._strip = strip
         self._truncate = truncate

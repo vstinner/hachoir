@@ -165,7 +165,7 @@ class File3ds(Parser):
     }
 
     def validate(self):
-        if self.stream.readBytes(0, 2) != "MM":
+        if self.stream.readBytes(0, 2) != b"MM":
             return "Wrong signature"
         if self["main/version/version"].value not in (2, 3):
             return "Unknown format version"

@@ -184,7 +184,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
         HachoirParser.__init__(self, stream, **args)
 
     def validate(self):
-        if self["ole_id"].value != "\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1":
+        if self["ole_id"].value != b"\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1":
             return "Invalid magic"
         if self["header/ver_maj"].value not in (3, 4):
             return "Unknown major version (%s)" % self["header/ver_maj"].value

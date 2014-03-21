@@ -512,7 +512,7 @@ class JpegFile(Parser):
     }
 
     def validate(self):
-        if self.stream.readBytes(0, 2) != "\xFF\xD8":
+        if self.stream.readBytes(0, 2) != b"\xFF\xD8":
             return "Invalid file signature"
         try:
             for index, field in enumerate(self):

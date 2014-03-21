@@ -190,7 +190,7 @@ class Bzip2Parser(Parser):
     endian = BIG_ENDIAN
 
     def validate(self):
-        if self.stream.readBytes(0, 3) != 'BZh':
+        if self.stream.readBytes(0, 3) != b'BZh':
             return "Wrong file signature"
         if not("1" <= self["blocksize"].value <= "9"):
             return "Wrong blocksize"

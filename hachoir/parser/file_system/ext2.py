@@ -407,7 +407,7 @@ class EXT2_FS(Parser):
     endian = LITTLE_ENDIAN
 
     def validate(self):
-        if self.stream.readBytes((1024+56)*8, 2) != "\x53\xEF":
+        if self.stream.readBytes((1024+56)*8, 2) != b"\x53\xEF":
             return "Invalid magic number"
         if not(0 <= self["superblock/log_block_size"].value <= 2):
             return "Invalid (log) block size"

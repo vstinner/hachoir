@@ -186,7 +186,7 @@ class File3do(Parser):
 
     def validate(self):
         signature = self.stream.readBytes(0, 4)
-        return signature in ('LDOM', 'MODL') # lazy endian-safe hack =D
+        return signature in (b'LDOM', b'MODL') # lazy endian-safe hack =D
 
     def createFields(self):
         # Read file signature, and fix endian if needed

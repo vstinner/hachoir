@@ -207,7 +207,7 @@ class Header(FieldSet):
             self["file_format"].display, self["nb_track"].value)
 
 class MidiFile(Parser):
-    MAGIC = "MThd"
+    MAGIC = b"MThd"
     PARSER_TAGS = {
         "id": "midi",
         "category": "audio",

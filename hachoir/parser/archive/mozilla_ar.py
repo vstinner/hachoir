@@ -24,7 +24,7 @@ class IndexEntry(FieldSet):
             self["name"].display, self["length"].display, self["flags"].display)
 
 class MozillaArchive(HachoirParser, RootSeekableFieldSet):
-    MAGIC = "MAR1"
+    MAGIC = b"MAR1"
     PARSER_TAGS = {
         "id": "mozilla_ar",
         "category": "archive",
@@ -34,11 +34,11 @@ class MozillaArchive(HachoirParser, RootSeekableFieldSet):
         "description": "Mozilla Archive",
     }
     endian = BIG_ENDIAN
-    
+
     def __init__(self, stream, **args):
         RootSeekableFieldSet.__init__(self, None, "root", stream, None, stream.askSize(self))
         HachoirParser.__init__(self, stream, **args)
-        
+
     def validate(self):
         if self.stream.readBytes(0, 4) != self.MAGIC:
             return "Invalid magic"

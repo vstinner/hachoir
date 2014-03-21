@@ -234,7 +234,7 @@ class RpmFile(Parser):
     endian = BIG_ENDIAN
 
     def validate(self):
-        if self["signature"].value != '\xED\xAB\xEE\xDB':
+        if self["signature"].value != b'\xED\xAB\xEE\xDB':
             return "Invalid signature"
         if self["major_ver"].value != 3:
             return "Unknown major version (%u)" % self["major_ver"].value

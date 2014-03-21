@@ -36,7 +36,7 @@ class Generic2DArray(FieldSet):
             yield GenericVector(self, self.row_name+"[]", self.width, self.item_class, self.item_name)
 
 class BLP1File(Parser):
-    MAGIC = "BLP1"
+    MAGIC = b"BLP1"
     PARSER_TAGS = {
         "id": "blp1",
         "category": "game",
@@ -188,7 +188,7 @@ class DXT5(FieldSet):
         yield DXT1(self, "color", True, "Color Channel Data")
 
 class BLP2File(Parser):
-    MAGIC = "BLP2"
+    MAGIC = b"BLP2"
     PARSER_TAGS = {
         "id": "blp2",
         "category": "game",

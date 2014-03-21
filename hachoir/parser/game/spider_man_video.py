@@ -57,7 +57,7 @@ class SpiderManVideoFile(Parser):
     endian = BIG_ENDIAN
 
     def validate(self):
-        return (self.stream.readBytes(0, 4) == 'CONF')
+        return (self.stream.readBytes(0, 4) == b'CONF')
 
     def createFields(self):
         while not self.eof:

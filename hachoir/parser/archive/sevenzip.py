@@ -389,7 +389,7 @@ class SevenZipParser(Parser):
         yield NextHeader(self, "next_hdr")
 
     def validate(self):
-        if self.stream.readBytes(0,6) != "7z\xbc\xaf'\x1c":
+        if self.stream.readBytes(0,6) != b"7z\xbc\xaf'\x1c":
             return "Invalid signature"
         return True
 

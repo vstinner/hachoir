@@ -125,7 +125,7 @@ class Properties(GlyphNames):
             yield NullBytes(self, "end_padding", padding)
 
 class PcfFile(Parser):
-    MAGIC = "\1fcp"
+    MAGIC = b"\1fcp"
     PARSER_TAGS = {
         "id": "pcf",
         "category": "misc",

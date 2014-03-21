@@ -274,7 +274,7 @@ class XcfFile(Parser):
     }
 
     def validate(self):
-        if self.stream.readBytes(0, 14) not in ('gimp xcf file\0', 'gimp xcf v002\0'):
+        if self.stream.readBytes(0, 14) not in (b'gimp xcf file\0', b'gimp xcf v002\0'):
             return "Wrong signature"
         return True
 

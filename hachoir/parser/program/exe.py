@@ -74,7 +74,7 @@ class ExeFile(HachoirParser, RootSeekableFieldSet):
         HachoirParser.__init__(self, stream, **args)
 
     def validate(self):
-        if self.stream.readBytes(0, 2) != 'MZ':
+        if self.stream.readBytes(0, 2) != b'MZ':
             return "Wrong header"
         err = self["msdos"].isValid()
         if err:

@@ -239,7 +239,7 @@ class SystemEntry(FieldSet):
         yield RawBytes(self, "data", self["length"].value)
     def createDescription(self):
         return '#SYSTEM Entry, Type %s'%self["type"].display
-        
+
 class SystemFile(FieldSet):
     def createFields(self):
         yield UInt32(self, "version", "Either 2 or 3")
@@ -247,7 +247,7 @@ class SystemFile(FieldSet):
             yield SystemEntry(self, "entry[]")
 
 class ChmFile(HachoirParser, RootSeekableFieldSet):
-    MAGIC = "ITSF\3\0\0\0"
+    MAGIC = b"ITSF\3\0\0\0"
     PARSER_TAGS = {
         "id": "chm",
         "category": "misc",

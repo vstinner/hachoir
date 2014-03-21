@@ -27,19 +27,19 @@ from hachoir.core.text_handler import textHandler
 
 # Old NoiseTracker 15-samples modules can have anything here.
 MODULE_TYPE = {
-    "M.K.": ("Noise/Pro-Tracker", 4),
-    "M!K!": ("Noise/Pro-Tracker", 4),
-    "M&K&": ("Noise/Pro-Tracker", 4),
-    "RASP": ("StarTrekker", 4),
-    "FLT4": ("StarTrekker", 4),
-    "FLT8": ("StarTrekker", 8),
-    "6CHN": ("FastTracker", 6),
-    "8CHN": ("FastTracker", 8),
-    "CD81": ("Octalyser", 8),
-    "OCTA": ("Octalyser", 8),
-    "FA04": ("Digital Tracker", 4),
-    "FA06": ("Digital Tracker", 6),
-    "FA08": ("Digital Tracker", 8),
+    b"M.K.": ("Noise/Pro-Tracker", 4),
+    b"M!K!": ("Noise/Pro-Tracker", 4),
+    b"M&K&": ("Noise/Pro-Tracker", 4),
+    b"RASP": ("StarTrekker", 4),
+    b"FLT4": ("StarTrekker", 4),
+    b"FLT8": ("StarTrekker", 8),
+    b"6CHN": ("FastTracker", 6),
+    b"8CHN": ("FastTracker", 8),
+    b"CD81": ("Octalyser", 8),
+    b"OCTA": ("Octalyser", 8),
+    b"FA04": ("Digital Tracker", 4),
+    b"FA06": ("Digital Tracker", 6),
+    b"FA08": ("Digital Tracker", 8),
 }
 
 def getFineTune(val):

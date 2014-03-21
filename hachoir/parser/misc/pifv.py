@@ -218,7 +218,7 @@ class FirmwareVolume(FieldSet):
 
 class PIFVFile(Parser):
     endian = LITTLE_ENDIAN
-    MAGIC = '_FVH'
+    MAGIC = b'_FVH'
     PARSER_TAGS = {
         "id": "pifv",
         "category": "program",

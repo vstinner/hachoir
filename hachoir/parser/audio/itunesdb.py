@@ -463,7 +463,7 @@ class ITunesDBFile(Parser):
     endian = LITTLE_ENDIAN
 
     def validate(self):
-        return self.stream.readBytes(0, 4) == 'mhbd'
+        return self.stream.readBytes(0, 4) == b'mhbd'
 
     def createFields(self):
         yield String(self, "header_id", 4, "DataBase Header Markup (\"mhbd\")", charset="ISO-8859-1")

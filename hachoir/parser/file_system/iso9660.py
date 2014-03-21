@@ -92,7 +92,7 @@ class Volume(FieldSet):
 
 class ISO9660(Parser):
     endian = LITTLE_ENDIAN
-    MAGIC = "\x01CD001"
+    MAGIC = b"\x01CD001"
     NULL_BYTES = 0x8000
     PARSER_TAGS = {
         "id": "iso9660",

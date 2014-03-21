@@ -103,9 +103,9 @@ class AiffFile(Parser):
     endian = BIG_ENDIAN
 
     def validate(self):
-        if self.stream.readBytes(0, 4) != "FORM":
+        if self.stream.readBytes(0, 4) != b"FORM":
             return "Invalid signature"
-        if self.stream.readBytes(8*8, 4) not in ("AIFF", "AIFC"):
+        if self.stream.readBytes(8*8, 4) not in (b"AIFF", b"AIFC"):
             return "Invalid type"
         return True
 

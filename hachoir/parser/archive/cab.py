@@ -195,7 +195,7 @@ class FolderData(FieldSet):
 
 class CabFile(Parser):
     endian = LITTLE_ENDIAN
-    MAGIC = "MSCF"
+    MAGIC = b"MSCF"
     PARSER_TAGS = {
         "id": "cab",
         "category": "archive",

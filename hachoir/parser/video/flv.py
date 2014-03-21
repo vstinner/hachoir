@@ -139,7 +139,7 @@ class FlvFile(Parser):
     endian = BIG_ENDIAN
 
     def validate(self):
-        if self.stream.readBytes(0, 3) != "FLV":
+        if self.stream.readBytes(0, 3) != b"FLV":
             return "Wrong file signature"
         if self["header/data_offset"].value != 9:
             return "Unknown data offset in main header"

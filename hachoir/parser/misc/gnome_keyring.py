@@ -151,7 +151,7 @@ class EncryptedData(Parser):
             yield NullBytes(self, "padding_align", size)
 
 class GnomeKeyring(Parser):
-    MAGIC = "GnomeKeyring\n\r\0\n"
+    MAGIC = b"GnomeKeyring\n\r\0\n"
     PARSER_TAGS = {
         "id": "gnomekeyring",
         "category": "misc",

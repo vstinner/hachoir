@@ -49,7 +49,7 @@ class GzipParser(Parser):
     }
 
     def validate(self):
-        if self["signature"].value != '\x1F\x8B':
+        if self["signature"].value != b'\x1F\x8B':
             return "Invalid signature"
         if self["compression"].value not in self.COMPRESSION_NAME:
             return "Unknown compression method (%u)" % self["compression"].value

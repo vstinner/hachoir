@@ -326,7 +326,7 @@ class GifFile(Parser):
     }
 
     def validate(self):
-        if self.stream.readBytes(0, 6) not in ("GIF87a", "GIF89a"):
+        if self.stream.readBytes(0, 6) not in (b"GIF87a", b"GIF89a"):
             return "Wrong header"
         if self["screen/width"].value == 0 or self["screen/height"].value == 0:
             return "Invalid image size"

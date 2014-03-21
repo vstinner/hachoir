@@ -220,7 +220,7 @@ class ZSNESFile(Parser):
 
     def validate(self):
         temp = self.stream.readBytes(0,28)
-        if temp[0:26] != "ZSNES Save State File V143":
+        if temp[0:26] != b"ZSNES Save State File V143":
             return "Wrong header"
         if ord(temp[27:28]) != 143: # extra...
             return "Wrong save version %d <> 143" % temp[27:1]

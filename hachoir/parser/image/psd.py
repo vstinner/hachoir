@@ -48,7 +48,7 @@ class PsdFile(Parser):
     }
 
     def validate(self):
-        if self.stream.readBytes(0, 4) != "8BPS":
+        if self.stream.readBytes(0, 4) != b"8BPS":
             return "Invalid signature"
         return True
 

@@ -121,7 +121,7 @@ class SEPXGroup(FieldSet):
             yield SEPX(self, "sepx[]")
 
 class Word2DocumentParser(OLE2FragmentParser):
-    MAGIC='\xdb\xa5' # 42459
+    MAGIC = b'\xdb\xa5' # 42459
     PARSER_TAGS = {
         "id": "word_v2_document",
         "min_size": 8,
@@ -143,7 +143,7 @@ class Word2DocumentParser(OLE2FragmentParser):
 
     def createFields(self):
         yield FIB(self, "FIB", "File Information Block")
-        
+
         padding = (self['FIB/fcMin'].value - self.current_size//8)
         if padding:
             yield NullBytes(self, "padding[]", padding)
@@ -161,7 +161,7 @@ class Word2DocumentParser(OLE2FragmentParser):
         padding = (self['FIB/fcMax'].value - self.current_size//8)
         if padding:
             yield RawBytes(self, "padding[]", padding)
-        
+
         sepx_size = (self['FIB/pnChpFirst'].value*512 - self.current_size//8)
         if sepx_size:
             yield SEPXGroup(self, "sepx", sepx_size)

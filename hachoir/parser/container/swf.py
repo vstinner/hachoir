@@ -382,7 +382,7 @@ class SwfFile(Parser):
     SWF_SCALE_FACTOR = 1.0 / 20
 
     def validate(self):
-        if self.stream.readBytes(0, 3) not in ("FWS", "CWS"):
+        if self.stream.readBytes(0, 3) not in (b"FWS", b"CWS"):
             return "Wrong file signature"
         if self["version"].value not in self.VALID_VERSIONS:
             return "Unknown version"

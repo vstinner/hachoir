@@ -310,7 +310,7 @@ class Pattern(FieldSet):
         return "Pattern with %i rows" % self["rows"].value
 
 class Header(FieldSet):
-    MAGIC = "Extended Module: "
+    MAGIC = b"Extended Module: "
     static_size = 336*8
 
     def createFields(self):

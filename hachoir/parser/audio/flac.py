@@ -133,7 +133,7 @@ class Frames(FieldSet):
 
 class FlacParser(Parser):
     "Parse FLAC audio files: FLAC is a lossless audio codec"
-    MAGIC = "fLaC\x00"
+    MAGIC = b"fLaC\x00"
     PARSER_TAGS = {
         "id": "flac",
         "category": "audio",

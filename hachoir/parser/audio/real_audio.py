@@ -25,7 +25,7 @@ class Metadata(FieldSet):
         yield PascalString8(self, "comment", charset="ISO-8859-1")
 
 class RealAudioFile(Parser):
-    MAGIC = ".ra\xFD"
+    MAGIC = b".ra\xFD"
     PARSER_TAGS = {
         "id": "real_audio",
         "category": "audio",

@@ -109,7 +109,7 @@ class ElfHeader(FieldSet):
         yield Enum(UInt8(self, "osabi_ident", "OS/syscall ABI identification"), self.OSABI_NAME)
         yield UInt8(self, "abi_version", "syscall ABI version")
         yield String(self, "pad", 7, "Pad")
-        
+
         yield Enum(UInt16(self, "type", "File type"), self.TYPE_NAME)
         yield Enum(UInt16(self, "machine", "Machine type"), self.MACHINE_NAME)
         yield UInt32(self, "version", "ELF format version")
@@ -275,7 +275,7 @@ class ProgramHeader64(ProgramHeader32):
         yield UInt64(self, "align", "Alignment padding")
 
 class ElfFile(HachoirParser, RootSeekableFieldSet):
-    MAGIC = "\x7FELF"
+    MAGIC = b"\x7FELF"
     PARSER_TAGS = {
         "id": "elf",
         "category": "program",
@@ -328,7 +328,7 @@ class ElfFile(HachoirParser, RootSeekableFieldSet):
                 yield SectionHeader64(self, "section_header[]")
             else:
                 yield SectionHeader32(self, "section_header[]")
-        
+
         for index in range(self["header/shnum"].value):
             field = self["section_header["+str(index)+"]"]
             if field['size'].value != 0:

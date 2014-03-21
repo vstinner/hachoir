@@ -26,7 +26,7 @@ class FileIndex(FieldSet):
             self["filename"].value, self["filesize"].display, self["offset"].value)
 
 class MarFile(Parser):
-    MAGIC = "MARC"
+    MAGIC = b"MARC"
     PARSER_TAGS = {
         "id": "mar",
         "category": "archive",
