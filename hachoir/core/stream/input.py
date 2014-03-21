@@ -230,7 +230,7 @@ class InputStream(Logger):
             raise InputStreamError("Unable to search bytes with address with bit granularity")
         length = len(needle)
         size = max(3 * length, 4096)
-        buffer = ''
+        buffer = b''
 
         if self._size and (end_address is None or self._size < end_address):
             end_address = self._size

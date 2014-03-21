@@ -252,7 +252,7 @@ controlchars = tuple({
     for code in range(128)
 )
 
-def makePrintable(data, charset, quote=None, to_unicode=False, smart=True):
+def makePrintable(data, charset, quote=None, smart=True):
     r"""
     Prepare a string to make it printable in the specified charset.
     It escapes control characters. Characters with code bigger than 127
@@ -313,9 +313,7 @@ def makePrintable(data, charset, quote=None, to_unicode=False, smart=True):
     if smart:
         # Replace \x00\x01 by \0\1
         data = re.sub(br"\\x0([0-7])(?=[^0-7]|$)", r"\\\1", data)
-    if to_unicode:
-        data = str(data, charset)
-    return data
+    return str(data, charset)
 
 def makeUnicode(text):
     r"""
