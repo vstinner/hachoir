@@ -48,7 +48,7 @@ class TextField(AttrWrap):
     def selectable(self):
         return True
 
-    def keypress(self, (maxcol,), key):
+    def keypress(self, arg, key):
         return key
 
 
@@ -62,15 +62,15 @@ class Node:
             self.index = field
             self.field = parent.field[self.index]
             if self.field.is_field_set:
-                self.text = u' +'
+                self.text = ' +'
             else:
-                self.text = u'  '
-            self.text = u'   ' * parent.depth + self.text + u' (...)'
+                self.text = '  '
+            self.text = '   ' * parent.depth + self.text + ' (...)'
         else:
             self.depth = 0
             self.index = None
             self.field = field
-            self.text = u''
+            self.text = ''
         self.widget = TextField(self.text)
 
     def setText(self, text, flags):
@@ -93,7 +93,7 @@ class Node:
     def sync(self):
         start, end = len(self.childs), self.field.current_length
         if start < end:
-            self.childs += [ Node(i, self) for i in xrange(start, end) ]
+            self.childs += [ Node(i, self) for i in range(start, end) ]
 
     def refresh(self):
         if self.flags:
@@ -151,9 +151,9 @@ class Walker(ListWalker):
     def fromField(self, root, path):
         try:
             field = self.focus.field[path]
-        except MissingField, e:
+        except MissingField as e:
             field = e.field
-            hachoir_log.error(unicode(e))
+            hachoir_log.error(str(e))
         path = []
         while field.parent:
             path.append(field.index)
@@ -351,8 +351,8 @@ class Walker(ListWalker):
     def save_field(self, path, raw):
         try:
             fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-        except OSError, err:
-            hachoir_log.error(unicode(str(err), self.charset))
+        except OSError as err:
+            hachoir_log.error(str(str(err), self.charset))
         else:
             field = self.focus.field
             if raw:
@@ -457,21 +457,24 @@ class Separator(Text):
         return l * mc // lr, r * mc // lr
 
     if urwid_ver < '0.9.8':
-        def render(self, (maxcol,), focus=False):
+        def render(self, xxx_todo_changeme, focus=False):
+            (maxcol,) = xxx_todo_changeme
             l, r = self.cols(maxcol)
             return CanvasJoin([
                 Text.render(self, (l,), focus),
                 maxcol - r, self.info.render((r,)),
             ])
     else:
-        def render(self, (maxcol,), focus=False):
+        def render(self, xxx_todo_changeme1, focus=False):
+            (maxcol,) = xxx_todo_changeme1
             l, r = self.cols(maxcol)
             return CanvasJoin([
                 (Text.render(self, (l,), focus), None, True, maxcol - r),
                 (self.info.render((r,)), None, False, r),
             ])
 
-    def rows(self, (maxcol,), focus=False):
+    def rows(self, xxx_todo_changeme3, focus=False):
+        (maxcol,) = xxx_todo_changeme3
         l, r = self.cols(maxcol)
         return max(Text.rows(self, (l,), focus), self.info.rows((r,)))
 
@@ -574,8 +577,8 @@ def exploreFieldSet(field_set, args, options={}):
                 c[:0] = [ name ]
             if c:
                 text = "[%s] %s" % ('|'.join(c), text)
-        if not isinstance(text, unicode):
-            text = unicode(text, charset)
+        if not isinstance(text, str):
+            text = str(text, charset)
         msgs[0].append((level, prefix, text))
     logger.objects = WeakKeyDictionary()
     hachoir_log.on_new_message = logger
@@ -587,7 +590,7 @@ def exploreFieldSet(field_set, args, options={}):
     sep.set_info(*tuple(log_count))
     body = Tabbed(sep)
     help = ('help', ListBox([ Text(getHelpMessage()) ]))
-    logger.objects[field_set] = logger.objects[field_set.stream] = name = u'root'
+    logger.objects[field_set] = logger.objects[field_set.stream] = name = 'root'
     body.append((name, TreeBox(charset, Node(field_set, None), preload_fields, args.path, options)))
 
     log = BoxAdapter(ListBox(msgs[1]), 0)
@@ -645,7 +648,7 @@ def exploreFieldSet(field_set, args, options={}):
                             return
                 #except AssertionError:
                 #    hachoir_log.error(getBacktrace())
-                except NewTab_Stream, e:
+                except NewTab_Stream as e:
                     stream = e.field.getSubIStream()
                     logger.objects[stream] = e = "%u/%s" % (body.active, e.field.absolute_address)
                     parser = guessParser(stream)
@@ -655,7 +658,7 @@ def exploreFieldSet(field_set, args, options={}):
                         logger.objects[parser] = e
                         body.append((e, TreeBox(charset, Node(parser, None), preload_fields, None, options)))
                         resize = log.height
-                except NeedInput, e:
+                except NeedInput as e:
                     input.do(*e.args)
                 if profile_display:
                     events = events[1:]
@@ -696,9 +699,9 @@ def exploreFieldSet(field_set, args, options={}):
 
     try:
         ui.run_wrapper(run)
-    except (HachoirError, StandardError):
+    except (HachoirError, Exception):
         pending = [ msg.get_text()[0] for msg in msgs[1][msgs[2]:] ] + \
                   [ "[*]%s %s" % (prefix, text) for level, prefix, text in msgs[0] ]
         if pending:
-            print "\nPending messages:\n" + '\n'.join(pending)
+            print("\nPending messages:\n" + '\n'.join(pending))
         raise

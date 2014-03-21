@@ -11,10 +11,10 @@ import hachoir.core
 import sys
 
 def displayVersion(*args):
-    print(_("Hachoir urwid version %s") % VERSION)
-    print(_("Hachoir library version %s") % hachoir.core.__version__)
+    print((_("Hachoir urwid version %s") % VERSION))
+    print((_("Hachoir library version %s") % hachoir.core.__version__))
     print()
-    print(_("Website: %s") % WEBSITE)
+    print((_("Website: %s") % WEBSITE))
     sys.exit(0)
 
 def displayParserList(*args):
