@@ -61,7 +61,7 @@ class RawBytes(Field):
         if self._display:
             self._display = None
         return self._parent.stream.readBytes(
-            self.absolute_address, self._size / 8)
+            self.absolute_address, self._size // 8)
 
 class Bytes(RawBytes):
     """
