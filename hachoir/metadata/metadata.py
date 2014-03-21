@@ -219,7 +219,7 @@ class MultipleMetadata(RootMetadata):
         return iter(self.__groups.values())
 
     def __bool__(self):
-        if RootMetadata.__nonzero__(self):
+        if RootMetadata.__bool__(self):
             return True
         return any(bool(group) for group in self.__groups)
 

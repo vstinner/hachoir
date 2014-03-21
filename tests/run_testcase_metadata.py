@@ -9,7 +9,6 @@ from hachoir.core import config
 config.use_i18n = False  # Don't use i18n
 config.quiet = True      # Don't display warnings
 
-from hachoir.core.i18n import getTerminalCharset
 from hachoir.core.error import HachoirError
 from hachoir.core.stream import InputStreamError
 from hachoir.parser import createParser
@@ -415,8 +414,7 @@ def main():
     if len(sys.argv) != 2:
         print("usage: %s testcase_directory" % sys.argv[0], file=sys.stderr)
         sys.exit(1)
-    charset = getTerminalCharset()
-    directory = str(sys.argv[1], charset)
+    directory = sys.argv[1]
 
     print("Test hachoir-metadata using testcase.")
     print()
