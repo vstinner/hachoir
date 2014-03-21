@@ -34,7 +34,7 @@ def parseDatetime(value):
     """
     Year and date:
     >>> parseDatetime("2000")
-    (datetime.date(2000, 1, 1), u'2000')
+    (datetime.date(2000, 1, 1), '2000')
     >>> parseDatetime("2004-01-02")
     datetime.date(2004, 1, 2)
 
@@ -45,9 +45,9 @@ def parseDatetime(value):
     datetime.datetime(2004, 1, 2, 18, 10, 45)
 
     Timestamp with timezone:
-    >>> parseDatetime(u'Thu, 19 Jul 2007 09:03:57 +0000')
-    datetime.datetime(2007, 7, 19, 9, 3, 57, tzinfo=<TimezoneUTC delta=0, name=u'UTC'>)
-    >>> parseDatetime(u'Thu, 19 Jul 2007 09:03:57 +0200')
+    >>> parseDatetime('Thu, 19 Jul 2007 09:03:57 +0000')
+    datetime.datetime(2007, 7, 19, 9, 3, 57, tzinfo=<TimezoneUTC delta=0, name='UTC'>)
+    >>> parseDatetime('Thu, 19 Jul 2007 09:03:57 +0200')
     datetime.datetime(2007, 7, 19, 9, 3, 57, tzinfo=<Timezone delta=2:00:00, name='+0200'>)
     """
     value = NORMALIZE_REGEX.sub("~", value.strip())

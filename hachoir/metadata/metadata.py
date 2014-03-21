@@ -72,8 +72,8 @@ class Metadata(Logger):
         >>> a.duration = timedelta(seconds=2300)
         >>> a.get('duration')
         datetime.timedelta(0, 2300)
-        >>> a.get('author', u'Anonymous')
-        u'Anonymous'
+        >>> a.get('author', 'Anonymous')
+        'Anonymous'
         """
         item = self.getItem(key, index)
         if item is None:
@@ -98,9 +98,9 @@ class Metadata(Logger):
         >>> a = RootMetadata()
         >>> a.duration = timedelta(seconds=2300)
         >>> a.getText('duration')
-        u'38 min 20 sec'
-        >>> a.getText('titre', u'Unknown')
-        u'Unknown'
+        '38 min 20 sec'
+        >>> a.getText('titre', 'Unknown')
+        'Unknown'
         """
         item = self.getItem(key, index)
         if item is not None:
@@ -123,8 +123,8 @@ class Metadata(Logger):
 
         >>> a = RootMetadata()
         >>> a.author = "haypo"
-        >>> a.copyright = unicode("© Hachoir", "UTF-8")
-        >>> print a
+        >>> a.copyright = "© Hachoir"
+        >>> print(a)
         Metadata:
         - Author: haypo
         - Copyright: \xa9 Hachoir
@@ -140,9 +140,9 @@ class Metadata(Logger):
         represents all datas.
 
         >>> a = RootMetadata()
-        >>> a.copyright = unicode("© Hachoir", "UTF-8")
-        >>> print repr(unicode(a))
-        u'Metadata:\n- Copyright: \xa9 Hachoir'
+        >>> a.copyright = "© Hachoir"
+        >>> print(repr(str(a)))
+        'Metadata:\n- Copyright: \\xa9 Hachoir'
 
         @see __str__() and exportPlaintext()
         """
@@ -159,12 +159,12 @@ class Metadata(Logger):
 
         If priority is too small, metadata are empty and so None is returned.
 
-        >>> print RootMetadata().exportPlaintext()
+        >>> print(RootMetadata().exportPlaintext())
         None
         >>> meta = RootMetadata()
-        >>> meta.copyright = unicode("© Hachoir", "UTF-8")
-        >>> print repr(meta.exportPlaintext())
-        [u'Metadata:', u'- Copyright: \xa9 Hachoir']
+        >>> meta.copyright = "© Hachoir"
+        >>> print(repr(meta.exportPlaintext()))
+        ['Metadata:', '- Copyright: \xa9 Hachoir']
 
         @see __str__() and __unicode__()
         """

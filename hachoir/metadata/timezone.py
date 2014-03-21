@@ -14,7 +14,7 @@ class TimezoneUTC(tzinfo):
         return TimezoneUTC.ZERO
 
     def __repr__(self):
-        return "<TimezoneUTC delta=0, name=u'UTC'>"
+        return "<TimezoneUTC delta=0, name='UTC'>"
 
 class Timezone(TimezoneUTC):
     """Fixed offset in hour from UTC."""

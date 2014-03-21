@@ -48,5 +48,9 @@ def main():
     testModule("hachoir.core.text_handler")
     testModule("hachoir.core.tools")
 
+    # Test documentation of some functions/classes
+    testModule("hachoir.metadata.metadata")
+    testModule("hachoir.metadata.setter")
+
 if __name__ == "__main__":
     main()
