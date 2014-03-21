@@ -14,8 +14,8 @@ WARNING: Loading this module indirectly calls initLocale() which sets
          settings.
 """
 
-import hachoir_core.config as config
-import hachoir_core
+import hachoir.core.config as config
+import hachoir.core
 import locale
 from os import path
 import sys
@@ -133,7 +133,7 @@ def _initGettext():
         return (_dummy_gettext, _dummy_ngettext)
 
     # Gettext variables
-    package = hachoir_core.PACKAGE
+    package = hachoir.core.PACKAGE
     locale_dir = path.join(path.dirname(__file__), "..", "locale")
 
     # Initialize gettext module

@@ -2,7 +2,7 @@
 import doctest
 import sys
 import os
-import hachoir_core.i18n   # import it because it does change the locale
+import hachoir.core.i18n   # import it because it does change the locale
 from locale import setlocale, LC_ALL
 
 def testDoc(filename, name=None):
@@ -34,7 +34,7 @@ def main():
     sys.path.append(hachoir_dir)
 
     # Configure Hachoir for tests
-    import hachoir_core.config as config
+    import hachoir.core.config as config
     config.use_i18n = False
 
     # Test documentation in doc/*.rst files
@@ -42,12 +42,12 @@ def main():
     testDoc('doc/internals.rst')
 
     # Test documentation of some functions/classes
-    testModule("hachoir_core.bits")
-    testModule("hachoir_core.compatibility")
-    testModule("hachoir_core.dict")
-    testModule("hachoir_core.i18n")
-    testModule("hachoir_core.text_handler")
-    testModule("hachoir_core.tools")
+    testModule("hachoir.core.bits")
+    testModule("hachoir.core.compatibility")
+    testModule("hachoir.core.dict")
+    testModule("hachoir.core.i18n")
+    testModule("hachoir.core.text_handler")
+    testModule("hachoir.core.tools")
 
 if __name__ == "__main__":
     main()

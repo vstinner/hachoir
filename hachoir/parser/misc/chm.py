@@ -15,15 +15,15 @@ Author: Victor Stinner
 Creation date: 2007-03-04
 """
 
-from hachoir_core.field import (Field, FieldSet, ParserError, RootSeekableFieldSet,
+from hachoir.core.field import (Field, FieldSet, ParserError, RootSeekableFieldSet,
     Int32, UInt16, UInt32, UInt64,
     RawBytes, PaddingBytes,
     Enum, String)
-from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_parser import HachoirParser
-from hachoir_parser.common.win32 import GUID
-from hachoir_parser.common.win32_lang_id import LANGUAGE_ID
-from hachoir_core.text_handler import textHandler, hexadecimal, filesizeHandler
+from hachoir.core.endian import LITTLE_ENDIAN
+from hachoir.parser import HachoirParser
+from hachoir.parser.common.win32 import GUID
+from hachoir.parser.common.win32_lang_id import LANGUAGE_ID
+from hachoir.core.text_handler import textHandler, hexadecimal, filesizeHandler
 
 class CWord(Field):
     """

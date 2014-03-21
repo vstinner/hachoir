@@ -1,14 +1,14 @@
-from hachoir_metadata.metadata import RootMetadata, registerExtractor
-from hachoir_metadata.image import computeComprRate
-from hachoir_parser.image.exif import IFD, BasicIFDEntry
-from hachoir_parser.image.jpeg import (
+from hachoir.metadata.metadata import RootMetadata, registerExtractor
+from hachoir.metadata.image import computeComprRate
+from hachoir.parser.image.exif import IFD, BasicIFDEntry
+from hachoir.parser.image.jpeg import (
     JpegFile, JpegChunk,
     QUALITY_HASH_COLOR, QUALITY_SUM_COLOR,
     QUALITY_HASH_GRAY, QUALITY_SUM_GRAY)
-from hachoir_core.field import MissingField
-from hachoir_core.i18n import _
-from hachoir_core.tools import makeUnicode
-from hachoir_metadata.safe import fault_tolerant
+from hachoir.core.field import MissingField
+from hachoir.core.i18n import _
+from hachoir.core.tools import makeUnicode
+from hachoir.metadata.safe import fault_tolerant
 from datetime import datetime
 
 def deg2float(degree, minute, second):

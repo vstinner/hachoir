@@ -1,7 +1,7 @@
 #!/usr/bin/python
-from hachoir_core.cmd_line import unicodeFilename
-from hachoir_parser import createParser, guessParser
-from hachoir_parser.container.swf import SOUND_CODEC_MP3
+from hachoir.core.cmd_line import unicodeFilename
+from hachoir.parser import createParser, guessParser
+from hachoir.parser.container.swf import SOUND_CODEC_MP3
 from sys import stderr, exit, argv
 
 class JpegExtractor:

@@ -7,28 +7,28 @@ Author: Victor Stinner
 Creation: 17 september 2006
 """
 
-from hachoir_core.field import MissingField
-from hachoir_core.cmd_line import unicodeFilename
+from hachoir.core.field import MissingField
+from hachoir.core.cmd_line import unicodeFilename
 from hachoir_editor import (createEditor,
     NewFieldSet, EditableInteger, EditableBytes)
-from hachoir_core.stream import FileOutputStream, StringOutputStream
-from hachoir_core.tools import humanFilesize, makePrintable
-from hachoir_core.i18n import _, getTerminalCharset
-from hachoir_parser import createParser
+from hachoir.core.stream import FileOutputStream, StringOutputStream
+from hachoir.core.tools import humanFilesize, makePrintable
+from hachoir.core.i18n import _, getTerminalCharset
+from hachoir.parser import createParser
 from optparse import OptionGroup, OptionParser
-import hachoir_core
+import hachoir.core
 import sys
 
 # File formats
-from hachoir_parser.archive import TarFile
-from hachoir_parser.audio import AuFile
-from hachoir_parser.image import PngFile, JpegFile
-from hachoir_parser.container import RiffFile
-from hachoir_parser.audio import MpegAudioFile
+from hachoir.parser.archive import TarFile
+from hachoir.parser.audio import AuFile
+from hachoir.parser.image import PngFile, JpegFile
+from hachoir.parser.container import RiffFile
+from hachoir.parser.audio import MpegAudioFile
 
 # Constants
 __version__ = "0.1"
-WEBSITE = "%s/wiki/hachoir-strip" % hachoir_core.WEBSITE
+WEBSITE = "%s/wiki/hachoir-strip" % hachoir.core.WEBSITE
 
 # Strip what?
 STRIP_USELESS  = 0x01   # Useless padding, useless duplicate information, etc.
@@ -229,7 +229,7 @@ def stripEditor(editor, filename, level, verbose):
 
 def displayVersion(*args):
     print _("Hachoir strip version %s") % __version__
-    print _("Hachoir library version %s") % hachoir_core.__version__
+    print _("Hachoir library version %s") % hachoir.core.__version__
     print
     print _("Website: %s") % WEBSITE
     sys.exit(0)

@@ -1,2 +1,2 @@
-from hachoir_parser.network.tcpdump import TcpdumpFile
+from hachoir.parser.network.tcpdump import TcpdumpFile
 

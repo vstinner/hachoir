@@ -6,8 +6,8 @@ Download and check Hachoir testcase. Files are downloaded from:
 TESTCASE_URL = "http://hachoir.tuxfamily.org/testcase/"
 
 from urllib2 import Request, urlopen, URLError, HTTPError
-from hachoir_core.i18n import getTerminalCharset
-from hachoir_core.tools import humanFilesize
+from hachoir.core.i18n import getTerminalCharset
+from hachoir.core.tools import humanFilesize
 try:
     from md5 import md5
 except ImportError:

@@ -2,7 +2,7 @@
 from __future__ import with_statement
 
 def writeReadme(out):
-    from hachoir_parser.parser_list import HachoirParserList
+    from hachoir.parser.parser_list import HachoirParserList
 
     # Write header
     for line in open('README.header'):

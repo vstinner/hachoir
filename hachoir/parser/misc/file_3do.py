@@ -7,12 +7,12 @@ Author: Cyril Zorin
 Creation date: 28 september 2006
 """
 
-from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet,
+from hachoir.parser import Parser
+from hachoir.core.field import (FieldSet,
     UInt32, Int32, String, Float32,
     RawBytes, PaddingBytes)
-from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
-from hachoir_parser.misc.common import Vertex, MapUV
+from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
+from hachoir.parser.misc.common import Vertex, MapUV
 
 class Vector(FieldSet):
     def __init__(self, parent, name,

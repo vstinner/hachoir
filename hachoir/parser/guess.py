@@ -4,10 +4,10 @@ Parser list managment:
 """
 
 import os
-from hachoir_core.error import warning, info, HACHOIR_ERRORS
-from hachoir_parser import ValidateError, HachoirParserList
-from hachoir_core.stream import FileInputStream
-from hachoir_core.i18n import _
+from hachoir.core.error import warning, info, HACHOIR_ERRORS
+from hachoir.parser import ValidateError, HachoirParserList
+from hachoir.core.stream import FileInputStream
+from hachoir.core.i18n import _
 import weakref
 
 

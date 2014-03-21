@@ -18,11 +18,11 @@ from Cookie import SimpleCookie
 import cgi
 import cgitb; cgitb.enable()
 
-from hachoir_core.tools import alignValue
-from hachoir_core.field import Field, SubFile
-from hachoir_core.stream import FileInputStream, StringInputStream
-from hachoir_core.stream.input import FileFromInputStream, InputSubStream
-from hachoir_parser.guess import guessParser
+from hachoir.core.tools import alignValue
+from hachoir.core.field import Field, SubFile
+from hachoir.core.stream import FileInputStream, StringInputStream
+from hachoir.core.stream.input import FileFromInputStream, InputSubStream
+from hachoir.parser.guess import guessParser
 
 # from http://code.activestate.com/recipes/273844/
 try: # Windows needs stdio set for binary mode.

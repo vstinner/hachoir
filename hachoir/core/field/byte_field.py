@@ -3,10 +3,10 @@ Very basic field: raw content with a size in byte. Use this class for
 unknown content.
 """
 
-from hachoir_core.field import Field, FieldError
-from hachoir_core.tools import makePrintable
-from hachoir_core.bits import str2hex
-from hachoir_core import config
+from hachoir.core.field import Field, FieldError
+from hachoir.core.tools import makePrintable
+from hachoir.core.bits import str2hex
+from hachoir.core import config
 
 MAX_LENGTH = (2**64)
 

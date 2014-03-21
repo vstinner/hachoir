@@ -1,9 +1,9 @@
-from hachoir_core.field import (MissingField, BasicFieldSet, Field, ParserError,
+from hachoir.core.field import (MissingField, BasicFieldSet, Field, ParserError,
     createRawField, createNullField, createPaddingField, FakeArray)
-from hachoir_core.dict import Dict, UniqKeyError
-from hachoir_core.error import HACHOIR_ERRORS
-from hachoir_core.tools import lowerBound, makeUnicode
-import hachoir_core.config as config
+from hachoir.core.dict import Dict, UniqKeyError
+from hachoir.core.error import HACHOIR_ERRORS
+from hachoir.core.tools import lowerBound, makeUnicode
+import hachoir.core.config as config
 
 class GenericFieldSet(BasicFieldSet):
     """

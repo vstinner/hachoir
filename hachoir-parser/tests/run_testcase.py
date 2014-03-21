@@ -7,16 +7,16 @@ Use script %s to download and check the testcase.
 """ % DOWNLOAD_SCRIPT
 
 # Configure Hachoir
-from hachoir_core import config
+from hachoir.core import config
 config.use_i18n = False  # Don't use i18n
 config.quiet = True      # Don't display warnings
 
-from hachoir_core.field import FieldError
-from hachoir_core.i18n import getTerminalCharset
-from hachoir_core.error import HACHOIR_ERRORS, error
-from hachoir_core.stream import InputStreamError, StringInputStream
-from hachoir_parser import createParser, HachoirParserList, ValidateError
-from hachoir_core.compatibility import all
+from hachoir.core.field import FieldError
+from hachoir.core.i18n import getTerminalCharset
+from hachoir.core.error import HACHOIR_ERRORS, error
+from hachoir.core.stream import InputStreamError, StringInputStream
+from hachoir.parser import createParser, HachoirParserList, ValidateError
+from hachoir.core.compatibility import all
 from locale import setlocale, LC_ALL
 from array import array
 from datetime import datetime
@@ -188,7 +188,7 @@ def checkRAR(parser): return (
 def checkACE(parser): return (
     checkValue(parser, "header/crc16", 0xA9BE),
     checkValue(parser, "file[0]/reserved", 0x4554),
-    checkValue(parser, "file[1]/filename", "hachoir_core\.svn"),
+    checkValue(parser, "file[1]/filename", "hachoir.core\.svn"),
     checkValue(parser, "file[2]/parameters", 0x000A),
     #End of archive, lots of work...
     #checkValue(parser, "new_recovery[0]/signature", "**ACE**"),

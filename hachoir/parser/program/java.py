@@ -59,15 +59,15 @@ TODO/FIXME:
    should update the length field of it's entry, etc.  Sounds like a huge work.
 """
 
-from hachoir_parser import Parser
-from hachoir_core.field import (
+from hachoir.parser import Parser
+from hachoir.core.field import (
         ParserError, FieldSet, StaticFieldSet,
         Enum, RawBytes, PascalString16, Float32, Float64,
         Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64,
         Bit, NullBits )
-from hachoir_core.endian import BIG_ENDIAN
-from hachoir_core.text_handler import textHandler, hexadecimal
-from hachoir_core.tools import paddingSize
+from hachoir.core.endian import BIG_ENDIAN
+from hachoir.core.text_handler import textHandler, hexadecimal
+from hachoir.core.tools import paddingSize
 
 ###############################################################################
 def parse_flags(flags, flags_dict, show_unknown_flags=True, separator=" "):

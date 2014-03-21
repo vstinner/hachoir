@@ -20,10 +20,10 @@ Kurz.
 """
 
 
-from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet, Enum,
+from hachoir.parser import Parser
+from hachoir.core.field import (FieldSet, Enum,
     UInt16, UInt32, String, RawBytes, NullBytes, SeekableFieldSet, Bit)
-from hachoir_core.endian import LITTLE_ENDIAN
+from hachoir.core.endian import LITTLE_ENDIAN
 
 
 class BlockState(Bit):

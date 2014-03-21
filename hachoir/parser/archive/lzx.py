@@ -6,14 +6,14 @@ LZX data stored in a Hachoir stream.
 Author: Robert Xiao
 Creation date: July 18, 2007
 """
-from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet,
+from hachoir.parser import Parser
+from hachoir.core.field import (FieldSet,
     UInt32, Bit, Bits, PaddingBits,
     RawBytes, ParserError)
-from hachoir_core.endian import MIDDLE_ENDIAN, LITTLE_ENDIAN
-from hachoir_core.tools import paddingSize, alignValue
-from hachoir_parser.archive.zlib import build_tree, HuffmanCode, extend_data
-from hachoir_core.bits import str2long
+from hachoir.core.endian import MIDDLE_ENDIAN, LITTLE_ENDIAN
+from hachoir.core.tools import paddingSize, alignValue
+from hachoir.parser.archive.zlib import build_tree, HuffmanCode, extend_data
+from hachoir.core.bits import str2long
 import new # for instancemethod
 
 class LZXPreTreeEncodedTree(FieldSet):

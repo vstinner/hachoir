@@ -1,18 +1,18 @@
 #!/usr/bin/python
-from hachoir_core.cmd_line import (getHachoirOptions,
+from hachoir.core.cmd_line import (getHachoirOptions,
     configureHachoir, unicodeFilename)
-from hachoir_core.stream import InputStreamError, FileInputStream
-from hachoir_core.i18n import _
-from hachoir_parser import guessParser, HachoirParserList
+from hachoir.core.stream import InputStreamError, FileInputStream
+from hachoir.core.i18n import _
+from hachoir.parser import guessParser, HachoirParserList
 from hachoir_urwid import exploreFieldSet
 from hachoir_urwid.version import VERSION, WEBSITE
 from optparse import OptionGroup, OptionParser
-import hachoir_core
+import hachoir.core
 import sys
 
 def displayVersion(*args):
     print _("Hachoir urwid version %s") % VERSION
-    print _("Hachoir library version %s") % hachoir_core.__version__
+    print _("Hachoir library version %s") % hachoir.core.__version__
     print
     print _("Website: %s") % WEBSITE
     sys.exit(0)
@@ -59,7 +59,7 @@ def parseOptions():
     return values, arguments[0]
 
 def profile(func, *args):
-    from hachoir_core.profiler import runProfiler
+    from hachoir.core.profiler import runProfiler
     runProfiler(func, args)
 
 def openParser(parser_id, filename, offset, size):

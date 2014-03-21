@@ -14,19 +14,19 @@ Information:
 Author: Victor Stinner, Robert Xiao
 """
 
-from hachoir_core.error import HachoirError
-from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet, ParserError, FieldError,
+from hachoir.core.error import HachoirError
+from hachoir.parser import Parser
+from hachoir.core.field import (FieldSet, ParserError, FieldError,
     UInt8, UInt16, Enum, Field,
     Bit, Bits, NullBits, NullBytes, PaddingBits,
     String, RawBytes)
-from hachoir_parser.image.common import PaletteRGB
-from hachoir_core.endian import BIG_ENDIAN
-from hachoir_core.text_handler import textHandler, hexadecimal
-from hachoir_parser.image.exif import Exif
-from hachoir_parser.image.photoshop_metadata import PhotoshopMetadata
-from hachoir_parser.archive.zlib import build_tree
-from hachoir_core.tools import paddingSize, alignValue
+from hachoir.parser.image.common import PaletteRGB
+from hachoir.core.endian import BIG_ENDIAN
+from hachoir.core.text_handler import textHandler, hexadecimal
+from hachoir.parser.image.exif import Exif
+from hachoir.parser.image.photoshop_metadata import PhotoshopMetadata
+from hachoir.parser.archive.zlib import build_tree
+from hachoir.core.tools import paddingSize, alignValue
 
 MAX_FILESIZE = 100 * 1024 * 1024
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Procedure to release a new version:
-#  - edit hachoir_core/version.py: VERSION = "XXX"
+#  - edit hachoir.core/version.py: VERSION = "XXX"
 #  - edit ChangeLog (set release date)
 #  - run: ./test_doc.py
 #  - run: hg commit
@@ -14,7 +14,7 @@
 #  - update the website
 #    * http://bitbucket.org/haypo/hachoir/wiki/Install/source
 #    * http://bitbucket.org/haypo/hachoir/wiki/Home
-#  - edit hachoir_core/version.py: set version to N+1
+#  - edit hachoir.core/version.py: set version to N+1
 #  - edit ChangeLog: add a new "hachoir-core N+1" section with text XXX
 
 # Constants
@@ -50,19 +50,19 @@ def main():
         use_setuptools = False
 
     # Set some variables
-    hachoir_core = load_source("version", path_join("hachoir_core", "version.py"))
+    hachoir.core = load_source("version", path_join("hachoir.core", "version.py"))
     long_description = open('README').read() + open('ChangeLog').read()
 
     install_options = {
-        "name": hachoir_core.PACKAGE,
-        "version": hachoir_core.VERSION,
-        "url": hachoir_core.WEBSITE,
-        "download_url": hachoir_core.WEBSITE,
-        "license": hachoir_core.LICENSE,
+        "name": hachoir.core.PACKAGE,
+        "version": hachoir.core.VERSION,
+        "url": hachoir.core.WEBSITE,
+        "download_url": hachoir.core.WEBSITE,
+        "license": hachoir.core.LICENSE,
         "author": AUTHORS,
         "description": DESCRIPTION,
         "classifiers": CLASSIFIERS,
-        "packages": ['hachoir_core', 'hachoir_core.field', 'hachoir_core.stream'],
+        "packages": ['hachoir.core', 'hachoir.core.field', 'hachoir.core.stream'],
         "long_description": long_description,
     }
 

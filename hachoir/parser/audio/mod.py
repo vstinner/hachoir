@@ -18,12 +18,12 @@ Creation: 18th February 2007
 """
 
 from math import log10
-from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet,
+from hachoir.parser import Parser
+from hachoir.core.field import (FieldSet,
     Bits, UInt16, UInt8,
     RawBytes, String, GenericVector)
-from hachoir_core.endian import BIG_ENDIAN
-from hachoir_core.text_handler import textHandler
+from hachoir.core.endian import BIG_ENDIAN
+from hachoir.core.text_handler import textHandler
 
 # Old NoiseTracker 15-samples modules can have anything here.
 MODULE_TYPE = {

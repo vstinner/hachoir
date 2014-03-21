@@ -20,15 +20,15 @@ Author: Victor Stinner
 Creation: 2006-04-23
 """
 
-from hachoir_parser import HachoirParser
-from hachoir_core.field import (
+from hachoir.parser import HachoirParser
+from hachoir.core.field import (
     FieldSet, ParserError, SeekableFieldSet, RootSeekableFieldSet,
     UInt8, UInt16, UInt32, UInt64, TimestampWin64, Enum,
     Bytes, NullBytes, String)
-from hachoir_core.text_handler import filesizeHandler
-from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
-from hachoir_parser.common.win32 import GUID
-from hachoir_parser.misc.msoffice import PROPERTY_NAME, RootEntry, RawParser, CustomFragment
+from hachoir.core.text_handler import filesizeHandler
+from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
+from hachoir.parser.common.win32 import GUID
+from hachoir.parser.misc.msoffice import PROPERTY_NAME, RootEntry, RawParser, CustomFragment
 
 MIN_BIG_BLOCK_LOG2 = 6   # 512 bytes
 MAX_BIG_BLOCK_LOG2 = 14  # 64 kB

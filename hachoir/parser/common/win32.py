@@ -1,9 +1,9 @@
-from hachoir_core.field import (FieldSet,
+from hachoir.core.field import (FieldSet,
     UInt16, UInt32, Enum, String, Bytes, Bits, TimestampUUID60)
-from hachoir_parser.video.fourcc import video_fourcc_name
-from hachoir_core.bits import str2hex
-from hachoir_core.text_handler import textHandler, hexadecimal
-from hachoir_parser.network.common import MAC48_Address
+from hachoir.parser.video.fourcc import video_fourcc_name
+from hachoir.core.bits import str2hex
+from hachoir.core.text_handler import textHandler, hexadecimal
+from hachoir.parser.network.common import MAC48_Address
 
 # Dictionary: Windows codepage => Python charset name
 CODEPAGE_CHARSET = {

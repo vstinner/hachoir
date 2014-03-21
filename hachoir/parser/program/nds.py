@@ -9,12 +9,12 @@ File format references:
 - http://nocash.emubase.de/gbatek.htm
 """
 
-from hachoir_parser import Parser
-from hachoir_core.field import (ParserError,
+from hachoir.parser import Parser
+from hachoir.core.field import (ParserError,
     UInt8, UInt16, UInt32, UInt64, String, RawBytes, SubFile, FieldSet, NullBits, Bit, Bits, Bytes,
     SeekableFieldSet, RootSeekableFieldSet)
-from hachoir_core.text_handler import textHandler, hexadecimal
-from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
+from hachoir.core.text_handler import textHandler, hexadecimal
+from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 
 
 """

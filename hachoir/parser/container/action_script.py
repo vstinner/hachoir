@@ -12,12 +12,12 @@ Authors: Sebastien Ponce, Robert Xiao
 Creation date: 26 April 2008
 """
 
-from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet, ParserError,
+from hachoir.parser import Parser
+from hachoir.core.field import (FieldSet, ParserError,
     Bit, Bits, UInt8, UInt32, Int16, UInt16, Float32, Float64, CString, Enum,
     Bytes, RawBytes, NullBits, String, SubFile, Field)
-from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
-from hachoir_core.field.float import FloatExponent
+from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
+from hachoir.core.field.float import FloatExponent
 from struct import unpack
 
 class FlashPackedInteger(Bits):

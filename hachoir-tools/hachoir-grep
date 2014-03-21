@@ -2,25 +2,25 @@
 
 __version__ = "0.1"
 
-from hachoir_core.i18n import getTerminalCharset, _
-from hachoir_core.cmd_line import (getHachoirOptions,
+from hachoir.core.i18n import getTerminalCharset, _
+from hachoir.core.cmd_line import (getHachoirOptions,
     configureHachoir, unicodeFilename)
-from hachoir_core.field import isString
-from hachoir_core.benchmark import Benchmark
-from hachoir_core.error import error
-from hachoir_core.stream import InputStreamError
-from hachoir_core.tools import makePrintable
-from hachoir_parser import createParser
+from hachoir.core.field import isString
+from hachoir.core.benchmark import Benchmark
+from hachoir.core.error import error
+from hachoir.core.stream import InputStreamError
+from hachoir.core.tools import makePrintable
+from hachoir.parser import createParser
 from optparse import OptionGroup, OptionParser
 import errno
 import sys
 
 def displayVersion(*args):
-    import hachoir_core
+    import hachoir.core
     print _("Hachoir grep version %s") % __version__
-    print _("Hachoir library version %s") % hachoir_core.__version__
+    print _("Hachoir library version %s") % hachoir.core.__version__
     print
-    print _("Website: %s/wiki/hachoir-grep") % hachoir_core.WEBSITE
+    print _("Website: %s/wiki/hachoir-grep") % hachoir.core.WEBSITE
     sys.exit(0)
 
 def countChildren(field_set):

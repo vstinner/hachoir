@@ -3,8 +3,8 @@
 from wx import App, EVT_MENU, ID_OK
 from wx.xrc import XRCID
 
-from hachoir_parser.guess import createParser, guessParser
-from hachoir_core.stream.input import FileFromInputStream
+from hachoir.parser.guess import createParser, guessParser
+from hachoir.core.stream.input import FileFromInputStream
 from hachoir_wx.dispatcher import dispatcher_t
 from hachoir_wx import frame_view, field_view, hex_view
 from hachoir_wx.dialogs import file_open_dialog

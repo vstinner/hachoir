@@ -4,15 +4,15 @@ BZIP2 archive file
 Author: Victor Stinner, Robert Xiao
 """
 
-from hachoir_parser import Parser
-from hachoir_core.tools import paddingSize
-from hachoir_core.field import (Field, FieldSet, GenericVector,
+from hachoir.parser import Parser
+from hachoir.core.tools import paddingSize
+from hachoir.core.field import (Field, FieldSet, GenericVector,
     ParserError, String,
     PaddingBits, Bit, Bits, Character,
     UInt32, Enum, CompressedField)
-from hachoir_core.endian import BIG_ENDIAN
-from hachoir_core.text_handler import textHandler, hexadecimal
-from hachoir_parser.archive.zlib import build_tree, HuffmanCode
+from hachoir.core.endian import BIG_ENDIAN
+from hachoir.core.text_handler import textHandler, hexadecimal
+from hachoir.parser.archive.zlib import build_tree, HuffmanCode
 
 try:
     from bz2 import BZ2Decompressor

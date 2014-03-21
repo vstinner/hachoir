@@ -5,10 +5,10 @@ Authors: Victor Stinner, Sebastien Ponce, Robert Xiao
 Creation date: 30 september 2006
 """
 
-from hachoir_parser import Parser
-from hachoir_core.field import FieldSet, SeekableFieldSet, RootSeekableFieldSet, Bytes
-from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
-from hachoir_parser.image.exif import TIFF
+from hachoir.parser import Parser
+from hachoir.core.field import FieldSet, SeekableFieldSet, RootSeekableFieldSet, Bytes
+from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
+from hachoir.parser.image.exif import TIFF
 
 def getStrips(ifd):
     data = {}

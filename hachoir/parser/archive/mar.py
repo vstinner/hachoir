@@ -7,10 +7,10 @@ Creation date: 2007-03-04
 
 MAX_NB_FILE = 100000
 
-from hachoir_parser import Parser
-from hachoir_core.field import FieldSet, String, UInt32, SubFile
-from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.text_handler import textHandler, filesizeHandler, hexadecimal
+from hachoir.parser import Parser
+from hachoir.core.field import FieldSet, String, UInt32, SubFile
+from hachoir.core.endian import LITTLE_ENDIAN
+from hachoir.core.text_handler import textHandler, filesizeHandler, hexadecimal
 
 class FileIndex(FieldSet):
     static_size = 68*8

@@ -7,15 +7,15 @@ Author: Robert Xiao
 Created: 2010-09-01
 """
 
-from hachoir_parser import HachoirParser
-from hachoir_core.field import (RootSeekableFieldSet, FieldSet,
+from hachoir.parser import HachoirParser
+from hachoir.core.field import (RootSeekableFieldSet, FieldSet,
     NullBytes, RawBytes, PaddingBytes, Bytes, SubFile, String, PascalString8,
     Bits, UInt8, UInt16, UInt32,
     Link,
     ParserError)
-from hachoir_core.endian import BIG_ENDIAN
-from hachoir_core.text_handler import displayHandler, hexadecimal
-from hachoir_core.tools import paddingSize
+from hachoir.core.endian import BIG_ENDIAN
+from hachoir.core.text_handler import displayHandler, hexadecimal
+from hachoir.core.tools import paddingSize
 
 class BlockAddress(FieldSet):
     static_size = 32

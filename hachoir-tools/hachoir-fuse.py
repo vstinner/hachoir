@@ -11,7 +11,7 @@ from hachoir.field import MissingField
 from hachoir.tools import makePrintable
 from hachoir.stream import FileOutputStream
 from hachoir.editor import createEditor
-from hachoir_parser import createParser
+from hachoir.parser import createParser
 
 # some spaghetti to make it usable without fuse-py being installed
 for i in True, False:

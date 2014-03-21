@@ -1,9 +1,9 @@
-from hachoir_core.field import (FieldError,
+from hachoir.core.field import (FieldError,
     RawBits, RawBytes,
     PaddingBits, PaddingBytes,
     NullBits, NullBytes,
     GenericString, GenericInteger)
-from hachoir_core.stream import FileOutputStream
+from hachoir.core.stream import FileOutputStream
 
 def createRawField(parent, size, name="raw[]", description=None):
     if size <= 0:

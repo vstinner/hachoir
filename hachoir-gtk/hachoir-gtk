@@ -4,11 +4,11 @@ import sys
 import os
 pygtk.require ('2.0') # 2.2 for Clipboard
 import gtk.glade
-from hachoir_core.cmd_line import unicodeFilename
-from hachoir_parser import createParser
-from hachoir_parser import guessParser, HachoirParserList
-from hachoir_core.field import SubFile
-from hachoir_core.stream import FileInputStream
+from hachoir.core.cmd_line import unicodeFilename
+from hachoir.parser import createParser
+from hachoir.parser import guessParser, HachoirParserList
+from hachoir.core.field import SubFile
+from hachoir.core.stream import FileInputStream
 
 UI_FILENAME = os.path.dirname( __file__ ) + "/hachoir.glade"
 

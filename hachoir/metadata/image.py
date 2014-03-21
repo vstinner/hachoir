@@ -1,12 +1,12 @@
-from hachoir_metadata.metadata import (registerExtractor,
+from hachoir.metadata.metadata import (registerExtractor,
     Metadata, RootMetadata, MultipleMetadata)
-from hachoir_parser.image import (
+from hachoir.parser.image import (
     BmpFile, IcoFile, PcxFile, GifFile, PngFile, TiffFile,
     XcfFile, TargaFile, WMF_File, PsdFile)
-from hachoir_parser.image.png import getBitsPerPixel as pngBitsPerPixel
-from hachoir_parser.image.xcf import XcfProperty
-from hachoir_core.i18n import _
-from hachoir_metadata.safe import fault_tolerant
+from hachoir.parser.image.png import getBitsPerPixel as pngBitsPerPixel
+from hachoir.parser.image.xcf import XcfProperty
+from hachoir.core.i18n import _
+from hachoir.metadata.safe import fault_tolerant
 
 def computeComprRate(meta, compr_size):
     """

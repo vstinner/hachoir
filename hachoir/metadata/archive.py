@@ -1,11 +1,11 @@
-from hachoir_metadata.metadata_item import QUALITY_BEST, QUALITY_FASTEST
-from hachoir_metadata.safe import fault_tolerant, getValue
-from hachoir_metadata.metadata import (
+from hachoir.metadata.metadata_item import QUALITY_BEST, QUALITY_FASTEST
+from hachoir.metadata.safe import fault_tolerant, getValue
+from hachoir.metadata.metadata import (
     RootMetadata, Metadata, MultipleMetadata, registerExtractor)
-from hachoir_parser.archive import (Bzip2Parser, CabFile, GzipParser,
+from hachoir.parser.archive import (Bzip2Parser, CabFile, GzipParser,
     TarFile, ZipFile, MarFile)
-from hachoir_core.tools import humanUnixAttributes
-from hachoir_core.i18n import _
+from hachoir.core.tools import humanUnixAttributes
+from hachoir.core.i18n import _
 
 def maxNbFile(meta):
     if meta.quality <= QUALITY_FASTEST:

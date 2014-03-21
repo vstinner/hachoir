@@ -1,7 +1,7 @@
-from hachoir_core.error import HACHOIR_ERRORS, error
-from hachoir_core.stream import InputSubStream
-from hachoir_core.tools import humanFilesize, humanDuration
-from hachoir_core.memory import limitedMemory
+from hachoir.core.error import HACHOIR_ERRORS, error
+from hachoir.core.stream import InputSubStream
+from hachoir.core.tools import humanFilesize, humanDuration
+from hachoir.core.memory import limitedMemory
 from hachoir_subfile.data_rate import DataRate
 from hachoir_subfile.output import Output
 from hachoir_subfile.pattern import HachoirPatternMatching as PatternMatching

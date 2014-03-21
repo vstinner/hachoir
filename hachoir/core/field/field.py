@@ -2,12 +2,12 @@
 Parent of all (field) classes in Hachoir: Field.
 """
 
-from hachoir_core.compatibility import reversed
-from hachoir_core.stream import InputFieldStream
-from hachoir_core.error import HachoirError, HACHOIR_ERRORS
-from hachoir_core.log import Logger
-from hachoir_core.i18n import _
-from hachoir_core.tools import makePrintable
+from hachoir.core.compatibility import reversed
+from hachoir.core.stream import InputFieldStream
+from hachoir.core.error import HachoirError, HACHOIR_ERRORS
+from hachoir.core.log import Logger
+from hachoir.core.i18n import _
+from hachoir.core.tools import makePrintable
 from weakref import ref as weakref_ref
 
 class FieldError(HachoirError):

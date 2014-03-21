@@ -4,7 +4,7 @@ from os import path
 from sys import argv
 
 # Procedure to release a new version:
-#  - edit hachoir_parser/version.py: __version__ = "XXX"
+#  - edit hachoir.parser/version.py: __version__ = "XXX"
 #  - edit setup.py: install_options["install_requires"] = "hachoir-core>=XXX"
 #  - edit INSTALL: update Dependencies
 #  - run: ./tests/run_testcase.py ~/testcase
@@ -21,7 +21,7 @@ from sys import argv
 #  - update the website
 #    * http://bitbucket.org/haypo/hachoir/wiki/Install/source
 #    * http://bitbucket.org/haypo/hachoir/wiki/Home
-#  - edit hachoir_parser/version.py: set version to N+1
+#  - edit hachoir.parser/version.py: set version to N+1
 #  - edit ChangeLog: add a new "hachoir-parser N+1" section with text XXX
 
 CLASSIFIERS = [
@@ -46,25 +46,25 @@ def main():
         use_setuptools = False
 
 
-    hachoir_parser = load_source("version", path.join("hachoir_parser", "version.py"))
-    PACKAGES = {"hachoir_parser": "hachoir_parser"}
+    hachoir.parser = load_source("version", path.join("hachoir.parser", "version.py"))
+    PACKAGES = {"hachoir.parser": "hachoir.parser"}
     for name in MODULES:
-        PACKAGES["hachoir_parser." + name] = "hachoir_parser/" + name
+        PACKAGES["hachoir.parser." + name] = "hachoir.parser/" + name
 
     readme = open('README')
     long_description = readme.read()
     readme.close()
 
     install_options = {
-        "name": hachoir_parser.PACKAGE,
-        "version": hachoir_parser.__version__,
-        "url": hachoir_parser.WEBSITE,
-        "download_url": hachoir_parser.WEBSITE,
+        "name": hachoir.parser.PACKAGE,
+        "version": hachoir.parser.__version__,
+        "url": hachoir.parser.WEBSITE,
+        "download_url": hachoir.parser.WEBSITE,
         "author": "Hachoir team (see AUTHORS file)",
         "description": "Package of Hachoir parsers used to open binary files",
         "long_description": long_description,
         "classifiers": CLASSIFIERS,
-        "license": hachoir_parser.LICENSE,
+        "license": hachoir.parser.LICENSE,
         "packages": PACKAGES.keys(),
         "package_dir": PACKAGES,
     }

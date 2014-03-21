@@ -1,14 +1,14 @@
-from hachoir_core.endian import BIG_ENDIAN, LITTLE_ENDIAN, MIDDLE_ENDIAN
-from hachoir_core.error import info
-from hachoir_core.log import Logger
-from hachoir_core.bits import str2long
-from hachoir_core.i18n import getTerminalCharset
-from hachoir_core.tools import lowerBound
-from hachoir_core.i18n import _
-from hachoir_core.tools import alignValue
+from hachoir.core.endian import BIG_ENDIAN, LITTLE_ENDIAN, MIDDLE_ENDIAN
+from hachoir.core.error import info
+from hachoir.core.log import Logger
+from hachoir.core.bits import str2long
+from hachoir.core.i18n import getTerminalCharset
+from hachoir.core.tools import lowerBound
+from hachoir.core.i18n import _
+from hachoir.core.tools import alignValue
 from errno import ESPIPE
 from weakref import ref as weakref_ref
-from hachoir_core.stream import StreamError
+from hachoir.core.stream import StreamError
 
 class InputStreamError(StreamError):
     pass

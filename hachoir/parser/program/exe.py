@@ -9,15 +9,15 @@ Author: Victor Stinner
 Creation date: 2006-08-13
 """
 
-from hachoir_parser import HachoirParser
-from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.field import (FieldSet, RootSeekableFieldSet,
+from hachoir.parser import HachoirParser
+from hachoir.core.endian import LITTLE_ENDIAN
+from hachoir.core.field import (FieldSet, RootSeekableFieldSet,
     UInt16, UInt32, String,
     RawBytes, PaddingBytes)
-from hachoir_core.text_handler import textHandler, hexadecimal
-from hachoir_parser.program.exe_ne import NE_Header
-from hachoir_parser.program.exe_pe import PE_Header, PE_OptHeader, SectionHeader
-from hachoir_parser.program.exe_res import PE_Resource, NE_VersionInfoNode
+from hachoir.core.text_handler import textHandler, hexadecimal
+from hachoir.parser.program.exe_ne import NE_Header
+from hachoir.parser.program.exe_pe import PE_Header, PE_OptHeader, SectionHeader
+from hachoir.parser.program.exe_res import PE_Resource, NE_VersionInfoNode
 
 MAX_NB_SECTION = 50
 

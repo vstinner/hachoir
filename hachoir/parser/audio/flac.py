@@ -9,11 +9,11 @@ Author: Esteban Loiseau <baal AT tuxfamily.org>
 Creation date: 2008-04-09
 """
 
-from hachoir_parser import Parser
-from hachoir_core.field import FieldSet, String, Bit, Bits, UInt16, UInt24, RawBytes, Enum, NullBytes
-from hachoir_core.stream import BIG_ENDIAN, LITTLE_ENDIAN
-from hachoir_core.tools import createDict
-from hachoir_parser.container.ogg import parseVorbisComment
+from hachoir.parser import Parser
+from hachoir.core.field import FieldSet, String, Bit, Bits, UInt16, UInt24, RawBytes, Enum, NullBytes
+from hachoir.core.stream import BIG_ENDIAN, LITTLE_ENDIAN
+from hachoir.core.tools import createDict
+from hachoir.parser.container.ogg import parseVorbisComment
 
 class VorbisComment(FieldSet):
     endian = LITTLE_ENDIAN

@@ -8,17 +8,17 @@ Creation date: 31 january 2007
   http://msdn2.microsoft.com/en-us/library/ms974336.aspx
 """
 from __future__ import absolute_import
-from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet, Enum,
+from hachoir.parser import Parser
+from hachoir.core.field import (FieldSet, Enum,
     CString, String,
     UInt8, UInt16, UInt32, Bit, Bits, PaddingBits, NullBits,
     DateTimeMSDOS32, RawBytes)
-from hachoir_core.text_handler import textHandler, hexadecimal, filesizeHandler
-from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.tools import paddingSize
-from hachoir_core.stream import StringInputStream
-from hachoir_parser.archive.lzx import LZXStream, lzx_decompress
-from hachoir_parser.archive.zlib import DeflateBlock
+from hachoir.core.text_handler import textHandler, hexadecimal, filesizeHandler
+from hachoir.core.endian import LITTLE_ENDIAN
+from hachoir.core.tools import paddingSize
+from hachoir.core.stream import StringInputStream
+from hachoir.parser.archive.lzx import LZXStream, lzx_decompress
+from hachoir.parser.archive.zlib import DeflateBlock
 
 MAX_NB_FOLDER = 30
 

@@ -5,12 +5,12 @@ Author: Victor Stinner, Robert Xiao
 Creation date: 08 may 2006
 """
 
-from hachoir_parser import HachoirParser
-from hachoir_core.field import (RootSeekableFieldSet, FieldSet, ParserError, Bit, NullBits, RawBits,
+from hachoir.parser import HachoirParser
+from hachoir.core.field import (RootSeekableFieldSet, FieldSet, ParserError, Bit, NullBits, RawBits,
     UInt8, UInt16, UInt32, UInt64, Enum,
     String, RawBytes, Bytes)
-from hachoir_core.text_handler import textHandler, hexadecimal
-from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
+from hachoir.core.text_handler import textHandler, hexadecimal
+from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 
 class ElfHeader(FieldSet):
     LITTLE_ENDIAN_ID = 1

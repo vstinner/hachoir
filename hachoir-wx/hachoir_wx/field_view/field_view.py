@@ -3,7 +3,7 @@
 from wx import ListCtrl, PreListCtrl, EVT_WINDOW_CREATE, CallAfter
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
 from sys import maxint
-from hachoir_core.i18n import _
+from hachoir.core.i18n import _
 
 class field_view_t(ListCtrl, ListCtrlAutoWidthMixin):
     def __init__(self):

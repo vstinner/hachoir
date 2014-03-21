@@ -1,7 +1,7 @@
-from hachoir_core.field import Field, FieldError
-from hachoir_core.stream import InputStream
-from hachoir_core.endian import BIG_ENDIAN, LITTLE_ENDIAN, MIDDLE_ENDIAN
-from hachoir_core.event_handler import EventHandler
+from hachoir.core.field import Field, FieldError
+from hachoir.core.stream import InputStream
+from hachoir.core.endian import BIG_ENDIAN, LITTLE_ENDIAN, MIDDLE_ENDIAN
+from hachoir.core.event_handler import EventHandler
 
 class ParserError(FieldError):
     """

@@ -2,22 +2,22 @@
 
 import sys
 try:
-    from hachoir_core.error import error, HachoirError
-    from hachoir_core.cmd_line import unicodeFilename
-    from hachoir_core.i18n import getTerminalCharset, _
-    from hachoir_core.benchmark import Benchmark
-    from hachoir_core.stream import InputStreamError
-    from hachoir_core.tools import makePrintable
-    from hachoir_parser import createParser, ParserList
-    import hachoir_core.config as hachoir_config
-    from hachoir_metadata import config
+    from hachoir.core.error import error, HachoirError
+    from hachoir.core.cmd_line import unicodeFilename
+    from hachoir.core.i18n import getTerminalCharset, _
+    from hachoir.core.benchmark import Benchmark
+    from hachoir.core.stream import InputStreamError
+    from hachoir.core.tools import makePrintable
+    from hachoir.parser import createParser, ParserList
+    import hachoir.core.config as hachoir_config
+    from hachoir.metadata import config
 except ImportError, err:
     raise
     print >>sys.stderr, "Unable to import an Hachoir module: %s" % err
     sys.exit(1)
 from optparse import OptionGroup, OptionParser
-from hachoir_metadata import extractMetadata
-from hachoir_metadata.metadata import extractors as metadata_extractors
+from hachoir.metadata import extractMetadata
+from hachoir.metadata.metadata import extractors as metadata_extractors
 
 
 def displayParserList(*args):
@@ -28,12 +28,12 @@ def displayParserList(*args):
     sys.exit(0)
 
 def displayVersion(*args):
-    import hachoir_core
-    from hachoir_metadata import __version__
+    import hachoir.core
+    from hachoir.metadata import __version__
     print _("Metadata extractor version %s") % __version__
-    print _("Hachoir library version %s") % hachoir_core.__version__
+    print _("Hachoir library version %s") % hachoir.core.__version__
     print
-    print _("Website: %s/wiki/hachoir-metadata") % hachoir_core.WEBSITE
+    print _("Website: %s/wiki/hachoir-metadata") % hachoir.core.WEBSITE
     sys.exit(0)
 
 def parseOptions():
@@ -148,7 +148,7 @@ def benchmarkMetadata(values, filenames):
     bench.run(processFiles, values, filenames, display=False)
 
 def profile(values, filenames):
-    from hachoir_core.profiler import runProfiler
+    from hachoir.core.profiler import runProfiler
     return runProfiler(processFiles, (values, filenames), {'display': False})
 
 def main():

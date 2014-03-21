@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from hachoir_wx.field_view.format import format_addr_hex, format_addr_dec, format_size, format_data, format_name, format_desc
-from hachoir_core.i18n import _
+from hachoir.core.i18n import _
 
 MAXITEMS = 1000
 

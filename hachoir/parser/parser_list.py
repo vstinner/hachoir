@@ -1,8 +1,8 @@
 import re
 import types
-from hachoir_core.error import error
-from hachoir_core.i18n import _
-from hachoir_parser import Parser, HachoirParser
+from hachoir.core.error import error
+from hachoir.core.i18n import _
+from hachoir.parser import Parser, HachoirParser
 import sys
 
 ### Parser list ################################################################
@@ -198,7 +198,7 @@ class HachoirParserList(ParserList):
             return self.parser_list
 
         todo = []
-        module = __import__("hachoir_parser")
+        module = __import__("hachoir.parser")
         for attrname in dir(module):
             attr = getattr(module, attrname)
             if isinstance(attr, types.ModuleType):

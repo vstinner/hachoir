@@ -1,5 +1,5 @@
-from hachoir_core.error import HachoirError
-from hachoir_core.field import joinPath, MissingField
+from hachoir.core.error import HachoirError
+from hachoir.core.field import joinPath, MissingField
 
 class EditorError(HachoirError):
     pass

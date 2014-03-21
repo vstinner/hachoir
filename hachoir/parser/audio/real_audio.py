@@ -8,14 +8,14 @@ Samples:
   http://samples.mplayerhq.hu/real/RA/
 """
 
-from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet,
+from hachoir.parser import Parser
+from hachoir.core.field import (FieldSet,
     UInt8, UInt16, UInt32,
     Bytes, RawBytes, String,
     PascalString8)
-from hachoir_core.tools import humanFrequency
-from hachoir_core.text_handler import displayHandler
-from hachoir_core.endian import BIG_ENDIAN
+from hachoir.core.tools import humanFrequency
+from hachoir.core.text_handler import displayHandler
+from hachoir.core.endian import BIG_ENDIAN
 
 class Metadata(FieldSet):
     def createFields(self):

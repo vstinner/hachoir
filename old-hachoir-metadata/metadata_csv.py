@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-from hachoir_core.error import HachoirError
-from hachoir_core.cmd_line import unicodeFilename
-from hachoir_parser import createParser
-from hachoir_core.tools import makePrintable
-from hachoir_metadata import extractMetadata
-from hachoir_core.i18n import initLocale
+from hachoir.core.error import HachoirError
+from hachoir.core.cmd_line import unicodeFilename
+from hachoir.parser import createParser
+from hachoir.core.tools import makePrintable
+from hachoir.metadata import extractMetadata
+from hachoir.core.i18n import initLocale
 from sys import argv, stderr, exit
 from os import walk
 from os.path import join as path_join

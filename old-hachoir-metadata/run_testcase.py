@@ -6,18 +6,18 @@ Test hachoir-metadata using the testcase.
 DOWNLOAD_SCRIPT = "download_testcase.py"
 
 # Configure Hachoir
-from hachoir_core import config
+from hachoir.core import config
 config.use_i18n = False  # Don't use i18n
 config.quiet = True      # Don't display warnings
 
-from hachoir_core.i18n import getTerminalCharset
-from hachoir_core.error import HachoirError
-from hachoir_core.stream import InputStreamError
-from hachoir_parser import createParser
-from hachoir_core.compatibility import all
-from hachoir_core.language import Language
-from hachoir_metadata import extractMetadata
-from hachoir_metadata.timezone import createTimezone
+from hachoir.core.i18n import getTerminalCharset
+from hachoir.core.error import HachoirError
+from hachoir.core.stream import InputStreamError
+from hachoir.parser import createParser
+from hachoir.core.compatibility import all
+from hachoir.core.language import Language
+from hachoir.metadata import extractMetadata
+from hachoir.metadata.timezone import createTimezone
 from datetime import date, timedelta, datetime
 from locale import setlocale, LC_ALL
 import os

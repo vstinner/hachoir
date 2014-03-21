@@ -10,18 +10,18 @@ http://technet.microsoft.com/en-us/library/bb490996.aspx
 """
 
 
-from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet, RootSeekableFieldSet,
+from hachoir.parser import Parser
+from hachoir.core.field import (FieldSet, RootSeekableFieldSet,
     CString, String, PascalString16,
     UInt32, UInt16, UInt8,
     Bit, Bits, PaddingBits,
     TimestampWin64, DateTimeMSDOS32,
     NullBytes, PaddingBytes, RawBits, RawBytes, Enum)
-from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
-from hachoir_core.text_handler import textHandler, hexadecimal
-from hachoir_parser.common.win32 import PascalStringWin16, GUID
-from hachoir_parser.common.msdos import MSDOSFileAttr16, MSDOSFileAttr32
-from hachoir_core.text_handler import filesizeHandler
+from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
+from hachoir.core.text_handler import textHandler, hexadecimal
+from hachoir.parser.common.win32 import PascalStringWin16, GUID
+from hachoir.parser.common.msdos import MSDOSFileAttr16, MSDOSFileAttr32
+from hachoir.core.text_handler import filesizeHandler
 
 class TaskTrigger(FieldSet):
     TRIGGER_TYPE = {

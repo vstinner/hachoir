@@ -1,6 +1,6 @@
-from hachoir_core.cmd_line import unicodeFilename
-from hachoir_core.stream import FileOutputStream, StreamError
-from hachoir_core.error import error
+from hachoir.core.cmd_line import unicodeFilename
+from hachoir.core.stream import FileOutputStream, StreamError
+from hachoir.core.error import error
 from errno import EEXIST
 from os import mkdir, path
 

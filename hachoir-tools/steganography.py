@@ -2,11 +2,11 @@
 
 from hachoir_editor import (createEditor as hachoirCreateEditor,
     NewFieldSet, EditableInteger, EditableString, EditableBytes)
-from hachoir_core.stream import FileOutputStream
-from hachoir_core.error import HachoirError
-from hachoir_parser import createParser
-from hachoir_parser.image import PngFile
-from hachoir_parser.audio import MpegAudioFile
+from hachoir.core.stream import FileOutputStream
+from hachoir.core.error import HachoirError
+from hachoir.parser import createParser
+from hachoir.parser.image import PngFile
+from hachoir.parser.audio import MpegAudioFile
 from sys import argv, stdin, stdout, stderr, exit
 import zlib
 

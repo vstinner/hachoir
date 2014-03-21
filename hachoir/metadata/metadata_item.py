@@ -1,7 +1,7 @@
-from hachoir_core.tools import makeUnicode, normalizeNewline
-from hachoir_core.error import HACHOIR_ERRORS
-from hachoir_metadata import config
-from hachoir_metadata.setter import normalizeString
+from hachoir.core.tools import makeUnicode, normalizeNewline
+from hachoir.core.error import HACHOIR_ERRORS
+from hachoir.metadata import config
+from hachoir.metadata.setter import normalizeString
 
 MIN_PRIORITY = 100
 MAX_PRIORITY = 999

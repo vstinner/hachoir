@@ -1,4 +1,4 @@
-from hachoir_parser import QueryParser
+from hachoir.parser import QueryParser
 from hachoir_regex import PatternMatching
 
 class HachoirPatternMatching(PatternMatching):

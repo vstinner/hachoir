@@ -10,14 +10,14 @@ Author: Robert Xiao, Victor Stinner
 Creation: 8 january 2005
 """
 
-from hachoir_core.field import (SubFile, FieldSet,
+from hachoir.core.field import (SubFile, FieldSet,
     UInt8, UInt16, Int32, UInt32, Enum, String, CString,
     Bits, RawBytes)
-from hachoir_core.text_handler import textHandler, hexadecimal
-from hachoir_parser.misc.ole2_util import OLE2FragmentParser, RawParser
-from hachoir_core.stream import StringInputStream
-from hachoir_parser.misc.msoffice_summary import Summary, CompObj
-from hachoir_parser.misc.word_doc import WordDocumentParser, WordTableParser
+from hachoir.core.text_handler import textHandler, hexadecimal
+from hachoir.parser.misc.ole2_util import OLE2FragmentParser, RawParser
+from hachoir.core.stream import StringInputStream
+from hachoir.parser.misc.msoffice_summary import Summary, CompObj
+from hachoir.parser.misc.word_doc import WordDocumentParser, WordTableParser
 
 class RootEntry(OLE2FragmentParser):
     ENDIAN_CHECK=False

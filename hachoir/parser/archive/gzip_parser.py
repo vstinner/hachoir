@@ -4,14 +4,14 @@ GZIP archive parser.
 Author: Victor Stinner
 """
 
-from hachoir_parser import Parser
-from hachoir_core.field import (
+from hachoir.parser import Parser
+from hachoir.core.field import (
     UInt8, UInt16, UInt32, Enum, TimestampUnix32,
     Bit, CString, SubFile,
     NullBits, Bytes, RawBytes)
-from hachoir_core.text_handler import textHandler, hexadecimal, filesizeHandler
-from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_parser.common.deflate import Deflate
+from hachoir.core.text_handler import textHandler, hexadecimal, filesizeHandler
+from hachoir.core.endian import LITTLE_ENDIAN
+from hachoir.parser.common.deflate import Deflate
 
 class GzipParser(Parser):
     endian = LITTLE_ENDIAN

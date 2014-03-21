@@ -2,10 +2,10 @@ from os import path
 from os.path import basename
 from random import randint
 from tools import getFilesize, generateUniqueID
-from hachoir_core.stream import InputIOStream, InputStreamError
-from hachoir_metadata import extractMetadata
-from hachoir_parser import guessParser
-from hachoir_core.error import HACHOIR_ERRORS
+from hachoir.core.stream import InputIOStream, InputStreamError
+from hachoir.metadata import extractMetadata
+from hachoir.parser import guessParser
+from hachoir.core.error import HACHOIR_ERRORS
 from cStringIO import StringIO
 from array import array
 from mangle import mangle

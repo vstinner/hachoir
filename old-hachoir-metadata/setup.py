@@ -9,7 +9,7 @@
 #---------------
 #
 # Procedure to release a new version:
-#  - edit hachoir_metadata/version.py: VERSION = "XXX"
+#  - edit hachoir.metadata/version.py: VERSION = "XXX"
 #  - edit setup.py: install_options["install_requires"] = ["hachoir-core>=1.3", "hachoir-parser>=1.3"]
 #  - edit INSTALL: Dependencies section
 #  - edit ChangeLog (set release date)
@@ -25,7 +25,7 @@
 #  - update the website
 #    * http://bitbucket.org/haypo/hachoir/wiki/Install/source
 #    * http://bitbucket.org/haypo/hachoir/wiki/Home
-#  - edit hachoir_metadata/version.py: set version to N+1 in
+#  - edit hachoir.metadata/version.py: set version to N+1 in
 #  - edit ChangeLog: add a new "hachoir-metadata N+1" section with text XXX
 
 from imp import load_source
@@ -52,12 +52,12 @@ def main():
         use_setuptools = False
 
     SCRIPTS = ["hachoir-metadata", "hachoir-metadata-gtk"]
-    PACKAGES = ["hachoir_metadata"]
+    PACKAGES = ["hachoir.metadata"]
 
     if "--disable-qt" not in sys.argv:
         from subprocess import call
         SCRIPTS.append("hachoir-metadata-qt")
-        dialog = "hachoir_metadata/qt/dialog"
+        dialog = "hachoir.metadata/qt/dialog"
         dialog_python = dialog + "_ui.py"
         command = ["pyuic4", "-o", dialog_python, dialog + ".ui"]
         try:
@@ -74,22 +74,22 @@ def main():
                 print >>sys.stderr, 'Use command "%s --disable-qt" to skip hachoir-metadata-qt' % ' '.join(sys.argv)
                 print >>sys.stderr, 'pyuic4 is included in the PyQt4 development package'
                 sys.exit(1)
-        PACKAGES.append("hachoir_metadata.qt")
+        PACKAGES.append("hachoir.metadata.qt")
     else:
         sys.argv.remove("--disable-qt")
 
-    hachoir_metadata = load_source("version", path.join("hachoir_metadata", "version.py"))
+    hachoir.metadata = load_source("version", path.join("hachoir.metadata", "version.py"))
     long_description = open('README').read() + open('ChangeLog').read()
     install_options = {
-        "name": hachoir_metadata.PACKAGE,
-        "version": hachoir_metadata.VERSION,
-        "url": hachoir_metadata.WEBSITE,
-        "download_url": hachoir_metadata.WEBSITE,
+        "name": hachoir.metadata.PACKAGE,
+        "version": hachoir.metadata.VERSION,
+        "url": hachoir.metadata.WEBSITE,
+        "download_url": hachoir.metadata.WEBSITE,
         "author": "Victor Stinner",
         "description": "Program to extract metadata using Hachoir library",
         "long_description": long_description,
         "classifiers": CLASSIFIERS,
-        "license": hachoir_metadata.LICENSE,
+        "license": hachoir.metadata.LICENSE,
         "scripts": SCRIPTS,
         "packages": PACKAGES,
     }

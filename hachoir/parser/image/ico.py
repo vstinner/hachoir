@@ -4,12 +4,12 @@ Microsoft Windows icon and cursor file format parser.
 Author: Victor Stinner
 """
 
-from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet, ParserError,
+from hachoir.parser import Parser
+from hachoir.core.field import (FieldSet, ParserError,
     UInt8, UInt16, UInt32, Enum, RawBytes)
-from hachoir_parser.image.common import PaletteRGBA
-from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_parser.common.win32 import BitmapInfoHeader
+from hachoir.parser.image.common import PaletteRGBA
+from hachoir.core.endian import LITTLE_ENDIAN
+from hachoir.parser.common.win32 import BitmapInfoHeader
 
 class IconHeader(FieldSet):
     def createFields(self):

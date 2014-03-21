@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from hachoir_core.tools import alignValue
-from hachoir_core.error import warning
+from hachoir.core.tools import alignValue
+from hachoir.core.error import warning
 
 def byte_addr(bit):
     return bit // 8

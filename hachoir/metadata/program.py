@@ -1,6 +1,6 @@
-from hachoir_metadata.metadata import RootMetadata, registerExtractor
-from hachoir_parser.program import ExeFile
-from hachoir_metadata.safe import fault_tolerant, getValue
+from hachoir.metadata.metadata import RootMetadata, registerExtractor
+from hachoir.parser.program import ExeFile
+from hachoir.metadata.safe import fault_tolerant, getValue
 
 class ExeMetadata(RootMetadata):
     KEY_TO_ATTR = {

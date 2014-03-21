@@ -19,12 +19,12 @@ def testModule(name):
 
 def main():
     # Configure Hachoir for tests
-    import hachoir_core.config as config
+    import hachoir.core.config as config
     config.use_i18n = False
 
     # Test documentation of some functions/classes
-    testModule("hachoir_metadata.metadata")
-    testModule("hachoir_metadata.setter")
+    testModule("hachoir.metadata.metadata")
+    testModule("hachoir.metadata.setter")
 
 if __name__ == "__main__":
     main()

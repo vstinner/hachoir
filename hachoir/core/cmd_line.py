@@ -1,8 +1,8 @@
 from optparse import OptionGroup
-from hachoir_core.log import log
-from hachoir_core.i18n import _, getTerminalCharset
-from hachoir_core.tools import makePrintable
-import hachoir_core.config as config
+from hachoir.core.log import log
+from hachoir.core.i18n import _, getTerminalCharset
+from hachoir.core.tools import makePrintable
+import hachoir.core.config as config
 
 def getHachoirOptions(parser):
     """

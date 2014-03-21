@@ -12,16 +12,16 @@ Author: Victor Stinner
 Creation: 23 march 2006
 """
 
-from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet, ParserError,
+from hachoir.parser import Parser
+from hachoir.core.field import (FieldSet, ParserError,
     Enum, Bytes, NullBytes, RawBytes,
     UInt8, UInt16, UInt32, Int32, TimestampUnix32,
     Bit, Bits, NullBits)
-from hachoir_core.endian import NETWORK_ENDIAN, LITTLE_ENDIAN
-from hachoir_core.tools import humanDuration
-from hachoir_core.text_handler import textHandler, hexadecimal
-from hachoir_core.tools import createDict
-from hachoir_parser.network.common import MAC48_Address, IPv4_Address, IPv6_Address
+from hachoir.core.endian import NETWORK_ENDIAN, LITTLE_ENDIAN
+from hachoir.core.tools import humanDuration
+from hachoir.core.text_handler import textHandler, hexadecimal
+from hachoir.core.tools import createDict
+from hachoir.parser.network.common import MAC48_Address, IPv4_Address, IPv6_Address
 
 def diff(field):
     return humanDuration(field.value*1000)

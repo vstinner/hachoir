@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from hachoir_wx.field_view.stubs import save_substream_to_disk
-from hachoir_core.i18n import _
+from hachoir.core.i18n import _
 
 class field_menu_imp_t:
     def on_field_set_ready(self, dispatcher, fields):

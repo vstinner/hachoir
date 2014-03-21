@@ -7,10 +7,10 @@ Creation date: 2006-09-30
 File samples: http://samples.mplayerhq.hu/game-formats/spiderman-segacd-bin/
 """
 
-from hachoir_parser import Parser
-from hachoir_core.field import FieldSet, UInt32, String, RawBytes
-from hachoir_core.endian import BIG_ENDIAN
-from hachoir_core.text_handler import textHandler, hexadecimal
+from hachoir.parser import Parser
+from hachoir.core.field import FieldSet, UInt32, String, RawBytes
+from hachoir.core.endian import BIG_ENDIAN
+from hachoir.core.text_handler import textHandler, hexadecimal
 
 class Chunk(FieldSet):
     tag_info = {

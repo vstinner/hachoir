@@ -24,6 +24,6 @@ else:
     use_i18n = True
 
 # Parser global options
-autofix = True            # Enable Autofix? see hachoir_core.field.GenericFieldSet
+autofix = True            # Enable Autofix? see hachoir.core.field.GenericFieldSet
 check_padding_pattern = True   # Check padding fields pattern?
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from wx import GetNumberFromUser
-from hachoir_core.i18n import _
+from hachoir.core.i18n import _
 
 class field_split_menu_t:
     def __init__(self, parent, menu):

@@ -1,11 +1,11 @@
-from hachoir_core.i18n import getTerminalCharset
-from hachoir_core.field import Field, MissingField
-from hachoir_core.tools import humanFilesize, humanBitSize, makePrintable
-from hachoir_core.log import log as hachoir_log
-from hachoir_core.error import HachoirError
-from hachoir_core.i18n import _, ngettext
-from hachoir_core.stream import InputFieldStream
-from hachoir_parser import guessParser
+from hachoir.core.i18n import getTerminalCharset
+from hachoir.core.field import Field, MissingField
+from hachoir.core.tools import humanFilesize, humanBitSize, makePrintable
+from hachoir.core.log import log as hachoir_log
+from hachoir.core.error import HachoirError
+from hachoir.core.i18n import _, ngettext
+from hachoir.core.stream import InputFieldStream
+from hachoir.parser import guessParser
 from urwid import AttrWrap, BoxAdapter, BoxWidget, CanvasJoin, Edit, Frame, ListBox, Pile, Text
 from shutil import copyfileobj
 from weakref import WeakKeyDictionary

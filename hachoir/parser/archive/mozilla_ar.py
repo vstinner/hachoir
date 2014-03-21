@@ -5,12 +5,12 @@ Creation date: July 10, 2007
 
 """
 
-from hachoir_core.endian import BIG_ENDIAN
-from hachoir_core.field import (RootSeekableFieldSet, FieldSet,
+from hachoir.core.endian import BIG_ENDIAN
+from hachoir.core.field import (RootSeekableFieldSet, FieldSet,
     String, CString, UInt32, RawBytes)
-from hachoir_core.text_handler import displayHandler, filesizeHandler
-from hachoir_core.tools import humanUnixAttributes
-from hachoir_parser import HachoirParser
+from hachoir.core.text_handler import displayHandler, filesizeHandler
+from hachoir.core.tools import humanUnixAttributes
+from hachoir.parser import HachoirParser
 
 class IndexEntry(FieldSet):
     def createFields(self):

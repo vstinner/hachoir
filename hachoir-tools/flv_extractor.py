@@ -5,10 +5,10 @@ Extract audio from a FLV movie
 Author: Victor Stinner
 Creation date: 2006-11-06
 """
-from hachoir_parser import createParser
-from hachoir_core.stream import FileOutputStream
-from hachoir_core.i18n import getTerminalCharset
-from hachoir_parser.video.flv import AUDIO_CODEC_MP3
+from hachoir.parser import createParser
+from hachoir.core.stream import FileOutputStream
+from hachoir.core.i18n import getTerminalCharset
+from hachoir.parser.video.flv import AUDIO_CODEC_MP3
 from sys import stderr, exit, argv
 
 def main():

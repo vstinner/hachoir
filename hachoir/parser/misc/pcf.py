@@ -10,13 +10,13 @@ Author: Victor Stinner
 Creation date: 2007-03-20
 """
 
-from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet, Enum,
+from hachoir.parser import Parser
+from hachoir.core.field import (FieldSet, Enum,
     UInt8, UInt32, Bytes, RawBytes, NullBytes,
     Bit, Bits, PaddingBits, CString)
-from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
-from hachoir_core.text_handler import textHandler, hexadecimal, filesizeHandler
-from hachoir_core.tools import paddingSize
+from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
+from hachoir.core.text_handler import textHandler, hexadecimal, filesizeHandler
+from hachoir.core.tools import paddingSize
 
 class TOC(FieldSet):
     TYPE_NAME = {

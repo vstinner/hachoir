@@ -3,7 +3,7 @@
 
 from hachoir_wx.app import app_t
 from hachoir_wx.version import PACKAGE, VERSION, WEBSITE
-from hachoir_core.cmd_line import (getHachoirOptions,
+from hachoir.core.cmd_line import (getHachoirOptions,
     configureHachoir, unicodeFilename)
 from optparse import OptionParser
 import sys

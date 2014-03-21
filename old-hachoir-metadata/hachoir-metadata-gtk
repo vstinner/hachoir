@@ -2,10 +2,10 @@
 import sys, pygtk, os
 pygtk.require('2.0')
 import gtk
-from hachoir_core.cmd_line import unicodeFilename
-from hachoir_parser import createParser
-from hachoir_metadata import extractMetadata
-from hachoir_metadata.metadata import MultipleMetadata
+from hachoir.core.cmd_line import unicodeFilename
+from hachoir.parser import createParser
+from hachoir.metadata import extractMetadata
+from hachoir.metadata.metadata import MultipleMetadata
 
 class Gui:
     def __init__(self):

@@ -4,8 +4,8 @@
 # some stubs that could be in hachoir-core.
 #
 
-from hachoir_core.tools import alignValue
-from hachoir_core.stream.input import FileFromInputStream
+from hachoir.core.tools import alignValue
+from hachoir.core.stream.input import FileFromInputStream
 
 def field_index(field_set, field):
     return field_set._fields.index(field._getName())

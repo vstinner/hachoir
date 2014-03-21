@@ -5,18 +5,18 @@ Creation: 12 decembre 2005
 Author: Victor Stinner
 """
 
-from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet,
+from hachoir.parser import Parser
+from hachoir.core.field import (FieldSet,
     MissingField, ParserError, createOrphanField,
     Bit, Bits, Enum,
     PaddingBits, PaddingBytes,
     RawBytes)
-from hachoir_parser.audio.id3 import ID3v1, ID3v2
-from hachoir_core.endian import BIG_ENDIAN
-from hachoir_core.tools import humanFrequency, humanBitSize
-from hachoir_core.bits import long2raw
-from hachoir_core.error import HACHOIR_ERRORS
-from hachoir_core.stream import InputStreamError
+from hachoir.parser.audio.id3 import ID3v1, ID3v2
+from hachoir.core.endian import BIG_ENDIAN
+from hachoir.core.tools import humanFrequency, humanBitSize
+from hachoir.core.bits import long2raw
+from hachoir.core.error import HACHOIR_ERRORS
+from hachoir.core.stream import InputStreamError
 
 # Max MP3 filesize: 200 MB
 MAX_FILESIZE = 200*1024*1024*8

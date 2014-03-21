@@ -5,13 +5,13 @@ Creation date: July 9 2007
 
 """
 
-from hachoir_parser import Parser
-from hachoir_core.field import (Bit, Bits, Field, Int16, UInt32,
+from hachoir.parser import Parser
+from hachoir.core.field import (Bit, Bits, Field, Int16, UInt32,
     Enum, FieldSet, GenericFieldSet,
     PaddingBits, ParserError, RawBytes)
-from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_core.text_handler import textHandler, hexadecimal
-from hachoir_core.tools import paddingSize, alignValue
+from hachoir.core.endian import LITTLE_ENDIAN
+from hachoir.core.text_handler import textHandler, hexadecimal
+from hachoir.core.tools import paddingSize, alignValue
 
 def extend_data(data, length, offset):
     """Extend data using a length and an offset."""

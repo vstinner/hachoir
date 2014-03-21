@@ -5,15 +5,15 @@ Documents:
    http://www.wotsit.org/download.asp?f=word2&sc=275927573
 """
 
-from hachoir_core.field import (FieldSet, Enum,
+from hachoir.core.field import (FieldSet, Enum,
     Bit, Bits,
     UInt8, Int16, UInt16, UInt32, Int32,
     NullBytes, Bytes, RawBytes, PascalString16,
     DateTimeMSDOS32, TimeDateMSDOS32)
-from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_parser.misc.ole2_util import OLE2FragmentParser
-from hachoir_core.tools import paddingSize
-from hachoir_parser.common.win32_lang_id import LANGUAGE_ID
+from hachoir.core.endian import LITTLE_ENDIAN
+from hachoir.parser.misc.ole2_util import OLE2FragmentParser
+from hachoir.core.tools import paddingSize
+from hachoir.parser.common.win32_lang_id import LANGUAGE_ID
 TIMESTAMP = DateTimeMSDOS32
 
 class FC_CB(FieldSet):

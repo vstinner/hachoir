@@ -1,4 +1,4 @@
-from hachoir_core.field import (
+from hachoir.core.field import (
     RawBits, Bit, Bits, PaddingBits,
     RawBytes, Bytes, PaddingBytes,
     GenericString, Character,

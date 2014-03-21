@@ -10,15 +10,15 @@ References:
     http://partners.adobe.com/public/developer/en/tiff/TIFF6.pdf
 """
 
-from hachoir_core.field import (FieldSet, SeekableFieldSet, ParserError,
+from hachoir.core.field import (FieldSet, SeekableFieldSet, ParserError,
     UInt8, UInt16, UInt32,
     Int8, Int16, Int32,
     Float32, Float64,
     Enum, String, Bytes, SubFile,
     NullBits, NullBytes, createPaddingField)
-from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN, NETWORK_ENDIAN
-from hachoir_core.text_handler import textHandler, hexadecimal
-from hachoir_core.tools import createDict
+from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN, NETWORK_ENDIAN
+from hachoir.core.text_handler import textHandler, hexadecimal
+from hachoir.core.tools import createDict
 
 MAX_COUNT = 1000 # maximum number of array entries in an IFD entry (excluding string types)
 

@@ -15,12 +15,12 @@ Author: Robert Xiao
 Created: 2008-09-21
 """
 
-from hachoir_parser import HachoirParser
-from hachoir_core.field import (RootSeekableFieldSet, FieldSet, Enum,
+from hachoir.parser import HachoirParser
+from hachoir.core.field import (RootSeekableFieldSet, FieldSet, Enum,
 Bits, GenericInteger, Float32, Float64, UInt8, UInt64, Bytes, NullBytes, RawBytes, String)
-from hachoir_core.endian import BIG_ENDIAN
-from hachoir_core.text_handler import displayHandler
-from hachoir_core.tools import humanDatetime
+from hachoir.core.endian import BIG_ENDIAN
+from hachoir.core.text_handler import displayHandler
+from hachoir.core.tools import humanDatetime
 from datetime import datetime, timedelta
 
 class BPListTrailer(FieldSet):

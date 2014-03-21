@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import wx, os
-from hachoir_core.i18n import _
+from hachoir.core.i18n import _
 
 def file_open_dialog():
     dialog_style = wx.OPEN | wx.FILE_MUST_EXIST

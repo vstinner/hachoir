@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from hachoir_wx.field_view.mutator import split_field
-from hachoir_core.field import RawBytes, RawBits
-from hachoir_core.i18n import _
+from hachoir.core.field import RawBytes, RawBits
+from hachoir.core.i18n import _
 
 class field_split_menu_imp_t:
     def on_field_split_menu_ready(self, dispatcher, view):

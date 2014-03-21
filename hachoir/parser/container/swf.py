@@ -13,18 +13,18 @@ Author: Victor Stinner
 Creation date: 29 october 2006
 """
 
-from hachoir_parser import Parser
-from hachoir_core.field import (FieldSet, ParserError,
+from hachoir.parser import Parser
+from hachoir.core.field import (FieldSet, ParserError,
     Bit, Bits, UInt8, UInt16, Int32, UInt32, Int64, CString, Enum,
     Bytes, RawBytes, NullBits, String, SubFile)
-from hachoir_core.endian import LITTLE_ENDIAN, BIG_ENDIAN
-from hachoir_core.text_handler import textHandler, filesizeHandler
-from hachoir_core.tools import paddingSize, humanFrequency
-from hachoir_parser.image.common import RGB
-from hachoir_parser.image.jpeg import JpegChunk, JpegFile
-from hachoir_core.stream import StringInputStream, ConcatStream
-from hachoir_parser.common.deflate import Deflate, has_deflate
-from hachoir_parser.container.action_script import parseActionScript, parseABC
+from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
+from hachoir.core.text_handler import textHandler, filesizeHandler
+from hachoir.core.tools import paddingSize, humanFrequency
+from hachoir.parser.image.common import RGB
+from hachoir.parser.image.jpeg import JpegChunk, JpegFile
+from hachoir.core.stream import StringInputStream, ConcatStream
+from hachoir.parser.common.deflate import Deflate, has_deflate
+from hachoir.parser.container.action_script import parseActionScript, parseABC
 import math
 
 # Maximum file size (50 MB)

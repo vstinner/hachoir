@@ -11,16 +11,16 @@ Documents:
    section. Revised Dec 21 1998, added missing Document Properties (section).
 """
 
-from hachoir_core.field import (FieldSet, Enum,
+from hachoir.core.field import (FieldSet, Enum,
     Bit, Bits,
     UInt8, Int16, UInt16, UInt32, Int32,
     NullBytes, Bytes, RawBytes, PascalString8, PascalString16, CString, String,
     TimestampMac32, TimestampWin64)
-from hachoir_core.text_handler import displayHandler
-from hachoir_core.endian import LITTLE_ENDIAN
-from hachoir_parser import guessParser
-from hachoir_parser.misc.ole2_util import OLE2FragmentParser
-from hachoir_parser.common.win32_lang_id import LANGUAGE_ID
+from hachoir.core.text_handler import displayHandler
+from hachoir.core.endian import LITTLE_ENDIAN
+from hachoir.parser import guessParser
+from hachoir.parser.misc.ole2_util import OLE2FragmentParser
+from hachoir.parser.common.win32_lang_id import LANGUAGE_ID
 
 CREATOR_ID={0x6A62: "Microsoft Word"}
 class ShortArray(FieldSet):

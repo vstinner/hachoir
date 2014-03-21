@@ -3,10 +3,10 @@ from os import path, getcwd, nice, mkdir
 from sys import exit, argv, stderr
 from glob import glob
 from random import choice as random_choice, randint
-from hachoir_core.memory import limitedMemory
+from hachoir.core.memory import limitedMemory
 from errno import EEXIST
 from time import sleep
-from hachoir_core.log import log as hachoir_logger, Log
+from hachoir.core.log import log as hachoir_logger, Log
 from file_fuzzer import FileFuzzer, MAX_NB_EXTRACT, TRUNCATE_RATE
 import re
 
