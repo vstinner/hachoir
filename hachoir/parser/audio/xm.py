@@ -101,7 +101,7 @@ def createInstrumentContentSize(s, addr):
 
     sample_size = 0
     if samples:
-        for index in xrange(samples):
+        for index in range(samples):
             # Read the sample size from the header
             sample_size += s.stream.readBits(addr, 32, LITTLE_ENDIAN)
             # Seek to next sample header
@@ -139,7 +139,7 @@ class Instrument(FieldSet):
 
             # This part probably wrong
             sample_size = [ ]
-            for index in xrange(num):
+            for index in range(num):
                 sample = SampleHeader(self, "sample_header[]")
                 yield sample
                 sample_size.append(sample["length"].value)
@@ -284,7 +284,7 @@ class Note(FieldSet):
 
 class Row(FieldSet):
     def createFields(self):
-        for index in xrange(self["/header/channels"].value):
+        for index in range(self["/header/channels"].value):
             yield Note(self, "note[]")
 
 def createPatternContentSize(s, addr):
@@ -303,7 +303,7 @@ class Pattern(FieldSet):
         yield UInt16(self, "data_size", r"Packed patterndata size")
         rows = self["rows"].value
         self.info("Pattern: %i rows" % rows)
-        for index in xrange(rows):
+        for index in range(rows):
             yield Row(self, "row[]")
 
     def createDescription(self):
@@ -343,8 +343,8 @@ class XMModule(Parser):
         "category": "audio",
         "file_ext": ("xm",),
         "mime": (
-            u'audio/xm', u'audio/x-xm',
-            u'audio/module-xm', u'audio/mod', u'audio/x-mod'),
+            'audio/xm', 'audio/x-xm',
+            'audio/module-xm', 'audio/mod', 'audio/x-mod'),
         "magic": ((Header.MAGIC, 0),),
         "min_size": Header.static_size +29*8, # Header + 1 empty instrument
         "description": "FastTracker2 module"
@@ -361,9 +361,9 @@ class XMModule(Parser):
 
     def createFields(self):
         yield Header(self, "header")
-        for index in xrange(self["/header/patterns"].value):
+        for index in range(self["/header/patterns"].value):
             yield Pattern(self, "pattern[]")
-        for index in xrange(self["/header/instruments"].value):
+        for index in range(self["/header/instruments"].value):
             yield Instrument(self, "instrument[]")
 
         # Metadata added by ModPlug - can be discarded
@@ -375,11 +375,11 @@ class XMModule(Parser):
         size = Header.static_size
 
         # Add patterns size
-        for index in xrange(self["/header/patterns"].value):
+        for index in range(self["/header/patterns"].value):
             size += createPatternContentSize(self, size)
 
         # Add instruments size
-        for index in xrange(self["/header/instruments"].value):
+        for index in range(self["/header/instruments"].value):
             size += createInstrumentContentSize(self, size)
 
         # Not reporting Modplug metadata

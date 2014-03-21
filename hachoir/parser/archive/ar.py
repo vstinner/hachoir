@@ -28,9 +28,9 @@ class ArchiveFile(Parser):
         "category": "archive",
         "file_ext": ("a", "deb"),
         "mime":
-            (u"application/x-debian-package",
-             u"application/x-archive",
-             u"application/x-dpkg"),
+            ("application/x-debian-package",
+             "application/x-archive",
+             "application/x-dpkg"),
         "min_size": (8 + 13)*8, # file signature + smallest file as possible
         "magic": ((MAGIC, 0),),
         "description": "Unix archive"

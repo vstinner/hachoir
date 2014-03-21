@@ -173,7 +173,7 @@ class MasterBootRecord(FieldSet):
         yield textHandler(UInt16(self, "signature", "Signature (0xAA55)"), hexadecimal)
 
     def _getPartitions(self):
-        return ( self[index] for index in xrange(1,5) )
+        return ( self[index] for index in range(1,5) )
     headers = property(_getPartitions)
 
 

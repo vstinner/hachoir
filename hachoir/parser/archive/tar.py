@@ -14,15 +14,15 @@ import re
 class FileEntry(FieldSet):
     type_name = {
         # 48 is "0", 49 is "1", ...
-         0: u"Normal disk file (old format)",
-        48: u"Normal disk file",
-        49: u"Link to previously dumped file",
-        50: u"Symbolic link",
-        51: u"Character special file",
-        52: u"Block special file",
-        53: u"Directory",
-        54: u"FIFO special file",
-        55: u"Contiguous file"
+         0: "Normal disk file (old format)",
+        48: "Normal disk file",
+        49: "Link to previously dumped file",
+        50: "Symbolic link",
+        51: "Character special file",
+        52: "Block special file",
+        53: "Directory",
+        54: "FIFO special file",
+        55: "Contiguous file"
     }
 
     def getOctal(self, name):
@@ -88,7 +88,7 @@ class TarFile(Parser):
         "id": "tar",
         "category": "archive",
         "file_ext": ("tar",),
-        "mime": (u"application/x-tar", u"application/x-gtar"),
+        "mime": ("application/x-tar", "application/x-gtar"),
         "min_size": 512*8,
         "magic": (("ustar  \0", 257*8),),
         "subfile": "skip",

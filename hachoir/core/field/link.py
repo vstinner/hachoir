@@ -1,5 +1,6 @@
 from hachoir.core.field import Field, FieldSet, ParserError, Bytes, MissingField
 from hachoir.core.stream import FragmentedStream
+import collections
 
 
 class Link(Field):
@@ -33,7 +34,7 @@ class Fragments:
         while fragment is not None:
             data = fragment.getData()
             yield data and data.size
-            fragment = fragment.next
+            fragment = fragment.__next__
 
 
 class Fragment(FieldSet):
@@ -48,7 +49,7 @@ class Fragment(FieldSet):
     def getData(self):
         try:
             return self._getData()
-        except MissingField, e:
+        except MissingField as e:
             self.error(str(e))
         return None
 
@@ -68,7 +69,7 @@ class Fragment(FieldSet):
 
     def _getNext(self):
         next = self._feedLinks()._next
-        if callable(next):
+        if isinstance(next, collections.Callable):
             self._next = next = next()
         return next
     next  = property(_getNext)

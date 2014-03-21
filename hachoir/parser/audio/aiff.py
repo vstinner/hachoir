@@ -16,12 +16,12 @@ from hachoir.core.tools import alignValue
 from hachoir.parser.audio.id3 import ID3v2
 
 CODEC_NAME = {
-    'ACE2': u"ACE 2-to-1",
-    'ACE8': u"ACE 8-to-3",
-    'MAC3': u"MAC 3-to-1",
-    'MAC6': u"MAC 6-to-1",
-    'NONE': u"None",
-    'sowt': u"Little-endian, no compression",
+    'ACE2': "ACE 2-to-1",
+    'ACE8': "ACE 8-to-3",
+    'MAC3': "MAC 3-to-1",
+    'MAC6': "MAC 6-to-1",
+    'NONE': "None",
+    'sowt': "Little-endian, no compression",
 }
 
 class Comment(FieldSet):
@@ -37,7 +37,7 @@ def parseID3(self):
 
 def parseComment(self):
     yield UInt16(self, "nb_comment")
-    for index in xrange(self["nb_comment"].value):
+    for index in range(self["nb_comment"].value):
         yield Comment(self, "comment[]")
 
 def parseCommon(self):
@@ -95,7 +95,7 @@ class AiffFile(Parser):
         "id": "aiff",
         "category": "audio",
         "file_ext": ("aif", "aiff", "aifc"),
-        "mime": (u"audio/x-aiff",),
+        "mime": ("audio/x-aiff",),
         "magic_regex": (("FORM.{4}AIF[CF]", 0),),
         "min_size": 12*8,
         "description": "Audio Interchange File Format (AIFF)"

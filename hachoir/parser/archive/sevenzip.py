@@ -28,7 +28,7 @@ class SZUInt64(Field):
         addr = self.absolute_address
         mask = 0x80
         firstByte = parent.stream.readBits(addr, 8, LITTLE_ENDIAN)
-        for i in xrange(8):
+        for i in range(8):
             addr += 8
             if not (firstByte & mask):
                 value += ((firstByte & (mask-1)) << (8*i))
@@ -43,7 +43,7 @@ ID_FILES_INFO, ID_PACK_INFO, ID_UNPACK_INFO, ID_SUBSTREAMS_INFO, ID_SIZE, \
 ID_CRC, ID_FOLDER, ID_CODERS_UNPACK_SIZE, ID_NUM_UNPACK_STREAMS, \
 ID_EMPTY_STREAM, ID_EMPTY_FILE, ID_ANTI, ID_NAME, ID_CREATION_TIME, \
 ID_LAST_ACCESS_TIME, ID_LAST_WRITE_TIME, ID_WIN_ATTR, ID_COMMENT, \
-ID_ENCODED_HEADER = xrange(24)
+ID_ENCODED_HEADER = range(24)
 
 ID_INFO = {
     ID_END               : "End",
@@ -100,7 +100,7 @@ class HashDigest(FieldSet):
         bytes = self.stream.readBytes(self.absolute_address, self.num_digests)
         if self.num_digests > 0:
             yield GenericVector(self, "defined[]", self.num_digests, UInt8, "bool")
-            for index in xrange(self.num_digests):
+            for index in range(self.num_digests):
                 if bytes[index]:
                     yield textHandler(UInt32(self, "hash[]",
                         "Hash for digest %u" % index), hexadecimal)
@@ -117,7 +117,7 @@ class PackInfo(FieldSet):
         for field in waitForID(self, ID_SIZE, "size_marker"):
             yield field
 
-        for size in xrange(num):
+        for size in range(num):
             yield SZUInt64(self, "pack_size[]")
 
         while not self.eof:
@@ -220,7 +220,7 @@ class FolderItem(FieldSet):
         self.info("Folder: %u codecs" % num)
 
         # Coders info
-        for index in xrange(num):
+        for index in range(num):
             ci = CoderInfo(self, "coder_info[]")
             yield ci
             self.in_streams += ci.in_streams
@@ -228,7 +228,7 @@ class FolderItem(FieldSet):
 
         # Bin pairs
         self.info("out streams: %u" % self.out_streams)
-        for index in xrange(self.out_streams-1):
+        for index in range(self.out_streams-1):
             yield BindPairInfo(self, "bind_pair[]")
 
         # Packed streams
@@ -237,7 +237,7 @@ class FolderItem(FieldSet):
         if packed_streams == 1:
             pass
         else:
-            for index in xrange(packed_streams):
+            for index in range(packed_streams):
                 yield SZUInt64(self, "pack_stream[]")
 
 
@@ -255,15 +255,15 @@ class UnpackInfo(FieldSet):
         yield UInt8(self, "is_external")
 
         # Read folder items
-        for folder_index in xrange(num):
+        for folder_index in range(num):
             yield FolderItem(self, "folder_item[]")
 
         # Get unpack sizes for each coder of each folder
         for field in waitForID(self, ID_CODERS_UNPACK_SIZE, "coders_unpsize_marker"):
             yield field
-        for folder_index in xrange(num):
+        for folder_index in range(num):
             folder_item = self["folder_item[%u]" % folder_index]
-            for index in xrange(folder_item.out_streams):
+            for index in range(folder_item.out_streams):
                 #yield UInt8(self, "unpack_size[]")
                 yield SZUInt64(self, "unpack_size[]")
 
@@ -376,7 +376,7 @@ class SevenZipParser(Parser):
         "id": "7zip",
         "category": "archive",
         "file_ext": ("7z",),
-        "mime": (u"application/x-7z-compressed",),
+        "mime": ("application/x-7z-compressed",),
         "min_size": 32*8,
         "magic": (("7z\xbc\xaf\x27\x1c", 0),),
         "description": "Compressed archive in 7z format"

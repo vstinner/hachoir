@@ -37,7 +37,7 @@ def unicodeFilename(filename, charset=None):
     if not charset:
         charset = getTerminalCharset()
     try:
-        return unicode(filename, charset)
+        return str(filename, charset)
     except UnicodeDecodeError:
         return makePrintable(filename, charset, to_unicode=True)
 

@@ -40,7 +40,7 @@ class BudHeader(FieldSet):
         yield UInt32(self, "allocator_offset")
         yield UInt32(self, "allocator_size")
         yield UInt32(self, "allocator_offset_backup", description="Finder will refuse to read the file if this does not match the first copy")
-        for i in xrange(4):
+        for i in range(4):
             yield BlockAddress(self, "block_address_copy[]", description="Copies of block addresses defined in the allocator")
 
 class BudDirectory(FieldSet):
@@ -57,22 +57,22 @@ class BudDirectory(FieldSet):
 class FreeList(FieldSet):
     def createFields(self):
         yield UInt32(self, "count")
-        for i in xrange(self['count'].value):
+        for i in range(self['count'].value):
             yield UInt32(self, "offset[]")
 
 class BudAllocator(FieldSet):
     def createFields(self):
         yield UInt32(self, "nblocks")
         yield UInt32(self, "unknown", description="Always 0")
-        for i in xrange(self['nblocks'].value):
+        for i in range(self['nblocks'].value):
             yield BlockAddress(self, "block[]")
         padding = paddingSize(self['nblocks'].value, 256)
         if padding:
             yield NullBytes(self, "padding", padding*4, description="padding to make the number of blocks a multiple of 256")
         yield UInt32(self, "ndirs")
-        for i in xrange(self['ndirs'].value):
+        for i in range(self['ndirs'].value):
             yield BudDirectory(self, "dir[]")
-        for i in xrange(32):
+        for i in range(32):
             yield FreeList(self, "freelist[]")
         if self.current_size < self.size:
             yield PaddingBytes(self, "slack", (self.size-self.current_size)//8, description="slack space")
@@ -94,7 +94,7 @@ class PascalString32UTF16(FieldSet):
     def createValue(self):
         return self['value'].value
     def createDisplay(self):
-        return unicode(self['value'].display)
+        return str(self['value'].display)
 
 class DSRecord(FieldSet):
     def createFields(self):
@@ -133,7 +133,7 @@ class BTNode(FieldSet):
         yield UInt32(self, "last_block")
         yield UInt32(self, "count")
         if self['last_block'].value != 0:
-            for i in xrange(self['count'].value):
+            for i in range(self['count'].value):
                 block = UInt32(self, "child_block[]")
                 yield block
                 link = Link(self, "child_link[]")
@@ -144,7 +144,7 @@ class BTNode(FieldSet):
             link.createValue = self.linkValue(self['last_block'])
             yield link
         else:
-            for i in xrange(self['count'].value):
+            for i in range(self['count'].value):
                 yield DSRecord(self, "record[]")
         if self.current_size < self.size:
             yield PaddingBytes(self, "slack", (self.size-self.current_size)//8, description="slack space")

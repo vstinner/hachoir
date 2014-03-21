@@ -10,12 +10,12 @@ def importModule(name):
     return mod
 
 def testModule(name):
-    print "--- Test module %s" % name
+    print("--- Test module %s" % name)
     module = importModule(name)
     failure, nb_test = doctest.testmod(module)
     if failure:
         sys.exit(1)
-    print "--- End of test"
+    print("--- End of test")
 
 def main():
     # Configure Hachoir for tests

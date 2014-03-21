@@ -19,15 +19,15 @@ try:
             image = pool.getImage()
             if image:
                 count += 1
-                print "Downloaded: %s/%s" % (count, total)
+                print("Downloaded: %s/%s" % (count, total))
                 if total <= count:
                     break
             else:
                 sleep(1.0)
     except KeyboardInterrupt:
-        print "Interrupt."
+        print("Interrupt.")
 finally:
-    print "Stopping image pool (please wait)."
+    print("Stopping image pool (please wait).")
     pool.shutdown()
     pool.join()
 

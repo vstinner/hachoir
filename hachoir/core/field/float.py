@@ -14,7 +14,7 @@ class FloatMantissa(Bits):
         return 1 + float(value) / (2 ** self.size)
 
     def createRawDisplay(self):
-        return unicode(Bits.createValue(self))
+        return str(Bits.createValue(self))
 
 class FloatExponent(Bits):
     def __init__(self, parent, name, size):
@@ -25,7 +25,7 @@ class FloatExponent(Bits):
         return Bits.createValue(self) - self.bias
 
     def createRawDisplay(self):
-        return unicode(self.value + self.bias)
+        return str(self.value + self.bias)
 
 def floatFactory(name, format, mantissa_bits, exponent_bits, doc):
     size = 1 + mantissa_bits + exponent_bits
@@ -58,7 +58,7 @@ def floatFactory(name, format, mantissa_bits, exponent_bits, doc):
                     self.absolute_address, self._size//8)
                 try:
                     return struct.unpack(self.struct_format, raw)[0]
-                except struct.error, err:
+                except struct.error as err:
                     raise ValueError("[%s] conversion error: %s" %
                         (self.__class__.__name__, err))
             else:

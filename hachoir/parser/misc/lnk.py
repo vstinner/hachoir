@@ -452,7 +452,7 @@ class ExtraInfo(FieldSet):
             yield UInt32(self, "history_size", "Size of the history buffer (in lines)")
             yield UInt32(self, "history_count", "Number of history buffers (each process gets one up to this limit)")
             yield Enum(UInt32(self, "history_no_dup", "Automatically eliminate duplicate lines in the history buffer?"), self.BOOL_ENUM)
-            for index in xrange(16):
+            for index in range(16):
                 yield ColorRef(self, "color[]")
 
         elif self["signature"].value == 0xA0000004:
@@ -469,48 +469,48 @@ class ExtraInfo(FieldSet):
             return "End of Extra Info"
 
 HOT_KEYS = {
-    0x00: u'None',
-    0x13: u'Pause',
-    0x14: u'Caps Lock',
-    0x21: u'Page Up',
-    0x22: u'Page Down',
-    0x23: u'End',
-    0x24: u'Home',
-    0x25: u'Left',
-    0x26: u'Up',
-    0x27: u'Right',
-    0x28: u'Down',
-    0x2d: u'Insert',
-    0x2e: u'Delete',
-    0x6a: u'Num *',
-    0x6b: u'Num +',
-    0x6d: u'Num -',
-    0x6e: u'Num .',
-    0x6f: u'Num /',
-    0x90: u'Num Lock',
-    0x91: u'Scroll Lock',
-    0xba: u';',
-    0xbb: u'=',
-    0xbc: u',',
-    0xbd: u'-',
-    0xbe: u'.',
-    0xbf: u'/',
-    0xc0: u'`',
-    0xdb: u'[',
-    0xdc: u'\\',
-    0xdd: u']',
-    0xde: u"'",
+    0x00: 'None',
+    0x13: 'Pause',
+    0x14: 'Caps Lock',
+    0x21: 'Page Up',
+    0x22: 'Page Down',
+    0x23: 'End',
+    0x24: 'Home',
+    0x25: 'Left',
+    0x26: 'Up',
+    0x27: 'Right',
+    0x28: 'Down',
+    0x2d: 'Insert',
+    0x2e: 'Delete',
+    0x6a: 'Num *',
+    0x6b: 'Num +',
+    0x6d: 'Num -',
+    0x6e: 'Num .',
+    0x6f: 'Num /',
+    0x90: 'Num Lock',
+    0x91: 'Scroll Lock',
+    0xba: ';',
+    0xbb: '=',
+    0xbc: ',',
+    0xbd: '-',
+    0xbe: '.',
+    0xbf: '/',
+    0xc0: '`',
+    0xdb: '[',
+    0xdc: '\\',
+    0xdd: ']',
+    0xde: "'",
 }
 
 def text_hot_key(field):
     assert hasattr(field, "value")
     val=field.value
     if 0x30 <= val <= 0x39:
-        return unichr(val)
+        return chr(val)
     elif 0x41 <= val <= 0x5A:
-        return unichr(val)
+        return chr(val)
     elif 0x60 <= val <= 0x69:
-        return u'Numpad %c' % unichr(val-0x30)
+        return 'Numpad %c' % chr(val-0x30)
     elif 0x70 <= val <= 0x87:
         return 'F%i'%(val-0x6F)
     elif val in HOT_KEYS:
@@ -523,7 +523,7 @@ class LnkFile(Parser):
         "id": "lnk",
         "category": "misc",
         "file_ext": ("lnk",),
-        "mime": (u"application/x-ms-shortcut",),
+        "mime": ("application/x-ms-shortcut",),
         "magic": ((MAGIC, 0),),
         "min_size": len(MAGIC)*8,   # signature + guid = 20 bytes
         "description": "Windows Shortcut (.lnk)",
@@ -531,17 +531,17 @@ class LnkFile(Parser):
     endian = LITTLE_ENDIAN
 
     SHOW_WINDOW_STATE = {
-         0: u"Hide",
-         1: u"Show Normal",
-         2: u"Show Minimized",
-         3: u"Show Maximized",
-         4: u"Show Normal, not activated",
-         5: u"Show",
-         6: u"Minimize",
-         7: u"Show Minimized, not activated",
-         8: u"Show, not activated",
-         9: u"Restore",
-        10: u"Show Default",
+         0: "Hide",
+         1: "Show Normal",
+         2: "Show Minimized",
+         3: "Show Maximized",
+         4: "Show Normal, not activated",
+         5: "Show",
+         6: "Minimize",
+         7: "Show Minimized, not activated",
+         8: "Show, not activated",
+         9: "Restore",
+        10: "Show Default",
     }
 
     def validate(self):

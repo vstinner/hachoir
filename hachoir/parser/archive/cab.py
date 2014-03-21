@@ -7,7 +7,7 @@ Creation date: 31 january 2007
 - Microsoft Cabinet SDK
   http://msdn2.microsoft.com/en-us/library/ms974336.aspx
 """
-from __future__ import absolute_import
+
 from hachoir.parser import Parser
 from hachoir.core.field import (FieldSet, Enum,
     CString, String,
@@ -107,7 +107,7 @@ class FragmentGroup:
         # FIXME: Use smarter code to send arguments
         self.args["compr_level"] = self.items[0].parent.parent.folder["compr_level"].value
         tags = {"class": self.parser, "args": self.args}
-        tags = tags.iteritems()
+        tags = iter(tags.items())
         return StringInputStream(data, "<fragment group>", tags=tags)
 
 class CustomFragment(FieldSet):
@@ -187,7 +187,7 @@ class FolderData(FieldSet):
 
     def createFields(self):
         self.uncompressed_data = ""
-        for index in xrange(self.folder["data_blocks"].value):
+        for index in range(self.folder["data_blocks"].value):
             block = DataBlock(self, "block[]")
             for i in block:
                 pass
@@ -200,7 +200,7 @@ class CabFile(Parser):
         "id": "cab",
         "category": "archive",
         "file_ext": ("cab",),
-        "mime": (u"application/vnd.ms-cab-compressed",),
+        "mime": ("application/vnd.ms-cab-compressed",),
         "magic": ((MAGIC, 0),),
         "min_size": 1*8, # header + file entry
         "description": "Microsoft Cabinet archive"
@@ -245,18 +245,18 @@ class CabFile(Parser):
 
         folders = []
         files = []
-        for index in xrange(self["nb_folder"].value):
+        for index in range(self["nb_folder"].value):
             folder = Folder(self, "folder[]")
             yield folder
             folders.append(folder)
-        for index in xrange(self["nb_files"].value):
+        for index in range(self["nb_files"].value):
             file = File(self, "file[]")
             yield file
             files.append(file)
 
         folders = sorted(enumerate(folders), key=lambda x:x[1]["offset"].value)
 
-        for i in xrange(len(folders)):
+        for i in range(len(folders)):
             index, folder = folders[i]
             padding = self.seekByte(folder["offset"].value)
             if padding:

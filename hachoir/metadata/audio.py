@@ -120,10 +120,10 @@ class OggMetadata(MultipleMetadata):
         meta.comment = "Quality: %s" % header["quality"].value
 
     def vorbisHeader(self, header, meta):
-        meta.compression = u"Vorbis"
+        meta.compression = "Vorbis"
         meta.sample_rate = header["audio_sample_rate"].value
         meta.nb_channel = header["audio_channels"].value
-        meta.format_version = u"Vorbis version %s" % header["vorbis_version"].value
+        meta.format_version = "Vorbis version %s" % header["vorbis_version"].value
         meta.bit_rate = header["bitrate_nominal"].value
 
 class AuMetadata(RootMetadata):
@@ -142,9 +142,9 @@ class AuMetadata(RootMetadata):
 
 class RealAudioMetadata(RootMetadata):
     FOURCC_TO_BITRATE = {
-        u"28_8": 15200, # 28.8 kbit/sec (audio bit rate: 15.2 kbit/s)
-        u"14_4": 8000,  # 14.4 kbit/sec
-        u"lpcJ": 8000,  # 14.4 kbit/sec
+        "28_8": 15200, # 28.8 kbit/sec (audio bit rate: 15.2 kbit/s)
+        "14_4": 8000,  # 14.4 kbit/sec
+        "lpcJ": 8000,  # 14.4 kbit/sec
     }
 
     def extract(self, real):
@@ -303,7 +303,7 @@ class MpegAudioMetadata(RootMetadata):
         if "/frames/frame[0]" in mp3:
             frame = mp3["/frames/frame[0]"]
             self.nb_channel = (frame.getNbChannel(), frame["channel_mode"].display)
-            self.format_version = u"MPEG version %s layer %s" % \
+            self.format_version = "MPEG version %s layer %s" % \
                 (frame["version"].display, frame["layer"].display)
             self.sample_rate = frame.getSampleRate()
             self.bits_per_sample = 16

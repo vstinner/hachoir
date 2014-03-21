@@ -22,9 +22,9 @@ class LZXPreTreeEncodedTree(FieldSet):
         self.num_elements = num_elements
         
     def createFields(self):
-        for i in xrange(20):
+        for i in range(20):
             yield Bits(self, "pretree_lengths[]", 4)
-        pre_tree = build_tree([self['pretree_lengths[%d]'%x].value for x in xrange(20)])
+        pre_tree = build_tree([self['pretree_lengths[%d]'%x].value for x in range(20)])
         if not hasattr(self.root, "lzx_tree_lengths_"+self.name):
             self.lengths = [0] * self.num_elements
             setattr(self.root, "lzx_tree_lengths_"+self.name, self.lengths)
@@ -141,9 +141,9 @@ class LZXBlock(FieldSet):
         curlen = len(self.parent.uncompressed_data)
         if self.block_type in (1, 2): # Verbatim or aligned offset block
             if self.block_type == 2:
-                for i in xrange(8):
+                for i in range(8):
                     yield Bits(self, "aligned_len[]", 3)
-                aligned_tree = build_tree([self['aligned_len[%d]'%i].value for i in xrange(8)])
+                aligned_tree = build_tree([self['aligned_len[%d]'%i].value for i in range(8)])
             yield LZXPreTreeEncodedTree(self, "main_tree_start", 256)
             yield LZXPreTreeEncodedTree(self, "main_tree_rest", self.window_size * 8)
             main_tree = build_tree(self["main_tree_start"].lengths + self["main_tree_rest"].lengths)

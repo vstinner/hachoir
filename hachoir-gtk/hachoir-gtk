@@ -39,11 +39,11 @@ class Interface:
         self.categories = {}
         for p in self.parserDb:
             tags = p.getParserTags()
-            if tags.has_key('category'):
+            if 'category' in tags:
                 cat = tags['category']
             else:
                 cat = 'misc'
-            if not self.categories.has_key(cat):
+            if cat not in self.categories:
                 self.categories[cat] = []
             self.categories[cat].append(tags)
 
@@ -72,7 +72,7 @@ class Interface:
                 assert(rowType == ROW_SUBFILE_DUMMY)
                 stream = model.get_value(childIt, 2)
                 selectedParser = None
-                if self.selectedParsers.has_key(path):
+                if path in self.selectedParsers:
                     selectedParser = self.selectedParsers[path]
 
                     parser = None
@@ -84,7 +84,7 @@ class Interface:
                     parser = guessParser(stream)
 
                 if not parser:
-                    print "no parser found for %s" % stream.source
+                    print("no parser found for %s" % stream.source)
                     model[childIt] = ("Subfile", "(unrecognized)", stream, ROW_SUBFILE_DUMMY)
                 else:
                     self.fill_tree(parser, it, model)
@@ -103,7 +103,7 @@ class Interface:
                     menu = gtk.Menu()
 
                     selectedParser = None
-                    if self.selectedParsers.has_key(path):
+                    if path in self.selectedParsers:
                         selectedParser = self.selectedParsers[path]
 
                     treeview.grab_focus()
@@ -240,7 +240,7 @@ def resultSearchCb (model, column, key, it):
 
 def main():
     if(len(sys.argv)!=2 ):
-        print "usage: %s file" %sys.argv[0]
+        print("usage: %s file" %sys.argv[0])
         return
     filename = sys.argv[1]
 

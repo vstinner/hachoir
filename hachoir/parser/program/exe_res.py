@@ -175,7 +175,7 @@ class WindowsString(FieldSet):
         if "text" in self:
             return self["text"].value
         else:
-            return u""
+            return ""
 
     def createDisplay(self):
         return makePrintable(self.value, "UTF-8", to_unicode=True, quote='"')
@@ -318,9 +318,9 @@ class Directory(FieldSet):
                 % self["header/nb_index"].value)
 
         hdr = self["header"]
-        for index in xrange(hdr["nb_name"].value):
+        for index in range(hdr["nb_name"].value):
             yield NameOffset(self, "name[]")
-        for index in xrange(hdr["nb_index"].value):
+        for index in range(hdr["nb_index"].value):
             yield IndexOffset(self, "index[]", self.res_type)
 
     def createDescription(self):
@@ -366,7 +366,7 @@ class PE_Resource(SeekableFieldSet):
                         if field.__class__ == Directory:
                             newsubdirs.append(field)
                         yield field
-                except HACHOIR_ERRORS, err:
+                except HACHOIR_ERRORS as err:
                     self.error("Unable to create directory %s: %s" % (name, err))
             subdirs = newsubdirs
             alldirs.extend(subdirs)
@@ -398,7 +398,7 @@ class PE_Resource(SeekableFieldSet):
                 if padding:
                     yield padding
                 yield ResourceContent(self, "content[]", entry)
-            except HACHOIR_ERRORS, err:
+            except HACHOIR_ERRORS as err:
                 self.warning("Error when parsing entry %s: %s" % (entry.path, err))
 
         size = (self.size - self.current_size) // 8

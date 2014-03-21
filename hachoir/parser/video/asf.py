@@ -21,7 +21,7 @@ from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.text_handler import (
     displayHandler, filesizeHandler)
 from hachoir.core.tools import humanBitRate
-from itertools import izip
+
 from hachoir.parser.video.fourcc import audio_codec_name, video_fourcc_name
 from hachoir.parser.common.win32 import BitmapInfoHeader, GUID
 
@@ -52,7 +52,7 @@ class BitrateMutualExclusion(FieldSet):
     def createFields(self):
         yield Enum(GUID(self, "exclusion_type"), self.mutex_name)
         yield UInt16(self, "nb_stream")
-        for index in xrange(self["nb_stream"].value):
+        for index in range(self["nb_stream"].value):
             yield UInt16(self, "stream[]")
 
 class VideoHeader(FieldSet):
@@ -108,16 +108,16 @@ class Header(FieldSet):
     def createFields(self):
         yield UInt32(self, "obj_count")
         yield PaddingBytes(self, "reserved[]", 2)
-        for index in xrange(self["obj_count"].value):
+        for index in range(self["obj_count"].value):
             yield Object(self, "object[]")
 
 class Metadata(FieldSet):
     guid = "75B22633-668E-11CF-A6D9-00AA0062CE6C"
     names = ("title", "author", "copyright", "xxx", "yyy")
     def createFields(self):
-        for index in xrange(5):
+        for index in range(5):
             yield UInt16(self, "size[]")
-        for name, size in izip(self.names, self.array("size")):
+        for name, size in zip(self.names, self.array("size")):
             if size.value:
                 yield String(self, name, size.value, charset="UTF-16-LE", strip=" \0")
 
@@ -154,7 +154,7 @@ class ExtendedContentDescription(FieldSet):
     guid = "D2D0A440-E307-11D2-97F0-00A0C95EA850"
     def createFields(self):
         yield UInt16(self, "count")
-        for index in xrange(self["count"].value):
+        for index in range(self["count"].value):
             yield Descriptor(self, "descriptor[]")
 
 class Codec(FieldSet):
@@ -183,7 +183,7 @@ class CodecList(FieldSet):
     def createFields(self):
         yield GUID(self, "reserved[]")
         yield UInt32(self, "count")
-        for index in xrange(self["count"].value):
+        for index in range(self["count"].value):
             yield Codec(self, "codec[]")
 
 class SimpleIndexEntry(FieldSet):
@@ -202,7 +202,7 @@ class SimpleIndex(FieldSet):
         yield TimedeltaWin64(self, "entry_interval")
         yield UInt32(self, "max_pckt_count")
         yield UInt32(self, "entry_count")
-        for index in xrange(self["entry_count"].value):
+        for index in range(self["entry_count"].value):
             yield SimpleIndexEntry(self, "entry[]")
 
 class BitRate(FieldSet):
@@ -219,7 +219,7 @@ class BitRateList(FieldSet):
 
     def createFields(self):
         yield UInt16(self, "count")
-        for index in xrange(self["count"].value):
+        for index in range(self["count"].value):
             yield BitRate(self, "bit_rate[]")
 
 class Data(FieldSet):
@@ -305,15 +305,15 @@ class AsfFile(Parser):
         "id": "asf",
         "category": "video",
         "file_ext": ("wmv", "wma", "asf"),
-        "mime": (u"video/x-ms-asf", u"video/x-ms-wmv", u"audio/x-ms-wma"),
+        "mime": ("video/x-ms-asf", "video/x-ms-wmv", "audio/x-ms-wma"),
         "min_size": 24*8,
         "description": "Advanced Streaming Format (ASF), used for WMV (video) and WMA (audio)",
         "magic": ((MAGIC, 0),),
     }
     FILE_TYPE = {
-        "video/x-ms-wmv": (".wmv", u"Window Media Video (wmv)"),
-        "video/x-ms-asf": (".asf", u"ASF container"),
-        "audio/x-ms-wma": (".wma", u"Window Media Audio (wma)"),
+        "video/x-ms-wmv": (".wmv", "Window Media Video (wmv)"),
+        "video/x-ms-asf": (".asf", "ASF container"),
+        "audio/x-ms-wma": (".wma", "Window Media Audio (wma)"),
     }
     endian = LITTLE_ENDIAN
 
@@ -331,13 +331,13 @@ class AsfFile(Parser):
         for prop in self.array("header/content/stream_prop"):
             guid = prop["content/type"].value
             if guid == VideoHeader.guid:
-                return u"video/x-ms-wmv"
+                return "video/x-ms-wmv"
             if guid == AudioHeader.guid:
                 audio = True
         if audio:
-            return u"audio/x-ms-wma"
+            return "audio/x-ms-wma"
         else:
-            return u"video/x-ms-asf"
+            return "video/x-ms-asf"
 
     def createFields(self):
         while not self.eof:

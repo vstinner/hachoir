@@ -28,7 +28,7 @@ class CharBitmap(FieldSet):
 
   def createFields(self):
     width = self.char["width_pixels"].value
-    for line in xrange(self.char["height_pixels"].value):
+    for line in range(self.char["height_pixels"].value):
       yield GenericVector(self, "line[]", width,
                           UInt8, "pixel")
 

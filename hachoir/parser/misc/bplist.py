@@ -97,7 +97,7 @@ class BPListDict(FieldSet):
             yield BPListObjectRef(self, "valref[]")
 
     def createValue(self):
-        return zip(self.array('keyref'),self.array('valref'))
+        return list(zip(self.array('keyref'),self.array('valref')))
 
     def createDisplay(self):
         return '{' + ', '.join(['%s: %s'%(k.display,v.display) for k,v in self.value]) + '}'
@@ -223,15 +223,15 @@ class BPListObject(FieldSet):
         if 'value' in self:
             return self['value'].value
         elif self['marker_type'].value in [4,5,6]:
-            return u''
+            return ''
         else:
             return None
 
     def createDisplay(self):
         if 'value' in self:
-            return unicode(self['value'].display)
+            return str(self['value'].display)
         elif self['marker_type'].value in [4,5,6]:
-            return u''
+            return ''
         else:
             return None
 

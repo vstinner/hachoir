@@ -287,7 +287,7 @@ class InodeGen:
 
     def __call__(self, prev):
         name = self.path + "[]"
-        address, size, last = self.cluster.next()
+        address, size, last = next(self.cluster)
         if self.filesize:
             if self.done >= self.filesize:
                 error("(FAT) bad metadata for " + self.path)
@@ -371,7 +371,7 @@ class FAT_FS(Parser):
         if fat_size == 0:
             fat_size = boot["fat32_size"].value
         fat_size *= self.sector_size * 8
-        for i in xrange(boot["fat_nb"].value):
+        for i in range(boot["fat_nb"].value):
             yield FAT(self, "fat[]", "File Allocation Table", size=fat_size)
 
         # Read inode table (Directory)

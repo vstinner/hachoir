@@ -28,56 +28,56 @@ from hachoir.parser.image.common import RGBA
 POLYFILL_MODE = {1: "Alternate", 2: "Winding"}
 
 BRUSH_STYLE = {
-    0: u"Solid",
-    1: u"Null",
-    2: u"Hollow",
-    3: u"Pattern",
-    4: u"Indexed",
-    5: u"DIB pattern",
-    6: u"DIB pattern point",
-    7: u"Pattern 8x8",
-    8: u"DIB pattern 8x8",
+    0: "Solid",
+    1: "Null",
+    2: "Hollow",
+    3: "Pattern",
+    4: "Indexed",
+    5: "DIB pattern",
+    6: "DIB pattern point",
+    7: "Pattern 8x8",
+    8: "DIB pattern 8x8",
 }
 
 HATCH_STYLE = {
-    0: u"Horizontal",      # -----
-    1: u"Vertical",        # |||||
-    2: u"FDIAGONAL",       # \\\\\
-    3: u"BDIAGONAL",       # /////
-    4: u"Cross",           # +++++
-    5: u"Diagonal cross",  # xxxxx
+    0: "Horizontal",      # -----
+    1: "Vertical",        # |||||
+    2: "FDIAGONAL",       # \\\\\
+    3: "BDIAGONAL",       # /////
+    4: "Cross",           # +++++
+    5: "Diagonal cross",  # xxxxx
 }
 
 PEN_STYLE = {
-    0: u"Solid",
-    1: u"Dash",          # -------
-    2: u"Dot",           # .......
-    3: u"Dash dot",      # _._._._
-    4: u"Dash dot dot",  # _.._.._
-    5: u"Null",
-    6: u"Inside frame",
-    7: u"User style",
-    8: u"Alternate",
+    0: "Solid",
+    1: "Dash",          # -------
+    2: "Dot",           # .......
+    3: "Dash dot",      # _._._._
+    4: "Dash dot dot",  # _.._.._
+    5: "Null",
+    6: "Inside frame",
+    7: "User style",
+    8: "Alternate",
 }
 
 # Binary raster operations
 ROP2_DESC = {
-     1: u"Black (0)",
-     2: u"Not merge pen (DPon)",
-     3: u"Mask not pen (DPna)",
-     4: u"Not copy pen (PN)",
-     5: u"Mask pen not (PDna)",
-     6: u"Not (Dn)",
-     7: u"Xor pen (DPx)",
-     8: u"Not mask pen (DPan)",
-     9: u"Mask pen (DPa)",
-    10: u"Not xor pen (DPxn)",
-    11: u"No operation (D)",
-    12: u"Merge not pen (DPno)",
-    13: u"Copy pen (P)",
-    14: u"Merge pen not (PDno)",
-    15: u"Merge pen (DPo)",
-    16: u"White (1)",
+     1: "Black (0)",
+     2: "Not merge pen (DPon)",
+     3: "Mask not pen (DPna)",
+     4: "Not copy pen (PN)",
+     5: "Mask pen not (PDna)",
+     6: "Not (Dn)",
+     7: "Xor pen (DPx)",
+     8: "Not mask pen (DPan)",
+     9: "Mask pen (DPa)",
+    10: "Not xor pen (DPxn)",
+    11: "No operation (D)",
+    12: "Merge not pen (DPno)",
+    13: "Copy pen (P)",
+    14: "Merge pen not (PDno)",
+    15: "Merge pen (DPo)",
+    16: "White (1)",
 }
 
 def parseXY(parser):
@@ -114,73 +114,73 @@ class Point(FieldSet):
 
 def parsePolygon(parser):
     yield UInt16(parser, "count")
-    for index in xrange(parser["count"].value):
+    for index in range(parser["count"].value):
         yield Point(parser, "point[]")
 
 META = {
-    0x0000: ("EOF", u"End of file", None),
-    0x001E: ("SAVEDC", u"Save device context", None),
-    0x0035: ("REALIZEPALETTE", u"Realize palette", None),
-    0x0037: ("SETPALENTRIES", u"Set palette entries", None),
-    0x00f7: ("CREATEPALETTE", u"Create palette", None),
-    0x0102: ("SETBKMODE", u"Set background mode", None),
-    0x0103: ("SETMAPMODE", u"Set mapping mode", None),
-    0x0104: ("SETROP2", u"Set foreground mix mode", parseROP2),
-    0x0106: ("SETPOLYFILLMODE", u"Set polygon fill mode", parsePolyFillMode),
-    0x0107: ("SETSTRETCHBLTMODE", u"Set bitmap streching mode", None),
-    0x0108: ("SETTEXTCHAREXTRA", u"Set text character extra", None),
-    0x0127: ("RESTOREDC", u"Restore device context", None),
-    0x012A: ("INVERTREGION", u"Invert region", None),
-    0x012B: ("PAINTREGION", u"Paint region", None),
-    0x012C: ("SELECTCLIPREGION", u"Select clipping region", None),
-    0x012D: ("SELECTOBJECT", u"Select object", parseObjectID),
-    0x012E: ("SETTEXTALIGN", u"Set text alignment", None),
-    0x0142: ("CREATEDIBPATTERNBRUSH", u"Create DIB brush with specified pattern", None),
-    0x01f0: ("DELETEOBJECT", u"Delete object", parseObjectID),
-    0x0201: ("SETBKCOLOR", u"Set background color", None),
-    0x0209: ("SETTEXTCOLOR", u"Set text color", None),
-    0x020A: ("SETTEXTJUSTIFICATION", u"Set text justification", None),
-    0x020B: ("SETWINDOWORG", u"Set window origin", parseXY),
-    0x020C: ("SETWINDOWEXT", u"Set window extends", parseXY),
-    0x020D: ("SETVIEWPORTORG", u"Set view port origin", None),
-    0x020E: ("SETVIEWPORTEXT", u"Set view port extends", None),
-    0x020F: ("OFFSETWINDOWORG", u"Offset window origin", None),
-    0x0211: ("OFFSETVIEWPORTORG", u"Offset view port origin", None),
-    0x0213: ("LINETO", u"Draw a line to", None),
-    0x0214: ("MOVETO", u"Move to", None),
-    0x0220: ("OFFSETCLIPRGN", u"Offset clipping rectangle", None),
-    0x0228: ("FILLREGION", u"Fill region", None),
-    0x0231: ("SETMAPPERFLAGS", u"Set mapper flags", None),
-    0x0234: ("SELECTPALETTE", u"Select palette", None),
-    0x02FB: ("CREATEFONTINDIRECT", u"Create font indirect", None),
-    0x02FA: ("CREATEPENINDIRECT", u"Create pen indirect", parsePenIndirect),
-    0x02FC: ("CREATEBRUSHINDIRECT", u"Create brush indirect", parseCreateBrushIndirect),
-    0x0324: ("POLYGON", u"Draw a polygon", parsePolygon),
-    0x0325: ("POLYLINE", u"Draw a polyline", None),
-    0x0410: ("SCALEWINDOWEXT", u"Scale window extends", None),
-    0x0412: ("SCALEVIEWPORTEXT", u"Scale view port extends", None),
-    0x0415: ("EXCLUDECLIPRECT", u"Exclude clipping rectangle", None),
-    0x0416: ("INTERSECTCLIPRECT", u"Intersect clipping rectangle", None),
-    0x0418: ("ELLIPSE", u"Draw an ellipse", None),
-    0x0419: ("FLOODFILL", u"Flood fill", None),
-    0x041B: ("RECTANGLE", u"Draw a rectangle", None),
-    0x041F: ("SETPIXEL", u"Set pixel", None),
-    0x0429: ("FRAMEREGION", u"Fram region", None),
-    0x0521: ("TEXTOUT", u"Draw text", None),
-    0x0538: ("POLYPOLYGON", u"Draw multiple polygons", None),
-    0x0548: ("EXTFLOODFILL", u"Extend flood fill", None),
-    0x061C: ("ROUNDRECT", u"Draw a rounded rectangle", None),
-    0x061D: ("PATBLT", u"Pattern blitting", None),
-    0x0626: ("ESCAPE", u"Escape", None),
-    0x06FF: ("CREATEREGION", u"Create region", None),
-    0x0817: ("ARC", u"Draw an arc", None),
-    0x081A: ("PIE", u"Draw a pie", None),
-    0x0830: ("CHORD", u"Draw a chord", None),
-    0x0940: ("DIBBITBLT", u"DIB bit blitting", None),
-    0x0a32: ("EXTTEXTOUT", u"Draw text (extra)", None),
-    0x0b41: ("DIBSTRETCHBLT", u"DIB stretch blitting", None),
-    0x0d33: ("SETDIBTODEV", u"Set DIB to device", None),
-    0x0f43: ("STRETCHDIB", u"Stretch DIB", None),
+    0x0000: ("EOF", "End of file", None),
+    0x001E: ("SAVEDC", "Save device context", None),
+    0x0035: ("REALIZEPALETTE", "Realize palette", None),
+    0x0037: ("SETPALENTRIES", "Set palette entries", None),
+    0x00f7: ("CREATEPALETTE", "Create palette", None),
+    0x0102: ("SETBKMODE", "Set background mode", None),
+    0x0103: ("SETMAPMODE", "Set mapping mode", None),
+    0x0104: ("SETROP2", "Set foreground mix mode", parseROP2),
+    0x0106: ("SETPOLYFILLMODE", "Set polygon fill mode", parsePolyFillMode),
+    0x0107: ("SETSTRETCHBLTMODE", "Set bitmap streching mode", None),
+    0x0108: ("SETTEXTCHAREXTRA", "Set text character extra", None),
+    0x0127: ("RESTOREDC", "Restore device context", None),
+    0x012A: ("INVERTREGION", "Invert region", None),
+    0x012B: ("PAINTREGION", "Paint region", None),
+    0x012C: ("SELECTCLIPREGION", "Select clipping region", None),
+    0x012D: ("SELECTOBJECT", "Select object", parseObjectID),
+    0x012E: ("SETTEXTALIGN", "Set text alignment", None),
+    0x0142: ("CREATEDIBPATTERNBRUSH", "Create DIB brush with specified pattern", None),
+    0x01f0: ("DELETEOBJECT", "Delete object", parseObjectID),
+    0x0201: ("SETBKCOLOR", "Set background color", None),
+    0x0209: ("SETTEXTCOLOR", "Set text color", None),
+    0x020A: ("SETTEXTJUSTIFICATION", "Set text justification", None),
+    0x020B: ("SETWINDOWORG", "Set window origin", parseXY),
+    0x020C: ("SETWINDOWEXT", "Set window extends", parseXY),
+    0x020D: ("SETVIEWPORTORG", "Set view port origin", None),
+    0x020E: ("SETVIEWPORTEXT", "Set view port extends", None),
+    0x020F: ("OFFSETWINDOWORG", "Offset window origin", None),
+    0x0211: ("OFFSETVIEWPORTORG", "Offset view port origin", None),
+    0x0213: ("LINETO", "Draw a line to", None),
+    0x0214: ("MOVETO", "Move to", None),
+    0x0220: ("OFFSETCLIPRGN", "Offset clipping rectangle", None),
+    0x0228: ("FILLREGION", "Fill region", None),
+    0x0231: ("SETMAPPERFLAGS", "Set mapper flags", None),
+    0x0234: ("SELECTPALETTE", "Select palette", None),
+    0x02FB: ("CREATEFONTINDIRECT", "Create font indirect", None),
+    0x02FA: ("CREATEPENINDIRECT", "Create pen indirect", parsePenIndirect),
+    0x02FC: ("CREATEBRUSHINDIRECT", "Create brush indirect", parseCreateBrushIndirect),
+    0x0324: ("POLYGON", "Draw a polygon", parsePolygon),
+    0x0325: ("POLYLINE", "Draw a polyline", None),
+    0x0410: ("SCALEWINDOWEXT", "Scale window extends", None),
+    0x0412: ("SCALEVIEWPORTEXT", "Scale view port extends", None),
+    0x0415: ("EXCLUDECLIPRECT", "Exclude clipping rectangle", None),
+    0x0416: ("INTERSECTCLIPRECT", "Intersect clipping rectangle", None),
+    0x0418: ("ELLIPSE", "Draw an ellipse", None),
+    0x0419: ("FLOODFILL", "Flood fill", None),
+    0x041B: ("RECTANGLE", "Draw a rectangle", None),
+    0x041F: ("SETPIXEL", "Set pixel", None),
+    0x0429: ("FRAMEREGION", "Fram region", None),
+    0x0521: ("TEXTOUT", "Draw text", None),
+    0x0538: ("POLYPOLYGON", "Draw multiple polygons", None),
+    0x0548: ("EXTFLOODFILL", "Extend flood fill", None),
+    0x061C: ("ROUNDRECT", "Draw a rounded rectangle", None),
+    0x061D: ("PATBLT", "Pattern blitting", None),
+    0x0626: ("ESCAPE", "Escape", None),
+    0x06FF: ("CREATEREGION", "Create region", None),
+    0x0817: ("ARC", "Draw an arc", None),
+    0x081A: ("PIE", "Draw a pie", None),
+    0x0830: ("CHORD", "Draw a chord", None),
+    0x0940: ("DIBBITBLT", "DIB bit blitting", None),
+    0x0a32: ("EXTTEXTOUT", "Draw text (extra)", None),
+    0x0b41: ("DIBSTRETCHBLT", "DIB stretch blitting", None),
+    0x0d33: ("SETDIBTODEV", "Set DIB to device", None),
+    0x0f43: ("STRETCHDIB", "Stretch DIB", None),
 }
 META_NAME = createDict(META, 0)
 META_DESC = createDict(META, 1)
@@ -230,7 +230,7 @@ class Point16(FieldSet):
 def parsePoint16array(parser):
     yield RECT32(parser, "bounds")
     yield UInt32(parser, "count")
-    for index in xrange(parser["count"].value):
+    for index in range(parser["count"].value):
         yield Point16(parser, "point[]")
 
 def parseGDIComment(parser):
@@ -254,113 +254,113 @@ def parseExtCreatePen(parser):
     yield RGBA(parser, "color")
     yield UInt32(parser, "hatch")
     yield UInt32(parser, "nb_style")
-    for index in xrange(parser["nb_style"].value):
+    for index in range(parser["nb_style"].value):
         yield UInt32(parser, "style")
 
 EMF_META = {
-    1: ("HEADER", u"Header", None),
-    2: ("POLYBEZIER", u"Draw poly bezier", None),
-    3: ("POLYGON", u"Draw polygon", None),
-    4: ("POLYLINE", u"Draw polyline", None),
-    5: ("POLYBEZIERTO", u"Draw poly bezier to", None),
-    6: ("POLYLINETO", u"Draw poly line to", None),
-    7: ("POLYPOLYLINE", u"Draw poly polyline", None),
-    8: ("POLYPOLYGON", u"Draw poly polygon", None),
-    9: ("SETWINDOWEXTEX", u"Set window extend EX", parseXY32),
-    10: ("SETWINDOWORGEX", u"Set window origin EX", parseXY32),
-    11: ("SETVIEWPORTEXTEX", u"Set viewport extend EX", parseXY32),
-    12: ("SETVIEWPORTORGEX", u"Set viewport origin EX", parseXY32),
-    13: ("SETBRUSHORGEX", u"Set brush org EX", None),
-    14: ("EOF", u"End of file", None),
-    15: ("SETPIXELV", u"Set pixel V", None),
-    16: ("SETMAPPERFLAGS", u"Set mapper flags", None),
-    17: ("SETMAPMODE", u"Set mapping mode", parseEmfMappingMode),
-    18: ("SETBKMODE", u"Set background mode", None),
-    19: ("SETPOLYFILLMODE", u"Set polyfill mode", None),
-    20: ("SETROP2", u"Set ROP2", None),
-    21: ("SETSTRETCHBLTMODE", u"Set stretching blitting mode", None),
-    22: ("SETTEXTALIGN", u"Set text align", None),
-    23: ("SETCOLORADJUSTMENT", u"Set color adjustment", None),
-    24: ("SETTEXTCOLOR", u"Set text color", None),
-    25: ("SETBKCOLOR", u"Set background color", None),
-    26: ("OFFSETCLIPRGN", u"Offset clipping region", None),
-    27: ("MOVETOEX", u"Move to EX", parseXY32),
-    28: ("SETMETARGN", u"Set meta region", None),
-    29: ("EXCLUDECLIPRECT", u"Exclude clipping rectangle", None),
-    30: ("INTERSECTCLIPRECT", u"Intersect clipping rectangle", None),
-    31: ("SCALEVIEWPORTEXTEX", u"Scale viewport extend EX", None),
-    32: ("SCALEWINDOWEXTEX", u"Scale window extend EX", None),
-    33: ("SAVEDC", u"Save device context", None),
-    34: ("RESTOREDC", u"Restore device context", None),
-    35: ("SETWORLDTRANSFORM", u"Set world transform", None),
-    36: ("MODIFYWORLDTRANSFORM", u"Modify world transform", None),
-    37: ("SELECTOBJECT", u"Select object", parseObjectID32),
-    38: ("CREATEPEN", u"Create pen", None),
-    39: ("CREATEBRUSHINDIRECT", u"Create brush indirect", parseBrushIndirect),
-    40: ("DELETEOBJECT", u"Delete object", parseObjectID32),
-    41: ("ANGLEARC", u"Draw angle arc", None),
-    42: ("ELLIPSE", u"Draw ellipse", None),
-    43: ("RECTANGLE", u"Draw rectangle", None),
-    44: ("ROUNDRECT", u"Draw rounded rectangle", None),
-    45: ("ARC", u"Draw arc", None),
-    46: ("CHORD", u"Draw chord", None),
-    47: ("PIE", u"Draw pie", None),
-    48: ("SELECTPALETTE", u"Select palette", None),
-    49: ("CREATEPALETTE", u"Create palette", None),
-    50: ("SETPALETTEENTRIES", u"Set palette entries", None),
-    51: ("RESIZEPALETTE", u"Resize palette", None),
-    52: ("REALIZEPALETTE", u"Realize palette", None),
-    53: ("EXTFLOODFILL", u"EXT flood fill", None),
-    54: ("LINETO", u"Draw line to", parseXY32),
-    55: ("ARCTO", u"Draw arc to", None),
-    56: ("POLYDRAW", u"Draw poly draw", None),
-    57: ("SETARCDIRECTION", u"Set arc direction", None),
-    58: ("SETMITERLIMIT", u"Set miter limit", None),
-    59: ("BEGINPATH", u"Begin path", None),
-    60: ("ENDPATH", u"End path", None),
-    61: ("CLOSEFIGURE", u"Close figure", None),
-    62: ("FILLPATH", u"Fill path", None),
-    63: ("STROKEANDFILLPATH", u"Stroke and fill path", None),
-    64: ("STROKEPATH", u"Stroke path", None),
-    65: ("FLATTENPATH", u"Flatten path", None),
-    66: ("WIDENPATH", u"Widen path", None),
-    67: ("SELECTCLIPPATH", u"Select clipping path", None),
-    68: ("ABORTPATH", u"Arbort path", None),
-    70: ("GDICOMMENT", u"GDI comment", parseGDIComment),
-    71: ("FILLRGN", u"Fill region", None),
-    72: ("FRAMERGN", u"Frame region", None),
-    73: ("INVERTRGN", u"Invert region", None),
-    74: ("PAINTRGN", u"Paint region", None),
-    75: ("EXTSELECTCLIPRGN", u"EXT select clipping region", None),
-    76: ("BITBLT", u"Bit blitting", None),
-    77: ("STRETCHBLT", u"Stretch blitting", None),
-    78: ("MASKBLT", u"Mask blitting", None),
-    79: ("PLGBLT", u"PLG blitting", None),
-    80: ("SETDIBITSTODEVICE", u"Set DIB bits to device", None),
-    81: ("STRETCHDIBITS", u"Stretch DIB bits", None),
-    82: ("EXTCREATEFONTINDIRECTW", u"EXT create font indirect W", None),
-    83: ("EXTTEXTOUTA", u"EXT text out A", None),
-    84: ("EXTTEXTOUTW", u"EXT text out W", None),
-    85: ("POLYBEZIER16", u"Draw poly bezier (16-bit)", None),
-    86: ("POLYGON16", u"Draw polygon (16-bit)", parsePoint16array),
-    87: ("POLYLINE16", u"Draw polyline (16-bit)", parsePoint16array),
-    88: ("POLYBEZIERTO16", u"Draw poly bezier to (16-bit)", parsePoint16array),
-    89: ("POLYLINETO16", u"Draw polyline to (16-bit)", parsePoint16array),
-    90: ("POLYPOLYLINE16", u"Draw poly polyline (16-bit)", None),
-    91: ("POLYPOLYGON16", u"Draw poly polygon (16-bit)", parsePoint16array),
-    92: ("POLYDRAW16", u"Draw poly draw (16-bit)", None),
-    93: ("CREATEMONOBRUSH", u"Create monobrush", None),
-    94: ("CREATEDIBPATTERNBRUSHPT", u"Create DIB pattern brush PT", None),
-    95: ("EXTCREATEPEN", u"EXT create pen", parseExtCreatePen),
-    96: ("POLYTEXTOUTA", u"Poly text out A", None),
-    97: ("POLYTEXTOUTW", u"Poly text out W", None),
-    98: ("SETICMMODE", u"Set ICM mode", parseICMMode),
-    99: ("CREATECOLORSPACE", u"Create color space", None),
-    100: ("SETCOLORSPACE", u"Set color space", None),
-    101: ("DELETECOLORSPACE", u"Delete color space", None),
-    102: ("GLSRECORD", u"GLS record", None),
-    103: ("GLSBOUNDEDRECORD", u"GLS bound ED record", None),
-    104: ("PIXELFORMAT", u"Pixel format", None),
+    1: ("HEADER", "Header", None),
+    2: ("POLYBEZIER", "Draw poly bezier", None),
+    3: ("POLYGON", "Draw polygon", None),
+    4: ("POLYLINE", "Draw polyline", None),
+    5: ("POLYBEZIERTO", "Draw poly bezier to", None),
+    6: ("POLYLINETO", "Draw poly line to", None),
+    7: ("POLYPOLYLINE", "Draw poly polyline", None),
+    8: ("POLYPOLYGON", "Draw poly polygon", None),
+    9: ("SETWINDOWEXTEX", "Set window extend EX", parseXY32),
+    10: ("SETWINDOWORGEX", "Set window origin EX", parseXY32),
+    11: ("SETVIEWPORTEXTEX", "Set viewport extend EX", parseXY32),
+    12: ("SETVIEWPORTORGEX", "Set viewport origin EX", parseXY32),
+    13: ("SETBRUSHORGEX", "Set brush org EX", None),
+    14: ("EOF", "End of file", None),
+    15: ("SETPIXELV", "Set pixel V", None),
+    16: ("SETMAPPERFLAGS", "Set mapper flags", None),
+    17: ("SETMAPMODE", "Set mapping mode", parseEmfMappingMode),
+    18: ("SETBKMODE", "Set background mode", None),
+    19: ("SETPOLYFILLMODE", "Set polyfill mode", None),
+    20: ("SETROP2", "Set ROP2", None),
+    21: ("SETSTRETCHBLTMODE", "Set stretching blitting mode", None),
+    22: ("SETTEXTALIGN", "Set text align", None),
+    23: ("SETCOLORADJUSTMENT", "Set color adjustment", None),
+    24: ("SETTEXTCOLOR", "Set text color", None),
+    25: ("SETBKCOLOR", "Set background color", None),
+    26: ("OFFSETCLIPRGN", "Offset clipping region", None),
+    27: ("MOVETOEX", "Move to EX", parseXY32),
+    28: ("SETMETARGN", "Set meta region", None),
+    29: ("EXCLUDECLIPRECT", "Exclude clipping rectangle", None),
+    30: ("INTERSECTCLIPRECT", "Intersect clipping rectangle", None),
+    31: ("SCALEVIEWPORTEXTEX", "Scale viewport extend EX", None),
+    32: ("SCALEWINDOWEXTEX", "Scale window extend EX", None),
+    33: ("SAVEDC", "Save device context", None),
+    34: ("RESTOREDC", "Restore device context", None),
+    35: ("SETWORLDTRANSFORM", "Set world transform", None),
+    36: ("MODIFYWORLDTRANSFORM", "Modify world transform", None),
+    37: ("SELECTOBJECT", "Select object", parseObjectID32),
+    38: ("CREATEPEN", "Create pen", None),
+    39: ("CREATEBRUSHINDIRECT", "Create brush indirect", parseBrushIndirect),
+    40: ("DELETEOBJECT", "Delete object", parseObjectID32),
+    41: ("ANGLEARC", "Draw angle arc", None),
+    42: ("ELLIPSE", "Draw ellipse", None),
+    43: ("RECTANGLE", "Draw rectangle", None),
+    44: ("ROUNDRECT", "Draw rounded rectangle", None),
+    45: ("ARC", "Draw arc", None),
+    46: ("CHORD", "Draw chord", None),
+    47: ("PIE", "Draw pie", None),
+    48: ("SELECTPALETTE", "Select palette", None),
+    49: ("CREATEPALETTE", "Create palette", None),
+    50: ("SETPALETTEENTRIES", "Set palette entries", None),
+    51: ("RESIZEPALETTE", "Resize palette", None),
+    52: ("REALIZEPALETTE", "Realize palette", None),
+    53: ("EXTFLOODFILL", "EXT flood fill", None),
+    54: ("LINETO", "Draw line to", parseXY32),
+    55: ("ARCTO", "Draw arc to", None),
+    56: ("POLYDRAW", "Draw poly draw", None),
+    57: ("SETARCDIRECTION", "Set arc direction", None),
+    58: ("SETMITERLIMIT", "Set miter limit", None),
+    59: ("BEGINPATH", "Begin path", None),
+    60: ("ENDPATH", "End path", None),
+    61: ("CLOSEFIGURE", "Close figure", None),
+    62: ("FILLPATH", "Fill path", None),
+    63: ("STROKEANDFILLPATH", "Stroke and fill path", None),
+    64: ("STROKEPATH", "Stroke path", None),
+    65: ("FLATTENPATH", "Flatten path", None),
+    66: ("WIDENPATH", "Widen path", None),
+    67: ("SELECTCLIPPATH", "Select clipping path", None),
+    68: ("ABORTPATH", "Arbort path", None),
+    70: ("GDICOMMENT", "GDI comment", parseGDIComment),
+    71: ("FILLRGN", "Fill region", None),
+    72: ("FRAMERGN", "Frame region", None),
+    73: ("INVERTRGN", "Invert region", None),
+    74: ("PAINTRGN", "Paint region", None),
+    75: ("EXTSELECTCLIPRGN", "EXT select clipping region", None),
+    76: ("BITBLT", "Bit blitting", None),
+    77: ("STRETCHBLT", "Stretch blitting", None),
+    78: ("MASKBLT", "Mask blitting", None),
+    79: ("PLGBLT", "PLG blitting", None),
+    80: ("SETDIBITSTODEVICE", "Set DIB bits to device", None),
+    81: ("STRETCHDIBITS", "Stretch DIB bits", None),
+    82: ("EXTCREATEFONTINDIRECTW", "EXT create font indirect W", None),
+    83: ("EXTTEXTOUTA", "EXT text out A", None),
+    84: ("EXTTEXTOUTW", "EXT text out W", None),
+    85: ("POLYBEZIER16", "Draw poly bezier (16-bit)", None),
+    86: ("POLYGON16", "Draw polygon (16-bit)", parsePoint16array),
+    87: ("POLYLINE16", "Draw polyline (16-bit)", parsePoint16array),
+    88: ("POLYBEZIERTO16", "Draw poly bezier to (16-bit)", parsePoint16array),
+    89: ("POLYLINETO16", "Draw polyline to (16-bit)", parsePoint16array),
+    90: ("POLYPOLYLINE16", "Draw poly polyline (16-bit)", None),
+    91: ("POLYPOLYGON16", "Draw poly polygon (16-bit)", parsePoint16array),
+    92: ("POLYDRAW16", "Draw poly draw (16-bit)", None),
+    93: ("CREATEMONOBRUSH", "Create monobrush", None),
+    94: ("CREATEDIBPATTERNBRUSHPT", "Create DIB pattern brush PT", None),
+    95: ("EXTCREATEPEN", "EXT create pen", parseExtCreatePen),
+    96: ("POLYTEXTOUTA", "Poly text out A", None),
+    97: ("POLYTEXTOUTW", "Poly text out W", None),
+    98: ("SETICMMODE", "Set ICM mode", parseICMMode),
+    99: ("CREATECOLORSPACE", "Create color space", None),
+    100: ("SETCOLORSPACE", "Set color space", None),
+    101: ("DELETECOLORSPACE", "Delete color space", None),
+    102: ("GLSRECORD", "GLS record", None),
+    103: ("GLSBOUNDEDRECORD", "GLS bound ED record", None),
+    104: ("PIXELFORMAT", "Pixel format", None),
 }
 EMF_META_NAME = createDict(EMF_META, 0)
 EMF_META_DESC = createDict(EMF_META, 1)
@@ -491,9 +491,9 @@ class WMF_File(Parser):
         "category": "image",
         "file_ext": ("wmf", "apm", "emf"),
         "mime": (
-            u"image/wmf", u"image/x-wmf", u"image/x-win-metafile",
-            u"application/x-msmetafile", u"application/wmf", u"application/x-wmf",
-            u"image/x-emf"),
+            "image/wmf", "image/x-wmf", "image/x-win-metafile",
+            "application/x-msmetafile", "application/wmf", "application/x-wmf",
+            "image/x-emf"),
         "magic": (
             (PlaceableHeader.MAGIC, 0),
             (EMF_Header.MAGIC, 40*8),
@@ -503,7 +503,7 @@ class WMF_File(Parser):
             ("\1\0\x09\0\0\3", 0),
         ),
         "min_size": 40*8,
-        "description": u"Microsoft Windows Metafile (WMF)",
+        "description": "Microsoft Windows Metafile (WMF)",
     }
     endian = LITTLE_ENDIAN
     FILE_TYPE = {0: "memory", 1: "disk"}
@@ -536,7 +536,7 @@ class WMF_File(Parser):
                 return "Invalid number of parameters"
 
         # Check first functions
-        for index in xrange(5):
+        for index in range(5):
             try:
                 func = self["func[%u]" % index]
             except MissingField:
@@ -588,17 +588,17 @@ class WMF_File(Parser):
 
     def createDescription(self):
         if self.isEMF():
-            return u"Microsoft Enhanced Metafile (EMF) picture"
+            return "Microsoft Enhanced Metafile (EMF) picture"
         elif self.isAPM():
-            return u"Aldus Placeable Metafile (APM) picture"
+            return "Aldus Placeable Metafile (APM) picture"
         else:
-            return u"Microsoft Windows Metafile (WMF) picture"
+            return "Microsoft Windows Metafile (WMF) picture"
 
     def createMimeType(self):
         if self.isEMF():
-            return u"image/x-emf"
+            return "image/x-emf"
         else:
-            return u"image/wmf"
+            return "image/wmf"
 
     def createContentSize(self):
         if self.isEMF():

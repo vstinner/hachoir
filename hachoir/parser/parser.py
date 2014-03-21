@@ -76,9 +76,9 @@ class HachoirParser(object):
                 self._description = self.createDescription()
                 if isinstance(self._description, str):
                     self._description = makeUnicode(self._description)
-            except HACHOIR_ERRORS, err:
+            except HACHOIR_ERRORS as err:
                 error("Error getting description of %s: %s" \
-                    % (self.path, unicode(err)))
+                    % (self.path, str(err)))
                 self._description = self.PARSER_TAGS["description"]
         return self._description
     description = property(_getDescription,
@@ -88,13 +88,13 @@ class HachoirParser(object):
         if not self._mime_type:
             try:
                 self._mime_type = self.createMimeType()
-            except HACHOIR_ERRORS, err:
-                self.error("Error when creating MIME type: %s" % unicode(err))
+            except HACHOIR_ERRORS as err:
+                self.error("Error when creating MIME type: %s" % str(err))
             if not self._mime_type \
             and self.createMimeType != Parser.createMimeType:
                 self._mime_type = Parser.createMimeType(self)
             if not self._mime_type:
-                self._mime_type = u"application/octet-stream"
+                self._mime_type = "application/octet-stream"
         return self._mime_type
     mime_type = property(_getMimeType)
 
@@ -104,7 +104,7 @@ class HachoirParser(object):
         if not hasattr(self, "_content_size"):
             try:
                 self._content_size = self.createContentSize()
-            except HACHOIR_ERRORS, err:
+            except HACHOIR_ERRORS as err:
                 error("Unable to compute %s content size: %s" % (self.__class__.__name__, err))
                 self._content_size = None
         return self._content_size
@@ -136,14 +136,14 @@ class HachoirParser(object):
     @classmethod
     def print_(cls, out, verbose):
         tags = cls.getParserTags()
-        print >>out, "- %s: %s" % (tags["id"], tags["description"])
+        print("- %s: %s" % (tags["id"], tags["description"]), file=out)
         if verbose:
             if "mime" in tags:
-                print >>out, "  MIME type: %s" % (", ".join(tags["mime"]))
+                print("  MIME type: %s" % (", ".join(tags["mime"])), file=out)
             if "file_ext" in tags:
                 file_ext = ", ".join(
                     ".%s" % file_ext for file_ext in tags["file_ext"])
-                print >>out, "  File extension: %s" % file_ext
+                print("  File extension: %s" % file_ext, file=out)
 
     autofix = property(lambda self: self._autofix and config.autofix)
 

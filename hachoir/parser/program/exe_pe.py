@@ -70,8 +70,8 @@ class SectionHeader(FieldSet):
             name = str(self["name"].value.strip("."))
             if name:
                 return "section_%s" % name
-        except HACHOIR_ERRORS, err:
-            self.warning(unicode(err))
+        except HACHOIR_ERRORS as err:
+            self.warning(str(err))
         return "section[]"
 
 class DataDirectory(FieldSet):
@@ -89,29 +89,29 @@ class DataDirectory(FieldSet):
 class PE_Header(FieldSet):
     static_size = 24*8
     cpu_name = {
-        0x0184: u"Alpha AXP",
-        0x01c0: u"ARM",
-        0x014C: u"Intel 80386",
-        0x014D: u"Intel 80486",
-        0x014E: u"Intel Pentium",
-        0x0200: u"Intel IA64",
-        0x0268: u"Motorola 68000",
-        0x0266: u"MIPS",
-        0x0284: u"Alpha AXP 64 bits",
-        0x0366: u"MIPS with FPU",
-        0x0466: u"MIPS16 with FPU",
-        0x01f0: u"PowerPC little endian",
-        0x0162: u"R3000",
-        0x0166: u"MIPS little endian (R4000)",
-        0x0168: u"R10000",
-        0x01a2: u"Hitachi SH3",
-        0x01a6: u"Hitachi SH4",
-        0x0160: u"R3000 (MIPS), big endian",
-        0x0162: u"R3000 (MIPS), little endian",
-        0x0166: u"R4000 (MIPS), little endian",
-        0x0168: u"R10000 (MIPS), little endian",
-        0x0184: u"DEC Alpha AXP",
-        0x01F0: u"IBM Power PC, little endian",
+        0x0184: "Alpha AXP",
+        0x01c0: "ARM",
+        0x014C: "Intel 80386",
+        0x014D: "Intel 80486",
+        0x014E: "Intel Pentium",
+        0x0200: "Intel IA64",
+        0x0268: "Motorola 68000",
+        0x0266: "MIPS",
+        0x0284: "Alpha AXP 64 bits",
+        0x0366: "MIPS with FPU",
+        0x0466: "MIPS16 with FPU",
+        0x01f0: "PowerPC little endian",
+        0x0162: "R3000",
+        0x0166: "MIPS little endian (R4000)",
+        0x0168: "R10000",
+        0x01a2: "Hitachi SH3",
+        0x01a6: "Hitachi SH4",
+        0x0160: "R3000 (MIPS), big endian",
+        0x0162: "R3000 (MIPS), little endian",
+        0x0166: "R4000 (MIPS), little endian",
+        0x0168: "R10000 (MIPS), little endian",
+        0x0184: "DEC Alpha AXP",
+        0x01F0: "IBM Power PC, little endian",
     }
 
     def createFields(self):
@@ -144,19 +144,19 @@ class PE_Header(FieldSet):
 
 class PE_OptHeader(FieldSet):
     SUBSYSTEM_NAME = {
-         1: u"Native",
-         2: u"Windows GUI",
-         3: u"Windows CUI",
-         5: u"OS/2 CUI",
-         7: u"POSIX CUI",
-         8: u"Native Windows",
-         9: u"Windows CE GUI",
-        10: u"EFI application",
-        11: u"EFI boot service driver",
-        12: u"EFI runtime driver",
-        13: u"EFI ROM",
-        14: u"XBOX",
-        16: u"Windows boot application",
+         1: "Native",
+         2: "Windows GUI",
+         3: "Windows CUI",
+         5: "OS/2 CUI",
+         7: "POSIX CUI",
+         8: "Native Windows",
+         9: "Windows CE GUI",
+        10: "EFI application",
+        11: "EFI boot service driver",
+        12: "EFI runtime driver",
+        13: "EFI ROM",
+        14: "XBOX",
+        16: "Windows boot application",
     }
     DIRECTORY_NAME = {
          0: "export",
@@ -207,7 +207,7 @@ class PE_OptHeader(FieldSet):
         yield filesizeHandler(UInt32(self, "size_heap_commit"))
         yield UInt32(self, "loader_flags")
         yield UInt32(self, "nb_directory", "Number of RVA and sizes")
-        for index in xrange(self["nb_directory"].value):
+        for index in range(self["nb_directory"].value):
             try:
                 name = self.DIRECTORY_NAME[index]
             except KeyError:

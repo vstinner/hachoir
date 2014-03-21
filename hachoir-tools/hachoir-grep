@@ -17,10 +17,10 @@ import sys
 
 def displayVersion(*args):
     import hachoir.core
-    print _("Hachoir grep version %s") % __version__
-    print _("Hachoir library version %s") % hachoir.core.__version__
-    print
-    print _("Website: %s/wiki/hachoir-grep") % hachoir.core.WEBSITE
+    print(_("Hachoir grep version %s") % __version__)
+    print(_("Hachoir library version %s") % hachoir.core.__version__)
+    print()
+    print(_("Website: %s/wiki/hachoir-grep") % hachoir.core.WEBSITE)
     sys.exit(0)
 
 def countChildren(field_set):
@@ -32,8 +32,8 @@ def countChildren(field_set):
     return count
 
 def displayParserStat(parser):
-    print "Parser: %s children" % \
-        (countChildren(parser))
+    print("Parser: %s children" % \
+        (countChildren(parser)))
 
 def parseOptions():
     parser = OptionParser(usage="%prog [options] pattern filename [filename2 ...]")
@@ -71,7 +71,7 @@ def parseOptions():
         if len(arguments) < 2:
             parser.print_help()
             sys.exit(1)
-        pattern = unicode(arguments[0], "ascii")
+        pattern = str(arguments[0], "ascii")
         filenames = arguments[1:]
     return values, pattern, filenames
 
@@ -141,13 +141,13 @@ class ConsoleGrep(Grep):
             sys.stdout.flush()
             sys.stderr.write("[%02.1f%%] " % percent)
             sys.stderr.flush()
-        print text
+        print(text)
 
     def searchFile(self, filename, pattern, case_sensitive=True):
         self.filename, realname = unicodeFilename(filename), filename
         try:
             self.parser = createParser(self.filename, real_filename=realname)
-        except InputStreamError, err:
+        except InputStreamError as err:
             error("Unable to open file: %s" % err)
             sys.exit(1)
         if not self.parser:
@@ -159,7 +159,7 @@ class ConsoleGrep(Grep):
         self.pattern = pattern
         try:
             self.grep(self.parser)
-        except IOError, err:
+        except IOError as err:
             if err[0] == errno.EPIPE:
                 # Ignore broken PIPE error
                 return
@@ -187,7 +187,7 @@ def main():
         else:
             runGrep(values, pattern, filenames)
     except KeyboardInterrupt:
-        print _("Program interrupted (CTRL+C).")
+        print(_("Program interrupted (CTRL+C)."))
         sys.exit(1)
 
 if __name__ == "__main__":

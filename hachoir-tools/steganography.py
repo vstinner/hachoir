@@ -89,8 +89,8 @@ class MpegAudioInjecter(Injecter):
         count = 30
         self.packet_size = 3
         data = "\0" * (self.packet_size * count - 1)
-        print "Packet size: %s" % self.packet_size
-        print "Check input message"
+        print("Packet size: %s" % self.packet_size)
+        print("Check input message")
         if "\xff" in data:
             raise InjecterError("Sorry, MPEG audio injecter disallows 0xFF byte")
 
@@ -100,14 +100,14 @@ class MpegAudioInjecter(Injecter):
 #            raise InjecterError("Message is too big (max: %s, want: %s)" % \
 #                (maxbytes, len(data)))
 
-        print "Inject message"
+        print("Inject message")
         field_index = 0
         index = 0
         output = self.frames
         while index < len(data):
             padding = data[index:index + self.packet_size]
             name = "frame[%u]" % field_index
-            print "Insert %s before %s" % (len(padding), name)
+            print("Insert %s before %s" % (len(padding), name))
             output.insertAfter(name,  EditableString(output, "padding[]", "fixed", padding) )
             index += self.packet_size
             field_index += 2
@@ -124,10 +124,10 @@ injecter_cls = {
 
 def main():
     if len(argv) != 2:
-        print >>stderr, "usage: %s music.mp3" % argv[0]
+        print("usage: %s music.mp3" % argv[0], file=stderr)
         exit(1)
 
-    filename = unicode(argv[1])
+    filename = str(argv[1])
     editor = createEditor(filename)
 #    injecter = injecter_cls[editor.input.__class__]
     injecter = MpegAudioInjecter(editor, packet_size=16)
@@ -138,18 +138,18 @@ def main():
             stdout.write(data)
             exit(0)
         else:
-            print >>stderr, "No data"
+            print("No data", file=stderr)
             exit(1)
     else:
         out_filename = filename + ".msg"
-        print "Write your message and valid with CTRL+D:"
+        print("Write your message and valid with CTRL+D:")
         stdout.flush()
         data = stdin.read()
 
-        print "Hide message"
+        print("Hide message")
         injecter.write(data)
 
-        print "Write ouput into: %s" % out_filename
+        print("Write ouput into: %s" % out_filename)
         injecter.saveInto(out_filename)
 
 if __name__ == "__main__":

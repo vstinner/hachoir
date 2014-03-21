@@ -97,7 +97,7 @@ class BasicIFDEntry(FieldSet):
             else:
                 if count > 1:
                     name += "[]"
-                for i in xrange(count):
+                for i in range(count):
                     yield self.value_cls(self, name)
             if totalsize < 32:
                 yield NullBits(self, "padding", 32-totalsize)
@@ -322,10 +322,10 @@ class IFD(SeekableFieldSet):
         count = self["count"].value
         if count == 0:
             raise ParserError("IFDs cannot be empty.")
-        for i in xrange(count):
+        for i in range(count):
             yield self.EntryClass(self, "entry[]")
         yield UInt32(self, "next", "Offset to next IFD")
-        for i in xrange(count):
+        for i in range(count):
             entry = self['entry[%d]'%i]
             if 'offset' not in entry:
                 continue
@@ -337,7 +337,7 @@ class IFD(SeekableFieldSet):
             else:
                 if count > 1:
                     name += "[]"
-                for i in xrange(count):
+                for i in range(count):
                     yield entry.value_cls(self, name)
 
     def getEntryValues(self, entry):

@@ -14,6 +14,7 @@ from hachoir.core.field import (StaticFieldSet, FieldSet,
 from hachoir.core.text_handler import textHandler, filesizeHandler, hexadecimal
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.parser.common.msdos import MSDOSFileAttr32
+import collections
 
 MAX_FILESIZE = 1000 * 1024 * 1024
 
@@ -151,7 +152,7 @@ class ExtTime(FieldSet):
     def createFields(self):
         yield textHandler(UInt16(self, "time_flags", "Flags for extended time"), hexadecimal)
         flags = self["time_flags"].value
-        for index in xrange(4):
+        for index in range(4):
             rmode = flags >> ((3-index)*4)
             if rmode & 8:
                 if index:
@@ -255,7 +256,7 @@ class Block(FieldSet):
         t = self["block_type"].value
         if t in self.BLOCK_INFO:
             self._name, desc, parseFlags, parseHeader, parseBody = self.BLOCK_INFO[t]
-            if callable(desc):
+            if isinstance(desc, collections.Callable):
                 self.createDescription = lambda: desc(self)
             elif desc:
                 self._description = desc
@@ -326,7 +327,7 @@ class RarFile(Parser):
         "id": "rar",
         "category": "archive",
         "file_ext": ("rar",),
-        "mime": (u"application/x-rar-compressed", ),
+        "mime": ("application/x-rar-compressed", ),
         "min_size": 7*8,
         "magic": ((MAGIC, 0),),
         "description": "Roshal archive (RAR)",

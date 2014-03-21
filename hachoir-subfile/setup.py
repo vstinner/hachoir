@@ -25,7 +25,7 @@ import sys
 def main():
     # Check Python version!
     if sys.hexversion < 0x2040000:
-        print "Sorry, you need Python 2.4 or greater to run (install) hachoir-subfile!"
+        print("Sorry, you need Python 2.4 or greater to run (install) hachoir-subfile!")
         sys.exit(1)
 
     if "--setuptools" in sys.argv:
@@ -47,7 +47,7 @@ def main():
         "author": AUTHORS,
         "description": DESCRIPTION,
         "classifiers": CLASSIFIERS,
-        "packages": PACKAGES.keys(),
+        "packages": list(PACKAGES.keys()),
         "package_dir": PACKAGES,
         "long_description": open('README').read(),
         "scripts": ["hachoir-subfile"],

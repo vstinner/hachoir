@@ -61,7 +61,7 @@ def parseInt64(parent):
 
 def parseLong(parent):
     yield Int32(parent, "digit_count")
-    for index in xrange( abs(parent["digit_count"].value) ):
+    for index in range( abs(parent["digit_count"].value) ):
         yield UInt16(parent, "digit[]")
 
 
@@ -84,7 +84,7 @@ def parseTuple(parent):
     count = parent["count"].value
     if count < 0:
         raise ParserError("Invalid tuple/list count")
-    for index in xrange(count):
+    for index in range(count):
         yield Object(parent, "item[]")
 
 def createTupleDesc(parent):
@@ -219,7 +219,7 @@ class Object(FieldSet):
         is_negative = self["digit_count"].value < 0
         count = abs(self["digit_count"].value)
         total = 0
-        for index in xrange(count-1, -1, -1):
+        for index in range(count-1, -1, -1):
             total <<= 15
             total += self["digit[%u]" % index].value
         if is_negative:
@@ -323,7 +323,7 @@ class PythonCompiledFile(Parser):
     # to a Python version string (eg. "m\xf2\r\n" => "2.4b1")
     STR_MAGIC = dict( \
         (long2raw(magic | (ord('\r')<<16) | (ord('\n')<<24), LITTLE_ENDIAN), value[0]) \
-        for magic, value in MAGIC.iteritems())
+        for magic, value in MAGIC.items())
 
     def validate(self):
         signature = self.stream.readBits(0, 16, self.endian)

@@ -13,10 +13,10 @@ from hachoir.metadata.register import registerAllItems
 extractors = {}
 
 class Metadata(Logger):
-    header = u"Metadata"
+    header = "Metadata"
 
     def __init__(self, parent, quality=QUALITY_NORMAL):
-        assert isinstance(self.header, unicode)
+        assert isinstance(self.header, str)
 
         # Limit to 0.0 .. 1.0
         if parent:
@@ -115,7 +115,7 @@ class Metadata(Logger):
         self.__data[data.key] = data
 
     def __iter__(self):
-        return self.__data.itervalues()
+        return iter(self.__data.values())
 
     def __str__(self):
         r"""
@@ -149,7 +149,7 @@ class Metadata(Logger):
         """
         return "\n".join(self.exportPlaintext())
 
-    def exportPlaintext(self, priority=None, human=True, line_prefix=u"- ", title=None):
+    def exportPlaintext(self, priority=None, human=True, line_prefix="- ", title=None):
         r"""
         Convert metadata to multi-line Unicode string and skip datas
         with priority lower than specified priority.
@@ -197,8 +197,8 @@ class Metadata(Logger):
         else:
             return None
 
-    def __nonzero__(self):
-        return any(item for item in self.__data.itervalues())
+    def __bool__(self):
+        return any(item for item in self.__data.values())
 
 class RootMetadata(Metadata):
     def __init__(self, quality=QUALITY_NORMAL):
@@ -218,9 +218,9 @@ class MultipleMetadata(RootMetadata):
         return self.__groups[key]
 
     def iterGroups(self):
-        return self.__groups.itervalues()
+        return iter(self.__groups.values())
 
-    def __nonzero__(self):
+    def __bool__(self):
         if RootMetadata.__nonzero__(self):
             return True
         return any(bool(group) for group in self.__groups)
@@ -246,13 +246,13 @@ class MultipleMetadata(RootMetadata):
         self.__groups.append(key, metadata)
         return True
 
-    def exportPlaintext(self, priority=None, human=True, line_prefix=u"- "):
+    def exportPlaintext(self, priority=None, human=True, line_prefix="- "):
         common = Metadata.exportPlaintext(self, priority, human, line_prefix)
         if common:
             text = common
         else:
             text = []
-        for key, metadata in self.__groups.iteritems():
+        for key, metadata in self.__groups.items():
             if not human:
                 title = key
             else:
@@ -282,8 +282,8 @@ def extractMetadata(parser, quality=QUALITY_NORMAL):
     metadata = extractor(quality)
     try:
         metadata.extract(parser)
-    except HACHOIR_ERRORS, err:
-        error("Error during metadata extraction: %s" % unicode(err))
+    except HACHOIR_ERRORS as err:
+        error("Error during metadata extraction: %s" % str(err))
     if metadata:
         metadata.mime_type = parser.mime_type
         metadata.endian = endian_name[parser.endian]

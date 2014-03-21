@@ -6,12 +6,12 @@ import hachoir.core.i18n   # import it because it does change the locale
 from locale import setlocale, LC_ALL
 
 def testDoc(filename, name=None):
-    print "--- %s: Run tests" % filename
+    print("--- %s: Run tests" % filename)
     failure, nb_test = doctest.testfile(
         filename, optionflags=doctest.ELLIPSIS, name=name)
     if failure:
         sys.exit(1)
-    print "--- %s: End of tests" % filename
+    print("--- %s: End of tests" % filename)
 
 def importModule(name):
     mod = __import__(name)
@@ -21,12 +21,12 @@ def importModule(name):
     return mod
 
 def testModule(name):
-    print "--- Test module %s" % name
+    print("--- Test module %s" % name)
     module = importModule(name)
     failure, nb_test = doctest.testmod(module)
     if failure:
         sys.exit(1)
-    print "--- End of test"
+    print("--- End of test")
 
 def main():
     setlocale(LC_ALL, "C")

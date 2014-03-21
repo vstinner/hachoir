@@ -42,7 +42,7 @@ except ImportError:
 
 UNIT_NAME = {1: "Meter"}
 COMPRESSION_NAME = {
-    0: u"deflate" # with 32K sliding window
+    0: "deflate" # with 32K sliding window
 }
 MAX_CHUNK_SIZE = 5 * 1024 * 1024 # Maximum chunk size (5 MB)
 
@@ -67,7 +67,7 @@ def paletteParse(parent):
     if (size % 3) != 0:
         raise ParserError("Palette have invalid size (%s), should be 3*n!" % size)
     nb_colors = size // 3
-    for index in xrange(nb_colors):
+    for index in range(nb_colors):
         yield RGB(parent, "color[]")
 
 def paletteDescription(parent):
@@ -88,9 +88,9 @@ def textParse(parent):
 
 def textDescription(parent):
     if "text" in parent:
-        return u'Text: %s' % parent["text"].display
+        return 'Text: %s' % parent["text"].display
     else:
-        return u'Text'
+        return 'Text'
 
 def timestampParse(parent):
     yield UInt16(parent, "year", "Year")
@@ -230,7 +230,7 @@ class PngFile(Parser):
         "id": "png",
         "category": "image",
         "file_ext": ("png",),
-        "mime": (u"image/png", u"image/x-png"),
+        "mime": ("image/png", "image/x-png"),
         "min_size": 8*8, # just the identifier
         "magic": [('\x89PNG\r\n\x1A\n', 0)],
         "description": "Portable Network Graphics (PNG) picture"

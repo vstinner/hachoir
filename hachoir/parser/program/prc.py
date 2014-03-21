@@ -48,8 +48,8 @@ class PRCFile(Parser):
         "file_ext": ("prc", ""),
         "min_size": ResourceHeader.static_size,  # At least one program header
         "mime": (
-            u"application/x-pilot-prc",
-            u"application/x-palmpilot"),
+            "application/x-pilot-prc",
+            "application/x-palmpilot"),
         "description": "Palm Resource File"
     }
     endian = BIG_ENDIAN
@@ -64,7 +64,7 @@ class PRCFile(Parser):
         lens = []
         firstOne = True
         poff = 0
-        for index in xrange(self["header/num_records"].value):
+        for index in range(self["header/num_records"].value):
             r = ResourceHeader(self, "res_header[]")
             if firstOne:
                 firstOne = False

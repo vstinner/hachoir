@@ -13,6 +13,7 @@ from hachoir.core.field import (FieldSet,
     RawBytes, String, GenericVector, ParserError)
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal
+import collections
 
 MAX_ENVPOINTS = 32
 
@@ -41,13 +42,13 @@ class Command(FieldSet):
 class MidiSFXExt(FieldSet):
     static_size = 16*32*8
     def createFields(self):
-        for index in xrange(16):
+        for index in range(16):
             yield Command(self, "command[]")
 
 class MidiZXXExt(FieldSet):
     static_size = 128*32*8
     def createFields(self):
-        for index in xrange(128):
+        for index in range(128):
             yield Command(self, "command[]")
 
 def parseMidiConfig(parser):
@@ -255,7 +256,7 @@ class ModplugBlock(FieldSet):
         self.has_size = False
         if t in self.BLOCK_INFO:
             self._name, self.has_size, desc, parseBlock = self.BLOCK_INFO[t]
-            if callable(desc):
+            if isinstance(desc, collections.Callable):
                 self.createDescription = lambda: desc(self)
             if parseBlock:
                 self.parseBlock = lambda: parseBlock(self)

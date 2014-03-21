@@ -18,10 +18,10 @@ from hachoir.core.endian import NETWORK_ENDIAN
 class XcfCompression(FieldSet):
     static_size = 8
     COMPRESSION_NAME = {
-        0: u"None",
-        1: u"RLE",
-        2: u"Zlib",
-        3: u"Fractal"
+        0: "None",
+        1: "RLE",
+        2: "Zlib",
+        3: "Fractal"
     }
 
     def createFields(self):
@@ -45,29 +45,29 @@ class LayerOffsets(StaticFieldSet):
 class LayerMode(FieldSet):
     static_size = 32
     MODE_NAME = {
-         0: u"Normal",
-         1: u"Dissolve",
-         2: u"Behind",
-         3: u"Multiply",
-         4: u"Screen",
-         5: u"Overlay",
-         6: u"Difference",
-         7: u"Addition",
-         8: u"Subtract",
-         9: u"Darken only",
-        10: u"Lighten only",
-        11: u"Hue",
-        12: u"Saturation",
-        13: u"Color",
-        14: u"Value",
-        15: u"Divide",
-        16: u"Dodge",
-        17: u"Burn",
-        18: u"Hard light",
-        19: u"Soft light",
-        20: u"Grain extract",
-        21: u"Grain merge",
-        22: u"Color erase"
+         0: "Normal",
+         1: "Dissolve",
+         2: "Behind",
+         3: "Multiply",
+         4: "Screen",
+         5: "Overlay",
+         6: "Difference",
+         7: "Addition",
+         8: "Subtract",
+         9: "Darken only",
+        10: "Lighten only",
+        11: "Hue",
+        12: "Saturation",
+        13: "Color",
+        14: "Value",
+        15: "Divide",
+        16: "Dodge",
+        17: "Burn",
+        18: "Hard light",
+        19: "Soft light",
+        20: "Grain extract",
+        21: "Grain merge",
+        22: "Color erase"
     }
 
     def createFields(self):
@@ -181,33 +181,33 @@ class XcfProperty(FieldSet):
     PROP_RESOLUTION = 19
     PROP_PARASITES = 21
     TYPE_NAME = {
-         0: u"End",
-         1: u"Colormap",
-         2: u"Active layer",
-         3: u"Active channel",
-         4: u"Selection",
-         5: u"Floating selection",
-         6: u"Opacity",
-         7: u"Mode",
-         8: u"Visible",
-         9: u"Linked",
-        10: u"Lock alpha",
-        11: u"Apply mask",
-        12: u"Edit mask",
-        13: u"Show mask",
-        14: u"Show masked",
-        15: u"Offsets",
-        16: u"Color",
-        17: u"Compression",
-        18: u"Guides",
-        19: u"Resolution",
-        20: u"Tattoo",
-        21: u"Parasites",
-        22: u"Unit",
-        23: u"Paths",
-        24: u"User unit",
-        25: u"Vectors",
-        26: u"Text layer flags",
+         0: "End",
+         1: "Colormap",
+         2: "Active layer",
+         3: "Active channel",
+         4: "Selection",
+         5: "Floating selection",
+         6: "Opacity",
+         7: "Mode",
+         8: "Visible",
+         9: "Linked",
+        10: "Lock alpha",
+        11: "Apply mask",
+        12: "Edit mask",
+        13: "Show mask",
+        14: "Show masked",
+        15: "Offsets",
+        16: "Color",
+        17: "Compression",
+        18: "Guides",
+        19: "Resolution",
+        20: "Tattoo",
+        21: "Parasites",
+        22: "Unit",
+        23: "Paths",
+        24: "User unit",
+        25: "Vectors",
+        26: "Text layer flags",
     }
 
     handler = {
@@ -258,7 +258,7 @@ class XcfFile(Parser):
         "id": "xcf",
         "category": "image",
         "file_ext": ("xcf",),
-        "mime": (u"image/x-xcf", u"application/x-gimp-image"),
+        "mime": ("image/x-xcf", "application/x-gimp-image"),
         "min_size": (26 + 8 + 4 + 4)*8, # header+empty property+layer offset+channel offset
         "magic": (
             ('gimp xcf file\0', 0),
@@ -268,9 +268,9 @@ class XcfFile(Parser):
     }
     endian = NETWORK_ENDIAN
     IMAGE_TYPE_NAME = {
-        0: u"RGB",
-        1: u"Gray",
-        2: u"Indexed"
+        0: "RGB",
+        1: "Gray",
+        2: "Indexed"
     }
 
     def validate(self):

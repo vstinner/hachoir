@@ -89,7 +89,7 @@ class Dict(object):
         'two': 'deux'
         'one': 'un'
         """
-        for index in xrange(len(self)):
+        for index in range(len(self)):
             yield (self._key_list[index], self._value_list[index])
 
     def itervalues(self):
@@ -144,13 +144,13 @@ class Dict(object):
         del self._key_list[index]
 
         # First loop which may alter self._index
-        for key, item_index in self._index.iteritems():
+        for key, item_index in self._index.items():
             if item_index == index:
                 del self._index[key]
                 break
 
         # Second loop update indexes
-        for key, item_index in self._index.iteritems():
+        for key, item_index in self._index.items():
             if index < item_index:
                 self._index[key] -= 1
 
@@ -170,7 +170,7 @@ class Dict(object):
             index += len(self._value_list)
         if not(0 <= index <= len(self._value_list)):
             raise IndexError(_("Insert error: index '%s' is invalid") % _index)
-        for item_key, item_index in self._index.iteritems():
+        for item_key, item_index in self._index.items():
             if item_index >= index:
                 self._index[item_key] += 1
         self._index[key] = index
@@ -178,6 +178,6 @@ class Dict(object):
         self._value_list.insert(index, value)
 
     def __repr__(self):
-        items = ( "%r: %r" % (key, value) for key, value in self.iteritems() )
+        items = ( "%r: %r" % (key, value) for key, value in self.items() )
         return "{%s}" % ", ".join(items)
 

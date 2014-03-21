@@ -61,7 +61,7 @@ def main():
         "author": AUTHORS,
         "description": DESCRIPTION,
         "classifiers": CLASSIFIERS,
-        "packages": PACKAGES.keys(),
+        "packages": list(PACKAGES.keys()),
         "package_dir": PACKAGES,
         "long_description": open('README').read(),
     }

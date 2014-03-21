@@ -50,7 +50,7 @@ class RootEntry(OLE2FragmentParser):
         chain = ole2.getChain(property["start"].value, ole2.ss_fat)
         while True:
             try:
-                block = chain.next()
+                block = next(chain)
                 contiguous = False
                 if first is None:
                     first = block
@@ -99,7 +99,7 @@ class FragmentGroup:
         # FIXME: Use smarter code to send arguments
         self.args["ole2"] = self.items[0].root
         tags = {"class": self.parser, "args": self.args}
-        tags = tags.iteritems()
+        tags = iter(tags.items())
         return StringInputStream(data, "<fragment group>", tags=tags)
 
 class CustomFragment(FieldSet):
@@ -756,20 +756,20 @@ class ThumbsCatalog(OLE2FragmentParser):
         yield UInt32(self, "count")
         yield UInt32(self, "unknown[]")
         yield UInt32(self, "unknown[]")
-        for i in xrange(self['count'].value):
+        for i in range(self['count'].value):
             yield ThumbsCatalog.ThumbsEntry(self, "entry[]")
 
 PROPERTY_NAME = {
-    u"Root Entry": ("root",RootEntry),
-    u"\5DocumentSummaryInformation": ("doc_summary",Summary),
-    u"\5SummaryInformation": ("summary",Summary),
-    u"\1CompObj": ("compobj",CompObj),
-    u"Pictures": ("pictures",Pictures),
-    u"PowerPoint Document": ("powerpointdoc",PowerPointDocument),
-    u"Current User": ("current_user",CurrentUser),
-    u"Workbook": ("workbook",ExcelWorkbook),
-    u"Catalog": ("catalog",ThumbsCatalog),
-    u"WordDocument": ("word_doc",WordDocumentParser),
-    u"0Table": ("table0",WordTableParser),
-    u"1Table": ("table1",WordTableParser),
+    "Root Entry": ("root",RootEntry),
+    "\5DocumentSummaryInformation": ("doc_summary",Summary),
+    "\5SummaryInformation": ("summary",Summary),
+    "\1CompObj": ("compobj",CompObj),
+    "Pictures": ("pictures",Pictures),
+    "PowerPoint Document": ("powerpointdoc",PowerPointDocument),
+    "Current User": ("current_user",CurrentUser),
+    "Workbook": ("workbook",ExcelWorkbook),
+    "Catalog": ("catalog",ThumbsCatalog),
+    "WordDocument": ("word_doc",WordDocumentParser),
+    "0Table": ("table0",WordTableParser),
+    "1Table": ("table1",WordTableParser),
 }

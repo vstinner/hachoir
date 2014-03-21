@@ -46,7 +46,7 @@ class Log:
             else:
                 self.__file = codecs.open(filename, "w", "utf-8")
             self._writeIntoFile(_("Starting Hachoir"))
-        except IOError, err:
+        except IOError as err:
             if err.errno == 2:
                 self.__file = None
                 self.info(_("[Log] setFilename(%s) fails: no such file") % filename)
@@ -55,7 +55,7 @@ class Log:
 
     def _writeIntoFile(self, message):
         timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-        self.__file.write(u"%s - %s\n" % (timestamp, message))
+        self.__file.write("%s - %s\n" % (timestamp, message))
         self.__file.flush()
 
     def newMessage(self, level, text, ctxt=None):
@@ -88,7 +88,7 @@ class Log:
 
         # Add message to log buffer
         if self.use_buffer:
-            if not self.__buffer.has_key(level):
+            if level not in self.__buffer:
                 self.__buffer[level] = [text]
             else:
                 self.__buffer[level].append(text)

@@ -108,16 +108,16 @@ class DIFat(SeekableFieldSet):
         self.count=db_count
 
     def createFields(self):
-        for index in xrange(NB_DIFAT):
+        for index in range(NB_DIFAT):
             yield SECT(self, "index[%u]" % index)
 
         difat_sect = self.start
         index = NB_DIFAT
         entries_per_sect = self.parent.sector_size / 32 - 1
-        for ctr in xrange(self.count):
+        for ctr in range(self.count):
             # this is relative to real DIFAT start
             self.seekBit(NB_DIFAT*SECT.static_size + self.parent.sector_size*difat_sect)
-            for sect_index in xrange(entries_per_sect):
+            for sect_index in range(entries_per_sect):
                 yield SECT(self, "index[%u]" % (index+sect_index))
             index += entries_per_sect
             next = SECT(self, "difat[%u]" % ctr)
@@ -154,7 +154,7 @@ class SectFat(FieldSet):
         self.start = start
 
     def createFields(self):
-        for i in xrange(self.start, self.start + self.count):
+        for i in range(self.start, self.start + self.count):
             yield SECT(self, "index[%u]" % i)
 
 class OLE2_File(HachoirParser, RootSeekableFieldSet):
@@ -169,9 +169,9 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
             "msi",                       # Windows installer
         ),
         "mime": (
-            u"application/msword",
-            u"application/msexcel",
-            u"application/mspowerpoint",
+            "application/msword",
+            "application/msexcel",
+            "application/mspowerpoint",
         ),
         "min_size": 512*8,
         "description": "Microsoft Office document",
@@ -228,7 +228,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
         self.properties = []
         for block in chain:
             self.seekBlock(block)
-            for index in xrange(prop_per_sector):
+            for index in range(prop_per_sector):
                 property = Property(self, "property[]")
                 yield property
                 self.properties.append(property)
@@ -259,7 +259,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
         chain = self.getChain(property["start"].value)
         while True:
             try:
-                block = chain.next()
+                block = next(chain)
                 contiguous = False
                 if first is None:
                     first = block
@@ -312,7 +312,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
             index = block // items_per_fat
             try:
                 block = fat[index]["index[%u]" % block].value
-            except LookupError, err:
+            except LookupError as err:
                 break
 
     def readBFAT(self):

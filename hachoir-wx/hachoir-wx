@@ -24,9 +24,9 @@ def parseOptions():
     return values, filename
 
 def main():
-    print "%s version %s" % (PACKAGE, VERSION)
-    print WEBSITE
-    print
+    print("%s version %s" % (PACKAGE, VERSION))
+    print(WEBSITE)
+    print()
     values, filename = parseOptions()
     configureHachoir(values)
     app = app_t(filename)

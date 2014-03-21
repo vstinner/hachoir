@@ -35,7 +35,7 @@ class Polygon(StaticFieldSet):
 
 def readMapList(parent):
     yield UInt16(parent, "count", "Map count")
-    for index in xrange(parent["count"].value):
+    for index in range(parent["count"].value):
         yield MapUV(parent, "map_uv[]", "Mapping UV")
 
 def readColor(parent):
@@ -159,7 +159,7 @@ class File3ds(Parser):
         "id": "3ds",
         "category": "misc",
         "file_ext": ("3ds",),
-        "mime": (u"image/x-3ds",),
+        "mime": ("image/x-3ds",),
         "min_size": 16*8,
         "description": "3D Studio Max model"
     }

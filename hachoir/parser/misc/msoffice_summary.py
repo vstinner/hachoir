@@ -273,7 +273,7 @@ class PropertyContent(FieldSet):
             # raise ParserError(
         elif self["is_vector"].value:
             yield UInt32(self, "count")
-            for index in xrange(self["count"].value):
+            for index in range(self["count"].value):
                 yield handler(self, "item[]", **kw)
         else:
             yield handler(self, "value", **kw)
@@ -289,9 +289,9 @@ class SummarySection(SeekableFieldSet):
         self.osconfig = self.parent.osconfig
         yield UInt32(self, "size")
         yield UInt32(self, "property_count")
-        for index in xrange(self["property_count"].value):
+        for index in range(self["property_count"].value):
             yield PropertyIndex(self, "property_index[]")
-        for index in xrange(self["property_count"].value):
+        for index in range(self["property_count"].value):
             findex = self["property_index[%u]" % index]
             self.seekByte(findex["offset"].value)
             field = PropertyContent(self, "property[]", findex["id"].display)
@@ -330,7 +330,7 @@ class Summary(OLE2FragmentParser):
             raise ParserError("OLE2: Too much sections (%s)" % self["section_count"].value)
 
         section_indexes = []
-        for index in xrange(self["section_count"].value):
+        for index in range(self["section_count"].value):
             section_index = SummaryIndex(self, "section_index[]")
             yield section_index
             section_indexes.append(section_index)

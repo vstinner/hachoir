@@ -4,17 +4,17 @@ from hachoir.metadata.safe import fault_tolerant, getValue
 
 class ExeMetadata(RootMetadata):
     KEY_TO_ATTR = {
-        u"ProductName": "title",
-        u"LegalCopyright": "copyright",
-        u"LegalTrademarks": "copyright",
-        u"LegalTrademarks1": "copyright",
-        u"LegalTrademarks2": "copyright",
-        u"CompanyName": "author",
-        u"BuildDate": "creation_date",
-        u"FileDescription": "title",
-        u"ProductVersion": "version",
+        "ProductName": "title",
+        "LegalCopyright": "copyright",
+        "LegalTrademarks": "copyright",
+        "LegalTrademarks1": "copyright",
+        "LegalTrademarks2": "copyright",
+        "CompanyName": "author",
+        "BuildDate": "creation_date",
+        "FileDescription": "title",
+        "ProductVersion": "version",
     }
-    SKIP_KEY = set((u"InternalName", u"OriginalFilename", u"FileVersion", u"BuildVersion"))
+    SKIP_KEY = set(("InternalName", "OriginalFilename", "FileVersion", "BuildVersion"))
 
     def extract(self, exe):
         if exe.isPE():
@@ -52,20 +52,20 @@ class ExeMetadata(RootMetadata):
     @fault_tolerant
     def useNE_Header(self, hdr):
         if hdr["is_dll"].value:
-            self.format_version = u"New-style executable: Dynamic-link library (DLL)"
+            self.format_version = "New-style executable: Dynamic-link library (DLL)"
         elif hdr["is_win_app"].value:
-            self.format_version = u"New-style executable: Windows 3.x application"
+            self.format_version = "New-style executable: Windows 3.x application"
         else:
-            self.format_version = u"New-style executable for Windows 3.x"
+            self.format_version = "New-style executable for Windows 3.x"
 
     @fault_tolerant
     def usePE_Header(self, hdr):
         self.creation_date = hdr["creation_date"].value
         self.comment = "CPU: %s" % hdr["cpu"].display
         if hdr["is_dll"].value:
-            self.format_version = u"Portable Executable: Dynamic-link library (DLL)"
+            self.format_version = "Portable Executable: Dynamic-link library (DLL)"
         else:
-            self.format_version = u"Portable Executable: Windows application"
+            self.format_version = "Portable Executable: Windows application"
 
     @fault_tolerant
     def usePE_OptHeader(self, hdr):
@@ -90,7 +90,7 @@ class ExeMetadata(RootMetadata):
             del values["FileDescription"]
             del values["ProductName"]
 
-        for key, value in values.iteritems():
+        for key, value in values.items():
             if key in self.KEY_TO_ATTR:
                 setattr(self, self.KEY_TO_ATTR[key], value)
             elif key not in self.SKIP_KEY:

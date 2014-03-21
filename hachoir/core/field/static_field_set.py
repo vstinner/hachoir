@@ -1,4 +1,5 @@
 from hachoir.core.field import FieldSet, ParserError
+import collections
 
 class StaticFieldSet(FieldSet):
     """
@@ -28,13 +29,13 @@ class StaticFieldSet(FieldSet):
         if item_class.static_size is None:
             raise ParserError("Unable to get static size of field type: %s"
                 % item_class.__name__)
-        if callable(item_class.static_size):
+        if isinstance(item_class.static_size, collections.Callable):
             if isinstance(item[-1], dict):
                 return item_class.static_size(*item[1:-1], **item[-1])
             else:
                 return item_class.static_size(*item[1:])
         else:
-            assert isinstance(item_class.static_size, (int, long))
+            assert isinstance(item_class.static_size, int)
             return item_class.static_size
 
     def createFields(self):

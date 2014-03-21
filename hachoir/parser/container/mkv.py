@@ -17,6 +17,7 @@ from hachoir.core.tools import humanDatetime
 from hachoir.core.text_handler import textHandler, hexadecimal
 from hachoir.parser.container.ogg import XiphInt
 from datetime import datetime, timedelta
+import collections
 
 class RawInt(GenericInteger):
     """
@@ -166,19 +167,19 @@ class Lace(FieldSet):
         FieldSet.__init__(self, parent, 'Lace', size=size * 8)
 
     def parseXiph(self):
-        for i in xrange(self.n_frames):
+        for i in range(self.n_frames):
             yield XiphInt(self, 'size[]')
-        for i in xrange(self.n_frames):
+        for i in range(self.n_frames):
             yield RawBytes(self, 'frame[]', self['size['+str(i)+']'].value)
         yield RawBytes(self,'frame[]', (self._size - self.current_size) / 8)
 
     def parseEBML(self):
         yield Unsigned(self, 'size')
-        for i in xrange(1, self.n_frames):
+        for i in range(1, self.n_frames):
             yield Signed(self, 'dsize[]')
         size = self['size'].value
         yield RawBytes(self, 'frame[]', size)
-        for i in xrange(self.n_frames-1):
+        for i in range(self.n_frames-1):
             size += self['dsize['+str(i)+']'].value
             yield RawBytes(self, 'frame[]', size)
         yield RawBytes(self,'frame[]', (self._size - self.current_size) / 8)
@@ -186,7 +187,7 @@ class Lace(FieldSet):
     def parseFixed(self):
         n = self.n_frames + 1
         size = self._size / 8 / n
-        for i in xrange(n):
+        for i in range(n):
             yield RawBytes(self, 'frame[]', size)
 
 class Block(FieldSet):
@@ -534,7 +535,7 @@ class EBML(FieldSet):
         yield RawInt(self, 'id')
         yield Unsigned(self, 'size')
         for val in self.val[1:]:
-            if callable(val):
+            if isinstance(val, collections.Callable):
                 yield val(self)
             else:
                 while not self.eof:
@@ -547,10 +548,10 @@ class MkvFile(Parser):
         "category": "container",
         "file_ext": ("mka", "mkv", "webm"),
         "mime": (
-            u"video/x-matroska",
-            u"audio/x-matroska",
-            u"video/webm",
-            u"audio/webm"),
+            "video/x-matroska",
+            "audio/x-matroska",
+            "video/webm",
+            "audio/webm"),
         "min_size": 5*8,
         "magic": (("\x1A\x45\xDF\xA3", 0),),
         "description": "Matroska multimedia container"
@@ -592,7 +593,7 @@ class MkvFile(Parser):
 
     def createMimeType(self):
         if self._getDoctype() == 'webm':
-            return u"video/webm"
+            return "video/webm"
         else:
-            return u"video/x-matroska"
+            return "video/x-matroska"
 

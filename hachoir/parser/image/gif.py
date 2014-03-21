@@ -45,7 +45,7 @@ class FragmentGroup:
         # FIXME: Use smarter code to send arguments
         self.args["startbits"] = self.items[0].parent["lzw_min_code_size"].value
         tags = {"class": self.parser, "args": self.args}
-        tags = tags.iteritems()
+        tags = iter(tags.items())
         return StringInputStream(data, "<fragment group>", tags=tags)
 
 class CustomFragment(FieldSet):
@@ -86,7 +86,7 @@ def rle_repr(l):
     runlen = 1
     result = []
     try:
-        previous = iterable.next()
+        previous = next(iterable)
     except StopIteration:
         return "[]"
     for element in iterable:
@@ -319,7 +319,7 @@ class GifFile(Parser):
         "id": "gif",
         "category": "image",
         "file_ext": ("gif",),
-        "mime": (u"image/gif",),
+        "mime": ("image/gif",),
         "min_size": (6 + 7 + 1 + 9)*8,   # signature + screen + separator + image
         "magic": (("GIF87a", 0), ("GIF89a", 0)),
         "description": "GIF picture"

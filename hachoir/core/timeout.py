@@ -30,7 +30,7 @@ def fixTimeout(second):
     """
     if isinstance(second, float):
         second = int(ceil(second))
-    assert isinstance(second, (int, long))
+    assert isinstance(second, int)
     return max(second, 1)
 
 if not IMPLEMENTATION:

@@ -81,7 +81,7 @@ class Fuzzer:
 #                print "   ignore %s %s" % (prefix, text)
             return
         self.log_error += 1
-        print "METADATA ERROR: %s %s" % (prefix, text)
+        print("METADATA ERROR: %s %s" % (prefix, text))
 
     def fuzzFile(self, fuzz):
 
@@ -96,18 +96,18 @@ class Fuzzer:
                 prefix = fuzz.prefix
             except KeyboardInterrupt:
                 try:
-                    failure = (raw_input("Keep current file (y/n)?").strip() == "y")
+                    failure = (input("Keep current file (y/n)?").strip() == "y")
                 except (KeyboardInterrupt, EOFError):
-                    print
+                    print()
                     failure = False
                 prefix = "interrupt"
                 fatal_error = True
             except MemoryError:
-                print "MEMORY ERROR!"
+                print("MEMORY ERROR!")
                 failure = True
                 prefix = "memory"
-            except Exception, err:
-                print "EXCEPTION (%s): %s" % (err.__class__.__name__, err)
+            except Exception as err:
+                print("EXCEPTION (%s): %s" % (err.__class__.__name__, err))
                 failure = True
                 prefix = "exception"
             if fatal_error:
@@ -116,7 +116,7 @@ class Fuzzer:
                 if fuzz.tryUndo():
                     failure = False
                 elif fuzz.is_original:
-                    print "    Warning: Unsupported file format: remove %s from test suite" % fuzz.filename
+                    print("    Warning: Unsupported file format: remove %s from test suite" % fuzz.filename)
                     self.filedb.remove(fuzz.filename)
                     return True
             if failure is None:
@@ -150,13 +150,13 @@ class Fuzzer:
             new_files = glob(path.join(directory, "*.*"))
             self.filedb.extend(new_files)
         if not self.filedb:
-            print "Empty directories: %s" % self.filedb_dirs
+            print("Empty directories: %s" % self.filedb_dirs)
             exit(1)
 
         # Create error directory
         try:
             mkdir(self.error_dir)
-        except OSError, err:
+        except OSError as err:
             if err[0] == EEXIST:
                 pass
 
@@ -165,18 +165,18 @@ class Fuzzer:
         try:
             while True:
                 test_file = random_choice(self.filedb)
-                print "[+] %s error -- test file: %s" % (self.nb_error, test_file)
+                print("[+] %s error -- test file: %s" % (self.nb_error, test_file))
                 fuzz = FileFuzzer(self, test_file)
                 ok = self.fuzzFile(fuzz)
                 if not ok:
                     break
         except KeyboardInterrupt:
-            print "Stop"
+            print("Stop")
 
 def main():
     # Read command line argument
     if len(argv) < 2:
-        print >>stderr, "usage: %s directory [directory2 ...]" % argv[0]
+        print("usage: %s directory [directory2 ...]" % argv[0], file=stderr)
         exit(1)
     test_dirs = [ path.normpath(path.expanduser(item)) for item in argv[1:] ]
 

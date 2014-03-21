@@ -51,7 +51,7 @@ class MarFile(Parser):
         yield UInt32(self, "version")
         yield UInt32(self, "nb_file")
         files = []
-        for index in xrange(self["nb_file"].value):
+        for index in range(self["nb_file"].value):
             item = FileIndex(self, "file[]")
             yield item
             if item["filesize"].value:

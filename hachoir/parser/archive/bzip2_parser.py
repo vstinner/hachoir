@@ -62,7 +62,7 @@ class Bzip2Bitmap(FieldSet):
         self.start_index = start_index
 
     def createFields(self):
-        for i in xrange(self.start_index, self.start_index+self.nb_items):
+        for i in range(self.start_index, self.start_index+self.nb_items):
             yield Bit(self, "symbol_used[%i]"%i, "Is the symbol %i (%r) used?"%(i, chr(i)))
 
 class Bzip2Lengths(FieldSet):
@@ -74,7 +74,7 @@ class Bzip2Lengths(FieldSet):
         yield Bits(self, "start_length", 5)
         length = self["start_length"].value
         lengths = []
-        for i in xrange(self.symbols):
+        for i in range(self.symbols):
             while True:
                 bit = Bit(self, "change_length[%i][]"%i, "Should the length be changed for symbol %i?"%i)
                 yield bit
@@ -94,10 +94,10 @@ class Bzip2Lengths(FieldSet):
 class Bzip2Selectors(FieldSet):
     def __init__(self, parent, name, ngroups, *args, **kwargs):
         FieldSet.__init__(self, parent, name, *args, **kwargs)
-        self.groups = range(ngroups)
+        self.groups = list(range(ngroups))
 
     def createFields(self):
-        for i in xrange(self["../selectors_used"].value):
+        for i in range(self["../selectors_used"].value):
             field = ZeroTerminatedNumber(self, "selector_list[]")
             move_to_front(self.groups, field.value)
             field.realvalue = self.groups[0]
@@ -126,7 +126,7 @@ class Bzip2Block(FieldSet):
         yield Bits(self, "selectors_used", 15, "Number of times the Huffman tables are switched")
         yield Bzip2Selectors(self, "selectors_list", self["huffman_groups"].value)
         trees = []
-        for group in xrange(self["huffman_groups"].value):
+        for group in range(self["huffman_groups"].value):
             field = Bzip2Lengths(self, "huffman_lengths[]", len(symbols_used)+2)
             yield field
             trees.append(field.tree)
@@ -182,7 +182,7 @@ class Bzip2Parser(Parser):
         "id": "bzip2",
         "category": "archive",
         "file_ext": ("bz2",),
-        "mime": (u"application/x-bzip2",),
+        "mime": ("application/x-bzip2",),
         "min_size": 10*8,
         "magic": (('BZh', 0),),
         "description": "bzip2 archive"

@@ -164,5 +164,5 @@ class MSTaskFile(Parser, RootSeekableFieldSet):
         elif self["ReservedDataSize"].value:
             yield RawBytes(self, "Reserved", self["ReservedDataSize"].value)
         yield UInt16(self, "TriggerCount", "size of the array of triggers")
-        for i in xrange(self["TriggerCount"].value):
+        for i in range(self["TriggerCount"].value):
             yield TaskTrigger(self, "Trigger[]")

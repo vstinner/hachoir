@@ -9,7 +9,7 @@ class SubFile(Bytes):
     def __init__(self, parent, name, length, description=None,
     parser=None, filename=None, mime_type=None, parser_class=None):
         if filename:
-            if not isinstance(filename, unicode):
+            if not isinstance(filename, str):
                 filename = makePrintable(filename, "ISO-8859-1")
             if not description:
                 description = 'File "%s" (%s)' % (filename, humanFilesize(length))

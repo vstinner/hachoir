@@ -13,23 +13,23 @@ from sys import stderr, exit, argv
 
 def main():
     if len(argv) != 2:
-        print >>stderr, "usage: %s video.flv" % argv[0]
+        print("usage: %s video.flv" % argv[0], file=stderr)
         exit(1)
 
     # Open input video
-    inputname = unicode(argv[1], getTerminalCharset())
+    inputname = str(argv[1], getTerminalCharset())
     parser = createParser(inputname)
     if parser["audio[0]/codec"].value != AUDIO_CODEC_MP3:
-        print >>stderr, "Unknown audio codec: %s" % parser["audio[0]/codec"].display
+        print("Unknown audio codec: %s" % parser["audio[0]/codec"].display, file=stderr)
 
     # Extract audio
-    print "Extractor audio from: %s" % inputname
+    print("Extractor audio from: %s" % inputname)
     outputname = inputname + ".mp3"
     output = FileOutputStream(outputname)
     for chunk in parser.array("audio"):
         data = chunk["music_data"]
         output.copyBitsFrom(data.parent.stream, data.absolute_address, data.size, data.parent.endian)
-    print "Write audio into: %s" % outputname
+    print("Write audio into: %s" % outputname)
 
 main()
 

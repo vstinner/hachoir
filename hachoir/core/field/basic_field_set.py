@@ -32,7 +32,7 @@ class BasicFieldSet(Field):
 
         # Set field set size
         if size is None and self.static_size:
-            assert isinstance(self.static_size, (int, long))
+            assert isinstance(self.static_size, int)
             size = self.static_size
 
         # Set Field attributes

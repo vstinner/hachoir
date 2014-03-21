@@ -1001,7 +1001,7 @@ class JavaCompiledClassFile(Parser):
         "id": "java_class",
         "category": "program",
         "file_ext": ("class",),
-        "mime": (u"application/java-vm",),
+        "mime": ("application/java-vm",),
         "min_size": (32 + 3*16),
         "description": "Compiled Java class"
     }

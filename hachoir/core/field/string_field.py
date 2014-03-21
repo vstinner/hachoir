@@ -230,8 +230,8 @@ class GenericString(Bytes):
 
         # Try to convert to Unicode
         try:
-            return unicode(text, self._charset, "strict")
-        except UnicodeDecodeError, err:
+            return str(text, self._charset, "strict")
+        except UnicodeDecodeError as err:
             pass
 
         #--- Conversion error ---
@@ -242,15 +242,15 @@ class GenericString(Bytes):
         and err.end == len(text) \
         and self._charset == "UTF-16-LE":
             try:
-                text = unicode(text+"\0", self._charset, "strict")
+                text = str(text+"\0", self._charset, "strict")
                 self.warning("Fix truncated %s string: add missing nul byte" % self._charset)
                 return text
-            except UnicodeDecodeError, err:
+            except UnicodeDecodeError as err:
                 pass
 
         # On error, use FALLBACK_CHARSET
-        self.warning(u"Unable to convert string to Unicode: %s" % err)
-        return unicode(text, FALLBACK_CHARSET, "strict")
+        self.warning("Unable to convert string to Unicode: %s" % err)
+        return str(text, FALLBACK_CHARSET, "strict")
 
     def _guessCharset(self):
         addr = self.absolute_address + self._content_offset * 8
@@ -267,7 +267,7 @@ class GenericString(Bytes):
             size = self._size // 8
         if size == 0:
             # Empty string
-            return u""
+            return ""
 
         # Read bytes in data stream
         text = self._parent.stream.readBytes(addr, size)
@@ -287,11 +287,11 @@ class GenericString(Bytes):
 
         # Strip string if needed
         if self._strip:
-            if isinstance(self._strip, (str, unicode)):
+            if isinstance(self._strip, str):
                 text = text.strip(self._strip)
             else:
                 text = text.strip()
-        assert isinstance(text, unicode)
+        assert isinstance(text, str)
         return text
 
     def createDisplay(self, human=True):
@@ -344,7 +344,7 @@ class GenericString(Bytes):
     def getFieldType(self):
         info = self.charset
         if self._strip:
-            if isinstance(self._strip, (str, unicode)):
+            if isinstance(self._strip, str):
                 info += ",strip=%s" % makePrintable(self._strip, "ASCII", quote="'")
             else:
                 info += ",strip=True"

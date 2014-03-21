@@ -11,9 +11,9 @@ try:
     from hachoir.parser import createParser, ParserList
     import hachoir.core.config as hachoir_config
     from hachoir.metadata import config
-except ImportError, err:
+except ImportError as err:
     raise
-    print >>sys.stderr, "Unable to import an Hachoir module: %s" % err
+    print("Unable to import an Hachoir module: %s" % err, file=sys.stderr)
     sys.exit(1)
 from optparse import OptionGroup, OptionParser
 from hachoir.metadata import extractMetadata
@@ -22,7 +22,7 @@ from hachoir.metadata.metadata import extractors as metadata_extractors
 
 def displayParserList(*args):
     parser_list = ParserList()
-    for parser in metadata_extractors.keys():
+    for parser in list(metadata_extractors.keys()):
         parser_list.add(parser)
     parser_list.print_(_("List of metadata extractors."))
     sys.exit(0)
@@ -30,10 +30,10 @@ def displayParserList(*args):
 def displayVersion(*args):
     import hachoir.core
     from hachoir.metadata import __version__
-    print _("Metadata extractor version %s") % __version__
-    print _("Hachoir library version %s") % hachoir.core.__version__
-    print
-    print _("Website: %s/wiki/hachoir-metadata") % hachoir.core.WEBSITE
+    print(_("Metadata extractor version %s") % __version__)
+    print(_("Hachoir library version %s") % hachoir.core.__version__)
+    print()
+    print(_("Website: %s/wiki/hachoir-metadata") % hachoir.core.WEBSITE)
     sys.exit(0)
 
 def parseOptions():
@@ -45,7 +45,7 @@ def parseOptions():
     parser.add_option("--level",
         help=_("Quantity of information to display from 1 to 9 (9 is the maximum)"),
         action="store", default="9", type="choice",
-        choices=[ str(choice) for choice in xrange(1,9+1) ])
+        choices=[ str(choice) for choice in range(1,9+1) ])
     parser.add_option("--raw", help=_("Raw output"),
         action="store_true", default=False)
     parser.add_option("--bench", help=_("Run benchmark"),
@@ -91,8 +91,8 @@ display_filename=False, priority=None, human=True, display=True):
         else:
             tags = None
         parser = createParser(filename, real_filename=real_filename, tags=tags)
-    except InputStreamError, err:
-        error(unicode(err))
+    except InputStreamError as err:
+        error(str(err))
         return False
     if not parser:
         error(_("Unable to parse file: %s") % filename)
@@ -103,8 +103,8 @@ display_filename=False, priority=None, human=True, display=True):
     if extract_metadata:
         try:
             metadata = extractMetadata(parser, values.quality)
-        except HachoirError, err:
-            error(unicode(err))
+        except HachoirError as err:
+            error(str(err))
             metadata = None
         if not metadata:
             parser.error(_("Hachoir can't extract metadata, but is able to parse: %s")
@@ -120,10 +120,10 @@ display_filename=False, priority=None, human=True, display=True):
             if display_filename:
                 for line in text:
                     line = "%s: %s" % (filename, line)
-                    print makePrintable(line, charset)
+                    print(makePrintable(line, charset))
             else:
                 for line in text:
-                    print makePrintable(line, charset)
+                    print(makePrintable(line, charset))
         else:
             if values.type:
                 text = parser.description
@@ -131,7 +131,7 @@ display_filename=False, priority=None, human=True, display=True):
                 text = parser.mime_type
             if display_filename:
                 text = "%s: %s" % (filename, text)
-            print text
+            print(text)
     return True
 
 def processFiles(values, filenames, display=True):
@@ -170,7 +170,7 @@ def main():
         else:
             ok = processFiles(values, filenames)
     except KeyboardInterrupt:
-        print _("Program interrupted (CTRL+C).")
+        print(_("Program interrupted (CTRL+C)."))
         ok = False
     sys.exit(int(not ok))
 

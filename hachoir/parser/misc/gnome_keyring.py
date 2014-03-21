@@ -62,13 +62,13 @@ class KeyringString(FieldSet):
         if "text" in self:
             return self["text"].value
         else:
-            return u''
+            return ''
 
     def createDescription(self):
         if "text" in self:
             return self["text"].value
         else:
-            return u"(empty string)"
+            return "(empty string)"
 
 class Attribute(FieldSet):
     def createFields(self):
@@ -98,7 +98,7 @@ class Item(FieldSet):
         yield UInt32(self, "id")
         yield UInt32(self, "type")
         yield UInt32(self, "attr_count")
-        for index in xrange(self["attr_count"].value):
+        for index in range(self["attr_count"].value):
             yield Attribute(self, "attr[]")
 
     def createDescription(self):
@@ -107,7 +107,7 @@ class Item(FieldSet):
 class Items(FieldSet):
     def createFields(self):
         yield UInt32(self, "count")
-        for index in xrange(self["count"].value):
+        for index in range(self["count"].value):
             yield Item(self, "item[]")
 
 class EncryptedItem(FieldSet):
@@ -117,13 +117,13 @@ class EncryptedItem(FieldSet):
         yield TimestampUnix64(self, "mtime")
         yield TimestampUnix64(self, "ctime")
         yield KeyringString(self, "reserved[]")
-        for index in xrange(4):
+        for index in range(4):
             yield UInt32(self, "reserved[]")
         yield UInt32(self, "attr_count")
-        for index in xrange(self["attr_count"].value):
+        for index in range(self["attr_count"].value):
             yield Attribute(self, "attr[]")
         yield UInt32(self, "acl_count")
-        for index in xrange(self["acl_count"].value):
+        for index in range(self["acl_count"].value):
             yield ACL(self, "acl[]")
 #        size = 8 # paddingSize((self.stream.size - self.current_size) // 8, 16)
 #        if size:
@@ -133,7 +133,7 @@ class EncryptedData(Parser):
     PARSER_TAGS = {
         "id": "gnomeencryptedkeyring",
         "min_size": 16*8,
-        "description": u"Gnome encrypted keyring",
+        "description": "Gnome encrypted keyring",
     }
     endian = BIG_ENDIAN
     def validate(self):
@@ -157,20 +157,20 @@ class GnomeKeyring(Parser):
         "category": "misc",
         "magic": ((MAGIC, 0),),
         "min_size": 47*8,
-        "description": u"Gnome keyring",
+        "description": "Gnome keyring",
     }
     CRYPTO_NAMES = {
-        0: u"AEL",
+        0: "AEL",
     }
     HASH_NAMES = {
-        0: u"MD5",
+        0: "MD5",
     }
 
     endian = BIG_ENDIAN
 
     def validate(self):
         if self.stream.readBytes(0, len(self.MAGIC)) != self.MAGIC:
-            return u"Invalid magic string"
+            return "Invalid magic string"
         return True
 
     def createFields(self):
@@ -194,7 +194,7 @@ class GnomeKeyring(Parser):
 
 def generate_key(password, salt, hash_iterations):
     sha = sha256(password+salt)
-    for index in xrange(hash_iterations-1):
+    for index in range(hash_iterations-1):
         sha = sha256(sha)
     return sha[:16], sha[16:]
 

@@ -348,7 +348,7 @@ class InputPipe(object):
 
     def read(self, size):
         end = self.address + size
-        for i in xrange(len(self.buffers), (end >> self.buffer_size) + 1):
+        for i in range(len(self.buffers), (end >> self.buffer_size) + 1):
             data = self._input.read(1 << self.buffer_size)
             if len(data) < 1 << self.buffer_size:
                 self.size = (len(self.buffers) << self.buffer_size) + len(data)
@@ -360,7 +360,7 @@ class InputPipe(object):
             self._append(data)
         block, offset = divmod(self.address, 1 << self.buffer_size)
         data = ''.join(self._get(index)
-                for index in xrange(block, (end - 1 >> self.buffer_size) + 1)
+                for index in range(block, (end - 1 >> self.buffer_size) + 1)
             )[offset:offset+size]
         self._flush()
         self.address += len(data)
@@ -377,12 +377,12 @@ class InputIOStream(InputStream):
             try:
                 input.seek(0, 2)
                 size = input.tell() * 8
-            except IOError, err:
+            except IOError as err:
                 if err.errno == ESPIPE:
                     input = InputPipe(input, self._setSize)
                 else:
                     charset = getTerminalCharset()
-                    errmsg = unicode(str(err), charset)
+                    errmsg = str(str(err), charset)
                     source = args.get("source", "<inputio:%r>" % input)
                     raise InputStreamError(_("Unable to get size of %s: %s") % (source, errmsg))
         self._input = input
@@ -469,10 +469,10 @@ class FragmentedStream(InputStream):
         self.stream = field.parent.stream
         data = field.getData()
         self.fragments = [ (0, data.absolute_address, data.size) ]
-        self.next = field.next
+        self.next = field.__next__
         args.setdefault("source", "%s%s" % (self.stream.source, field.path))
         InputStream.__init__(self, **args)
-        if not self.next:
+        if not self.__next__:
             self._current_size = data.size
             self._setSize()
 
@@ -483,14 +483,14 @@ class FragmentedStream(InputStream):
             a, fa, fs = self.fragments[-1]
             while self.stream.sizeGe(fa + min(fs, end - a)):
                 a += fs
-                f = self.next
+                f = self.__next__
                 if a >= end:
                     self._current_size = end
                     if a == end and not f:
                         self._setSize()
                     return False
                 if f:
-                    self.next = f.next
+                    self.next = f.__next__
                     f = f.getData()
                 if not f:
                     self._current_size = a

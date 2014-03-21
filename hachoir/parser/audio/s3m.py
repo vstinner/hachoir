@@ -312,13 +312,13 @@ class S3MHeader(Header):
 
     def getSubChunks(self):
         # Instruments -  no warranty that they are concatenated
-        for index in xrange(self["num_instruments"].value):
+        for index in range(self["num_instruments"].value):
             yield Chunk(S3MInstrument, "instrument[]",
                         16*self["instr_pptr/offset[%u]" % index].value,
                         S3MInstrument.static_size//8)
 
         # Patterns - size unknown but listed in their headers
-        for index in xrange(self["num_patterns"].value):
+        for index in range(self["num_patterns"].value):
             yield Chunk(S3MPattern, "pattern[]",
                         16*self["pattern_pptr/offset[%u]" % index].value, 0)
 
@@ -358,7 +358,7 @@ class PTMHeader(Header):
         # Instruments and minimal end position for last pattern
         count = self["num_instruments"].value
         addr = self.absolute_address
-        for index in xrange(count):
+        for index in range(count):
             offset = (self.static_size+index*PTMInstrument.static_size)//8
             yield Chunk(PTMInstrument, "instrument[]", offset,
                         PTMInstrument.static_size//8)
@@ -639,7 +639,7 @@ class S3MModule(Module):
         "id": "s3m",
         "category": "audio",
         "file_ext": ("s3m",),
-        "mime": (u'audio/s3m', u'audio/x-s3m'),
+        "mime": ('audio/s3m', 'audio/x-s3m'),
         "min_size": 64*8,
         "description": "ScreamTracker3 module"
     }

@@ -119,7 +119,7 @@ class DataObject(FieldSet):
             padding = self.seekByte(padding_offset, "header padding")
             if padding:
                 yield padding
-            for i in xrange(self["entry_count"].value):
+            for i in range(self["entry_count"].value):
                 yield UInt32(self, "index["+str(i)+"]", "Index of the "+str(i)+"nth mhit")
         else:
             padding = self.seekByte(self["header_length"].value, "header padding")
@@ -244,7 +244,7 @@ class TrackItem(FieldSet):
             yield padding
 
         #while ((self.stream.readBytes(0, 4) == 'mhod') and  ((self.current_size/8) < self["entry_length"].value)):
-        for i in xrange(self["string_number"].value):
+        for i in range(self["string_number"].value):
             yield DataObject(self, "data[]")
         padding = self.seekBit(self._size, "entry padding")
         if padding:
@@ -260,7 +260,7 @@ class TrackList(FieldSet):
         if padding:
             yield padding
 
-        for i in xrange(self["track_number"].value):
+        for i in range(self["track_number"].value):
             yield TrackItem(self, "track[]")
 
 class PlaylistItem(FieldSet):
@@ -282,7 +282,7 @@ class PlaylistItem(FieldSet):
         if padding:
             yield padding
 
-        for i in xrange(self["data_object_child_count"].value):
+        for i in range(self["data_object_child_count"].value):
             yield DataObject(self, "mhod[]")
 
 
@@ -356,10 +356,10 @@ class Playlist(FieldSet):
         if padding:
             yield padding
 
-        for i in xrange(self["data_object_child_count"].value):
+        for i in range(self["data_object_child_count"].value):
             yield DataObject(self, "mhod[]")
 
-        for i in xrange(self["playlist_count"].value):
+        for i in range(self["playlist_count"].value):
             yield PlaylistItem(self, "playlist_item[]")
 
 
@@ -374,7 +374,7 @@ class PlaylistList(FieldSet):
         if padding:
             yield padding
 
-        for i in xrange(self["playlist_number"].value):
+        for i in range(self["playlist_number"].value):
             yield Playlist(self, "playlist[]")
 
 class Album(FieldSet):
@@ -397,7 +397,7 @@ class Album(FieldSet):
         if padding:
             yield padding
 
-        for i in xrange(self["data_object_child_count"].value):
+        for i in range(self["data_object_child_count"].value):
             yield DataObject(self, "mhod[]")
 
 class AlbumList(FieldSet):
@@ -410,7 +410,7 @@ class AlbumList(FieldSet):
         if padding:
             yield padding
 
-        for i in xrange(self["album_number"].value):
+        for i in range(self["album_number"].value):
             yield Album(self, "album[]")
 
 class DataSet(FieldSet):
@@ -490,7 +490,7 @@ class ITunesDBFile(Parser):
         size = self["header_length"].value-self.current_size/ 8
         if size>0:
             yield NullBytes(self, "padding", size)
-        for i in xrange(self["child_number"].value):
+        for i in range(self["child_number"].value):
             yield DataSet(self, "dataset[]")
         padding = self.seekByte(self["entry_length"].value, "entry padding")
         if padding:

@@ -19,5 +19,5 @@ class Language:
        return self.__unicode__()
 
     def __repr__(self):
-        return "<Language '%s', code=%r>" % (unicode(self), self.code)
+        return "<Language '%s', code=%r>" % (str(self), self.code)
 

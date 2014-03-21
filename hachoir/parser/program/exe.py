@@ -61,7 +61,7 @@ class ExeFile(HachoirParser, RootSeekableFieldSet):
         "id": "exe",
         "category": "program",
         "file_ext": ("exe", "dll", "ocx"),
-        "mime": (u"application/x-dosexec",),
+        "mime": ("application/x-dosexec",),
         "min_size": 64*8,
         #"magic": (("MZ", 0),),
         "magic_regex": (("MZ.[\0\1].{4}[^\0\1\2\3]", 0),),
@@ -127,7 +127,7 @@ class ExeFile(HachoirParser, RootSeekableFieldSet):
 
         # Read section headers
         sections = []
-        for index in xrange(self["pe_header/nb_section"].value):
+        for index in range(self["pe_header/nb_section"].value):
             section = SectionHeader(self, "section_hdr[]")
             yield section
             if section["phys_size"].value:
@@ -181,25 +181,25 @@ class ExeFile(HachoirParser, RootSeekableFieldSet):
     def createDescription(self):
         if self.isPE():
             if self["pe_header/is_dll"].value:
-                text = u"Microsoft Windows DLL"
+                text = "Microsoft Windows DLL"
             else:
-                text = u"Microsoft Windows Portable Executable"
+                text = "Microsoft Windows Portable Executable"
             info = [self["pe_header/cpu"].display]
             if "pe_opt_header" in self:
                 hdr = self["pe_opt_header"]
                 info.append(hdr["subsystem"].display)
             if self["pe_header/is_stripped"].value:
-                info.append(u"stripped")
-            return u"%s: %s" % (text, ", ".join(info))
+                info.append("stripped")
+            return "%s: %s" % (text, ", ".join(info))
         elif self.isNE():
-            return u"New-style Executable (NE) for Microsoft MS Windows 3.x"
+            return "New-style Executable (NE) for Microsoft MS Windows 3.x"
         else:
-            return u"MS-DOS executable"
+            return "MS-DOS executable"
 
     def createContentSize(self):
         if self.isPE():
             size = 0
-            for index in xrange(self["pe_header/nb_section"].value):
+            for index in range(self["pe_header/nb_section"].value):
                 section = self["section_hdr[%u]" % index]
                 section_size = section["phys_size"].value
                 if not section_size:

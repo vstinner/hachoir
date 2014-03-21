@@ -10,10 +10,10 @@ from optparse import OptionGroup, OptionParser
 
 def displayVersion(*args):
     from hachoir_subfile.version import VERSION, WEBSITE
-    print _("Hachoir subfile version %s") % VERSION
-    print _("hachoir-core version %s") % hachoir.core.__version__
-    print
-    print _("Website: %s") % WEBSITE
+    print(_("Hachoir subfile version %s") % VERSION)
+    print(_("hachoir-core version %s") % hachoir.core.__version__)
+    print()
+    print(_("Website: %s") % WEBSITE)
     exit(0)
 
 def parseOptions():
@@ -50,21 +50,21 @@ def parseOptions():
 
 def displaySearchStat(subfile):
     stats = [ (parser.tags["id"], stats[0], stats[1])
-        for parser, stats in subfile.stats.iteritems() ]
-    print
-    print "[ Match statistics ]"
+        for parser, stats in subfile.stats.items() ]
+    print()
+    print("[ Match statistics ]")
     total_hit = 0
     total_valid = 0
     if stats:
         stats.sort(key=lambda values: values[1])
         for parser_id, hit, valid in stats:
-            print " - %s: %u hit/%u valid" % (parser_id, hit, valid)
+            print(" - %s: %u hit/%u valid" % (parser_id, hit, valid))
             total_hit += hit
             total_valid += valid
-        print
+        print()
     else:
-        print "(no match)"
-    print "Total: %u hit/%u valid" % (total_hit, total_valid)
+        print("(no match)")
+    print("Total: %u hit/%u valid" % (total_hit, total_valid))
 
 def runSearch(subfile, values):
     # Load categories and parsers

@@ -24,11 +24,11 @@ def swap32(value):
     >>> "%x" % swap32(0x12345678)
     '78563412'
     """
-    value = long(value)
-    return ((value & 0x000000FFL) << 24) \
-         | ((value & 0x0000FF00L) << 8) \
-         | ((value & 0x00FF0000L) >> 8) \
-         | ((value & 0xFF000000L) >> 24)
+    value = int(value)
+    return ((value & 0x000000FF) << 24) \
+         | ((value & 0x0000FF00) << 8) \
+         | ((value & 0x00FF0000) >> 8) \
+         | ((value & 0xFF000000) >> 24)
 
 def arrswapmid(data):
     r"""
@@ -77,7 +77,7 @@ def bin2long(text, endian):
         value += bit
     return value
 
-def str2hex(value, prefix="", glue=u"", format="%02X"):
+def str2hex(value, prefix="", glue="", format="%02X"):
     r"""
     Convert binary string in hexadecimal (base 16).
 
@@ -91,7 +91,7 @@ def str2hex(value, prefix="", glue=u"", format="%02X"):
     u'\\x41\\x42\\x43'
     """
     if isinstance(glue, str):
-        glue = unicode(glue)
+        glue = str(glue)
     if 0 < len(prefix):
         text = [prefix]
     else:
@@ -208,7 +208,7 @@ def long2bin(size, value, endian, classic_mode=False):
     text = ""
     assert endian in (LITTLE_ENDIAN, BIG_ENDIAN)
     assert 0 <= value
-    for index in xrange(size):
+    for index in range(size):
         if (value & 1) == 1:
             text += "1"
         else:

@@ -9,13 +9,13 @@ from hachoir.metadata.setter import normalizeString
 
 class TorrentMetadata(RootMetadata):
     KEY_TO_ATTR = {
-        u"announce": "url",
-        u"comment": "comment",
-        u"creation_date": "creation_date",
+        "announce": "url",
+        "comment": "comment",
+        "creation_date": "creation_date",
     }
     INFO_TO_ATTR = {
-        u"length": "file_size",
-        u"name": "filename",
+        "length": "file_size",
+        "name": "filename",
     }
 
     def extract(self, torrent):
@@ -61,8 +61,8 @@ class TTF_Metadata(RootMetadata):
     def extractHeader(self, header):
         self.creation_date = header["created"].value
         self.last_modification = header["modified"].value
-        self.comment = u"Smallest readable size in pixels: %s pixels" % header["lowest"].value
-        self.comment = u"Font direction: %s" % header["font_dir"].display
+        self.comment = "Smallest readable size in pixels: %s pixels" % header["lowest"].value
+        self.comment = "Font direction: %s" % header["font_dir"].display
 
     @fault_tolerant
     def extractNames(self, names):
@@ -77,7 +77,7 @@ class TTF_Metadata(RootMetadata):
             if key not in self.NAMEID_TO_ATTR:
                 continue
             key = self.NAMEID_TO_ATTR[key]
-            if key == "version" and value.startswith(u"Version "):
+            if key == "version" and value.startswith("Version "):
                 # "Version 1.2" => "1.2"
                 value = value[8:]
             setattr(self, key, value)
@@ -172,7 +172,7 @@ class OLE2_Metadata(RootMetadata):
 
         # Get value
         value = field.value
-        if isinstance(value, (str, unicode)):
+        if isinstance(value, str):
             value = normalizeString(value)
             if not value:
                 return

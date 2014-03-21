@@ -47,13 +47,13 @@ class MetadataBlock(FieldSet):
     "Metadata block field: http://flac.sourceforge.net/format.html#metadata_block"
 
     BLOCK_TYPES = {
-        0: ("stream_info", u"Stream info", StreamInfo),
-        1: ("padding[]", u"Padding", None),
-        2: ("application[]", u"Application", None),
-        3: ("seek_table", u"Seek table", SeekTable),
-        4: ("comment", u"Vorbis comment", VorbisComment),
-        5: ("cue_sheet[]", u"Cue sheet", None),
-        6: ("picture[]", u"Picture", None),
+        0: ("stream_info", "Stream info", StreamInfo),
+        1: ("padding[]", "Padding", None),
+        2: ("application[]", "Application", None),
+        3: ("seek_table", "Seek table", SeekTable),
+        4: ("comment", "Vorbis comment", VorbisComment),
+        5: ("cue_sheet[]", "Cue sheet", None),
+        6: ("picture[]", "Picture", None),
     }
     BLOCK_TYPE_DESC = createDict(BLOCK_TYPES, 1)
 
@@ -138,7 +138,7 @@ class FlacParser(Parser):
         "id": "flac",
         "category": "audio",
         "file_ext": ("flac",),
-        "mime": (u"audio/x-flac",),
+        "mime": ("audio/x-flac",),
         "magic": ((MAGIC, 0),),
         "min_size": 4*8,
         "description": "FLAC audio",
@@ -147,7 +147,7 @@ class FlacParser(Parser):
 
     def validate(self):
         if self.stream.readBytes(0, len(self.MAGIC)) != self.MAGIC:
-            return u"Invalid magic string"
+            return "Invalid magic string"
         return True
 
     def createFields(self):

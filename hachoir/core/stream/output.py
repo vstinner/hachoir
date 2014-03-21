@@ -1,4 +1,4 @@
-from cStringIO import StringIO
+from io import StringIO
 from hachoir.core.endian import BIG_ENDIAN, LITTLE_ENDIAN
 from hachoir.core.bits import long2raw
 from hachoir.core.stream import StreamError
@@ -148,7 +148,7 @@ class OutputStream(object):
             self._output.seek(0)
             try:
                 return self._output.read(nbytes)
-            except IOError, err:
+            except IOError as err:
                 if err[0] == EBADF:
                     raise OutputStreamError("Stream doesn't support read() operation")
         finally:
@@ -167,7 +167,7 @@ def FileOutputStream(filename, real_filename=None):
 
     Filename have to be unicode, whereas (optional) real_filename can be str.
     """
-    assert isinstance(filename, unicode)
+    assert isinstance(filename, str)
     if not real_filename:
         real_filename = filename
     output = open(real_filename, 'wb')

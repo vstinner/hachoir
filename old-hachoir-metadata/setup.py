@@ -62,17 +62,17 @@ def main():
         command = ["pyuic4", "-o", dialog_python, dialog + ".ui"]
         try:
             exitcode = call(command)
-        except OSError, err:
+        except OSError as err:
             exitcode = 1
         if exitcode:
             if path.exists(dialog_python):
-                print >>sys.stderr, "Warning: unable to recompile dialog.ui to dialog_ui.py using pyuic4"
-                print >>sys.stderr, '(use command "%s --disable-qt" to disable this warning)' % ' '.join(sys.argv)
-                print >>sys.stderr
+                print("Warning: unable to recompile dialog.ui to dialog_ui.py using pyuic4", file=sys.stderr)
+                print('(use command "%s --disable-qt" to disable this warning)' % ' '.join(sys.argv), file=sys.stderr)
+                print(file=sys.stderr)
             else:
-                print >>sys.stderr, "ERROR: Unable to compile dialog.ui to dialog_ui.py using pyuic4"
-                print >>sys.stderr, 'Use command "%s --disable-qt" to skip hachoir-metadata-qt' % ' '.join(sys.argv)
-                print >>sys.stderr, 'pyuic4 is included in the PyQt4 development package'
+                print("ERROR: Unable to compile dialog.ui to dialog_ui.py using pyuic4", file=sys.stderr)
+                print('Use command "%s --disable-qt" to skip hachoir-metadata-qt' % ' '.join(sys.argv), file=sys.stderr)
+                print('pyuic4 is included in the PyQt4 development package', file=sys.stderr)
                 sys.exit(1)
         PACKAGES.append("hachoir.metadata.qt")
     else:

@@ -19,33 +19,33 @@ class GzipParser(Parser):
         "id": "gzip",
         "category": "archive",
         "file_ext": ("gz",),
-        "mime": (u"application/x-gzip",),
+        "mime": ("application/x-gzip",),
         "min_size": 18*8,
         #"magic": (('\x1F\x8B\x08', 0),),
         "magic_regex": (
             # (magic, compression=deflate, <flags>, <mtime>, )
             ('\x1F\x8B\x08.{5}[\0\2\4\6][\x00-\x0D]', 0),
         ),
-        "description": u"gzip archive",
+        "description": "gzip archive",
     }
     os_name = {
-         0: u"FAT filesystem",
-         1: u"Amiga",
-         2: u"VMS (or OpenVMS)",
-         3: u"Unix",
-         4: u"VM/CMS",
-         5: u"Atari TOS",
-         6: u"HPFS filesystem (OS/2, NT)",
-         7: u"Macintosh",
-         8: u"Z-System",
-         9: u"CP/M",
-        10: u"TOPS-20",
-        11: u"NTFS filesystem (NT)",
-        12: u"QDOS",
-        13: u"Acorn RISCOS",
+         0: "FAT filesystem",
+         1: "Amiga",
+         2: "VMS (or OpenVMS)",
+         3: "Unix",
+         4: "VM/CMS",
+         5: "Atari TOS",
+         6: "HPFS filesystem (OS/2, NT)",
+         7: "Macintosh",
+         8: "Z-System",
+         9: "CP/M",
+        10: "TOPS-20",
+        11: "NTFS filesystem (NT)",
+        12: "QDOS",
+        13: "Acorn RISCOS",
     }
     COMPRESSION_NAME = {
-        8: u"deflate",
+        8: "deflate",
     }
 
     def validate(self):
@@ -117,7 +117,7 @@ class GzipParser(Parser):
         yield filesizeHandler(UInt32(self, "size", "Uncompressed size"))
 
     def createDescription(self):
-        desc = u"gzip archive"
+        desc = "gzip archive"
         info = []
         if "filename" in self:
             info.append('filename "%s"' % self["filename"].value)

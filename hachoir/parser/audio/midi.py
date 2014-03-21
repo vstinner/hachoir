@@ -80,7 +80,7 @@ def parseTimeSignature(parser, size):
 
 class Command(FieldSet):
     COMMAND = {}
-    for channel in xrange(16):
+    for channel in range(16):
         COMMAND[0x80+channel] = ("Note off (channel %u)" % channel, parseNote)
         COMMAND[0x90+channel] = ("Note on (channel %u)" % channel, parseNote)
         COMMAND[0xA0+channel] = ("Key after-touch (channel %u)" % channel, parseNote)
@@ -212,7 +212,7 @@ class MidiFile(Parser):
         "id": "midi",
         "category": "audio",
         "file_ext": ["mid", "midi"],
-        "mime": (u"audio/mime", ),
+        "mime": ("audio/mime", ),
         "magic": ((MAGIC, 0),),
         "min_size": 64,
         "description": "MIDI audio"

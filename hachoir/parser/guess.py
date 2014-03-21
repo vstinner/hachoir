@@ -9,6 +9,7 @@ from hachoir.parser import ValidateError, HachoirParserList
 from hachoir.core.stream import FileInputStream
 from hachoir.core.i18n import _
 import weakref
+import collections
 
 
 class QueryParser(object):
@@ -51,7 +52,7 @@ class QueryParser(object):
         if tag is None:
             self.parsers.clear()
             return []
-        elif callable(tag):
+        elif isinstance(tag, collections.Callable):
             parsers = [ parser for parser in self.parsers if tag(parser) ]
             for parser in parsers:
                 self.parsers.remove(parser)
@@ -68,7 +69,7 @@ class QueryParser(object):
                 key = tag[0]
                 byname = self.db.bytag.get(key,{})
                 if tag[1] is None:
-                    values = byname.itervalues()
+                    values = iter(byname.values())
                 else:
                     values = byname.get(tag[1],()),
                 if key == "id" and values:
@@ -100,15 +101,15 @@ class QueryParser(object):
             try:
                 parser_obj = parser(stream, validate=self.validate)
                 if self.parser_args:
-                    for key, value in self.parser_args.iteritems():
+                    for key, value in self.parser_args.items():
                         setattr(parser_obj, key, value)
                 return parser_obj
-            except ValidateError, err:
-                res = unicode(err)
+            except ValidateError as err:
+                res = str(err)
                 if fallback and self.fallback:
                     fb = parser
-            except HACHOIR_ERRORS, err:
-                res = unicode(err)
+            except HACHOIR_ERRORS as err:
+                res = str(err)
             if warn:
                 if parser == self.other:
                     warn = info

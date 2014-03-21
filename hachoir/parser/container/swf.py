@@ -81,7 +81,7 @@ SOUND_CODEC = {
 class SoundEnvelope(FieldSet):
     def createFields(self):
         yield UInt8(self, "count")
-        for index in xrange(self["count"].value):
+        for index in range(self["count"].value):
             yield UInt32(self, "mark44[]")
             yield UInt16(self, "level0[]")
             yield UInt16(self, "level1[]")
@@ -203,7 +203,7 @@ class Export(FieldSet):
 
 def parseExport(parent, size):
     yield UInt16(parent, "count")
-    for index in xrange(parent["count"].value):
+    for index in range(parent["count"].value):
         yield Export(parent, "export[]")
 
 def parseProductInfo(parent, size):
@@ -220,7 +220,7 @@ def parseScriptLimits(parent, size):
 
 def parseSymbolClass(parent, size):
     yield UInt16(parent, "count")
-    for index in xrange(parent["count"].value):
+    for index in range(parent["count"].value):
         yield UInt16(parent, "symbol_id[]")
         yield CString(parent, "symbol_name[]")
 
@@ -365,14 +365,14 @@ class Tag(FieldSet):
         return "Tag: %s (%s)" % (self["code"].display, self["length"].display)
 
 class SwfFile(Parser):
-    VALID_VERSIONS = set(xrange(1, 10+1))
+    VALID_VERSIONS = set(range(1, 10+1))
     PARSER_TAGS = {
         "id": "swf",
         "category": "container",
         "file_ext": ["swf"],
-        "mime": (u"application/x-shockwave-flash",),
+        "mime": ("application/x-shockwave-flash",),
         "min_size": 64,
-        "description": u"Macromedia Flash data"
+        "description": "Macromedia Flash data"
     }
     PARSER_TAGS["magic"] = []
     for version in VALID_VERSIONS:
@@ -422,7 +422,7 @@ class SwfFile(Parser):
         desc = ["version %u" % self["version"].value]
         if self["signature"].value == "CWS":
             desc.append("compressed")
-        return u"Macromedia Flash data: %s" % (", ".join(desc))
+        return "Macromedia Flash data: %s" % (", ".join(desc))
 
     def createContentSize(self):
         if self["signature"].value == "FWS":

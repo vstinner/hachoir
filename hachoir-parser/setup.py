@@ -65,7 +65,7 @@ def main():
         "long_description": long_description,
         "classifiers": CLASSIFIERS,
         "license": hachoir.parser.LICENSE,
-        "packages": PACKAGES.keys(),
+        "packages": list(PACKAGES.keys()),
         "package_dir": PACKAGES,
     }
     if use_setuptools:

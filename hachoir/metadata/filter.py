@@ -22,7 +22,7 @@ class Filter:
 
 class NumberFilter(Filter):
     def __init__(self, min=None, max=None):
-        Filter.__init__(self, (int, long, float), min, max)
+        Filter.__init__(self, (int, int, float), min, max)
 
 class DatetimeFilter(Filter):
     def __init__(self, min=None, max=None):

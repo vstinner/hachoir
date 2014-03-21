@@ -81,7 +81,7 @@ class JpegMetadata(RootMetadata):
         if "data" in jpeg:
             computeComprRate(self, jpeg["data"].size)
         if not self.has("producer") and "photoshop" in jpeg:
-            self.producer = u"Adobe Photoshop"
+            self.producer = "Adobe Photoshop"
         if self.has("compression"):
             self.compression = "JPEG"
 
@@ -120,7 +120,7 @@ class JpegMetadata(RootMetadata):
         sumcoeff = 0
         for qt in qtlist:
            coeff = qt.array("coeff")
-           for index in xrange(64):
+           for index in range(64):
                 sumcoeff += coeff[index].value
 
         # Choose the right quality table and compute hash value
@@ -138,7 +138,7 @@ class JpegMetadata(RootMetadata):
             return
 
         # Find the JPEG quality
-        for index in xrange(100):
+        for index in range(100):
             if (hashval >= hashtable[index]) or (sumcoeff >= sumtable[index]):
                 quality = "%s%%" % (index + 1)
                 if (hashval > hashtable[index]) or (sumcoeff > sumtable[index]):
@@ -148,7 +148,7 @@ class JpegMetadata(RootMetadata):
 
     @fault_tolerant
     def extractAPP0(self, app0):
-        self.format_version = u"JFIF %u.%02u" \
+        self.format_version = "JFIF %u.%02u" \
             % (app0["ver_maj"].value, app0["ver_min"].value)
         if "y_density" in app0:
             self.width_dpi = app0["x_density"].value
@@ -176,9 +176,9 @@ class JpegMetadata(RootMetadata):
             if not value:
                 return
             if isinstance(value, float):
-                value = (value, u"1/%g" % (1/value))
+                value = (value, "1/%g" % (1/value))
         elif entry["type"].value in (BasicIFDEntry.TYPE_RATIONAL, BasicIFDEntry.TYPE_SIGNED_RATIONAL):
-            value = (value, u"%.3g" % value)
+            value = (value, "%.3g" % value)
 
         # Store information
         setattr(self, key, value)
@@ -251,7 +251,7 @@ class JpegMetadata(RootMetadata):
 
             # Get value
             value = field["content"].value
-            if isinstance(value, (str, unicode)):
+            if isinstance(value, str):
                 value = value.replace("\r", " ")
                 value = value.replace("\n", " ")
 

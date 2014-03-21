@@ -49,7 +49,7 @@ def main():
         "long_description": long_description,
         "classifiers": CLASSIFIERS,
         "scripts": ["hachoir-wx"],
-        "packages": PACKAGES.keys(),
+        "packages": list(PACKAGES.keys()),
         "package_dir": PACKAGES,
         "package_data": {"hachoir_wx.resource": ['hachoir_wx.xrc']},
     }

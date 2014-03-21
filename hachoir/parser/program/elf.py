@@ -17,79 +17,79 @@ class ElfHeader(FieldSet):
     BIG_ENDIAN_ID = 2
     MACHINE_NAME = {
         # e_machine, EM_ defines
-        0: u"No machine",
-        1: u"AT&T WE 32100",
-        2: u"SPARC",
-        3: u"Intel 80386",
-        4: u"Motorola 68000",
-        5: u"Motorola 88000",
-        6: u"Intel 80486",
-        7: u"Intel 80860",
-        8: u"MIPS I Architecture",
-        9: u"Amdahl UTS on System/370",
-        10: u"MIPS RS3000 Little-endian",
-        11: u"IBM RS/6000 XXX reserved",
-        15: u"Hewlett-Packard PA-RISC",
-        16: u"NCube XXX reserved",
-        17: u"Fujitsu VPP500",
-        18: u"Enhanced instruction set SPARC",
-        19: u"Intel 80960",
-        20: u"PowerPC 32-bit",
-        21: u"PowerPC 64-bit",
-        36: u"NEC V800",
-        37: u"Fujitsu FR20",
-        38: u"TRW RH-32",
-        39: u"Motorola RCE",
-        40: u"Advanced RISC Machines (ARM)",
-        41: u"DIGITAL Alpha",
-        42: u"Hitachi Super-H",
-        43: u"SPARC Version 9",
-        44: u"Siemens Tricore",
-        45: u"Argonaut RISC Core",
-        46: u"Hitachi H8/300",
-        47: u"Hitachi H8/300H",
-        48: u"Hitachi H8S",
-        49: u"Hitachi H8/500",
-        50: u"Intel Merced (IA-64) Processor",
-        51: u"Stanford MIPS-X",
-        52: u"Motorola Coldfire",
-        53: u"Motorola MC68HC12",
-        62: u"Advanced Micro Devices x86-64",
-        75: u"DIGITAL VAX",
-        36902: u"used by NetBSD/alpha; obsolete",
+        0: "No machine",
+        1: "AT&T WE 32100",
+        2: "SPARC",
+        3: "Intel 80386",
+        4: "Motorola 68000",
+        5: "Motorola 88000",
+        6: "Intel 80486",
+        7: "Intel 80860",
+        8: "MIPS I Architecture",
+        9: "Amdahl UTS on System/370",
+        10: "MIPS RS3000 Little-endian",
+        11: "IBM RS/6000 XXX reserved",
+        15: "Hewlett-Packard PA-RISC",
+        16: "NCube XXX reserved",
+        17: "Fujitsu VPP500",
+        18: "Enhanced instruction set SPARC",
+        19: "Intel 80960",
+        20: "PowerPC 32-bit",
+        21: "PowerPC 64-bit",
+        36: "NEC V800",
+        37: "Fujitsu FR20",
+        38: "TRW RH-32",
+        39: "Motorola RCE",
+        40: "Advanced RISC Machines (ARM)",
+        41: "DIGITAL Alpha",
+        42: "Hitachi Super-H",
+        43: "SPARC Version 9",
+        44: "Siemens Tricore",
+        45: "Argonaut RISC Core",
+        46: "Hitachi H8/300",
+        47: "Hitachi H8/300H",
+        48: "Hitachi H8S",
+        49: "Hitachi H8/500",
+        50: "Intel Merced (IA-64) Processor",
+        51: "Stanford MIPS-X",
+        52: "Motorola Coldfire",
+        53: "Motorola MC68HC12",
+        62: "Advanced Micro Devices x86-64",
+        75: "DIGITAL VAX",
+        36902: "used by NetBSD/alpha; obsolete",
     }
     CLASS_NAME = {
         # e_ident[EI_CLASS], ELFCLASS defines
-        1: u"32 bits",
-        2: u"64 bits"
+        1: "32 bits",
+        2: "64 bits"
     }
     TYPE_NAME = {
         # e_type, ET_ defines
-             0: u"No file type",
-             1: u"Relocatable file",
-             2: u"Executable file",
-             3: u"Shared object file",
-             4: u"Core file",
-        0xFF00: u"Processor-specific (0xFF00)",
-        0xFFFF: u"Processor-specific (0xFFFF)",
+             0: "No file type",
+             1: "Relocatable file",
+             2: "Executable file",
+             3: "Shared object file",
+             4: "Core file",
+        0xFF00: "Processor-specific (0xFF00)",
+        0xFFFF: "Processor-specific (0xFFFF)",
     }
     OSABI_NAME = {
         # e_ident[EI_OSABI], ELFOSABI_ defines
-        0: u"UNIX System V ABI",
-        1: u"HP-UX operating system",
-        2: u"NetBSD",
-        3: u"GNU/Linux",
-        4: u"GNU/Hurd",
-        5: u"86Open common IA32 ABI",
-        6: u"Solaris",
-        7: u"Monterey",
-        8: u"IRIX",
-        9: u"FreeBSD",
-        10: u"TRU64 UNIX",
-        11: u"Novell Modesto",
-        12: u"OpenBSD",
-        97: u"ARM",
-        255: u"Standalone (embedded) application",
+        0: "UNIX System V ABI",
+        1: "HP-UX operating system",
+        2: "NetBSD",
+        3: "GNU/Linux",
+        4: "GNU/Hurd",
+        5: "86Open common IA32 ABI",
+        6: "Solaris",
+        7: "Monterey",
+        8: "IRIX",
+        9: "FreeBSD",
+        10: "TRU64 UNIX",
+        11: "Novell Modesto",
+        12: "OpenBSD",
+        97: "ARM",
+        255: "Standalone (embedded) application",
     }
     ENDIAN_NAME = {
         # e_ident[EI_DATA], ELFDATA defines
@@ -236,15 +236,15 @@ class ProgramFlags(FieldSet):
 class ProgramHeader32(FieldSet):
     TYPE_NAME = {
         # p_type, PT_ defines
-        0: u"Unused program header table entry",
-        1: u"Loadable program segment",
-        2: u"Dynamic linking information",
-        3: u"Program interpreter",
-        4: u"Auxiliary information",
-        5: u"Reserved, unspecified semantics",
-        6: u"Entry for header table itself",
-        7: u"Thread Local Storage segment",
-        0x70000000: u"MIPS_REGINFO",
+        0: "Unused program header table entry",
+        1: "Loadable program segment",
+        2: "Dynamic linking information",
+        3: "Program interpreter",
+        4: "Auxiliary information",
+        5: "Reserved, unspecified semantics",
+        6: "Entry for header table itself",
+        7: "Thread Local Storage segment",
+        0x70000000: "MIPS_REGINFO",
     }
     static_size = 32*8
 
@@ -282,11 +282,11 @@ class ElfFile(HachoirParser, RootSeekableFieldSet):
         "file_ext": ("so", ""),
         "min_size": 52*8,  # At least one program header
         "mime": (
-            u"application/x-executable",
-            u"application/x-object",
-            u"application/x-sharedlib",
-            u"application/x-executable-file",
-            u"application/x-coredump"),
+            "application/x-executable",
+            "application/x-object",
+            "application/x-sharedlib",
+            "application/x-executable-file",
+            "application/x-coredump"),
         "magic": (("\x7FELF", 0),),
         "description": "ELF Unix/BSD program/library"
     }
@@ -315,7 +315,7 @@ class ElfFile(HachoirParser, RootSeekableFieldSet):
         yield ElfHeader(self, "header", "Header")
         self.is64bit = (self["header/class"].value == 2)
 
-        for index in xrange(self["header/phnum"].value):
+        for index in range(self["header/phnum"].value):
             if self.is64bit:
                 yield ProgramHeader64(self, "prg_header[]")
             else:
@@ -323,13 +323,13 @@ class ElfFile(HachoirParser, RootSeekableFieldSet):
 
         self.seekByte(self["header/shoff"].value, relative=False)
 
-        for index in xrange(self["header/shnum"].value):
+        for index in range(self["header/shnum"].value):
             if self.is64bit:
                 yield SectionHeader64(self, "section_header[]")
             else:
                 yield SectionHeader32(self, "section_header[]")
         
-        for index in xrange(self["header/shnum"].value):
+        for index in range(self["header/shnum"].value):
             field = self["section_header["+str(index)+"]"]
             if field['size'].value != 0:
                 self.seekByte(field['LMA'].value, relative=False)

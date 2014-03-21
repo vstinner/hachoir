@@ -41,7 +41,7 @@ class BenchmarkStat:
     def __len__(self):
         return len(self._values)
 
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(self._values)
 
     def getMin(self):
@@ -97,8 +97,8 @@ class Benchmark:
         average = stat.getSum() / len(stat)
         values = (stat.getMin(), average, stat.getMax(), stat.getSum())
         values = tuple(self.formatTime(value) for value in values)
-        print _("Benchmark: best=%s  average=%s  worst=%s  total=%s") \
-            % values
+        print(_("Benchmark: best=%s  average=%s  worst=%s  total=%s") \
+            % values)
 
     def _runOnce(self, func, args, kw):
         before = time()
@@ -139,33 +139,33 @@ class Benchmark:
             return stat
         estimate = diff * count
         if self.verbose:
-            print _("Run benchmark: %s calls (estimate: %s)") \
-                % (count, self.formatTime(estimate))
+            print(_("Run benchmark: %s calls (estimate: %s)") \
+                % (count, self.formatTime(estimate)))
 
         display_progress = self.verbose and (1.0 <= estimate)
         total_count = 1
         while total_count < count:
             # Run benchmark and display each result
             if display_progress:
-                print _("Result %s/%s: %s  (best: %s)") % \
+                print(_("Result %s/%s: %s  (best: %s)") % \
                     (total_count, count,
-                    self.formatTime(diff), self.formatTime(best))
+                    self.formatTime(diff), self.formatTime(best)))
             part = count - total_count
 
             # Will takes more than one second?
             average = total_time / total_count
             if self.progress_time < part * average:
                 part = max( int(self.progress_time / average), 1)
-            for index in xrange(part):
+            for index in range(part):
                 diff = self._runOnce(func, args, kw)
                 stat.append(diff)
                 total_time += diff
                 best = min(diff, best)
             total_count += part
         if display_progress:
-            print _("Result %s/%s: %s  (best: %s)") % \
+            print(_("Result %s/%s: %s  (best: %s)") % \
                 (count, count,
-                self.formatTime(diff), self.formatTime(best))
+                self.formatTime(diff), self.formatTime(best)))
         return stat
 
     def validateStat(self, stat):

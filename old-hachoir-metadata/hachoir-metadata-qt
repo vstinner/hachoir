@@ -46,14 +46,14 @@ class File:
             self.realname = filename
         try:
             self.parser = createParser(self.name, self.realname)
-        except HACHOIR_ERRORS, err:
-            raise MetadataError("Parser error: %s" % unicode(err))
+        except HACHOIR_ERRORS as err:
+            raise MetadataError("Parser error: %s" % str(err))
         if not self.parser:
             raise MetadataError("Unable to parse the file: %s" % self.name)
         try:
             self.metadata = extractMetadata(self.parser)
-        except HACHOIR_ERRORS, err:
-            raise MetadataError("Metadata extraction error: %s" % unicode(err))
+        except HACHOIR_ERRORS as err:
+            raise MetadataError("Metadata extraction error: %s" % str(err))
         if not self.metadata:
             file_type = self.parser.mime_type
             raise MetadataError("Unable to extract metadata from file of type %s" % file_type)
@@ -87,7 +87,7 @@ class Metadata(QDialog, Ui_Form):
         )
         if not filename:
             return
-        filename = unicode(filename)
+        filename = str(filename)
         self.current_dir = dirname(filename)
         self.addFile(filename, change=True)
 
@@ -115,7 +115,7 @@ class Metadata(QDialog, Ui_Form):
         row = 0
         for metadata in groups:
             for data in metadata:
-                if isinstance(data, (str, unicode)):
+                if isinstance(data, str):
                     table.setItem(row, 0, CustomTableWidgetItem("-- group --"))
                     table.setItem(row, 1, CustomTableWidgetItem(data))
                     row += 1
@@ -129,18 +129,18 @@ class Metadata(QDialog, Ui_Form):
         table.resizeColumnsToContents()
 
     def changeFile(self, name):
-        name = unicode(name)
+        name = str(name)
         file = self.files[name]
         self.fillList(file)
 
     def error(self, message):
-        QMessageBox.warning(self, u"Metadata error", message)
+        QMessageBox.warning(self, "Metadata error", message)
 
     def addFile(self, filename, realname=None, change=False):
         try:
             file = File(filename, realname)
-        except MetadataError, err:
-            errmsg = unicode(err)
+        except MetadataError as err:
+            errmsg = str(err)
             self.error(errmsg)
             return
         name = basename(file.name)

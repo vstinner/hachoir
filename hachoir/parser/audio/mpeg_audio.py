@@ -275,8 +275,8 @@ def createMpegAudioMagic():
     # MPEG frame magic
     # TODO: Use longer magic: 32 bits instead of 16 bits
     SYNC_BITS = 2047
-    for version in Frame.VERSION_NAME.iterkeys():
-        for layer in Frame.LAYER_NAME.iterkeys():
+    for version in Frame.VERSION_NAME.keys():
+        for layer in Frame.LAYER_NAME.keys():
             for crc16 in (0, 1):
                 magic = (SYNC_BITS << 5) | (version << 3) | (layer << 1) | crc16
                 magic = long2raw(magic, BIG_ENDIAN, 2)
@@ -288,7 +288,7 @@ class MpegAudioFile(Parser):
         "id": "mpeg_audio",
         "category": "audio",
         "file_ext": ("mpa", "mp1", "mp2", "mp3"),
-        "mime": (u"audio/mpeg",),
+        "mime": ("audio/mpeg",),
         "min_size": 4*8,
 #        "magic": createMpegAudioMagic(),
         "description": "MPEG audio version 1, 2, 2.5",
@@ -304,7 +304,7 @@ class MpegAudioFile(Parser):
             return False
 
         # Validate first 5 frames
-        for index in xrange(5):
+        for index in range(5):
             try:
                 frame = self["frames/frame[%u]" % index]
             except MissingField:

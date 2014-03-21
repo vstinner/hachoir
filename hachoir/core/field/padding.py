@@ -41,7 +41,7 @@ class PaddingBits(Bits):
 
     def createDisplay(self):
         if self._display_pattern:
-            return u"<padding pattern=%s>" % self.pattern
+            return "<padding pattern=%s>" % self.pattern
         else:
             return Bits.createDisplay(self)
 
@@ -94,7 +94,7 @@ class PaddingBytes(Bytes):
 
     def createDisplay(self):
         if self._display_pattern:
-            return u"<padding pattern=%s>" % makePrintable(self.pattern, "ASCII", quote="'")
+            return "<padding pattern=%s>" % makePrintable(self.pattern, "ASCII", quote="'")
         else:
             return Bytes.createDisplay(self)
 

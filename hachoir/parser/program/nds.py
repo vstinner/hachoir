@@ -284,7 +284,7 @@ class NdsFile(Parser, RootSeekableFieldSet):
         "id": "nds_file",
         "category": "program",
         "file_ext": ("nds",),
-        "mime": (u"application/octet-stream",),
+        "mime": ("application/octet-stream",),
         "min_size": 352 * 8, # just a minimal header
         "description": "Nintendo DS game file",
     }
@@ -294,7 +294,7 @@ class NdsFile(Parser, RootSeekableFieldSet):
     def validate(self):
         try:
             header = self["header"]
-        except Exception, e:
+        except Exception as e:
             return False
 
         return (self.stream.readBytes(0, 1) != "\0"

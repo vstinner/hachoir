@@ -51,7 +51,7 @@ class BasicStripper:
 
     def info(self, message):
         if self.verbose:
-            print message
+            print(message)
 
     def strip(self):
         """
@@ -165,7 +165,7 @@ class MpegAudioStripper(CheckStripper):
         return False
 
 def usage():
-    print "Usage: %s filename" % sys.argv[0]
+    print("Usage: %s filename" % sys.argv[0])
 
 class TarStripper(BasicStripper):
     def strip(self):
@@ -205,7 +205,7 @@ def stripEditor(editor, filename, level, verbose):
     try:
         stripper_cls = strippers[cls]
     except KeyError:
-        print "Don't have stripper for file type: %s" % editor.description
+        print("Don't have stripper for file type: %s" % editor.description)
         return False
     stripper = stripper_cls(editor, level, verbose)
 
@@ -217,21 +217,21 @@ def stripEditor(editor, filename, level, verbose):
         if size:
             percent = "%.1f%%" % (float(size) * 100 / editor.input.size)
             if size%8 and size < 128:
-                print _("Remove %u.%u bytes (%s)") \
-                    % (size//8, size%8, percent)
+                print(_("Remove %u.%u bytes (%s)") \
+                    % (size//8, size%8, percent))
             else:
-                print _("Remove %s (%s)") % (humanFilesize(size//8), percent)
-        print _("Save new file into %s") % \
-            makePrintable(filename, getTerminalCharset(), to_unicode=True)
+                print(_("Remove %s (%s)") % (humanFilesize(size//8), percent))
+        print(_("Save new file into %s") % \
+            makePrintable(filename, getTerminalCharset(), to_unicode=True))
     else:
-        print _("Stripper doesn't touch the file")
+        print(_("Stripper doesn't touch the file"))
     return True
 
 def displayVersion(*args):
-    print _("Hachoir strip version %s") % __version__
-    print _("Hachoir library version %s") % hachoir.core.__version__
-    print
-    print _("Website: %s") % WEBSITE
+    print(_("Hachoir strip version %s") % __version__)
+    print(_("Hachoir library version %s") % hachoir.core.__version__)
+    print()
+    print(_("Website: %s") % WEBSITE)
     sys.exit(0)
 
 def parseOptions():
@@ -265,13 +265,13 @@ def main():
         elif item == "index":
             level |= STRIP_INDEX
     if not level:
-        print _("Nothing to do, exit")
+        print(_("Nothing to do, exit"))
         sys.exit(0)
     ok = True
     charset = getTerminalCharset()
     for filename in filenames:
         filename, real_filename = unicodeFilename(filename), filename
-        print "[+]", (_("Process file %s") % filename)
+        print("[+]", (_("Process file %s") % filename))
         parser = createParser(filename, real_filename=real_filename)
         if parser:
             editor = createEditor(parser)

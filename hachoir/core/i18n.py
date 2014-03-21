@@ -75,7 +75,7 @@ class UnicodeStdout(object):
         self.device.flush()
 
     def write(self, text):
-        if isinstance(text, unicode):
+        if isinstance(text, str):
             text = text.encode(self.charset, 'replace')
         self.device.write(text)
 
@@ -107,13 +107,13 @@ def initLocale():
 initLocale.is_done = False
 
 def _dummy_gettext(text):
-    return unicode(text)
+    return str(text)
 
 def _dummy_ngettext(singular, plural, count):
     if 1 < abs(count) or not count:
-        return unicode(plural)
+        return str(plural)
     else:
-        return unicode(singular)
+        return str(singular)
 
 def _initGettext():
     charset = initLocale()
@@ -145,9 +145,9 @@ def _initGettext():
     # TODO: translate_unicode lambda function really sucks!
     # => find native function to do that
     unicode_gettext = lambda text: \
-        unicode(translate(text), charset)
+        str(translate(text), charset)
     unicode_ngettext = lambda singular, plural, count: \
-        unicode(ngettext(singular, plural, count), charset)
+        str(ngettext(singular, plural, count), charset)
     return (unicode_gettext, unicode_ngettext)
 
 UTF_BOMS = (
@@ -159,10 +159,10 @@ UTF_BOMS = (
 # Set of valid characters for specific charset
 CHARSET_CHARACTERS = (
     # U+00E0: LATIN SMALL LETTER A WITH GRAVE
-    (set(u"©®éêè\xE0ç".encode("ISO-8859-1")), "ISO-8859-1"),
-    (set(u"©®éêè\xE0ç€".encode("ISO-8859-15")), "ISO-8859-15"),
-    (set(u"©®".encode("MacRoman")), "MacRoman"),
-    (set(u"εδηιθκμοΡσςυΈί".encode("ISO-8859-7")), "ISO-8859-7"),
+    (set("©®éêè\xE0ç".encode("ISO-8859-1")), "ISO-8859-1"),
+    (set("©®éêè\xE0ç€".encode("ISO-8859-15")), "ISO-8859-15"),
+    (set("©®".encode("MacRoman")), "MacRoman"),
+    (set("εδηιθκμοΡσςυΈί".encode("ISO-8859-7")), "ISO-8859-7"),
 )
 
 def guessBytesCharset(bytes, default=None):
@@ -189,14 +189,14 @@ def guessBytesCharset(bytes, default=None):
 
     # Pure ASCII?
     try:
-        text = unicode(bytes, 'ASCII', 'strict')
+        text = str(bytes, 'ASCII', 'strict')
         return 'ASCII'
     except UnicodeDecodeError:
         pass
 
     # Valid UTF-8?
     try:
-        text = unicode(bytes, 'UTF-8', 'strict')
+        text = str(bytes, 'UTF-8', 'strict')
         return 'UTF-8'
     except UnicodeDecodeError:
         pass

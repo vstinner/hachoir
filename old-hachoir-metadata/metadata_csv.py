@@ -27,19 +27,19 @@ class Extractor:
             self.total += 1
             line = self.processFile(filename)
             if line:
-                print >>output, line
+                print(line, file=output)
             else:
                 self.invalid += 1
         output.close()
         self.summary()
 
     def summary(self):
-        print >>stderr
-        print >>stderr, "Valid files: %s" % (self.total - self.invalid)
-        print >>stderr, "Invalid files: %s" % self.invalid
-        print >>stderr, "Total files: %s" % self.total
-        print >>stderr
-        print >>stderr, "Result written into %s" % OUTPUT_FILENAME
+        print(file=stderr)
+        print("Valid files: %s" % (self.total - self.invalid), file=stderr)
+        print("Invalid files: %s" % self.invalid, file=stderr)
+        print("Total files: %s" % self.total, file=stderr)
+        print(file=stderr)
+        print("Result written into %s" % OUTPUT_FILENAME, file=stderr)
 
     def findFiles(self, directory, pattern):
         for dirpath, dirnames, filenames in walk(directory):
@@ -50,24 +50,24 @@ class Extractor:
 
     def processFile(self, filename):
         filename, realname = unicodeFilename(filename), filename
-        print u"[%s] Process file %s..." % (self.total, filename)
+        print("[%s] Process file %s..." % (self.total, filename))
         parser = createParser(filename, realname)
         if not parser:
-            print >>stderr, "Unable to parse file"
+            print("Unable to parse file", file=stderr)
             return None
         try:
             metadata = extractMetadata(parser)
-        except HachoirError, err:
-            print >>stderr, "Metadata extraction error: %s" % unicode(err)
+        except HachoirError as err:
+            print("Metadata extraction error: %s" % str(err), file=stderr)
             return None
         if not metadata:
-            print >>stderr, "Unable to extract metadata"
+            print("Unable to extract metadata", file=stderr)
             return None
 
         filename = makePrintable(filename, self.charset, to_unicode=True)
         line = [filename]
         for field in self.fields:
-            value = metadata.getText(field, u'')
+            value = metadata.getText(field, '')
             value = makePrintable(value, self.charset, to_unicode=True)
             line.append(value)
         return '; '.join(line)
@@ -75,9 +75,9 @@ class Extractor:
 def main():
     initLocale()
     if len(argv) != 3:
-        print >>stderr, "usage: %s directory fields" % argv[0]
-        print >>stderr
-        print >>stderr, "eg. %s . title,creation_date" % argv[0]
+        print("usage: %s directory fields" % argv[0], file=stderr)
+        print(file=stderr)
+        print("eg. %s . title,creation_date" % argv[0], file=stderr)
         exit(1)
     directory = argv[1]
     fields = [field.strip() for field in argv[2].split(",")]

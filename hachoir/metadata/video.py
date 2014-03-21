@@ -289,7 +289,7 @@ class AsfMetadata(MultipleMetadata):
                 del data["IsVBR"]
 
             # Store data
-            for key, value in data.iteritems():
+            for key, value in data.items():
                 if key in self.EXT_DESC_TO_ATTR:
                     key = self.EXT_DESC_TO_ATTR[key]
                 else:
@@ -376,7 +376,7 @@ class AsfMetadata(MultipleMetadata):
         self.creation_date = prop["creation_date"].value
         self.duration = prop["play_duration"].value
         if prop["seekable"].value:
-            self.comment = u"Is seekable"
+            self.comment = "Is seekable"
         value = prop["max_bitrate"].value
         text = prop["max_bitrate"].display
         if is_vbr is True:

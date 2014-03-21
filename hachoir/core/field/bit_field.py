@@ -30,7 +30,7 @@ class RawBits(Field):
 
     def createDisplay(self):
         if self._size < config.max_bit_length:
-            return unicode(self.value)
+            return str(self.value)
         else:
             return _("<%s size=%u>" %
                 (self.__class__.__name__, self._size))
@@ -64,5 +64,5 @@ class Bit(RawBits):
                 self.absolute_address, 1, self._parent.endian)
 
     def createRawDisplay(self):
-        return unicode(int(self.value))
+        return str(int(self.value))
 

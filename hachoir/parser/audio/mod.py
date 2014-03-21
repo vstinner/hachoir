@@ -92,7 +92,7 @@ class Row(FieldSet):
         self._size = 8*self.channels*4
 
     def createFields(self):
-        for index in xrange(self.channels):
+        for index in range(self.channels):
             yield Note(self, "note[]")
 
 class Pattern(FieldSet):
@@ -102,7 +102,7 @@ class Pattern(FieldSet):
         self._size = 64*8*self.channels*4
 
     def createFields(self):
-        for index in xrange(64):
+        for index in range(64):
             yield Row(self, "row[]", self.channels)
 
 class AmigaModule(Parser):
@@ -110,7 +110,7 @@ class AmigaModule(Parser):
         "id": "mod",
         "category": "audio",
         "file_ext": ("mod", "nst", "wow", "oct", "sd0" ),
-        "mime": (u'audio/mod', u'audio/x-mod', u'audio/mod', u'audio/x-mod'),
+        "mime": ('audio/mod', 'audio/x-mod', 'audio/mod', 'audio/x-mod'),
         "min_size": 1084*8,
         "description": "Uncompressed amiga module"
     }
@@ -130,17 +130,17 @@ class AmigaModule(Parser):
 
         # Number of patterns
         patterns = 0
-        for index in xrange(128):
+        for index in range(128):
             patterns = max(patterns,
                            header["patterns/position[%u]" % index].value)
         patterns += 1
 
         # Yield patterns
-        for index in xrange(patterns):
+        for index in range(patterns):
             yield Pattern(self, "pattern[]", channels)
 
         # Yield samples
-        for index in xrange(31):
+        for index in range(31):
             count = header["samples/info[%u]/sample_count" % index].value
             if count:
                 self.info("Yielding sample %u: %u samples" % (index, count))

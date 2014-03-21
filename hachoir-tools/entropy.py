@@ -3,7 +3,7 @@ from math import log
 
 class Entropy:
     def __init__(self):
-        self.frequence = dict( (chr(index), 0) for index in xrange(0, 256) )
+        self.frequence = dict( (chr(index), 0) for index in range(0, 256) )
         self.count = 0
 
     def readBytes(self, bytes):
@@ -14,7 +14,7 @@ class Entropy:
 
     def compute(self):
         h = 0
-        for value in self.frequence.itervalues():
+        for value in self.frequence.values():
             if not value:
                 continue
             p_i = float(value) / self.count
@@ -31,7 +31,7 @@ class EntropyFile(Entropy):
         self.buffer_size = 4096
 
     def displayProgress(self, percent):
-        print >>stderr, "Progress: %.1f%%" % percent
+        print("Progress: %.1f%%" % percent, file=stderr)
 
     def readStream(self, stream, streamsize=None):
         # Read stream size
@@ -62,11 +62,11 @@ class EntropyFile(Entropy):
 def main():
     from sys import argv, exit
     if len(argv) != 2:
-        print >>stderr, "usage: %s filename" % argv[0]
+        print("usage: %s filename" % argv[0], file=stderr)
         exit(1)
     entropy = EntropyFile()
     entropy.readFile(argv[1])
-    print "Entropy: %.4f bit/byte" % entropy.compute()
+    print("Entropy: %.4f bit/byte" % entropy.compute())
     exit(0)
 
 if __name__ == "__main__":

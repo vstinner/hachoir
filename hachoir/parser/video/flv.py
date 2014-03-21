@@ -32,23 +32,23 @@ SAMPLING_RATE_TEXT = createDict(SAMPLING_RATE, 1)
 
 AUDIO_CODEC_MP3 = 2
 AUDIO_CODEC_NAME = {
-    0: u"Uncompressed",
-    1: u"ADPCM",
-    2: u"MP3",
-    5: u"Nellymoser 8kHz mono",
-    6: u"Nellymoser",
+    0: "Uncompressed",
+    1: "ADPCM",
+    2: "MP3",
+    5: "Nellymoser 8kHz mono",
+    6: "Nellymoser",
 }
 
 VIDEO_CODEC_NAME = {
-    2: u"Sorensen H.263",
-    3: u"Screen video",
-    4: u"On2 VP6",
+    2: "Sorensen H.263",
+    3: "Screen video",
+    4: "On2 VP6",
 }
 
 FRAME_TYPE = {
-    1: u"keyframe",
-    2: u"inter frame",
-    3: u"disposable inter frame",
+    1: "keyframe",
+    2: "inter frame",
+    3: "disposable inter frame",
 }
 
 class Header(FieldSet):
@@ -126,7 +126,7 @@ class FlvFile(Parser):
         "id": "flv",
         "category": "video",
         "file_ext": ("flv",),
-        "mime": (u"video/x-flv",),
+        "mime": ("video/x-flv",),
         "min_size": 9*4,
         "magic": (
             # Signature, version=1, flags=5 (video+audio), header size=9
@@ -134,7 +134,7 @@ class FlvFile(Parser):
             # Signature, version=1, flags=5 (video), header size=9
             ("FLV\1\x01\0\0\0\x09", 0),
         ),
-        "description": u"Macromedia Flash video"
+        "description": "Macromedia Flash video"
     }
     endian = BIG_ENDIAN
 
@@ -153,5 +153,5 @@ class FlvFile(Parser):
             yield UInt32(self, "prev_size[]", "Size of previous chunk")
 
     def createDescription(self):
-        return u"Macromedia Flash video version %s" % self["header/version"].value
+        return "Macromedia Flash video version %s" % self["header/version"].value
 

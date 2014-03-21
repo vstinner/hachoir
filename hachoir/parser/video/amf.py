@@ -25,7 +25,7 @@ def parseBool(parent):
 
 def parseArray(parent):
     yield UInt32(parent, "count")
-    for index in xrange(parent["count"].value):
+    for index in range(parent["count"].value):
         yield AMFObject(parent, "item[]")
 
 def parseObjectAttributes(parent):
@@ -37,7 +37,7 @@ def parseObjectAttributes(parent):
 
 def parseMixedArray(parent):
     yield UInt32(parent, "count")
-    for index in xrange(parent["count"].value + 1):
+    for index in range(parent["count"].value + 1):
         item = Attribute(parent, "item[]")
         yield item
         if not item['key'].value:

@@ -47,7 +47,7 @@ class Lacing(FieldSet):
 def parseVorbisComment(parent):
     yield PascalString32(parent, 'vendor', charset="UTF-8")
     yield UInt32(parent, 'count')
-    for index in xrange(parent["count"].value):
+    for index in range(parent["count"].value):
         yield PascalString32(parent, 'metadata[]', charset="UTF-8")
     if parent.current_size != parent.size:
         yield UInt8(parent, "framing_flag")
@@ -164,7 +164,7 @@ class Packets:
                     if size:
                         yield size * 8
                     size = segment_size
-            fragment = fragment.next
+            fragment = fragment.__next__
         if size:
             yield size * 8
 
@@ -249,10 +249,10 @@ class OggFile(Parser):
         "category": "container",
         "file_ext": ("ogg", "ogm"),
         "mime": (
-            u"application/ogg", u"application/x-ogg",
-            u"audio/ogg", u"audio/x-ogg",
-            u"video/ogg", u"video/x-ogg",
-            u"video/theora", u"video/x-theora",
+            "application/ogg", "application/x-ogg",
+            "audio/ogg", "audio/x-ogg",
+            "video/ogg", "video/x-ogg",
+            "video/theora", "video/x-theora",
          ),
         "magic": ((OggPage.MAGIC, 0),),
         "subfile": "skip",
@@ -266,7 +266,7 @@ class OggFile(Parser):
         if self.stream.readBytes(0, len(magic)) != magic:
             return "Invalid magic string"
         # Validate first 3 pages
-        for index in xrange(3):
+        for index in range(3):
             try:
                 page = self[index]
             except MissingField:
@@ -282,19 +282,19 @@ class OggFile(Parser):
 
     def createMimeType(self):
         if "theora_hdr" in self["page[0]/segments"]:
-            return u"video/theora"
+            return "video/theora"
         elif "vorbis_hdr" in self["page[0]/segments"]:
-            return u"audio/vorbis"
+            return "audio/vorbis"
         else:
-            return u"application/ogg"
+            return "application/ogg"
 
     def createDescription(self):
         if "theora_hdr" in self["page[0]"]:
-            return u"Ogg/Theora video"
+            return "Ogg/Theora video"
         elif "vorbis_hdr" in self["page[0]"]:
-            return u"Ogg/Vorbis audio"
+            return "Ogg/Vorbis audio"
         else:
-            return u"Ogg multimedia container"
+            return "Ogg multimedia container"
 
     def createFields(self):
         self.streams = {}

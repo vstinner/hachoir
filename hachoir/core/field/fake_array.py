@@ -26,7 +26,7 @@ class FakeArray:
         self._known_size = False
         self._max_index = -1
 
-    def __nonzero__(self):
+    def __bool__(self):
         "Is the array empty or not?"
         if self._cache:
             return True

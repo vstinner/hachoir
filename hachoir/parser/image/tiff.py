@@ -36,7 +36,7 @@ class TiffFile(RootSeekableFieldSet, Parser):
         "id": "tiff",
         "category": "image",
         "file_ext": ("tif", "tiff"),
-        "mime": (u"image/tiff",),
+        "mime": ("image/tiff",),
         "min_size": 8*8,
         "magic": (("II\x2A\0", 0), ("MM\0\x2A", 0)),
         "description": "TIFF picture"

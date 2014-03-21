@@ -30,10 +30,10 @@ class RealAudioFile(Parser):
         "id": "real_audio",
         "category": "audio",
         "file_ext": ["ra"],
-        "mime": (u"audio/x-realaudio", u"audio/x-pn-realaudio"),
+        "mime": ("audio/x-realaudio", "audio/x-pn-realaudio"),
         "min_size": 6*8,
         "magic": ((MAGIC, 0),),
-        "description": u"Real audio (.ra)",
+        "description": "Real audio (.ra)",
     }
     endian = BIG_ENDIAN
 

@@ -289,7 +289,7 @@ class Chunk(FieldSet):
 
     def createDescription(self):
         tag = self["tag"].display
-        return u"Chunk (tag %s)" % tag
+        return "Chunk (tag %s)" % tag
 
 class ChunkAVI(Chunk):
     TAG_INFO = Chunk.TAG_INFO.copy()
@@ -359,7 +359,7 @@ class RiffFile(Parser):
         "category": "container",
         "file_ext": ("avi", "cda", "wav", "ani"),
         "min_size": 16*8,
-        "mime": (u"video/x-msvideo", u"audio/x-wav", u"audio/x-cda"),
+        "mime": ("video/x-msvideo", "audio/x-wav", "audio/x-cda"),
         # FIXME: Use regex "RIFF.{4}(WAVE|CDDA|AVI )"
         "magic": (
             ("AVI LIST", 8*8),
@@ -370,10 +370,10 @@ class RiffFile(Parser):
         "description": "Microsoft RIFF container"
     }
     VALID_TYPES = {
-        "WAVE": (ChunkWAVE, u"audio/x-wav",     u"Microsoft WAVE audio", ".wav"),
-        "CDDA": (ChunkCDDA, u"audio/x-cda",     u"Microsoft Windows audio CD file (cda)", ".cda"),
-        "AVI ": (ChunkAVI,  u"video/x-msvideo", u"Microsoft AVI video", ".avi"),
-        "ACON": (ChunkACON, u"image/x-ani",     u"Microsoft Windows animated cursor", ".ani"),
+        "WAVE": (ChunkWAVE, "audio/x-wav",     "Microsoft WAVE audio", ".wav"),
+        "CDDA": (ChunkCDDA, "audio/x-cda",     "Microsoft Windows audio CD file (cda)", ".cda"),
+        "AVI ": (ChunkAVI,  "video/x-msvideo", "Microsoft AVI video", ".avi"),
+        "ACON": (ChunkACON, "image/x-ani",     "Microsoft Windows animated cursor", ".ani"),
     }
     endian = LITTLE_ENDIAN
 
@@ -410,7 +410,7 @@ class RiffFile(Parser):
     def createDescription(self):
         tag = self["type"].value
         if tag == "AVI ":
-            desc = u"Microsoft AVI video"
+            desc = "Microsoft AVI video"
             if "headers/avi_hdr" in self:
                 header = self["headers/avi_hdr"]
                 desc += ": %ux%u pixels" % (header["width"].value, header["height"].value)
@@ -425,7 +425,7 @@ class RiffFile(Parser):
             try:
                 return self.VALID_TYPES[tag][2]
             except KeyError:
-                return u"Microsoft RIFF container"
+                return "Microsoft RIFF container"
 
     def createContentSize(self):
         size = (self["filesize"].value + 8) * 8

@@ -44,7 +44,7 @@ class FragmentGroup:
 
         # FIXME: Use smarter code to send arguments
         tags = {"class": self.parser, "args": self.args}
-        tags = tags.iteritems()
+        tags = iter(tags.items())
         return StringInputStream(data, "<fragment group>", tags=tags)
 
 class CustomFragment(FieldSet):
@@ -527,7 +527,7 @@ class MPEGVideoFile(Parser):
         "id": "mpeg_video",
         "category": "video",
         "file_ext": ("mpeg", "mpg", "mpe", "vob"),
-        "mime": (u"video/mpeg", u"video/mp2p"),
+        "mime": ("video/mpeg", "video/mp2p"),
         "min_size": 12*8,
 #TODO:        "magic": xxx,
         "description": "MPEG video, version 1 or 2"

@@ -29,7 +29,7 @@ class ImageLine(FieldSet):
         self._size = alignValue(self._width * self._pixel.static_size, 32)
 
     def createFields(self):
-        for x in xrange(self._width):
+        for x in range(self._width):
             yield self._pixel(self, "pixel[]")
         size = self.size - self.current_size
         if size:
@@ -43,7 +43,7 @@ class ImagePixels(FieldSet):
         self._pixel = pixel_class
 
     def createFields(self):
-        for y in xrange(self._height-1, -1, -1):
+        for y in range(self._height-1, -1, -1):
             yield ImageLine(self, "line[%u]" % y, self._width, self._pixel)
         size = (self.size - self.current_size) // 8
         if size:
@@ -127,7 +127,7 @@ class BmpFile(Parser):
         "id": "bmp",
         "category": "image",
         "file_ext": ("bmp",),
-        "mime": (u"image/x-ms-bmp", u"image/x-bmp"),
+        "mime": ("image/x-ms-bmp", "image/x-bmp"),
         "min_size": 30*8,
 #        "magic": (("BM", 0),),
         "magic_regex": ((
@@ -139,12 +139,12 @@ class BmpFile(Parser):
     endian = LITTLE_ENDIAN
 
     COMPRESSION_NAME = {
-        0: u"Uncompressed",
-        1: u"RLE 8-bit",
-        2: u"RLE 4-bit",
-        3: u"Bitfields",
-        4: u"JPEG",
-        5: u"PNG",
+        0: "Uncompressed",
+        1: "RLE 8-bit",
+        2: "RLE 4-bit",
+        3: "Bitfields",
+        4: "JPEG",
+        5: "PNG",
     }
 
     def validate(self):
@@ -188,7 +188,7 @@ class BmpFile(Parser):
         yield parseImageData(self, "pixels", size, header)
 
     def createDescription(self):
-        return u"Microsoft Bitmap version %s" % self["header"].getFormatVersion()
+        return "Microsoft Bitmap version %s" % self["header"].getFormatVersion()
 
     def createContentSize(self):
         return self["file_size"].value * 8

@@ -128,7 +128,7 @@ class DictionaryItem(FieldSet):
 
 # Map first chunk byte => type
 TAGS = {'d': Dictionary, 'i': Integer, 'l': List}
-for index in xrange(0, 9+1):
+for index in range(0, 9+1):
     TAGS[str(index)] = TorrentString
 
 # Create an entry
@@ -148,7 +148,7 @@ class TorrentFile(Parser):
         "category": "misc",
         "file_ext": ("torrent",),
         "min_size": 50*8,
-        "mime": (u"application/x-bittorrent",),
+        "mime": ("application/x-bittorrent",),
         "magic": ((MAGIC, 0),),
         "description": "Torrent metainfo file"
     }

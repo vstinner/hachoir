@@ -58,10 +58,10 @@ class Packet(FieldSet):
 
     def isValid(self):
         if not self["has_payload"].value and not self["has_adaptation"].value:
-            return u"No payload and no adaptation"
+            return "No payload and no adaptation"
         pid = self["pid"].value
         if (0x0002 <= pid <= 0x000f) or (0x2000 <= pid):
-            return u"Invalid program identifier (%s)" % self["pid"].display
+            return "Invalid program identifier (%s)" % self["pid"].display
         return ""
 
 class MPEG_TS(Parser):
@@ -70,7 +70,7 @@ class MPEG_TS(Parser):
         "category": "video",
         "file_ext": ("ts",),
         "min_size": 188*8,
-        "description": u"MPEG-2 Transport Stream"
+        "description": "MPEG-2 Transport Stream"
     }
     endian = BIG_ENDIAN
 
@@ -78,7 +78,7 @@ class MPEG_TS(Parser):
         sync = self.stream.searchBytes("\x47", 0, 204*8)
         if sync is None:
             return "Unable to find synchronization byte"
-        for index in xrange(5):
+        for index in range(5):
             try:
                 packet = self["packet[%u]" % index]
             except (ParserError, MissingField):

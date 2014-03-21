@@ -16,7 +16,7 @@ class Line(FieldSet):
         self._size = self["/width"].value * self["/bpp"].value
 
     def createFields(self):
-        for x in xrange(self["/width"].value):
+        for x in range(self["/width"].value):
             yield UInt8(self, "pixel[]")
 
 class Pixels(FieldSet):
@@ -26,9 +26,9 @@ class Pixels(FieldSet):
 
     def createFields(self):
         if self["/options"].value == 0:
-            RANGE = xrange(self["/height"].value-1,-1,-1)
+            RANGE = range(self["/height"].value-1,-1,-1)
         else:
-            RANGE = xrange(self["/height"].value)
+            RANGE = range(self["/height"].value)
         for y in RANGE:
             yield Line(self, "line[%u]" % y)
 
@@ -37,15 +37,15 @@ class TargaFile(Parser):
         "id": "targa",
         "category": "image",
         "file_ext": ("tga",),
-        "mime": (u"image/targa", u"image/tga", u"image/x-tga"),
+        "mime": ("image/targa", "image/tga", "image/x-tga"),
         "min_size": 18*8,
-        "description": u"Truevision Targa Graphic (TGA)"
+        "description": "Truevision Targa Graphic (TGA)"
     }
     CODEC_NAME = {
-         1: u"8-bit uncompressed",
-         2: u"24-bit uncompressed",
-         9: u"8-bit RLE",
-        10: u"24-bit RLE",
+         1: "8-bit uncompressed",
+         2: "24-bit uncompressed",
+         9: "8-bit RLE",
+        10: "24-bit RLE",
     }
     endian = LITTLE_ENDIAN
 

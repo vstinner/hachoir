@@ -11,10 +11,10 @@ import hachoir.core
 import sys
 
 def displayVersion(*args):
-    print _("Hachoir urwid version %s") % VERSION
-    print _("Hachoir library version %s") % hachoir.core.__version__
-    print
-    print _("Website: %s") % WEBSITE
+    print(_("Hachoir urwid version %s") % VERSION)
+    print(_("Hachoir library version %s") % hachoir.core.__version__)
+    print()
+    print(_("Website: %s") % WEBSITE)
     sys.exit(0)
 
 def displayParserList(*args):
@@ -69,7 +69,7 @@ def openParser(parser_id, filename, offset, size):
     try:
         stream = FileInputStream(unicodeFilename(filename), filename,
                                  offset=offset, size=size, tags=tags)
-    except InputStreamError, err:
+    except InputStreamError as err:
         return None, _("Unable to open file: %s") % err
     parser = guessParser(stream)
     if not parser:
@@ -84,7 +84,7 @@ def main():
     # Open file and create parser
     parser, err = openParser(values.parser, filename, values.offset, values.size)
     if err:
-        print err
+        print(err)
         sys.exit(1)
 
     # Explore file

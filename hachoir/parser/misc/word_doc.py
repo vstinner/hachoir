@@ -374,7 +374,7 @@ class TableParsers(object):
             extra_data_field = UInt16(self, "extra_data_len", "Size of optional extra data after each string")
             yield extra_data_field
             extra_data_len = extra_data_field.value
-            for i in xrange(self["count"].value):
+            for i in range(self["count"].value):
                 if self.name == "SttbfAssoc":
                     desc = self.SttbfAssocDESC.get(i, None)
                 else:
@@ -402,9 +402,9 @@ class TableParsers(object):
             if size is None:
                 size = chunk_parser.static_size // 8
             n = (self.size / 8 - 4) / (4 + size)
-            for i in xrange(n+1):
+            for i in range(n+1):
                 yield UInt32(self, "cp_fc[]", "CP or FC value")
-            for i in xrange(n):
+            for i in range(n):
                 yield chunk_parser(self, "obj[]")
 
 class WordTableParser(OLE2FragmentParser):

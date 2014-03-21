@@ -83,6 +83,7 @@ It's should returns a generator, but this module it may be a list.
 
 import copy
 import operator
+from functools import reduce
 
 # --- True and False constants from Python 2.0                ---
 # --- Warning: for Python < 2.3, they are aliases for 1 and 0 ---
@@ -95,7 +96,7 @@ except NameError:
 
 # --- any() from Python 2.5 ---
 try:
-    from __builtin__ import any
+    from builtins import any
 except ImportError:
     def any(items):
         for item in items:
@@ -105,7 +106,7 @@ except ImportError:
 
 # ---all() from Python 2.5 ---
 try:
-    from __builtin__ import all
+    from builtins import all
 except ImportError:
     def all(items):
         return reduce(operator.__and__, items)
@@ -136,9 +137,9 @@ except (TypeError, SyntaxError):
 # --- isinstance with isinstance Python 2.3 behaviour (arg 2 is a type) ---
 try:
     if isinstance(1, int):
-        from __builtin__ import isinstance
+        from builtins import isinstance
 except TypeError:
-    print "Redef isinstance"
+    print("Redef isinstance")
     def isinstance20(a, typea):
         if type(typea) != type(type):
             raise TypeError("TypeError: isinstance() arg 2 must be a class, type, or tuple of classes and types")
@@ -147,7 +148,7 @@ except TypeError:
 
 # --- reversed() from Python 2.4 ---
 try:
-    from __builtin__ import reversed
+    from builtins import reversed
 except ImportError:
 #    if hasYield() == "ok":
 #        code = """
@@ -166,13 +167,13 @@ except ImportError:
             if not isinstance(data, list):
                 data = list(data)
             reversed_data = []
-            for index in xrange(len(data)-1, -1, -1):
+            for index in range(len(data)-1, -1, -1):
                 reversed_data.append(data[index])
             return reversed_data
 
 # --- sorted() from Python 2.4 ---
 try:
-    from __builtin__ import sorted
+    from builtins import sorted
 except ImportError:
     def sorted(data):
         sorted_data = copy.copy(data)

@@ -38,7 +38,7 @@ class BmpMetadata(RootMetadata):
                 self.nb_colors = hdr["used_colors"].value
             self.bits_per_pixel = bpp
         self.compression = hdr["compression"].display
-        self.format_version = u"Microsoft Bitmap version %s" % hdr.getFormatVersion()
+        self.format_version = "Microsoft Bitmap version %s" % hdr.getFormatVersion()
 
         self.width_dpi = hdr["horizontal_dpi"].value
         self.height_dpi = hdr["vertical_dpi"].value

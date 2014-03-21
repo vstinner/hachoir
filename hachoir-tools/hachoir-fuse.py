@@ -28,8 +28,7 @@ for i in True, False:
             raise
 
 if not hasattr(fuse, '__version__'):
-    raise RuntimeError, \
-        "your fuse-py doesn't know of fuse.__version__, probably it's too old."
+    raise RuntimeError("your fuse-py doesn't know of fuse.__version__, probably it's too old.")
 
 # This setting is optional, but it ensures that this class will keep
 # working after a future API revision
@@ -74,7 +73,7 @@ class HelloFS(Fuse):
                 return field
             except MissingField:
                 return None
-        except Exception, xx:
+        except Exception as xx:
             log.info("Exception: %s" % str(xx))
             raise
 
@@ -84,16 +83,16 @@ class HelloFS(Fuse):
     def getattr(self, path):
         st = MyStat()
         if path == '/':
-            st.st_mode = stat.S_IFDIR | 0755
+            st.st_mode = stat.S_IFDIR | 0o755
             st.st_nlink = 2
             return st
         if path == "/.command":
-            st.st_mode = stat.S_IFDIR | 0755
+            st.st_mode = stat.S_IFDIR | 0o755
             return st
         if path.startswith("/.command/"):
             name = path.split("/", 3)[2]
             if name in ("writeInto",):
-                st.st_mode = stat.S_IFREG | 0444
+                st.st_mode = stat.S_IFREG | 0o444
                 return st
             return -errno.ENOENT
 
@@ -104,9 +103,9 @@ class HelloFS(Fuse):
 
         # Set size and mode
         if field.is_field_set:
-            st.st_mode = stat.S_IFDIR | 0755
+            st.st_mode = stat.S_IFDIR | 0o755
         else:
-            st.st_mode = stat.S_IFREG | 0444
+            st.st_mode = stat.S_IFREG | 0o444
         st.st_nlink = 1
         if field.hasValue():
             st.st_size = len(self.fieldValue(field))
@@ -125,7 +124,7 @@ class HelloFS(Fuse):
         log.info("del %s" % field.name)
         try:
             del field.parent[field.name]
-        except Exception, err:
+        except Exception as err:
             log.info("del ERROR %s" % err)
         return 0
 
@@ -182,7 +181,7 @@ class HelloFS(Fuse):
                 return -errno.EACCES
             try:
                 data = data.strip(" \t\r\n\0")
-                filename = unicode(data, self.fs_charset)
+                filename = str(data, self.fs_charset)
             except UnicodeDecodeError:
                 log.info("writeInto(): unicode error!")
                 return 0
@@ -200,7 +199,7 @@ class HelloFS(Fuse):
                 return -errno.ENOENT
             if not field.hasValue():
                 return ''
-        except Exception, xx:
+        except Exception as xx:
             log.info("ERR: %s" % xx)
             raise
         data = self.fieldValue(field)
@@ -224,7 +223,7 @@ def main():
 Userspace hello example
 
 """ + Fuse.fusage
-    server = HelloFS(u'/home/haypo/testcase/KDE_Click.wav',
+    server = HelloFS('/home/haypo/testcase/KDE_Click.wav',
                      version="%prog " + fuse.__version__,
                      usage=usage,
                      dash_s_do='setsingle')

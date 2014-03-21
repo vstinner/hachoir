@@ -33,7 +33,7 @@ def build_tree(lengths):
         if i:
             bit_counts[i] += 1
     code = 0
-    for i in xrange(1, len(bit_counts)):
+    for i in range(1, len(bit_counts)):
         next_code[i] = code = (code + bit_counts[i-1]) << 1
     for i, ln in enumerate(lengths):
         if ln:
@@ -150,15 +150,15 @@ class DeflateBlock(FieldSet):
         elif self["compression_type"].value == 1: # Fixed Huffman
             length_tree = {} # (size, huffman code): value
             distance_tree = {}
-            for i in xrange(144):
+            for i in range(144):
                 length_tree[(8, i+48)] = i
-            for i in xrange(144, 256):
+            for i in range(144, 256):
                 length_tree[(9, i+256)] = i
-            for i in xrange(256, 280):
+            for i in range(256, 280):
                 length_tree[(7, i-256)] = i
-            for i in xrange(280, 288):
+            for i in range(280, 288):
                 length_tree[(8, i-88)] = i
-            for i in xrange(32):
+            for i in range(32):
                 distance_tree[(5, i)] = i
         elif self["compression_type"].value == 2: # Dynamic Huffman
             yield Bits(self, "huff_num_length_codes", 5, "Number of Literal/Length Codes, minus 257")

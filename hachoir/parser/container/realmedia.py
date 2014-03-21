@@ -64,15 +64,15 @@ class LogicalFileInfo(FieldSet):
         yield UInt32(self, "size")
         yield UInt16(self, "obj_version")
         yield UInt16(self, "nb_physical_stream")
-        for index in xrange(self["nb_physical_stream"].value):
+        for index in range(self["nb_physical_stream"].value):
             yield UInt16(self, "physical_stream[]")
-        for index in xrange(self["nb_physical_stream"].value):
+        for index in range(self["nb_physical_stream"].value):
             yield UInt16(self, "data_offset[]")
         yield UInt16(self, "nb_rule")
-        for index in xrange(self["nb_rule"].value):
+        for index in range(self["nb_rule"].value):
             yield UInt16(self, "rule[]")
         yield UInt16(self, "nb_prop")
-        for index in xrange(self["nb_prop"].value):
+        for index in range(self["nb_prop"].value):
             yield NameValueProperty(self, "prop[]")
 
 def parseMediaPropertiesHeader(self):
@@ -140,14 +140,14 @@ class RealMediaFile(Parser):
         "category": "container",
         "file_ext": ("rm",),
         "mime": (
-            u"video/x-pn-realvideo",
-            u"audio/x-pn-realaudio",
-            u"audio/x-pn-realaudio-plugin",
-            u"audio/x-real-audio",
-            u"application/vnd.rn-realmedia"),
+            "video/x-pn-realvideo",
+            "audio/x-pn-realaudio",
+            "audio/x-pn-realaudio-plugin",
+            "audio/x-real-audio",
+            "application/vnd.rn-realmedia"),
         "min_size": len(MAGIC)*8, # just the identifier
         "magic": ((MAGIC, 0),),
-        "description": u"RealMedia (rm) Container File",
+        "description": "RealMedia (rm) Container File",
     }
     endian = BIG_ENDIAN
 
@@ -167,6 +167,6 @@ class RealMediaFile(Parser):
     def createMimeType(self):
         for prop in self.array("stream_prop"):
             if prop["mime_type"].value == "video/x-pn-realvideo":
-                return u"video/x-pn-realvideo"
-        return u"audio/x-pn-realaudio"
+                return "video/x-pn-realvideo"
+        return "audio/x-pn-realaudio"
 
