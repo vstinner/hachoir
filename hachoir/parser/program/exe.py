@@ -108,7 +108,7 @@ class ExeFile(HachoirParser, RootSeekableFieldSet):
         # FIXME: Compute resource offset instead of using searchBytes()
         # Ugly hack to get find version info structure
         start = self.current_size
-        addr = self.stream.searchBytes('VS_VERSION_INFO', start)
+        addr = self.stream.searchBytes(b'VS_VERSION_INFO', start)
         if addr:
             self.seekBit(addr-32)
             yield NE_VersionInfoNode(self, "info")

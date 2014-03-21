@@ -110,6 +110,7 @@ class QueryParser(object):
                     fb = parser
             except HACHOIR_ERRORS as err:
                 res = str(err)
+                raise
             if warn:
                 if parser == self.other:
                     warn = info

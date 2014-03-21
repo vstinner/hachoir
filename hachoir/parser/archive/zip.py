@@ -227,7 +227,7 @@ class ZipEndCentralDirectory(FieldSet):
         yield PascalString16(self, "comment", "ZIP comment")
 
 class ZipDataDescriptor(FieldSet):
-    HEADER_STRING = "\x50\x4B\x07\x08"
+    HEADER_STRING = b"\x50\x4B\x07\x08"
     HEADER = 0x08074B50
     static_size = 96
     def createFields(self):
@@ -426,7 +426,7 @@ class ZipFile(Parser):
     def createContentSize(self):
         start = 0
         end = MAX_FILESIZE * 8
-        end = self.stream.searchBytes("PK\5\6", start, end)
+        end = self.stream.searchBytes(b"PK\5\6", start, end)
         if end is not None:
             return end + 22*8
         return None

@@ -369,7 +369,7 @@ class VideoSlice(FieldSet):
     def createFields(self):
         yield Bits(self, "quantizer_scale", 5)
         start=self.absolute_address+self.current_size+3
-        pos=self.stream.searchBytes('\0\0\1',start,start+1024*1024*8) # seek forward by at most 1MB
+        pos=self.stream.searchBytes(b'\0\0\1',start,start+1024*1024*8) # seek forward by at most 1MB
         if pos is None: pos=self.root.size
         yield RawBits(self, "data", pos-start+3)
 
@@ -406,7 +406,7 @@ class VideoStream(Parser):
     endian = BIG_ENDIAN
     def createFields(self):
         while self.current_size < self.size:
-            pos=self.stream.searchBytes('\0\0\1',self.current_size,self.current_size+1024*1024*8) # seek forward by at most 1MB
+            pos=self.stream.searchBytes(b'\0\0\1',self.current_size,self.current_size+1024*1024*8) # seek forward by at most 1MB
             if pos is not None:
                 padsize = pos-self.current_size
                 if padsize:
@@ -503,7 +503,7 @@ class Chunk(FieldSet):
                 self._name, self.parser, self._description = ("stream[]", Stream, "Data Stream Packet")
         else:
             self.parser = defaultParser
-        
+
         if not self.parser:
             self.parser = defaultParser
         elif self.parser != PackHeader and "length" in self:
@@ -537,7 +537,7 @@ class MPEGVideoFile(Parser):
 
     def createFields(self):
         while self.current_size < self.size:
-            pos=self.stream.searchBytes('\0\0\1',self.current_size,self.current_size+1024*1024*8) # seek forward by at most 1MB
+            pos=self.stream.searchBytes(b'\0\0\1',self.current_size,self.current_size+1024*1024*8) # seek forward by at most 1MB
             if pos is not None:
                 padsize = pos-self.current_size
                 if padsize:

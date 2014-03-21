@@ -183,7 +183,7 @@ def findSynchronizeBits(parser, start, max_size):
     size = 0
     while start < end:
         # Fast search: search 0xFF (first byte of sync frame field)
-        length = parser.stream.searchBytesLength("\xff", False, start, end)
+        length = parser.stream.searchBytesLength(b"\xff", False, start, end)
         if length is None:
             return None
         size += length

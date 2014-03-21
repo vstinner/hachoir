@@ -345,7 +345,7 @@ class JpegImageData(FieldSet):
         # try to figure out where this field ends
         start = self.absolute_address
         while True:
-            end = self.stream.searchBytes("\xff", start, MAX_FILESIZE*8)
+            end = self.stream.searchBytes(b"\xff", start, MAX_FILESIZE*8)
             if end is None:
                 # this is a bad sign, since it means there is no terminator
                 # we ignore this; it likely means a truncated image
@@ -581,7 +581,7 @@ class JpegFile(Parser):
         if "data" not in self:
             return None
         start = self["data"].absolute_address
-        end = self.stream.searchBytes("\xff\xd9", start, MAX_FILESIZE*8)
+        end = self.stream.searchBytes(b"\xff\xd9", start, MAX_FILESIZE*8)
         if end is not None:
             return end + 16
         return None

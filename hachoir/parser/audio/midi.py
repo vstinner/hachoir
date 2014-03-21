@@ -239,7 +239,7 @@ class MidiFile(Parser):
         count = self["/header/nb_track"].value - 1
         start = self["track[%u]" % count].absolute_address
         # Search "End of track" of last track
-        end = self.stream.searchBytes("\xff\x2f\x00", start, MAX_FILESIZE*8)
+        end = self.stream.searchBytes(b"\xff\x2f\x00", start, MAX_FILESIZE*8)
         if end is not None:
             return end + 3*8
         return None

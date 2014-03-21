@@ -604,7 +604,7 @@ class WMF_File(Parser):
         if self.isEMF():
             return None
         start = self["func[0]"].absolute_address
-        end = self.stream.searchBytes("\3\0\0\0\0\0", start, MAX_FILESIZE * 8)
+        end = self.stream.searchBytes(b"\3\0\0\0\0\0", start, MAX_FILESIZE * 8)
         if end is not None:
             return end + 6*8
         return None

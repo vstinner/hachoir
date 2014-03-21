@@ -15,14 +15,14 @@ from hachoir.core.field import (
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal
 
-MAGIC = "%PDF-"
-ENDMAGIC = "%%EOF"
+MAGIC = b"%PDF-"
+ENDMAGIC = b"%%EOF"
 
 def getLineEnd(s, pos=None):
     if pos == None:
         pos = (s.absolute_address+s.current_size)//8
-    end = s.stream.searchBytesLength("\x0D", False, 8*pos)
-    other_end = s.stream.searchBytesLength("\x0A", False, 8*pos)
+    end = s.stream.searchBytesLength(b"\x0D", False, 8*pos)
+    other_end = s.stream.searchBytesLength(b"\x0A", False, 8*pos)
     if end == None or (other_end != None and other_end < end):
         return other_end
     return end
@@ -30,7 +30,7 @@ def getLineEnd(s, pos=None):
 # TODO: rewrite to account for all possible terminations: ' ', '/', '\0XD'
 #       But this probably requires changing *ALL* of the places they are used,
 #       as ' ' is swallowed but not the others
-def getElementEnd(s, limit=' ', offset=0):
+def getElementEnd(s, limit=b' ', offset=0):
     addr = s.absolute_address+s.current_size
     addr += 8*offset
     pos = s.stream.searchBytesLength(limit, True, addr)
@@ -40,7 +40,7 @@ def getElementEnd(s, limit=' ', offset=0):
     return pos
 
 class PDFNumber(Field):
-    LIMITS = ['[', '/', '\x0D', ']']
+    LIMITS = [b'[', b'/', b'\x0D', b']']
     """
     sprintf("%i") or sprinf("%.?f")
     """
@@ -99,7 +99,7 @@ class PDFString(Field):
         self.createValue = lambda: val
 
 class PDFName(Field):
-    LIMITS = ['[', '/', '<', ']']
+    LIMITS = [b'[', b'/', b'<', b']']
     """
     String starting with '/', where characters may be written using their
     ASCII code (exemple: '#20' would be ' '
@@ -332,7 +332,7 @@ class SubSection(FieldSet):
                (self["entry_count"].value, self["start_number"])
 
 class CrossReferenceTable(FieldSet):
-    MAGIC = "xref"
+    MAGIC = b"xref"
 
     def __init__(self, parent, name, desc=None):
         FieldSet.__init__(self, parent, name, description=desc)
@@ -356,7 +356,7 @@ class Catalog(FieldSet):
             self._size = 8*size
         # object catalogs are ended with "obj"
         elif self["object"].value == "obj":
-            size = self.stream.searchBytesLength("endobj", False)
+            size = self.stream.searchBytesLength(b"endobj", False)
             if size != None:
                 self._size = 8*(size+2)
     def createFields(self):
@@ -377,7 +377,7 @@ class Catalog(FieldSet):
             yield LineEnd(self, "line_end[]")
 
 class Trailer(FieldSet):
-    MAGIC = "trailer"
+    MAGIC = b"trailer"
     def createFields(self):
         yield RawBytes(self, "marker", len(self.MAGIC))
         yield LineEnd(self, "line_end[]")

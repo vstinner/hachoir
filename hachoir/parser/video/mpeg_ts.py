@@ -75,7 +75,7 @@ class MPEG_TS(Parser):
     endian = BIG_ENDIAN
 
     def validate(self):
-        sync = self.stream.searchBytes("\x47", 0, 204*8)
+        sync = self.stream.searchBytes(b"\x47", 0, 204*8)
         if sync is None:
             return "Unable to find synchronization byte"
         for index in range(5):
@@ -93,7 +93,7 @@ class MPEG_TS(Parser):
 
     def createFields(self):
         while not self.eof:
-            sync = self.stream.searchBytes("\x47", self.current_size, self.current_size+204*8)
+            sync = self.stream.searchBytes(b"\x47", self.current_size, self.current_size+204*8)
             if sync is None:
                 raise ParserError("Unable to find synchronization byte")
             elif sync:

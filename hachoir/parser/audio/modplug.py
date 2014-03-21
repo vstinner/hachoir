@@ -33,7 +33,7 @@ class Command(FieldSet):
     static_size = 32*8
     def createFields(self):
         start = self.absolute_address
-        size = self.stream.searchBytesLength("\0", False, start)
+        size = self.stream.searchBytesLength(b"\0", False, start)
         if size > 0:
             self.info("Command: %s" % self.stream.readBytes(start, size))
             yield String(self, "command", size, strip='\0')

@@ -368,7 +368,7 @@ class GifFile(Parser):
         field = self["image[0]"]
         start = field.absolute_address + field.size
         end = start + MAX_FILE_SIZE*8
-        pos = self.stream.searchBytes("\0;", start, end)
+        pos = self.stream.searchBytes(b"\0;", start, end)
         if pos:
             return pos + 16
         return None

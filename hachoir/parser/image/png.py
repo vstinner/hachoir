@@ -261,7 +261,7 @@ class PngFile(Parser):
         field = self["header"]
         start = field.absolute_address + field.size
         end = MAX_FILESIZE * 8
-        pos = self.stream.searchBytes("\0\0\0\0IEND\xae\x42\x60\x82", start, end)
+        pos = self.stream.searchBytes(b"\0\0\0\0IEND\xae\x42\x60\x82", start, end)
         if pos is not None:
             return pos + 12*8
         return None

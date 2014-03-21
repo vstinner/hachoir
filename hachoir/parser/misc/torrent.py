@@ -26,7 +26,7 @@ class Integer(FieldSet):
 
         # Find integer end
         addr = self.absolute_address+self.current_size
-        len = self.stream.searchBytesLength('e', False, addr, addr+(MAX_INTEGER_SIZE+1)*8)
+        len = self.stream.searchBytesLength(b'e', False, addr, addr+(MAX_INTEGER_SIZE+1)*8)
         if len is None:
             raise ParserError("Torrent: Unable to find integer end delimiter (e)!")
         if not len:
@@ -44,7 +44,7 @@ class TorrentString(FieldSet):
 
     def createFields(self):
         addr = self.absolute_address
-        len = self.stream.searchBytesLength(':', False, addr, addr+(MAX_STRING_LENGTH+1)*8)
+        len = self.stream.searchBytesLength(b':', False, addr, addr+(MAX_STRING_LENGTH+1)*8)
         if len is None:
             raise ParserError("Torrent: unable to find string separator (':')")
         if not len:

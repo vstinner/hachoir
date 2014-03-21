@@ -347,7 +347,7 @@ class RarFile(Parser):
     def createContentSize(self):
         start = 0
         end = MAX_FILESIZE * 8
-        pos = self.stream.searchBytes("\xC4\x3D\x7B\x00\x40\x07\x00", start, end)
+        pos = self.stream.searchBytes(b"\xC4\x3D\x7B\x00\x40\x07\x00", start, end)
         if pos is not None:
             return pos + 7*8
         return None
