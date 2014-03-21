@@ -310,18 +310,18 @@ class PowerPointDocument(OLE2FragmentParser):
                 11021:"AnimationHashAtom12",
                 14100:"SlideSyncInfo12",
                 14101:"SlideSyncInfoAtom12",
-                0xf000:"EscherDggContainer", # Drawing Group Container 
+                0xf000:"EscherDggContainer", # Drawing Group Container
                 0xf006:"EscherDgg",
                 0xf016:"EscherCLSID",
                 0xf00b:"EscherOPT",
                 0xf001:"EscherBStoreContainer",
                 0xf007:"EscherBSE",
-                0xf018:"EscherBlip_START", # Blip types are between 
-                0xf117:"EscherBlip_END", # these two values 
-                0xf002:"EscherDgContainer", # Drawing Container 
+                0xf018:"EscherBlip_START", # Blip types are between
+                0xf117:"EscherBlip_END", # these two values
+                0xf002:"EscherDgContainer", # Drawing Container
                 0xf008:"EscherDg",
                 0xf118:"EscherRegroupItems",
-                0xf120:"EscherColorScheme", # bug in docs 
+                0xf120:"EscherColorScheme", # bug in docs
                 0xf003:"EscherSpgrContainer",
                 0xf004:"EscherSpContainer",
                 0xf009:"EscherSpgr",
@@ -333,14 +333,14 @@ class PowerPointDocument(OLE2FragmentParser):
                 0xf010:"EscherClientAnchor",
                 0xf011:"EscherClientData",
                 0xf005:"EscherSolverContainer",
-                0xf012:"EscherConnectorRule", # bug in docs 
+                0xf012:"EscherConnectorRule", # bug in docs
                 0xf013:"EscherAlignRule",
                 0xf014:"EscherArcRule",
                 0xf015:"EscherClientRule",
                 0xf017:"EscherCalloutRule",
                 0xf119:"EscherSelection",
                 0xf11a:"EscherColorMRU",
-                0xf11d:"EscherDeletedPspl", # bug in docs 
+                0xf11d:"EscherDeletedPspl", # bug in docs
                 0xf11e:"EscherSplitMenuColors",
                 0xf11f:"EscherOleObject",
                 0xf122:"EscherUserDefined"}
@@ -401,7 +401,7 @@ class CurrentUser(OLE2FragmentParser):
         yield PowerPointDocument.PowerPointObject(self, "current_user")
         if self.current_size < self.size:
             yield String(self, "unicode_name", self["current_user/data/lenUserName"].value * 2, charset="UTF-16-LE")
-        
+
 
 class ExcelWorkbook(OLE2FragmentParser):
     BIFF_TYPES={0x000:"DIMENSIONS_v0",
@@ -450,14 +450,14 @@ class ExcelWorkbook(OLE2FragmentParser):
                 0x01d:"SELECTION",
                 0x01e:"FORMAT_v0",
                 0x41e:"FORMAT_v4",
-                0x01f:"FORMATCOUNT",	# Undocumented 
-                0x020:"COLUMNDEFAULT",	# Undocumented 
+                0x01f:"FORMATCOUNT",	# Undocumented
+                0x020:"COLUMNDEFAULT",	# Undocumented
                 0x021:"ARRAY_v0",
                 0x221:"ARRAY_v2",
                 0x022:"1904",
                 0x023:"EXTERNNAME_v0",
                 0x223:"EXTERNNAME_v2",
-                0x024:"COLWIDTH",	# Undocumented 
+                0x024:"COLWIDTH",	# Undocumented
                 0x025:"DEFAULTROWHEIGHT_v0",
                 0x225:"DEFAULTROWHEIGHT_v2",
                 0x026:"LEFT_MARGIN",
@@ -469,20 +469,20 @@ class ExcelWorkbook(OLE2FragmentParser):
                 0x02f:"FILEPASS",
                 0x031:"FONT_v0",
                 0x231:"FONT_v2",
-                0x032:"FONTCOUNT",	# Undocumented 
-                0x033:"PRINTSIZE",	# Undocumented 
+                0x032:"FONTCOUNT",	# Undocumented
+                0x033:"PRINTSIZE",	# Undocumented
                 0x036:"TABLE_v0",
                 0x236:"TABLE_v2",
-                0x037:"TABLE2",	# OOo has docs 
-                0x038:"WNDESK",	# Undocumented 
-                0x039:"ZOOM",	# Undocumented 
-                0x03a:"BEGINPREF",	# Undocumented 
-                0x03b:"ENDPREF",	# Undocumented 
+                0x037:"TABLE2",	# OOo has docs
+                0x038:"WNDESK",	# Undocumented
+                0x039:"ZOOM",	# Undocumented
+                0x03a:"BEGINPREF",	# Undocumented
+                0x03b:"ENDPREF",	# Undocumented
                 0x03c:"CONTINUE",
                 0x03d:"WINDOW1",
                 0x03e:"WINDOW2_v0",
                 0x23e:"WINDOW2_v2",
-                0x03f:"PANE_V2",	# Undocumented 
+                0x03f:"PANE_V2",	# Undocumented
                 0x040:"BACKUP",
                 0x041:"PANE",
                 0x042:"CODEPAGE",
@@ -504,11 +504,11 @@ class ExcelWorkbook(OLE2FragmentParser):
                 0x05e:"UNCALCED",
                 0x05f:"SAVERECALC",
                 0x060:"TEMPLATE",
-                0x061:"INTL",	# Undocumented 
-                0x862:"TAB_COLOR",	# Undocumented, OO calls it SHEETLAYOUT 
+                0x061:"INTL",	# Undocumented
+                0x862:"TAB_COLOR",	# Undocumented, OO calls it SHEETLAYOUT
                 0x063:"OBJPROTECT",
                 0x07d:"COLINFO",
-                0x27e:"RK", # Odd that there is no 0x7e 
+                0x27e:"RK", # Odd that there is no 0x7e
                 0x07f:"IMDATA",
                 0x080:"GUTS",
                 0x081:"WSBOOL",
@@ -522,16 +522,16 @@ class ExcelWorkbook(OLE2FragmentParser):
                 0x089:"PUB",
                 0x08c:"COUNTRY",
                 0x08d:"HIDEOBJ",
-                0x08e:"BUNDLESOFFSET",	# Undocumented 
-                0x08f:"BUNDLEHEADER",	# Undocumented 
+                0x08e:"BUNDLESOFFSET",	# Undocumented
+                0x08f:"BUNDLEHEADER",	# Undocumented
                 0x090:"SORT",
                 0x091:"SUB",
                 0x092:"PALETTE",
-                0x293:"STYLE", # Odd that there is no 0x93 
+                0x293:"STYLE", # Odd that there is no 0x93
                 0x094:"LHRECORD",
                 0x095:"LHNGRAPH",
                 0x096:"SOUND",
-                0x097:"SYNC",	# Undocumented 
+                0x097:"SYNC",	# Undocumented
                 0x098:"LPR",
                 0x099:"STANDARDWIDTH",
                 0x09a:"FNGROUPNAME",
@@ -541,7 +541,7 @@ class ExcelWorkbook(OLE2FragmentParser):
                 0x09e:"AUTOFILTER",
                 0x0a0:"SCL",
                 0x0a1:"SETUP",
-                0x0a4:"TOOLBARVER",	# Undocumented 
+                0x0a4:"TOOLBARVER",	# Undocumented
                 0x0a9:"COORDLIST",
                 0x0ab:"GCW",
                 0x0ae:"SCENMAN",
@@ -549,35 +549,35 @@ class ExcelWorkbook(OLE2FragmentParser):
                 0x0b0:"SXVIEW",
                 0x0b1:"SXVD",
                 0x0b2:"SXVI",
-                0x0b3:"SXSI",	# Undocumented 
+                0x0b3:"SXSI",	# Undocumented
                 0x0b4:"SXIVD",
                 0x0b5:"SXLI",
                 0x0b6:"SXPI",
                 0x0b7:"FACENUM",	# Undocumented
                 0x0b8:"DOCROUTE",
                 0x0b9:"RECIPNAME",
-                0x0ba:"SSLIST",	# Undocumented 
-                0x0bb:"MASKIMDATA",	# Undocumented 
+                0x0ba:"SSLIST",	# Undocumented
+                0x0bb:"MASKIMDATA",	# Undocumented
                 0x4bc:"SHRFMLA",
                 0x0bd:"MULRK",
                 0x0be:"MULBLANK",
-                0x0bf:"TOOLBARHDR",	# Undocumented 
-                0x0c0:"TOOLBAREND",	# Undocumented 
+                0x0bf:"TOOLBARHDR",	# Undocumented
+                0x0c0:"TOOLBAREND",	# Undocumented
                 0x0c1:"MMS",
                 0x0c2:"ADDMENU",
                 0x0c3:"DELMENU",
-                0x0c4:"TIPHISTORY",	# Undocumented 
+                0x0c4:"TIPHISTORY",	# Undocumented
                 0x0c5:"SXDI",
                 0x0c6:"SXDB",
-                0x0c7:"SXFDB",	# guessed 
-                0x0c8:"SXDDB",	# guessed 
-                0x0c9:"SXNUM",	# guessed 
-                0x0ca:"SXBOOL",	# guessed 
-                0x0cb:"SXERR",	# guessed 
-                0x0cc:"SXINT",	# guessed 
+                0x0c7:"SXFDB",	# guessed
+                0x0c8:"SXDDB",	# guessed
+                0x0c9:"SXNUM",	# guessed
+                0x0ca:"SXBOOL",	# guessed
+                0x0cb:"SXERR",	# guessed
+                0x0cc:"SXINT",	# guessed
                 0x0cd:"SXSTRING",
-                0x0ce:"SXDTR",	# guessed 
-                0x0cf:"SXNIL",	# guessed 
+                0x0ce:"SXDTR",	# guessed
+                0x0cf:"SXNIL",	# guessed
                 0x0d0:"SXTBL",
                 0x0d1:"SXTBRGIITM",
                 0x0d2:"SXTBPG",
@@ -585,10 +585,10 @@ class ExcelWorkbook(OLE2FragmentParser):
                 0x0d5:"SXIDSTM",
                 0x0d6:"RSTRING",
                 0x0d7:"DBCELL",
-                0x0d8:"SXNUMGROUP",	# from OO : numerical grouping in pivot cache field 
+                0x0d8:"SXNUMGROUP",	# from OO : numerical grouping in pivot cache field
                 0x0da:"BOOKBOOL",
-                0x0dc:"PARAMQRY",	# DUPLICATE dc 
-                0x0dc:"SXEXT",	# DUPLICATE dc 
+                0x0dc:"PARAMQRY",	# DUPLICATE dc
+                0x0dc:"SXEXT",	# DUPLICATE dc
                 0x0dd:"SCENPROTECT",
                 0x0de:"OLESIZE",
                 0x0df:"UDDESC",
@@ -596,13 +596,13 @@ class ExcelWorkbook(OLE2FragmentParser):
                 0x0e1:"INTERFACEHDR",
                 0x0e2:"INTERFACEEND",
                 0x0e3:"SXVS",
-                0x0e5:"MERGECELLS",	# guessed 
-                0x0e9:"BG_PIC",	# Undocumented 
+                0x0e5:"MERGECELLS",	# guessed
+                0x0e9:"BG_PIC",	# Undocumented
                 0x0ea:"TABIDCONF",
                 0x0eb:"MS_O_DRAWING_GROUP",
                 0x0ec:"MS_O_DRAWING",
                 0x0ed:"MS_O_DRAWING_SELECTION",
-                0x0ef:"PHONETIC",	# semi-Undocumented 
+                0x0ef:"PHONETIC",	# semi-Undocumented
                 0x0f0:"SXRULE",
                 0x0f1:"SXEX",
                 0x0f2:"SXFILT",
@@ -642,21 +642,21 @@ class ExcelWorkbook(OLE2FragmentParser):
                 0x1b6:"TXO",
                 0x1b7:"REFRESHALL",
                 0x1b8:"HLINK",
-                0x1ba:"CODENAME",	# TYPO in MS Docs 
+                0x1ba:"CODENAME",	# TYPO in MS Docs
                 0x1bb:"SXFDBTYPE",
                 0x1bc:"PROT4REVPASS",
                 0x1be:"DV",
                 0x1c0:"XL9FILE",
                 0x1c1:"RECALCID",
-                0x800:"LINK_TIP",	# follows an hlink 
-                0x802:"UNKNOWN_802",	# OO exports it but has not name or docs 
-                0x803:"WQSETT",	# OO named it and can export it, but does not include it in the docs 
-                0x804:"WQTABLES",	# OO named it and can export it, but does not include it in the docs 
-                0x805:"UNKNOWN_805",	# No name or docs, seems related to web query see #153260 for sample 
-                0x810:"PIVOT_AUTOFORMAT",	# Seems to contain pivot table autoformat indicies, plus ?? 
-                0x864:"UNKNOWN_864",	# seems related to pivot tables 
-                0x867:"SHEETPROTECTION",	# OO named it, and has docs 
-                0x868:"RANGEPROTECTION",	# OO named it, no docs yet 
+                0x800:"LINK_TIP",	# follows an hlink
+                0x802:"UNKNOWN_802",	# OO exports it but has not name or docs
+                0x803:"WQSETT",	# OO named it and can export it, but does not include it in the docs
+                0x804:"WQTABLES",	# OO named it and can export it, but does not include it in the docs
+                0x805:"UNKNOWN_805",	# No name or docs, seems related to web query see #153260 for sample
+                0x810:"PIVOT_AUTOFORMAT",	# Seems to contain pivot table autoformat indicies, plus ??
+                0x864:"UNKNOWN_864",	# seems related to pivot tables
+                0x867:"SHEETPROTECTION",	# OO named it, and has docs
+                0x868:"RANGEPROTECTION",	# OO named it, no docs yet
 
                 0x1001:"CHART_units",
                 0x1002:"CHART_chart",
@@ -710,9 +710,9 @@ class ExcelWorkbook(OLE2FragmentParser):
                 0x1050:"CHART_alruns",
                 0x1051:"CHART_ai",
                 0x105b:"CHART_serauxerrbar",
-                0x105c:"CHART_clrtclient",	# Undocumented 
+                0x105c:"CHART_clrtclient",	# Undocumented
                 0x105d:"CHART_serfmt",
-                0x105f:"CHART_3dbarshape",	# Undocumented 
+                0x105f:"CHART_3dbarshape",	# Undocumented
                 0x1060:"CHART_fbi",
                 0x1061:"CHART_boppop",
                 0x1062:"CHART_axcext",

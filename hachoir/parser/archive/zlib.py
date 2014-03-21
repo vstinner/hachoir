@@ -131,7 +131,7 @@ class DeflateBlock(FieldSet):
     def __init__(self, parent, name, uncomp_data="", *args, **kwargs):
         FieldSet.__init__(self, parent, name, *args, **kwargs)
         self.uncomp_data = uncomp_data
-        
+
     def createFields(self):
         yield Bit(self, "final", "Is this the final block?") # BFINAL
         yield Enum(Bits(self, "compression_type", 2), # BTYPE

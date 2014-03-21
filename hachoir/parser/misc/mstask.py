@@ -3,7 +3,7 @@ ms task/job file parser
 
 Author: Jeff Bryner
 Creation date: 2010-11
-References: 
+References:
 http://msdn.microsoft.com/en-us/library/cc248286%28v=PROT.13%29.aspx
 http://msdn.microsoft.com/en-us/library/cc248287%28v=PROT.13%29.aspx
 http://technet.microsoft.com/en-us/library/bb490996.aspx

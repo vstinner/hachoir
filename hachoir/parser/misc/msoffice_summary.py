@@ -349,7 +349,7 @@ class CompObj(OLE2FragmentParser):
     def __init__(self, stream, **args):
         OLE2FragmentParser.__init__(self, stream, **args)
         self.osconfig = OSConfig(self["os"].value == OS_MAC)
-        
+
     def createFields(self):
         # Header
         yield UInt16(self, "version", "Version (=1)")
