@@ -84,7 +84,7 @@ class Dict(object):
 
         >>> d=Dict( (("two", "deux"), ("one", "un")) )
         >>> for key, value in d.iteritems():
-        ...    print "%r: %r" % (key, value)
+        ...    print("%r: %r" % (key, value))
         ...
         'two': 'deux'
         'one': 'un'
@@ -178,6 +178,6 @@ class Dict(object):
         self._value_list.insert(index, value)
 
     def __repr__(self):
-        items = ( "%r: %r" % (key, value) for key, value in self.items() )
+        items = ("%r: %r" % (key, value) for key, value in self.iteritems())
         return "{%s}" % ", ".join(items)
 

@@ -17,19 +17,19 @@ In most cases we work on files using the FileInputStream function. This function
 takes one argument: a Unicode filename. But for practical reasons
 we will use StringInputStream function in this documentation.
 
-   >>> data = "point\0\3\0\2\0"
-   >>> from hachoir_core.stream import StringInputStream, LITTLE_ENDIAN
+   >>> data = b"point\0\3\0\2\0"
+   >>> from hachoir.core.stream import StringInputStream, LITTLE_ENDIAN
    >>> stream = StringInputStream(data)
    >>> stream.source
    '<string>'
    >>> len(data), stream.size
    (10, 80)
    >>> data[1:6], stream.readBytes(8, 5)
-   ('oint\x00', 'oint\x00')
+   (b'oint\x00', b'oint\x00')
    >>> data[6:8], stream.readBits(6*8, 16, LITTLE_ENDIAN)
-   ('\x03\x00', 3)
+   (b'\x03\x00', 3)
    >>> data[8:10], stream.readBits(8*8, 16, LITTLE_ENDIAN)
-   ('\x02\x00', 2)
+   (b'\x02\x00', 2)
 
 First big difference between a string and a Hachoir stream is that sizes
 and addresses are written in bits and not bytes. The difference is a factor
@@ -44,7 +44,7 @@ Basic parser
 
 We will parse the data used in the last section.
 
-   >>> from hachoir_core.field import Parser, CString, UInt16
+   >>> from hachoir.core.field import Parser, CString, UInt16
    >>> class Point(Parser):
    ...     endian = LITTLE_ENDIAN
    ...     def createFields(self):
@@ -54,7 +54,7 @@ We will parse the data used in the last section.
    ...
    >>> point = Point(stream)
    >>> for field in point:
-   ...     print "%s) %s=%s" % (field.address, field.name, field.display)
+   ...     print("%s) %s=%s" % (field.address, field.name, field.display))
    ...
    0) name="point"
    48) x=3
@@ -86,7 +86,7 @@ Parser with sub-field sets
 After learning basic API, let's see a more complex parser: parser with
 sub-field sets.
 
-   >>> from hachoir_core.field import FieldSet, UInt8, Character, String
+   >>> from hachoir.core.field import FieldSet, UInt8, Character, String
    >>> class Entry(FieldSet):
    ...     def createFields(self):
    ...         yield Character(self, "letter")
@@ -110,7 +110,7 @@ with two levels:
 
    >>> def displayTree(parent):
    ...     for field in parent:
-   ...         print field.path
+   ...         print(field.path)
    ...         if field.is_field_set: displayTree(field)
    ...
    >>> displayTree(root)
@@ -142,20 +142,20 @@ behaviour, you can watch "current_length" (number of read fields) and
 "current_size" (current size in bits of a field set):
 
    >>> root = MyFormat(stream)  # Rebuild our parser
-   >>> print (root.current_length, root.current_size)
+   >>> (root.current_length, root.current_size)
    (0, 0)
-   >>> print root["signature"].display
+   >>> root["signature"].display
    "MYF"
-   >>> print (root.current_length, root.current_size, root["signature"].size)
+   >>> (root.current_length, root.current_size, root["signature"].size)
    (1, 24, 24)
 
 Just after its creation, a parser is empty (0 fields). When we read the first
 field, its size becomes the size of the first field. Some operations requires
 to read more fields:
 
-   >>> print root["point[0]/letter"].display
+   >>> root["point[0]/letter"].display
    'a'
-   >>> print (root.current_length, root.current_size)
+   >>> (root.current_length, root.current_size)
    (3, 48)
 
 Reading point[0] needs to read field "count". So root now contains three

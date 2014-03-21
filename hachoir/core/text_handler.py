@@ -28,9 +28,9 @@ def durationWin64(field):
     a 64-bit number: number of 100ns. See also timestampWin64().
 
     >>> durationWin64(type("", (), dict(value=2146280000, size=64)))
-    u'3 min 34 sec 628 ms'
+    '3 min 34 sec 628 ms'
     >>> durationWin64(type("", (), dict(value=(1 << 64)-1, size=64)))
-    u'58494 years 88 days 5 hours'
+    '58494 years 88 days 5 hours'
     """
     assert hasattr(field, "value") and hasattr(field, "size")
     assert field.size == 64
@@ -48,9 +48,9 @@ def hexadecimal(field):
     Convert an integer to hexadecimal in lower case. Returns unicode string.
 
     >>> hexadecimal(type("", (), dict(value=412, size=16)))
-    u'0x019c'
+    '0x019c'
     >>> hexadecimal(type("", (), dict(value=0, size=32)))
-    u'0x00000000'
+    '0x00000000'
     """
     assert hasattr(field, "value") and hasattr(field, "size")
     size = field.size

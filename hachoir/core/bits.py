@@ -33,11 +33,11 @@ def arrswapmid(data):
     r"""
     Convert an array of characters from middle-endian to big-endian and vice-versa.
 
-    >>> arrswapmid("badcfehg")
-    ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+    >>> bytes(arrswapmid(b"badcfehg"))
+    b'abcdefgh'
     """
     assert len(data)%2 == 0
-    ret = ['']*len(data)
+    ret = [b'']*len(data)
     ret[1::2] = data[0::2]
     ret[0::2] = data[1::2]
     return ret
@@ -46,10 +46,10 @@ def strswapmid(data):
     r"""
     Convert raw data from middle-endian to big-endian and vice-versa.
 
-    >>> strswapmid("badcfehg")
-    'abcdefgh'
+    >>> strswapmid(b"badcfehg")
+    b'abcdefgh'
     """
-    return ''.join(arrswapmid(data))
+    return bytes(arrswapmid(data))
 
 def bin2long(text, endian):
     """
@@ -81,13 +81,13 @@ def str2hex(value, prefix="", glue="", format="%02X"):
     Convert binary string in hexadecimal (base 16).
 
     >>> str2hex("ABC")
-    u'414243'
+    '414243'
     >>> str2hex("\xF0\xAF", glue=" ")
-    u'F0 AF'
+    'F0 AF'
     >>> str2hex("ABC", prefix="0x")
-    u'0x414243'
+    '0x414243'
     >>> str2hex("ABC", format=r"\x%02X")
-    u'\\x41\\x42\\x43'
+    '\\x41\\x42\\x43'
     """
     if isinstance(glue, str):
         glue = str(glue)
@@ -265,23 +265,23 @@ _struct_format = _createStructFormat()
 
 def str2long(data, endian):
     r"""
-    Convert a raw data (type 'str') into a long integer.
+    Convert a raw data (type 'bytes') into a long integer.
 
-    >>> chr(str2long('*', BIG_ENDIAN))
+    >>> chr(str2long(b'*', BIG_ENDIAN))
     '*'
-    >>> str2long("\x00\x01\x02\x03", BIG_ENDIAN) == 0x10203
+    >>> str2long(b"\x00\x01\x02\x03", BIG_ENDIAN) == 0x10203
     True
-    >>> str2long("\x2a\x10", LITTLE_ENDIAN) == 0x102a
+    >>> str2long(b"\x2a\x10", LITTLE_ENDIAN) == 0x102a
     True
-    >>> str2long("\xff\x14\x2a\x10", BIG_ENDIAN) == 0xff142a10
+    >>> str2long(b"\xff\x14\x2a\x10", BIG_ENDIAN) == 0xff142a10
     True
-    >>> str2long("\x00\x01\x02\x03", LITTLE_ENDIAN) == 0x3020100
+    >>> str2long(b"\x00\x01\x02\x03", LITTLE_ENDIAN) == 0x3020100
     True
-    >>> str2long("\xff\x14\x2a\x10\xab\x00\xd9\x0e", BIG_ENDIAN) == 0xff142a10ab00d90e
+    >>> str2long(b"\xff\x14\x2a\x10\xab\x00\xd9\x0e", BIG_ENDIAN) == 0xff142a10ab00d90e
     True
-    >>> str2long("\xff\xff\xff\xff\xff\xff\xff\xff", BIG_ENDIAN) == (2**64-1)
+    >>> str2long(b"\xff\xff\xff\xff\xff\xff\xff\xff", BIG_ENDIAN) == (2**64-1)
     True
-    >>> str2long("\x0b\x0a\x0d\x0c", MIDDLE_ENDIAN) == 0x0a0b0c0d
+    >>> str2long(b"\x0b\x0a\x0d\x0c", MIDDLE_ENDIAN) == 0x0a0b0c0d
     True
     """
     assert 1 <= len(data) <= 32   # arbitrary limit: 256 bits
@@ -297,8 +297,7 @@ def str2long(data, endian):
         data = reversed(data)
     elif endian is MIDDLE_ENDIAN:
         data = reversed(strswapmid(data))
-    for character in data:
-        byte = ord(character)
+    for byte in data:
         value += (byte << shift)
         shift += 8
     return value

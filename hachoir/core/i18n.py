@@ -142,19 +142,19 @@ CHARSET_CHARACTERS = (
 
 def guessBytesCharset(bytes, default=None):
     r"""
-    >>> guessBytesCharset("abc")
+    >>> guessBytesCharset(b"abc")
     'ASCII'
-    >>> guessBytesCharset("\xEF\xBB\xBFabc")
+    >>> guessBytesCharset(b"\xEF\xBB\xBFabc")
     'UTF-8'
-    >>> guessBytesCharset("abc\xC3\xA9")
+    >>> guessBytesCharset(b"abc\xC3\xA9")
     'UTF-8'
-    >>> guessBytesCharset("File written by Adobe Photoshop\xA8 4.0\0")
+    >>> guessBytesCharset(b"File written by Adobe Photoshop\xA8 4.0\0")
     'MacRoman'
-    >>> guessBytesCharset("\xE9l\xE9phant")
+    >>> guessBytesCharset(b"\xE9l\xE9phant")
     'ISO-8859-1'
-    >>> guessBytesCharset("100 \xA4")
+    >>> guessBytesCharset(b"100 \xA4")
     'ISO-8859-15'
-    >>> guessBytesCharset('Word \xb8\xea\xe4\xef\xf3\xe7 - Microsoft Outlook 97 - \xd1\xf5\xe8\xec\xdf\xf3\xe5\xe9\xf2 e-mail')
+    >>> guessBytesCharset(b'Word \xb8\xea\xe4\xef\xf3\xe7 - Microsoft Outlook 97 - \xd1\xf5\xe8\xec\xdf\xf3\xe5\xe9\xf2 e-mail')
     'ISO-8859-7'
     """
     # Check for UTF BOM
@@ -177,7 +177,7 @@ def guessBytesCharset(bytes, default=None):
         pass
 
     # Create a set of non-ASCII characters
-    non_ascii_set = set( byte for byte in bytes if ord(byte) >= 128 )
+    non_ascii_set = set(byte for byte in bytes if byte >= 128)
     for characters, charset in CHARSET_CHARACTERS:
         if characters.issuperset(non_ascii_set):
             return charset

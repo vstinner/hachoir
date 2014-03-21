@@ -38,7 +38,7 @@ def main():
     config.use_i18n = False
 
     # Test documentation in doc/*.rst files
-    testDoc('doc/hachoir-api.rst')
+    testDoc('doc/api.rst')
     testDoc('doc/internals.rst')
 
     # Test documentation of some functions/classes

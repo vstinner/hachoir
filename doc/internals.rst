@@ -8,8 +8,8 @@ A field is created when someone ask to access it, or when another field is
 asked and the field is before it. So if you use a field in your field set
 constructor, one or more fields will be created. Example:
 
->>> from hachoir_core.field import Parser, Int8
->>> from hachoir_core.endian import BIG_ENDIAN
+>>> from hachoir.core.field import Parser, Int8
+>>> from hachoir.core.endian import BIG_ENDIAN
 >>> class Point(Parser):
 ...     endian = BIG_ENDIAN
 ...     def __init__(self, stream):
@@ -29,7 +29,7 @@ constructor, one or more fields will be created. Example:
 In the constructor, the field "color" is asked. So the field list will
 contains one field (color):
 
->>> from hachoir_core.stream import StringInputStream
+>>> from hachoir.core.stream import StringInputStream
 >>> stream = StringInputStream("\x2A\x00\x04\x05")
 >>> p = Point(stream)
 >>> p.current_length
@@ -67,7 +67,7 @@ before size value can be read. But you can specify field list size:
 
 Two examples:
 
->>> from hachoir_core.field import Parser
+>>> from hachoir.core.field import Parser
 >>> class FourBytes(Parser):
 ...     endian = BIG_ENDIAN
 ...     static_size = 32
@@ -135,7 +135,7 @@ The endian is global to a FieldSet and is a class attribute. Allowed values:
 
 Example to set endian:
 
->>> from hachoir_core.endian import LITTLE_ENDIAN
+>>> from hachoir.core.endian import LITTLE_ENDIAN
 >>> class UseLittleEndian(Parser):
 ...     endian = LITTLE_ENDIAN
 ...

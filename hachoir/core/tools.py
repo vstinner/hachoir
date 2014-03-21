@@ -95,7 +95,7 @@ def humanDurationNanosec(nsec):
     Returns an unicode string.
 
     >>> humanDurationNanosec(60417893)
-    u'60.42 ms'
+    '60.42 ms'
     """
 
     # Nano second
@@ -119,13 +119,13 @@ def humanDuration(delta):
     Returns an unicode string.
 
     >>> humanDuration(0)
-    u'0 ms'
+    '0 ms'
     >>> humanDuration(213)
-    u'213 ms'
+    '213 ms'
     >>> humanDuration(4213)
-    u'4 sec 213 ms'
+    '4 sec 213 ms'
     >>> humanDuration(6402309)
-    u'1 hour 46 min 42 sec'
+    '1 hour 46 min 42 sec'
     """
     if not isinstance(delta, timedelta):
         delta = timedelta(microseconds=delta*1000)
@@ -164,11 +164,11 @@ def humanFilesize(size):
     The result is an unicode string.
 
     >>> humanFilesize(1)
-    u'1 byte'
+    '1 byte'
     >>> humanFilesize(790)
-    u'790 bytes'
+    '790 bytes'
     >>> humanFilesize(256960)
-    u'250.9 KB'
+    '250.9 KB'
     """
     if size < 10000:
         return ngettext("%u byte", "%u bytes", size) % size
@@ -188,11 +188,11 @@ def humanBitSize(size):
     The result is an unicode string.
 
     >>> humanBitSize(1)
-    u'1 bit'
+    '1 bit'
     >>> humanBitSize(790)
-    u'790 bits'
+    '790 bits'
     >>> humanBitSize(256960)
-    u'257.0 Kbit'
+    '257.0 Kbit'
     """
     divisor = 1000
     if size < divisor:
@@ -211,9 +211,9 @@ def humanBitRate(size):
     to convert size into human reprensation. The result is an unicode string.
 
     >>> humanBitRate(790)
-    u'790 bits/sec'
+    '790 bits/sec'
     >>> humanBitRate(256960)
-    u'257.0 Kbit/sec'
+    '257.0 Kbit/sec'
     """
     return "".join((humanBitSize(size), "/sec"))
 
@@ -224,9 +224,9 @@ def humanFrequency(hertz):
     The result is an unicode string.
 
     >>> humanFrequency(790)
-    u'790 Hz'
+    '790 Hz'
     >>> humanFrequency(629469)
-    u'629.5 kHz'
+    '629.5 kHz'
     """
     divisor = 1000
     if hertz < divisor:
@@ -259,10 +259,10 @@ def makePrintable(data, charset, quote=None, smart=True):
     are escaped if data type is 'str' or if charset is "ASCII".
 
     Examples with Unicode:
-    >>> aged = unicode("âgé", "UTF-8")
+    >>> aged = "âgé"
     >>> repr(aged)  # text type is 'unicode'
-    "u'\\xe2g\\xe9'"
-    >>> makePrintable("abc\0", "UTF-8")
+    "'âgé'"
+    >>> makePrintable(b"abc\0", "UTF-8")
     'abc\\0'
     >>> makePrintable(aged, "latin1")
     '\xe2g\xe9'
@@ -270,9 +270,9 @@ def makePrintable(data, charset, quote=None, smart=True):
     '"\xe2g\xe9"'
 
     Examples with string encoded in latin1:
-    >>> aged_latin = unicode("âgé", "UTF-8").encode("latin1")
-    >>> repr(aged_latin)  # text type is 'str'
-    "'\\xe2g\\xe9'"
+    >>> aged_latin = "âgé".encode("latin1")
+    >>> repr(aged_latin)  # text type is 'bytes'
+    "b'\\xe2g\\xe9'"
     >>> makePrintable(aged_latin, "latin1")
     '\\xe2g\\xe9'
     >>> makePrintable("", "latin1")
@@ -289,11 +289,11 @@ def makePrintable(data, charset, quote=None, smart=True):
     '\\0\\3\\n\\x10 \\x7f'
 
     Quote character may also be escaped (only ' and "):
-    >>> print makePrintable("a\"b", "latin-1", quote='"')
+    >>> print(makePrintable("a\"b", "latin-1", quote='"'))
     "a\"b"
-    >>> print makePrintable("a\"b", "latin-1", quote="'")
+    >>> print(makePrintable("a\"b", "latin-1", quote="'"))
     'a"b'
-    >>> print makePrintable("a'b", "latin-1", quote="'")
+    >>> print(makePrintable("a'b", "latin-1", quote="'"))
     'a\'b'
     """
 
@@ -312,7 +312,7 @@ def makePrintable(data, charset, quote=None, smart=True):
     data = data.encode(charset, "backslashreplace")
     if smart:
         # Replace \x00\x01 by \0\1
-        data = re.sub(br"\\x0([0-7])(?=[^0-7]|$)", r"\\\1", data)
+        data = re.sub(br"\\x0([0-7])(?=[^0-7]|$)", br"\\\1", data)
     return str(data, charset)
 
 def makeUnicode(text):
@@ -320,10 +320,10 @@ def makeUnicode(text):
     Convert text to printable Unicode string. For byte string (type 'str'),
     use charset ISO-8859-1 for the conversion to Unicode
 
-    >>> makeUnicode(u'abc\0d')
-    u'abc\\0d'
+    >>> makeUnicode('abc\0d')
+    'abc\\0d'
     >>> makeUnicode('a\xe9')
-    u'a\xe9'
+    'a\xe9'
     """
     if isinstance(text, bytes):
         text = str(text, "ISO-8859-1")
@@ -395,10 +395,10 @@ def humanUnixAttributes(mode):
     Original source code:
     http://cvs.savannah.gnu.org/viewcvs/coreutils/lib/filemode.c?root=coreutils
 
-    >>> humanUnixAttributes(0644)
-    u'-rw-r--r-- (644)'
-    >>> humanUnixAttributes(02755)
-    u'-rwxr-sr-x (2755)'
+    >>> humanUnixAttributes(0o644)
+    '-rw-r--r-- (644)'
+    >>> humanUnixAttributes(0o2755)
+    '-rwxr-sr-x (2755)'
     """
 
     def ftypelet(mode):
@@ -555,11 +555,11 @@ def humanDatetime(value, strip_microsecond=True):
     Convert a timestamp to Unicode string: use ISO format with space separator.
 
     >>> humanDatetime( datetime(2006, 7, 29, 12, 20, 44) )
-    u'2006-07-29 12:20:44'
+    '2006-07-29 12:20:44'
     >>> humanDatetime( datetime(2003, 6, 30, 16, 0, 5, 370000) )
-    u'2003-06-30 16:00:05'
+    '2003-06-30 16:00:05'
     >>> humanDatetime( datetime(2003, 6, 30, 16, 0, 5, 370000), False )
-    u'2003-06-30 16:00:05.370000'
+    '2003-06-30 16:00:05.370000'
     """
     text = str(value.isoformat())
     text = text.replace('T', ' ')
