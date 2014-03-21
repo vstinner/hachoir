@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from math import ceil
 from stubs import byte_addr, get_file_size, get_page_num
 

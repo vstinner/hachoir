@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from hachoir.core.tools import alignValue
 from hachoir.core.error import warning
 

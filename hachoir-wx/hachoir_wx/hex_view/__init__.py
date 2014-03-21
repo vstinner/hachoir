@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # platform workarounds
 import wx
 if '__WXGTK__' == wx.Platform:

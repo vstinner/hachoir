@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from wx import Frame, PreFrame
 
 class frame_view_t(Frame):

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from wx import App, EVT_MENU, ID_OK
 from wx.xrc import XRCID
 
@@ -32,7 +30,7 @@ class app_t(App):
                   id=XRCID('file_menu_open_file'))
         self.Bind(EVT_MENU, self.on_file_menu_close_window,
                   id=XRCID('file_menu_close_window'))
-    
+
     def on_file_menu_open_file(self, event):
         open_dialog = file_open_dialog()
         if ID_OK != open_dialog.ShowModal():

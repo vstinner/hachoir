@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 def format_addr_dec(addr):
     return "%08d.%01d" % divmod(addr, 8)
 

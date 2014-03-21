@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from hachoir_wx.field_view.format import format_addr_hex, format_addr_dec, format_size, format_data, format_name, format_desc
 from hachoir.core.i18n import _
 
@@ -9,7 +7,7 @@ class field_view_imp_t:
     def __init__(self):
         self.addr_func = lambda field: field._getAbsoluteAddress()
         self.format_addr = lambda field: format_addr_hex(self.addr_func(field))
-        
+
         self.col_str_table = [
             lambda f: self.format_addr(f),          # address
             format_name,                            # name

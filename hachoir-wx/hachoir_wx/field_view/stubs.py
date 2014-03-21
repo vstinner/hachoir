@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 #
 # some stubs that could be in hachoir-core.
 #

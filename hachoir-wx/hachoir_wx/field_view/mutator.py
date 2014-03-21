@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from hachoir.core import field as field_module
 from hachoir_wx.field_view.stubs import has_static_size, convert_size
 

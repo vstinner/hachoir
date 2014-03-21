@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import wx
 
 class core_type_menu_fwd_t:

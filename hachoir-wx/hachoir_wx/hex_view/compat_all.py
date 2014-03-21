@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 MAX_LINE_TEST = 10 * 1024
 
 def get_width_chars(view):
@@ -8,7 +6,7 @@ def get_width_chars(view):
         view.SetValue(padding)
 
     return view.GetLineLength(0) // 3
-    
+
 def get_height_chars(view):
     return view.GetClientSize()[1] // view.GetCharHeight()
 

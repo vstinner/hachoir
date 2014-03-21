@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from wx import GetNumberFromUser
 from hachoir.core.i18n import _
 
@@ -10,7 +8,7 @@ class field_split_menu_t:
         self.Bind = self.menu.Bind # see note in field_menu.py
 
     def ask_split(self, caption, min, max):
-        num = GetNumberFromUser(_('Enter split offset:'), '', 
+        num = GetNumberFromUser(_('Enter split offset:'), '',
                                 caption, min, min, max, self.parent)
 
         if -1 == num:

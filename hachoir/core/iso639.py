@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 ISO639-2 standart: the module only contains the dictionary ISO639_2
 which maps a language code in three letters (eg. "fre") to a language

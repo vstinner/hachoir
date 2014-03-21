@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from hachoir_wx.resource import get_child_control
 from field_view_imp import field_view_imp_t
 from field_view_fwd import field_view_fwd_t

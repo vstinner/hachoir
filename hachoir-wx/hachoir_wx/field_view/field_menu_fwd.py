@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from wx import EVT_MENU
 from wx.xrc import XRCID
 

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from wx import EVT_SIZE
 
 class hex_view_fwd_t:

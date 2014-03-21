@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import wx
 
 class field_split_menu_fwd_t:

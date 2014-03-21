@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from wx import ListCtrl, PreListCtrl, EVT_WINDOW_CREATE, CallAfter
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
 from sys import maxint

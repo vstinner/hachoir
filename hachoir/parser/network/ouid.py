@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 List of registered IEEE 24-bit Organizationally Unique IDentifiers.
 

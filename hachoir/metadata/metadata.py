@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from hachoir.core.endian import endian_name
 from hachoir.core.tools import makePrintable, makeUnicode
 from hachoir.core.dict import Dict

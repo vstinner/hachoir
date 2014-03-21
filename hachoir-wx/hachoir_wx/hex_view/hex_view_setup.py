@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from hachoir_wx.resource import get_child_control
 from hex_view_imp import hex_view_imp_t
 from hex_view_fwd import hex_view_fwd_t

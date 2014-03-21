@@ -1,4 +1,3 @@
-# -*- coding: UTF-8 -*-
 """
 Functions to manage internationalisation (i18n):
 - initLocale(): setup locales and install Unicode compatible stdout and

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from frame_view_imp import frame_view_imp_t
 from frame_view_fwd import frame_view_fwd_t
 

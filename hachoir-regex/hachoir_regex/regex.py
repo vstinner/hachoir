@@ -1,4 +1,3 @@
-# -*- coding: UTF-8 -*-
 """
 Object to manage regular expressions, try to optimize the result:
  - '(a|b)' => '[ab]'

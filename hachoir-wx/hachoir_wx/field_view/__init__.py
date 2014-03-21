@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from field_view_setup import setup_field_view
 from field_view import field_view_t
 

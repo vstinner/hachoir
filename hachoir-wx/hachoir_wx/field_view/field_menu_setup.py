@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from field_menu_imp import field_menu_imp_t
 from field_menu_fwd import field_menu_fwd_t
 from field_menu import field_menu_t

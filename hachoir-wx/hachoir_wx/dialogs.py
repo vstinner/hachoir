@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import wx, os
 from hachoir.core.i18n import _
 
@@ -8,9 +6,9 @@ def file_open_dialog():
 
     dialog = wx.FileDialog(
         None, message = _('Open'),
-        defaultDir = os.getcwd(), 
+        defaultDir = os.getcwd(),
         defaultFile = '', style = dialog_style)
-    
+
     return dialog
 
 def file_save_dialog(title):

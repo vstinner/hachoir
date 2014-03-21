@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 3do model parser.
 

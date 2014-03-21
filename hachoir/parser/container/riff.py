@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 """
 RIFF parser, able to parse:
    * AVI video container

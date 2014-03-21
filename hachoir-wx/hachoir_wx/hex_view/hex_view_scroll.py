@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from wx import ScrollBar, PreScrollBar
 
 class hex_view_scroll_t(ScrollBar):

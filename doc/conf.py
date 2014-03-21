@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Hachoir documentation build configuration file, created by
 # sphinx-quickstart on Fri Mar 21 16:27:57 2014.
 #

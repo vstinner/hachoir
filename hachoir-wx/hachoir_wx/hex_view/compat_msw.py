@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Windows wx compatibility
 
 def get_width_chars(view):

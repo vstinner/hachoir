@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import wx
 
 class hex_view_scroll_fwd_t:

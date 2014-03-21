@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from wx import TextCtrl, TextAttr, PreTextCtrl
 from stubs import to_ascii, to_hex, calc_char_range, calc_ascii_range, clamp_range
 from hachoir_wx.hex_view import get_width_chars, get_height_chars
@@ -36,7 +34,7 @@ class hex_view_t(TextCtrl):
 
         self.SetStyle(mark_start, mark_end, self.highlight_style)
         self.Refresh()
-        
+
         mark_start, mark_end = calc_ascii_range(start, start + size, self.get_width_chars())
 
         mark_start = clamp_range(mark_start, 0, self.get_ascii_size())

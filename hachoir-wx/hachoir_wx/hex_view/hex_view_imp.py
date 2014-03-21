@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from hex_view import get_page_size
 from stubs import clamp_range, byte_addr, safe_seek, calc_field_mark, get_page_offset
 
