@@ -34,7 +34,7 @@ class RawBytes(Field):
                 address = self.absolute_address
                 length = min(self._size // 8, max_bytes)
                 self._display = self._parent.stream.readBytes(address, length)
-            display = self._display
+            display = makePrintable(self._display, "ASCII")
         truncated = (8 * len(display) < self._size)
         if human:
             if truncated:
