@@ -265,11 +265,11 @@ class Frames(FieldSet):
 def createMpegAudioMagic():
 
     # ID3v1 magic
-    magics = [("TAG", 0)]
+    magics = [(b"TAG", 0)]
 
     # ID3v2 magics
     for ver_major in ID3v2.VALID_MAJOR_VERSIONS:
-       magic = "ID3%c\x00" % ver_major
+       magic = b"ID3%c\x00" % ver_major
        magics.append( (magic,0) )
 
     # MPEG frame magic
@@ -330,7 +330,7 @@ class MpegAudioFile(Parser):
 
     def createFields(self):
         # Read ID3v2 (if any)
-        if self.stream.readBytes(0, 3) == "ID3":
+        if self.stream.readBytes(0, 3) == b"ID3":
             yield ID3v2(self, "id3v2")
 
         if self._size is None: # TODO: is it possible to handle piped input?

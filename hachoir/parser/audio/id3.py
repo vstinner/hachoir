@@ -455,7 +455,7 @@ class ID3_Size(Bits):
     def createValue(self):
         data = self.parent.stream.readBytes(self.absolute_address, 4)
         # TODO: Check that bit #7 of each byte is nul: not(ord(data[i]) & 127)
-        return reduce(lambda x, y: x*128 + y, (ord(item) for item in data ))
+        return reduce(lambda x, y: x*128 + y, (item for item in data ))
 
 class ID3v2(FieldSet):
     endian = NETWORK_ENDIAN
