@@ -14,6 +14,8 @@ Contents:
    core
    parser
    metadata
+   api
+   internals
 
 
 
