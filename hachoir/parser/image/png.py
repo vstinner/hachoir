@@ -238,7 +238,7 @@ class PngFile(Parser):
     endian = NETWORK_ENDIAN
 
     def validate(self):
-        if self["id"].value != '\x89PNG\r\n\x1A\n':
+        if self["id"].value != b'\x89PNG\r\n\x1A\n':
             return "Invalid signature"
         if self[1].name != "header":
             return "First chunk is not header"

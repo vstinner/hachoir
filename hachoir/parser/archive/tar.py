@@ -94,7 +94,7 @@ class TarFile(Parser):
         "subfile": "skip",
         "description": "TAR archive",
     }
-    _sign = re.compile("ustar *\0|[ \0]*$")
+    _sign = re.compile(b"ustar *\0|[ \0]*$")
 
     def validate(self):
         if not self._sign.match(self.stream.readBytes(257*8, 8)):

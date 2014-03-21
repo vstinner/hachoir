@@ -53,24 +53,24 @@ class BitmapBlock(SeekableFieldSet):
     """ The bitmap blocks are Reiserfs blocks where each byte contains
         the state of 8 blocks in the filesystem. So each bit will describe
         the state of a block to tell if it is used or not.
-    """    
+    """
     def createFields(self):
         block_size=self["/superblock/blocksize"].value
-        
+
         for i in range(0, block_size * 8):
             yield BlockState(self, "block[]", i)
 
 
 class BitmapBlockGroup(SeekableFieldSet):
     """The group that manages the Bitmap Blocks"""
-    
-    def createFields(self):   
-        block_size=self["/superblock/blocksize"].value  
+
+    def createFields(self):
+        block_size=self["/superblock/blocksize"].value
         nb_bitmap_block = self["/superblock/bmap_nr"].value
         # Position of the first bitmap block
         self.seekByte(REISER_FS.SUPERBLOCK_OFFSET + block_size, relative=False)
-   
-        yield BitmapBlock(self, "BitmapBlock[]", "Bitmap blocks tells for each block if it is used")    
+
+        yield BitmapBlock(self, "BitmapBlock[]", "Bitmap blocks tells for each block if it is used")
         # The other bitmap blocks
         for i in range(1, nb_bitmap_block):
             self.seekByte( (block_size**2) * 8 * i, relative=False)
@@ -161,8 +161,8 @@ class REISER_FS(Parser):
 
     def validate(self):
         # Let's look at the magic field in the superblock
-        magic = self.stream.readBytes(self.MAGIC_OFFSET*8, 9).rstrip("\0")
-        if magic in ("ReIsEr3Fs", "ReIsErFs", "ReIsEr2Fs"):
+        magic = self.stream.readBytes(self.MAGIC_OFFSET*8, 9).rstrip(b"\0")
+        if magic in (b"ReIsEr3Fs", b"ReIsErFs", b"ReIsEr2Fs"):
             return True
         return "Invalid magic string"
 
