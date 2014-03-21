@@ -156,7 +156,7 @@ class Frame(FieldSet):
         elif self["layer"].value == self.LAYER_II:
             return (frame_size * 144) / sample_rate + padding
         else: # self.LAYER_I:
-            frame_size = (frame_size * 12) / sample_rate
+            frame_size = (frame_size * 12) // sample_rate
             return (frame_size + padding) * 4
 
     def getNbChannel(self):
