@@ -5,8 +5,8 @@ import struct
 # Make sure that we use right struct types
 assert struct.calcsize("f") == 4
 assert struct.calcsize("d") == 8
-assert struct.unpack("<d", "\x1f\x85\xebQ\xb8\x1e\t@")[0] == 3.14
-assert struct.unpack(">d", "\xc0\0\0\0\0\0\0\0")[0] == -2.0
+assert struct.unpack("<d", b"\x1f\x85\xebQ\xb8\x1e\t@")[0] == 3.14
+assert struct.unpack(">d", b"\xc0\0\0\0\0\0\0\0")[0] == -2.0
 
 class FloatMantissa(Bits):
     def createValue(self):
