@@ -1,9 +1,6 @@
-Hachoir project
-===============
-
-Hachoir is a Python library used to represent of a binary file as a tree of
-Python objects. Each object has a type, a value, an address, etc. The goal is
-to be able to know the meaning of each bit in a file.
+++++++++++++
+Hachoir core
+++++++++++++
 
 Why using slow Python code instead of fast hardcoded C code? Hachoir has many
 interesting features:
@@ -19,10 +16,10 @@ interesting features:
  * Editor: Using Hachoir representation of data, you can edit, insert, remove
    data and then save in a new file.
 
-Website: http://bitbucket.org/haypo/hachoir/wiki/hachoir-core
+* [[Features|Feature list]]
+* [[QualityControl|Quality control]]: documentation, diagrams, ...
+* [[WhatsNew|What's New]]
+* [[Limits|Hachoir limits]]
 
-Installation
-============
-
-For the installation, use setup.py or see: http://bitbucket.org/haypo/hachoir/wiki/Install
+See also [[hachoir-parser|hachoir-parser]], [[hachoir-urwid|hachoir-urwid]], [[hachoir-metadata|hachoir-metadata]], etc.
 

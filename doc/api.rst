@@ -1,11 +1,9 @@
-Hachoir is the French name for a mincer: a tool used by butchers to cut meat.
-Hachoir is also a tool written for hackers to cut a file or any binary stream.
-A file is split in a tree of fields where the smallest field can be a
-bit. There are various field types: integer, string, bits, padding, sub file,
-etc.
++++++++++++
+Hachoir API
++++++++++++
 
-This document is a presentation of Hachoir API. It tries to show most
-the interesting part of this tool, but is not exhaustive. Ok, let's start!
+This document is a presentation of Hachoir API. It tries to show most the
+interesting part of this tool, but is not exhaustive. Ok, let's start!
 
 hachoir.stream: Stream manipulation
 ===================================
@@ -15,7 +13,7 @@ To split data we first need is to get data :-) So this section presents the
 
 In most cases we work on files using the FileInputStream function. This function
 takes one argument: a Unicode filename. But for practical reasons
-we will use StringInputStream function in this documentation.
+we will use StringInputStream function in this documentation::
 
    >>> data = b"point\0\3\0\2\0"
    >>> from hachoir.core.stream import StringInputStream, LITTLE_ENDIAN
@@ -42,7 +40,7 @@ hachoir.field: Field manipulation
 Basic parser
 ------------
 
-We will parse the data used in the last section.
+We will parse the data used in the last section::
 
    >>> from hachoir.core.field import Parser, CString, UInt16
    >>> class Point(Parser):
@@ -63,7 +61,7 @@ We will parse the data used in the last section.
 `point` is a the root of our field tree. This tree is really simple, it just
 has one level and three fields: name, x and y. Hachoir stores a lot of
 information in each field. In this example we just show the address, name and
-display attributes. But a field has more attributes:
+display attributes. But a field has more attributes::
 
    >>> x = point["x"]
    >>> "%s = %s" % (x.path, x.value)
@@ -84,7 +82,7 @@ Parser with sub-field sets
 --------------------------
 
 After learning basic API, let's see a more complex parser: parser with
-sub-field sets.
+sub-field sets::
 
    >>> from hachoir.core.field import FieldSet, UInt8, Character, String
    >>> class Entry(FieldSet):
@@ -106,7 +104,7 @@ sub-field sets.
 
 This example presents many interesting features of Hachoir. First of all, you
 can see that you can have two or more levels of fields. Here we have a tree
-with two levels:
+with two levels::
 
    >>> def displayTree(parent):
    ...     for field in parent:
@@ -139,7 +137,7 @@ field set and read all values; you just need to read some values of some
 specific fields. Hachoir is really lazy: no field is parsed before you ask for
 it, no value is read from stream before you read a value, etc. To inspect this
 behaviour, you can watch "current_length" (number of read fields) and
-"current_size" (current size in bits of a field set):
+"current_size" (current size in bits of a field set)::
 
    >>> root = MyFormat(stream)  # Rebuild our parser
    >>> (root.current_length, root.current_size)
@@ -151,7 +149,7 @@ behaviour, you can watch "current_length" (number of read fields) and
 
 Just after its creation, a parser is empty (0 fields). When we read the first
 field, its size becomes the size of the first field. Some operations requires
-to read more fields:
+to read more fields::
 
    >>> print(root["point[0]/letter"].display)
    'a'
@@ -306,4 +304,41 @@ Lazy methods:
 * __iter__(): iterate over children
 * createFields(): main function of the parser, create the fields. Don't call
   this function directly.
+
+
+Hachoir Metadata Example
+========================
+
+:ref:`hachoir-metadata <metadata>` example::
+
+    from hachoir_core.error import HachoirError
+    from hachoir_core.cmd_line import unicodeFilename
+    from hachoir_parser import createParser
+    from hachoir_core.tools import makePrintable
+    from hachoir_metadata import extractMetadata
+    from hachoir_core.i18n import getTerminalCharset
+    from sys import argv, stderr, exit
+
+    if len(argv) != 2:
+        print >>stderr, "usage: %s filename" % argv[0]
+        exit(1)
+    filename = argv[1]
+    filename, realname = unicodeFilename(filename), filename
+    parser = createParser(filename, realname)
+    if not parser:
+        print >>stderr, "Unable to parse file"
+        exit(1)
+    try:
+        metadata = extractMetadata(parser)
+    except HachoirError, err:
+        print "Metadata extraction error: %s" % unicode(err)
+        metadata = None
+    if not metadata:
+        print "Unable to extract metadata"
+        exit(1)
+
+    text = metadata.exportPlaintext()
+    charset = getTerminalCharset()
+    for line in text:
+        print makePrintable(line, charset)
 
