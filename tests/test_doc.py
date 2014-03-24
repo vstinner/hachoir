@@ -55,7 +55,6 @@ def main():
     testModule("hachoir.metadata.setter")
 
     # Test hachoir.regex
-    testModule("hachoir.regex.tools")
     testModule("hachoir.regex.parser")
     testModule("hachoir.regex.regex")
     testModule("hachoir.regex.pattern")
