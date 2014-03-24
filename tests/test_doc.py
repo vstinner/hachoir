@@ -29,14 +29,6 @@ def testModule(name):
     print("--- End of test")
 
 def main():
-    setlocale(LC_ALL, "C")
-    hachoir_dir = os.path.dirname(__file__)
-    sys.path.append(hachoir_dir)
-
-    # Configure Hachoir for tests
-    import hachoir.core.config as config
-    config.use_i18n = False
-
     # Test documentation in doc/*.rst files
     testDoc('doc/api.rst')
     testDoc('doc/internals.rst')
@@ -53,4 +45,12 @@ def main():
     testModule("hachoir.metadata.setter")
 
 if __name__ == "__main__":
+    setlocale(LC_ALL, "C")
+    hachoir_dir = os.path.join(os.path.dirname(__file__), '..')
+    sys.path.append(hachoir_dir)
+
+    # Configure Hachoir for tests
+    import hachoir.core.config as config
+    config.use_i18n = False
+
     main()
