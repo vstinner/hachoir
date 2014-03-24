@@ -191,12 +191,7 @@ def testFiles(directory, url_prefix):
                 return False
     return True
 
-def main():
-    if len(sys.argv) != 2:
-        print("usage: %s directory" % sys.argv[0], file=sys.stderr)
-        sys.exit(1)
-    directory = sys.argv[1]
-
+def main(directory):
     print("Download and check Hachoir testcase.")
     print()
     print("Use directory: %s" % directory)
@@ -218,5 +213,8 @@ def main():
         sys.exit(1)
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) != 2:
+        print("usage: %s directory" % sys.argv[0], file=sys.stderr)
+        sys.exit(1)
+    main(sys.argv[1])
 

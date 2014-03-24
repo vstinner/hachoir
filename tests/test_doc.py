@@ -3,12 +3,14 @@ import doctest
 import sys
 import os
 import hachoir.core.i18n   # import it because it does change the locale
-from locale import setlocale, LC_ALL
+
+ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), '..'))
 
 def testDoc(filename, name=None):
     print("--- %s: Run tests" % filename)
+    fullpath = os.path.join('..', 'doc', filename)
     failure, nb_test = doctest.testfile(
-        filename, optionflags=doctest.ELLIPSIS, name=name)
+        fullpath, optionflags=doctest.ELLIPSIS, name=name)
     if failure:
         sys.exit(1)
     print("--- %s: End of tests" % filename)
@@ -30,8 +32,8 @@ def testModule(name):
 
 def main():
     # Test documentation in doc/*.rst files
-    testDoc('doc/api.rst')
-    testDoc('doc/internals.rst')
+    testDoc('api.rst')
+    testDoc('internals.rst')
 
     # Test documentation of some functions/classes
     testModule("hachoir.core.bits")
@@ -45,9 +47,10 @@ def main():
     testModule("hachoir.metadata.setter")
 
 if __name__ == "__main__":
+    from locale import setlocale, LC_ALL
     setlocale(LC_ALL, "C")
-    hachoir_dir = os.path.join(os.path.dirname(__file__), '..')
-    sys.path.append(hachoir_dir)
+
+    sys.path.append(ROOT)
 
     # Configure Hachoir for tests
     import hachoir.core.config as config

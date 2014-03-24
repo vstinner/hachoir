@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
-DOWNLOAD_SCRIPT = "download_testcase.py"
 """
 Test hachoir-parser using the testcase.
-Use script %s to download and check the testcase.
-""" % DOWNLOAD_SCRIPT
+"""
 
 # Configure Hachoir
 from hachoir.core import config
@@ -14,7 +12,6 @@ from hachoir.core.field import FieldError
 from hachoir.core.error import HACHOIR_ERRORS, error
 from hachoir.core.stream import InputStreamError, StringInputStream
 from hachoir.parser import createParser, HachoirParserList, ValidateError
-from locale import setlocale, LC_ALL
 from array import array
 from datetime import datetime
 import random
@@ -499,9 +496,7 @@ def testFiles(directory):
         try:
             os.stat(fullname)
         except OSError:
-            print("[!] Error: file %s is missing, " \
-                "use script %s to fix your testcase" % \
-                (filename, DOWNLOAD_SCRIPT), file=sys.stderr)
+            print("[!] Error: file %s is missing" % filename, file=sys.stderr)
             return False
 
         print("[+] Test %s:" % filename)
@@ -535,13 +530,7 @@ def testRandom(seed=0, tests=(1,8)):
     return ok
 
 
-def main():
-    setlocale(LC_ALL, "C")
-    if len(sys.argv) != 2:
-        print("usage: %s testcase_directory" % sys.argv[0], file=sys.stderr)
-        sys.exit(1)
-    directory = sys.argv[1]
-
+def main(directory):
     print("Test hachoir-parser using random data.")
     print()
     if not testRandom():
@@ -642,5 +631,10 @@ testcase_files = (
 )
 
 if __name__ == "__main__":
-    main()
+    from locale import setlocale, LC_ALL
+    setlocale(LC_ALL, "C")
+    if len(sys.argv) != 2:
+        print("usage: %s testcase_directory" % sys.argv[0], file=sys.stderr)
+        sys.exit(1)
+    main(sys.argv[1])
 

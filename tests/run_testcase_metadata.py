@@ -409,13 +409,7 @@ def testFiles(directory):
             return False
     return True
 
-def main():
-    setlocale(LC_ALL, "C")
-    if len(sys.argv) != 2:
-        print("usage: %s testcase_directory" % sys.argv[0], file=sys.stderr)
-        sys.exit(1)
-    directory = sys.argv[1]
-
+def main(directory):
     print("Test hachoir-metadata using testcase.")
     print()
     print("Testcase is in directory: %s" % directory)
@@ -471,5 +465,9 @@ testcase_files = (
 )
 
 if __name__ == "__main__":
-    main()
+    setlocale(LC_ALL, "C")
+    if len(sys.argv) != 2:
+        print("usage: %s testcase_directory" % sys.argv[0], file=sys.stderr)
+        sys.exit(1)
+    main(sys.argv[1])
 
