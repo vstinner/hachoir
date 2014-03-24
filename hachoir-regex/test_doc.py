@@ -26,17 +26,7 @@ def testModule(name):
     print("--- End of test")
 
 def main():
-    # Test documentation in doc/*.rst files
-    testDoc('README')
-    testDoc('regex.rst')
-    testDoc('regression.rst')
 
-    # Test documentation of some functions/classes
-    testModule("hachoir_regex.compatibility")
-    testModule("hachoir_regex.tools")
-    testModule("hachoir_regex.parser")
-    testModule("hachoir_regex.regex")
-    testModule("hachoir_regex.pattern")
 
 if __name__ == "__main__":
     main()

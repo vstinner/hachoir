@@ -1,5 +1,6 @@
-Hachoir regex
-=============
++++++++++++++
+Hachoir Regex
++++++++++++++
 
 hachoir-regex is a Python library for regular expression (regex or regexp)
 manupulation. You can use a|b (or) and a+b (and) operators. Expressions are
@@ -7,50 +8,48 @@ optimized during the construction: merge ranges, simplify repetitions, etc.
 It also contains a class for pattern matching allowing to search multiple
 strings and regex at the same time.
 
-Website: http://bitbucket.org/haypo/hachoir/wiki/hachoir-regex
-
 Changelog
 =========
 
 Version 1.0.5 (2010-01-28)
 
- * Create a MANIFEST.in to include extra files: regex.rst, test_doc.py, etc.
- * Create an INSTALL file
+* Create a MANIFEST.in to include extra files: regex.rst, test_doc.py, etc.
+* Create an INSTALL file
 
 Version 1.0.4 (2010-01-13)
 
- * Support \b (match a word)
- * Fix parser: support backslash in a range, eg. parse(r"[a\]x]")
+* Support \b (match a word)
+* Fix parser: support backslash in a range, eg. parse(r"[a\]x]")
 
 Version 1.0.3 (2008-04-01)
 
- * Raise SyntaxError on unsupported escape character
- * Two dot atoms are always equals
+* Raise SyntaxError on unsupported escape character
+* Two dot atoms are always equals
 
 Version 1.0.2 (2007-07-12)
 
- * Refix PatternMatching without any pattern
+* Refix PatternMatching without any pattern
 
 Version 1.0.1 (2007-06-28)
 
- * Fix PatternMatching without any pattern
+* Fix PatternMatching without any pattern
 
 Version 1.0 (2007-06-28)
 
- * First public version
+* First public version
 
 Regex examples
 ==============
 
-Regex are optimized during their creation:
+Regex are optimized during their creation::
 
-   >>> from hachoir_regex import parse, createRange, createString
+   >>> from hachoir.regex import parse, createRange, createString
    >>> createString("bike") + createString("motor")
    <RegexString 'bikemotor'>
    >>> parse('(foo|fooo|foot|football)')
    <RegexAnd 'foo(|[ot]|tball)'>
 
-Create character range:
+Create character range::
 
    >>> regex = createString("1") | createString("3")
    >>> regex
@@ -60,7 +59,7 @@ Create character range:
    <RegexRange '[1-4]'>
 
 As you can see, you can use classic "a|b" (or) and "a+b" (and)
-Python operators. Example of regular expressions using repetition:
+Python operators. Example of regular expressions using repetition::
 
    >>> parse("(a{2,}){3,4}")
    <RegexRepeat 'a{6,}'>
@@ -69,7 +68,7 @@ Python operators. Example of regular expressions using repetition:
    >>> parse("(a*|b|){4,5}")
    <RegexRepeat '(a+|b){0,5}'>
 
-Compute minimum/maximum matched pattern:
+Compute minimum/maximum matched pattern::
 
    >>> r=parse('(cat|horse)')
    >>> r.minLength(), r.maxLength()
@@ -82,44 +81,32 @@ Pattern maching
 ===============
 
 Use PatternMaching if you would like to find many strings or regex in a string.
-Use addString() and addRegex() to add your patterns.
+Use addString() and addRegex() to add your patterns::
 
-    >>> from hachoir_regex import PatternMatching
+    >>> from hachoir.regex import PatternMatching
     >>> p = PatternMatching()
     >>> p.addString("a")
     >>> p.addString("b")
     >>> p.addRegex("[cd]")
 
-And then use search() to find all patterns:
+And then use search() to find all patterns::
 
     >>> for start, end, item in p.search("a b c d"):
-    ...    print "%s..%s: %s" % (start, end, item)
+    ...    print("%s..%s: %s" % (start, end, item))
     ...
     0..1: a
     2..3: b
     4..5: [cd]
     6..7: [cd]
 
-You can also attach an objet to a pattern with 'user' (user data) argument:
+You can also attach an objet to a pattern with 'user' (user data) argument::
 
     >>> p = PatternMatching()
     >>> p.addString("un", 1)
     >>> p.addString("deux", 2)
     >>> for start, end, item in p.search("un deux"):
-    ...    print "%r at %s: user=%r" % (item, start, item.user)
+    ...    print("%r at %s: user=%r" % (item, start, item.user))
     ...
     <StringPattern 'un'> at 0: user=1
     <StringPattern 'deux'> at 3: user=2
-
-
-Installation
-============
-
-With distutils:
-
-   sudo ./setup.py install
-
-Or using setuptools:
-
-   sudo ./setup.py --setuptools install
 

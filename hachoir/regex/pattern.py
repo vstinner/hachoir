@@ -1,5 +1,5 @@
-from hachoir_regex import RegexEmpty, RegexOr, parse, createString
-from hachoir_regex.tools import makePrintable
+from hachoir.regex import RegexEmpty, RegexOr, parse, createString
+from hachoir.regex.tools import makePrintable
 
 class Pattern:
     """
@@ -17,7 +17,7 @@ class StringPattern(Pattern):
         self.text = text
 
     def __str__(self):
-        return makePrintable(self.text, 'ASCII', to_unicode=True)
+        return makePrintable(self.text, 'ASCII')
 
     def __repr__(self):
         return "<StringPattern '%s'>" % self
@@ -32,7 +32,7 @@ class RegexPattern(Pattern):
         self._compiled_regex = None
 
     def __str__(self):
-        return makePrintable(str(self.regex), 'ASCII', to_unicode=True)
+        return makePrintable(str(self.regex), 'ASCII')
 
     def __repr__(self):
         return "<RegexPattern '%s'>" % self
@@ -60,7 +60,7 @@ class PatternMatching:
     Search patterns:
 
     >>> for item in p.search("a b ce"):
-    ...    print item
+    ...    print(item)
     ...
     (0, 1, <StringPattern 'a'>)
     (2, 3, <StringPattern 'b'>)
@@ -150,7 +150,7 @@ class PatternMatching:
             yield (match.start(0), match.end(0), item)
 
     def __str__(self):
-        return makePrintable(str(self.regex), 'ASCII', to_unicode=True)
+        return makePrintable(str(self.regex), 'ASCII')
 
     def _getAttribute(self, name):
         self.commit()

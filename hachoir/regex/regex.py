@@ -32,7 +32,7 @@ See also CPAN Regexp::Assemble (Perl module):
    http://search.cpan.org/~dland/Regexp-Assemble-0.28/Assemble.pm
 """
 
-from hachoir_regex.tools import makePrintable
+from hachoir.regex.tools import makePrintable
 import re
 import itertools
 import operator
@@ -133,7 +133,7 @@ class Regex:
 
     def __repr__(self, **kw):
         regex = self.__str__(**kw)
-        regex = makePrintable(regex, 'ASCII', to_unicode=True)
+        regex = makePrintable(regex, 'ASCII')
         return "<%s '%s'>" % (
             self.__class__.__name__, regex)
 
@@ -361,7 +361,7 @@ class RegexString(Regex):
 
         # '(text abc|text def)' => 'text (abc|def)'
         common = None
-        for length in xrange(1, min(len(texta),len(textb))+1):
+        for length in range(1, min(len(texta), len(textb))+1):
             if textb.startswith(texta[:length]):
                 common = length
             else:
@@ -641,7 +641,7 @@ class RegexAnd(Regex):
     def _eq(self, other):
         if len(self.content) != len(other.content):
             return False
-        return all( item[0] == item[1] for item in itertools.izip(self.content, other.content) )
+        return all( item[0] == item[1] for item in zip(self.content, other.content) )
 
 class RegexOr(Regex):
     def __init__(self, items, optimize=True):
@@ -725,7 +725,7 @@ class RegexOr(Regex):
     def _eq(self, other):
         if len(self.content) != len(other.content):
             return False
-        return all( item[0] == item[1] for item in itertools.izip(self.content, other.content) )
+        return all( item[0] == item[1] for item in zip(self.content, other.content) )
 
 def optimizeRepeatOr(rmin, rmax, regex):
     # Fix rmin/rmax

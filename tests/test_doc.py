@@ -6,9 +6,12 @@ import hachoir.core.i18n   # import it because it does change the locale
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), '..'))
 
-def testDoc(filename, name=None):
+def testDoc(filename, subdir=None, name=None):
     print("--- %s: Run tests" % filename)
-    fullpath = os.path.join('..', 'doc', filename)
+    if not subdir:
+        fullpath = os.path.join('..', 'doc', filename)
+    else:
+        fullpath = os.path.join(subdir, filename)
     failure, nb_test = doctest.testfile(
         fullpath, optionflags=doctest.ELLIPSIS, name=name)
     if failure:
@@ -35,6 +38,11 @@ def main():
     testDoc('api.rst')
     testDoc('internals.rst')
 
+    # Test documentation in doc/*.rst files
+    #testDoc('README')
+    testDoc('regex.rst')
+    testDoc('regex_regression.rst', subdir='.')
+
     # Test documentation of some functions/classes
     testModule("hachoir.core.bits")
     testModule("hachoir.core.dict")
@@ -45,6 +53,12 @@ def main():
     # Test documentation of some functions/classes
     testModule("hachoir.metadata.metadata")
     testModule("hachoir.metadata.setter")
+
+    # Test hachoir.regex
+    testModule("hachoir.regex.tools")
+    testModule("hachoir.regex.parser")
+    testModule("hachoir.regex.regex")
+    testModule("hachoir.regex.pattern")
 
 if __name__ == "__main__":
     from locale import setlocale, LC_ALL

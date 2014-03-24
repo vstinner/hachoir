@@ -28,9 +28,6 @@ def main():
     import tests.run_testcase_metadata
     tests.run_testcase_metadata.main(TESTCASE)
 
-    #print("=== hachoir-regex: tests ===")
-    #$PYTHON $ROOT/hachoir-regex/test_doc.py
-
 if __name__ == "__main__":
     main()
 

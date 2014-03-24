@@ -7,7 +7,7 @@ TODO:
  - Support \<, \>, \s, \S, \w, \W, \Z <=> $, \d, \D, \A <=> ^, \b, \B, [[:space:]], etc.
 """
 
-from hachoir_regex import (RegexString, RegexEmpty, RegexRepeat,
+from hachoir.regex import (RegexString, RegexEmpty, RegexRepeat,
     RegexDot, RegexWord, RegexStart, RegexEnd,
     RegexRange, RegexRangeItem, RegexRangeCharacter)
 import re

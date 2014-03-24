@@ -32,6 +32,7 @@ Contents:
    parser
    metadata
    install
+   regex
    metadata_examples
    api
    internals
