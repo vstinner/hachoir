@@ -1,3 +1,7 @@
++++++++++++++++++
+Hachoir Regex API
++++++++++++++++++
+
 Create regular expressions
 ==========================
 
