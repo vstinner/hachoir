@@ -1,4 +1,3 @@
-from hachoir.parser.version import __version__
 from hachoir.parser.parser import ValidateError, HachoirParser, Parser
 from hachoir.parser.parser_list import ParserList, HachoirParserList
 from hachoir.parser.guess import (QueryParser, guessParser, createParser)

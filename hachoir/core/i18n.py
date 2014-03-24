@@ -108,7 +108,7 @@ def _initGettext():
         return (_dummy_gettext, _dummy_ngettext)
 
     # Gettext variables
-    package = hachoir.core.PACKAGE
+    package = 'hachoir'
     locale_dir = path.join(path.dirname(__file__), "..", "locale")
 
     # Initialize gettext module

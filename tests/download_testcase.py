@@ -204,17 +204,18 @@ def main(directory):
         print()
         totalsize = sum( item[1] for item in testcase_files )
         print("Test case is ok (%s files, %s)" % (len(testcase_files), humanFilesize(totalsize)))
-        sys.exit(0)
+        return False
     else:
         print()
         for index in range(3):
             print("!!! ERROR !!!")
         print()
-        sys.exit(1)
+        return True
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("usage: %s directory" % sys.argv[0], file=sys.stderr)
         sys.exit(1)
-    main(sys.argv[1])
+    err = main(sys.argv[1])
+    sys.exit(int(err))
 
