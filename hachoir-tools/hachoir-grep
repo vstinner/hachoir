@@ -120,7 +120,7 @@ class ConsoleGrep(Grep):
         if self.display_percent or self.display_address:
             addr = field.absolute_address
         if self.display_filename:
-            filename = makePrintable(self.filename, self.term_charset, to_unicode=True)
+            filename = makePrintable(self.filename, self.term_charset)
             text.append(filename)
         if self.display_address:
             if (addr % 8) == 0:
@@ -131,7 +131,7 @@ class ConsoleGrep(Grep):
             text.append(field.path)
         if self.display_value:
             value = field.value
-            value = makePrintable(value, self.term_charset, to_unicode=True)
+            value = makePrintable(value, self.term_charset)
             text.append(value)
         if not text:
             return
