@@ -1,3 +1,28 @@
++++++++++++++++
+Hachoir Authors
++++++++++++++++
+
+Core
+====
+
+ * Team
+
+Julien Muchembled <jm AT jm10 DOT no-ip DOT com>
+Victor Stinner aka haypo <victor DOT stinner AT haypocalc DOT com>
+Robert Xiao aka nneonneo <nneonneo AT gmail.com> - improve SeekableFieldSet
+
+ * Packagers
+
+Arnaud Pithon aka bildoon <apithon AT free DOT fr> - ArchLinux package (v0.5.2 and svn)
+Emmanuel GARETTE aka GnunuX <gnunux AT laposte DOT net> - ArchLinux package (v0.5.2)
+Michael Scherer aka misc <misc AT mandriva DOT org> - Mandriva package (v0.5.2)
+Michel Casabona aka plumbear <michel DOT casabona AT free DOT fr> - Debian package (v0.5.2)
+Richard DEMONGEOT <richard AT demongeot DOT biz> - Debian package (v0.5.2)
+Thomas de Grenier de Latour TGL <degrenier AT easyconnect DOT fr> - Gentoo ebuild
+
+Parser
+======
+
  * Team
 
 Julien Muchembled <jm AT jm10 DOT no-ip DOT com>
@@ -24,4 +49,21 @@ Thomas de Grenier de Latour aka TGL <degrenier AT easyconnect DOT fr> - Java cla
  * Packagers
 
 (same then hachoir-core packagers, see AUTHORS file from hachoir-core)
+
+
+Metadata
+========
+
+Elie Roudninski aka adema <liliroud AT hotmail.com> - Started Gtk GUI
+Feth Arezki <feth AT arezki.net> - Fix hachoir-metadata-qt to save the current directory
+Jean-Marc Libs <jeanmarc.libs AT gmail.com> - KDE plugin
+Pierre THIERRY <nowhere.man AT levallois.eu.org> - KDE plugin
+Thomas PABST <thomas.pabst AT gmail.com> - Gnome plugin
+Victor Stinner aka haypo <victor.stinner AT gmail.com> - Metadata core
+
+
+Regex
+=====
+
+Victor Stinner aka haypo <victor DOT stinner AT haypocalc DOT com>
 

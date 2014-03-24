@@ -36,6 +36,7 @@ Contents:
    metadata_examples
    api
    internals
+   authors
 
 
 
