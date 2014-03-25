@@ -9,7 +9,7 @@ Creation: 17 september 2006
 
 from hachoir.core.field import MissingField
 from hachoir.core.cmd_line import unicodeFilename
-from hachoir_editor import (createEditor,
+from hachoir.editor import (createEditor,
     NewFieldSet, EditableInteger, EditableBytes)
 from hachoir.core.stream import FileOutputStream, StringOutputStream
 from hachoir.core.tools import humanFilesize, makePrintable
@@ -17,6 +17,7 @@ from hachoir.core.i18n import _, getTerminalCharset
 from hachoir.parser import createParser
 from optparse import OptionGroup, OptionParser
 import hachoir.core
+from hachoir import version as hachoir_version
 import sys
 
 # File formats
@@ -28,7 +29,7 @@ from hachoir.parser.audio import MpegAudioFile
 
 # Constants
 __version__ = "0.1"
-WEBSITE = "%s/wiki/hachoir-strip" % hachoir.core.WEBSITE
+WEBSITE = "%s/wiki/hachoir-strip" % hachoir_version.WEBSITE
 
 # Strip what?
 STRIP_USELESS  = 0x01   # Useless padding, useless duplicate information, etc.
@@ -222,7 +223,7 @@ def stripEditor(editor, filename, level, verbose):
             else:
                 print(_("Remove %s (%s)") % (humanFilesize(size//8), percent))
         print(_("Save new file into %s") % \
-            makePrintable(filename, getTerminalCharset(), to_unicode=True))
+            makePrintable(filename, getTerminalCharset()))
     else:
         print(_("Stripper doesn't touch the file"))
     return True

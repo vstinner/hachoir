@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from hachoir_editor import (createEditor as hachoirCreateEditor,
+from hachoir.editor import (createEditor as hachoirCreateEditor,
     NewFieldSet, EditableInteger, EditableString, EditableBytes)
 from hachoir.core.stream import FileOutputStream
 from hachoir.core.error import HachoirError

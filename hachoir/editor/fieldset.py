@@ -1,7 +1,7 @@
 from hachoir.core.dict import UniqKeyError
 from hachoir.core.field import MissingField, Float32, Float64, FakeArray
 from hachoir.core.i18n import _
-from hachoir_editor import createEditableField, EditorError
+from hachoir.editor import createEditableField, EditorError
 from collections import deque # Python 2.4
 import weakref # Python 2.1
 import struct
@@ -31,14 +31,14 @@ class EditableFieldSet(object):
             return True
         if self._deleted:
             return True
-        return any(field.is_altered for field in self._fields.itervalues())
+        return any(field.is_altered for field in self._fields.values())
     is_altered = property(_isAltered)
 
     def reset(self):
         """
         Reset the field set and the input field set.
         """
-        for key, field in self._fields.iteritems():
+        for key, field in self._fields.items():
             if not field.is_altered:
                 del self._fields[key]
         self.input.reset()
@@ -46,7 +46,7 @@ class EditableFieldSet(object):
     def __len__(self):
         return len(self.input) \
             - len(self._deleted) \
-            + sum( len(new) for new in self._inserted.itervalues() )
+            + sum( len(new) for new in self._inserted.values() )
 
     def __iter__(self):
         for field in self.input:
@@ -94,7 +94,7 @@ class EditableFieldSet(object):
                     raise UniqKeyError(_("Field name '%s' already exists") % name)
 
         # Check that field names are not in inserted fields
-        for fields in self._inserted.itervalues():
+        for fields in self._inserted.values():
             for field in fields:
                 if field.name in new_names:
                     raise UniqKeyError(_("Field name '%s' already exists") % field.name)
@@ -109,7 +109,7 @@ class EditableFieldSet(object):
 
         # Whould like to insert in inserted fields?
         if key:
-            for fields in self._inserted.itervalues():
+            for fields in self._inserted.values():
                 names = [item.name for item in fields]
                 try:
                     pos = names.index(key)
@@ -236,7 +236,7 @@ class EditableFieldSet(object):
         """
         if "/" in key:
             return self._getItemByPath(key.split("/"))
-        if isinstance(key, (int, long)):
+        if isinstance(key, int):
             raise EditorError("Integer index are not supported")
 
         if (key in self._deleted) or (key not in self.input):

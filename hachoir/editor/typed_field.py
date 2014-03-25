@@ -3,7 +3,7 @@ from hachoir.core.field import (
     RawBytes, Bytes, PaddingBytes,
     GenericString, Character,
     isInteger, isString)
-from hachoir_editor import FakeField
+from hachoir.editor import FakeField
 
 class EditableField(FakeField):
     """
