@@ -177,9 +177,6 @@ class ItemHeader(Item):
     def __init__(self, parent, name, description=None):
         Item.__init__(self, parent, name, description, self.tag_name)
 
-def sortRpmItem(a,b):
-    return int( a["offset"].value - b["offset"].value )
-
 class PropertySet(FieldSet):
     def __init__(self, parent, name, *args):
         FieldSet.__init__(self, parent, name, *args)
@@ -188,7 +185,7 @@ class PropertySet(FieldSet):
     def createFields(self):
         # Read chunk header
         yield Bytes(self, "signature", 3, r"Property signature (\x8E\xAD\xE8)")
-        if self["signature"].value != "\x8E\xAD\xE8":
+        if self["signature"].value != b"\x8E\xAD\xE8":
             raise ParserError("Invalid property signature")
         yield UInt8(self, "version", "Signature version")
         yield NullBytes(self, "reserved", 4, "Reserved")
@@ -203,7 +200,7 @@ class PropertySet(FieldSet):
             items.append(item)
 
         # Sort items by their offset
-        items.sort( sortRpmItem )
+        items.sort(key=lambda field: field["offset"].value)
 
         # Read item content
         start = self.current_size//8
