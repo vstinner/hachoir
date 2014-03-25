@@ -1,4 +1,3 @@
-from hachoir.core.cmd_line import unicodeFilename
 from hachoir.core.stream import FileOutputStream, StreamError
 from hachoir.core.error import error
 from errno import EEXIST
@@ -9,14 +8,13 @@ class Output:
     Store files found by search tool.
     """
     def __init__(self, directory):
-        self.directory_raw = directory
-        self.directory_unicode = unicodeFilename(directory)
+        self.directory = directory
         self.mkdir = False
         self.file_id = 1
 
     def createDirectory(self):
         try:
-            mkdir(self.directory_raw)
+            mkdir(self.directory)
         except OSError as err:
             if err.errno == EEXIST:
                 pass
@@ -37,9 +35,8 @@ class Output:
             self.mkdir = True
 
         # Create output file
-        filename, real_filename = path.join(self.directory_unicode, filename), \
-                                  path.join(self.directory_raw, filename)
-        output = FileOutputStream(filename, real_filename=real_filename)
+        filename = path.join(self.directory, filename)
+        output = FileOutputStream(filename)
 
         # Write output
         try:

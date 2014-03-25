@@ -32,14 +32,3 @@ def configureHachoir(option):
       config.verbose = True
     if option.debug:
       config.debug = True
-
-def unicodeFilename(filename, charset=None):
-    if not charset:
-        charset = getTerminalCharset()
-    if isinstance(filename, str):
-        return filename
-    try:
-        return str(filename, charset)
-    except UnicodeDecodeError:
-        return makePrintable(filename, charset)
-

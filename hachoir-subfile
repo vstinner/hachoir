@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from hachoir.core.cmd_line import unicodeFilename
 from hachoir.core.stream import FileInputStream
 from hachoir.core.i18n import _
 from hachoir.core import config
@@ -88,7 +87,7 @@ def main():
     # Initialize
     values, filename, output = parseOptions()
     config.quiet = True
-    stream = FileInputStream(unicodeFilename(filename), real_filename=filename)
+    stream = FileInputStream(filename)
     subfile = SearchSubfile(stream, values.offset, values.size)
     subfile.verbose = not(values.quiet)
     subfile.debug = values.debug

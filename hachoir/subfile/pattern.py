@@ -15,7 +15,6 @@ class HachoirPatternMatching(PatternMatching):
         # Create string patterns
         for parser in parser_list:
             for (magic, offset) in parser.getParserTags().get("magic",()):
-                print(parser)
                 self.addString(magic, (offset, parser))
 
         # Create regex patterns
