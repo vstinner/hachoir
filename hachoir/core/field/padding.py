@@ -54,7 +54,7 @@ class PaddingBytes(Bytes):
      * nbytes: Size of the field in bytes
 
     Optional arguments:
-     * pattern (str): Content pattern, eg. "\0" for nul bytes
+     * pattern (str): Content pattern, eg. b"\0" for nul bytes
     """
 
     static_size = staticmethod(lambda *args, **kw: args[1]*8)
@@ -63,7 +63,7 @@ class PaddingBytes(Bytes):
     def __init__(self, parent, name, nbytes,
     description="Padding", pattern=None):
         """ pattern is None or repeated string """
-        assert (pattern is None) or (isinstance(pattern, str))
+        assert (pattern is None) or (isinstance(pattern, bytes))
         Bytes.__init__(self, parent, name, nbytes, description)
         self.pattern = pattern
         self._display_pattern = self.checkPattern()
@@ -128,7 +128,7 @@ class NullBytes(PaddingBytes):
      * nbytes: Size of the field in bytes
     """
     def __init__(self, parent, name, nbytes, description=None):
-        PaddingBytes.__init__(self, parent, name, nbytes, description, pattern="\0")
+        PaddingBytes.__init__(self, parent, name, nbytes, description, pattern=b"\0")
 
     def createDisplay(self):
         if self._display_pattern:

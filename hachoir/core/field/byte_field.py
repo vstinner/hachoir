@@ -28,7 +28,7 @@ class RawBytes(Field):
     def _createDisplay(self, human):
         max_bytes = config.max_byte_length
         if type(self._getValue) is type(lambda: None):
-            display = self.value[:max_bytes]
+            display = makePrintable(self.value[:max_bytes], "ASCII")
         else:
             if self._display is None:
                 address = self.absolute_address
@@ -41,7 +41,6 @@ class RawBytes(Field):
                 display += "(...)"
             return makePrintable(display, "latin-1", quote='"')
         else:
-            display = str2hex(display, format=r"\x%02x")
             if truncated:
                 return '"%s(...)"' % display
             else:
