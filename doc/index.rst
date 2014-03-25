@@ -35,6 +35,7 @@ Contents:
    regex_api
    editor
    subfile
+   changelog
 
 
 

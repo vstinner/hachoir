@@ -29,7 +29,10 @@ CLASSIFIERS = [
     'Operating System :: OS Independent',
     'Programming Language :: Python',
     'Topic :: Multimedia',
+    'Topic :: Scientific/Engineering :: Information Analysis',
+    'Topic :: Software Development :: Disassemblers',
     'Topic :: Software Development :: Libraries :: Python Modules',
+    'Topic :: System :: Filesystems',
     'Topic :: Utilities',
 ]
 
@@ -59,6 +62,7 @@ def main():
         "classifiers": CLASSIFIERS,
         "license": hachoir.LICENSE,
         "packages": ['hachoir'],
+        "scripts": ["hachoir-metadata", "hachoir-subfile"],
     }
     if use_setuptools:
         install_options["zip_safe"] = True
