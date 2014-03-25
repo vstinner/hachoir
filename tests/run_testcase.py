@@ -208,8 +208,8 @@ def checkPYC(parser): return (
     checkValue(parser, "/content/stack_size", 4),
     checkValue(parser, "/content/consts/item[1]", 2535301200456458802993406410752),
     checkValue(parser, "/content/consts/item[4]", 0.3j),
-    checkValue(parser, "/content/consts/item[8]", "abc"),
-    checkValue(parser, "/content/filename", "pyc_example.py"))
+    checkValue(parser, "/content/consts/item[8]", b"abc"),
+    checkValue(parser, "/content/filename", b"pyc_example.py"))
 
 def checkReferenceMapClass(parser): return (
     checkValue(parser, "/minor_version", 3),
