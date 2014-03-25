@@ -18,7 +18,7 @@ Note: For PascalStringXX, prefixed value is the number of bytes and not
 from hachoir.core.field import FieldError, Bytes
 from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir.core.tools import alignValue, makePrintable
-from hachoir.core.i18n import guessBytesCharset, _
+from hachoir.core.i18n import guessBytesCharset
 from hachoir.core import config
 from codecs import BOM_UTF16_LE, BOM_UTF16_BE, BOM_UTF32_LE, BOM_UTF32_BE
 
@@ -312,7 +312,7 @@ class GenericString(Bytes):
             if value:
                 return '"%s"' % value.replace('"', '\\"')
             else:
-                return _("(empty)")
+                return "(empty)"
 
     def createRawDisplay(self):
         return GenericString.createDisplay(self, human=False)

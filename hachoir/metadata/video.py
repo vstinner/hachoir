@@ -7,7 +7,6 @@ from hachoir.parser.video import MovFile, AsfFile, FlvFile
 from hachoir.parser.video.asf import Descriptor as ASF_Descriptor
 from hachoir.parser.container import MkvFile
 from hachoir.parser.container.mkv import dateToDatetime
-from hachoir.core.i18n import _
 from hachoir.core.tools import makeUnicode, makePrintable, timedelta2seconds
 from datetime import timedelta
 
@@ -222,8 +221,8 @@ class MovMetadata(RootMetadata):
         self.creation_date = hdr["creation_date"].value
         self.last_modification = hdr["lastmod_date"].value
         self.duration = timedelta(seconds=float(hdr["duration"].value) / hdr["time_scale"].value)
-        self.comment = _("Play speed: %.1f%%") % (hdr["play_speed"].value*100)
-        self.comment = _("User volume: %.1f%%") % (float(hdr["volume"].value)*100)
+        self.comment = "Play speed: %.1f%%" % (hdr["play_speed"].value*100)
+        self.comment = "User volume: %.1f%%" % (float(hdr["volume"].value)*100)
 
     @fault_tolerant
     def processTrackHeader(self, hdr):

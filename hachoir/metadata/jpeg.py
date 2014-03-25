@@ -6,7 +6,6 @@ from hachoir.parser.image.jpeg import (
     QUALITY_HASH_COLOR, QUALITY_SUM_COLOR,
     QUALITY_HASH_GRAY, QUALITY_SUM_GRAY)
 from hachoir.core.field import MissingField
-from hachoir.core.i18n import _
 from hachoir.core.tools import makeUnicode
 from hachoir.metadata.safe import fault_tolerant
 from datetime import datetime
@@ -44,14 +43,14 @@ class JpegMetadata(RootMetadata):
     }
 
     orientation_name = {
-        1: _('Horizontal (normal)'),
-        2: _('Mirrored horizontal'),
-        3: _('Rotated 180'),
-        4: _('Mirrored vertical'),
-        5: _('Mirrored horizontal then rotated 90 counter-clock-wise'),
-        6: _('Rotated 90 clock-wise'),
-        7: _('Mirrored horizontal then rotated 90 clock-wise'),
-        8: _('Rotated 90 counter clock-wise'),
+        1: 'Horizontal (normal)',
+        2: 'Mirrored horizontal',
+        3: 'Rotated 180',
+        4: 'Mirrored vertical',
+        5: 'Mirrored horizontal then rotated 90 counter-clock-wise',
+        6: 'Rotated 90 clock-wise',
+        7: 'Mirrored horizontal then rotated 90 clock-wise',
+        8: 'Rotated 90 counter clock-wise',
     }
 
     def extract(self, jpeg):
@@ -97,9 +96,9 @@ class JpegMetadata(RootMetadata):
         nb_components = sof["nr_components"].value
         self.bits_per_pixel = 8 * nb_components
         if nb_components == 3:
-            self.pixel_format = _("YCbCr")
+            self.pixel_format = "YCbCr"
         elif nb_components == 1:
-            self.pixel_format = _("Grayscale")
+            self.pixel_format = "Grayscale"
             self.nb_colors = 256
 
     @fault_tolerant
@@ -142,7 +141,7 @@ class JpegMetadata(RootMetadata):
             if (hashval >= hashtable[index]) or (sumcoeff >= sumtable[index]):
                 quality = "%s%%" % (index + 1)
                 if (hashval > hashtable[index]) or (sumcoeff > sumtable[index]):
-                    quality += " " + _("(approximate)")
+                    quality += " " + "(approximate)"
                 self.comment = "JPEG quality: %s" % quality
                 return
 

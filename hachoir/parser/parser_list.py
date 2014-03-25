@@ -1,7 +1,6 @@
 import re
 import types
 from hachoir.core.error import error
-from hachoir.core.i18n import _
 from hachoir.parser import Parser, HachoirParser
 import sys
 
@@ -134,7 +133,7 @@ class ParserList(object):
             if title:
                 print(title, file=out)
             else:
-                print(_("List of Hachoir parsers."), file=out)
+                print("List of Hachoir parsers.", file=out)
             print(file=out)
 
         # Create parser list sorted by module

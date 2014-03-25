@@ -3,7 +3,6 @@ from hachoir.core.error import info
 from hachoir.core.log import Logger
 from hachoir.core.bits import str2long
 from hachoir.core.tools import lowerBound
-from hachoir.core.i18n import _
 from hachoir.core.tools import alignValue
 from errno import ESPIPE
 from weakref import ref as weakref_ref
@@ -18,15 +17,15 @@ class ReadStreamError(InputStreamError):
         self.address = address
         self.got = got
         if self.got is not None:
-            msg = _("Can't read %u bits at address %u (got %u bits)") % (self.size, self.address, self.got)
+            msg = "Can't read %u bits at address %u (got %u bits)" % (self.size, self.address, self.got)
         else:
-            msg = _("Can't read %u bits at address %u") % (self.size, self.address)
+            msg = "Can't read %u bits at address %u" % (self.size, self.address)
         InputStreamError.__init__(self, msg)
 
 class NullStreamError(InputStreamError):
     def __init__(self, source):
         self.source = source
-        msg = _("Input size is nul (source='%s')!") % self.source
+        msg = "Input size is nul (source='%s')!" % self.source
         InputStreamError.__init__(self, msg)
 
 class FileFromInputStream:
@@ -315,7 +314,7 @@ class InputPipe(object):
             return ''
         buf = self.buffers[index]
         if buf is None:
-            raise InputStreamError(_("Error: Buffers too small. Can't seek backward."))
+            raise InputStreamError("Error: Buffers too small. Can't seek backward.")
         if self.last != index:
             next = buf[1]
             prev = buf[2]
@@ -381,7 +380,7 @@ class InputIOStream(InputStream):
                     input = InputPipe(input, self._setSize)
                 else:
                     source = args.get("source", "<inputio:%r>" % input)
-                    raise InputStreamError(_("Unable to get size of %s: %s") % (source, err))
+                    raise InputStreamError("Unable to get size of %s: %s" % (source, err))
         self._input = input
         InputStream.__init__(self, size=size, **args)
 

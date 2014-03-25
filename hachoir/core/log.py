@@ -1,6 +1,5 @@
 import os, sys, time
 import hachoir.core.config as config
-from hachoir.core.i18n import _
 
 class Log:
     LOG_INFO   = 0
@@ -22,7 +21,7 @@ class Log:
 
     def shutdown(self):
         if self.__file:
-            self._writeIntoFile(_("Stop Hachoir"))
+            self._writeIntoFile("Stop Hachoir")
 
     def setFilename(self, filename, append=True):
         """
@@ -45,11 +44,11 @@ class Log:
                 self.__file = codecs.open(filename, "a", "utf-8")
             else:
                 self.__file = codecs.open(filename, "w", "utf-8")
-            self._writeIntoFile(_("Starting Hachoir"))
+            self._writeIntoFile("Starting Hachoir")
         except IOError as err:
             if err.errno == 2:
                 self.__file = None
-                self.info(_("[Log] setFilename(%s) fails: no such file") % filename)
+                self.info("[Log] setFilename(%s) fails: no such file" % filename)
             else:
                 raise
 

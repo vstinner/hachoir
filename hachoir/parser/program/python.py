@@ -18,7 +18,6 @@ from hachoir.core.field import (FieldSet, UInt8,
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.bits import long2raw
 from hachoir.core.text_handler import textHandler, hexadecimal
-from hachoir.core.i18n import ngettext
 if DISASSEMBLE:
     from dis import dis
 
@@ -89,7 +88,7 @@ def parseTuple(parent):
 
 def createTupleDesc(parent):
     count = parent["count"].value
-    items = ngettext("%s item", "%s items", count) % count
+    items = "%s items" % count
     return "%s: %s" % (parent.code_info[2], items)
 
 
@@ -109,7 +108,7 @@ def parseDict(parent):
         parent.count += 1
 
 def createDictDesc(parent):
-    return "Dict: %s" % (ngettext("%s key", "%s keys", parent.count) % parent.count)
+    return "Dict: %s" % ("%s keys" % parent.count)
 
 # --- Code ---
 def parseCode(parent):

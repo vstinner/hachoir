@@ -2,7 +2,6 @@ from hachoir.metadata.metadata import (registerExtractor,
     Metadata, RootMetadata, MultipleMetadata)
 from hachoir.parser.audio import AuFile, MpegAudioFile, RealAudioFile, AiffFile, FlacParser
 from hachoir.parser.container import OggFile, RealMediaFile
-from hachoir.core.i18n import _
 from hachoir.core.tools import makePrintable, timedelta2seconds, humanBitRate
 from datetime import timedelta
 from hachoir.metadata.metadata_item import QUALITY_FAST, QUALITY_NORMAL, QUALITY_BEST
@@ -330,7 +329,7 @@ class MpegAudioMetadata(RootMetadata):
         bit_rate = frame.getBitRate() # may returns None on error
         if not bit_rate:
             return
-        self.bit_rate = (bit_rate, _("%s (constant)") % humanBitRate(bit_rate))
+        self.bit_rate = (bit_rate, "%s (constant)" % humanBitRate(bit_rate))
         self.duration = timedelta(seconds=float(frame["/frames"].size) / bit_rate)
 
     def computeVariableBitrate(self, mp3):
@@ -356,7 +355,7 @@ class MpegAudioMetadata(RootMetadata):
             return
         bit_rate = total_bit_rate / count
         self.bit_rate = (bit_rate,
-            _("%s (Variable bit rate)") % humanBitRate(bit_rate))
+            "%s (Variable bit rate)" % humanBitRate(bit_rate))
         duration = timedelta(seconds=float(mp3["frames"].size) / bit_rate)
         self.duration = duration
 

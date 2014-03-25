@@ -5,7 +5,6 @@ from hachoir.parser.image import (
     XcfFile, TargaFile, WMF_File, PsdFile)
 from hachoir.parser.image.png import getBitsPerPixel as pngBitsPerPixel
 from hachoir.parser.image.xcf import XcfProperty
-from hachoir.core.i18n import _
 from hachoir.metadata.safe import fault_tolerant
 
 def computeComprRate(meta, compr_size):
@@ -94,7 +93,7 @@ class IcoMetadata(MultipleMetadata):
             elif bpp == 0:
                 bpp = 8
             image.bits_per_pixel = bpp
-            image.setHeader(_("Icon #%u (%sx%s)")
+            image.setHeader("Icon #%u (%sx%s)"
                 % (1+index, image.get("width", "?"), image.get("height", "?")))
 
             # Read compression from data (if available)
@@ -118,7 +117,7 @@ class PcxMetadata(RootMetadata):
         self.bits_per_pixel = pcx["bpp"].value
         if 1 <= pcx["bpp"].value <= 8:
             self.nb_colors = 2 ** pcx["bpp"].value
-        self.compression = _("Run-length encoding (RLE)")
+        self.compression = "Run-length encoding (RLE)"
         self.format_version = "PCX: %s" % pcx["version"].display
         if "image_data" in pcx:
             computeComprRate(self, pcx["image_data"].size)
@@ -205,15 +204,15 @@ class PngMetadata(RootMetadata):
             nb_colors = None
         if not header["has_palette"].value:
             if header["has_alpha"].value:
-                self.pixel_format = _("RGBA")
+                self.pixel_format = "RGBA"
             else:
-                self.pixel_format = _("RGB")
+                self.pixel_format = "RGB"
         elif "/transparency" in header:
-            self.pixel_format = _("Color index with transparency")
+            self.pixel_format = "Color index with transparency"
             if nb_colors:
                 nb_colors -= 1
         else:
-            self.pixel_format = _("Color index")
+            self.pixel_format = "Color index"
         self.bits_per_pixel = pngBitsPerPixel(header)
         if nb_colors:
             self.nb_colors = nb_colors
@@ -226,15 +225,15 @@ class GifMetadata(RootMetadata):
         self.useScreen(gif["/screen"])
         if self.has("bits_per_pixel"):
             self.nb_colors = (1 << self.get('bits_per_pixel'))
-        self.compression = _("LZW")
+        self.compression = "LZW"
         self.format_version =  "GIF version %s" % gif["version"].value
         for comments in gif.array("comments"):
             for comment in gif.array(comments.name + "/comment"):
                 self.comment = comment.value
         if "graphic_ctl/has_transp" in gif and gif["graphic_ctl/has_transp"].value:
-            self.pixel_format = _("Color index with transparency")
+            self.pixel_format = "Color index with transparency"
         else:
-            self.pixel_format = _("Color index")
+            self.pixel_format = "Color index"
 
     @fault_tolerant
     def useScreen(self, screen):

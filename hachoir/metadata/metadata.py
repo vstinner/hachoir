@@ -2,7 +2,6 @@ from hachoir.core.endian import endian_name
 from hachoir.core.tools import makePrintable, makeUnicode
 from hachoir.core.dict import Dict
 from hachoir.core.error import error, HACHOIR_ERRORS
-from hachoir.core.i18n import _
 from hachoir.core.log import Logger
 from hachoir.metadata.metadata_item import (
     MIN_PRIORITY, MAX_PRIORITY, QUALITY_NORMAL)
@@ -39,7 +38,7 @@ class Metadata(Logger):
         """
         # Invalid key?
         if key not in self.__data:
-            raise KeyError(_("%s has no metadata '%s'") % (self.__class__.__name__, key))
+            raise KeyError("%s has no metadata '%s'" % (self.__class__.__name__, key))
 
         # Skip duplicates
         self.__data[key].add(value)
@@ -203,7 +202,7 @@ class RootMetadata(Metadata):
         Metadata.__init__(self, None, quality)
 
 class MultipleMetadata(RootMetadata):
-    header = _("Common")
+    header = "Common"
     def __init__(self, quality=QUALITY_NORMAL):
         RootMetadata.__init__(self, quality)
         object.__setattr__(self, "_MultipleMetadata__groups", Dict())

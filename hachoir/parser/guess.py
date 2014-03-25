@@ -7,7 +7,6 @@ import os
 from hachoir.core.error import warning, info, HACHOIR_ERRORS
 from hachoir.parser import ValidateError, HachoirParserList
 from hachoir.core.stream import FileInputStream
-from hachoir.core.i18n import _
 import weakref
 import collections
 
@@ -114,10 +113,10 @@ class QueryParser(object):
             if warn:
                 if parser == self.other:
                     warn = info
-                warn(_("Skip parser '%s': %s") % (parser.__name__, res))
+                warn("Skip parser '%s': %s" % (parser.__name__, res))
             fallback = False
         if self.use_fallback and fb:
-            warning(_("Force use of parser '%s'") % fb.__name__)
+            warning("Force use of parser '%s'" % fb.__name__)
             return fb(stream)
 
 

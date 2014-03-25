@@ -2,7 +2,6 @@ import hachoir.core.config as config
 from hachoir.core.field import Parser as GenericParser
 from hachoir.core.error import HACHOIR_ERRORS, HachoirError, error
 from hachoir.core.tools import makeUnicode
-from hachoir.core.i18n import _
 from inspect import getmro
 
 
@@ -39,8 +38,8 @@ class HachoirParser(object):
                     break
                 res = makeUnicode(res)
             else:
-                res = _("stream is smaller than %s.%s bytes" % divmod(nbits, 8))
-            raise ValidateError(res or _("no reason given"))
+                res = "stream is smaller than %s.%s bytes" % divmod(nbits, 8)
+            raise ValidateError(res or "no reason given")
         self._autofix = True
 
     #--- Methods that can be overridden -------------------------------------

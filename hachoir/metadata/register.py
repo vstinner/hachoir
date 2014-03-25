@@ -1,4 +1,3 @@
-from hachoir.core.i18n import _
 from hachoir.core.tools import (
     humanDuration, humanBitRate,
     humanFrequency, humanBitSize, humanFilesize,
@@ -34,79 +33,79 @@ DURATION_FILTER = Filter(timedelta,
     timedelta(days=365))
 
 def registerAllItems(meta):
-    meta.register(Data("title", 100, _("Title"), type=str))
-    meta.register(Data("artist", 101, _("Artist"), type=str))
-    meta.register(Data("author", 102, _("Author"), type=str))
-    meta.register(Data("music_composer", 103, _("Music composer"), type=str))
+    meta.register(Data("title", 100, "Title", type=str))
+    meta.register(Data("artist", 101, "Artist", type=str))
+    meta.register(Data("author", 102, "Author", type=str))
+    meta.register(Data("music_composer", 103, "Music composer", type=str))
 
-    meta.register(Data("album", 200, _("Album"), type=str))
-    meta.register(Data("duration", 201, _("Duration"), # integer in milliseconde
+    meta.register(Data("album", 200, "Album", type=str))
+    meta.register(Data("duration", 201, "Duration", # integer in milliseconde
         type=timedelta, text_handler=humanDuration, filter=DURATION_FILTER))
-    meta.register(Data("nb_page", 202, _("Nb page"), filter=NumberFilter(1, MAX_NB_PAGE)))
-    meta.register(Data("music_genre", 203, _("Music genre"), type=str))
-    meta.register(Data("language", 204, _("Language"), conversion=setLanguage, type=Language))
-    meta.register(Data("track_number", 205, _("Track number"), conversion=setTrackNumber,
+    meta.register(Data("nb_page", 202, "Nb page", filter=NumberFilter(1, MAX_NB_PAGE)))
+    meta.register(Data("music_genre", 203, "Music genre", type=str))
+    meta.register(Data("language", 204, "Language", conversion=setLanguage, type=Language))
+    meta.register(Data("track_number", 205, "Track number", conversion=setTrackNumber,
         filter=NumberFilter(1, MAX_TRACK), type=(int, int)))
-    meta.register(Data("track_total", 206, _("Track total"), conversion=setTrackTotal,
+    meta.register(Data("track_total", 206, "Track total", conversion=setTrackTotal,
         filter=NumberFilter(1, MAX_TRACK), type=(int, int)))
-    meta.register(Data("organization", 210, _("Organization"), type=str))
-    meta.register(Data("version", 220, _("Version")))
+    meta.register(Data("organization", 210, "Organization", type=str))
+    meta.register(Data("version", 220, "Version"))
 
 
-    meta.register(Data("width", 301, _("Image width"), filter=NumberFilter(1, MAX_WIDTH), type=(int, int), text_handler=humanPixelSize))
-    meta.register(Data("height", 302, _("Image height"), filter=NumberFilter(1, MAX_HEIGHT), type=(int, int), text_handler=humanPixelSize))
-    meta.register(Data("nb_channel", 303, _("Channel"), text_handler=humanAudioChannel, filter=NumberFilter(1, MAX_NB_CHANNEL), type=(int, int)))
-    meta.register(Data("sample_rate", 304, _("Sample rate"), text_handler=humanFrequency, filter=NumberFilter(MIN_SAMPLE_RATE, MAX_SAMPLE_RATE), type=(int, int, float)))
-    meta.register(Data("bits_per_sample", 305, _("Bits/sample"), text_handler=humanBitSize, filter=NumberFilter(1, 64), type=(int, int)))
-    meta.register(Data("image_orientation", 306, _("Image orientation")))
-    meta.register(Data("nb_colors", 307, _("Number of colors"), filter=NumberFilter(1, MAX_NB_COLOR), type=(int, int)))
-    meta.register(Data("bits_per_pixel", 308, _("Bits/pixel"), filter=NumberFilter(1, MAX_BITS_PER_PIXEL), type=(int, int)))
-    meta.register(Data("filename", 309, _("File name"), type=str))
-    meta.register(Data("file_size", 310, _("File size"), text_handler=humanFilesize, type=(int, int)))
-    meta.register(Data("pixel_format", 311, _("Pixel format")))
-    meta.register(Data("compr_size", 312, _("Compressed file size"), text_handler=humanFilesize, type=(int, int)))
-    meta.register(Data("compr_rate", 313, _("Compression rate"), text_handler=humanComprRate, filter=NumberFilter(MIN_COMPR_RATE, MAX_COMPR_RATE), type=(int, int, float)))
+    meta.register(Data("width", 301, "Image width", filter=NumberFilter(1, MAX_WIDTH), type=(int, int), text_handler=humanPixelSize))
+    meta.register(Data("height", 302, "Image height", filter=NumberFilter(1, MAX_HEIGHT), type=(int, int), text_handler=humanPixelSize))
+    meta.register(Data("nb_channel", 303, "Channel", text_handler=humanAudioChannel, filter=NumberFilter(1, MAX_NB_CHANNEL), type=(int, int)))
+    meta.register(Data("sample_rate", 304, "Sample rate", text_handler=humanFrequency, filter=NumberFilter(MIN_SAMPLE_RATE, MAX_SAMPLE_RATE), type=(int, int, float)))
+    meta.register(Data("bits_per_sample", 305, "Bits/sample", text_handler=humanBitSize, filter=NumberFilter(1, 64), type=(int, int)))
+    meta.register(Data("image_orientation", 306, "Image orientation"))
+    meta.register(Data("nb_colors", 307, "Number of colors", filter=NumberFilter(1, MAX_NB_COLOR), type=(int, int)))
+    meta.register(Data("bits_per_pixel", 308, "Bits/pixel", filter=NumberFilter(1, MAX_BITS_PER_PIXEL), type=(int, int)))
+    meta.register(Data("filename", 309, "File name", type=str))
+    meta.register(Data("file_size", 310, "File size", text_handler=humanFilesize, type=(int, int)))
+    meta.register(Data("pixel_format", 311, "Pixel format"))
+    meta.register(Data("compr_size", 312, "Compressed file size", text_handler=humanFilesize, type=(int, int)))
+    meta.register(Data("compr_rate", 313, "Compression rate", text_handler=humanComprRate, filter=NumberFilter(MIN_COMPR_RATE, MAX_COMPR_RATE), type=(int, int, float)))
 
-    meta.register(Data("width_dpi", 320, _("Image DPI width"), filter=NumberFilter(1, MAX_DPI_WIDTH), type=(int, int), text_handler=humanDPI))
-    meta.register(Data("height_dpi", 321, _("Image DPI height"), filter=NumberFilter(1, MAX_DPI_HEIGHT), type=(int, int), text_handler=humanDPI))
+    meta.register(Data("width_dpi", 320, "Image DPI width", filter=NumberFilter(1, MAX_DPI_WIDTH), type=(int, int), text_handler=humanDPI))
+    meta.register(Data("height_dpi", 321, "Image DPI height", filter=NumberFilter(1, MAX_DPI_HEIGHT), type=(int, int), text_handler=humanDPI))
 
-    meta.register(Data("file_attr", 400, _("File attributes")))
-    meta.register(Data("file_type", 401, _("File type")))
-    meta.register(Data("subtitle_author", 402, _("Subtitle author"), type=str))
+    meta.register(Data("file_attr", 400, "File attributes"))
+    meta.register(Data("file_type", 401, "File type"))
+    meta.register(Data("subtitle_author", 402, "Subtitle author", type=str))
 
-    meta.register(Data("creation_date", 500, _("Creation date"), text_handler=humanDatetime,
+    meta.register(Data("creation_date", 500, "Creation date", text_handler=humanDatetime,
         filter=DATETIME_FILTER, type=(datetime, date), conversion=setDatetime))
-    meta.register(Data("last_modification", 501, _("Last modification"), text_handler=humanDatetime,
+    meta.register(Data("last_modification", 501, "Last modification", text_handler=humanDatetime,
         filter=DATETIME_FILTER, type=(datetime, date), conversion=setDatetime))
-    meta.register(Data("latitude", 510, _("Latitude"), type=float))
-    meta.register(Data("longitude", 511, _("Longitude"), type=float))
-    meta.register(Data("altitude", 511, _("Altitude"), type=float, text_handler=humanAltitude))
-    meta.register(Data("location", 530, _("Location"), type=str))
-    meta.register(Data("city", 531, _("City"), type=str))
-    meta.register(Data("country", 532, _("Country"), type=str))
-    meta.register(Data("charset", 540, _("Charset"), type=str))
-    meta.register(Data("font_weight", 550, _("Font weight")))
+    meta.register(Data("latitude", 510, "Latitude", type=float))
+    meta.register(Data("longitude", 511, "Longitude", type=float))
+    meta.register(Data("altitude", 511, "Altitude", type=float, text_handler=humanAltitude))
+    meta.register(Data("location", 530, "Location", type=str))
+    meta.register(Data("city", 531, "City", type=str))
+    meta.register(Data("country", 532, "Country", type=str))
+    meta.register(Data("charset", 540, "Charset", type=str))
+    meta.register(Data("font_weight", 550, "Font weight"))
 
-    meta.register(Data("camera_aperture", 520, _("Camera aperture")))
-    meta.register(Data("camera_focal", 521, _("Camera focal")))
-    meta.register(Data("camera_exposure", 522, _("Camera exposure")))
-    meta.register(Data("camera_brightness", 530, _("Camera brightness")))
-    meta.register(Data("camera_model", 531, _("Camera model"), type=str))
-    meta.register(Data("camera_manufacturer", 532, _("Camera manufacturer"), type=str))
+    meta.register(Data("camera_aperture", 520, "Camera aperture"))
+    meta.register(Data("camera_focal", 521, "Camera focal"))
+    meta.register(Data("camera_exposure", 522, "Camera exposure"))
+    meta.register(Data("camera_brightness", 530, "Camera brightness"))
+    meta.register(Data("camera_model", 531, "Camera model", type=str))
+    meta.register(Data("camera_manufacturer", 532, "Camera manufacturer", type=str))
 
-    meta.register(Data("compression", 600, _("Compression")))
-    meta.register(Data("copyright", 601, _("Copyright"), type=str))
-    meta.register(Data("url", 602, _("URL"), type=str))
-    meta.register(Data("frame_rate", 603, _("Frame rate"), text_handler=humanFrameRate,
+    meta.register(Data("compression", 600, "Compression"))
+    meta.register(Data("copyright", 601, "Copyright", type=str))
+    meta.register(Data("url", 602, "URL", type=str))
+    meta.register(Data("frame_rate", 603, "Frame rate", text_handler=humanFrameRate,
         filter=NumberFilter(1, MAX_FRAME_RATE), type=(int, int, float)))
-    meta.register(Data("bit_rate", 604, _("Bit rate"), text_handler=humanBitRate,
+    meta.register(Data("bit_rate", 604, "Bit rate", text_handler=humanBitRate,
         filter=NumberFilter(1, MAX_BIT_RATE), type=(int, int, float)))
-    meta.register(Data("aspect_ratio", 604, _("Aspect ratio"), type=(int, int, float)))
+    meta.register(Data("aspect_ratio", 604, "Aspect ratio", type=(int, int, float)))
 
-    meta.register(Data("os", 900, _("OS"), type=str))
-    meta.register(Data("producer", 901, _("Producer"), type=str))
-    meta.register(Data("comment", 902, _("Comment"), type=str))
-    meta.register(Data("format_version", 950, _("Format version"), type=str))
-    meta.register(Data("mime_type", 951, _("MIME type"), type=str))
-    meta.register(Data("endian", 952, _("Endianness"), type=str))
+    meta.register(Data("os", 900, "OS", type=str))
+    meta.register(Data("producer", 901, "Producer", type=str))
+    meta.register(Data("comment", 902, "Comment", type=str))
+    meta.register(Data("format_version", 950, "Format version", type=str))
+    meta.register(Data("mime_type", 951, "MIME type", type=str))
+    meta.register(Data("endian", 952, "Endianness", type=str))
 

@@ -6,7 +6,6 @@ Bit sized classes:
 """
 
 from hachoir.core.field import Field
-from hachoir.core.i18n import _
 from hachoir.core import config
 
 class RawBits(Field):

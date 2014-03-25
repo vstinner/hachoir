@@ -7,7 +7,6 @@ from hachoir.metadata.safe import fault_tolerant, getValue
 from hachoir.parser.container.riff import RiffFile
 from hachoir.parser.video.fourcc import UNCOMPRESSED_AUDIO
 from hachoir.core.tools import humanFilesize, makeUnicode, timedelta2seconds
-from hachoir.core.i18n import _
 from hachoir.metadata.audio import computeComprRate as computeAudioComprRate
 from datetime import timedelta
 
@@ -168,7 +167,7 @@ class RiffMetadata(MultipleMetadata):
 
         # Video has index?
         if "/index" in headers:
-            self.comment = _("Has audio/video index (%s)") \
+            self.comment = "Has audio/video index (%s)" \
                 % humanFilesize(headers["/index"].size//8)
 
     @fault_tolerant

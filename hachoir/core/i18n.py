@@ -3,10 +3,6 @@ Functions to manage internationalisation (i18n):
 - initLocale(): setup locales and install Unicode compatible stdout and
   stderr ;
 - getTerminalCharset(): guess terminal charset ;
-- gettext(text) translate a string to current language. The function always
-  returns Unicode string. You can also use the alias: _() ;
-- ngettext(singular, plural, count): translate a sentence with singular and
-  plural form. The function always returns Unicode string.
 
 WARNING: Loading this module indirectly calls initLocale() which sets
          locale LC_ALL to ''. This is needed to get user preferred locale
@@ -78,49 +74,6 @@ def initLocale():
         pass
 initLocale.is_done = False
 
-def _dummy_gettext(text):
-    return str(text)
-
-def _dummy_ngettext(singular, plural, count):
-    if 1 < abs(count) or not count:
-        return str(plural)
-    else:
-        return str(singular)
-
-def _initGettext():
-    charset = initLocale()
-
-    # Try to load gettext module
-    if config.use_i18n:
-        try:
-            import gettext
-            ok = True
-        except ImportError:
-            ok = False
-    else:
-        ok = False
-
-    # gettext is not available or not needed: use dummy gettext functions
-    if not ok:
-        return (_dummy_gettext, _dummy_ngettext)
-
-    # Gettext variables
-    package = 'hachoir'
-    locale_dir = path.join(path.dirname(__file__), "..", "locale")
-
-    # Initialize gettext module
-    gettext.bindtextdomain(package, locale_dir)
-    gettext.textdomain(package)
-    translate = gettext.gettext
-    ngettext = gettext.ngettext
-
-    # TODO: translate_unicode lambda function really sucks!
-    # => find native function to do that
-    unicode_gettext = lambda text: translate(text)
-    unicode_ngettext = (lambda singular, plural, count:
-                                            ngettext(singular, plural, count))
-    return (unicode_gettext, unicode_ngettext)
-
 UTF_BOMS = (
     (BOM_UTF8, "UTF-8"),
     (BOM_UTF16_LE, "UTF-16-LE"),
@@ -178,8 +131,3 @@ def guessBytesCharset(bytes, default=None):
         if characters.issuperset(non_ascii_set):
             return charset
     return default
-
-# Initialize _(), gettext() and ngettext() functions
-gettext, ngettext = _initGettext()
-_ = gettext
-

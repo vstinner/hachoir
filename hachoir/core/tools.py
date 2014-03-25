@@ -2,7 +2,6 @@
 Various utilities.
 """
 
-from hachoir.core.i18n import _, ngettext
 import re
 import stat
 from datetime import datetime, timedelta, MAXYEAR
@@ -123,7 +122,7 @@ def humanDuration(delta):
     >>> humanDuration(4213)
     '4 sec 213 ms'
     >>> humanDuration(6402309)
-    '1 hour 46 min 42 sec'
+    '1 hours 46 min 42 sec'
     """
     if not isinstance(delta, timedelta):
         delta = timedelta(microseconds=delta*1000)
@@ -141,14 +140,14 @@ def humanDuration(delta):
     if minutes:
         text.append("%u min" % minutes)
     if hours:
-        text.append(ngettext("%u hour", "%u hours", hours) % hours)
+        text.append("%u hours" % hours)
 
     # Days
     years, days = divmod(delta.days, 365)
     if days:
-        text.append(ngettext("%u day", "%u days", days) % days)
+        text.append("%u days" % days)
     if years:
-        text.append(ngettext("%u year", "%u years", years) % years)
+        text.append("%u years" % years)
     if 3 < len(text):
         text = text[-3:]
     elif not text:
@@ -162,15 +161,15 @@ def humanFilesize(size):
     The result is an unicode string.
 
     >>> humanFilesize(1)
-    '1 byte'
+    '1 bytes'
     >>> humanFilesize(790)
     '790 bytes'
     >>> humanFilesize(256960)
     '250.9 KB'
     """
     if size < 10000:
-        return ngettext("%u byte", "%u bytes", size) % size
-    units = [_("KB"), _("MB"), _("GB"), _("TB")]
+        return "%u bytes" % size
+    units = ["KB", "MB", "GB", "TB"]
     size = float(size)
     divisor = 1024
     for unit in units:
@@ -186,7 +185,7 @@ def humanBitSize(size):
     The result is an unicode string.
 
     >>> humanBitSize(1)
-    '1 bit'
+    '1 bits'
     >>> humanBitSize(790)
     '790 bits'
     >>> humanBitSize(256960)
@@ -194,7 +193,7 @@ def humanBitSize(size):
     """
     divisor = 1000
     if size < divisor:
-        return ngettext("%u bit", "%u bits", size) % size
+        return "%u bits" % size
     units = ["Kbit", "Mbit", "Gbit", "Tbit"]
     size = float(size)
     for unit in units:
@@ -486,7 +485,7 @@ def timestampMac32(value):
     if not isinstance(value, (float, int)):
         raise TypeError("an integer or float is required")
     if not(0 <= value <= 4294967295):
-        return _("invalid Mac timestamp (%s)") % value
+        return "invalid Mac timestamp (%s)" % value
     return MAC_TIMESTAMP_T0 + timedelta(seconds=value)
 
 def durationWin64(value):
@@ -523,7 +522,7 @@ def timestampWin64(value):
     try:
         return WIN64_TIMESTAMP_T0 + durationWin64(value)
     except OverflowError:
-        raise ValueError(_("date newer than year %s (value=%s)") % (MAXYEAR, value))
+        raise ValueError("date newer than year %s (value=%s)" % (MAXYEAR, value))
 
 # Start of 60-bit UUID timestamp: 15 October 1582 at 00:00
 UUID60_TIMESTAMP_T0 = datetime(1582, 10, 15, 0, 0, 0)
@@ -546,7 +545,7 @@ def timestampUUID60(value):
     try:
         return UUID60_TIMESTAMP_T0 + timedelta(microseconds=value/10)
     except OverflowError:
-        raise ValueError(_("timestampUUID60() overflow (value=%s)") % value)
+        raise ValueError("timestampUUID60() overflow (value=%s)" % value)
 
 def humanDatetime(value, strip_microsecond=True):
     """

@@ -1,4 +1,4 @@
-from hachoir.core.i18n import guessBytesCharset, _
+from hachoir.core.i18n import guessBytesCharset
 from hachoir.core.stream import InputIOStream, InputSubStream, InputStreamError
 
 def FileInputStream(filename, real_filename=None, **args):
@@ -17,7 +17,7 @@ def FileInputStream(filename, real_filename=None, **args):
         inputio = open(real_filename, 'rb')
     except IOError as err:
         errmsg = str(err)
-        raise InputStreamError(_("Unable to open file %s: %s") % (filename, errmsg))
+        raise InputStreamError("Unable to open file %s: %s" % (filename, errmsg))
     source = "file:" + filename
     offset = args.pop("offset", 0)
     size = args.pop("size", None)

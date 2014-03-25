@@ -5,7 +5,6 @@ Parent of all (field) classes in Hachoir: Field.
 from hachoir.core.stream import InputFieldStream
 from hachoir.core.error import HachoirError, HACHOIR_ERRORS
 from hachoir.core.log import Logger
-from hachoir.core.i18n import _
 from hachoir.core.tools import makePrintable
 from weakref import ref as weakref_ref
 
@@ -111,7 +110,7 @@ class Field(Logger):
         try:
             value = self.createValue()
         except HACHOIR_ERRORS as err:
-            self.error(_("Unable to create value: %s") % str(err))
+            self.error("Unable to create value: %s" % str(err))
             value = None
         self._getValue = lambda: value
         return value

@@ -5,7 +5,6 @@ from hachoir.metadata.metadata import (
 from hachoir.parser.archive import (Bzip2Parser, CabFile, GzipParser,
     TarFile, ZipFile, MarFile)
 from hachoir.core.tools import humanUnixAttributes
-from hachoir.core.i18n import _
 
 def maxNbFile(meta):
     if meta.quality <= QUALITY_FASTEST:
@@ -85,9 +84,9 @@ class TarMetadata(MultipleMetadata):
             meta = Metadata(self)
             self.extractFile(field, meta)
             if meta.has("filename"):
-                title = _('File "%s"') % meta.getText('filename')
+                title = 'File "%s"' % meta.getText('filename')
             else:
-                title = _("File")
+                title = "File"
             self.addGroup(field.name, meta, title)
 
     @fault_tolerant
@@ -137,9 +136,9 @@ class CabMetadata(MultipleMetadata):
         if attr != "(none)":
             meta.file_attr = attr
         if meta.has("filename"):
-            title = _("File \"%s\"") % meta.getText('filename')
+            title = "File \"%s\"" % meta.getText('filename')
         else:
-            title = _("File")
+            title = "File"
         self.addGroup(field.name, meta, title)
 
 class MarMetadata(MultipleMetadata):
