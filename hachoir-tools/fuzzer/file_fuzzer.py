@@ -6,7 +6,7 @@ from hachoir.core.stream import InputIOStream, InputStreamError
 from hachoir.metadata import extractMetadata
 from hachoir.parser import guessParser
 from hachoir.core.error import HACHOIR_ERRORS
-from cStringIO import StringIO
+from io import StringIO
 from array import array
 from mangle import mangle
 from time import time
@@ -87,7 +87,7 @@ class FileFuzzer:
                 self.nb_truncate, percent, self.size))
 
     def warning(self, message):
-        print "    %s (%s): %s" % (basename(self.filename), self.nb_extract, message)
+        print("    %s (%s): %s" % (basename(self.filename), self.nb_extract, message))
 
     def info(self, message):
         if self.verbose:
@@ -148,7 +148,7 @@ class FileFuzzer:
         start = time()
         try:
             parser = guessParser(stream)
-        except InputStreamError, err:
+        except InputStreamError as err:
             parser = None
         if not parser:
             self.info("Unable to create parser: stop")
@@ -158,7 +158,7 @@ class FileFuzzer:
         try:
             metadata = extractMetadata(parser, 0.5)
             failure = bool(self.fuzzer.log_error)
-        except (HACHOIR_ERRORS, AssertionError), err:
+        except (HACHOIR_ERRORS, AssertionError) as err:
             self.info("SERIOUS ERROR: %s" % err)
             self.prefix = "metadata"
             failure = True
@@ -173,7 +173,7 @@ class FileFuzzer:
             self.info("Unable to extract metadata")
             return None
 #        for line in metadata.exportPlaintext():
-#            print ">>> %s" % line
+#            print(">>> %s" % line)
         return failure
 
     def keepFile(self, prefix):
@@ -184,5 +184,5 @@ class FileFuzzer:
             filename = "%s-%s" % (prefix, filename)
         filename = path.join(self.fuzzer.error_dir, filename)
         open(filename, "wb").write(data)
-        print "=> Store file %s" % filename
+        print("=> Store file %s" % filename)
 
