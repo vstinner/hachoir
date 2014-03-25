@@ -3,7 +3,6 @@ from hachoir.core.field import Field, MissingField
 from hachoir.core.tools import humanFilesize, humanBitSize, makePrintable
 from hachoir.core.log import log as hachoir_log
 from hachoir.core.error import HachoirError
-from hachoir.core.i18n import _, ngettext
 from hachoir.core.stream import InputFieldStream
 from hachoir.parser import guessParser
 from urwid import AttrWrap, BoxAdapter, BoxWidget, CanvasJoin, Edit, Frame, ListBox, Pile, Text
@@ -282,7 +281,7 @@ class Walker(ListWalker):
                 else:
                     size = node.field.size // 8
                     if not self.flags & self.human_size:
-                        tmp_text.append( ngettext("%u byte", "%u bytes", size) % size)
+                        tmp_text.append("%u bytes" % size)
                     else:
                         tmp_text.append( humanFilesize(size) )
             text += " (%s)" % ", ".join(tmp_text)
@@ -293,7 +292,7 @@ class Walker(ListWalker):
         if not pos:
             return None, None
         if pos.parent and pos.field != pos.parent.field[pos.index]:
-            hachoir_log.error(_("assertion failed at urwid_ui.Walker._get"))
+            hachoir_log.error("assertion failed at urwid_ui.Walker._get")
         if not (pos.flags is None and pos.hidden()) and pos.flags != self.flags:
             self.update(pos)
         return pos.getWidget(self.start), pos
@@ -525,28 +524,28 @@ class Input(Edit):
 
 
 def getHelpMessage():
-    actions = (_("Application:"),
-        ("q",      _("exit")),
-        ("F1",     _("help")),
-        ("< / >",  _("prev/next tab")),
-        ("+ / -",  _("move separator vertically")),
-        ("esc/^W", _("close current tab")),
-    ), (_("Parser window:"),
-        ("a", _("absolute address")),
-        ("b", _("address in hexadecimal")),
-        ("h", _("human display")),
-        ("d", _("description")),
-        ("s", _("field set size")),
-        ("t", _("field type")),
-        ("v", _("field value")),
-        ("^E", _("save field to a file")),
-        ("^X", _("create a stream from the selected field and save it to a file")),
-        ("enter", _("collapse/expand")),
-        ("(page) up/down", _("move (1 page) up/down")),
-        ("home", _("move to parent field")),
-        ("end", _("move to last (parent) field")),
-        ("<-/->", _("scroll horizontally")),
-        ("space", _("parse the selected field")),
+    actions = ("Application:",
+        ("q",      "exit"),
+        ("F1",     "help"),
+        ("< / >",  "prev/next tab"),
+        ("+ / -",  "move separator vertically"),
+        ("esc/^W", "close current tab"),
+    ), ("Parser window:",
+        ("a", "absolute address"),
+        ("b", "address in hexadecimal"),
+        ("h", "human display"),
+        ("d", "description"),
+        ("s", "field set size"),
+        ("t", "field type"),
+        ("v", "field value"),
+        ("^E", "save field to a file"),
+        ("^X", "create a stream from the selected field and save it to a file"),
+        ("enter", "collapse/expand"),
+        ("(page) up/down", "move (1 page) up/down"),
+        ("home", "move to parent field"),
+        ("end", "move to last (parent) field"),
+        ("<-/->", "scroll horizontally"),
+        ("space", "parse the selected field"),
     )
     length = 4 + max(max(len(action[0]) for action in group[1:]) for group in actions)
     return "\n".join("\n    %s\n%s" % (group[0],
@@ -586,7 +585,7 @@ def exploreFieldSet(field_set, args, options={}):
     preload_fields = 1 + max(0, args.preload)
 
     log_count = [ 0, 0, 0 ]
-    sep = Separator("log: %%u/%%u/%%u  |  %s  " % _("F1: help"))
+    sep = Separator("log: %%u/%%u/%%u  |  %s  " % "F1: help")
     sep.set_info(*tuple(log_count))
     body = Tabbed(sep)
     help = ('help', ListBox([ Text(getHelpMessage()) ]))
@@ -653,7 +652,7 @@ def exploreFieldSet(field_set, args, options={}):
                     logger.objects[stream] = e = "%u/%s" % (body.active, e.field.absolute_address)
                     parser = guessParser(stream)
                     if not parser:
-                        hachoir_log.error(_("No parser found for %s") % stream.source)
+                        hachoir_log.error("No parser found for %s" % stream.source)
                     else:
                         logger.objects[parser] = e
                         body.append((e, TreeBox(charset, Node(parser, None), preload_fields, None, options)))
