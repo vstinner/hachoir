@@ -143,7 +143,7 @@ def checkGzip(parser):
     return (checkValue(parser, "filename", "test.txt"),)
 
 def checkSteganography(parser): return (
-    checkValue(parser, "/frames/padding[0]", "misc est un canard\r"),
+    checkValue(parser, "/frames/padding[0]", b"misc est un canard\r"),
     checkDesc(parser, "/frames", 'Frames: Variable bit rate (VBR)'),
     checkDesc(parser, "/frames/frame[1]", 'MPEG-1 layer III, 160.0 Kbit/sec, 44.1 kHz'))
 
@@ -182,7 +182,7 @@ def checkRAR(parser): return (
 def checkACE(parser): return (
     checkValue(parser, "header/crc16", 0xA9BE),
     checkValue(parser, "file[0]/reserved", 0x4554),
-    checkValue(parser, "file[1]/filename", "hachoir.core\.svn"),
+    checkValue(parser, "file[1]/filename", "hachoir_core\.svn"),
     checkValue(parser, "file[2]/parameters", 0x000A),
     #End of archive, lots of work...
     #checkValue(parser, "new_recovery[0]/signature", "**ACE**"),
