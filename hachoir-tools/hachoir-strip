@@ -8,12 +8,11 @@ Creation: 17 september 2006
 """
 
 from hachoir.core.field import MissingField
-from hachoir.core.cmd_line import unicodeFilename
 from hachoir.editor import (createEditor,
     NewFieldSet, EditableInteger, EditableBytes)
 from hachoir.core.stream import FileOutputStream, StringOutputStream
 from hachoir.core.tools import humanFilesize, makePrintable
-from hachoir.core.i18n import _, getTerminalCharset
+from hachoir.core.i18n import getTerminalCharset
 from hachoir.parser import createParser
 from optparse import OptionGroup, OptionParser
 import hachoir.core
@@ -211,39 +210,38 @@ def stripEditor(editor, filename, level, verbose):
     stripper = stripper_cls(editor, level, verbose)
 
     if stripper():
-        filename, realname = unicodeFilename(filename), filename
-        output = FileOutputStream(filename, real_filename=realname)
+        output = FileOutputStream(filename)
         editor.writeInto(output)
         size = stripper.stripped_bytes
         if size:
             percent = "%.1f%%" % (float(size) * 100 / editor.input.size)
             if size%8 and size < 128:
-                print(_("Remove %u.%u bytes (%s)") \
+                print("Remove %u.%u bytes (%s)" \
                     % (size//8, size%8, percent))
             else:
-                print(_("Remove %s (%s)") % (humanFilesize(size//8), percent))
-        print(_("Save new file into %s") % \
+                print("Remove %s (%s)" % (humanFilesize(size//8), percent))
+        print("Save new file into %s" % \
             makePrintable(filename, getTerminalCharset()))
     else:
-        print(_("Stripper doesn't touch the file"))
+        print("Stripper doesn't touch the file")
     return True
 
 def displayVersion(*args):
-    print(_("Hachoir strip version %s") % __version__)
-    print(_("Hachoir library version %s") % hachoir.core.__version__)
+    print("Hachoir strip version %s" % __version__)
+    print("Hachoir library version %s" % hachoir.core.__version__)
     print()
-    print(_("Website: %s") % WEBSITE)
+    print("Website: %s" % WEBSITE)
     sys.exit(0)
 
 def parseOptions():
     parser = OptionParser(usage="%prog [options] filename")
 
     common = OptionGroup(parser, "Hachoir strip")
-    common.add_option("--strip", help=_("Data types to remove: useless, metadata, index (default: all). Use comma to specify two or more."),
+    common.add_option("--strip", help="Data types to remove: useless, metadata, index (default: all). Use comma to specify two or more.",
         type="str", action="store", default="metadata, useless, index")
-    common.add_option("--quiet", help=_("Be quiet"),
+    common.add_option("--quiet", help="Be quiet",
         action="store_true", default=False)
-    common.add_option("--version", help=_("Display version and exit"),
+    common.add_option("--version", help="Display version and exit",
         action="callback", callback=displayVersion)
     parser.add_option_group(common)
 
@@ -266,17 +264,16 @@ def main():
         elif item == "index":
             level |= STRIP_INDEX
     if not level:
-        print(_("Nothing to do, exit"))
+        print("Nothing to do, exit")
         sys.exit(0)
     ok = True
     charset = getTerminalCharset()
     for filename in filenames:
-        filename, real_filename = unicodeFilename(filename), filename
-        print("[+]", (_("Process file %s") % filename))
-        parser = createParser(filename, real_filename=real_filename)
+        print("[+]", ("Process file %s" % filename))
+        parser = createParser(filename)
         if parser:
             editor = createEditor(parser)
-            ok &= stripEditor(editor, real_filename+".new", level, not(values.quiet))
+            ok &= stripEditor(editor, filename+".new", level, not(values.quiet))
         else:
             ok = False
     if ok:

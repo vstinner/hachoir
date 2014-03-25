@@ -1,6 +1,5 @@
 from hachoir.core.dict import UniqKeyError
 from hachoir.core.field import MissingField, Float32, Float64, FakeArray
-from hachoir.core.i18n import _
 from hachoir.editor import createEditableField, EditorError
 from collections import deque # Python 2.4
 import weakref # Python 2.1
@@ -85,19 +84,19 @@ class EditableFieldSet(object):
         names_set = set(new_names)
         if len(names_set) != len(new_fields):
             duplicates = (name for name in names_set if 1 < new_names.count(name))
-            raise UniqKeyError(_("Duplicates in inserted fields: %s") % ", ".join(duplicates))
+            raise UniqKeyError("Duplicates in inserted fields: %s" % ", ".join(duplicates))
 
         # Check that field names are not in input
         if self.input: # Write special version for NewFieldSet?
             for name in new_names:
                 if name in self.input and name not in self._deleted:
-                    raise UniqKeyError(_("Field name '%s' already exists") % name)
+                    raise UniqKeyError("Field name '%s' already exists" % name)
 
         # Check that field names are not in inserted fields
         for fields in self._inserted.values():
             for field in fields:
                 if field.name in new_names:
-                    raise UniqKeyError(_("Field name '%s' already exists") % field.name)
+                    raise UniqKeyError("Field name '%s' already exists" % field.name)
 
         # Input have already inserted field?
         if key in self._inserted:
