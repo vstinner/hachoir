@@ -281,8 +281,7 @@ class Extension(FieldSet):
 
     def createFields(self):
         yield textHandler(UInt8(self, "code", "Extension code"), hexadecimal)
-        for field in self.parser(self):
-            yield field
+        yield from self.parser(self)
 
     def createDescription(self):
         return "Extension: function %s" % self["func"].display

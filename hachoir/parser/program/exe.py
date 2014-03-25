@@ -93,11 +93,9 @@ class ExeFile(HachoirParser, RootSeekableFieldSet):
             self.seekByte(offset, relative=False)
 
         if self.isPE():
-            for field in self.parsePortableExecutable():
-                yield field
+            yield from self.parsePortableExecutable()
         elif self.isNE():
-            for field in self.parseNE_Executable():
-                yield field
+            yield from self.parseNE_Executable()
         else:
             offset = self["msdos/code_offset"].value * 16
             self.seekByte(offset, relative=False)

@@ -241,8 +241,7 @@ class Object(FieldSet):
         yield Character(self, "bytecode", "Bytecode")
         parser = self.code_info[1]
         if parser:
-            for field in parser(self):
-                yield field
+            yield from parser(self)
 
     def createDescription(self):
         create = self.code_info[3]

@@ -260,8 +260,7 @@ class ResourceContent(FieldSet):
 
     def createFields(self):
         if self._parser:
-            for field in self._parser(self):
-                yield field
+            yield from self._parser(self)
         else:
             yield RawBytes(self, "content", self.size//8)
 

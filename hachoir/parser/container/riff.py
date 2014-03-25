@@ -88,8 +88,7 @@ def parseAVIStreamFormat(self):
         info = TYPE_HANDLER[strtype]
         if info[1] <= size:
             handler = info[0]
-    for field in handler(self, size):
-        yield field
+    yield from handler(self, size)
 
 def parseAVIStreamHeader(self):
     if self["size"].value != 56:
@@ -277,8 +276,7 @@ class Chunk(FieldSet):
         else:
             handler = self.tag_info[1]
             if handler:
-                for field in handler(self):
-                    yield field
+                yield from handler(self)
             else:
                 yield RawBytes(self, "raw_content", self["size"].value)
             padding = self.seekBit(self._size)

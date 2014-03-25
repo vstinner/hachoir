@@ -270,8 +270,7 @@ class ModplugBlock(FieldSet):
             yield UInt32(self, "block_size")
 
         if self.parseBlock:
-            for field in self.parseBlock():
-                yield field
+            yield from self.parseBlock()
 
         if self.has_size:
             size = self["block_size"].value - (self.current_size//8)

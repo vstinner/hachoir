@@ -134,8 +134,7 @@ class Instrument(FieldSet):
         if num:
             yield InstrumentSecondHeader(self, "second_header")
 
-            for field in self.fixInstrumentHeader():
-                yield field
+            yield from self.fixInstrumentHeader()
 
             # This part probably wrong
             sample_size = [ ]
@@ -148,8 +147,7 @@ class Instrument(FieldSet):
                 if size:
                     yield RawBytes(self, "sample_data[]", size, "Deltas")
         else:
-            for field in self.fixInstrumentHeader():
-                yield field
+            yield from self.fixInstrumentHeader()
 
     def createDescription(self):
         return "Instrument '%s': %i samples, header %i bytes" % \
@@ -367,8 +365,7 @@ class XMModule(Parser):
             yield Instrument(self, "instrument[]")
 
         # Metadata added by ModPlug - can be discarded
-        for field in ParseModplugMetadata(self):
-            yield field
+        yield from ParseModplugMetadata(self)
 
     def createContentSize(self):
         # Header size

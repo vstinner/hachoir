@@ -224,8 +224,7 @@ class Table(FieldSet):
 
     def createFields(self):
         if self.parser:
-            for field in self.parser(self):
-                yield field
+            yield from self.parser(self)
         else:
             yield RawBytes(self, "content", self.size//8)
 

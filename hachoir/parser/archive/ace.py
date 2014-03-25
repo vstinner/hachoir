@@ -225,19 +225,17 @@ class Block(FieldSet):
         yield UInt8(self, "block_type", "Block type")
 
         # Flags
-        for flag in self.parseFlags(self):
-            yield flag
+        yield from self.parseFlags(self)
 
         # Rest of the header
-        for field in self.parseHeader(self):
-            yield field
+        yield from self.parseHeader(self)
+
         size = self["head_size"].value - (self.current_size//8) + (2+2)
         if size > 0:
             yield RawBytes(self, "extra_data", size, "Extra header data, unhandled")
 
         # Body in itself
-        for field in self.parseBody(self):
-            yield field
+        yield from self.parseBody(self)
 
     def createDescription(self):
         if self.desc_func:

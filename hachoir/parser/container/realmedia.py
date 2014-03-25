@@ -123,8 +123,7 @@ class Chunk(FieldSet):
         yield UInt16(self, "version", "Chunk Version")
 
         if self.parse_func:
-            for field in self.parse_func(self):
-                yield field
+            yield from self.parse_func(self)
         else:
             size = (self.size - self.current_size) // 8
             if size:

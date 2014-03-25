@@ -40,8 +40,7 @@ class Chunk(FieldSet):
         size = self["length"].value - 8
         if 0 < size:
             if self._parser:
-                for field in self._parser(self, size):
-                    yield field
+                yield from self._parser(self, size)
             else:
                 yield RawBytes(self, "data", size)
 

@@ -60,8 +60,7 @@ class TiffFile(RootSeekableFieldSet, Parser):
         return True
 
     def createFields(self):
-        for field in TIFF(self):
-            yield field
+        yield from TIFF(self)
 
         for ifd in self.array('ifd'):
             offs = (off for off, byte in getStrips(ifd))

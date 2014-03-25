@@ -147,9 +147,7 @@ class Chunk(FieldSet):
                 yield Chunk(self, "chunk[]")
         else:
             if type in Chunk.handlers:
-                fields = Chunk.handlers[type] (self)
-                for field in fields:
-                    yield field
+                yield from Chunk.handlers[type](self)
             else:
                 yield RawBytes(self, "data", content_size)
 

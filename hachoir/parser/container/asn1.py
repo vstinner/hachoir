@@ -120,8 +120,8 @@ def readOctetString(self, content_size):
 
 def formatObjectID(fieldset):
     text = [ fieldset["first"].display ]
-    items = [ field for field in fieldset if field.name.startswith("item[") ]
-    text.extend( str(field.value) for field in items )
+    items = [field for field in fieldset if field.name.startswith("item[")]
+    text.extend(str(field.value) for field in items)
     return ".".join(text)
 
 def readObjectID(self, content_size):
@@ -253,8 +253,7 @@ class Object(FieldSet):
         size = self["size"].value
         if size:
             if self._handler:
-                for field in self._handler(self, size):
-                    yield field
+                yield from self._handler(self, size)
             else:
                 yield RawBytes(self, "raw", size)
 

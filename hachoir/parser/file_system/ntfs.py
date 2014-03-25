@@ -111,8 +111,7 @@ class Attribute(FieldSet):
         yield UInt8(self, "indexed_flag")
         yield NullBytes(self, "padding", 1)
         if self._parser:
-            for field in self._parser(self):
-                yield field
+            yield from self._parser(self)
         else:
             size = self["length_attr"].value
             if size:

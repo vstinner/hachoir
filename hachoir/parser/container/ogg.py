@@ -139,8 +139,7 @@ class Chunk(FieldSet):
             yield UInt8(self, 'type')
             yield String(self, 'codec', 6)
         if self.parser:
-            for field in self.parser(self):
-                yield field
+            yield from self.parser(self)
         else:
             size = (self.size - self.current_size) // 8
             if size:

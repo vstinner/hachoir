@@ -171,8 +171,7 @@ class LineEnd(FieldSet):
 class PDFDictionaryPair(FieldSet):
     def createFields(self):
         yield PDFName(self, "name", getElementEnd(self))
-        for field in parsePDFType(self):
-            yield field
+        yield from parsePDFType(self)
 
 class PDFDictionary(FieldSet):
     def createFields(self):
@@ -180,8 +179,7 @@ class PDFDictionary(FieldSet):
         while not self.eof:
             addr = self.absolute_address+self.current_size
             if self.stream.readBytes(addr, 2) != '>>':
-                for field in parsePDFType(self):
-                    yield field
+                yield from parsePDFType(self)
             else:
                 break
         yield String(self, "dict_end", 2)
@@ -194,8 +192,7 @@ class PDFArray(FieldSet):
     def createFields(self):
         yield String(self, "array_start", 1)
         while self.stream.readBytes(self.absolute_address+self.current_size, 1) != ']':
-            for field in parsePDFType(self):
-                yield field
+            yield from parsePDFType(self)
         yield String(self, "array_end", 1)
 
 def parsePDFType(s):

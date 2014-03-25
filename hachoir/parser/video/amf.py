@@ -86,8 +86,7 @@ class AMFObject(FieldSet):
 
     def createFields(self):
         yield UInt8(self, "type")
-        for field in self.parser(self):
-            yield field
+        yield from self.parser(self)
 
     def createValueDate(self):
         value = (self["timestamp_microsec"].value * 0.001) \
@@ -102,8 +101,7 @@ class Attribute(AMFObject):
     def createFields(self):
         yield PascalString16(self, "key", charset="UTF-8")
         yield UInt8(self, "type")
-        for field in self.parser(self):
-            yield field
+        yield from self.parser(self)
 
     def createDescription(self):
         return 'Attribute "%s"' % self["key"].value

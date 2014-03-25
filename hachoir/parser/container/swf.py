@@ -356,8 +356,7 @@ class Tag(FieldSet):
         size = self["length"].value
         if 0 < size:
             if self.parser:
-                for field in self.parser(self, size):
-                    yield field
+                yield from self.parser(self, size)
             else:
                 yield RawBytes(self, "data", size)
 

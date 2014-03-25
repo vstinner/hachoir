@@ -83,8 +83,7 @@ class Chunk(FieldSet):
         size = self["size"].value
         if size:
             if self._parser:
-                for field in self._parser(self):
-                    yield field
+                yield from self._parser(self)
                 if size % 2:
                     yield NullBytes(self, "padding", 1)
             else:

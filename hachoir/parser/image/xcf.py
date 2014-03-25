@@ -138,8 +138,7 @@ class XcfChannel(FieldSet):
         yield UInt32(self, "width", "Channel width")
         yield UInt32(self, "height", "Channel height")
         yield PascalString32(self, "name", "Channel name", strip="\0", charset="UTF-8")
-        for field in readProperties(self):
-            yield field
+        yield from readProperties(self)
         yield UInt32(self, "hierarchy_ofs", "Hierarchy offset")
         yield XcfHierarchy(self, "hierarchy", "Hierarchy")
 

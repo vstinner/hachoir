@@ -31,8 +31,7 @@ class RootEntry(OLE2FragmentParser):
             except LookupError:
                 name = property.name+"content"
                 parser = RawParser
-            for field in self.parseProperty(property, name, parser):
-                yield field
+            yield from self.parseProperty(property, name, parser)
     def seekSBlock(self, block):
         self.seekBit(block * self.ole2.ss_size)
 

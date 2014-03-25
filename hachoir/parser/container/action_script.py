@@ -320,8 +320,7 @@ class Instruction(FieldSet):
         if not size:
             return
         if self.parser:
-            for field in self.parser(self, size):
-                yield field
+            yield from self.parser(self, size)
         else:
             yield RawBytes(self, "action_data", size)
 

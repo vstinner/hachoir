@@ -215,12 +215,10 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
         yield DIFat(self, "difat",  header["db_start"].value, header["db_count"].value, "Double Indirection FAT")
 
         # Read FAT (one level of indirection)
-        for field in self.readBFAT():
-            yield field
+        yield from self.readBFAT()
 
         # Read SFAT
-        for field in self.readSFAT():
-            yield field
+        yield from self.readSFAT()
 
         # Read properties
         chain = self.getChain(self["header/bb_start"].value)
@@ -243,8 +241,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
                 except LookupError:
                     name = property.name+"content"
                     parser = RawParser
-            for field in self.parseProperty(property, name, parser):
-                yield field
+            yield from self.parseProperty(property, name, parser)
 
     def parseProperty(self, property, name_prefix, parser=RawParser):
         if not property["size"].value:

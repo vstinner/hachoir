@@ -143,17 +143,15 @@ class Command(FieldSet):
                     parser = self.META_COMMAND_PARSER[command]
                 else:
                     parser = None
-                if parser:
-                    for field in parser(self, size):
-                        yield field
+                if parser is not None:
+                    yield from parser(self, size)
                 else:
                     yield RawBytes(self, "data", size)
         else:
             if self.command not in self.COMMAND_PARSER:
                 raise ParserError("Unknown command: %s" % self["command"].display)
             parser = self.COMMAND_PARSER[self.command]
-            for field in parser(self):
-                yield field
+            yield from parser(self)
 
     def createDescription(self):
         if "meta_command" in self:

@@ -280,15 +280,13 @@ class Block(FieldSet):
         yield textHandler(UInt8(self, "block_type", "Block type"), hexadecimal)
 
         # Parse flags
-        for field in self.parseFlags():
-            yield field
+        yield from self.parseFlags()
 
         # Get block size
         yield filesizeHandler(UInt16(self, "block_size", "Block size"))
 
         # Parse remaining header
-        for field in self.parseHeader():
-            yield field
+        yield from self.parseHeader()
 
         # Finish header with stuff of unknow size
         size = self["block_size"].value - (self.current_size//8)
@@ -296,8 +294,7 @@ class Block(FieldSet):
             yield RawBytes(self, "unknown", size, "Unknow data (UInt32 probably)")
 
         # Parse body
-        for field in self.parseBody():
-            yield field
+        yield from self.parseBody()
 
     def createDescription(self):
         return "Block entry: %s" % self["type"].display

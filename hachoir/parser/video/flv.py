@@ -110,8 +110,7 @@ class Chunk(FieldSet):
         size = self["size"].value
         if size:
             if self.parser:
-                for field in self.parser(self, size):
-                    yield field
+                yield from self.parser(self, size)
             else:
                 yield RawBytes(self, "content", size)
 

@@ -114,8 +114,7 @@ class PackInfo(FieldSet):
         yield num
         num = num.value
 
-        for field in waitForID(self, ID_SIZE, "size_marker"):
-            yield field
+        yield from waitForID(self, ID_SIZE, "size_marker")
 
         for size in range(num):
             yield SZUInt64(self, "pack_size[]")
@@ -245,8 +244,8 @@ class UnpackInfo(FieldSet):
     def createFields(self):
         yield Enum(UInt8(self, "id"), ID_INFO)
         # Wait for synch
-        for field in waitForID(self, ID_FOLDER, "folder_marker"):
-            yield field
+        yield from waitForID(self, ID_FOLDER, "folder_marker")
+
         yield SZUInt64(self, "num_folders")
 
         # Get generic info
@@ -259,8 +258,8 @@ class UnpackInfo(FieldSet):
             yield FolderItem(self, "folder_item[]")
 
         # Get unpack sizes for each coder of each folder
-        for field in waitForID(self, ID_CODERS_UNPACK_SIZE, "coders_unpsize_marker"):
-            yield field
+        yield from waitForID(self, ID_CODERS_UNPACK_SIZE, "coders_unpsize_marker")
+
         for folder_index in range(num):
             folder_item = self["folder_item[%u]" % folder_index]
             for index in range(folder_item.out_streams):

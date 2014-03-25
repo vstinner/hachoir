@@ -183,8 +183,7 @@ class SizeFieldSet(FieldSet):
         self._size = size
 
     def createFields(self):
-        for field in self.createUnpaddedFields():
-            yield field
+        yield from self.createUnpaddedFields()
         size = (self._size - self.current_size)//8
         if size > 0:
             yield PaddingBytes(self, "padding", size)
@@ -203,18 +202,16 @@ class Header(SizeFieldSet):
     def createUnpaddedFields(self):
         yield String(self, "title", 28, strip='\0')
         yield textHandler(UInt8(self, "marker[]"), hexadecimal)
-        for field in self.getFileVersionField():
-            yield field
+        yield from self.getFileVersionField()
 
         yield UInt16(self, "num_orders")
         yield UInt16(self, "num_instruments")
         yield UInt16(self, "num_patterns")
 
-        for field in self.getFirstProperties():
-            yield field
+        yield from self.getFirstProperties()
+
         yield String(self, "marker[]", 4)
-        for field in self.getLastProperties():
-            yield field
+        yield from self.getLastProperties()
 
         yield GenericVector(self, "channel_settings", 32,
                             ChannelSettings, "channel")
@@ -222,8 +219,7 @@ class Header(SizeFieldSet):
         # Orders
         yield GenericVector(self, "orders", self.getNumOrders(), UInt8, "order")
 
-        for field in self.getHeaderEndFields():
-            yield field
+        yield from self.getHeaderEndFields()
 
 class S3MHeader(Header):
     """
@@ -418,8 +414,7 @@ class Instrument(SizeFieldSet):
         yield self.getType()
         yield String(self, "filename", 12, strip='\0')
 
-        for field in self.getInstrumentFields():
-            yield field
+        yield from self.getInstrumentFields()
 
         yield String(self, "name", 28, strip='\0')
         yield String(self, "marker", 4, "Either 'SCRS' or '(empty)'", strip='\0')
@@ -630,8 +625,7 @@ class Module(Parser):
         indexer = ChunkIndexer()
         # Add header - at least 0x50 bytes
         indexer.addChunk(Chunk(self.HEADER, "header", 0, 0x50))
-        for field in indexer.yieldChunks(self):
-            yield field
+        yield from indexer.yieldChunks(self)
 
 
 class S3MModule(Module):

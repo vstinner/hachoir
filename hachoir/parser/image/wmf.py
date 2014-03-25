@@ -389,8 +389,7 @@ class Function(FieldSet):
             except KeyError:
                 parser = None
         if parser:
-            for field in parser(self):
-                yield field
+            yield from parser(self)
         else:
             size = (self.size - self.current_size) // 8
             if size:

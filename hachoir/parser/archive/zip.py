@@ -170,8 +170,7 @@ class ZipCentralDirectory(FieldSet):
     HEADER = 0x02014b50
     def createFields(self):
         yield ZipVersion(self, "version_made_by", "Version made by")
-        for field in ZipStartCommonFields(self):
-            yield field
+        yield from ZipStartCommonFields(self)
 
         # Check unicode status
         charset = zipGetCharset(self)
@@ -272,8 +271,7 @@ class FileEntry(FieldSet):
                               (size, data_desc["file_compressed_size"].value))
 
     def createFields(self):
-        for field in ZipStartCommonFields(self):
-            yield field
+        yield from ZipStartCommonFields(self)
         length = self["filename_length"].value
 
 
@@ -289,8 +287,7 @@ class FileEntry(FieldSet):
         if size > 0:
             yield self.data(size)
         elif self["flags/incomplete"].value:
-            for field in self.resync():
-                yield field
+            yield from self.resync()
         if self["flags/has_descriptor"].value and self['crc32'].value == 0:
             yield ZipDataDescriptor(self, "data_desc", "Data descriptor")
 

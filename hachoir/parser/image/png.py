@@ -213,8 +213,7 @@ class Chunk(FieldSet):
         size = self["size"].value
         if size != 0:
             if self.parse_func:
-                for field in self.parse_func(self):
-                    yield field
+                yield from self.parse_func(self)
             else:
                 yield RawBytes(self, "content", size, "Data")
         yield textHandler(UInt32(self, "crc32", "CRC32"), hexadecimal)
