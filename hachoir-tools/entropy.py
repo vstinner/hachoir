@@ -3,7 +3,7 @@ from math import log
 
 class Entropy:
     def __init__(self):
-        self.frequence = dict( (chr(index), 0) for index in range(0, 256) )
+        self.frequence = dict((index, 0) for index in range(0, 256))
         self.count = 0
 
     def readBytes(self, bytes):
