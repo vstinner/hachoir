@@ -93,7 +93,7 @@ class FragmentGroup:
         data = []
         for item in self.items:
             data.append( item["rawdata"].value )
-        data = "".join(data)
+        data = b"".join(data)
 
         # FIXME: Use smarter code to send arguments
         self.args["ole2"] = self.items[0].root

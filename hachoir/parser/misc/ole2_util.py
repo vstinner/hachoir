@@ -14,9 +14,9 @@ class OLE2FragmentParser(HachoirParser,RootSeekableFieldSet):
         RootSeekableFieldSet.__init__(self, None, "root", stream, None, stream.askSize(self))
         HachoirParser.__init__(self, stream, **args)
         if self.ENDIAN_CHECK:
-            if self["endian"].value == "\xFF\xFE":
+            if self["endian"].value == b"\xFF\xFE":
                 self.endian = BIG_ENDIAN
-            elif self["endian"].value == "\xFE\xFF":
+            elif self["endian"].value == b"\xFE\xFF":
                 self.endian = LITTLE_ENDIAN
             else:
                 raise ParserError("OLE2: Invalid endian value")

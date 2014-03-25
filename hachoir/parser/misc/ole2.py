@@ -188,7 +188,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
             return "Invalid magic"
         if self["header/ver_maj"].value not in (3, 4):
             return "Unknown major version (%s)" % self["header/ver_maj"].value
-        if self["header/endian"].value not in ("\xFF\xFE", "\xFE\xFF"):
+        if self["header/endian"].value not in (b"\xFF\xFE", b"\xFE\xFF"):
             return "Unknown endian (%s)" % self["header/endian"].raw_display
         if not(MIN_BIG_BLOCK_LOG2 <= self["header/bb_shift"].value <= MAX_BIG_BLOCK_LOG2):
             return "Invalid (log 2 of) big block size (%s)" % self["header/bb_shift"].value
