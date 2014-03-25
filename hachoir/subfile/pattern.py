@@ -1,5 +1,5 @@
 from hachoir.parser import QueryParser
-from hachoir_regex import PatternMatching
+from hachoir.regex import PatternMatching
 
 class HachoirPatternMatching(PatternMatching):
     def __init__(self, categories=None, parser_ids=None):
@@ -15,6 +15,7 @@ class HachoirPatternMatching(PatternMatching):
         # Create string patterns
         for parser in parser_list:
             for (magic, offset) in parser.getParserTags().get("magic",()):
+                print(parser)
                 self.addString(magic, (offset, parser))
 
         # Create regex patterns

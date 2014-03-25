@@ -17,7 +17,7 @@ class Output:
     def createDirectory(self):
         try:
             mkdir(self.directory_raw)
-        except OSError, err:
+        except OSError as err:
             if err.errno == EEXIST:
                 pass
             else:
@@ -44,7 +44,7 @@ class Output:
         # Write output
         try:
             output.copyBytesFrom(stream, offset, size//8)
-        except StreamError, err:
-            error(u"copyBytesFrom() error: %s" % err)
+        except StreamError as err:
+            error("copyBytesFrom() error: %s" % err)
         return filename
 

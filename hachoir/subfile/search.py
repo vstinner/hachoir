@@ -2,9 +2,9 @@ from hachoir.core.error import HACHOIR_ERRORS, error
 from hachoir.core.stream import InputSubStream
 from hachoir.core.tools import humanFilesize, humanDuration
 from hachoir.core.memory import limitedMemory
-from hachoir_subfile.data_rate import DataRate
-from hachoir_subfile.output import Output
-from hachoir_subfile.pattern import HachoirPatternMatching as PatternMatching
+from hachoir.subfile.data_rate import DataRate
+from hachoir.subfile.output import Output
+from hachoir.subfile.pattern import HachoirPatternMatching as PatternMatching
 from sys import stderr
 from time import time
 
@@ -68,8 +68,8 @@ class SearchSubfile:
         before = time()
         self.patterns = PatternMatching(categories, parser_ids)
         if self.debug:
-            print "Regex compilation: %.1f ms" % ((time() - before)*1000)
-            print "Use regex: %s" % self.patterns
+            print("Regex compilation: %.1f ms" % ((time() - before)*1000))
+            print("Use regex: %s" % self.patterns)
 
     def main(self):
         """
@@ -86,11 +86,11 @@ class SearchSubfile:
             # Run search
             limitedMemory(MEMORY_LIMIT, self.searchSubfiles)
         except KeyboardInterrupt:
-            print >>stderr, "[!] Program interrupted (CTRL+C)"
+            print("[!] Program interrupted (CTRL+C)", file=stderr)
             main_error = True
         except MemoryError:
             main_error = True
-            print >>stderr, "[!] Memory error!"
+            print("[!] Memory error!", file=stderr)
         self.mainFooter()
         return not(main_error)
 
@@ -103,22 +103,22 @@ class SearchSubfile:
             self.loadParsers()
 
         bytes = (self.size-self.start_offset)//8
-        print >>stderr, "[+] Start search on %s bytes (%s)" % (
-            bytes, humanFilesize(bytes))
-        print >>stderr
+        print("[+] Start search on %s bytes (%s)" % (
+            bytes, humanFilesize(bytes)), file=stderr)
+        print(file=stderr)
         self.stats = {}
         self.current_offset = self.start_offset
         self.main_start = time()
 
     def mainFooter(self):
-        print >>stderr
-        print >>stderr, "[+] End of search -- offset=%s (%s)" % (
-            self.current_offset//8, humanFilesize(self.current_offset//8))
+        print(file=stderr)
+        print("[+] End of search -- offset=%s (%s)" % (
+            self.current_offset//8, humanFilesize(self.current_offset//8)), file=stderr)
         size = (self.current_offset - self.start_offset) // 8
         duration = time() - self.main_start
         if 0.1 <= duration:
-            print >>stderr, "Total time: %s -- global rate: %s/sec" % (
-                humanDuration(duration*1000), humanFilesize(size // duration))
+            print("Total time: %s -- global rate: %s/sec" % (
+                humanDuration(duration*1000), humanFilesize(size // duration)), file=stderr)
 
     def searchSubfiles(self):
         """
@@ -158,7 +158,7 @@ class SearchSubfile:
                 filename = self.output.createFilename(parser.filename_suffix)
                 filename = self.output.writeFile(filename, self.stream, offset, parser.content_size)
                 text += " => %s" % filename
-        print text
+        print(text)
         self.next_progress = time() + PROGRESS_UPDATE
 
     def findMagic(self, offset):
@@ -196,8 +196,8 @@ class SearchSubfile:
             self.stats[parser_cls][1] += 1
 
             if self.debug:
-                print >>stderr, "Found %s at offset %s" % (
-                    parser.__class__.__name__, offset//8)
+                print("Found %s at offset %s" % (
+                    parser.__class__.__name__, offset//8), file=stderr)
             yield (offset, parser)
 
             # Set next offset
@@ -241,5 +241,5 @@ class SearchSubfile:
             message += " -- ETA: %s" % humanDuration(eta * 1000)
 
         # Display message
-        print >>stderr, message
+        print(message, file=stderr)
 

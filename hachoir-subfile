@@ -3,13 +3,13 @@ from hachoir.core.cmd_line import unicodeFilename
 from hachoir.core.stream import FileInputStream
 from hachoir.core.i18n import _
 from hachoir.core import config
-from hachoir_subfile.search import SearchSubfile
+from hachoir.subfile.search import SearchSubfile
 import hachoir.core
 from sys import exit
 from optparse import OptionGroup, OptionParser
 
 def displayVersion(*args):
-    from hachoir_subfile.version import VERSION, WEBSITE
+    from hachoir.subfile.version import VERSION, WEBSITE
     print(_("Hachoir subfile version %s") % VERSION)
     print(_("hachoir-core version %s") % hachoir.core.__version__)
     print()
