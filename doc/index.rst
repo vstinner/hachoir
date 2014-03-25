@@ -34,6 +34,7 @@ Contents:
    authors
    regex_api
    editor
+   subfile
 
 
 
