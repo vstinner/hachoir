@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from hachoir.core.error import HachoirError
-from hachoir.core.cmd_line import unicodeFilename
 from hachoir.parser import createParser
 from hachoir.core.tools import makePrintable
 from hachoir.metadata import extractMetadata
@@ -49,9 +48,8 @@ class Extractor:
                 yield path_join(dirpath, filename)
 
     def processFile(self, filename):
-        filename, realname = unicodeFilename(filename), filename
         print("[%s] Process file %s..." % (self.total, filename))
-        parser = createParser(filename, realname)
+        parser = createParser(filename)
         if not parser:
             print("Unable to parse file", file=stderr)
             return None
