@@ -24,6 +24,7 @@ CLASSIFIERS = [
     'Environment :: Console :: Curses',
     'Environment :: Plugins',
     'Intended Audience :: Developers',
+    'Intended Audience :: Education',
     'License :: OSI Approved :: GNU General Public License (GPL)',
     'Natural Language :: English',
     'Operating System :: OS Independent',
@@ -31,8 +32,10 @@ CLASSIFIERS = [
     'Topic :: Multimedia',
     'Topic :: Scientific/Engineering :: Information Analysis',
     'Topic :: Software Development :: Disassemblers',
+    'Topic :: Software Development :: Interpreters',
     'Topic :: Software Development :: Libraries :: Python Modules',
     'Topic :: System :: Filesystems',
+    'Topic :: Text Processing',
     'Topic :: Utilities',
 ]
 
