@@ -67,3 +67,7 @@ Regex
 
 Victor Stinner aka haypo <victor DOT stinner AT haypocalc DOT com>
 
+Editor
+======
+
+Victor Stinner aka haypo <victor DOT stinner AT haypocalc DOT com>

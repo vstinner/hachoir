@@ -33,6 +33,7 @@ Contents:
    internals
    authors
    regex_api
+   editor
 
 
 
