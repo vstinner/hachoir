@@ -2,7 +2,6 @@ from hachoir.core.endian import BIG_ENDIAN, LITTLE_ENDIAN, MIDDLE_ENDIAN
 from hachoir.core.error import info
 from hachoir.core.log import Logger
 from hachoir.core.bits import str2long
-from hachoir.core.i18n import getTerminalCharset
 from hachoir.core.tools import lowerBound
 from hachoir.core.i18n import _
 from hachoir.core.tools import alignValue
@@ -381,10 +380,8 @@ class InputIOStream(InputStream):
                 if err.errno == ESPIPE:
                     input = InputPipe(input, self._setSize)
                 else:
-                    charset = getTerminalCharset()
-                    errmsg = str(str(err), charset)
                     source = args.get("source", "<inputio:%r>" % input)
-                    raise InputStreamError(_("Unable to get size of %s: %s") % (source, errmsg))
+                    raise InputStreamError(_("Unable to get size of %s: %s") % (source, err))
         self._input = input
         InputStream.__init__(self, size=size, **args)
 
