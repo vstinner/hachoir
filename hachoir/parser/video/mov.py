@@ -831,7 +831,7 @@ class MovFile(Parser):
         "file_ext": ("mov", "qt", "mp4", "m4v", "m4a", "m4p", "m4b"),
         "mime": ("video/quicktime", 'video/mp4'),
         "min_size": 8*8,
-        "magic": (("moov", 4*8),),
+        "magic": ((b"moov", 4*8),),
         "description": "Apple QuickTime movie"
     }
     BRANDS = {

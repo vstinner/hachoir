@@ -184,7 +184,7 @@ class Bzip2Parser(Parser):
         "file_ext": ("bz2",),
         "mime": ("application/x-bzip2",),
         "min_size": 10*8,
-        "magic": (('BZh', 0),),
+        "magic": ((b'BZh', 0),),
         "description": "bzip2 archive"
     }
     endian = BIG_ENDIAN

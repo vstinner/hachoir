@@ -224,7 +224,7 @@ class RpmFile(Parser):
         "file_ext": ("rpm",),
         "mime": ("application/x-rpm",),
         "min_size": (96 + 16 + 16)*8, # file header + checksum + content header
-        "magic": (('\xED\xAB\xEE\xDB', 0),),
+        "magic": ((b'\xED\xAB\xEE\xDB', 0),),
         "description": "RPM package"
     }
     TYPE_NAME = {

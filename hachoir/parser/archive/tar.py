@@ -90,7 +90,7 @@ class TarFile(Parser):
         "file_ext": ("tar",),
         "mime": ("application/x-tar", "application/x-gtar"),
         "min_size": 512*8,
-        "magic": (("ustar  \0", 257*8),),
+        "magic": ((b"ustar  \0", 257*8),),
         "subfile": "skip",
         "description": "TAR archive",
     }

@@ -360,10 +360,10 @@ class RiffFile(Parser):
         "mime": ("video/x-msvideo", "audio/x-wav", "audio/x-cda"),
         # FIXME: Use regex "RIFF.{4}(WAVE|CDDA|AVI )"
         "magic": (
-            ("AVI LIST", 8*8),
-            ("WAVEfmt ", 8*8),
-            ("CDDAfmt ", 8*8),
-            ("ACONanih", 8*8),
+            (b"AVI LIST", 8*8),
+            (b"WAVEfmt ", 8*8),
+            (b"CDDAfmt ", 8*8),
+            (b"ACONanih", 8*8),
         ),
         "description": "Microsoft RIFF container"
     }

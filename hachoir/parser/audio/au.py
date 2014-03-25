@@ -18,7 +18,7 @@ class AuFile(Parser):
         "file_ext": ("au", "snd"),
         "mime": ("audio/basic",),
         "min_size": 24*8,
-        "magic": ((".snd", 0),),
+        "magic": ((b".snd", 0),),
         "description": "Sun/NeXT audio"
     }
     endian = BIG_ENDIAN

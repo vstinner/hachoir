@@ -130,9 +130,9 @@ class FlvFile(Parser):
         "min_size": 9*4,
         "magic": (
             # Signature, version=1, flags=5 (video+audio), header size=9
-            ("FLV\1\x05\0\0\0\x09", 0),
+            (b"FLV\1\x05\0\0\0\x09", 0),
             # Signature, version=1, flags=5 (video), header size=9
-            ("FLV\1\x01\0\0\0\x09", 0),
+            (b"FLV\1\x01\0\0\0\x09", 0),
         ),
         "description": "Macromedia Flash video"
     }

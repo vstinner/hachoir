@@ -498,9 +498,9 @@ class WMF_File(Parser):
             (PlaceableHeader.MAGIC, 0),
             (EMF_Header.MAGIC, 40*8),
             # WMF: file_type=memory, header size=9, version=3.0
-            ("\0\0\x09\0\0\3", 0),
+            (b"\0\0\x09\0\0\3", 0),
             # WMF: file_type=disk, header size=9, version=3.0
-            ("\1\0\x09\0\0\3", 0),
+            (b"\1\0\x09\0\0\3", 0),
         ),
         "min_size": 40*8,
         "description": "Microsoft Windows Metafile (WMF)",

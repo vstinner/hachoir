@@ -29,7 +29,7 @@ class PsdFile(Parser):
         "file_ext": ("psd",),
         "mime": ("image/psd", "image/photoshop", "image/x-photoshop"),
         "min_size": 4*8,
-        "magic": (("8BPS\0\1",0),),
+        "magic": ((b"8BPS\0\1",0),),
         "description": "Photoshop (PSD) picture",
     }
     COLOR_MODE = {

@@ -261,8 +261,8 @@ class XcfFile(Parser):
         "mime": ("image/x-xcf", "application/x-gimp-image"),
         "min_size": (26 + 8 + 4 + 4)*8, # header+empty property+layer offset+channel offset
         "magic": (
-            ('gimp xcf file\0', 0),
-            ('gimp xcf v002\0', 0),
+            (b'gimp xcf file\0', 0),
+            (b'gimp xcf v002\0', 0),
         ),
         "description": "Gimp (XCF) picture"
     }

@@ -397,11 +397,11 @@ class EXT2_FS(Parser):
         "min_size": (1024*2)*8,
         "magic": (
             # (magic, state=valid)
-            ("\x53\xEF\1\0", 1080*8),
+            (b"\x53\xEF\1\0", 1080*8),
             # (magic, state=error)
-            ("\x53\xEF\2\0", 1080*8),
+            (b"\x53\xEF\2\0", 1080*8),
             # (magic, state=error)
-            ("\x53\xEF\4\0", 1080*8),
+            (b"\x53\xEF\4\0", 1080*8),
         ),
     }
     endian = LITTLE_ENDIAN

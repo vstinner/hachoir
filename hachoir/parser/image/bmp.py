@@ -132,7 +132,7 @@ class BmpFile(Parser):
 #        "magic": (("BM", 0),),
         "magic_regex": ((
             # "BM", <filesize>, <reserved>, header_size=(12|40|108)
-            "BM.{4}.{8}[\x0C\x28\x6C]\0{3}",
+            b"BM.{4}.{8}[\x0C\x28\x6C]\0{3}",
         0),),
         "description": "Microsoft bitmap (BMP) picture"
     }

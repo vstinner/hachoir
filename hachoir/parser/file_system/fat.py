@@ -400,7 +400,7 @@ class FAT12(FAT_FS):
     PARSER_TAGS = {
         "id": "fat12",
         "description": "FAT12 filesystem",
-        "magic": (("FAT12   ", 54*8),),
+        "magic": ((b"FAT12   ", 54*8),),
     }
     version = 12
 
@@ -412,7 +412,7 @@ class FAT16(FAT_FS):
     PARSER_TAGS = {
         "id": "fat16",
         "description": "FAT16 filesystem",
-        "magic": (("FAT16   ", 54*8),),
+        "magic": ((b"FAT16   ", 54*8),),
     }
     version = 16
 
@@ -424,7 +424,7 @@ class FAT32(FAT_FS):
     PARSER_TAGS = {
         "id": "fat32",
         "description": "FAT32 filesystem",
-        "magic": (("FAT32   ", 82*8),),
+        "magic": ((b"FAT32   ", 82*8),),
     }
     version = 32
 

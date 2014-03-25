@@ -175,7 +175,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
         ),
         "min_size": 512*8,
         "description": "Microsoft Office document",
-        "magic": (("\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1", 0),),
+        "magic": ((b"\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1", 0),),
     }
     endian = LITTLE_ENDIAN
 

@@ -45,9 +45,9 @@ class LinuxSwapFile(Parser):
         "min_size": PAGE_SIZE*8,
         "description": "Linux swap file",
         "magic": (
-            ("SWAP-SPACE", (PAGE_SIZE-10)*8),
-            ("SWAPSPACE2", (PAGE_SIZE-10)*8),
-            ("S1SUSPEND\0", (PAGE_SIZE-10)*8),
+            (b"SWAP-SPACE", (PAGE_SIZE-10)*8),
+            (b"SWAPSPACE2", (PAGE_SIZE-10)*8),
+            (b"S1SUSPEND\0", (PAGE_SIZE-10)*8),
         ),
     }
     endian = LITTLE_ENDIAN

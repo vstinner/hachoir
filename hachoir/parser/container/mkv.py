@@ -553,7 +553,7 @@ class MkvFile(Parser):
             "video/webm",
             "audio/webm"),
         "min_size": 5*8,
-        "magic": (("\x1A\x45\xDF\xA3", 0),),
+        "magic": ((b"\x1A\x45\xDF\xA3", 0),),
         "description": "Matroska multimedia container"
     }
     endian = BIG_ENDIAN

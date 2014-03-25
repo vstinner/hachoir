@@ -232,7 +232,7 @@ class PngFile(Parser):
         "file_ext": ("png",),
         "mime": ("image/png", "image/x-png"),
         "min_size": 8*8, # just the identifier
-        "magic": [('\x89PNG\r\n\x1A\n', 0)],
+        "magic": [(b'\x89PNG\r\n\x1A\n', 0)],
         "description": "Portable Network Graphics (PNG) picture"
     }
     endian = NETWORK_ENDIAN

@@ -287,7 +287,7 @@ class ElfFile(HachoirParser, RootSeekableFieldSet):
             "application/x-sharedlib",
             "application/x-executable-file",
             "application/x-coredump"),
-        "magic": (("\x7FELF", 0),),
+        "magic": ((b"\x7FELF", 0),),
         "description": "ELF Unix/BSD program/library"
     }
     endian = LITTLE_ENDIAN
