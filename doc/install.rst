@@ -97,43 +97,27 @@ PyPI entries
 Dependencies
 ------------
 
-* hachoir-regex 1.0
 
- -  (nothing)
+hachoir-metadata-gtk:
 
-* hachoir-core 1.3.3
+* pygtk (Debian package: python-gtk2)
 
- -  (nothing)
+hachoir-metadata-qt:
 
-* hachoir-parser 1.3.3
-
- -  hachoir-core 1.3
-
-* hachoir-metadata 1.3.2
-
- -  hachoir-core 1.3
- -  hachoir-parser 1.3
- -  optional: profiler module of Python
+* PyQt4
+* To compile hachoir_metadata/qt/dialog.ui, you need pyuic4 which is part of
+  PyQt4 development tools.
 
 * hachoir-urwid 1.1
 
- -  hachoir-core 1.2
- -  hachoir-parser 1.0
+ -  hachoir 1.2
  -  `urwid <http://excess.org/urwid/>`_ 0.9.4
  -  optional: profiler module of Python
 
 * hachoir-wx 0.3
 
- -  hachoir-core 1.2
- -  hachoir-parser 0.7
+ -  hachoir 1.2
  -  `wxPython <http://www.wxpython.org/>`_ with Unicode support (2.6.3+ or 2.7.2+)
-
-* hachoir-subfile 0.5.3
-
- -  hachoir-core 1.1
- -  hachoir-parser 1.1
- -  hachoir-regex 1.0.5
- -  optional: profiler module of Python
 
 
 Notes for Windows user (urwid)
