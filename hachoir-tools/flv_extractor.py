@@ -7,7 +7,6 @@ Creation date: 2006-11-06
 """
 from hachoir.parser import createParser
 from hachoir.core.stream import FileOutputStream
-from hachoir.core.i18n import getTerminalCharset
 from hachoir.parser.video.flv import AUDIO_CODEC_MP3
 from sys import stderr, exit, argv
 
@@ -17,7 +16,7 @@ def main():
         exit(1)
 
     # Open input video
-    inputname = str(argv[1], getTerminalCharset())
+    inputname = argv[1]
     parser = createParser(inputname)
     if parser["audio[0]/codec"].value != AUDIO_CODEC_MP3:
         print("Unknown audio codec: %s" % parser["audio[0]/codec"].display, file=stderr)
