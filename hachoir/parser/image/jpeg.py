@@ -350,7 +350,7 @@ class JpegImageData(FieldSet):
                 # this is a bad sign, since it means there is no terminator
                 # we ignore this; it likely means a truncated image
                 break
-            if self.stream.readBytes(end, 2) == '\xff\x00':
+            if self.stream.readBytes(end, 2) == b'\xff\x00':
                 # padding: false alarm
                 start=end+16
                 continue
@@ -464,7 +464,7 @@ class JpegChunk(FieldSet):
         if tag == 0xE1:
             # Hack for Adobe extension: XAP metadata (as XML)
             bytes = self.stream.readBytes(self.absolute_address + 32, 6)
-            if bytes == "Exif\0\0":
+            if bytes == b"Exif\0\0":
                 self._name = "exif"
                 self._description = "EXIF"
                 self._parser = Exif

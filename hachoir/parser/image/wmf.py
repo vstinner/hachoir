@@ -515,7 +515,7 @@ class WMF_File(Parser):
                 return "Invalid signature"
             if emf["type"].value != 1:
                 return "Invalid record type"
-            if emf["reserved"].value != "\0\0":
+            if emf["reserved"].value != b"\0\0":
                 return "Invalid reserved"
         else:
             # Check AMF header
@@ -523,7 +523,7 @@ class WMF_File(Parser):
                 amf = self["amf_header"]
                 if amf["handle"].value != 0:
                     return "Invalid handle"
-                if amf["reserved"].value != "\0\0\0\0":
+                if amf["reserved"].value != b"\0\0\0\0":
                     return "Invalid reserved"
 
             # Check common header

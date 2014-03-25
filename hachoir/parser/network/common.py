@@ -32,7 +32,7 @@ class IPv4_Address(Field):
 
     def createValue(self):
         value = self._parent.stream.readBytes(self.absolute_address, 4)
-        return ".".join(( "%u" % ord(byte) for byte in value ))
+        return ".".join("%u" % byte for byte in value)
 
     def createDisplay(self):
         return ip2name(self.value)

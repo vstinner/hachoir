@@ -36,7 +36,7 @@ class PcxFile(Parser):
             return "Unknown format version"
         if self["bpp"].value not in (1, 2, 4, 8, 24, 32):
             return "Unknown bits/pixel"
-        if self["reserved[0]"].value != "\0":
+        if self["reserved[0]"].value != b"\0":
             return "Invalid reserved value"
         return True
 

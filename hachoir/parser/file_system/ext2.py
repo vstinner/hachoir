@@ -289,7 +289,7 @@ class SuperBlock(FieldSet):
         if self._group_count is None:
             # Calculate number of groups
             blocks_per_group = self["blocks_per_group"].value
-            self._group_count = (self["blocks_count"].value - self["first_data_block"].value + (blocks_per_group - 1)) / blocks_per_group
+            self._group_count = (self["blocks_count"].value - self["first_data_block"].value + (blocks_per_group - 1)) // blocks_per_group
         return self._group_count
     group_count = property(_getGroupCount)
 

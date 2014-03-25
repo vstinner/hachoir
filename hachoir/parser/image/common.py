@@ -33,7 +33,7 @@ class RGBA(RGB):
 
     def createDescription(self):
         description = RGB.createDescription(self)
-        opacity = self["alpha"].value*100/255
+        opacity = self["alpha"].value*100 // 255
         return "%s (opacity: %s%%)" % (description, opacity)
 
 class PaletteRGB(UserVector):

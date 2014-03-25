@@ -127,16 +127,16 @@ class DictionaryItem(FieldSet):
         return timestampUNIX(self["value"].value)
 
 # Map first chunk byte => type
-TAGS = {'d': Dictionary, 'i': Integer, 'l': List}
+TAGS = {b'd': Dictionary, b'i': Integer, b'l': List}
 for index in range(0, 9+1):
-    TAGS[str(index)] = TorrentString
+    TAGS[str(index).encode('ascii')] = TorrentString
 
 # Create an entry
 def Entry(parent, name):
     addr = parent.absolute_address + parent.current_size
     tag = parent.stream.readBytes(addr, 1)
     if tag not in TAGS:
-        raise ParserError("Torrent: Entry of type %r not handled" % type)
+        raise ParserError("Torrent: Entry of type %r not handled" % tag)
     cls = TAGS[tag]
     return cls(parent, name)
 
