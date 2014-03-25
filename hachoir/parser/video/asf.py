@@ -300,7 +300,7 @@ tag_info_list = Object.TAG_INFO
 Object.TAG_INFO = dict( (parser[1].guid, parser) for parser in tag_info_list )
 
 class AsfFile(Parser):
-    MAGIC = "\x30\x26\xB2\x75\x8E\x66\xCF\x11\xA6\xD9\x00\xAA\x00\x62\xCE\x6C"
+    MAGIC = b"\x30\x26\xB2\x75\x8E\x66\xCF\x11\xA6\xD9\x00\xAA\x00\x62\xCE\x6C"
     PARSER_TAGS = {
         "id": "asf",
         "category": "video",

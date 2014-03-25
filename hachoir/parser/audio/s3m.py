@@ -440,7 +440,7 @@ class S3MInstrument(Instrument):
         +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
   xxxx: sampledata
     """
-    MAGIC = "SCRS"
+    MAGIC = b"SCRS"
     PACKING = {0: "Unpacked", 1: "DP30ADPCM" }
     TYPE = {0: "Unknown", 1: "Sample", 2: "adlib melody", 3: "adlib drum2" }
 
@@ -495,7 +495,7 @@ class PTMType(FieldSet):
 ##    )
 
 class PTMInstrument(Instrument):
-    MAGIC = "PTMI"
+    MAGIC = b"PTMI"
     ALIGN = 0
 
     def getType(self):
