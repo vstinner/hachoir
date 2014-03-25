@@ -1,5 +1,4 @@
 from hachoir.core.tools import humanDurationNanosec
-from hachoir.core.i18n import _
 from math import floor
 from time import time
 
@@ -97,7 +96,7 @@ class Benchmark:
         average = stat.getSum() / len(stat)
         values = (stat.getMin(), average, stat.getMax(), stat.getSum())
         values = tuple(self.formatTime(value) for value in values)
-        print(_("Benchmark: best=%s  average=%s  worst=%s  total=%s") \
+        print("Benchmark: best=%s  average=%s  worst=%s  total=%s" \
             % values)
 
     def _runOnce(self, func, args, kw):
@@ -139,7 +138,7 @@ class Benchmark:
             return stat
         estimate = diff * count
         if self.verbose:
-            print(_("Run benchmark: %s calls (estimate: %s)") \
+            print("Run benchmark: %s calls (estimate: %s)" \
                 % (count, self.formatTime(estimate)))
 
         display_progress = self.verbose and (1.0 <= estimate)
@@ -147,7 +146,7 @@ class Benchmark:
         while total_count < count:
             # Run benchmark and display each result
             if display_progress:
-                print(_("Result %s/%s: %s  (best: %s)") % \
+                print("Result %s/%s: %s  (best: %s)" % \
                     (total_count, count,
                     self.formatTime(diff), self.formatTime(best)))
             part = count - total_count
@@ -163,7 +162,7 @@ class Benchmark:
                 best = min(diff, best)
             total_count += part
         if display_progress:
-            print(_("Result %s/%s: %s  (best: %s)") % \
+            print("Result %s/%s: %s  (best: %s)" % \
                 (count, count,
                 self.formatTime(diff), self.formatTime(best)))
         return stat
