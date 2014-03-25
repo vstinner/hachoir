@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from hachoir.core.cmd_line import unicodeFilename
 from hachoir.parser import createParser, guessParser
 from hachoir.parser.container.swf import SOUND_CODEC_MP3
 from sys import stderr, exit, argv
@@ -13,14 +12,15 @@ class JpegExtractor:
     def storeJPEG(self, content):
         name = "image-%03u.jpg" % self.jpg_index
         print("Write new image: %s" % name)
-        open(name, "w").write(content)
+        with open(name, "wb") as fp:
+            fp.write(content)
         self.jpg_index += 1
 
     def createNewSound(self):
         name = "sound-%03u.mp3" % self.snd_index
         print("Write new sound: %s" % name)
         self.snd_index += 1
-        return open(name, "w")
+        return open(name, "wb")
 
     def extractFormat2(self, field):
         if "jpeg_header" in field:
@@ -48,7 +48,7 @@ class JpegExtractor:
                 header = field
                 output = self.createNewSound()
                 data = header["music_data"].value
-                assert data[0] == '\xFF'
+                assert data[:1] == b'\xFF'
                 output.write(data)
             elif field.name.startswith("sound_blk") \
             and "music_data" in field:
@@ -62,9 +62,8 @@ class JpegExtractor:
             print("usage: %s document.swf" % argv[0], file=stderr)
             exit(1)
 
-        realname = argv[1]
-        filename = unicodeFilename(realname)
-        parser = createParser(filename, real_filename=realname)
+        filename = argv[1]
+        parser = createParser(filename)
 
         if parser["signature"].value == "CWS":
             deflate_swf = parser["compressed_data"].getSubIStream()
