@@ -1,2 +1,3 @@
 Write tests for hachoir-grep
 Rename Dict.iteritems()
+wxPython doesn't support Python3 on Fedora
