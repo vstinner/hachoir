@@ -68,7 +68,7 @@ def getTerminalCharset():
 def initLocale():
     # Only initialize locale once
     if initLocale.is_done:
-        return getTerminalCharset()
+        return
     initLocale.is_done = True
 
     # Setup locales
@@ -76,9 +76,6 @@ def initLocale():
         locale.setlocale(locale.LC_ALL, "")
     except (locale.Error, IOError):
         pass
-
-    # Get the terminal charset
-    return getTerminalCharset()
 initLocale.is_done = False
 
 def _dummy_gettext(text):
