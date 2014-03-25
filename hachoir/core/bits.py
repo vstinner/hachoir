@@ -80,13 +80,13 @@ def str2hex(value, prefix="", glue="", format="%02X"):
     r"""
     Convert binary string in hexadecimal (base 16).
 
-    >>> str2hex("ABC")
+    >>> str2hex(b"ABC")
     '414243'
-    >>> str2hex("\xF0\xAF", glue=" ")
+    >>> str2hex(b"\xF0\xAF", glue=" ")
     'F0 AF'
-    >>> str2hex("ABC", prefix="0x")
+    >>> str2hex(b"ABC", prefix="0x")
     '0x414243'
-    >>> str2hex("ABC", format=r"\x%02X")
+    >>> str2hex(b"ABC", format=r"\x%02X")
     '\\x41\\x42\\x43'
     """
     if isinstance(glue, str):
@@ -96,7 +96,7 @@ def str2hex(value, prefix="", glue="", format="%02X"):
     else:
         text = []
     for character in value:
-        text.append(format % ord(character))
+        text.append(format % character)
     return glue.join(text)
 
 def countBits(value):
