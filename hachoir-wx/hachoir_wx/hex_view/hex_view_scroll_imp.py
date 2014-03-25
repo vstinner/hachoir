@@ -1,5 +1,5 @@
 from math import ceil
-from stubs import byte_addr, get_file_size, get_page_num
+from .stubs import byte_addr, get_file_size, get_page_num
 
 class hex_view_scroll_imp_t:
     def on_file_ready(self, dispatcher, file):

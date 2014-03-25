@@ -1,14 +1,14 @@
-from field_menu_imp import field_menu_imp_t
-from field_menu_fwd import field_menu_fwd_t
-from field_menu import field_menu_t
+from .field_menu_imp import field_menu_imp_t
+from .field_menu_fwd import field_menu_fwd_t
+from .field_menu import field_menu_t
 
-from core_type_menu import core_type_menu_t
-from core_type_menu_fwd import core_type_menu_fwd_t
-from core_type_menu_imp import core_type_menu_imp_t
+from .core_type_menu import core_type_menu_t
+from .core_type_menu_fwd import core_type_menu_fwd_t
+from .core_type_menu_imp import core_type_menu_imp_t
 
-from field_split_menu import field_split_menu_t
-from field_split_menu_fwd import field_split_menu_fwd_t
-from field_split_menu_imp import field_split_menu_imp_t
+from .field_split_menu import field_split_menu_t
+from .field_split_menu_fwd import field_split_menu_fwd_t
+from .field_split_menu_imp import field_split_menu_imp_t
 
 import wx
 

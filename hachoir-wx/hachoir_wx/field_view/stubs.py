@@ -12,7 +12,7 @@ def field_from_index(field_set, index):
     return field_set._fields.values[index]
 
 def has_static_size(type):
-    return isinstance(type.static_size, (int, long))
+    return isinstance(type.static_size, int)
 
 def can_convert(from_field, to_type):
     if has_static_size(from_field) and has_static_size(to_type):

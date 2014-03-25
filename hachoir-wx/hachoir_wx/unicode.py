@@ -14,8 +14,8 @@ def get_charset():
     return charset
 
 def force_unicode(name):
-    if not isinstance(name, unicode):
+    if not isinstance(name, str):
         charset = get_charset()
-        name = unicode(name, charset)
+        name = str(name, charset)
 
     return name

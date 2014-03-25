@@ -17,7 +17,7 @@ def get_file_size(file):
 
 def to_hex(data, width=None):
     hex_data = ''
-    for i in xrange(len(data)):
+    for i in range(len(data)):
         hex_data += "%02x" % ord(data[i])
         if width and (i+1)%width==0:
             hex_data += '\n'
@@ -28,7 +28,7 @@ def to_hex(data, width=None):
 
 def to_ascii(data, width=None):
     ascii_data = ''
-    for i in xrange(len(data)):
+    for i in range(len(data)):
         if 32 <= ord(data[i]) <= 126:
             ascii_data += data[i]
         else:
@@ -75,8 +75,8 @@ def safe_seek(file, where):
     try:
         where = max(0, where)
         file.seek(where)
-    except IOError, err:
-        warning("Cannot seek to %s: %s" % (where, unicode(err)))
+    except IOError as err:
+        warning("Cannot seek to %s: %s" % (where, str(err)))
         return False
 
     return True

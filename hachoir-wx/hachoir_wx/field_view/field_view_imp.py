@@ -33,7 +33,7 @@ class field_view_imp_t:
 
     def on_item_selected(self):
         name = self.view.get_selected(_('name'))
-        if isinstance(name, unicode):
+        if isinstance(name, str):
             name = str(name)
         self.dispatcher.trigger('field_selected', self.fields[name])
 
@@ -88,7 +88,7 @@ class field_view_imp_t:
             self.view.SetItemCount(field_count)
 
         # autosize columns, based on a sample of the rows
-        for col in xrange(self.view.get_col_count()):
+        for col in range(self.view.get_col_count()):
             width = 0
             func = self.col_str_table[col]
             # when fields has more than 20 rows, they are probably similar.
@@ -100,7 +100,7 @@ class field_view_imp_t:
                 field_range = [(0, 10), (field_count - 10, field_count)]
 
             for begin, end in field_range:
-                for i in xrange(begin, end):
+                for i in range(begin, end):
                     width = max(width, len(func(self.fields[i])))
 
             self.view.resize_column(col, width)

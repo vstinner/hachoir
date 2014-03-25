@@ -6,12 +6,12 @@ from hachoir.core.stream.input import FileFromInputStream
 from hachoir_wx.dispatcher import dispatcher_t
 from hachoir_wx import frame_view, field_view, hex_view
 from hachoir_wx.dialogs import file_open_dialog
-from hachoir_wx.unicode import force_unicode
+from hachoir_wx.str import force_unicode
 from hachoir_wx import __version__ as VERSION
 
 class app_t(App):
     def __init__(self, filename = None):
-        print "[+] Run hachoir-wx version %s" % VERSION
+        print("[+] Run hachoir-wx version %s" % VERSION)
         self.filename = filename
         App.__init__(self, False)
 
@@ -66,7 +66,7 @@ def load_file(app, filename):
     new_window(app, open(filename, 'rb'), parser, filename)
 
 def new_window(app, file, parser, filename):
-    print '[+] Opening new GUI'
+    print('[+] Opening new GUI')
 
     dispatcher = dispatcher_t()
     dispatcher.add_receiver(app)
@@ -84,4 +84,4 @@ def new_window(app, file, parser, filename):
     hex_view_widget.ready()
 
     frame.Show()
-    print '[+] GUI ready'
+    print('[+] GUI ready')
