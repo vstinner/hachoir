@@ -328,9 +328,9 @@ class PythonCompiledFile(Parser):
         signature = self.stream.readBits(0, 16, self.endian)
         if signature not in self.MAGIC:
             return "Unknown version (%s)" % signature
-        if self.stream.readBytes(2*8, 2) != "\r\n":
+        if self.stream.readBytes(2*8, 2) != b"\r\n":
             return r"Wrong signature (\r\n)"
-        if self.stream.readBytes(8*8, 1) != 'c':
+        if self.stream.readBytes(8*8, 1) != b'c':
             return "First object bytecode is not code"
         return True
 
