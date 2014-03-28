@@ -37,6 +37,9 @@ class Data:
         self.priority = priority
         self.conversion = conversion
 
+    def __lt__(self, other):
+        return self.priority < other.priority
+
     def _createItem(self, value, text=None):
         if text is None:
             if isinstance(value, str):
