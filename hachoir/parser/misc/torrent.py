@@ -81,7 +81,7 @@ class Dictionary(FieldSet):
     # d<bencoded string><bencoded element>e
     def createFields(self):
         yield String(self, "start", 1, "Dictionary start delimiter (d)", charset="ASCII")
-        while self.stream.readBytes(self.absolute_address+self.current_size, 1) != "e":
+        while self.stream.readBytes(self.absolute_address+self.current_size, 1) != b"e":
             yield DictionaryItem(self, "item[]")
         yield String(self, "end", 1, "Dictionary end delimiter")
 
@@ -89,7 +89,7 @@ class List(FieldSet):
     # l<bencoded values>e
     def createFields(self):
         yield String(self, "start", 1, "List start delimiter")
-        while self.stream.readBytes(self.absolute_address+self.current_size, 1) != "e":
+        while self.stream.readBytes(self.absolute_address+self.current_size, 1) != b"e":
             yield Entry(self, "item[]")
         yield String(self, "end", 1, "List end delimiter")
 
