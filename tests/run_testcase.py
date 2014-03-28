@@ -442,7 +442,7 @@ def checkVimLNK(parser): return (
 def checkSevenzipCHM(parser): return (
     checkValue(parser, "/itsf/version", 3),
     checkDisplay(parser, "/itsf/lang_id", "Russian"),
-    checkValue(parser, "/itsf/dir_uuid/time", datetime(1997, 1, 31, 20, 42, 14, 890625)),
+    checkValue(parser, "/itsf/dir_uuid/time", datetime(1997, 1, 31, 20, 42, 14, 890626)),
     checkDisplay(parser, "/itsf/stream_uuid/variant", "Microsoft Corporation"),
     checkDisplay(parser, "/itsf/stream_uuid/mac", 'INTEL CORPORATION - HF1-06 [22:e6:ec]'),
     checkDisplay(parser, "/file_size/file_size", "75.6 KB"),
@@ -466,7 +466,7 @@ def checkNds(parser): return (
     checkValue(parser, "/filename_table/directory[3]/entry[1]/dir_id", 61444),
     checkValue(parser, "/filename_table/directory[4]/entry[0]/name", "file2.txt"),
     checkValue(parser, "/filename_table/directory[4]/entry[0]/is_directory", False),
-    checkValue(parser, "/file[1]", "Hello from file2.txt\n\n"),
+    checkValue(parser, "/file[1]", b"Hello from file2.txt\n\n"),
 )
 
 def checkFile(filename, check_parser):

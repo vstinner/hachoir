@@ -151,7 +151,7 @@ class RealMediaFile(Parser):
     endian = BIG_ENDIAN
 
     def validate(self):
-        if self.stream.readBytes(0, 4) != '.RMF':
+        if self.stream.readBytes(0, 4) != b'.RMF':
             return "Invalid magic"
         if self["header/size"].value != 18:
             return "Invalid header size"

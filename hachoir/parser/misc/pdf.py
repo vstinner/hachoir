@@ -107,7 +107,7 @@ class PDFName(Field):
     """
     def __init__(self, parent, name, desc=None):
         Field.__init__(self, parent, name, description=desc)
-        if parent.stream.readBytes(self.absolute_address, 1) != '/':
+        if parent.stream.readBytes(self.absolute_address, 1) != b'/':
             raise ParserError("Unknown PDFName '%s'" %
                               parent.stream.readBytes(self.absolute_address, 10))
         size = getElementEnd(parent, offset=1)
@@ -124,7 +124,7 @@ class PDFName(Field):
 
         self._size = 8*(size+1)
         # Value should be without the initial '/' and final ' '
-        self.createValue = lambda: parent.stream.readBytes(self.absolute_address+8, size).strip(' ')
+        self.createValue = lambda: parent.stream.readBytes(self.absolute_address+8, size).strip(b' ')
 
 class PDFID(Field):
     """
@@ -143,10 +143,10 @@ class PDFBool(Field):
     """
     def __init__(self, parent, name, desc=None):
         Field.__init__(self, parent, name, description=desc)
-        if parent.stream.readBytes(self.absolute_address, 4) == "true":
+        if parent.stream.readBytes(self.absolute_address, 4) == b"true":
             self._size = 4
             self.createValue = lambda: True
-        elif parent.stream.readBytes(self.absolute_address, 5) == "false":
+        elif parent.stream.readBytes(self.absolute_address, 5) == b"false":
             self._size = 5
             self.createValue = lambda: False
         raise NotABool
@@ -159,9 +159,9 @@ class LineEnd(FieldSet):
         while not self.eof:
             addr = self.absolute_address+self.current_size
             char = self.stream.readBytes(addr, 1)
-            if char == '\x0A':
+            if char == b'\x0A':
                 yield UInt8(self, "lf", "Line feed")
-            elif char == '\x0D':
+            elif char == b'\x0D':
                 yield UInt8(self, "cr", "Line feed")
             else:
                 self.info("Line ends at %u/%u, len %u" %
@@ -178,7 +178,7 @@ class PDFDictionary(FieldSet):
         yield String(self, "dict_start", 2)
         while not self.eof:
             addr = self.absolute_address+self.current_size
-            if self.stream.readBytes(addr, 2) != '>>':
+            if self.stream.readBytes(addr, 2) != b'>>':
                 yield from parsePDFType(self)
             else:
                 break
@@ -191,23 +191,23 @@ class PDFArray(FieldSet):
     """
     def createFields(self):
         yield String(self, "array_start", 1)
-        while self.stream.readBytes(self.absolute_address+self.current_size, 1) != ']':
+        while self.stream.readBytes(self.absolute_address+self.current_size, 1) != b']':
             yield from parsePDFType(self)
         yield String(self, "array_end", 1)
 
 def parsePDFType(s):
     addr = s.absolute_address+s.current_size
     char = s.stream.readBytes(addr, 1)
-    if char == '/':
+    if char == b'/':
         yield PDFName(s, "type[]", getElementEnd(s))
-    elif char == '<':
-        if s.stream.readBytes(addr+8, 1) == '<':
+    elif char == b'<':
+        if s.stream.readBytes(addr+8, 1) == b'<':
             yield PDFDictionary(s, "dict[]")
         else:
             yield PDFID(s, "id[]")
-    elif char == '(':
+    elif char == b'(':
         yield PDFString(s, "string[]")
-    elif char == '[':
+    elif char == b'[':
         yield PDFArray(s, "array[]")
     else:
         # First parse size
@@ -222,12 +222,12 @@ def parsePDFType(s):
         # Get element
         name = s.stream.readBytes(addr, size)
         char = s.stream.readBytes(addr+8*size+8, 1)
-        if name.count(' ') > 1 and char == '<':
+        if name.count(b' ') > 1 and char == b'<':
             # Probably a catalog
             yield Catalog(s, "catalog[]")
-        elif name[0] in ('.','-','+', '0', '1', '2', '3', \
-                         '4', '5', '6', '7', '8', '9'):
-            s.info("Not a catalog: %u spaces and end='%s'" % (name.count(' '), char))
+        elif name[:1] in (b'.', b'-', b'+', b'0', b'1', b'2', b'3', \
+                          b'4', b'5', b'6', b'7', b'8', b'9'):
+            s.info("Not a catalog: %u spaces and end='%s'" % (name.count(b' '), char))
             yield PDFNumber(s, "integer[]")
         else:
             s.info("Trying to parse '%s': %u bytes" % \
@@ -257,7 +257,7 @@ class Body(FieldSet):
         self._size = 8*pos-self.absolute_address
 
     def createFields(self):
-        while self.stream.readBytes(self.absolute_address+self.current_size, 1) == '%':
+        while self.stream.readBytes(self.absolute_address+self.current_size, 1) == b'%':
             size = getLineEnd(self, 4)
             if size == 2:
                 yield textHandler(UInt16(self, "crc32"), hexadecimal)
@@ -288,15 +288,16 @@ class Entry(FieldSet):
     static_size = 20*8
     def createFields(self):
         typ = self.stream.readBytes(self.absolute_address+17*8, 1)
-        if typ == 'n':
+        if typ == b'n':
             yield PDFNumber(self, "byte_offset")
-        elif typ == 'f':
+        elif typ == b'f':
             yield PDFNumber(self, "next_free_object_number")
         else:
             yield PDFNumber(self, "unknown_string")
         yield PDFNumber(self, "generation_number")
         yield UInt8(self, "type")
         yield LineEnd(self, "line_end")
+
     def createDescription(self):
         if self["type"].value == 'n':
             return "In-use entry at offset %u" % int(self["byte_offset"].value)
@@ -365,7 +366,7 @@ class Catalog(FieldSet):
             if length == None or (new_length != None and new_length < length):
                 length = new_length
         yield String(self, "object", length, strip=' ')
-        if self.stream.readBytes(self.absolute_address+self.current_size, 2) == '<<':
+        if self.stream.readBytes(self.absolute_address+self.current_size, 2) == b'<<':
             yield PDFDictionary(self, "key_list")
         # End of catalog: this one has "endobj"
         if self["object"].value == "obj":
@@ -380,7 +381,7 @@ class Trailer(FieldSet):
         yield LineEnd(self, "line_end[]")
         yield String(self, "start_attribute_marker", 2)
         addr = self.absolute_address + self.current_size
-        while self.stream.readBytes(addr, 2) != '>>':
+        while self.stream.readBytes(addr, 2) != b'>>':
             t = PDFName(self, "type[]")
             yield t
             name = t.value

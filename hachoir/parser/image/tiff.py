@@ -47,7 +47,7 @@ class TiffFile(RootSeekableFieldSet, Parser):
 
     def __init__(self, stream, **args):
         RootSeekableFieldSet.__init__(self, None, "root", stream, None, stream.askSize(self))
-        if self.stream.readBytes(0, 2) == "MM":
+        if self.stream.readBytes(0, 2) == b"MM":
             self.endian = BIG_ENDIAN
         Parser.__init__(self, stream, **args)
 

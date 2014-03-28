@@ -257,7 +257,7 @@ class RpmFile(Parser):
 
         size = (self._size - self.current_size) // 8
         if size:
-            if 3 <= size and self.stream.readBytes(self.current_size, 3) == "BZh":
+            if 3 <= size and self.stream.readBytes(self.current_size, 3) == b"BZh":
                 yield SubFile(self, "content", size, "bzip2 content", parser=Bzip2Parser)
             else:
                 yield SubFile(self, "content", size, "gzip content", parser=GzipParser)

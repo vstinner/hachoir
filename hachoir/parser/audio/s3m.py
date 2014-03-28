@@ -637,7 +637,7 @@ class S3MModule(Module):
         "min_size": 64*8,
         "description": "ScreamTracker3 module"
     }
-    MARKER = "SCRM"
+    MARKER = b"SCRM"
     HEADER = S3MHeader
 
 ##    def createContentSize(self):
@@ -658,5 +658,5 @@ class PTMModule(Module):
         "min_size": 64*8,
         "description": "PolyTracker module (v1.17)"
     }
-    MARKER = "PTMF"
+    MARKER = b"PTMF"
     HEADER = PTMHeader

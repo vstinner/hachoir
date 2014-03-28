@@ -115,7 +115,7 @@ class PE_Header(FieldSet):
 
     def createFields(self):
         yield Bytes(self, "header", 4, r"PE header signature (PE\0\0)")
-        if self["header"].value != "PE\0\0":
+        if self["header"].value != b"PE\0\0":
             raise ParserError("Invalid PE header signature")
         yield Enum(UInt16(self, "cpu", "CPU type"), self.cpu_name)
         yield UInt16(self, "nb_section", "Number of sections")

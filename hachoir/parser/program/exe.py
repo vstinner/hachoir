@@ -149,7 +149,7 @@ class ExeFile(HachoirParser, RootSeekableFieldSet):
             offset = self["msdos/next_offset"].value * 8
             if 2*8 <= offset \
             and (offset+PE_Header.static_size) <= self.size \
-            and self.stream.readBytes(offset, 4) == 'PE\0\0':
+            and self.stream.readBytes(offset, 4) == b'PE\0\0':
                 self._is_pe = True
         return self._is_pe
 
@@ -159,7 +159,7 @@ class ExeFile(HachoirParser, RootSeekableFieldSet):
             offset = self["msdos/next_offset"].value * 8
             if 64*8 <= offset \
             and (offset+NE_Header.static_size) <= self.size \
-            and self.stream.readBytes(offset, 2) == 'NE':
+            and self.stream.readBytes(offset, 2) == b'NE':
                 self._is_ne = True
         return self._is_ne
 

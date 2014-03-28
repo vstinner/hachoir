@@ -175,7 +175,7 @@ class AdobeChunk(FieldSet):
         2: "YCCK (converted from CMYK)",
     }
     def createFields(self):
-        if self.stream.readBytes(self.absolute_address, 5) != "Adobe":
+        if self.stream.readBytes(self.absolute_address, 5) != b"Adobe":
             yield RawBytes(self, "raw", self.size//8, "Raw data")
             return
         yield String(self, "adobe", 5, "\"Adobe\" string", charset="ASCII")
@@ -273,9 +273,9 @@ class HuffmanCode(Field):
         while (self.size, value) not in tree:
             if addr % 8 == 0:
                 last_byte = stream.readBytes(addr - 8, 1)
-                if last_byte == '\xFF':
+                if last_byte == b'\xFF':
                     next_byte = stream.readBytes(addr, 1)
-                    if next_byte != '\x00':
+                    if next_byte != b'\x00':
                         raise FieldError("Unexpected byte sequence %r!"%(last_byte + next_byte))
                     addr += 8 # hack hack hack
                     met_ff = True
@@ -393,9 +393,9 @@ class JpegImageData(FieldSet):
                     if padding:
                         yield PaddingBits(self, "padding[]", padding) # all 1s
                     last_byte = self.stream.readBytes(self.absolute_address + self.current_size - 8, 1)
-                    if last_byte == '\xFF':
+                    if last_byte == b'\xFF':
                         next_byte = self.stream.readBytes(self.absolute_address + self.current_size, 1)
-                        if next_byte != '\x00':
+                        if next_byte != b'\x00':
                             raise FieldError("Unexpected byte sequence %r!"%(last_byte + next_byte))
                         yield NullBytes(self, "stuffed_byte[]", 1)
                     break
@@ -560,7 +560,7 @@ class JpegFile(Parser):
         size = (self._size - self.current_size) // 8
         if size:
             if 2 < size \
-            and self.stream.readBytes(self._size - 16, 2) == "\xff\xd9":
+            and self.stream.readBytes(self._size - 16, 2) == b"\xff\xd9":
                 has_end = True
                 size -= 2
             yield RawBytes(self, "data", size, "JPEG data")

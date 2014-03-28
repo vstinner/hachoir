@@ -792,7 +792,7 @@ class Atom(FieldSet):
 
     def createFields(self):
         yield UInt32(self, "size")
-        yield RawBytes(self, "tag", 4)
+        yield String(self, "tag", 4, charset="ASCII")
         size = self["size"].value
         if size == 1:
             # 64-bit size
@@ -855,7 +855,9 @@ class MovFile(Parser):
         if size < 8:
             return "Invalid first atom size"
         tag = self.stream.readBytes(4*8, 4)
-        return tag in ("ftyp", "moov", "free")
+        if tag not in (b"ftyp", b"moov", b"free"):
+            return "Unknown MOV file type"
+        return True
 
     def createFields(self):
         while not self.eof:

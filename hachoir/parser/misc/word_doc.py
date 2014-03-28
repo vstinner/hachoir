@@ -365,7 +365,7 @@ class TableParsers(object):
         }
 
         def createFields(self):
-            if self.stream.readBytes(self.absolute_address, 2) == "\xff\xff":
+            if self.stream.readBytes(self.absolute_address, 2) == b"\xff\xff":
                 yield Int16(self, "utf16_marker", "If this field is present, the Sttbf contains UTF-16 data.")
                 self.is_utf16 = True
             else:

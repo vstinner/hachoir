@@ -297,7 +297,7 @@ class NdsFile(Parser, RootSeekableFieldSet):
         except Exception as e:
             return False
 
-        return (self.stream.readBytes(0, 1) != "\0"
+        return (self.stream.readBytes(0, 1) != b"\0"
             and (header["device_code"].value & 7) == 0
             and header["header_size"].value >= 352
             and header["card_size"].value < 15 # arbitrary limit at 32Gbit

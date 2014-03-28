@@ -171,7 +171,7 @@ def parseJpeg(parent, size):
             size -= 4
 
         addr = parent.absolute_address + parent.current_size + 16
-        if parent.stream.readBytes(addr, 2) in ("\xff\xdb", "\xff\xd8"):
+        if parent.stream.readBytes(addr, 2) in (b"\xff\xdb", b"\xff\xd8"):
             header = JpegHeader(parent, "jpeg_header")
             yield header
             hdr_size = header.size // 8

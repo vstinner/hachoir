@@ -125,7 +125,7 @@ class ElfHeader(FieldSet):
         yield UInt16(self, "shstrndx", "Section header string table index")
 
     def isValid(self):
-        if self["signature"].value != "\x7FELF":
+        if self["signature"].value != b"\x7FELF":
             return "Wrong ELF signature"
         if self["class"].value not in self.CLASS_NAME:
             return "Unknown class"

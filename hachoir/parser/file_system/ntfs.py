@@ -223,7 +223,7 @@ class File(FieldSet):
 
         while not self.eof:
             addr = self.absolute_address + self.current_size
-            if self.stream.readBytes(addr, 4) == "\xFF\xFF\xFF\xFF":
+            if self.stream.readBytes(addr, 4) == b"\xFF\xFF\xFF\xFF":
                 yield Bytes(self, "attr_end_marker", 8)
                 break
             yield Attribute(self, "attr[]")

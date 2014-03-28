@@ -556,7 +556,7 @@ class MPEGVideoFile(Parser):
             return "Unable to create first chunk"
         if pack.name != "pack_start[0]":
             return "Invalid first chunk"
-        if pack["sync"].value != "\0\0\1":
+        if pack["sync"].value != b"\0\0\1":
             return "Invalid synchronisation"
         return pack["content"].validate()
 

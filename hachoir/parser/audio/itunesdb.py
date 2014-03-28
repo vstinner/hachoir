@@ -243,7 +243,7 @@ class TrackItem(FieldSet):
         if padding:
             yield padding
 
-        #while ((self.stream.readBytes(0, 4) == 'mhod') and  ((self.current_size//8) < self["entry_length"].value)):
+        #while ((self.stream.readBytes(0, 4) == b'mhod') and  ((self.current_size//8) < self["entry_length"].value)):
         for i in range(self["string_number"].value):
             yield DataObject(self, "data[]")
         padding = self.seekBit(self._size, "entry padding")

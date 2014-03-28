@@ -109,7 +109,7 @@ def parseFontHeader(self):
     yield UInt16(self, "font_min_ver", "Font minor version")
     yield textHandler(UInt32(self, "checksum"), hexadecimal)
     yield Bytes(self, "magic", 4, r"Magic string (\x5F\x0F\x3C\xF5)")
-    if self["magic"].value != "\x5F\x0F\x3C\xF5":
+    if self["magic"].value != b"\x5F\x0F\x3C\xF5":
         raise ParserError("TTF: invalid magic of font header")
 
     # Flags

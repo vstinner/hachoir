@@ -199,9 +199,9 @@ class ID3v1(FieldSet):
         bytes = self.stream.readBytes(addr, 2)
 
         # last byte (127) is not space?
-        if bytes[1] != ' ':
+        if bytes[1] != 32:
             # byte 126 is nul?
-            if bytes[0] == 0x00:
+            if bytes[0] == 0:
                 return "v1.1"
             else:
                 return "v1.1b"
@@ -286,7 +286,7 @@ class ID3_Private(FieldSet):
     def createFields(self):
         size = self._size // 8
         # TODO: Strings charset?
-        if self.stream.readBytes(self.absolute_address, 9) == "PeakValue":
+        if self.stream.readBytes(self.absolute_address, 9) == b"PeakValue":
             yield String(self, "text", 9, "Text")
             size -= 9
         yield String(self, "content", size, "Content")

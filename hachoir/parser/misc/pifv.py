@@ -106,7 +106,7 @@ class FileSection(FieldSet):
             # claims! It's so nice to have so detailled specs and not follow
             # them ...
             if self.stream.readBytes(self.absolute_address +
-                self._size, 1) == '\0':
+                self._size, 1) == b'\0':
                 self._size = self._size + 16
 
     def createFields(self):
@@ -231,7 +231,7 @@ class PIFVFile(Parser):
     def validate(self):
         if self.stream.readBytes(40*8, 4) != self.MAGIC:
             return "Invalid magic number"
-        if self.stream.readBytes(0, 16) != "\0"*16:
+        if self.stream.readBytes(0, 16) != b"\0"*16:
             return "Invalid zero vector"
         return True
 

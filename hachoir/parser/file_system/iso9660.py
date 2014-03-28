@@ -81,7 +81,7 @@ class Volume(FieldSet):
     def createFields(self):
         yield Enum(UInt8(self, "type", "Volume descriptor type"), self.type_name)
         yield RawBytes(self, "signature", 5, "ISO 9960 signature (CD001)")
-        if self["signature"].value != "CD001":
+        if self["signature"].value != b"CD001":
             raise ParserError("Invalid ISO 9960 volume signature")
         yield UInt8(self, "version", "Volume descriptor version")
         cls = self.content_handler.get(self["type"].value, None)

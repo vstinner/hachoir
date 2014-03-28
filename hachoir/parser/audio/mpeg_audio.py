@@ -339,7 +339,7 @@ class MpegAudioFile(Parser):
         frames_size = self.size - self.current_size
         addr = self.size - 128*8
         if 0 <= addr:
-            has_id3 = (self.stream.readBytes(addr, 3) == "TAG")
+            has_id3 = (self.stream.readBytes(addr, 3) == b"TAG")
             if has_id3:
                 frames_size -= 128*8
         else:
@@ -399,7 +399,7 @@ class MpegAudioFile(Parser):
 
         # ID3v1 at the end?
         try:
-            if self.stream.readBytes(size, 3) == "TAG":
+            if self.stream.readBytes(size, 3) == b"TAG":
                 size += ID3v1.static_size
         except InputStreamError:
             pass

@@ -340,7 +340,7 @@ class Group(FieldSet):
 
         # Read block bitmap
         addr = self.absolute_address + 56*8
-        self.superblock_copy = (self.stream.readBytes(addr, 2) == "\x53\xEF")
+        self.superblock_copy = (self.stream.readBytes(addr, 2) == b"\x53\xEF")
         if self.superblock_copy:
             yield SuperBlock(self, "superblock_copy")
 

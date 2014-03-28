@@ -7,3 +7,4 @@ run flake8
 convert all methods names to PEP8!!!
 run pyflakes
 urwid help is broken
+run python -bb

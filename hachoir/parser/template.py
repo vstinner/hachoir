@@ -35,7 +35,7 @@ class TODOFile(Parser):
     def validate(self):
         # TODO: Check that file looks like your format
         # Example: check first two bytes
-        # return (self.stream.readBytes(0, 2) == 'BM')
+        # return (self.stream.readBytes(0, 2) == b'BM')
         return False
 
     def createFields(self):

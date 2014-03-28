@@ -18,7 +18,7 @@ class Boot(FieldSet):
     static_size = 512*8
     def createFields(self):
         yield Bytes(self, "jmp", 3, "Jump instruction (to skip over header on boot)")
-        yield Bytes(self, "oem_name", 8, "OEM Name (padded with spaces)")
+        yield String(self, "oem_name", 8, "OEM Name (padded with spaces)", charset="ASCII")
         yield UInt16(self, "sector_size", "Bytes per sector")
         yield UInt8 (self, "cluster_size", "Sectors per cluster")
         yield UInt16(self, "reserved_sectors", "Reserved sector count (including boot sector)")
@@ -321,9 +321,9 @@ class FAT_FS(Parser):
     }
 
     def _validate(self, type_offset):
-        if self.stream.readBytes(type_offset*8, 8) != ("FAT%-5u" % self.version):
+        if self.stream.readBytes(type_offset*8, 8) != ("FAT%-5u" % self.version).encode('ascii'):
             return "Invalid FAT%u signature" % self.version
-        if self.stream.readBytes(510*8, 2) != "\x55\xAA":
+        if self.stream.readBytes(510*8, 2) != b"\x55\xAA":
             return "Invalid BIOS signature"
         return True
 

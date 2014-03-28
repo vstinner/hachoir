@@ -141,7 +141,7 @@ class Photoshop8BIM(FieldSet):
         if self["signature"].value != "8BIM":
             raise ParserError("Stream doesn't look like 8BIM item (wrong signature)!")
         yield textHandler(UInt16(self, "tag"), hexadecimal)
-        if self.stream.readBytes(self.absolute_address + self.current_size, 4) != "\0\0\0\0":
+        if self.stream.readBytes(self.absolute_address + self.current_size, 4) != b"\0\0\0\0":
             yield PascalString8(self, "name")
             size = 2 + (self["name"].size // 8) % 2
             yield NullBytes(self, "name_padding", size)

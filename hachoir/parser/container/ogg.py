@@ -204,8 +204,6 @@ class Segments(Fragment):
                 yield Chunk(self, "chunk[]", size=segment_size*8)
 
 class OggPage(FieldSet):
-    MAGIC = b"OggS"
-
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
         size = 27
@@ -219,8 +217,8 @@ class OggPage(FieldSet):
 
     def createFields(self):
         yield String(self, 'capture_pattern', 4, charset="ASCII")
-        if self['capture_pattern'].value != self.MAGIC:
-            self.warning('Invalid signature. An Ogg page must start with "%s".' % self.MAGIC)
+        if self['capture_pattern'].value != "OggS":
+            self.warning('Invalid signature. An Ogg page must start with "OggS".')
         yield UInt8(self, 'stream_structure_version')
         yield Bit(self, 'continued_packet')
         yield Bit(self, 'first_page')
@@ -236,7 +234,7 @@ class OggPage(FieldSet):
             yield Segments(self, "segments", size=self._size-self._current_size)
 
     def validate(self):
-        if self['capture_pattern'].value != self.MAGIC:
+        if self['capture_pattern'].value != "OggS":
             return "Wrong signature"
         if self['stream_structure_version'].value != 0:
             return "Unknown structure version (%s)" % self['stream_structure_version'].value
@@ -253,7 +251,7 @@ class OggFile(Parser):
             "video/ogg", "video/x-ogg",
             "video/theora", "video/x-theora",
          ),
-        "magic": ((OggPage.MAGIC, 0),),
+        "magic": ((b'OggS', 0),),
         "subfile": "skip",
         "min_size": 28*8,
         "description": "Ogg multimedia container"
@@ -261,8 +259,7 @@ class OggFile(Parser):
     endian = LITTLE_ENDIAN
 
     def validate(self):
-        magic = OggPage.MAGIC
-        if self.stream.readBytes(0, len(magic)) != magic:
+        if self.stream.readBytes(0, 4) != b'OggS':
             return "Invalid magic string"
         # Validate first 3 pages
         for index in range(3):

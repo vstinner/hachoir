@@ -45,7 +45,7 @@ class ArchiveFile(Parser):
         yield String(self, "id", 8, "Unix archive identifier (\"<!arch>\")", charset="ASCII")
         while not self.eof:
             data = self.stream.readBytes(self.current_size, 1)
-            if data == "\n":
+            if data == b"\n":
                 yield RawBytes(self, "empty_line[]", 1, "Empty line")
             else:
                 yield ArchiveFileEntry(self, "file[]", "File")

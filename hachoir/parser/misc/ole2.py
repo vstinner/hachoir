@@ -74,7 +74,7 @@ class Property(FieldSet):
 
     def createFields(self):
         bytes = self.stream.readBytes(self.absolute_address, 4)
-        if bytes == "\0R\0\0":
+        if bytes == b"\0R\0\0":
             charset = "UTF-16-BE"
         else:
             charset = "UTF-16-LE"
