@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from hachoir.core.stream import FileInputStream
-from hachoir.core.i18n import _
 from hachoir.core import config
 from hachoir.subfile.search import SearchSubfile
 import hachoir.core
@@ -9,31 +8,31 @@ from optparse import OptionGroup, OptionParser
 
 def displayVersion(*args):
     from hachoir.subfile.version import VERSION, WEBSITE
-    print(_("Hachoir subfile version %s") % VERSION)
-    print(_("hachoir-core version %s") % hachoir.core.__version__)
+    print("Hachoir subfile version %s" % VERSION)
+    print("hachoir-core version %s" % hachoir.core.__version__)
     print()
-    print(_("Website: %s") % WEBSITE)
+    print("Website: %s" % WEBSITE)
     exit(0)
 
 def parseOptions():
     parser = OptionParser(usage="%prog [options] filename [output_directory]")
 
-    common = OptionGroup(parser, "hachoir-subfile", _("Option of hachoir-subfile"))
-    common.add_option("--offset", help=_("Skip first bytes of input file"),
+    common = OptionGroup(parser, "hachoir-subfile", "Option of hachoir-subfile")
+    common.add_option("--offset", help="Skip first bytes of input file",
         action="store", type='int', default=0)
-    common.add_option("--size", help=_("Maximum size of input file"),
+    common.add_option("--size", help="Maximum size of input file",
         action="store", type='int', default=None)
-    common.add_option("--category", help=_("Parser category list (separated with a comma)"),
+    common.add_option("--category", help="Parser category list (separated with a comma)",
         action="store", type='str', default=None)
-    common.add_option("--parser", help=_("Parser identifier list (separated with a comma)"),
+    common.add_option("--parser", help="Parser identifier list (separated with a comma)",
         action="store", type='str', default=None)
-    common.add_option("--version", help=_("Display version and exit"),
+    common.add_option("--version", help="Display version and exit",
         action="callback", callback=displayVersion)
-    common.add_option("--quiet", help=_("Be quiet"),
+    common.add_option("--quiet", help="Be quiet",
         action="store_true", default=False)
-    common.add_option("--profiler", help=_("Run profiler"),
+    common.add_option("--profiler", help="Run profiler",
         action="store_true", default=False)
-    common.add_option("--debug", help=_("Enable debug mode"),
+    common.add_option("--debug", help="Enable debug mode",
         action="store_true", default=False)
     parser.add_option_group(common)
 
