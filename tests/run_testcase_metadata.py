@@ -409,7 +409,8 @@ def testFiles(directory):
             return False
     return True
 
-def main(directory):
+def main():
+    directory = os.path.join(os.path.dirname(__file__), 'files')
     print("Test hachoir-metadata using testcase.")
     print()
     print("Testcase is in directory: %s" % directory)
@@ -466,8 +467,5 @@ testcase_files = (
 
 if __name__ == "__main__":
     setlocale(LC_ALL, "C")
-    if len(sys.argv) != 2:
-        print("usage: %s testcase_directory" % sys.argv[0], file=sys.stderr)
-        sys.exit(1)
-    main(sys.argv[1])
+    main()
 

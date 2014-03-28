@@ -530,7 +530,8 @@ def testRandom(seed=0, tests=(1,8)):
     return ok
 
 
-def main(directory):
+def main():
+    directory = os.path.join(os.path.dirname(__file__), 'files')
     print("Test hachoir-parser using random data.")
     print()
     if not testRandom():
@@ -633,8 +634,5 @@ testcase_files = (
 if __name__ == "__main__":
     from locale import setlocale, LC_ALL
     setlocale(LC_ALL, "C")
-    if len(sys.argv) != 2:
-        print("usage: %s testcase_directory" % sys.argv[0], file=sys.stderr)
-        sys.exit(1)
-    main(sys.argv[1])
+    main()
 

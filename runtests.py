@@ -3,8 +3,6 @@ import sys
 import os.path
 from locale import setlocale, LC_ALL
 
-TESTCASE = 'testcase'
-
 def main():
     setlocale(LC_ALL, "C")
 
@@ -16,17 +14,13 @@ def main():
     import tests.test_doc
     tests.test_doc.main()
 
-    print("=== download and check testcase ===")
-    import tests.download_testcase
-    tests.download_testcase.main(TESTCASE)
-
     print("=== hachoir-parser: testcase ===")
     import tests.run_testcase
-    tests.run_testcase.main(TESTCASE)
+    tests.run_testcase.main()
 
     print("=== hachoir-metadata: testcase ===")
     import tests.run_testcase_metadata
-    tests.run_testcase_metadata.main(TESTCASE)
+    tests.run_testcase_metadata.main()
 
 if __name__ == "__main__":
     main()
