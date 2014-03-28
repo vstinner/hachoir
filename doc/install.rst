@@ -86,6 +86,7 @@ Download tarballs
 * `hachoir-subfile-0.5.3.tar.gz <http://cheeseshop.python.org/packages/source/h/hachoir-subfile/hachoir-subfile-0.5.3.tar.gz>`_
 * `hachoir-regex-1.0.5.tar.gz <http://cheeseshop.python.org/packages/source/h/hachoir-regex/hachoir-regex-1.0.5.tar.gz>`_
 
+
 PyPI entries
 ------------
 
@@ -93,6 +94,7 @@ PyPI entries
   <http://cheeseshop.python.org/pypi/hachoir-core>`_
 * `hachoir-metadata on the Python Cheeseshop (PyPI)
   <http://cheeseshop.python.org/pypi/hachoir-metadata>`_
+
 
 Dependencies
 ------------
@@ -111,15 +113,13 @@ hachoir-metadata-qt:
 * To compile hachoir_metadata/qt/dialog.ui, you need pyuic4 which is part of
   PyQt4 development tools.
 
-* hachoir-urwid 1.1
+* hachoir-urwid
 
- -  hachoir 1.2
  -  `urwid <http://excess.org/urwid/>`_ 0.9.4
  -  optional: profiler module of Python
 
-* hachoir-wx 0.3
+* hachoir-wx
 
- -  hachoir 1.2
  -  `wxPython <http://www.wxpython.org/>`_ with Unicode support (2.6.3+ or 2.7.2+)
 
 
