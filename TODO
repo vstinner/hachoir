@@ -1,3 +1,5 @@
 Write tests for hachoir-grep
 Rename Dict.iteritems()
 wxPython doesn't support Python3 on Fedora
+hachoir.core.language : fix __cmp__
+nitrodir.nds is missing - http://comments.gmane.org/gmane.comp.python.hachoir/545
