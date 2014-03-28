@@ -1,6 +1,6 @@
 import hachoir.core.config as config
 from hachoir.core.field import Parser as GenericParser
-from hachoir.core.error import HACHOIR_ERRORS, error
+from hachoir.core.error import error
 from hachoir.core.tools import makeUnicode
 from inspect import getmro
 
@@ -75,7 +75,7 @@ class HachoirParser(object):
                 self._description = self.createDescription()
                 if isinstance(self._description, str):
                     self._description = makeUnicode(self._description)
-            except HACHOIR_ERRORS as err:
+            except Exception as err:
                 error("Error getting description of %s: %s" \
                     % (self.path, str(err)))
                 self._description = self.PARSER_TAGS["description"]
@@ -87,7 +87,7 @@ class HachoirParser(object):
         if not self._mime_type:
             try:
                 self._mime_type = self.createMimeType()
-            except HACHOIR_ERRORS as err:
+            except Exception as err:
                 self.error("Error when creating MIME type: %s" % str(err))
             if not self._mime_type \
             and self.createMimeType != Parser.createMimeType:
@@ -103,7 +103,7 @@ class HachoirParser(object):
         if not hasattr(self, "_content_size"):
             try:
                 self._content_size = self.createContentSize()
-            except HACHOIR_ERRORS as err:
+            except Exception as err:
                 error("Unable to compute %s content size: %s" % (self.__class__.__name__, err))
                 self._content_size = None
         return self._content_size

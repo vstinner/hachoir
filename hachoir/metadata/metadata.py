@@ -1,7 +1,7 @@
 from hachoir.core.endian import endian_name
 from hachoir.core.tools import makePrintable, makeUnicode
 from hachoir.core.dict import Dict
-from hachoir.core.error import error, HACHOIR_ERRORS
+from hachoir.core.error import error
 from hachoir.core.log import Logger
 from hachoir.metadata.metadata_item import (
     MIN_PRIORITY, MAX_PRIORITY, QUALITY_NORMAL)
@@ -261,7 +261,7 @@ def extractMetadata(parser, quality=QUALITY_NORMAL):
     metadata = extractor(quality)
     try:
         metadata.extract(parser)
-    except HACHOIR_ERRORS as err:
+    except Exception as err:
         error("Error during metadata extraction: %s" % str(err))
     if metadata:
         metadata.mime_type = parser.mime_type

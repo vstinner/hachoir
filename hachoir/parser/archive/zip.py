@@ -13,7 +13,6 @@ from hachoir.core.field import (FieldSet, ParserError,
     String, PascalString16,
     RawBytes)
 from hachoir.core.text_handler import textHandler, filesizeHandler, hexadecimal
-from hachoir.core.error import HACHOIR_ERRORS
 from hachoir.core.tools import makeUnicode
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.parser.common.deflate import Deflate
@@ -373,7 +372,7 @@ class ZipFile(Parser):
             return "Invalid magic"
         try:
             file0 = self["file[0]"]
-        except HACHOIR_ERRORS as err:
+        except Exception as err:
             return "Unable to get file #0"
         err = file0.validate()
         if err:

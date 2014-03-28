@@ -5,7 +5,6 @@ from tools import getFilesize, generateUniqueID
 from hachoir.core.stream import InputIOStream, InputStreamError
 from hachoir.metadata import extractMetadata
 from hachoir.parser import guessParser
-from hachoir.core.error import HACHOIR_ERRORS
 from io import StringIO
 from array import array
 from mangle import mangle
@@ -158,7 +157,7 @@ class FileFuzzer:
         try:
             metadata = extractMetadata(parser, 0.5)
             failure = bool(self.fuzzer.log_error)
-        except (HACHOIR_ERRORS, AssertionError) as err:
+        except Exception as err:
             self.info("SERIOUS ERROR: %s" % err)
             self.prefix = "metadata"
             failure = True

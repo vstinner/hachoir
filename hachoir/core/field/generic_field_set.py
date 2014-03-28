@@ -1,7 +1,6 @@
 from hachoir.core.field import (MissingField, BasicFieldSet, Field, ParserError,
     createRawField, createNullField, createPaddingField, FakeArray)
 from hachoir.core.dict import Dict, UniqKeyError
-from hachoir.core.error import HACHOIR_ERRORS
 from hachoir.core.tools import lowerBound, makeUnicode
 import hachoir.core.config as config
 
@@ -165,7 +164,7 @@ class GenericFieldSet(BasicFieldSet):
         self.__is_feeding = True
         try:
             field_size = field.size
-        except HACHOIR_ERRORS as err:
+        except Exception as err:
             if field.is_field_set and field.current_length and field.eof:
                 self.warning("Error when getting size of '%s': %s" % (field.name, err))
                 field._stopFeeding()
@@ -328,11 +327,11 @@ class GenericFieldSet(BasicFieldSet):
                 self._addField(field)
                 if field.name == field_name:
                     return field
-        except HACHOIR_ERRORS as err:
-            if self._fixFeedError(err) is False:
-                raise
         except StopIteration:
             self._stopFeeding()
+        except Exception as err:
+            if self._fixFeedError(err) is False:
+                raise
         return None
 
     def readMoreFields(self, number):
@@ -347,11 +346,11 @@ class GenericFieldSet(BasicFieldSet):
         try:
             for index in range(number):
                 self._addField( next(self._field_generator) )
-        except HACHOIR_ERRORS as err:
-            if self._fixFeedError(err) is False:
-                raise
         except StopIteration:
             self._stopFeeding()
+        except Exception as err:
+            if self._fixFeedError(err) is False:
+                raise
         return len(self._fields) - oldlen
 
     def _feedAll(self):
@@ -361,11 +360,11 @@ class GenericFieldSet(BasicFieldSet):
             while True:
                 field = next(self._field_generator)
                 self._addField(field)
-        except HACHOIR_ERRORS as err:
-            if self._fixFeedError(err) is False:
-                raise
         except StopIteration:
             self._stopFeeding()
+        except Exception as err:
+            if self._fixFeedError(err) is False:
+                raise
 
     def __iter__(self):
         """
@@ -382,7 +381,14 @@ class GenericFieldSet(BasicFieldSet):
                 for field in self._fields.values[done:]:
                     yield field
                     done += 1
-        except HACHOIR_ERRORS as err:
+        except StopIteration:
+            field = self._stopFeeding()
+            if isinstance(field, Field):
+                yield field
+            elif hasattr(field, '__iter__'):
+                for f in field:
+                    yield f
+        except Exception as err:
             field = self._fixFeedError(err)
             if isinstance(field, Field):
                 yield field
@@ -391,13 +397,6 @@ class GenericFieldSet(BasicFieldSet):
                     yield f
             elif field is False:
                 raise
-        except StopIteration:
-            field = self._stopFeeding()
-            if isinstance(field, Field):
-                yield field
-            elif hasattr(field, '__iter__'):
-                for f in field:
-                    yield f
 
     def _isDone(self):
         return (self._field_generator is None)

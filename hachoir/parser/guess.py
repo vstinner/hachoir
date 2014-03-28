@@ -4,7 +4,7 @@ Parser list managment:
 """
 
 import os
-from hachoir.core.error import warning, info, HACHOIR_ERRORS
+from hachoir.core.error import warning, info
 from hachoir.parser import ValidateError, HachoirParserList
 from hachoir.core.stream import FileInputStream
 import weakref
@@ -107,7 +107,7 @@ class QueryParser(object):
                 res = str(err)
                 if fallback and self.fallback:
                     fb = parser
-            except HACHOIR_ERRORS as err:
+            except Exception as err:
                 res = str(err)
                 raise
             if warn:

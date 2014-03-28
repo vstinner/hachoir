@@ -16,7 +16,6 @@ from hachoir.core.field import (FieldSet, ParserError, Enum,
     CString, String)
 from hachoir.core.text_handler import textHandler, filesizeHandler, hexadecimal
 from hachoir.core.tools import createDict, paddingSize, alignValue, makePrintable
-from hachoir.core.error import HACHOIR_ERRORS
 from hachoir.parser.common.win32 import BitmapInfoHeader
 
 MAX_DEPTH = 5
@@ -365,7 +364,7 @@ class PE_Resource(SeekableFieldSet):
                         if field.__class__ == Directory:
                             newsubdirs.append(field)
                         yield field
-                except HACHOIR_ERRORS as err:
+                except Exception as err:
                     self.error("Unable to create directory %s: %s" % (name, err))
             subdirs = newsubdirs
             alldirs.extend(subdirs)
@@ -397,7 +396,7 @@ class PE_Resource(SeekableFieldSet):
                 if padding:
                     yield padding
                 yield ResourceContent(self, "content[]", entry)
-            except HACHOIR_ERRORS as err:
+            except Exception as err:
                 self.warning("Error when parsing entry %s: %s" % (entry.path, err))
 
         size = (self.size - self.current_size) // 8

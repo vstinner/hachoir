@@ -3,7 +3,6 @@ from hachoir.core.field import (FieldSet, ParserError,
     Bytes, String, Enum,
     PaddingBytes, PaddingBits, NullBytes, NullBits)
 from hachoir.core.text_handler import textHandler, hexadecimal, filesizeHandler
-from hachoir.core.error import HACHOIR_ERRORS
 
 class SectionHeader(FieldSet):
     static_size = 40 * 8
@@ -70,7 +69,7 @@ class SectionHeader(FieldSet):
             name = str(self["name"].value.strip("."))
             if name:
                 return "section_%s" % name
-        except HACHOIR_ERRORS as err:
+        except Exception as err:
             self.warning(str(err))
         return "section[]"
 

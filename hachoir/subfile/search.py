@@ -1,4 +1,4 @@
-from hachoir.core.error import HACHOIR_ERRORS, error
+from hachoir.core.error import error
 from hachoir.core.stream import InputSubStream
 from hachoir.core.tools import humanFilesize, humanDuration
 from hachoir.core.memory import limitedMemory
@@ -216,7 +216,7 @@ class SearchSubfile:
         substream = InputSubStream(self.stream, offset)
         try:
             return parser_cls(substream, validate=True)
-        except HACHOIR_ERRORS:
+        except Exception:
             return None
 
     def displayProgress(self):

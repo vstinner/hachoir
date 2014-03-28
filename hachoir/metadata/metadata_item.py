@@ -1,5 +1,4 @@
 from hachoir.core.tools import makeUnicode, normalizeNewline
-from hachoir.core.error import HACHOIR_ERRORS
 from hachoir.metadata import config
 from hachoir.metadata.setter import normalizeString
 
@@ -70,7 +69,7 @@ class Data:
         if self.conversion:
             try:
                 new_value = self.conversion(self.metadata, self.key, value)
-            except HACHOIR_ERRORS as err:
+            except Exception as err:
                 self.metadata.warning("Error during conversion of %r value: %s" % (
                     self.key, err))
                 return

@@ -1,10 +1,10 @@
-from hachoir.core.error import HACHOIR_ERRORS, warning
+from hachoir.core.error import warning
 
 def fault_tolerant(func, *args):
     def safe_func(*args, **kw):
         try:
             func(*args, **kw)
-        except HACHOIR_ERRORS as err:
+        except Exception as err:
             warning("Error when calling function %s(): %s" % (
                 func.__name__, err))
     return safe_func
@@ -14,7 +14,7 @@ def getFieldAttribute(fieldset, key, attrname):
         field = fieldset[key]
         if field.hasValue():
             return getattr(field, attrname)
-    except HACHOIR_ERRORS as err:
+    except Exception as err:
         warning("Unable to get %s of field %s/%s: %s" % (
             attrname, fieldset.path, key, err))
     return None

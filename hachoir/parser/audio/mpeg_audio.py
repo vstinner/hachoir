@@ -15,7 +15,6 @@ from hachoir.parser.audio.id3 import ID3v1, ID3v2
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.core.tools import humanFrequency, humanBitSize
 from hachoir.core.bits import long2raw
-from hachoir.core.error import HACHOIR_ERRORS
 from hachoir.core.stream import InputStreamError
 
 # Max MP3 filesize: 200 MB
@@ -194,7 +193,7 @@ def findSynchronizeBits(parser, start, max_size):
         try:
             frame = createOrphanField(parser, start-address0, Frame, "frame")
             valid = frame.isValid()
-        except HACHOIR_ERRORS:
+        except Exception:
             valid = False
         if valid:
             return size
@@ -392,7 +391,7 @@ class MpegAudioFile(Parser):
                 # Check frame 32 bits header
                 if not frame.isValid():
                     break
-            except HACHOIR_ERRORS:
+            except Exception:
                 break
             if MAX_FILESIZE < (size + frame.size):
                 break

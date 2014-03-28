@@ -1,5 +1,4 @@
 from hachoir.core.field import BasicFieldSet, GenericFieldSet, ParserError, createRawField
-from hachoir.core.error import HACHOIR_ERRORS
 
 # getgaps(int, int, [listof (int, int)]) -> generator of (int, int)
 # Gets all the gaps not covered by a block in `blocks` from `start` for `length` units.

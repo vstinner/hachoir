@@ -9,7 +9,7 @@ config.use_i18n = False  # Don't use i18n
 config.quiet = True      # Don't display warnings
 
 from hachoir.core.field import FieldError
-from hachoir.core.error import HACHOIR_ERRORS, error
+from hachoir.core.error import error
 from hachoir.core.stream import InputStreamError, StringInputStream
 from hachoir.parser import createParser, HachoirParserList, ValidateError
 from array import array
@@ -524,7 +524,7 @@ def testRandom(seed=0, tests=(1,8)):
                 error("[%s] Parser didn't reject random data" % parser.__name__)
             except ValidateError:
                 continue
-            except HACHOIR_ERRORS as err:
+            except Exception as err:
                 error("[%s] %s" % (parser.__name__, err))
             ok = False
     return ok

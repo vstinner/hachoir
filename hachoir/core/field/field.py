@@ -3,7 +3,6 @@ Parent of all (field) classes in Hachoir: Field.
 """
 
 from hachoir.core.stream import InputFieldStream
-from hachoir.core.error import HACHOIR_ERRORS
 from hachoir.core.log import Logger
 from hachoir.core.tools import makePrintable
 from weakref import ref as weakref_ref
@@ -83,7 +82,7 @@ class Field(Logger):
                 if isinstance(self._description, str):
                     self._description = makePrintable(
                         self._description, "ISO-8859-1")
-            except HACHOIR_ERRORS as err:
+            except Exception as err:
                 self.error("Error getting description: " + str(err))
                 self._description = ""
         return self._description
@@ -104,7 +103,7 @@ class Field(Logger):
     def _getValue(self):
         try:
             value = self.createValue()
-        except HACHOIR_ERRORS as err:
+        except Exception as err:
             self.error("Unable to create value: %s" % str(err))
             value = None
         self._getValue = lambda: value
@@ -121,7 +120,7 @@ class Field(Logger):
         if not hasattr(self, "_Field__display"):
             try:
                 self.__display = self.createDisplay()
-            except HACHOIR_ERRORS as err:
+            except Exception as err:
                 self.error("Unable to create display: %s" % err)
                 self.__display = ""
         return self.__display
@@ -138,7 +137,7 @@ class Field(Logger):
         if not hasattr(self, "_Field__raw_display"):
             try:
                 self.__raw_display = self.createRawDisplay()
-            except HACHOIR_ERRORS as err:
+            except Exception as err:
                 self.error("Unable to create raw display: %s" % err)
                 self.__raw_display = ""
         return self.__raw_display
