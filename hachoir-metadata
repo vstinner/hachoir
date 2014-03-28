@@ -2,7 +2,7 @@
 
 import sys
 try:
-    from hachoir.core.error import error, HachoirError
+    from hachoir.core.error import error
     from hachoir.core.i18n import getTerminalCharset
     from hachoir.core.benchmark import Benchmark
     from hachoir.core.stream import InputStreamError
@@ -101,7 +101,7 @@ display_filename=False, priority=None, human=True, display=True):
     if extract_metadata:
         try:
             metadata = extractMetadata(parser, values.quality)
-        except HachoirError as err:
+        except Exception as err:
             error(str(err))
             metadata = None
         if not metadata:

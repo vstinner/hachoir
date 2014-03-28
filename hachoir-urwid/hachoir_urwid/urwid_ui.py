@@ -2,7 +2,6 @@ from hachoir.core.i18n import getTerminalCharset
 from hachoir.core.field import Field, MissingField
 from hachoir.core.tools import humanFilesize, humanBitSize, makePrintable
 from hachoir.core.log import log as hachoir_log
-from hachoir.core.error import HachoirError
 from hachoir.core.stream import InputFieldStream
 from hachoir.parser import guessParser
 from urwid import AttrWrap, BoxAdapter, BoxWidget, CanvasJoin, Edit, Frame, ListBox, Pile, Text
@@ -698,7 +697,7 @@ def exploreFieldSet(field_set, args, options={}):
 
     try:
         ui.run_wrapper(run)
-    except (HachoirError, Exception):
+    except Exception:
         pending = [ msg.get_text()[0] for msg in msgs[1][msgs[2]:] ] + \
                   [ "[*]%s %s" % (prefix, text) for level, prefix, text in msgs[0] ]
         if pending:

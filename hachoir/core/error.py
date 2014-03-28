@@ -21,22 +21,11 @@ def getBacktrace(empty="Empty backtrace."):
         return "Error while trying to get backtrace"
     return empty
 
-class HachoirError(Exception):
-    """
-    Parent of all errors in Hachoir library
-    """
-    def __init__(self, message):
-        message_bytes = makePrintable(message, "ASCII")
-        Exception.__init__(self, message_bytes)
-        self.text = message
-
-    def __str__(self):
-        return self.text
 
 # Error classes which may be raised by Hachoir core
 # FIXME: Add EnvironmentError (IOError or OSError) and AssertionError?
 # FIXME: Remove ArithmeticError and RuntimeError?
-HACHOIR_ERRORS = (HachoirError, LookupError, NameError, AttributeError,
+HACHOIR_ERRORS = (LookupError, NameError, AttributeError,
     TypeError, ValueError, ArithmeticError, RuntimeError)
 
 info    = log.info

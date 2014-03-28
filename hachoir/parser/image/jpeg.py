@@ -14,7 +14,6 @@ Information:
 Author: Victor Stinner, Robert Xiao
 """
 
-from hachoir.core.error import HachoirError
 from hachoir.parser import Parser
 from hachoir.core.field import (FieldSet, ParserError, FieldError,
     UInt8, UInt16, Enum, Field,
@@ -522,7 +521,7 @@ class JpegFile(Parser):
                 if index == 2:
                     # Only check 3 fields
                     break
-        except HachoirError:
+        except Exception:
             return "Unable to parse at least three chunks"
         return True
 

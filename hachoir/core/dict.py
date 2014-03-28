@@ -2,9 +2,7 @@
 Dictionnary classes which store values order.
 """
 
-from hachoir.core.error import HachoirError
-
-class UniqKeyError(HachoirError):
+class UniqKeyError(Exception):
     """
     Error raised when a value is set whereas the key already exist in a
     dictionnary.

@@ -9,7 +9,6 @@ from hachoir.core import config
 config.use_i18n = False  # Don't use i18n
 config.quiet = True      # Don't display warnings
 
-from hachoir.core.error import HachoirError
 from hachoir.core.stream import InputStreamError
 from hachoir.parser import createParser
 from hachoir.core.language import Language
@@ -377,7 +376,7 @@ def checkFile(filename, check_metadata, quality=1.0):
     sys.stdout.flush()
     try:
         metadata = extractMetadata(parser, quality)
-    except HachoirError as err:
+    except Exception as err:
         sys.stdout.write("stream error! %s\n" % str(err))
         sys.exit(1)
     if not metadata:

@@ -1,7 +1,6 @@
-from hachoir.core.error import HachoirError
 from hachoir.core.field import joinPath, MissingField
 
-class EditorError(HachoirError):
+class EditorError(Exception):
     pass
 
 class FakeField(object):

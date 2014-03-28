@@ -311,7 +311,6 @@ Hachoir Metadata Example
 
 :ref:`hachoir-metadata <metadata>` example::
 
-    from hachoir_core.error import HachoirError
     from hachoir_core.cmd_line import unicodeFilename
     from hachoir_parser import createParser
     from hachoir_core.tools import makePrintable
@@ -330,7 +329,7 @@ Hachoir Metadata Example
         exit(1)
     try:
         metadata = extractMetadata(parser)
-    except HachoirError, err:
+    except Exception as err:
         print "Metadata extraction error: %s" % unicode(err)
         metadata = None
     if not metadata:

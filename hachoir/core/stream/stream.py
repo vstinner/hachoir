@@ -1,5 +1,3 @@
-from hachoir.core.error import HachoirError
-
-class StreamError(HachoirError):
+class StreamError(Exception):
     pass
 

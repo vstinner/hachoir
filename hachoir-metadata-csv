@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from hachoir.core.error import HachoirError
 from hachoir.parser import createParser
 from hachoir.core.tools import makePrintable
 from hachoir.metadata import extractMetadata
@@ -55,7 +54,7 @@ class Extractor:
             return None
         try:
             metadata = extractMetadata(parser)
-        except HachoirError as err:
+        except Exception as err:
             print("Metadata extraction error: %s" % str(err), file=stderr)
             return None
         if not metadata:

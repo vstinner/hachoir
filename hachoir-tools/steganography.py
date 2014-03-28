@@ -3,14 +3,13 @@
 from hachoir.editor import (createEditor as hachoirCreateEditor,
     NewFieldSet, EditableInteger, EditableString, EditableBytes)
 from hachoir.core.stream import FileOutputStream
-from hachoir.core.error import HachoirError
 from hachoir.parser import createParser
 from hachoir.parser.image import PngFile
 from hachoir.parser.audio import MpegAudioFile
 from sys import argv, stdin, stdout, stderr, exit
 import zlib
 
-class InjecterError(HachoirError):
+class InjecterError(Exception):
     pass
 
 class Injecter:

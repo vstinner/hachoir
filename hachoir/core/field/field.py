@@ -3,16 +3,14 @@ Parent of all (field) classes in Hachoir: Field.
 """
 
 from hachoir.core.stream import InputFieldStream
-from hachoir.core.error import HachoirError, HACHOIR_ERRORS
+from hachoir.core.error import HACHOIR_ERRORS
 from hachoir.core.log import Logger
 from hachoir.core.tools import makePrintable
 from weakref import ref as weakref_ref
 
-class FieldError(HachoirError):
+class FieldError(Exception):
     """
     Error raised by a L{Field}.
-
-    @see: L{HachoirError}
     """
     pass
 

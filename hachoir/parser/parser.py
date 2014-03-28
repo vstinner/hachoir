@@ -1,11 +1,11 @@
 import hachoir.core.config as config
 from hachoir.core.field import Parser as GenericParser
-from hachoir.core.error import HACHOIR_ERRORS, HachoirError, error
+from hachoir.core.error import HACHOIR_ERRORS, error
 from hachoir.core.tools import makeUnicode
 from inspect import getmro
 
 
-class ValidateError(HachoirError):
+class ValidateError(Exception):
     pass
 
 class HachoirParser(object):
