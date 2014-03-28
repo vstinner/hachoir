@@ -15,12 +15,12 @@ def main():
     tests.test_doc.main()
 
     print("=== hachoir-parser: testcase ===")
-    import tests.run_testcase
-    tests.run_testcase.main()
+    import tests.test_parser
+    tests.test_parser.main()
 
     print("=== hachoir-metadata: testcase ===")
-    import tests.run_testcase_metadata
-    tests.run_testcase_metadata.main()
+    import tests.test_metadata
+    tests.test_metadata.main()
 
 if __name__ == "__main__":
     main()
