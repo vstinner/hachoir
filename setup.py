@@ -19,6 +19,13 @@ from imp import load_source
 from os import path
 from sys import argv
 
+SCRIPTS = [
+    "hachoir-metadata",
+    "hachoir-subfile",
+    "hachoir-grep",
+    "hachoir-strip",
+]
+
 CLASSIFIERS = [
     'Development Status :: 5 - Production/Stable',
     'Environment :: Console :: Curses',
@@ -65,7 +72,7 @@ def main():
         "classifiers": CLASSIFIERS,
         "license": hachoir.LICENSE,
         "packages": ['hachoir'],
-        "scripts": ["hachoir-metadata", "hachoir-subfile"],
+        "scripts": SCRIPTS,
     }
     if use_setuptools:
         install_options["zip_safe"] = True
