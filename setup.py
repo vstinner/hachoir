@@ -24,6 +24,7 @@ SCRIPTS = [
     "hachoir-subfile",
     "hachoir-grep",
     "hachoir-strip",
+    "hachoir-urwid",
 ]
 
 CLASSIFIERS = [

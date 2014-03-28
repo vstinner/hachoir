@@ -3,8 +3,8 @@ from hachoir.core.cmd_line import (getHachoirOptions,
     configureHachoir)
 from hachoir.core.stream import InputStreamError, FileInputStream
 from hachoir.parser import guessParser, HachoirParserList
-from hachoir_urwid import exploreFieldSet
-from hachoir_urwid.version import VERSION, WEBSITE
+from hachoir.urwid_ui import exploreFieldSet
+from hachoir.version import VERSION, WEBSITE
 from optparse import OptionGroup, OptionParser
 import hachoir.core
 import sys
