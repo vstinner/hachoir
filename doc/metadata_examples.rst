@@ -40,7 +40,7 @@ WMV
 Common:
  * Title: 欽ちゃん＆香取慎吾の全日本仮装大賞
  * Author: Nippon Television Network Corporation[[NTV]
-|* Duration: 1 min 47 sec 258 ms
+ * Duration: 1 min 47 sec 258 ms
  * Creation date: 2003-06-16 07:57:23.235000
  * Copyright: [C]]Nippon Television Network Corporation[NTV] 2003
  * Bit rate: 276.9 Kbit/sec (max)

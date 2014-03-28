@@ -23,6 +23,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   home
    core
    parser
    metadata
@@ -31,10 +32,12 @@ Contents:
    metadata_examples
    api
    internals
-   authors
    regex_api
    editor
    subfile
+   grep
+   strip
+   authors
    changelog
 
 

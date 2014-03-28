@@ -21,37 +21,43 @@ Hachoir projects
 ================
 
 Programs:
- * [[hachoir-metadata|hachoir-metadata]]: extract metadata from video, music and other files
- * [[hachoir-urwid|hachoir-urwid]]: text user interface
- * [[hachoir-wx|hachoir-wx]]: graphical user interface (wxWidgets)
- * [[hachoir-subfile|hachoir-subfile]]: find and extract all subfiles from any binary stream
- * [[hachoir-http|hachoir-http]]: HTML + Ajax user interface
+
+* [[hachoir-metadata|hachoir-metadata]]: extract metadata from video, music and other files
+* [[hachoir-urwid|hachoir-urwid]]: text user interface
+* [[hachoir-wx|hachoir-wx]]: graphical user interface (wxWidgets)
+* [[hachoir-subfile|hachoir-subfile]]: find and extract all subfiles from any binary stream
+* [[hachoir-http|hachoir-http]]: HTML + Ajax user interface
 
 Modules:
- * [[hachoir-core|hachoir-core]]: see [[Features|features]] and [[QualityControl|documentation]]
- * [[hachoir-parser|hachoir-parser]]: list of supported file formats
- * [[hachoir-regex|hachoir-regex]]: regular expression (regex) manipulation library
+
+* [[hachoir-core|hachoir-core]]: see [[Features|features]] and [[QualityControl|documentation]]
+* [[hachoir-parser|hachoir-parser]]: list of supported file formats
+* [[hachoir-regex|hachoir-regex]]: regular expression (regex) manipulation library
 
 Experimental programs:
- * [[hachoir-gtk|hachoir-gtk]]: graphical (Gtk+) user interface
- * [[hachoir-editor|hachoir-editor]]: library working with hachoir-core to edit a binary file
- * [[hachoir-strip|hachoir-strip]]: strip binary file (remove metadata, padding fields, etc.)
- * [[hachoir-grep|hachoir-grep]]: find substring in a binary file
+
+* [[hachoir-gtk|hachoir-gtk]]: graphical (Gtk+) user interface
+* [[hachoir-editor|hachoir-editor]]: library working with hachoir-core to edit a binary file
+* [[hachoir-strip|hachoir-strip]]: strip binary file (remove metadata, padding fields, etc.)
+* [[hachoir-grep|hachoir-grep]]: find substring in a binary file
 
 [[Install|Install and download]] or see [[Status|status of the project]].
 
-== Hachoir pages ==
 
- * [[Ideas|Ideas]] of projects based on Hachoir
- * [[Developer|Developer section]]
- * [[Contact|Contact]]
- * [[Links|Links]]: Links to similar projects and news on other websites about Hachoir
- * [[LegalIssue|Legal issues]]
- * [[Forensics|Forensics]]
- * [[FileFormatResources|File format resources]]
+Hachoir pages
+=============
+
+* [[Ideas|Ideas]] of projects based on Hachoir
+* [[Developer|Developer section]]
+* [[Contact|Contact]]
+* [[Links|Links]]: Links to similar projects and news on other websites about Hachoir
+* [[LegalIssue|Legal issues]]
+* [[Forensics|Forensics]]
+* [[FileFormatResources|File format resources]]
 * [[MicrosoftOffice|Microsoft Office file formats]]
 
-== News ==
+News
+====
 
 * 2010-07-26: Release of hachoir-parser 1.3.4 (`changes <http://bitbucket.org/haypo/hachoir/src/tip/hachoir-parser/ChangeLog>`_) and hachoir-metadata 1.3.3 (`changes <http://bitbucket.org/haypo/hachoir/src/tip/hachoir-metadata/ChangeLog>`_)
 * 2010-02-26: Release of hachoir-core 1.3.3 (`changes <http://bitbucket.org/haypo/hachoir/src/tip/hachoir-core/ChangeLog>`_)

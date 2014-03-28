@@ -1,3 +1,7 @@
++++++++++++++
+Hachoir Strip
++++++++++++++
+
 hachoir-strip is an experimental program based on Hachoir library: it removes
 "useless" informations from a file. Don't use it to create smaller file, you
 have better to recompress your data :-) hachoir-strip can be used if you would
@@ -7,6 +11,7 @@ Examples
 ========
 
 Our victim::
+
     $ hachoir-metadata KDE_Click.wav.new
     Common:
     - Creation date: 2001-02-21   <== here they are
@@ -18,6 +23,7 @@ Our victim::
     ...
 
 Clean up the file::
+
     $ hachoir-strip KDE_Click.wav
     [+] Process file KDE_Click.wav
     Remove field /info
@@ -36,23 +42,16 @@ So hachoir-strip removed creation date (2001-02-21) and producer (software
 used to record/edit the sound: Sound Forge 4.5). The file is also 56 bytes
 smaller.
 
-Option --strip
-==============
+
+Options
+=======
 
 You can select field types to remove using --strip:
 
  * (default): remove all useless fields
- * --strip=useless: remove really useless fields (eg. padding)
- * --strip=metadata: remove metadata like ID3 tags and EXIF and IPTC metadatas
- * --strip=index: remove video index
+ * ``--strip=useless``: remove really useless fields (eg. padding)
+ * ``--strip=metadata``: remove metadata like ID3 tags and EXIF and IPTC metadatas
+ * ``--strip=index``: remove video index
 
-You can combine options with comma: --strip="useless,metadata".
-
-Links
-=====
-
- * Hachoir library:
-   http://bitbucket.org/haypo/hachoir/wiki/
- * hachoir-strip program:
-   http://bitbucket.org/haypo/hachoir/wiki/hachoir-strip
+You can combine options with comma: ``--strip="useless,metadata"``.
 

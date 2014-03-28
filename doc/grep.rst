@@ -1,3 +1,7 @@
+++++++++++++
+Hachoir Grep
+++++++++++++
+
 hachoir-grep is an experimantal search program based on Hachoir. Its goal is
 to search a substring in a binary file or list all strings.
 
@@ -28,29 +32,24 @@ Search substring with case sensitive and display string path::
 
 Other options:
 
- * --no-value: Don't display the string value
- * --no-addr: Don't display string address
- * --percent: Display search percent (on stderr)
- * Get full option list using --help
+* ``--no-value``: Don't display the string value
+* ``--no-addr``: Don't display string address
+* ``--percent``: Display search percent (on stderr)
+* Get full option list using --help
+
 
 Comparaison to grep and strings
 ===============================
 
 The difference between hachoir-grep and grep or strings are:
 
- * hachoir-grep don't parse non-string data
- * hachoir-grep cares about string charset (ISO-8859-1, UTF-8, UTF-16, etc.)
-   but search is charset independant
- * hachoir-grep can display string address
+* hachoir-grep don't parse non-string data
+* hachoir-grep cares about string charset (ISO-8859-1, UTF-8, UTF-16, etc.)
+  but search is charset independant
+* hachoir-grep can display string address
 
 Drawbacks:
 
- * hachoir-grep is slow and might use a lot of memory
- * results depend on the quality of Hachoir parsers
-
-Links
-=====
-
- * Hachoir library:
-   http://bitbucket.org/haypo/hachoir/wiki/
+* hachoir-grep is slow and might use a lot of memory
+* results depend on the quality of Hachoir parsers
 

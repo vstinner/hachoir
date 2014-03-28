@@ -1,3 +1,5 @@
+.. _metadata:
+
 ++++++++++++++++
 Hachoir Metadata
 ++++++++++++++++
@@ -291,8 +293,8 @@ hachoir-metadata library is used by:
 Similar projects
 ================
 
- * Kaa - http://freevo.sourceforge.net/cgi-bin/freevo-2.0/Kaa (written in Python)
- * libextractor: http://gnunet.org/libextractor/ (written in C)
+* Kaa - http://freevo.sourceforge.net/cgi-bin/freevo-2.0/Kaa (written in Python)
+* libextractor: http://gnunet.org/libextractor/ (written in C)
 
 A *lot* of other libraries are written to read and/or write metadata in MP3
 music and/or EXIF photo.
