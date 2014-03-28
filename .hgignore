@@ -11,6 +11,3 @@ hachoir-metadata/hachoir_metadata/qt/dialog_ui.py
 
 # build/ subdirectories
 build
-
-# download files for tests
-testcase/
