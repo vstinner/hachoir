@@ -6,11 +6,7 @@ include MANIFEST.in
 include README
 include README.header
 include README.py
-include doc/*.css
-include doc/*.dia
 include doc/*.rst
-include doc/*.xmi
-include doc/adding_fields.graphviz
 include gnome/README
 include gnome/hachoir
 include hachoir_metadata/qt/dialog.ui
@@ -20,7 +16,5 @@ include kde/hachoir.desktop
 include metadata_csv.py
 include metadata_csv.py
 include run_testcase.py
-include tests/test_doc.py
-include tests/download_testcase.py
-include tests/run_testcase.py
-include tests/run_testcase_metadata.py
+include tests/*.py
+include runtests.py

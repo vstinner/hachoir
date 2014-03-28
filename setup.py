@@ -1,29 +1,29 @@
 #!/usr/bin/env python3
-# Procedure to release a new version:
-#  - edit hachoir/version.py: __version__ = "XXX"
+#
+# Procedure to release Hachoir:
+#
+#  - check version: hachoir/version.py and doc/conf.py
 #  - run: ./runtests.py
-#  - edit ChangeLog (set release date)
+#  - edit doc/changelog.rst (set release date)
 #  - run: hg commit
 #  - run: hg tag hachoir-XXX
 #  - run: hg push
 #  - run: ./README.py
 #  - run: ./setup.py --setuptools register sdist upload
 #  - run: rm README
-#  - check http://pypi.python.org/pypi/hachoir-parser
-#  - update the website
-#    * http://bitbucket.org/haypo/hachoir/wiki/Install/source
-#    * http://bitbucket.org/haypo/hachoir/wiki/Home
-#  - edit hachoir/version.py: set version to N+1
+#  - check http://pypi.python.org/pypi/hachoir
+#  - update doc/install.rst
+#  - set version to N+1: hachoir/version.py and doc/conf.py
 
 from imp import load_source
 from os import path
 from sys import argv
 
 SCRIPTS = [
-    "hachoir-metadata",
-    "hachoir-subfile",
     "hachoir-grep",
+    "hachoir-metadata",
     "hachoir-strip",
+    "hachoir-subfile",
     "hachoir-urwid",
 ]
 
