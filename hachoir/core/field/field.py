@@ -31,8 +31,6 @@ class MissingField(KeyError, FieldError):
     def __str__(self):
         return 'Can\'t get field "%s" from %s' % (self.key, self.field.path)
 
-    def __unicode__(self):
-        return 'Can\'t get field "%s" from %s' % (self.key, self.field.path)
 
 class Field(Logger):
     # static size can have two differents value: None (no static size), an
@@ -96,8 +94,7 @@ class Field(Logger):
 
     def __str__(self):
         return self.display
-    def __unicode__(self):
-        return self.display
+
     def __repr__(self):
         return "<%s path=%r, address=%s, size=%s>" % (
             self.__class__.__name__, self.path, self._address, self._size)

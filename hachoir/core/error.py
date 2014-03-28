@@ -30,7 +30,7 @@ class HachoirError(Exception):
         Exception.__init__(self, message_bytes)
         self.text = message
 
-    def __unicode__(self):
+    def __str__(self):
         return self.text
 
 # Error classes which may be raised by Hachoir core

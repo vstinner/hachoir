@@ -116,31 +116,13 @@ class Metadata(Logger):
 
     def __str__(self):
         r"""
-        Create a multi-line ASCII string (end of line is "\n") which
-        represents all datas.
-
-        >>> a = RootMetadata()
-        >>> a.author = "haypo"
-        >>> a.copyright = "© Hachoir"
-        >>> print(a)
-        Metadata:
-        - Author: haypo
-        - Copyright: \xa9 Hachoir
-
-        @see __unicode__() and exportPlaintext()
-        """
-        text = self.exportPlaintext()
-        return "\n".join( makePrintable(line, "ASCII") for line in text )
-
-    def __unicode__(self):
-        r"""
         Create a multi-line Unicode string (end of line is "\n") which
         represents all datas.
 
         >>> a = RootMetadata()
         >>> a.copyright = "© Hachoir"
         >>> print(repr(str(a)))
-        'Metadata:\n- Copyright: \\xa9 Hachoir'
+        'Metadata:\n- Copyright: \xa9 Hachoir'
 
         @see __str__() and exportPlaintext()
         """
