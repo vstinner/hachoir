@@ -355,3 +355,64 @@ hachoir-metadata 1.0 (2007-07-11)
  * Use Language from hachoir_core to store language from ID3 and MKV
  * OLE2 and FLV: Extractors are now fault tolerant
 
+Hachoir Urwid
+^^^^^^^^^^^^^
+
+What's new in hachoir-urwid 1.1?
+================================
+
+ * Use the new getFieldType() method of hachoir-core 1.2 to display better
+   informations about the field type, eg. shows the string charset
+
+What's new in hachoir-urwid 1.0?
+================================
+
+Version 1.0.1
+-------------
+
+ * Only use hachoir_core.profiler with --profiler command line option
+   so 'profiler' Python module is now optional
+ * Set shebang to "#!/usr/bin/python"
+
+Version 1.0
+-----------
+
+ * Compatible with hachoir-core 1.0 and hachoir-parser 1.0
+ * Set default of preload to 15 (instead of 3)
+
+What's new in hachoir-urwid 0.9.0?
+==================================
+
+Changes:
+
+ * Fixes to support latest version of urwid
+ * Updates to last version of hachoir-core and hachoir-parser (eg. use
+   HachoirParserList class to display parser list)
+ * Replace command line option --force-mime with --parser (value is now the
+   parser identifier and not a MIME type)
+ * Add command line options --hide-value and --hide-size
+
+What's new in hachoir-urwid 0.8.0?
+==================================
+
+ * CTRL+E write field content to a file
+ * CTRL+X create a stream from a field a write it into a file
+ * Update to hachoir-core 0.8.0 (changes in input streams)
+   and hachoir-parser 0.9.0 (way to choose the right parser)
+ * Update to urwid 0.9.7.2 (use Unicode string)
+ * Add option 'profile-display' to use Python profiler
+
+What's new in hachoir-urwid 0.7.1?
+==================================
+
+ * setup.py doesn't depdend on hachoir-core, nor hachoir-parser, not urwid
+ * setup.py uses distutils by default (and not setuptools)
+
+What's new in hachoir-urwid 0.7?
+================================
+
+ * Support invalid unicode filename
+ * Support decompression of a subfile
+ * Better managment of "raw display"
+ * Add command line option --parser-list
+
