@@ -352,7 +352,7 @@ class XMModule(Parser):
     def validate(self):
         header = self.stream.readBytes(0, 17)
         if header != Header.MAGIC:
-            return "Invalid signature '%s'" % header
+            return "Invalid signature %a" % header
         if self["/header/header_size"].value != 276:
             return "Unknown header size (%u)" % self["/header/header_size"].value
         return True

@@ -224,7 +224,7 @@ class PIFVFile(Parser):
         "category": "program",
         "file_ext": ("bin", ""),
         "min_size": 64*8, # smallest possible header
-        "magic_regex": (("\0{16}.{24}%s" % MAGIC, 0), ),
+        "magic_regex": ((b"\0{16}.{24}" + MAGIC, 0), ),
         "description": "EFI Platform Initialization Firmware Volume",
     }
 

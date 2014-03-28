@@ -117,10 +117,10 @@ class AmigaModule(Parser):
     endian = BIG_ENDIAN
 
     def validate(self):
-        t = self.stream.readBytes(1080*8, 4)
-        if t not in MODULE_TYPE:
-            return "Invalid module type '%s'" % t
-        self.createValue = lambda t: "%s module, %u channels" % MODULE_TYPE[t]
+        modtype = self.stream.readBytes(1080*8, 4)
+        if modtype not in MODULE_TYPE:
+            return "Invalid module type %a" % modtype
+        self.createValue = lambda modtype: "%s module, %u channels" % MODULE_TYPE[modtype]
         return True
 
     def createFields(self):
