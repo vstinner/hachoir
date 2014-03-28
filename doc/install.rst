@@ -103,7 +103,7 @@ hachoir-urwid:
 
 hachoir-metadata-gtk:
 
-* pygtk (Debian package: python-gtk2)
+* python3-gobject
 
 hachoir-metadata-qt:
 
