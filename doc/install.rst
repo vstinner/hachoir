@@ -97,6 +97,9 @@ PyPI entries
 Dependencies
 ------------
 
+hachoir-urwid:
+
+* urwid
 
 hachoir-metadata-gtk:
 

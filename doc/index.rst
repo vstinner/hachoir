@@ -28,6 +28,7 @@ Contents:
    parser
    metadata
    install
+   urwid
    regex
    metadata_examples
    api

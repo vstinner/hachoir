@@ -61,6 +61,12 @@ Pierre THIERRY <nowhere.man AT levallois.eu.org> - KDE plugin
 Thomas PABST <thomas.pabst AT gmail.com> - Gnome plugin
 Victor Stinner aka haypo <victor.stinner AT gmail.com> - Metadata core
 
+Urwid
+=====
+
+Julien Muchembled <jm AT jm10 DOT no-ip DOT com>
+Victor Stinner aka haypo <victor DOT stinner AT haypocalc DOT com>
+
 
 Regex
 =====
