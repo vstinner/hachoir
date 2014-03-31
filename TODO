@@ -4,7 +4,6 @@ TODO list
 * Write more tests:
 
   - use coverage to check which parsers are never tested
-  - write tests for hachoir-strip
   - write tests for hachoir-subfile
 
 * Fix hachoir-subfile: hachoir.regex only supports Unicode?
