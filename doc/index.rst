@@ -1,63 +1,14 @@
 Welcome to Hachoir's documentation!
 ===================================
 
-*Hachoir* is a Python library that allows to view and edit a binary stream
-field by field. In other words, Hachoir allows you to "browse" any binary
-stream just like you browse directories and files. A file is split in a tree of
-fields, where the smallest field is just one bit. There are other fields types:
-integers, strings, bits, padding types, floats, etc. Hachoir is the French word
-for a meat grinder (meat mincer), which is used by butchers to divide meat into
-long tubes; Hachoir is used by computer butchers to divide binary files into
-fields.
+*Hachoir* is a Python library to view and edit a binary stream field by field.
+In other words, Hachoir allows you to "browse" any binary stream just like you
+browse directories and files. A file is splitted in a tree of fields, where the
+smallest field is just one bit. Examples of fields types: integers,
+strings, bits, padding types, floats, etc. Hachoir is the French word for a
+meat grinder (meat mincer), which is used by butchers to divide meat into long
+tubes; Hachoir is used by computer butchers to divide binary files into fields.
 
-Hachoir is composed of the parser core (hachoir-core), various file format
-parsers (hachoir-parser), and other peripheral programs. For example, you can
-use hachoir-metadata to extract information from your favourite photos or
-videos. Hachoir also allows you to edit files (of supported formats) without
-the original (often proprietary) program that was used to create them.
-
-
-Hachoir is the French name for a mincer: a tool used by butchers to cut meat.
-Hachoir is also a tool written for hackers to cut a file or any binary stream.
-A file is split in a tree of fields where the smallest field can be a
-bit. There are various field types: integer, string, bits, padding, sub file,
-etc.
-
-Hachoir is the french name for a mincer: a tool used by butchers to cut meat.
-Hachoir is also a tool written for hackers to cut file or any binary stream. A
-file is splitted in a tree of fields where the smallest field can be just a
-bit. There are various field types: integer, string, bits, padding, sub file,
-etc.
-
-Hachoir is a Python library used to represent of a binary file as a tree of
-Python objects. Each object has a type, a value, an address, etc. The goal is
-to be able to know the meaning of each bit in a file.
-
-Hachoir projects
-================
-
-Programs:
-
-* [[hachoir-metadata|hachoir-metadata]]: extract metadata from video, music and other files
-* [[hachoir-urwid|hachoir-urwid]]: text user interface
-* [[hachoir-wx|hachoir-wx]]: graphical user interface (wxWidgets)
-* [[hachoir-subfile|hachoir-subfile]]: find and extract all subfiles from any binary stream
-* [[hachoir-http|hachoir-http]]: HTML + Ajax user interface
-
-Modules:
-
-* [[hachoir-core|hachoir-core]]: see [[Features|features]] and [[QualityControl|documentation]]
-* [[hachoir-parser|hachoir-parser]]: list of supported file formats
-* [[hachoir-regex|hachoir-regex]]: regular expression (regex) manipulation library
-
-Experimental programs:
-
-* [[hachoir-gtk|hachoir-gtk]]: graphical (Gtk+) user interface
-* [[hachoir-editor|hachoir-editor]]: library working with hachoir-core to edit a binary file
-* [[hachoir-strip|hachoir-strip]]: strip binary file (remove metadata, padding fields, etc.)
-* [[hachoir-grep|hachoir-grep]]: find substring in a binary file
-
-[[Install|Install and download]] or see [[Status|status of the project]].
 
 Table Of Contents
 =================
@@ -92,6 +43,12 @@ Pages:
 * [[Forensics|Forensics]]
 * [[FileFormatResources|File format resources]]
 * [[MicrosoftOffice|Microsoft Office file formats]]
+* [[hachoir-metadata|hachoir-metadata]]: extract metadata from video, music and other files
+* [[hachoir-urwid|hachoir-urwid]]: text user interface
+* [[hachoir-wx|hachoir-wx]]: graphical user interface (wxWidgets)
+* [[hachoir-http|hachoir-http]]: HTML + Ajax user interface
+* [[hachoir-gtk|hachoir-gtk]]: graphical (Gtk+) user interface
+* [[Status|status of the project]].
 
 
 News

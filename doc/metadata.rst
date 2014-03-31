@@ -1,23 +1,34 @@
 .. _metadata:
 
-++++++++++++++++
-Hachoir Metadata
-++++++++++++++++
+++++++++
+Metadata
+++++++++
 
-Documentation From code
-=======================
+The ``hachoir-metadata`` program is a tool to extract metadata from multimedia
+files: videos, pictures, sounds, archives, etc. It supports most common file
+formats:
 
-hachoir-metadata extracts metadata from multimedia files: music, picture,
-video, but also archives. It supports most common file formats:
+* Archives: bzip2, gzip, zip, tar
+* Audio: MPEG audio ("MP3"), WAV, Sun/NeXT audio, Ogg/Vorbis (OGG), MIDI,
+  AIFF, AIFC, Real audio (RA)
+* Image: BMP, CUR, EMF, ICO, GIF, JPEG, PCX, PNG, TGA, TIFF, WMF, XCF
+* Misc: Torrent
+* Program: EXE
+* Video: ASF format (WMV video), AVI, Matroska (MKV), Quicktime (MOV),
+  Ogg/Theora, Real media (RM)
 
- * Archives: bzip2, gzip, zip, tar
- * Audio: MPEG audio ("MP3"), WAV, Sun/NeXT audio, Ogg/Vorbis (OGG), MIDI,
-   AIFF, AIFC, Real audio (RA)
- * Image: BMP, CUR, EMF, ICO, GIF, JPEG, PCX, PNG, TGA, TIFF, WMF, XCF
- * Misc: Torrent
- * Program: EXE
- * Video: ASF format (WMV video), AVI, Matroska (MKV), Quicktime (MOV),
-   Ogg/Theora, Real media (RM)
+Features:
+
+* Gtk interface
+* Plugins for Nautilus (Gnome) and Konqueror (KDE)
+* Support invalid / truncated files
+* Unicode compliant (charset ISO-8859-XX, UTF-8, UTF-16), convert string to
+  your terminal charset
+* Remove duplicate values and if a string is a substring of another, just keep
+  the longest one
+* Set priority to value, so it's possible to filter metadata (option --level)
+* Only depends on [[hachoir-parser|hachoir-parser]] (and not on libmatroska,
+  libmpeg2, libvorbis, etc.)
 
 It tries to give as much information as possible. For some file formats,
 it gives more information than libextractor for example, such as the RIFF
@@ -27,31 +38,14 @@ is just to compute duration of a music using frame size and file size.
 
 hachoir-metadata has three modes:
 
- * classic mode: extract metadata, you can use --level=LEVEL to limit quantity
-   of information to display (and not to extract)
- * --type: show on one line the file format and most important informations
- * --mime: just display file MIME type
+* classic mode: extract metadata, you can use --level=LEVEL to limit quantity
+  of information to display (and not to extract)
+* ``--type``: show on one line the file format and most important informations
+* ``--mime``: just display file MIME type
 
-The command 'hachoir-metadata --mime' works like 'file --mime',
-and 'hachoir-metadata --type' like 'file'. But today file command supports
-more file formats then hachoir-metadata.
-
-
-Documentation From Wiki
-=======================
-
-hachoir-metadata is tool to extract metadata from multimedia files (sound,
-video, archives, etc.): see [[hachoir-metadata/examples|output examples]]!
-
-Features:
-
-* Gtk interface
-* Plugins for Nautilus (Gnome) and Konqueror (KDE)
-* Support invalid / truncated files
-* Unicode compliant (charset ISO-8859-XX, UTF-8, UTF-16), convert string to your terminal charset
-* Remove duplicate values (//and if a string is a substring of another, just keep the longest one//)
-* Set priority to value, so it's possible to filter metadata (option --level)
-* Only depends on [[hachoir-parser|hachoir-parser]] (and not on libmatroska, libmpeg2, libvorbis, etc.)
+The command ``hachoir-metadata --mime`` works like ``file --mime``, and
+``hachoir-metadata --type`` like ``file``. But today file command supports more
+file formats then hachoir-metadata.
 
 
 Example
@@ -143,8 +137,8 @@ Video
 * flv: Macromedia Flash video
 * mov: Apple !QuickTime movie
 
-Options
-=======
+Command line pptions
+====================
 
 Modes --mime and --type
 =======================
@@ -232,7 +226,15 @@ Use ``--help`` option to get full option list.
 See also
 ========
 
-See also: [[FileFormatResources|file format resources]].
+Used by
+-------
+
+hachoir-metadata library is used by:
+
+* `Plone4artist <http://plone.org/products/plone4artistsvideo/>`_
+* `amplee <http://trac.defuze.org/wiki/amplee>`_ (implementation of the Atom Publishing Protocol, APP)
+* `django-massmedia <http://opensource.washingtontimes.com/projects/django-massmedia/>`_ (Washington Post open source library)
+* `pyrenamer <http://www.infinicode.org/code/pyrenamer/>`_
 
 Informations
 ------------
@@ -278,24 +280,4 @@ Programs using metadata
 * Other: `Lucene <http://lucene.apache.org/>`_ (full text search)
 
 
-
-Used by
-=======
-
-hachoir-metadata library is used by:
-
-* `Plone4artist <http://plone.org/products/plone4artistsvideo/>`_
-* `amplee <http://trac.defuze.org/wiki/amplee>`_ (implementation of the Atom Publishing Protocol, APP)
-* `django-massmedia <http://opensource.washingtontimes.com/projects/django-massmedia/>`_ (Washington Post open source library)
-* `pyrenamer <http://www.infinicode.org/code/pyrenamer/>`_
-
-
-Similar projects
-================
-
-* Kaa - http://freevo.sourceforge.net/cgi-bin/freevo-2.0/Kaa (written in Python)
-* libextractor: http://gnunet.org/libextractor/ (written in C)
-
-A *lot* of other libraries are written to read and/or write metadata in MP3
-music and/or EXIF photo.
 

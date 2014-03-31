@@ -2,7 +2,7 @@
 Metadata examples
 +++++++++++++++++
 
-[[hachoir-metadata|hachoir-metadata]] (version 0.10) output examples.
+:ref:`hachoir-metadata <metadata>` (version 0.10) output examples.
 
 Video
 =====

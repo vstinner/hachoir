@@ -416,3 +416,34 @@ What's new in hachoir-urwid 0.7?
  * Better managment of "raw display"
  * Add command line option --parser-list
 
+
+Hachoir Regex
+^^^^^^^^^^^^^
+
+Version 1.0.5 (2010-01-28)
+
+* Create a MANIFEST.in to include extra files: regex.rst, test_doc.py, etc.
+* Create an INSTALL file
+
+Version 1.0.4 (2010-01-13)
+
+* Support \b (match a word)
+* Fix parser: support backslash in a range, eg. parse(r"[a\]x]")
+
+Version 1.0.3 (2008-04-01)
+
+* Raise SyntaxError on unsupported escape character
+* Two dot atoms are always equals
+
+Version 1.0.2 (2007-07-12)
+
+* Refix PatternMatching without any pattern
+
+Version 1.0.1 (2007-06-28)
+
+* Fix PatternMatching without any pattern
+
+Version 1.0 (2007-06-28)
+
+* First public version
+

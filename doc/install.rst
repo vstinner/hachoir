@@ -1,6 +1,6 @@
-+++++++++++++++
-Install Hachoir
-+++++++++++++++
++++++++
+Install
++++++++
 
 Packages
 ========
@@ -98,6 +98,9 @@ PyPI entries
 
 Dependencies
 ------------
+
+GnomeKeyring parser requires Python Crypto module:
+http://www.amk.ca/python/code/crypto.html
 
 hachoir-urwid:
 
