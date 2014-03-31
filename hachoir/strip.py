@@ -12,10 +12,10 @@ from hachoir.editor import (createEditor,
 from hachoir.core.stream import FileOutputStream, StringOutputStream
 from hachoir.core.tools import humanFilesize, makePrintable
 from hachoir.core.i18n import getTerminalCharset
+from hachoir.core.cmd_line import displayVersion
 from hachoir.parser import createParser
 from optparse import OptionGroup, OptionParser
 import hachoir.core
-from hachoir import version as hachoir_version
 import sys
 
 # File formats
@@ -24,10 +24,6 @@ from hachoir.parser.audio import AuFile
 from hachoir.parser.image import PngFile, JpegFile
 from hachoir.parser.container import RiffFile
 from hachoir.parser.audio import MpegAudioFile
-
-# Constants
-__version__ = "0.1"
-WEBSITE = "%s/wiki/hachoir-strip" % hachoir_version.WEBSITE
 
 # Strip what?
 STRIP_USELESS  = 0x01   # Useless padding, useless duplicate information, etc.
@@ -224,13 +220,6 @@ def stripEditor(editor, filename, level, verbose):
     else:
         print("Stripper doesn't touch the file")
     return True
-
-def displayVersion(*args):
-    print("Hachoir strip version %s" % __version__)
-    print("Hachoir library version %s" % hachoir.core.__version__)
-    print()
-    print("Website: %s" % WEBSITE)
-    sys.exit(0)
 
 def parseOptions():
     parser = OptionParser(usage="%prog [options] filename")

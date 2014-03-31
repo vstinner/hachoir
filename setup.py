@@ -66,7 +66,6 @@ def main():
         "name": hachoir.PACKAGE,
         "version": hachoir.__version__,
         "url": hachoir.WEBSITE,
-        "download_url": hachoir.WEBSITE,
         "author": "Hachoir team (see AUTHORS file)",
         "description": "Package of Hachoir parsers used to open binary files",
         "long_description": long_description,

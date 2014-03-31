@@ -2,19 +2,13 @@
 from hachoir.core.cmd_line import (getHachoirOptions,
     configureHachoir)
 from hachoir.core.stream import InputStreamError, FileInputStream
+from hachoir.core.cmd_line import displayVersion
 from hachoir.parser import guessParser, HachoirParserList
 from hachoir.urwid_ui import exploreFieldSet
 from hachoir.version import VERSION, WEBSITE
 from optparse import OptionGroup, OptionParser
 import hachoir.core
 import sys
-
-def displayVersion(*args):
-    print(("Hachoir urwid version %s" % VERSION))
-    print(("Hachoir library version %s" % hachoir.core.__version__))
-    print()
-    print(("Website: %s" % WEBSITE))
-    sys.exit(0)
 
 def displayParserList(*args):
     HachoirParserList().print_()

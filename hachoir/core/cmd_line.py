@@ -1,7 +1,14 @@
 from optparse import OptionGroup
 from hachoir.core.log import log
 from hachoir.core.tools import makePrintable
+from hachoir import version
 import hachoir.core.config as config
+import sys
+
+def displayVersion(*args):
+    print("Hachoir version %s" % version.VERSION)
+    print("Website: %s" % version.WEBSITE)
+    sys.exit(0)
 
 def getHachoirOptions(parser):
     """

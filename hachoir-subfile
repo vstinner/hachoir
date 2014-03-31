@@ -2,17 +2,10 @@
 from hachoir.core.stream import FileInputStream
 from hachoir.core import config
 from hachoir.subfile.search import SearchSubfile
+from hachoir.core.cmd_line import displayVersion
 import hachoir.core
 from sys import exit
 from optparse import OptionGroup, OptionParser
-
-def displayVersion(*args):
-    from hachoir.subfile.version import VERSION, WEBSITE
-    print("Hachoir subfile version %s" % VERSION)
-    print("hachoir-core version %s" % hachoir.core.__version__)
-    print()
-    print("Website: %s" % WEBSITE)
-    exit(0)
 
 def parseOptions():
     parser = OptionParser(usage="%prog [options] filename [output_directory]")

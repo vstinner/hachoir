@@ -1,22 +1,18 @@
 #!/usr/bin/env python3
 
-import sys
-try:
-    from hachoir.core.error import error
-    from hachoir.core.i18n import getTerminalCharset
-    from hachoir.core.benchmark import Benchmark
-    from hachoir.core.stream import InputStreamError
-    from hachoir.core.tools import makePrintable
-    from hachoir.parser import createParser, ParserList
-    import hachoir.core.config as hachoir_config
-    from hachoir.metadata import config
-except ImportError as err:
-    raise
-    print("Unable to import an Hachoir module: %s" % err, file=sys.stderr)
-    sys.exit(1)
+from hachoir.core.error import error
+from hachoir.core.i18n import getTerminalCharset
+from hachoir.core.benchmark import Benchmark
+from hachoir.core.stream import InputStreamError
+from hachoir.core.tools import makePrintable
+from hachoir.core.cmd_line import displayVersion
+from hachoir.parser import createParser, ParserList
+import hachoir.core.config as hachoir_config
+from hachoir.metadata import config
 from optparse import OptionGroup, OptionParser
 from hachoir.metadata import extractMetadata
 from hachoir.metadata.metadata import extractors as metadata_extractors
+import sys
 
 
 def displayParserList(*args):
@@ -24,15 +20,6 @@ def displayParserList(*args):
     for parser in list(metadata_extractors.keys()):
         parser_list.add(parser)
     parser_list.print_("List of metadata extractors.")
-    sys.exit(0)
-
-def displayVersion(*args):
-    import hachoir.core
-    from hachoir.metadata import __version__
-    print("Metadata extractor version %s" % __version__)
-    print("Hachoir library version %s" % hachoir.core.__version__)
-    print()
-    print("Website: %s/wiki/hachoir-metadata" % hachoir.core.WEBSITE)
     sys.exit(0)
 
 def parseOptions():

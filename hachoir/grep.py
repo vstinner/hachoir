@@ -7,17 +7,10 @@ from hachoir.core.error import error
 from hachoir.core.stream import InputStreamError
 from hachoir.core.tools import makePrintable
 from hachoir.parser import createParser
+from hachoir.core.cmd_line import displayVersion
 from optparse import OptionGroup, OptionParser
 import errno
 import sys
-
-def displayVersion(*args):
-    import hachoir.core
-    print("Hachoir grep version %s" % __version__)
-    print("Hachoir library version %s" % hachoir.core.__version__)
-    print()
-    print("Website: %s/wiki/hachoir-grep" % hachoir.core.WEBSITE)
-    sys.exit(0)
 
 def countChildren(field_set):
     count = 0
