@@ -1,12 +1,13 @@
 TODO list
 =========
 
+* Fix hachoir-subfile: hachoir.regex only supports Unicode?
 * Write more tests:
 
   - use coverage to check which parsers are never tested
   - write tests for hachoir-subfile
 
-* Fix hachoir-subfile: hachoir.regex only supports Unicode?
+* Rewrite test_parser and test_metadata as classic unit tests (TestCase API)
 * Rename Dict.iteritems()
 * wxPython doesn't support Python3 on Fedora
 * run flake8

@@ -18,9 +18,14 @@ from datetime import date, timedelta, datetime
 from locale import setlocale, LC_ALL
 import os
 import sys
+import unittest
+
+DATADIR = os.path.join(os.path.dirname(__file__), 'files')
+VERBOSE = False
 
 def checkAttr(metadata, name, value):
-    sys.stdout.write("  - Check metadata %s=%s: " % (name, repr(value)))
+    if VERBOSE:
+        sys.stdout.write("  - Check metadata %s=%s: " % (name, repr(value)))
 
     if not isinstance(value, (list, tuple)):
         value = [value]
@@ -29,13 +34,15 @@ def checkAttr(metadata, name, value):
     if "/" in name:
         group, name = name.split("/", 1)
         if group not in metadata:
-            sys.stdout.write("no group \"%s\"!\n" % group)
+            if VERBOSE:
+                sys.stdout.write("no group \"%s\"!\n" % group)
             return False
         metadata = metadata[group]
 
     # Has asked attribute?
     if not metadata.has(name):
-        sys.stdout.write("no attribute \"%s\"!\n" % name)
+        if VERBOSE:
+            sys.stdout.write("no attribute \"%s\"!\n" % name)
         return False
 
     # Read value
@@ -43,8 +50,9 @@ def checkAttr(metadata, name, value):
 
     # Check value
     if len(reads) != len(value):
-        sys.stdout.write("wrong len (%s instead of %s)!\n"
-            % (len(reads), len(value)))
+        if VERBOSE:
+            sys.stdout.write("wrong len (%s instead of %s)!\n"
+                % (len(reads), len(value)))
         return False
     values = value
     for index, value in enumerate(values):
@@ -53,16 +61,19 @@ def checkAttr(metadata, name, value):
         # Check type
         if type(read) != type(value) \
         and not(isinstance(value, int) and isinstance(value, int)):
-            sys.stdout.write("wrong type (%s instead of %s)!\n"
-                % (type(read).__name__, type(value).__name__))
+            if VERBOSE:
+                sys.stdout.write("wrong type (%s instead of %s)!\n"
+                    % (type(read).__name__, type(value).__name__))
             return False
 
         # Check value
         if value != read:
-            sys.stdout.write("wrong value %s (%r instead of %r)!\n"
-                % (index, read, value))
+            if VERBOSE:
+                sys.stdout.write("wrong value %s (%r instead of %r)!\n"
+                    % (index, read, value))
             return False
-    sys.stdout.write("ok\n")
+    if VERBOSE:
+        sys.stdout.write("ok\n")
     return True
 
 def checkLogoUbuntuMeta(metadata): return (
@@ -359,72 +370,6 @@ def checkQuicktime(meta): return (
     checkAttr(meta, 'mime_type', 'video/mp4'),
 )
 
-def checkFile(filename, check_metadata, quality=1.0):
-    sys.stdout.write("  - Create parser: ")
-    sys.stdout.flush()
-    try:
-        parser = createParser(filename)
-    except InputStreamError as err:
-        sys.stdout.write("stream error! %s\n" % str(err))
-        sys.exit(1)
-    if not parser:
-        sys.stdout.write("unable to create parser\n")
-        return False
-    sys.stdout.write("ok\n")
-
-    sys.stdout.write("  - Create metadata: ")
-    sys.stdout.flush()
-    try:
-        metadata = extractMetadata(parser, quality)
-    except Exception as err:
-        sys.stdout.write("stream error! %s\n" % str(err))
-        sys.exit(1)
-    if not metadata:
-        sys.stdout.write("unable to create parser\n")
-        return False
-    sys.stdout.write("ok\n")
-
-    return all(check_metadata(metadata))
-
-def testFiles(directory):
-    if not os.path.exists(directory):
-        try:
-            os.mkdir(directory)
-        except OSError:
-             print("Unable to create directory: %s" % directory)
-             return False
-
-    for filename, check_metadata in testcase_files:
-        fullname = os.path.join(directory, filename)
-        try:
-            os.stat(fullname)
-        except OSError:
-            print("[!] Error: file %s is missing, " \
-                "use script %s to fix your testcase" \
-                % (filename, DOWNLOAD_SCRIPT), file=sys.stderr)
-            return False
-        print("[+] Test %s:" % filename)
-        if not checkFile(fullname, check_metadata):
-            return False
-    return True
-
-def main():
-    directory = os.path.join(os.path.dirname(__file__), 'files')
-    print("Test hachoir-metadata using testcase.")
-    print()
-    print("Testcase is in directory: %s" % directory)
-    ok = testFiles(directory)
-    if ok:
-        print()
-        print("Result: ok for the %s files" % len(testcase_files))
-        sys.exit(0)
-    else:
-        print()
-        for index in range(3):
-            print("!!! ERROR !!!")
-        print()
-        sys.exit(1)
-
 testcase_files = (
     ("logo-kubuntu.png", checkLogoUbuntuMeta),
     ("kde_click.wav", checkClickMeta),
@@ -464,7 +409,39 @@ testcase_files = (
     ("quicktime.mp4", checkQuicktime),
 )
 
+
+class TestMetadata(unittest.TestCase):
+    def check_file(self, filename, check_metadata, quality=1.0, verbose=False):
+        if verbose:
+            print("[+] Test %s:" % filename)
+            sys.stdout.write("  - Create parser: ")
+            sys.stdout.flush()
+
+        parser = createParser(filename)
+        if not parser:
+            self.fail("unable to create parser\n")
+
+        if verbose:
+            sys.stdout.write("ok\n")
+            sys.stdout.write("  - Create metadata: ")
+            sys.stdout.flush()
+
+        metadata = extractMetadata(parser, quality)
+        if not metadata:
+            self.fail("unable to create parser\n")
+
+        if verbose:
+            sys.stdout.write("ok\n")
+
+        if not all(check_metadata(metadata)):
+            self.fail("error")
+
+    def test_files(self):
+        for filename, check_metadata in testcase_files:
+            fullname = os.path.join(DATADIR, filename)
+            self.check_file(fullname, check_metadata)
+
 if __name__ == "__main__":
     setlocale(LC_ALL, "C")
-    main()
+    unittest.main()
 

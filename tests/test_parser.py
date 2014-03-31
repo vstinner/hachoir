@@ -17,79 +17,100 @@ from datetime import datetime
 import random
 import os
 import sys
+import unittest
+
+DATADIR = os.path.join(os.path.dirname(__file__), 'files')
+VERBOSE = False
 
 ###########################################################################
 
 def checkValue(parser, path, value):
-    sys.stdout.write("  - Check field %s.value=%s (%s): "
-        % (path, repr(value), value.__class__.__name__))
-    sys.stdout.flush()
+    if VERBOSE:
+        sys.stdout.write("  - Check field %s.value=%s (%s): "
+            % (path, repr(value), value.__class__.__name__))
+        sys.stdout.flush()
     try:
         read = parser[path].value
         if read == value:
-            sys.stdout.write("ok\n")
+            if VERBOSE:
+                sys.stdout.write("ok\n")
             return True
         else:
-            sys.stdout.write("wrong value (%s, %s)\n"
-                % (repr(read), read.__class__.__name__))
+            if VERBOSE:
+                sys.stdout.write("wrong value (%s, %s)\n"
+                    % (repr(read), read.__class__.__name__))
             return False
     except FieldError as err:
-        sys.stdout.write("field error: %s\n" % str(err))
+        if VERBOSE:
+            sys.stdout.write("field error: %s\n" % str(err))
         return False
 
 def checkDisplay(parser, path, value):
-    sys.stdout.write("  - Check field %s.display=%s (%s): "
-        % (path, repr(value), value.__class__.__name__))
-    sys.stdout.flush()
+    if VERBOSE:
+        sys.stdout.write("  - Check field %s.display=%s (%s): "
+            % (path, repr(value), value.__class__.__name__))
+        sys.stdout.flush()
     try:
         read = parser[path].display
         if read == value:
-            sys.stdout.write("ok\n")
+            if VERBOSE:
+                sys.stdout.write("ok\n")
             return True
         else:
-            sys.stdout.write("wrong value (%s, %s)\n"
-                % (repr(read), read.__class__.__name__))
+            if VERBOSE:
+                sys.stdout.write("wrong value (%s, %s)\n"
+                    % (repr(read), read.__class__.__name__))
             return False
     except FieldError as err:
-        sys.stdout.write("field error: %s\n" % str(err))
+        if VERBOSE:
+            sys.stdout.write("field error: %s\n" % str(err))
         return False
 
 def checkDesc(parser, path, value):
-    sys.stdout.write("  - Check field %s.description=%s (%s): "
-        % (path, repr(value), value.__class__.__name__))
-    sys.stdout.flush()
+    if VERBOSE:
+        sys.stdout.write("  - Check field %s.description=%s (%s): "
+            % (path, repr(value), value.__class__.__name__))
+        sys.stdout.flush()
     try:
         read = parser[path].description
         if read == value:
-            sys.stdout.write("ok\n")
+            if VERBOSE:
+                sys.stdout.write("ok\n")
             return True
         else:
-            sys.stdout.write("wrong value (%s, %s)\n"
-                % (repr(read), read.__class__.__name__))
+            if VERBOSE:
+                sys.stdout.write("wrong value (%s, %s)\n"
+                    % (repr(read), read.__class__.__name__))
             return False
     except FieldError as err:
-        sys.stdout.write("field error: %s\n" % str(err))
+        if VERBOSE:
+            sys.stdout.write("field error: %s\n" % str(err))
         return False
 
 def checkNames(parser, path, names):
-    sys.stdout.write("  - Check field names %s=(%s) (%u): "
-        % (path, ", ".join(names), len(names)))
-    sys.stdout.flush()
+    if VERBOSE:
+        sys.stdout.write("  - Check field names %s=(%s) (%u): "
+            % (path, ", ".join(names), len(names)))
+        sys.stdout.flush()
     try:
         fieldset = parser[path]
         if len(fieldset) != len(names):
-            sys.stdout.write("invalid length (%u)\n" % len(fieldset))
+            if VERBOSE:
+                sys.stdout.write("invalid length (%u)\n" % len(fieldset))
             return False
         names = list(names)
         read = list(field.name for field in fieldset)
         if names != read:
-            sys.stdout.write("wrong names (%s)\n" % ", ".join(read))
+            if VERBOSE:
+                sys.stdout.write("wrong names (%s)\n" % ", ".join(read))
             return True
         else:
-            sys.stdout.write("ok\n")
+            if VERBOSE:
+                sys.stdout.write("ok\n")
             return True
     except FieldError as err:
-        sys.stdout.write("field error: %s\n" % str(err))
+        if VERBOSE:
+            sys.stdout.write("field error: %s\n" % str(err))
         return False
 
 ###########################################################################
@@ -469,91 +490,6 @@ def checkNds(parser): return (
     checkValue(parser, "/file[1]", b"Hello from file2.txt\n\n"),
 )
 
-def checkFile(filename, check_parser):
-    sys.stdout.write("  - Create parser: ")
-    sys.stdout.flush()
-    try:
-        parser = createParser(filename)
-    except InputStreamError as err:
-        sys.stdout.write("stream error! %s\n" % str(err))
-        sys.exit(1)
-    if not parser:
-        sys.stdout.write("unable to create parser\n")
-        return False
-    sys.stdout.write("ok\n")
-    return all(check_parser(parser))
-
-def testFiles(directory):
-    if not os.path.exists(directory):
-        try:
-            os.mkdir(directory)
-        except OSError:
-             print("Unable to create directory: %s" % directory)
-             return False
-
-    for filename, check_parser in testcase_files:
-        fullname = os.path.join(directory, filename)
-        try:
-            os.stat(fullname)
-        except OSError:
-            print("[!] Error: file %s is missing" % filename, file=sys.stderr)
-            return False
-
-        print("[+] Test %s:" % filename)
-        if not checkFile(fullname, check_parser):
-            return False
-    return True
-
-
-def testRandom(seed=0, tests=(1,8)):
-    random.seed(seed)
-    a = array('L')
-    parser_list = HachoirParserList()
-    n = max(tests) * max(parser.getParserTags()["min_size"] for parser in parser_list)
-    k = 8 * a.itemsize
-    for i in range((n - 1) // k + 1):
-        a.append(random.getrandbits(k))
-    a = StringInputStream(a.tostring(), source="<random data>")
-    ok = True
-    for parser in parser_list:
-        size = parser.getParserTags()["min_size"]
-        for test in tests:
-            a._size = a._current_size = size * test
-            try:
-                parser(a, validate=True)
-                error("[%s] Parser didn't reject random data" % parser.__name__)
-            except ValidateError:
-                continue
-            except Exception as err:
-                error("[%s] %s" % (parser.__name__, err))
-            ok = False
-    return ok
-
-
-def main():
-    directory = os.path.join(os.path.dirname(__file__), 'files')
-    print("Test hachoir-parser using random data.")
-    print()
-    if not testRandom():
-        print()
-        print("If you are really sure there is no error in your code," \
-              " increment the 'seed' parameter of testRandom.")
-        sys.exit(1)
-    print("Result: ok")
-
-    print()
-    print("Test hachoir-parser using testcase.")
-    print()
-    print("Testcase is in directory: %s" % directory)
-    if not testFiles(directory):
-        print()
-        for index in range(3):
-            print("!!! ERROR !!!")
-        print()
-        sys.exit(1)
-    print()
-    print("Result: ok for the %s files" % len(testcase_files))
-
 testcase_files = (
     ("yellowdude.3ds", checkYellowdude),
     ("logo-kubuntu.png", checkLogoUbuntu),
@@ -631,8 +567,50 @@ testcase_files = (
     ("nitrodir.nds", checkNds),
 )
 
+class TestParsers(unittest.TestCase):
+    def testRandom(self, tests=(1, 8)):
+        a = array('L')
+        parser_list = HachoirParserList()
+        n = max(tests) * max(parser.getParserTags()["min_size"] for parser in parser_list)
+        k = 8 * a.itemsize
+        for i in range((n - 1) // k + 1):
+            a.append(random.getrandbits(k))
+        a = StringInputStream(a.tobytes(), source="<random data>")
+        for parser in parser_list:
+            size = parser.getParserTags()["min_size"]
+            for test in tests:
+                a._size = a._current_size = size * test
+                try:
+                    parser(a, validate=True)
+                    error("[%s] Parser didn't reject random data" % parser.__name__)
+                except ValidateError:
+                    continue
+
+    def check_file(self, filename, check_parser, verbose=False):
+        if verbose:
+            print("[+] Test %s:" % filename)
+            sys.stdout.write("  - Create parser: ")
+            sys.stdout.flush()
+        try:
+            parser = createParser(filename)
+        except InputStreamError as err:
+            sys.stdout.write("stream error! %s\n" % str(err))
+            sys.exit(1)
+        if not parser:
+            self.fail("unable to create parser\n")
+            return False
+        if verbose:
+            sys.stdout.write("ok\n")
+        if not all(check_parser(parser)):
+            self.fail("test failed")
+
+    def test_files(self):
+        for filename, check_parser in testcase_files:
+            fullname = os.path.join(DATADIR, filename)
+            self.check_file(fullname, check_parser)
+
 if __name__ == "__main__":
     from locale import setlocale, LC_ALL
     setlocale(LC_ALL, "C")
-    main()
+    unittest.main()
 

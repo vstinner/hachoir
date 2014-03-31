@@ -1,22 +1,11 @@
 #!/usr/bin/env python3
 import doctest
-import sys
-import os
 import hachoir.core.i18n   # import it because it does change the locale
+import os
+import sys
+import unittest
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), '..'))
-
-def testDoc(filename, subdir=None, name=None):
-    print("--- %s: Run tests" % filename)
-    if not subdir:
-        fullpath = os.path.join('..', 'doc', filename)
-    else:
-        fullpath = os.path.join(subdir, filename)
-    failure, nb_test = doctest.testfile(
-        fullpath, optionflags=doctest.ELLIPSIS, name=name)
-    if failure:
-        sys.exit(1)
-    print("--- %s: End of tests" % filename)
 
 def importModule(name):
     mod = __import__(name)
@@ -25,39 +14,52 @@ def importModule(name):
         mod = getattr(mod, comp)
     return mod
 
-def testModule(name):
-    print("--- Test module %s" % name)
-    module = importModule(name)
-    failure, nb_test = doctest.testmod(module)
-    if failure:
-        sys.exit(1)
-    print("--- End of test")
+class TestDoc(unittest.TestCase):
+    def check_doc(self, filename, subdir=None, name=None, verbose=False):
+        if verbose:
+            print("--- %s: Run tests" % filename)
+        if not subdir:
+            fullpath = os.path.join('..', 'doc', filename)
+        else:
+            fullpath = os.path.join(subdir, filename)
+        failure, nb_test = doctest.testfile(
+            fullpath, optionflags=doctest.ELLIPSIS, name=name)
+        if failure:
+            self.fail("error")
+        if verbose:
+            print("--- %s: End of tests" % filename)
 
-def main():
-    # Test documentation in doc/*.rst files
-    testDoc('api.rst')
-    testDoc('internals.rst')
+    def check_module(self, name, verbose=False):
+        if verbose:
+            print("--- Test module %s" % name)
+        module = importModule(name)
+        failure, nb_test = doctest.testmod(module)
+        if failure:
+            self.fail("error")
+        if verbose:
+            print("--- End of test")
 
-    # Test documentation in doc/*.rst files
-    #testDoc('README')
-    testDoc('regex.rst')
-    testDoc('regex_regression.rst', subdir='.')
+    def test_doc_directory(self):
+        self.check_doc('api.rst')
+        self.check_doc('internals.rst')
+        self.check_doc('regex_api.rst')
 
-    # Test documentation of some functions/classes
-    testModule("hachoir.core.bits")
-    testModule("hachoir.core.dict")
-    testModule("hachoir.core.i18n")
-    testModule("hachoir.core.text_handler")
-    testModule("hachoir.core.tools")
+    def test_tests_directory(self):
+        self.check_doc('regex_regression.rst', subdir='.')
 
-    # Test documentation of some functions/classes
-    testModule("hachoir.metadata.metadata")
-    testModule("hachoir.metadata.setter")
+    def test_modules(self):
+        self.check_module("hachoir.core.bits")
+        self.check_module("hachoir.core.dict")
+        self.check_module("hachoir.core.i18n")
+        self.check_module("hachoir.core.text_handler")
+        self.check_module("hachoir.core.tools")
 
-    # Test hachoir.regex
-    testModule("hachoir.regex.parser")
-    testModule("hachoir.regex.regex")
-    testModule("hachoir.regex.pattern")
+        self.check_module("hachoir.metadata.metadata")
+        self.check_module("hachoir.metadata.setter")
+
+        self.check_module("hachoir.regex.parser")
+        self.check_module("hachoir.regex.regex")
+        self.check_module("hachoir.regex.pattern")
 
 if __name__ == "__main__":
     from locale import setlocale, LC_ALL
@@ -69,4 +71,4 @@ if __name__ == "__main__":
     import hachoir.core.config as config
     config.use_i18n = False
 
-    main()
+    unittest.main()
