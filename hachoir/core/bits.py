@@ -157,34 +157,26 @@ def long2raw(value, endian, size=None):
     If size is given, add nul bytes to fill to size bytes.
 
     >>> long2raw(0x1219, BIG_ENDIAN)
-    '\x12\x19'
+    b'\x12\x19'
     >>> long2raw(0x1219, BIG_ENDIAN, 4)   # 32 bits
-    '\x00\x00\x12\x19'
+    b'\x00\x00\x12\x19'
     >>> long2raw(0x1219, LITTLE_ENDIAN, 4)   # 32 bits
-    '\x19\x12\x00\x00'
+    b'\x19\x12\x00\x00'
     """
     assert (not size and 0 < value) or (0 <= value)
-    assert endian in (LITTLE_ENDIAN, BIG_ENDIAN, MIDDLE_ENDIAN)
+    assert endian in (LITTLE_ENDIAN, BIG_ENDIAN)
     text = []
     while (value != 0 or text == ""):
         byte = value % 256
-        text.append( chr(byte) )
+        text.append(byte)
         value >>= 8
     if size:
         need = max(size - len(text), 0)
-    else:
-        need = 0
-    if need:
-        if endian is LITTLE_ENDIAN:
-            text = chain(text, repeat("\0", need))
-        else:
-            text = chain(repeat("\0", need), reversed(text))
-    else:
-        if endian is not LITTLE_ENDIAN:
-            text = reversed(text)
-    if endian is MIDDLE_ENDIAN:
-        text = arrswapmid(text)
-    return "".join(text)
+        for i in range(need):
+            text.append(0)
+    if endian == BIG_ENDIAN:
+        text = reversed(text)
+    return bytes(text)
 
 def long2bin(size, value, endian, classic_mode=False):
     """
