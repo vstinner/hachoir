@@ -8,6 +8,7 @@ from hachoir.parser import createParser
 from hachoir.core.language import Language
 from hachoir.metadata import extractMetadata
 from hachoir.metadata.timezone import createTimezone
+from hachoir.test import setup_tests
 from datetime import date, timedelta, datetime
 import os
 import sys
@@ -399,10 +400,6 @@ class TestMetadata(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    from hachoir.core import config
-    from locale import setlocale, LC_ALL
-    config.use_i18n = False  # Don't use i18n
-    config.quiet = True      # Don't display warnings
-    setlocale(LC_ALL, "C")
+    setup_tests()
     unittest.main()
 

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-import os.path
-import unittest
+from hachoir.test import setup_tests
 import hashlib
-import sys
+import os.path
 import subprocess
+import sys
+import unittest
 
 DATADIR = os.path.join(os.path.dirname(__file__), "files")
 KDE_CLICK = os.path.join(DATADIR, 'kde_click.wav')
@@ -40,5 +41,6 @@ class TestStripCommandLine(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    setup_tests()
     unittest.main()
 

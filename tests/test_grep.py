@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from hachoir.grep import Grep
 from hachoir.parser import createParser
+from hachoir.test import setup_tests
 import os.path
 import subprocess
 import sys
@@ -51,5 +52,6 @@ class TestGrepCommandLine(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    setup_tests()
     unittest.main()
 

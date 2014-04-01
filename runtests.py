@@ -28,6 +28,7 @@ import os
 import re
 import sys
 import textwrap
+from hachoir.test import setup_tests
 try:
     import coverage
 except ImportError:
@@ -204,6 +205,8 @@ class TestRunner(unittest.TextTestRunner):
 
 
 def runtests():
+    setup_tests()
+
     args, commands = ARGS.parse_args()
 
     if args.coverage and coverage is None:

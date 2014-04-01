@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import doctest
 import hachoir.core.i18n   # import it because it does change the locale
+from hachoir.test import setup_tests
 import os
 import sys
 import unittest
@@ -62,13 +63,5 @@ class TestDoc(unittest.TestCase):
         self.check_module("hachoir.regex.pattern")
 
 if __name__ == "__main__":
-    from locale import setlocale, LC_ALL
-    setlocale(LC_ALL, "C")
-
-    sys.path.append(ROOT)
-
-    # Configure Hachoir for tests
-    import hachoir.core.config as config
-    config.use_i18n = False
-
+    setup_tests()
     unittest.main()

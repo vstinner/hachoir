@@ -7,6 +7,7 @@ from hachoir.core.field import FieldError
 from hachoir.core.error import error
 from hachoir.core.stream import InputStreamError, StringInputStream
 from hachoir.parser import createParser, HachoirParserList, ValidateError
+from hachoir.test import setup_tests
 from array import array
 from datetime import datetime
 import random
@@ -501,11 +502,6 @@ class TestParserRandomStream(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # Configure Hachoir
-    from hachoir.core import config
-    config.use_i18n = False  # Don't use i18n
-    config.quiet = True      # Don't display warnings
-    from locale import setlocale, LC_ALL
-    setlocale(LC_ALL, "C")
+    setup_tests()
     unittest.main()
 
