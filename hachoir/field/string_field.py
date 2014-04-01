@@ -235,7 +235,7 @@ class GenericString(Bytes):
         except UnicodeDecodeError as err:
             pass
 
-        #--- Conversion error ---
+        # --- Conversion error ---
 
         # Fix truncated UTF-16 string like 'B\0e' (3 bytes)
         # => Add missing nul byte: 'B\0e\0' (4 bytes)

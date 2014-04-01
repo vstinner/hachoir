@@ -644,8 +644,8 @@ def exploreFieldSet(field_set, args, options={}):
                             resize = log.height + 1
                         elif e == 'q':
                             return
-                #except AssertionError:
-                #    hachoir_log.error(getBacktrace())
+                # except AssertionError:
+                #     hachoir_log.error(getBacktrace())
                 except NewTab_Stream as e:
                     stream = e.field.getSubIStream()
                     logger.objects[stream] = e = "%u/%s" % (body.active, e.field.absolute_address)

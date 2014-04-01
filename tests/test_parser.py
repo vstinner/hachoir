@@ -174,7 +174,7 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "new_sub_block[1]/crc32", 0x34528E23)
         self.checkValue(parser, "file[1]/filename", ".svn\prop-base\README.svn-base")
         self.checkValue(parser, "new_sub_block[1]/filename", 'ACL')
-        #archive_end bad candidate for checking
+        # archive_end bad candidate for checking
         self.checkValue(parser, "new_sub_block[362]/crc32", 0x6C84C95E)
 
     def test_ace(self):
@@ -183,8 +183,8 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "file[0]/reserved", 0x4554)
         self.checkValue(parser, "file[1]/filename", "hachoir_core\.svn")
         self.checkValue(parser, "file[2]/parameters", 0x000A)
-        #End of archive, lots of work...
-        #self.checkValue(parser, "new_recovery[0]/signature", "**ACE**")
+        # End of archive, lots of work...
+        # self.checkValue(parser, "new_recovery[0]/signature", "**ACE**")
 
     def test_bmp(self):
         parser = self.parse("kde_haypo_corner.bmp")

@@ -1,6 +1,6 @@
 import gc
 
-#---- Default implementation when resource is missing ----------------------
+# ---- Default implementation when resource is missing ----------------------
 PAGE_SIZE = 4096
 
 
@@ -42,10 +42,10 @@ def clearCaches():
     Try to clear all caches: call gc.collect() (Python garbage collector).
     """
     gc.collect()
-    #import re; re.purge()
+    # import re; re.purge()
 
 try:
-#---- 'resource' implementation ---------------------------------------------
+# ---- 'resource' implementation ---------------------------------------------
     from resource import getpagesize, getrlimit, setrlimit, RLIMIT_AS
 
     PAGE_SIZE = getpagesize()

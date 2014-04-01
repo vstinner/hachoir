@@ -202,7 +202,7 @@ class EditableFieldSet(object):
         Compute relative address of a field. The operation takes care of
         deleted and resized fields.
         """
-        #assert name not in self._deleted
+        # assert name not in self._deleted
         addr = 0
         for field in self:
             if field.name == name:
