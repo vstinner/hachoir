@@ -7,7 +7,6 @@ TODO list
   - use coverage to check which parsers are never tested
   - write tests for hachoir-subfile
 
-* Rewrite test_parser and test_metadata as classic unit tests (TestCase API)
 * Rename Dict.iteritems()
 * wxPython doesn't support Python3 on Fedora
 * run flake8
@@ -17,3 +16,4 @@ TODO list
 * test hachoir-gtk
 * test hachoir-http
 * convert remaining wiki pages
+* runtests.py: unclosed files ; reference cycle somewhere
