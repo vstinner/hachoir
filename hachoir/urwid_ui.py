@@ -1,13 +1,23 @@
 from hachoir.core.i18n import getTerminalCharset
-from hachoir.field import Field, MissingField
 from hachoir.core.tools import humanFilesize, humanBitSize, makePrintable
 from hachoir.core.log import log as hachoir_log
-from hachoir.stream import InputFieldStream
+from hachoir.core.cmd_line import (getHachoirOptions,
+    configureHachoir)
+from hachoir.core.cmd_line import displayVersion
+
+from hachoir.field import Field, MissingField
+from hachoir.stream import InputFieldStream, InputStreamError, FileInputStream
 from hachoir.parser import guessParser
-from urwid import AttrWrap, BoxAdapter, BoxWidget, CanvasJoin, Edit, Frame, ListBox, Pile, Text
+from hachoir.parser import guessParser, HachoirParserList
+from hachoir.version import VERSION, WEBSITE
+from urwid import (AttrWrap, BoxAdapter, BoxWidget, CanvasJoin, Edit, Frame,
+                   ListBox, Pile, Text)
 from shutil import copyfileobj
 from weakref import WeakKeyDictionary
-import os, urwid.curses_display
+from optparse import OptionGroup, OptionParser
+import os
+import sys
+import urwid.curses_display
 
 try:
     from urwid import __version__ as urwid_ver
@@ -703,3 +713,83 @@ def exploreFieldSet(field_set, args, options={}):
         if pending:
             print("\nPending messages:\n" + '\n'.join(pending))
         raise
+
+
+def displayParserList(*args):
+    HachoirParserList().print_()
+    sys.exit(0)
+
+def parseOptions():
+    parser = OptionParser(usage="%prog [options] filename")
+
+    common = OptionGroup(parser, "Urwid", "Option of urwid explorer")
+    common.add_option("--preload", help="Number of fields to preload at each read",
+        type="int", action="store", default=15)
+    common.add_option("--path", help="Initial path to focus on",
+        type="str", action="store", default=None)
+    common.add_option("--parser", help="Use the specified parser (use its identifier)",
+        type="str", action="store", default=None)
+    common.add_option("--offset", help="Skip first bytes of input file",
+        type="long", action="store", default=0)
+    common.add_option("--parser-list",help="List all parsers then exit",
+        action="callback", callback=displayParserList)
+    common.add_option("--profiler", help="Run profiler",
+        action="store_true", default=False)
+    common.add_option("--profile-display", help="Force update of the screen beetween each event",
+        action="store_true", default=False)
+    common.add_option("--size", help="Maximum size of bytes of input file",
+        type="long", action="store", default=None)
+    common.add_option("--hide-value", dest="display_value", help="Don't display value",
+        action="store_false", default=True)
+    common.add_option("--hide-size", dest="display_size", help="Don't display size",
+        action="store_false", default=True)
+    common.add_option("--version", help="Display version and exit",
+        action="callback", callback=displayVersion)
+    parser.add_option_group(common)
+
+    hachoir = getHachoirOptions(parser)
+    parser.add_option_group(hachoir)
+
+    values, arguments = parser.parse_args()
+    if len(arguments) != 1:
+        parser.print_help()
+        sys.exit(1)
+    return values, arguments[0]
+
+def profile(func, *args):
+    from hachoir.core.profiler import runProfiler
+    runProfiler(func, args)
+
+def openParser(parser_id, filename, offset, size):
+    tags = []
+    if parser_id:
+        tags += [ ("id", parser_id), None ]
+    try:
+        stream = FileInputStream(filename,
+                                 offset=offset, size=size, tags=tags)
+    except InputStreamError as err:
+        return None, "Unable to open file: %s" % err
+    parser = guessParser(stream)
+    if not parser:
+        return None, "Unable to parse file: %s" % filename
+    return parser, None
+
+def main():
+    # Parser options and initialize Hachoir
+    values, filename = parseOptions()
+    configureHachoir(values)
+
+    # Open file and create parser
+    parser, err = openParser(values.parser, filename, values.offset, values.size)
+    if err:
+        print(err)
+        sys.exit(1)
+
+    # Explore file
+    if values.profiler:
+        ok = profile(exploreFieldSet, parser, values)
+    else:
+        exploreFieldSet(parser, values, {
+            "display_size": values.display_size,
+            "display_value": values.display_value,
+        })
