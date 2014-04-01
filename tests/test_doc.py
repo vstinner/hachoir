@@ -16,8 +16,10 @@ def importModule(name):
     return mod
 
 class TestDoc(unittest.TestCase):
-    def check_doc(self, filename, subdir=None, name=None, verbose=False):
-        if verbose:
+    verbose = False
+
+    def check_doc(self, filename, subdir=None, name=None):
+        if self.verbose:
             print("--- %s: Run tests" % filename)
         if not subdir:
             fullpath = os.path.join('..', 'doc', filename)
@@ -27,17 +29,17 @@ class TestDoc(unittest.TestCase):
             fullpath, optionflags=doctest.ELLIPSIS, name=name)
         if failure:
             self.fail("error")
-        if verbose:
+        if self.verbose:
             print("--- %s: End of tests" % filename)
 
-    def check_module(self, name, verbose=False):
-        if verbose:
+    def check_module(self, name):
+        if self.verbose:
             print("--- Test module %s" % name)
         module = importModule(name)
         failure, nb_test = doctest.testmod(module)
         if failure:
             self.fail("error")
-        if verbose:
+        if self.verbose:
             print("--- End of test")
 
     def test_doc_directory(self):
