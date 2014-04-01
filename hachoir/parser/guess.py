@@ -6,7 +6,7 @@ Parser list managment:
 import os
 from hachoir.core.error import warning, info
 from hachoir.parser import ValidateError, HachoirParserList
-from hachoir.core.stream import FileInputStream
+from hachoir.stream import FileInputStream
 import weakref
 import collections
 

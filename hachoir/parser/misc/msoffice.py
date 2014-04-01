@@ -15,7 +15,7 @@ from hachoir.field import (SubFile, FieldSet,
     Bits, RawBytes)
 from hachoir.core.text_handler import textHandler, hexadecimal
 from hachoir.parser.misc.ole2_util import OLE2FragmentParser, RawParser
-from hachoir.core.stream import StringInputStream
+from hachoir.stream import StringInputStream
 from hachoir.parser.misc.msoffice_summary import Summary, CompObj
 from hachoir.parser.misc.word_doc import WordDocumentParser, WordTableParser
 

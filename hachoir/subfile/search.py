@@ -1,5 +1,5 @@
 from hachoir.core.error import error
-from hachoir.core.stream import InputSubStream
+from hachoir.stream import InputSubStream
 from hachoir.core.tools import humanFilesize, humanDuration
 from hachoir.core.memory import limitedMemory
 from hachoir.subfile.data_rate import DataRate

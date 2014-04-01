@@ -2,7 +2,7 @@ from hachoir.core.i18n import getTerminalCharset
 from hachoir.field import Field, MissingField
 from hachoir.core.tools import humanFilesize, humanBitSize, makePrintable
 from hachoir.core.log import log as hachoir_log
-from hachoir.core.stream import InputFieldStream
+from hachoir.stream import InputFieldStream
 from hachoir.parser import guessParser
 from urwid import AttrWrap, BoxAdapter, BoxWidget, CanvasJoin, Edit, Frame, ListBox, Pile, Text
 from shutil import copyfileobj

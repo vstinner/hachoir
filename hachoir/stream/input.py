@@ -6,7 +6,7 @@ from hachoir.core.tools import lowerBound
 from hachoir.core.tools import alignValue
 from errno import ESPIPE
 from weakref import ref as weakref_ref
-from hachoir.core.stream import StreamError
+from hachoir.stream import StreamError
 
 class InputStreamError(StreamError):
     pass

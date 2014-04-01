@@ -17,7 +17,7 @@ from hachoir.field import (FieldSet, ParserError,
     NullBits, RawBytes)
 from hachoir.parser.image.common import PaletteRGB
 from hachoir.core.endian import LITTLE_ENDIAN
-from hachoir.core.stream import StringInputStream
+from hachoir.stream import StringInputStream
 from hachoir.core.tools import humanDuration, paddingSize
 from hachoir.core.text_handler import textHandler, displayHandler, hexadecimal
 

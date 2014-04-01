@@ -15,7 +15,7 @@ from hachoir.parser.audio.id3 import ID3v1, ID3v2
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.core.tools import humanFrequency, humanBitSize
 from hachoir.core.bits import long2raw
-from hachoir.core.stream import InputStreamError
+from hachoir.stream import InputStreamError
 
 # Max MP3 filesize: 200 MB
 MAX_FILESIZE = 200*1024*1024*8

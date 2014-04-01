@@ -2,7 +2,7 @@ from os import path
 from os.path import basename
 from random import randint
 from tools import getFilesize, generateUniqueID
-from hachoir.core.stream import InputIOStream, InputStreamError
+from hachoir.stream import InputIOStream, InputStreamError
 from hachoir.metadata import extractMetadata
 from hachoir.parser import guessParser
 from io import StringIO

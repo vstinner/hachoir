@@ -1,4 +1,4 @@
-from hachoir.core.stream import FileOutputStream, StreamError
+from hachoir.stream import FileOutputStream, StreamError
 from hachoir.core.error import error
 from errno import EEXIST
 from os import mkdir, path

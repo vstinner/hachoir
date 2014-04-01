@@ -2,7 +2,7 @@
 Parent of all (field) classes in Hachoir: Field.
 """
 
-from hachoir.core.stream import InputFieldStream
+from hachoir.stream import InputFieldStream
 from hachoir.core.log import Logger
 from hachoir.core.tools import makePrintable
 from weakref import ref as weakref_ref

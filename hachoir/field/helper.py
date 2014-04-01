@@ -3,7 +3,7 @@ from hachoir.field import (FieldError,
     PaddingBits, PaddingBytes,
     NullBits, NullBytes,
     GenericString, GenericInteger)
-from hachoir.core.stream import FileOutputStream
+from hachoir.stream import FileOutputStream
 
 def createRawField(parent, size, name="raw[]", description=None):
     if size <= 0:

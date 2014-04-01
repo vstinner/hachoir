@@ -20,8 +20,8 @@ import cgitb; cgitb.enable()
 
 from hachoir.core.tools import alignValue
 from hachoir.field import Field, SubFile
-from hachoir.core.stream import FileInputStream, StringInputStream
-from hachoir.core.stream.input import FileFromInputStream, InputSubStream
+from hachoir.stream import FileInputStream, StringInputStream
+from hachoir.stream.input import FileFromInputStream, InputSubStream
 from hachoir.parser.guess import guessParser
 
 # from http://code.activestate.com/recipes/273844/

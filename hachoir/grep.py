@@ -4,7 +4,7 @@ from hachoir.core.cmd_line import (getHachoirOptions,
 from hachoir.field import isString
 from hachoir.core.benchmark import Benchmark
 from hachoir.core.error import error
-from hachoir.core.stream import InputStreamError
+from hachoir.stream import InputStreamError
 from hachoir.core.tools import makePrintable
 from hachoir.parser import createParser
 from hachoir.core.cmd_line import displayVersion

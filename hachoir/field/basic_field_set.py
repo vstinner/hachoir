@@ -1,5 +1,5 @@
 from hachoir.field import Field, FieldError
-from hachoir.core.stream import InputStream
+from hachoir.stream import InputStream
 from hachoir.core.endian import BIG_ENDIAN, LITTLE_ENDIAN, MIDDLE_ENDIAN
 from hachoir.core.event_handler import EventHandler
 

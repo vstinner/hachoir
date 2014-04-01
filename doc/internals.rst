@@ -29,7 +29,7 @@ constructor, one or more fields will be created. Example:
 In the constructor, the field "color" is asked. So the field list will
 contains one field (color):
 
->>> from hachoir.core.stream import StringInputStream
+>>> from hachoir.stream import StringInputStream
 >>> stream = StringInputStream(b"\x2A\x00\x04\x05")
 >>> p = Point(stream)
 >>> p.current_length

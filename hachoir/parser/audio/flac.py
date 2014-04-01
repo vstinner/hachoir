@@ -11,7 +11,7 @@ Creation date: 2008-04-09
 
 from hachoir.parser import Parser
 from hachoir.field import FieldSet, String, Bit, Bits, UInt16, UInt24, RawBytes, Enum, NullBytes
-from hachoir.core.stream import BIG_ENDIAN, LITTLE_ENDIAN
+from hachoir.stream import BIG_ENDIAN, LITTLE_ENDIAN
 from hachoir.core.tools import createDict
 from hachoir.parser.container.ogg import parseVorbisComment
 

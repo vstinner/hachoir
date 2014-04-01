@@ -2,7 +2,7 @@
 
 from hachoir.editor import (createEditor as hachoirCreateEditor,
     NewFieldSet, EditableInteger, EditableString, EditableBytes)
-from hachoir.core.stream import FileOutputStream
+from hachoir.stream import FileOutputStream
 from hachoir.parser import createParser
 from hachoir.parser.image import PngFile
 from hachoir.parser.audio import MpegAudioFile

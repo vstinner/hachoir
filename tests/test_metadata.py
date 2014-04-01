@@ -3,7 +3,7 @@
 Test hachoir-metadata using the testcase.
 """
 
-from hachoir.core.stream import InputStreamError
+from hachoir.stream import InputStreamError
 from hachoir.parser import createParser
 from hachoir.core.language import Language
 from hachoir.metadata import extractMetadata

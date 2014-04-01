@@ -46,7 +46,7 @@ from hachoir.field import (FieldSet,
     Field, Enum, RawBytes)
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.core.tools import createDict, humanDatetime
-from hachoir.core.stream import InputStreamError
+from hachoir.stream import InputStreamError
 from hachoir.core.text_handler import textHandler
 
 # --- Field parser ---

@@ -16,7 +16,7 @@ takes one argument: a Unicode filename. But for practical reasons
 we will use StringInputStream function in this documentation::
 
    >>> data = b"point\0\3\0\2\0"
-   >>> from hachoir.core.stream import StringInputStream, LITTLE_ENDIAN
+   >>> from hachoir.stream import StringInputStream, LITTLE_ENDIAN
    >>> stream = StringInputStream(data)
    >>> stream.source
    '<string>'

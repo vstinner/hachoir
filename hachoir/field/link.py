@@ -1,5 +1,5 @@
 from hachoir.field import Field, FieldSet, ParserError, Bytes, MissingField
-from hachoir.core.stream import FragmentedStream
+from hachoir.stream import FragmentedStream
 import collections
 
 

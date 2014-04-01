@@ -16,7 +16,7 @@ from hachoir.field import (FieldSet, Enum,
 from hachoir.core.text_handler import textHandler, hexadecimal, filesizeHandler
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.tools import paddingSize
-from hachoir.core.stream import StringInputStream
+from hachoir.stream import StringInputStream
 from hachoir.parser.archive.lzx import LZXStream, lzx_decompress
 from hachoir.parser.archive.zlib import DeflateBlock
 

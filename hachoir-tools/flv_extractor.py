@@ -6,7 +6,7 @@ Author: Victor Stinner
 Creation date: 2006-11-06
 """
 from hachoir.parser import createParser
-from hachoir.core.stream import FileOutputStream
+from hachoir.stream import FileOutputStream
 from hachoir.parser.video.flv import AUDIO_CODEC_MP3
 from sys import stderr, exit, argv
 

@@ -22,7 +22,7 @@ from hachoir.field import (FieldSet,
     RawBytes, PaddingBytes,
     Enum)
 from hachoir.core.endian import BIG_ENDIAN
-from hachoir.core.stream import StringInputStream
+from hachoir.stream import StringInputStream
 from hachoir.core.text_handler import textHandler, hexadecimal
 
 class FragmentGroup:

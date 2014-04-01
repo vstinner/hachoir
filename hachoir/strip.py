@@ -9,7 +9,7 @@ Creation: 17 september 2006
 from hachoir.field import MissingField
 from hachoir.editor import (createEditor,
     NewFieldSet, EditableInteger, EditableBytes)
-from hachoir.core.stream import FileOutputStream, StringOutputStream
+from hachoir.stream import FileOutputStream, StringOutputStream
 from hachoir.core.tools import humanFilesize, makePrintable
 from hachoir.core.i18n import getTerminalCharset
 from hachoir.core.cmd_line import displayVersion

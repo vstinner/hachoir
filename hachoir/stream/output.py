@@ -1,7 +1,7 @@
 from io import StringIO
 from hachoir.core.endian import BIG_ENDIAN, LITTLE_ENDIAN
 from hachoir.core.bits import long2raw
-from hachoir.core.stream import StreamError
+from hachoir.stream import StreamError
 from errno import EBADF
 
 MAX_READ_NBYTES = 2 ** 16

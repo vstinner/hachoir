@@ -22,7 +22,7 @@ from hachoir.core.text_handler import textHandler, filesizeHandler
 from hachoir.core.tools import paddingSize, humanFrequency
 from hachoir.parser.image.common import RGB
 from hachoir.parser.image.jpeg import JpegChunk, JpegFile
-from hachoir.core.stream import StringInputStream, ConcatStream
+from hachoir.stream import StringInputStream, ConcatStream
 from hachoir.parser.common.deflate import Deflate, has_deflate
 from hachoir.parser.container.action_script import parseActionScript, parseABC
 import math
