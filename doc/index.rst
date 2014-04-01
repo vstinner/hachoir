@@ -36,6 +36,7 @@ Table Of Contents
    subfile
    grep
    strip
+   contact
    authors
    changelog
 
@@ -43,7 +44,6 @@ Pages:
 
 * [[Ideas|Ideas]] of projects based on Hachoir
 * [[Developer|Developer section]]
-* [[Contact|Contact]]
 * [[Links|Links]]: Links to similar projects and news on other websites about Hachoir
 * [[LegalIssue|Legal issues]]
 * [[Forensics|Forensics]]
