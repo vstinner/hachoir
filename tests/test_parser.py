@@ -3,11 +3,6 @@
 Test hachoir-parser using the testcase.
 """
 
-# Configure Hachoir
-from hachoir.core import config
-config.use_i18n = False  # Don't use i18n
-config.quiet = True      # Don't display warnings
-
 from hachoir.core.field import FieldError
 from hachoir.core.error import error
 from hachoir.core.stream import InputStreamError, StringInputStream
@@ -506,6 +501,10 @@ class TestParserRandomStream(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    # Configure Hachoir
+    from hachoir.core import config
+    config.use_i18n = False  # Don't use i18n
+    config.quiet = True      # Don't display warnings
     from locale import setlocale, LC_ALL
     setlocale(LC_ALL, "C")
     unittest.main()
