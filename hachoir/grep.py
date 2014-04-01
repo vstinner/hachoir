@@ -1,6 +1,5 @@
 from hachoir.core.i18n import getTerminalCharset
-from hachoir.core.cmd_line import (getHachoirOptions,
-    configureHachoir)
+from hachoir.core.cmd_line import getHachoirOptions, configureHachoir
 from hachoir.field import isString
 from hachoir.core.benchmark import Benchmark
 from hachoir.core.error import error
@@ -12,6 +11,7 @@ from optparse import OptionGroup, OptionParser
 import errno
 import sys
 
+
 def countChildren(field_set):
     count = 0
     for field in field_set.fields.values:
@@ -20,30 +20,33 @@ def countChildren(field_set):
         count += 1
     return count
 
+
 def displayParserStat(parser):
-    print("Parser: %s children" % \
-        (countChildren(parser)))
+    print("Parser: %s children"
+          % countChildren(parser))
+
 
 def parseOptions():
-    parser = OptionParser(usage="%prog [options] pattern filename [filename2 ...]")
+    parser = OptionParser(usage="%prog [options] "
+                                "pattern filename [filename2 ...]")
 
     common = OptionGroup(parser, "Grep", "Option of grep")
     common.add_option("--percent", help="Display percent",
-        action="store_true", default=False)
+                      action="store_true", default=False)
     common.add_option("--no-addr", help="Don't display address",
-        action="store_true", default=False)
+                      action="store_true", default=False)
     common.add_option("--no-value", help="Don't display value",
-        action="store_true", default=False)
+                      action="store_true", default=False)
     common.add_option("--case", help="Search is case sensitive",
-        action="store_true", default=False)
+                      action="store_true", default=False)
     common.add_option("--path", help="Display path",
-        action="store_true", default=False)
+                      action="store_true", default=False)
     common.add_option("--all", help="Match all (just extract strings)",
-        action="store_true", default=False)
+                      action="store_true", default=False)
     common.add_option("--bench", help="Run benchmark",
-        action="store_true", default=False)
+                      action="store_true", default=False)
     common.add_option("--version", help="Display version and exit",
-        action="callback", callback=displayVersion)
+                      action="callback", callback=displayVersion)
     parser.add_option_group(common)
 
     hachoir = getHachoirOptions(parser)
@@ -63,6 +66,7 @@ def parseOptions():
         pattern = str(arguments[0], "ascii")
         filenames = arguments[1:]
     return values, pattern, filenames
+
 
 class Grep:
     def __init__(self):
@@ -90,6 +94,7 @@ class Grep:
     def onMatch(self, field):
         raise NotImplementedError()
 
+
 class ConsoleGrep(Grep):
     def __init__(self):
         Grep.__init__(self)
@@ -115,7 +120,7 @@ class ConsoleGrep(Grep):
             if (addr % 8) == 0:
                 text.append(str(addr/8))
             else:
-                text.append("%u.%u" % (addr/8, addr%8))
+                text.append("%u.%u" % (addr // 8, addr % 8))
         if self.display_path:
             text.append(field.path)
         if self.display_value:
@@ -155,6 +160,7 @@ class ConsoleGrep(Grep):
             else:
                 raise
 
+
 def runGrep(values, pattern, filenames):
     grep = ConsoleGrep()
     grep.display_filename = (1 < len(filenames))
@@ -165,6 +171,7 @@ def runGrep(values, pattern, filenames):
     grep.display = not(values.bench)
     for filename in filenames:
         grep.searchFile(filename, pattern, case_sensitive=values.case)
+
 
 def main():
     try:
@@ -178,4 +185,3 @@ def main():
     except KeyboardInterrupt:
         print("Program interrupted (CTRL+C).")
         sys.exit(1)
-

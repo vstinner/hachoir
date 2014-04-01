@@ -7,15 +7,12 @@ Creation: 17 september 2006
 """
 
 from hachoir.field import MissingField
-from hachoir.editor import (createEditor,
-    NewFieldSet, EditableInteger, EditableBytes)
+from hachoir.editor import createEditor
 from hachoir.stream import FileOutputStream, StringOutputStream
-from hachoir.core.tools import humanFilesize, makePrintable
-from hachoir.core.i18n import getTerminalCharset
+from hachoir.core.tools import humanFilesize
 from hachoir.core.cmd_line import displayVersion
 from hachoir.parser import createParser
 from optparse import OptionGroup, OptionParser
-import hachoir.core
 import sys
 
 # File formats
@@ -26,9 +23,10 @@ from hachoir.parser.container import RiffFile
 from hachoir.parser.audio import MpegAudioFile
 
 # Strip what?
-STRIP_USELESS  = 0x01   # Useless padding, useless duplicate information, etc.
+STRIP_USELESS = 0x01    # Useless padding, useless duplicate information, etc.
 STRIP_METADATA = 0x02   # Timestamp, author, producter, comment, etc.
-STRIP_INDEX    = 0x04   # Index in video
+STRIP_INDEX = 0x04      # Index in video
+
 
 class BasicStripper:
     def __init__(self, editor, level, verbose=False):
@@ -67,6 +65,7 @@ class BasicStripper:
             editor = self.editor
         return sum(self.removeField(field, editor) for field in fields)
 
+
 class CheckStripper(BasicStripper):
     def checkField(self, field):
         """
@@ -79,6 +78,7 @@ class CheckStripper(BasicStripper):
         fields = (field for field in self.editor if self.checkField(field))
         return self.removeFields(fields)
 
+
 class PngStripper(CheckStripper):
     def checkField(self, field):
         if self.level & STRIP_METADATA:
@@ -89,6 +89,7 @@ class PngStripper(CheckStripper):
                 return True
         return False
 
+
 class JpegStripper(CheckStripper):
     def checkField(self, field):
         if self.level & STRIP_METADATA:
@@ -97,11 +98,13 @@ class JpegStripper(CheckStripper):
             return field.name in ("photoshop", "exif", "adobe")
         return False
 
+
 class MpegAudioStripper(CheckStripper):
     def checkField(self, field):
         if self.level & STRIP_METADATA:
             return field.name in ("id3v1", "id3v2")
         return False
+
 
 class AuStripper(BasicStripper):
     def strip(self):
@@ -111,6 +114,7 @@ class AuStripper(BasicStripper):
             return self.removeField(self.editor["info"])
         else:
             return 0
+
 
 class RiffStripper(BasicStripper):
     def stripSub(self, editor, names):
@@ -153,14 +157,10 @@ class RiffStripper(BasicStripper):
             self.editor["filesize"].value -= (size // 8)
         return size
 
-class MpegAudioStripper(CheckStripper):
-    def checkField(self, field):
-        if self.level & STRIP_METADATA:
-            return field.name in ("id3v1", "id3v2")
-        return False
 
 def usage():
     print("Usage: %s filename" % sys.argv[0])
+
 
 class TarStripper(BasicStripper):
     def strip(self):
@@ -172,7 +172,7 @@ class TarStripper(BasicStripper):
         stream = StringOutputStream()
         file.writeInto(stream)
         data = stream.readBytes(0, 512)
-        checksum = sum( ord(character) for character in data )
+        checksum = sum(ord(character) for character in data)
         file["check_sum"].value = ("0%o\0" % checksum).ljust(8, " ")
 
     def stripFile(self, file):
@@ -195,6 +195,7 @@ strippers = {
     TarFile: TarStripper,
 }
 
+
 def stripEditor(editor, filename, level, verbose):
     cls = editor.input.__class__
     try:
@@ -210,27 +211,31 @@ def stripEditor(editor, filename, level, verbose):
         size = stripper.stripped_bytes
         if size:
             percent = "%.1f%%" % (float(size) * 100 / editor.input.size)
-            if size%8 and size < 128:
-                print("Remove %u.%u bytes (%s)" \
-                    % (size//8, size%8, percent))
+            if size % 8 and size < 128:
+                print("Remove %u.%u bytes (%s)"
+                      % (size // 8, size % 8, percent))
             else:
-                print("Remove %s (%s)" % (humanFilesize(size//8), percent))
-        print("Save new file into %s" % \
-            makePrintable(filename, getTerminalCharset()))
+                print("Remove %s (%s)" % (humanFilesize(size // 8), percent))
+        print("Save new file into %s" % filename)
     else:
         print("Stripper doesn't touch the file")
     return True
+
 
 def parseOptions():
     parser = OptionParser(usage="%prog [options] filename")
 
     common = OptionGroup(parser, "Hachoir strip")
-    common.add_option("--strip", help="Data types to remove: useless, metadata, index (default: all). Use comma to specify two or more.",
-        type="str", action="store", default="metadata, useless, index")
+    common.add_option("--strip",
+                      help="Data types to remove: "
+                           "useless, metadata, index (default: all). "
+                           "Use comma to specify two or more.",
+                      type="str", action="store",
+                      default="metadata, useless, index")
     common.add_option("--quiet", help="Be quiet",
-        action="store_true", default=False)
+                      action="store_true", default=False)
     common.add_option("--version", help="Display version and exit",
-        action="callback", callback=displayVersion)
+                      action="callback", callback=displayVersion)
     parser.add_option_group(common)
 
     values, arguments = parser.parse_args()
@@ -238,6 +243,7 @@ def parseOptions():
         parser.print_help()
         sys.exit(1)
     return values, arguments
+
 
 def main():
     # Parse arguments and read filenames
@@ -255,13 +261,13 @@ def main():
         print("Nothing to do, exit")
         sys.exit(0)
     ok = True
-    charset = getTerminalCharset()
     for filename in filenames:
         print("[+]", ("Process file %s" % filename))
         parser = createParser(filename)
         if parser:
             editor = createEditor(parser)
-            ok &= stripEditor(editor, filename+".new", level, not(values.quiet))
+            ok &= stripEditor(editor, filename + ".new",
+                              level, not(values.quiet))
         else:
             ok = False
     if ok:
