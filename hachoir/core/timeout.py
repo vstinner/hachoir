@@ -6,11 +6,13 @@ from math import ceil
 
 IMPLEMENTATION = None
 
+
 class Timeout(RuntimeError):
     """
     Timeout error, inherits from RuntimeError
     """
     pass
+
 
 def signalHandler(signum, frame):
     """
@@ -18,11 +20,13 @@ def signalHandler(signum, frame):
     """
     raise Timeout("Timeout exceed!")
 
+
 def limitedTime(second, func, *args, **kw):
     """
     Call func(*args, **kw) with a timeout of second seconds.
     """
     return func(*args, **kw)
+
 
 def fixTimeout(second):
     """

@@ -5,6 +5,7 @@ from hachoir.field import (
     isInteger, isString)
 from hachoir.editor import FakeField
 
+
 class EditableField(FakeField):
     """
     Pure virtual class used to write editable field class.
@@ -55,6 +56,7 @@ class EditableField(FakeField):
         else:
             return FakeField.writeInto(self, output)
 
+
 class EditableFixedField(EditableField):
     """
     Editable field with fixed size.
@@ -70,6 +72,7 @@ class EditableFixedField(EditableField):
     def _getSize(self):
         return self._size
     size = property(_getSize)
+
 
 class EditableBits(EditableFixedField):
     def __init__(self, parent, name, *args):
@@ -98,6 +101,7 @@ class EditableBits(EditableFixedField):
     def _write(self, output):
         output.writeBits(self._size, self._value, self._parent.endian)
 
+
 class EditableBytes(EditableField):
     def _setValue(self, value):
         if not value: raise ValueError(
@@ -109,6 +113,7 @@ class EditableBytes(EditableField):
 
     def _write(self, output):
         output.writeBytes(self._value)
+
 
 class EditableString(EditableField):
     MAX_SIZE = {
@@ -166,6 +171,7 @@ class EditableString(EditableField):
             output.writeInteger(len(self._value), False, size, self._parent.endian)
             output.writeBytes(self._value)
 
+
 class EditableCharacter(EditableFixedField):
     def __init__(self, parent, name, *args):
         if args:
@@ -189,6 +195,7 @@ class EditableCharacter(EditableFixedField):
 
     def _write(self, output):
         output.writeBytes(self._value)
+
 
 class EditableInteger(EditableFixedField):
     VALID_VALUE_SIGNED = {
@@ -235,6 +242,7 @@ class EditableInteger(EditableFixedField):
     def _write(self, output):
         output.writeInteger(
             self.value, self._signed, self._size//8, self._parent.endian)
+
 
 def createEditableField(fieldset, field):
     if isInteger(field):

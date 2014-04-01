@@ -1,7 +1,9 @@
 from hachoir.field import joinPath, MissingField
 
+
 class EditorError(Exception):
     pass
+
 
 class FakeField(object):
     """

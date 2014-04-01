@@ -1,5 +1,6 @@
 from hachoir.field import BasicFieldSet, GenericFieldSet, ParserError, createRawField
 
+
 # getgaps(int, int, [listof (int, int)]) -> generator of (int, int)
 # Gets all the gaps not covered by a block in `blocks` from `start` for `length` units.
 def getgaps(start, length, blocks):
@@ -19,6 +20,7 @@ def getgaps(start, length, blocks):
             start = s+l
     if start < end:
         yield (start, end-start)
+
 
 class NewRootSeekableFieldSet(GenericFieldSet):
     def seekBit(self, address, relative=True):
@@ -74,6 +76,7 @@ class NewRootSeekableFieldSet(GenericFieldSet):
         new_field = self._fixLastField()
         self._field_generator = None
         return new_field
+
 
 class NewSeekableFieldSet(NewRootSeekableFieldSet):
     def __init__(self, parent, name, description=None, size=None):

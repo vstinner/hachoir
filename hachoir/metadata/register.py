@@ -32,6 +32,7 @@ DURATION_FILTER = Filter(timedelta,
     timedelta(milliseconds=1),
     timedelta(days=365))
 
+
 def registerAllItems(meta):
     meta.register(Data("title", 100, "Title", type=str))
     meta.register(Data("artist", 101, "Artist", type=str))

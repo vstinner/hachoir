@@ -3,6 +3,7 @@ from hachoir.core.error import error
 from errno import EEXIST
 from os import mkdir, path
 
+
 class Output:
     """
     Store files found by search tool.

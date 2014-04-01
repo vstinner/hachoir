@@ -16,6 +16,7 @@ from os import path
 import sys
 from codecs import BOM_UTF8, BOM_UTF16_LE, BOM_UTF16_BE
 
+
 def _getTerminalCharset():
     """
     Function used by getTerminalCharset() to get terminal charset.
@@ -45,6 +46,7 @@ def _getTerminalCharset():
     # (4) Otherwise, returns "ASCII"
     return "ASCII"
 
+
 def getTerminalCharset():
     """
     Guess terminal charset using differents tests:
@@ -60,6 +62,7 @@ def getTerminalCharset():
     except AttributeError:
         getTerminalCharset.value = _getTerminalCharset()
         return getTerminalCharset.value
+
 
 def initLocale():
     # Only initialize locale once
@@ -88,6 +91,7 @@ CHARSET_CHARACTERS = (
     (set("©®".encode("MacRoman")), "MacRoman"),
     (set("εδηιθκμοΡσςυΈί".encode("ISO-8859-7")), "ISO-8859-7"),
 )
+
 
 def guessBytesCharset(bytes, default=None):
     r"""

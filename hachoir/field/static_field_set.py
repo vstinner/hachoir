@@ -1,6 +1,7 @@
 from hachoir.field import FieldSet, ParserError
 import collections
 
+
 class StaticFieldSet(FieldSet):
     """
     Static field set: format class attribute is a tuple of all fields

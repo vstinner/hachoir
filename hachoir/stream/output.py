@@ -6,8 +6,10 @@ from errno import EBADF
 
 MAX_READ_NBYTES = 2 ** 16
 
+
 class OutputStreamError(StreamError):
     pass
+
 
 class OutputStream(object):
     def __init__(self, output, filename=None):
@@ -154,12 +156,14 @@ class OutputStream(object):
         finally:
             self._output.seek(oldpos)
 
+
 def StringOutputStream():
     """
     Create an output stream into a string.
     """
     data = StringIO()
     return OutputStream(data)
+
 
 def FileOutputStream(filename, real_filename=None):
     """

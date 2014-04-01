@@ -26,6 +26,7 @@ from codecs import BOM_UTF16_LE, BOM_UTF16_BE, BOM_UTF32_LE, BOM_UTF32_BE
 # This charset is used if no charset is specified or on conversion error
 FALLBACK_CHARSET = "ISO-8859-1"
 
+
 class GenericString(Bytes):
     """
     Generic string class.
@@ -349,6 +350,7 @@ class GenericString(Bytes):
             else:
                 info += ",strip=True"
         return "%s<%s>" % (Bytes.getFieldType(self), info)
+
 
 def stringFactory(name, format, doc):
     class NewString(GenericString):

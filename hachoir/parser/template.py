@@ -18,6 +18,7 @@ from hachoir.field import (ParserError,
     UInt8, UInt16, UInt32, String, RawBytes)
 from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 
+
 class TODOFile(Parser):
     PARSER_TAGS = {
         "id": "TODO",

@@ -5,10 +5,12 @@ from hachoir import version
 import hachoir.core.config as config
 import sys
 
+
 def displayVersion(*args):
     print("Hachoir version %s" % version.VERSION)
     print("Website: %s" % version.WEBSITE)
     sys.exit(0)
+
 
 def getHachoirOptions(parser):
     """
@@ -29,6 +31,7 @@ def getHachoirOptions(parser):
     common.add_option("--debug", help="Debug mode",
         default=False, action="store_true")
     return common
+
 
 def configureHachoir(option):
     # Configure Hachoir using "option" (value from optparse)

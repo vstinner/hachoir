@@ -6,6 +6,7 @@ Integer field classes:
 
 from hachoir.field import Bits, FieldError
 
+
 class GenericInteger(Bits):
     """
     Generic integer class used to generate other classes.
@@ -20,6 +21,7 @@ class GenericInteger(Bits):
         return self._parent.stream.readInteger(
             self.absolute_address, self.signed, self._size, self._parent.endian)
 
+
 def integerFactory(name, is_signed, size, doc):
     class Integer(GenericInteger):
         __doc__ = doc
@@ -29,6 +31,7 @@ def integerFactory(name, is_signed, size, doc):
     cls = Integer
     cls.__name__ = name
     return cls
+
 
 UInt8 = integerFactory("UInt8", False, 8, "Unsigned integer of 8 bits")
 UInt16 = integerFactory("UInt16", False, 16, "Unsigned integer of 16 bits")

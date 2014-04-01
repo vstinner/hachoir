@@ -5,6 +5,7 @@ from datetime import date, datetime
 MIN_YEAR = 1850
 MAX_YEAR = 2030
 
+
 class Filter:
     def __init__(self, valid_types, min=None, max=None):
         self.types = valid_types
@@ -20,9 +21,11 @@ class Filter:
             return False
         return True
 
+
 class NumberFilter(Filter):
     def __init__(self, min=None, max=None):
         Filter.__init__(self, (int, int, float), min, max)
+
 
 class DatetimeFilter(Filter):
     def __init__(self, min=None, max=None):

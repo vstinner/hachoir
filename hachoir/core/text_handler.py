@@ -9,17 +9,20 @@ from hachoir.core.tools import (
 from types import FunctionType, MethodType
 from hachoir.field import Field
 
+
 def textHandler(field, handler):
     assert isinstance(handler, (FunctionType, MethodType))
     assert issubclass(field.__class__, Field)
     field.createDisplay = lambda: handler(field)
     return field
 
+
 def displayHandler(field, handler):
     assert isinstance(handler, (FunctionType, MethodType))
     assert issubclass(field.__class__, Field)
     field.createDisplay = lambda: handler(field.value)
     return field
+
 
 @deprecated("Use TimedeltaWin64 field type")
 def durationWin64(field):
@@ -37,11 +40,13 @@ def durationWin64(field):
     delta = doDurationWin64(field.value)
     return humanDuration(delta)
 
+
 def filesizeHandler(field):
     """
     Format field value using humanFilesize()
     """
     return displayHandler(field, humanFilesize)
+
 
 def hexadecimal(field):
     """

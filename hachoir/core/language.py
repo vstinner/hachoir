@@ -1,6 +1,7 @@
 import functools
 from hachoir.core.iso639 import ISO639_2
 
+
 @functools.total_ordering
 class Language:
     def __init__(self, code):

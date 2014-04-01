@@ -30,6 +30,7 @@ RIFF_TIMESTAMP = "%a~%b~%d~%H~%M~%S~%Y"
 # Timestmap: 'Thu, 19 Jul 2007 09:03:57'
 ISO_TIMESTAMP = "%a,~%d~%b~%Y~%H~%M~%S"
 
+
 def parseDatetime(value):
     """
     Year and date:
@@ -125,12 +126,14 @@ def parseDatetime(value):
         setlocale(LC_ALL, current_locale)
     return None
 
+
 def setDatetime(meta, key, value):
     if isinstance(value, str):
         return parseDatetime(value)
     elif isinstance(value, (date, datetime)):
         return value
     return None
+
 
 def setLanguage(meta, key, value):
     """
@@ -140,6 +143,7 @@ def setLanguage(meta, key, value):
     <Language 'German', code='ger'>
     """
     return Language(value)
+
 
 def setTrackTotal(meta, key, total):
     """
@@ -152,6 +156,7 @@ def setTrackTotal(meta, key, total):
         meta.warning("Invalid track total: %r" % total)
         return None
 
+
 def setTrackNumber(meta, key, number):
     if isinstance(number, int):
         return number
@@ -163,6 +168,7 @@ def setTrackNumber(meta, key, number):
     except ValueError:
         meta.warning("Invalid track number: %r" % number)
         return None
+
 
 def normalizeString(text):
     if config.RAW_OUTPUT:

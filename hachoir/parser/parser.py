@@ -8,6 +8,7 @@ from inspect import getmro
 class ValidateError(Exception):
     pass
 
+
 class HachoirParser(object):
     """
     A parser is the root of all other fields. It create first level of fields
@@ -145,6 +146,7 @@ class HachoirParser(object):
                 print("  File extension: %s" % file_ext, file=out)
 
     autofix = property(lambda self: self._autofix and config.autofix)
+
 
 class Parser(HachoirParser, GenericParser):
     def __init__(self, stream, **args):

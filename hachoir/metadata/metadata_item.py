@@ -11,10 +11,12 @@ QUALITY_NORMAL = 0.5
 QUALITY_GOOD = 0.75
 QUALITY_BEST = 1.0
 
+
 class DataValue:
     def __init__(self, value, text):
         self.value = value
         self.text = text
+
 
 class Data:
     def __init__(self, key, priority, description,

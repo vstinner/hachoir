@@ -10,6 +10,7 @@ from hachoir.parser.container.mkv import dateToDatetime
 from hachoir.core.tools import makeUnicode, makePrintable, timedelta2seconds
 from datetime import timedelta
 
+
 class MkvMetadata(MultipleMetadata):
     tag_key = {
         "TITLE": "title",
@@ -146,6 +147,7 @@ class MkvMetadata(MultipleMetadata):
         if "Title/unicode" in info:
             self.title = info["Title/unicode"].value
 
+
 class FlvMetadata(MultipleMetadata):
     def extract(self, flv):
         if "video[0]" in flv:
@@ -209,6 +211,7 @@ class FlvMetadata(MultipleMetadata):
             self.width = int(entry["value"].value)
         elif key == "height":
             self.height = int(entry["value"].value)
+
 
 class MovMetadata(RootMetadata):
     def extract(self, mov):

@@ -1,6 +1,7 @@
 import os, sys, time
 import hachoir.core.config as config
 
+
 class Log:
     LOG_INFO   = 0
     LOG_WARN   = 1
@@ -131,6 +132,7 @@ class Log:
         self.newMessage(Log.LOG_ERROR, text)
 
 log = Log()
+
 
 class Logger(object):
     def _logger(self):

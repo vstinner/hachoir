@@ -6,6 +6,7 @@ from hachoir.field import Bits
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.core.tools import makePrintable
 
+
 class Character(Bits):
     """
     A 8-bit character using ASCII charset for display attribute.

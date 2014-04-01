@@ -7,6 +7,7 @@ import stat
 from datetime import datetime, timedelta, MAXYEAR
 from warnings import warn
 
+
 def deprecated(comment=None):
     """
     This is a decorator which can be used to mark functions
@@ -36,6 +37,7 @@ def deprecated(comment=None):
         return newFunc
     return _deprecated
 
+
 def paddingSize(value, align):
     """
     Compute size of a padding field.
@@ -53,6 +55,7 @@ def paddingSize(value, align):
         return align - (value % align)
     else:
         return 0
+
 
 def alignValue(value, align):
     """
@@ -73,6 +76,7 @@ def alignValue(value, align):
     else:
         return value
 
+
 def timedelta2seconds(delta):
     """
     Convert a datetime.timedelta() objet to a number of second
@@ -85,6 +89,7 @@ def timedelta2seconds(delta):
     """
     return delta.microseconds / 1000000.0 \
         + delta.seconds + delta.days * 60*60*24
+
 
 def humanDurationNanosec(nsec):
     """
@@ -109,6 +114,7 @@ def humanDurationNanosec(nsec):
     if msec < 1000:
         return "%.2f ms" % (msec + float(usec)/1000)
     return humanDuration(msec)
+
 
 def humanDuration(delta):
     """
@@ -154,6 +160,7 @@ def humanDuration(delta):
         return "0 ms"
     return " ".join(reversed(text))
 
+
 def humanFilesize(size):
     """
     Convert a file size in byte to human natural representation.
@@ -177,6 +184,7 @@ def humanFilesize(size):
         if size < divisor:
             return "%.1f %s" % (size, unit)
     return "%u %s" % (size, unit)
+
 
 def humanBitSize(size):
     """
@@ -202,6 +210,7 @@ def humanBitSize(size):
             return "%.1f %s" % (size, unit)
     return "%u %s" % (size, unit)
 
+
 def humanBitRate(size):
     """
     Convert a bit rate to human classic representation. It uses humanBitSize()
@@ -213,6 +222,7 @@ def humanBitRate(size):
     '257.0 Kbit/sec'
     """
     return "".join((humanBitSize(size), "/sec"))
+
 
 def humanFrequency(hertz):
     """
@@ -248,6 +258,7 @@ controlchars = tuple({
     }.get(code, '\\x%02x' % code)
     for code in range(128)
 )
+
 
 def makePrintable(data, charset, quote=None, smart=True):
     r"""
@@ -312,6 +323,7 @@ def makePrintable(data, charset, quote=None, smart=True):
         data = re.sub(br"\\x0([0-7])(?=[^0-7]|$)", br"\\\1", data)
     return str(data, charset)
 
+
 def makeUnicode(text):
     r"""
     Convert text to printable Unicode string. For byte string (type 'str'),
@@ -337,6 +349,7 @@ def makeUnicode(text):
         lambda regs: controlchars[ord(regs.group(1))], text)
     text = re.sub(r"\\x0([0-7])(?=[^0-7]|$)", r"\\\1", text)
     return text
+
 
 def binarySearch(seq, cmp_func):
     """
@@ -371,6 +384,7 @@ def binarySearch(seq, cmp_func):
             return index
     return None
 
+
 def lowerBound(seq, cmp_func):
     f = 0
     l = len(seq)
@@ -384,6 +398,7 @@ def lowerBound(seq, cmp_func):
         else:
             l = h
     return f
+
 
 def humanUnixAttributes(mode):
     """
@@ -430,6 +445,7 @@ def humanUnixAttributes(mode):
             chars[9] = 't'
     return "%s (%o)" % (''.join(chars), mode)
 
+
 def createDict(data, index):
     """
     Create a new dictionnay from dictionnary key=>values:
@@ -445,6 +461,7 @@ def createDict(data, index):
 
 # Start of UNIX timestamp (Epoch): 1st January 1970 at 00:00
 UNIX_TIMESTAMP_T0 = datetime(1970, 1, 1)
+
 
 def timestampUNIX(value):
     """
@@ -472,6 +489,7 @@ def timestampUNIX(value):
 # Start of Macintosh timestamp: 1st January 1904 at 00:00
 MAC_TIMESTAMP_T0 = datetime(1904, 1, 1)
 
+
 def timestampMac32(value):
     """
     Convert an Mac (32-bit) timestamp to string. The format is the number
@@ -487,6 +505,7 @@ def timestampMac32(value):
     if not(0 <= value <= 4294967295):
         return "invalid Mac timestamp (%s)" % value
     return MAC_TIMESTAMP_T0 + timedelta(seconds=value)
+
 
 def durationWin64(value):
     """
@@ -506,6 +525,7 @@ def durationWin64(value):
 
 # Start of 64-bit Windows timestamp: 1st January 1600 at 00:00
 WIN64_TIMESTAMP_T0 = datetime(1601, 1, 1, 0, 0, 0)
+
 
 def timestampWin64(value):
     """
@@ -527,6 +547,7 @@ def timestampWin64(value):
 # Start of 60-bit UUID timestamp: 15 October 1582 at 00:00
 UUID60_TIMESTAMP_T0 = datetime(1582, 10, 15, 0, 0, 0)
 
+
 def timestampUUID60(value):
     """
     Convert UUID 60-bit timestamp to string. The timestamp format is
@@ -547,6 +568,7 @@ def timestampUUID60(value):
     except OverflowError:
         raise ValueError("timestampUUID60() overflow (value=%s)" % value)
 
+
 def humanDatetime(value, strip_microsecond=True):
     """
     Convert a timestamp to Unicode string: use ISO format with space separator.
@@ -565,6 +587,7 @@ def humanDatetime(value, strip_microsecond=True):
     return text
 
 NEWLINES_REGEX = re.compile("\n+")
+
 
 def normalizeNewline(text):
     r"""

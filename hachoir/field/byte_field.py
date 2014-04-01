@@ -10,6 +10,7 @@ from hachoir.core import config
 
 MAX_LENGTH = (2**64)
 
+
 class RawBytes(Field):
     """
     Byte vector of unknown content
@@ -61,6 +62,7 @@ class RawBytes(Field):
             self._display = None
         return self._parent.stream.readBytes(
             self.absolute_address, self._size // 8)
+
 
 class Bytes(RawBytes):
     """

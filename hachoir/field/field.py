@@ -7,17 +7,20 @@ from hachoir.core.log import Logger
 from hachoir.core.tools import makePrintable
 from weakref import ref as weakref_ref
 
+
 class FieldError(Exception):
     """
     Error raised by a L{Field}.
     """
     pass
 
+
 def joinPath(path, name):
     if path != "/":
         return "/".join((path, name))
     else:
         return "/%s" % name
+
 
 class MissingField(KeyError, FieldError):
     def __init__(self, field, key):

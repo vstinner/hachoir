@@ -8,6 +8,7 @@ assert struct.calcsize("d") == 8
 assert struct.unpack("<d", b"\x1f\x85\xebQ\xb8\x1e\t@")[0] == 3.14
 assert struct.unpack(">d", b"\xc0\0\0\0\0\0\0\0")[0] == -2.0
 
+
 class FloatMantissa(Bits):
     def createValue(self):
         value = Bits.createValue(self)
@@ -15,6 +16,7 @@ class FloatMantissa(Bits):
 
     def createRawDisplay(self):
         return str(Bits.createValue(self))
+
 
 class FloatExponent(Bits):
     def __init__(self, parent, name, size):
@@ -26,6 +28,7 @@ class FloatExponent(Bits):
 
     def createRawDisplay(self):
         return str(self.value + self.bias)
+
 
 def floatFactory(name, format, mantissa_bits, exponent_bits, doc):
     size = 1 + mantissa_bits + exponent_bits

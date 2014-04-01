@@ -1,6 +1,7 @@
 from hachoir.parser import QueryParser
 from hachoir.regex import PatternMatching
 
+
 class HachoirPatternMatching(PatternMatching):
     def __init__(self, categories=None, parser_ids=None):
         PatternMatching.__init__(self)

@@ -2,6 +2,7 @@ from hachoir.field import Bits, Bytes
 from hachoir.core.tools import makePrintable, humanFilesize
 from hachoir.core import config
 
+
 class PaddingBits(Bits):
     """
     Padding bits used, for example, to align address (of next field).
@@ -44,6 +45,7 @@ class PaddingBits(Bits):
             return "<padding pattern=%s>" % self.pattern
         else:
             return Bits.createDisplay(self)
+
 
 class PaddingBytes(Bytes):
     """
@@ -101,6 +103,7 @@ class PaddingBytes(Bytes):
     def createRawDisplay(self):
         return Bytes.createDisplay(self)
 
+
 class NullBits(PaddingBits):
     """
     Null padding bits used, for example, to align address (of next field).
@@ -118,6 +121,7 @@ class NullBits(PaddingBits):
             return "<null>"
         else:
             return Bits.createDisplay(self)
+
 
 class NullBytes(PaddingBytes):
     """

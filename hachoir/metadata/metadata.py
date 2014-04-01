@@ -9,6 +9,7 @@ from hachoir.metadata.register import registerAllItems
 
 extractors = {}
 
+
 class Metadata(Logger):
     header = "Metadata"
 
@@ -179,9 +180,11 @@ class Metadata(Logger):
     def __bool__(self):
         return any(item for item in self.__data.values())
 
+
 class RootMetadata(Metadata):
     def __init__(self, quality=QUALITY_NORMAL):
         Metadata.__init__(self, None, quality)
+
 
 class MultipleMetadata(RootMetadata):
     header = "Common"
@@ -244,10 +247,12 @@ class MultipleMetadata(RootMetadata):
         else:
             return None
 
+
 def registerExtractor(parser, extractor):
     assert parser not in extractors
     assert issubclass(extractor, RootMetadata)
     extractors[parser] = extractor
+
 
 def extractMetadata(parser, quality=QUALITY_NORMAL):
     """

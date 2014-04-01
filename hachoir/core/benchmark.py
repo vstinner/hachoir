@@ -2,6 +2,7 @@ from hachoir.core.tools import humanDurationNanosec
 from math import floor
 from time import time
 
+
 class BenchmarkError(Exception):
     """
     Error during benchmark, use str(err) to format it as string.
@@ -9,6 +10,7 @@ class BenchmarkError(Exception):
     def __init__(self, message):
         Exception.__init__(self,
             "Benchmark internal error: %s" % message)
+
 
 class BenchmarkStat:
     """
@@ -51,6 +53,7 @@ class BenchmarkStat:
 
     def getSum(self):
         return self._sum
+
 
 class Benchmark:
     def __init__(self, max_time=5.0,

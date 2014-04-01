@@ -1,6 +1,7 @@
 import itertools
 from hachoir.field import MissingField
 
+
 class FakeArray:
     """
     Simulate an array for GenericFieldSet.array(): fielset.array("item")[0] is

@@ -6,12 +6,14 @@ from hachoir.parser.archive import (Bzip2Parser, CabFile, GzipParser,
     TarFile, ZipFile, MarFile)
 from hachoir.core.tools import humanUnixAttributes
 
+
 def maxNbFile(meta):
     if meta.quality <= QUALITY_FASTEST:
         return 0
     if QUALITY_BEST <= meta.quality:
         return None
     return 1 + int(10 * meta.quality)
+
 
 def computeCompressionRate(meta):
     """
@@ -25,10 +27,12 @@ def computeCompressionRate(meta):
         return
     meta.compr_rate = float(file_size) / meta.get("compr_size")
 
+
 class Bzip2Metadata(RootMetadata):
     def extract(self, zip):
         if "file" in zip:
             self.compr_size = zip["file"].size//8
+
 
 class GzipMetadata(RootMetadata):
     def extract(self, gzip):
@@ -47,6 +51,7 @@ class GzipMetadata(RootMetadata):
             self.comment = getValue(gzip, "comment")
         self.compr_size = gzip["file"].size//8
         self.file_size = gzip["size"].value
+
 
 class ZipMetadata(MultipleMetadata):
     def extract(self, zip):
@@ -73,6 +78,7 @@ class ZipMetadata(MultipleMetadata):
                 meta.compr_size = field["compressed_size"].value
         computeCompressionRate(meta)
         self.addGroup(field.name, meta, "File \"%s\"" % meta.get('filename'))
+
 
 class TarMetadata(MultipleMetadata):
     def extract(self, tar):
@@ -140,6 +146,7 @@ class CabMetadata(MultipleMetadata):
         else:
             title = "File"
         self.addGroup(field.name, meta, title)
+
 
 class MarMetadata(MultipleMetadata):
     def extract(self, mar):

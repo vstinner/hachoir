@@ -3,6 +3,7 @@ from hachoir.stream import InputStream
 from hachoir.core.endian import BIG_ENDIAN, LITTLE_ENDIAN, MIDDLE_ENDIAN
 from hachoir.core.event_handler import EventHandler
 
+
 class ParserError(FieldError):
     """
     Error raised by a field set.
@@ -10,6 +11,7 @@ class ParserError(FieldError):
     @see: L{FieldError}
     """
     pass
+
 
 class MatchError(FieldError):
     """
@@ -19,6 +21,7 @@ class MatchError(FieldError):
     @see: L{FieldError}
     """
     pass
+
 
 class BasicFieldSet(Field):
     _event_handler = None

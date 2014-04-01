@@ -2,6 +2,7 @@ from hachoir.field import Bytes
 from hachoir.core.tools import makePrintable, humanFilesize
 from hachoir.stream import InputIOStream
 
+
 class SubFile(Bytes):
     """
     File stored in another file
@@ -26,6 +27,7 @@ class SubFile(Bytes):
                 tags.append(( "filename", filename ))
             return cis(**args)
         self.setSubIStream(createInputStream)
+
 
 class CompressedStream:
     offset = 0
@@ -56,6 +58,7 @@ class CompressedStream:
                 size -= len(d)
         self._buffer = d[size+len(d):]
         return ''.join(data)
+
 
 def CompressedField(field, decompressor):
     def createInputStream(cis, source=None, **args):

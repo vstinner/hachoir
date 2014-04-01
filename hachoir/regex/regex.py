@@ -38,6 +38,7 @@ import operator
 
 from hachoir.core.tools import makePrintable
 
+
 def matchSingleValue(regex):
     """
     Regex only match one exact string.
@@ -62,12 +63,14 @@ def matchSingleValue(regex):
         return len(regex.ranges) == 1 and len(regex.ranges[0]) == 1
     return False
 
+
 def escapeRegex(text):
     """
     Escape string to use it in a regular expression:
     prefix special characters « ^.+*?{}[]|()\$ » by an antislash.
     """
     return re.sub(r"([][^.+*?{}|()\\$])", r"\\\1", text)
+
 
 def _join(func, regex_list):
     if not isinstance(regex_list, (tuple, list)):
@@ -78,6 +81,7 @@ def _join(func, regex_list):
     for item in regex_list[1:]:
         regex = func(regex, item)
     return regex
+
 
 def createString(text):
     """
@@ -91,6 +95,7 @@ def createString(text):
     else:
         return RegexEmpty()
 
+
 def createRange(*text, **kw):
     """
     Create a regex range using character list.
@@ -102,6 +107,7 @@ def createRange(*text, **kw):
     """
     ranges = ( RegexRangeCharacter(item) for item in text )
     return RegexRange(ranges, kw.get('exclude', False))
+
 
 class Regex:
     """
@@ -264,6 +270,7 @@ class Regex:
     def __iter__(self):
         raise NotImplementedError()
 
+
 class RegexEmpty(Regex):
     def minLength(self):
         return 0
@@ -277,6 +284,7 @@ class RegexEmpty(Regex):
     def _eq(self, other):
         return True
 
+
 class RegexWord(RegexEmpty):
     def _and(self, other):
         if other.__class__ == RegexWord:
@@ -285,6 +293,7 @@ class RegexWord(RegexEmpty):
 
     def _str(self, **kw):
         return r'\b'
+
 
 class RegexStart(RegexEmpty):
     def _and(self, other):
@@ -295,6 +304,7 @@ class RegexStart(RegexEmpty):
     def _str(self, **kw):
         return '^'
 
+
 class RegexEnd(RegexStart):
     def _and(self, other):
         if other.__class__ == RegexEnd:
@@ -303,6 +313,7 @@ class RegexEnd(RegexStart):
 
     def _str(self, **kw):
         return '$'
+
 
 class RegexDot(Regex):
     def minLength(self):
@@ -320,6 +331,7 @@ class RegexDot(Regex):
 
     def _eq(self, other):
         return True
+
 
 class RegexString(Regex):
     def __init__(self, text=""):
@@ -403,6 +415,7 @@ class RegexString(Regex):
     def _eq(self, other):
         return self.text == other.text
 
+
 class RegexRangeItem:
     def __init__(self, cmin, cmax=None):
         try:
@@ -438,9 +451,11 @@ class RegexRangeItem:
     def __repr__(self):
         return "<RegexRangeItem %u-%u>" % (self.cmin, self.cmax)
 
+
 class RegexRangeCharacter(RegexRangeItem):
     def __init__(self, char):
         RegexRangeItem.__init__(self, ord(char), ord(char))
+
 
 class RegexRange(Regex):
     def __init__(self, ranges, exclude=False, optimize=True):
@@ -545,6 +560,7 @@ class RegexRange(Regex):
             return False
         return self.ranges == other.ranges
 
+
 class RegexAnd(Regex):
     def __init__(self, items):
         self.content = list(items)
@@ -644,6 +660,7 @@ class RegexAnd(Regex):
             return False
         return all( item[0] == item[1] for item in zip(self.content, other.content) )
 
+
 class RegexOr(Regex):
     def __init__(self, items, optimize=True):
         if optimize:
@@ -728,6 +745,7 @@ class RegexOr(Regex):
             return False
         return all( item[0] == item[1] for item in zip(self.content, other.content) )
 
+
 def optimizeRepeatOr(rmin, rmax, regex):
     # Fix rmin/rmax
     for item in regex:
@@ -767,6 +785,7 @@ def optimizeRepeatOr(rmin, rmax, regex):
         content.append(item)
     regex = RegexOr.join(content)
     return (rmin, rmax, regex)
+
 
 class RegexRepeat(Regex):
     """

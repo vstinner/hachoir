@@ -10,6 +10,7 @@ from hachoir.core.tools import humanFilesize, makeUnicode, timedelta2seconds
 from hachoir.metadata.audio import computeComprRate as computeAudioComprRate
 from datetime import timedelta
 
+
 class RiffMetadata(MultipleMetadata):
     TAG_TO_KEY = {
         "INAM": "title",

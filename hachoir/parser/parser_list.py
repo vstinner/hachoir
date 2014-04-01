@@ -6,6 +6,7 @@ import sys
 
 ### Parser list ################################################################
 
+
 class ParserList(object):
     VALID_CATEGORY = ("archive", "audio", "container", "file_system",
         "game", "image", "misc", "program", "video")

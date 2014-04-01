@@ -1,6 +1,7 @@
 from hachoir.core.i18n import guessBytesCharset
 from hachoir.stream import InputIOStream, InputSubStream, InputStreamError
 
+
 def FileInputStream(filename, real_filename=None, **args):
     """
     Create an input stream of a file. filename must be unicode.
@@ -29,6 +30,7 @@ def FileInputStream(filename, real_filename=None, **args):
     else:
         args.setdefault("tags",[]).append(("filename", filename))
         return InputIOStream(inputio, source=source, **args)
+
 
 def guessStreamCharset(stream, address, size, default=None):
     size = min(size, 1024*8)

@@ -3,6 +3,7 @@ from hachoir.field import GenericFieldSet
 from hachoir.core.log import Logger
 import hachoir.core.config as config
 
+
 class Parser(GenericFieldSet):
     """
     A parser is the root of all other fields. It create first level of fields

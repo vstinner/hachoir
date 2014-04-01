@@ -8,8 +8,10 @@ from errno import ESPIPE
 from weakref import ref as weakref_ref
 from hachoir.stream import StreamError
 
+
 class InputStreamError(StreamError):
     pass
+
 
 class ReadStreamError(InputStreamError):
     def __init__(self, size, address, got=None):
@@ -22,11 +24,13 @@ class ReadStreamError(InputStreamError):
             msg = "Can't read %u bits at address %u" % (self.size, self.address)
         InputStreamError.__init__(self, msg)
 
+
 class NullStreamError(InputStreamError):
     def __init__(self, source):
         self.source = source
         msg = "Input size is nul (source='%s')!" % self.source
         InputStreamError.__init__(self, msg)
+
 
 class FileFromInputStream:
     _offset = 0
@@ -364,6 +368,7 @@ class InputPipe(object):
         self.address += len(data)
         return data
 
+
 class InputIOStream(InputStream):
     def __init__(self, input, size=None, **args):
         if not hasattr(input, "seek"):
@@ -450,6 +455,7 @@ class InputSubStream(InputStream):
 
     def read(self, address, size):
         return self.stream.read(self._offset + address, size)
+
 
 def InputFieldStream(field, **args):
     if not field.parent:

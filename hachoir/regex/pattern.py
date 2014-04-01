@@ -1,12 +1,14 @@
 from hachoir.core.tools import makePrintable
 from hachoir.regex import RegexEmpty, RegexOr, parse, createString
 
+
 class Pattern:
     """
     Abstract class used to define a pattern used in pattern matching
     """
     def __init__(self, user):
         self.user = user
+
 
 class StringPattern(Pattern):
     """
@@ -21,6 +23,7 @@ class StringPattern(Pattern):
 
     def __repr__(self):
         return "<StringPattern '%s'>" % self
+
 
 class RegexPattern(Pattern):
     """
@@ -45,6 +48,7 @@ class RegexPattern(Pattern):
             self._compiled_regex = self.regex.compile(python=True)
         return self._compiled_regex
     compiled_regex = property(_getCompiledRegex)
+
 
 class PatternMatching:
     """

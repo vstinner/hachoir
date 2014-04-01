@@ -7,6 +7,7 @@ from hachoir.parser.image.png import getBitsPerPixel as pngBitsPerPixel
 from hachoir.parser.image.xcf import XcfProperty
 from hachoir.metadata.safe import fault_tolerant
 
+
 def computeComprRate(meta, compr_size):
     """
     Compute image compression rate. Skip size of color palette, focus on
@@ -23,6 +24,7 @@ def computeComprRate(meta, compr_size):
         return
     orig_size = meta.get('width') * meta.get('height') * meta.get('bits_per_pixel')
     meta.compr_rate = float(orig_size) / compr_size
+
 
 class BmpMetadata(RootMetadata):
     def extract(self, image):
@@ -44,6 +46,7 @@ class BmpMetadata(RootMetadata):
 
         if "pixels" in image:
             computeComprRate(self, image["pixels"].size)
+
 
 class TiffMetadata(RootMetadata):
     key_to_attr = {
@@ -69,6 +72,7 @@ class TiffMetadata(RootMetadata):
                 continue
             value = field["value"].value
             setattr(self, attrname, value)
+
 
 class IcoMetadata(MultipleMetadata):
     color_to_bpp = {
@@ -107,6 +111,7 @@ class IcoMetadata(MultipleMetadata):
             # Store new image
             self.addGroup("image[%u]" % index, image)
 
+
 class PcxMetadata(RootMetadata):
     @fault_tolerant
     def extract(self, pcx):
@@ -121,6 +126,7 @@ class PcxMetadata(RootMetadata):
         self.format_version = "PCX: %s" % pcx["version"].display
         if "image_data" in pcx:
             computeComprRate(self, pcx["image_data"].size)
+
 
 class XcfMetadata(RootMetadata):
     # Map image type to bits/pixel
@@ -154,6 +160,7 @@ class XcfMetadata(RootMetadata):
     def readProperties(self, xcf):
         for prop in xcf.array("property"):
             self.processProperty(prop)
+
 
 class PngMetadata(RootMetadata):
     TEXT_TO_ATTR = {
@@ -220,6 +227,7 @@ class PngMetadata(RootMetadata):
         # Read compression, timestamp, etc.
         self.compression = header["compression"].display
 
+
 class GifMetadata(RootMetadata):
     def extract(self, gif):
         self.useScreen(gif["/screen"])
@@ -241,6 +249,7 @@ class GifMetadata(RootMetadata):
         self.height = screen["height"].value
         self.bits_per_pixel = (1 + screen["size_global_map"].value)
 
+
 class TargaMetadata(RootMetadata):
     def extract(self, tga):
         self.width = tga["width"].value
@@ -251,6 +260,7 @@ class TargaMetadata(RootMetadata):
         self.compression = tga["codec"].display
         if "pixels" in tga:
             computeComprRate(self, tga["pixels"].size)
+
 
 class WmfMetadata(RootMetadata):
     def extract(self, wmf):
@@ -275,6 +285,7 @@ class WmfMetadata(RootMetadata):
                 self.bits_per_pixel = 24
             self.width = emf["width_px"].value
             self.height = emf["height_px"].value
+
 
 class PsdMetadata(RootMetadata):
     @fault_tolerant

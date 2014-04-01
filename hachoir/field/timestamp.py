@@ -4,6 +4,7 @@ from hachoir.core.tools import (humanDatetime, humanDuration,
 from hachoir.field import Bits, FieldSet
 from datetime import datetime
 
+
 class GenericTimestamp(Bits):
     def __init__(self, parent, name, size, description=None):
         Bits.__init__(self, parent, name, size, description)
@@ -17,6 +18,7 @@ class GenericTimestamp(Bits):
 
     def __bool__(self):
         return Bits.createValue(self) != 0
+
 
 def timestampFactory(cls_name, handler, size):
     class Timestamp(GenericTimestamp):
@@ -35,6 +37,7 @@ TimestampUnix64 = timestampFactory("TimestampUnix64", timestampUNIX, 64)
 TimestampMac32 = timestampFactory("TimestampUnix32", timestampMac32, 32)
 TimestampUUID60 = timestampFactory("TimestampUUID60", timestampUUID60, 60)
 TimestampWin64 = timestampFactory("TimestampWin64", timestampWin64, 64)
+
 
 class TimeDateMSDOS32(FieldSet):
     """
@@ -61,6 +64,7 @@ class TimeDateMSDOS32(FieldSet):
     def createDisplay(self):
         return humanDatetime(self.value)
 
+
 class DateTimeMSDOS32(TimeDateMSDOS32):
     """
     32-bit MS-DOS timestamp (16-bit date, 16-bit time)
@@ -72,6 +76,7 @@ class DateTimeMSDOS32(TimeDateMSDOS32):
         yield Bits(self, "second", 5, "Second/2")
         yield Bits(self, "minute", 6)
         yield Bits(self, "hour", 5)
+
 
 class TimedeltaWin64(GenericTimestamp):
     def __init__(self, parent, name, description=None):

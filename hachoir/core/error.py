@@ -6,6 +6,7 @@ from hachoir.core.log import log
 from hachoir.core.tools import makePrintable
 import sys, traceback
 
+
 def getBacktrace(empty="Empty backtrace."):
     """
     Try to get backtrace as string.

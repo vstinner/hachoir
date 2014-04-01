@@ -1,5 +1,6 @@
 from datetime import tzinfo, timedelta
 
+
 class TimezoneUTC(tzinfo):
     """UTC timezone"""
     ZERO = timedelta(0)
@@ -15,6 +16,7 @@ class TimezoneUTC(tzinfo):
 
     def __repr__(self):
         return "<TimezoneUTC delta=0, name='UTC'>"
+
 
 class Timezone(TimezoneUTC):
     """Fixed offset in hour from UTC."""
@@ -33,6 +35,7 @@ class Timezone(TimezoneUTC):
             self._offset, self._name)
 
 UTC = TimezoneUTC()
+
 
 def createTimezone(offset):
     if offset:

@@ -10,8 +10,10 @@ from hachoir.core.tools import makeUnicode
 from hachoir.metadata.safe import fault_tolerant
 from datetime import datetime
 
+
 def deg2float(degree, minute, second):
     return degree + (float(minute) + float(second) / 60.0) / 60.0
+
 
 class JpegMetadata(RootMetadata):
     EXIF_KEY = {

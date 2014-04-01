@@ -2,12 +2,14 @@
 Dictionnary classes which store values order.
 """
 
+
 class UniqKeyError(Exception):
     """
     Error raised when a value is set whereas the key already exist in a
     dictionnary.
     """
     pass
+
 
 class Dict(object):
     """

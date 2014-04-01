@@ -3,6 +3,7 @@ import gc
 #---- Default implementation when resource is missing ----------------------
 PAGE_SIZE = 4096
 
+
 def getMemoryLimit():
     """
     Get current memory limit in bytes.
@@ -10,6 +11,7 @@ def getMemoryLimit():
     Return None on error.
     """
     return None
+
 
 def setMemoryLimit(max_mem):
     """
@@ -19,6 +21,7 @@ def setMemoryLimit(max_mem):
     Return True if limit is set, False on error.
     """
     return False
+
 
 def getMemorySize():
     """
@@ -32,6 +35,7 @@ def getMemorySize():
     except IOError:
         return None
     return int(statm[0]) * PAGE_SIZE
+
 
 def clearCaches():
     """
@@ -65,6 +69,7 @@ try:
             return False
 except ImportError:
     pass
+
 
 def limitedMemory(limit, func, *args, **kw):
     """

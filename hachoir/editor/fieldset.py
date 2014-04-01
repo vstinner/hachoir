@@ -5,6 +5,7 @@ from collections import deque # Python 2.4
 import weakref # Python 2.1
 import struct
 
+
 class EditableFieldSet(object):
     MAX_SIZE = (1 << 40) # Arbitrary limit to catch errors
     is_field_set = True
@@ -291,6 +292,7 @@ class EditableFieldSet(object):
         raise EditorError('Field set "%s" value is read only' % self.path)
     value = property(_getValue, _setValue, "Value of field")
 
+
 class EditableFloat(EditableFieldSet):
     _value = None
 
@@ -314,6 +316,7 @@ class EditableFloat(EditableFieldSet):
         self._value = value
     value = property(EditableFieldSet._getValue, _setValue)
 
+
 def createEditableFieldSet(parent, field):
     cls = field.__class__
     # FIXME: Support Float80
@@ -321,6 +324,7 @@ def createEditableFieldSet(parent, field):
         return EditableFloat(parent, field)
     else:
         return EditableFieldSet(parent, field)
+
 
 class NewFieldSet(EditableFieldSet):
     def __init__(self, parent, name):
@@ -343,6 +347,7 @@ class NewFieldSet(EditableFieldSet):
     endian = property(_getEndian)
 
     is_altered = property(lambda self: True)
+
 
 def createEditor(fieldset):
     return EditableFieldSet(None, fieldset)

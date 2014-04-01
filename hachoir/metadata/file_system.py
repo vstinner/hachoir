@@ -3,6 +3,7 @@ from hachoir.metadata.safe import fault_tolerant
 from hachoir.parser.file_system import ISO9660
 from datetime import datetime
 
+
 class ISO9660_Metadata(RootMetadata):
     def extract(self, iso):
         desc = iso['volume[0]/content']

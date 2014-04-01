@@ -14,6 +14,7 @@ import re
 
 REGEX_COMMAND_CHARACTERS = '.^$[](){}|+?*\\'
 
+
 def parseRange(text, start):
     r"""
     >>> parseRange('[a]b', 1)
@@ -61,6 +62,7 @@ def parseRange(text, start):
         raise SyntaxError('Invalid range: %s' % text[start-1:index])
     return RegexRange(char_range, exclude), index+1
 
+
 def parseOr(text, start):
     """
     >>> parseOr('(a)', 1)
@@ -95,6 +97,7 @@ def parseOr(text, start):
 
 REPEAT_REGEX = re.compile("([0-9]+)(,[0-9]*)?}")
 
+
 def parseRepeat(text, start):
     """
     >>> parseRepeat('a{0,1}b', 2)
@@ -119,6 +122,7 @@ def parseRepeat(text, start):
 CHAR_TO_FUNC = {'[': parseRange, '(': parseOr}
 CHAR_TO_CLASS = {'.': RegexDot, '^': RegexStart, '$': RegexEnd}
 CHAR_TO_REPEAT = {'*': (0, None), '?': (0, 1), '+': (1, None)}
+
 
 def _parse(text, start=0, until=None):
     if len(text) == start:
@@ -175,6 +179,7 @@ def _parse(text, start=0, until=None):
     if last:
         regex = regex + last
     return regex, index
+
 
 def parse(text):
     r"""

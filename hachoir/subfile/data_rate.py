@@ -2,6 +2,7 @@ from time import time
 
 DATARATE_UPDATE = 1.0   # Time slice (in second) for datarate computation
 
+
 class DataRate:
     """
     Compute average speed in bits per second of a function.

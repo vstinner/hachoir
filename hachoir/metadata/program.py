@@ -2,6 +2,7 @@ from hachoir.metadata.metadata import RootMetadata, registerExtractor
 from hachoir.parser.program import ExeFile
 from hachoir.metadata.safe import fault_tolerant, getValue
 
+
 class ExeMetadata(RootMetadata):
     KEY_TO_ATTR = {
         "ProductName": "title",

@@ -8,6 +8,7 @@ Bit sized classes:
 from hachoir.field import Field
 from hachoir.core import config
 
+
 class RawBits(Field):
     """
     Unknown content with a size in bits.
@@ -35,6 +36,7 @@ class RawBits(Field):
                     (self.__class__.__name__, self._size))
     createRawDisplay = createDisplay
 
+
 class Bits(RawBits):
     """
     Positive integer with a size in bits
@@ -43,6 +45,7 @@ class Bits(RawBits):
     @see: L{RawBits}
     """
     pass
+
 
 class Bit(RawBits):
     """

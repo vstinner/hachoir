@@ -4,6 +4,7 @@ from hachoir.core.dict import Dict, UniqKeyError
 from hachoir.core.tools import lowerBound, makeUnicode
 import hachoir.core.config as config
 
+
 class GenericFieldSet(BasicFieldSet):
     """
     Ordered list of fields. Use operator [] to access fields using their

@@ -7,6 +7,7 @@ from hachoir.core.endian import BIG_ENDIAN, LITTLE_ENDIAN, MIDDLE_ENDIAN
 from itertools import chain, repeat
 from struct import calcsize, unpack, error as struct_error
 
+
 def swap16(value):
     """
     Swap byte between big and little endian of a 16 bits integer.
@@ -15,6 +16,7 @@ def swap16(value):
     '3412'
     """
     return (value & 0xFF) << 8 | (value >> 8)
+
 
 def swap32(value):
     """
@@ -29,6 +31,7 @@ def swap32(value):
          | ((value & 0x00FF0000) >> 8) \
          | ((value & 0xFF000000) >> 24)
 
+
 def arrswapmid(data):
     r"""
     Convert an array of characters from middle-endian to big-endian and vice-versa.
@@ -42,6 +45,7 @@ def arrswapmid(data):
     ret[0::2] = data[1::2]
     return ret
 
+
 def strswapmid(data):
     r"""
     Convert raw data from middle-endian to big-endian and vice-versa.
@@ -50,6 +54,7 @@ def strswapmid(data):
     b'abcdefgh'
     """
     return bytes(arrswapmid(data))
+
 
 def bin2long(text, endian):
     """
@@ -76,6 +81,7 @@ def bin2long(text, endian):
         value += bit
     return value
 
+
 def str2hex(value, prefix="", glue="", format="%02X"):
     r"""
     Convert binary string in hexadecimal (base 16).
@@ -98,6 +104,7 @@ def str2hex(value, prefix="", glue="", format="%02X"):
     for character in value:
         text.append(format % character)
     return glue.join(text)
+
 
 def countBits(value):
     """
@@ -129,6 +136,7 @@ def countBits(value):
             value >>= bits
     return count
 
+
 def byte2bin(number, classic_mode=True):
     """
     Convert a byte (integer in 0..255 range) to a binary string.
@@ -150,6 +158,7 @@ def byte2bin(number, classic_mode=True):
         else:
             text += "0"
     return text
+
 
 def long2raw(value, endian, size=None):
     r"""
@@ -177,6 +186,7 @@ def long2raw(value, endian, size=None):
     if endian == BIG_ENDIAN:
         text = reversed(text)
     return bytes(text)
+
 
 def long2bin(size, value, endian, classic_mode=False):
     """
@@ -218,6 +228,7 @@ def long2bin(size, value, endian, classic_mode=False):
         text = text[8:]
     return result
 
+
 def str2bin(value, classic_mode=True):
     r"""
     Convert binary string to binary numbers.
@@ -235,6 +246,7 @@ def str2bin(value, classic_mode=True):
         byte = ord(character)
         text += byte2bin(byte, classic_mode)
     return text
+
 
 def _createStructFormat():
     """
@@ -254,6 +266,7 @@ def _createStructFormat():
             pass
     return format
 _struct_format = _createStructFormat()
+
 
 def str2long(data, endian):
     r"""

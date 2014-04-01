@@ -7,6 +7,7 @@ from hachoir.core.error import warning
 from hachoir.parser import guessParser
 from hachoir.metadata.setter import normalizeString
 
+
 class TorrentMetadata(RootMetadata):
     KEY_TO_ATTR = {
         "announce": "url",
@@ -40,6 +41,7 @@ class TorrentMetadata(RootMetadata):
             setattr(self, key, value)
         elif field.name == "piece_length":
             self.comment = "Piece length: %s" % field.display
+
 
 class TTF_Metadata(RootMetadata):
     NAMEID_TO_ATTR = {
@@ -81,6 +83,7 @@ class TTF_Metadata(RootMetadata):
                 # "Version 1.2" => "1.2"
                 value = value[8:]
             setattr(self, key, value)
+
 
 class OLE2_Metadata(RootMetadata):
     SUMMARY_ID_TO_ATTR = {
@@ -208,6 +211,7 @@ class OLE2_Metadata(RootMetadata):
                 return
         setattr(self, key, value)
 
+
 class PcfMetadata(RootMetadata):
     PROP_TO_KEY = {
         'CHARSET_REGISTRY': 'charset',
@@ -242,6 +246,7 @@ class PcfMetadata(RootMetadata):
                 continue
             key = self.PROP_TO_KEY[name]
             setattr(self, key, value)
+
 
 class SwfMetadata(RootMetadata):
     def extract(self, swf):
