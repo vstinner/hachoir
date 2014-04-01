@@ -14,7 +14,7 @@ Creation: 8th February 2007
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (StaticFieldSet, FieldSet,
+from hachoir.field import (StaticFieldSet, FieldSet,
     Bit, RawBits, Bits,
     UInt32, UInt16, UInt8, Int8, Enum,
     RawBytes, String, GenericVector)

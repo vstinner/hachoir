@@ -4,7 +4,7 @@ References:
 - http://www.scribd.com/doc/32900475/Photoshop-File-Formats
 """
 
-from hachoir.core.field import (FieldSet, ParserError,
+from hachoir.field import (FieldSet, ParserError,
     UInt8, UInt16, UInt32, Float32, Enum,
     SubFile, String, CString, PascalString8,
     NullBytes, RawBytes)

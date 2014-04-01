@@ -11,7 +11,7 @@ Creation date: 2006-08-13
 
 from hachoir.parser import HachoirParser
 from hachoir.core.endian import LITTLE_ENDIAN
-from hachoir.core.field import (FieldSet, RootSeekableFieldSet,
+from hachoir.field import (FieldSet, RootSeekableFieldSet,
     UInt16, UInt32, String,
     RawBytes, PaddingBytes)
 from hachoir.core.text_handler import textHandler, hexadecimal

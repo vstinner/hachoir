@@ -15,7 +15,7 @@ Author: Victor Stinner
 Creation date: 2007-03-04
 """
 
-from hachoir.core.field import (Field, FieldSet, ParserError, RootSeekableFieldSet,
+from hachoir.field import (Field, FieldSet, ParserError, RootSeekableFieldSet,
     Int32, UInt16, UInt32, UInt64,
     RawBytes, PaddingBytes,
     Enum, String)

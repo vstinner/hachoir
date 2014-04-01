@@ -10,7 +10,7 @@ Creation: 11th February 2007
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (StaticFieldSet, FieldSet, Field,
+from hachoir.field import (StaticFieldSet, FieldSet, Field,
     Bit, Bits,
     UInt32, UInt16, UInt8, Enum,
     PaddingBytes, RawBytes, NullBytes,

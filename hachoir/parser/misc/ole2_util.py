@@ -1,5 +1,5 @@
 from hachoir.core.endian import BIG_ENDIAN, LITTLE_ENDIAN
-from hachoir.core.field import RawBytes, RootSeekableFieldSet, ParserError
+from hachoir.field import RawBytes, RootSeekableFieldSet, ParserError
 from hachoir.parser import HachoirParser
 
 class OLE2FragmentParser(HachoirParser,RootSeekableFieldSet):

@@ -6,7 +6,7 @@ Creation: 12 july 2006
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import UInt32, Enum, String, RawBytes
+from hachoir.field import UInt32, Enum, String, RawBytes
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.core.text_handler import displayHandler, filesizeHandler
 from hachoir.core.tools import createDict, humanFrequency

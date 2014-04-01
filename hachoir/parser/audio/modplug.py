@@ -8,7 +8,7 @@ Author: Christophe GISQUET <christophe.gisquet@free.fr>
 Creation: 10th February 2007
 """
 
-from hachoir.core.field import (FieldSet,
+from hachoir.field import (FieldSet,
     UInt32, UInt16, UInt8, Int8, Float32,
     RawBytes, String, GenericVector, ParserError)
 from hachoir.core.endian import LITTLE_ENDIAN

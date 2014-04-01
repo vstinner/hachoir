@@ -21,7 +21,7 @@ Creation: 2006-04-23
 """
 
 from hachoir.parser import HachoirParser
-from hachoir.core.field import (
+from hachoir.field import (
     FieldSet, ParserError, SeekableFieldSet, RootSeekableFieldSet,
     UInt8, UInt16, UInt32, UInt64, TimestampWin64, Enum,
     Bytes, NullBytes, String)

@@ -23,7 +23,7 @@ Changes:
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet,
+from hachoir.field import (FieldSet,
     CString, String,
     UInt32, UInt16, UInt8,
     Bit, Bits, PaddingBits,

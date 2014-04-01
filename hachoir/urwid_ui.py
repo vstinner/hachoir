@@ -1,5 +1,5 @@
 from hachoir.core.i18n import getTerminalCharset
-from hachoir.core.field import Field, MissingField
+from hachoir.field import Field, MissingField
 from hachoir.core.tools import humanFilesize, humanBitSize, makePrintable
 from hachoir.core.log import log as hachoir_log
 from hachoir.core.stream import InputFieldStream

@@ -7,7 +7,7 @@ from hachoir.core.tools import (
     durationWin64 as doDurationWin64,
     deprecated)
 from types import FunctionType, MethodType
-from hachoir.core.field import Field
+from hachoir.field import Field
 
 def textHandler(field, handler):
     assert isinstance(handler, (FunctionType, MethodType))

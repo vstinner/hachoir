@@ -15,7 +15,7 @@ Author: Victor Stinner, Robert Xiao
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet, ParserError, FieldError,
+from hachoir.field import (FieldSet, ParserError, FieldError,
     UInt8, UInt16, Enum, Field,
     Bit, Bits, NullBits, NullBytes, PaddingBits,
     String, RawBytes)

@@ -10,7 +10,7 @@ Creation date: 6 december 2006
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (Field, FieldSet, ParserError,
+from hachoir.field import (Field, FieldSet, ParserError,
     GenericVector,
     Enum, UInt8, UInt32, UInt64,
     Bytes, RawBytes)

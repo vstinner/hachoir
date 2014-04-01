@@ -16,7 +16,7 @@ Created: 2008-09-21
 """
 
 from hachoir.parser import HachoirParser
-from hachoir.core.field import (RootSeekableFieldSet, FieldSet, Enum,
+from hachoir.field import (RootSeekableFieldSet, FieldSet, Enum,
 Bits, GenericInteger, Float32, Float64, UInt8, UInt64, Bytes, NullBytes, RawBytes, String)
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.core.text_handler import displayHandler

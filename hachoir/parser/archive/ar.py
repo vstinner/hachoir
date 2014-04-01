@@ -3,7 +3,7 @@ GNU ar archive : archive file (.a) and Debian (.deb) archive.
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet, ParserError,
+from hachoir.field import (FieldSet, ParserError,
     String, RawBytes, UnixLine)
 from hachoir.core.endian import BIG_ENDIAN
 

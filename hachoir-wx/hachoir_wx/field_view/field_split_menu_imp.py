@@ -1,5 +1,5 @@
 from hachoir_wx.field_view.mutator import split_field
-from hachoir.core.field import RawBytes, RawBits
+from hachoir.field import RawBytes, RawBits
 from hachoir.core.i18n import _
 
 class field_split_menu_imp_t:

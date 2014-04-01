@@ -17,7 +17,7 @@ Creation date: 26 december 2006
 MAX_FILESIZE = 50 * 1024 * 1024
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet, StaticFieldSet, Enum,
+from hachoir.field import (FieldSet, StaticFieldSet, Enum,
     MissingField, ParserError,
     UInt32, Int32, UInt16, Int16, UInt8, NullBytes, RawBytes, String)
 from hachoir.core.endian import LITTLE_ENDIAN

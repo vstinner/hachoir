@@ -3,7 +3,7 @@ Very basic field: raw content with a size in byte. Use this class for
 unknown content.
 """
 
-from hachoir.core.field import Field, FieldError
+from hachoir.field import Field, FieldError
 from hachoir.core.tools import makePrintable
 from hachoir.core.bits import str2hex
 from hachoir.core import config

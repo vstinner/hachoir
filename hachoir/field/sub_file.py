@@ -1,4 +1,4 @@
-from hachoir.core.field import Bytes
+from hachoir.field import Bytes
 from hachoir.core.tools import makePrintable, humanFilesize
 from hachoir.core.stream import InputIOStream
 

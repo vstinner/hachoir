@@ -8,7 +8,7 @@ Created: 2010-09-01
 """
 
 from hachoir.parser import HachoirParser
-from hachoir.core.field import (RootSeekableFieldSet, FieldSet,
+from hachoir.field import (RootSeekableFieldSet, FieldSet,
     NullBytes, RawBytes, PaddingBytes, Bytes, SubFile, String, PascalString8,
     Bits, UInt8, UInt16, UInt32,
     Link,

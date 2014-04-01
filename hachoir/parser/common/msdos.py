@@ -6,8 +6,8 @@ Documentation:
   http://www.cs.colorado.edu/~main/cs1300/include/ddk/winddk.h
 """
 
-from hachoir.core.field import StaticFieldSet
-from hachoir.core.field import Bit, NullBits
+from hachoir.field import StaticFieldSet
+from hachoir.field import Bit, NullBits
 
 _FIELDS = (
     (Bit, "read_only"),

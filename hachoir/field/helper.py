@@ -1,4 +1,4 @@
-from hachoir.core.field import (FieldError,
+from hachoir.field import (FieldError,
     RawBits, RawBytes,
     PaddingBits, PaddingBytes,
     NullBits, NullBytes,

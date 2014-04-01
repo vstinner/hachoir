@@ -5,7 +5,7 @@ Author: Victor Stinner
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet, ParserError,
+from hachoir.field import (FieldSet, ParserError,
     UInt8, UInt16, UInt32, Enum, RawBytes)
 from hachoir.parser.image.common import PaletteRGBA
 from hachoir.core.endian import LITTLE_ENDIAN

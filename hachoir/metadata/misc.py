@@ -2,7 +2,7 @@ from hachoir.metadata.metadata import RootMetadata, registerExtractor
 from hachoir.metadata.safe import fault_tolerant
 from hachoir.parser.container import SwfFile
 from hachoir.parser.misc import TorrentFile, TrueTypeFontFile, OLE2_File, PcfFile
-from hachoir.core.field import isString
+from hachoir.field import isString
 from hachoir.core.error import warning
 from hachoir.parser import guessParser
 from hachoir.metadata.setter import normalizeString

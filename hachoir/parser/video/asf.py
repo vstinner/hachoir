@@ -11,7 +11,7 @@ Creation: 5 august 2006
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet, ParserError,
+from hachoir.field import (FieldSet, ParserError,
     UInt16, UInt32, UInt64,
     TimestampWin64, TimedeltaWin64,
     String, PascalString16, Enum,

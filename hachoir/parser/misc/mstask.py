@@ -11,7 +11,7 @@ http://technet.microsoft.com/en-us/library/bb490996.aspx
 
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet, RootSeekableFieldSet,
+from hachoir.field import (FieldSet, RootSeekableFieldSet,
     CString, String, PascalString16,
     UInt32, UInt16, UInt8,
     Bit, Bits, PaddingBits,

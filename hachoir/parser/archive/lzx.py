@@ -7,7 +7,7 @@ Author: Robert Xiao
 Creation date: July 18, 2007
 """
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet,
+from hachoir.field import (FieldSet,
     UInt32, Bit, Bits, PaddingBits,
     RawBytes, ParserError)
 from hachoir.core.endian import MIDDLE_ENDIAN, LITTLE_ENDIAN

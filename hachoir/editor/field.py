@@ -1,4 +1,4 @@
-from hachoir.core.field import joinPath, MissingField
+from hachoir.field import joinPath, MissingField
 
 class EditorError(Exception):
     pass

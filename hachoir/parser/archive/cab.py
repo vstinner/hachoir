@@ -9,7 +9,7 @@ Creation date: 31 january 2007
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet, Enum,
+from hachoir.field import (FieldSet, Enum,
     CString, String,
     UInt8, UInt16, UInt32, Bit, Bits, PaddingBits, NullBits,
     DateTimeMSDOS32, RawBytes)

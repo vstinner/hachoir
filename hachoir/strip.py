@@ -6,7 +6,7 @@ Author: Victor Stinner
 Creation: 17 september 2006
 """
 
-from hachoir.core.field import MissingField
+from hachoir.field import MissingField
 from hachoir.editor import (createEditor,
     NewFieldSet, EditableInteger, EditableBytes)
 from hachoir.core.stream import FileOutputStream, StringOutputStream

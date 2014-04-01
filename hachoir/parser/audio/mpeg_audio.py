@@ -6,7 +6,7 @@ Author: Victor Stinner
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet,
+from hachoir.field import (FieldSet,
     MissingField, ParserError, createOrphanField,
     Bit, Bits, Enum,
     PaddingBits, PaddingBytes,

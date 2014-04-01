@@ -6,7 +6,7 @@ Informations: http://www.id3.org/
 Author: Victor Stinner
 """
 
-from hachoir.core.field import (FieldSet, MatchError, ParserError,
+from hachoir.field import (FieldSet, MatchError, ParserError,
     Enum, UInt8, UInt24, UInt32,
     CString, String, RawBytes,
     Bit, Bits, NullBytes, NullBits)

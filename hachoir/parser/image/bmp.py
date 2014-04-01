@@ -7,7 +7,7 @@ Creation: 16 december 2005
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet,
+from hachoir.field import (FieldSet,
     UInt8, UInt16, UInt32, Bits,
     String, RawBytes, Enum,
     PaddingBytes, NullBytes, createPaddingField)

@@ -1,4 +1,4 @@
-from hachoir.core.field import Bit, Bits, FieldSet
+from hachoir.field import Bit, Bits, FieldSet
 from hachoir.core.endian import BIG_ENDIAN, LITTLE_ENDIAN
 import struct
 

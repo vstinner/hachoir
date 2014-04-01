@@ -10,7 +10,7 @@ Author: Victor Stinner
 Creation date: 4 november 2006
 """
 
-from hachoir.core.field import (FieldSet, ParserError,
+from hachoir.field import (FieldSet, ParserError,
     UInt8, UInt16, UInt32, PascalString16, Float64)
 from hachoir.core.tools import timestampUNIX
 

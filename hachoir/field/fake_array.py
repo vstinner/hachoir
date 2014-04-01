@@ -1,5 +1,5 @@
 import itertools
-from hachoir.core.field import MissingField
+from hachoir.field import MissingField
 
 class FakeArray:
     """

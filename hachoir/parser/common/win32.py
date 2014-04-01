@@ -1,4 +1,4 @@
-from hachoir.core.field import (FieldSet,
+from hachoir.field import (FieldSet,
     UInt16, UInt32, Enum, String, Bytes, Bits, TimestampUUID60)
 from hachoir.parser.video.fourcc import video_fourcc_name
 from hachoir.core.bits import str2hex

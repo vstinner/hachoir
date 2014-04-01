@@ -8,7 +8,7 @@ A field is created when someone ask to access it, or when another field is
 asked and the field is before it. So if you use a field in your field set
 constructor, one or more fields will be created. Example:
 
->>> from hachoir.core.field import Parser, Int8
+>>> from hachoir.field import Parser, Int8
 >>> from hachoir.core.endian import BIG_ENDIAN
 >>> class Point(Parser):
 ...     endian = BIG_ENDIAN
@@ -67,7 +67,7 @@ before size value can be read. But you can specify field list size:
 
 Two examples:
 
->>> from hachoir.core.field import Parser
+>>> from hachoir.field import Parser
 >>> class FourBytes(Parser):
 ...     endian = BIG_ENDIAN
 ...     static_size = 32

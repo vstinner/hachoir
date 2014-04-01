@@ -19,7 +19,7 @@ import cgi
 import cgitb; cgitb.enable()
 
 from hachoir.core.tools import alignValue
-from hachoir.core.field import Field, SubFile
+from hachoir.field import Field, SubFile
 from hachoir.core.stream import FileInputStream, StringInputStream
 from hachoir.core.stream.input import FileFromInputStream, InputSubStream
 from hachoir.parser.guess import guessParser

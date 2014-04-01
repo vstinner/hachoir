@@ -19,7 +19,7 @@ Creation: 18th February 2007
 
 from math import log10
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet,
+from hachoir.field import (FieldSet,
     Bits, UInt16, UInt8,
     RawBytes, String, GenericVector)
 from hachoir.core.endian import BIG_ENDIAN

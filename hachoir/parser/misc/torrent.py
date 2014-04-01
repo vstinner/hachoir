@@ -8,7 +8,7 @@ Author: Christophe Gisquet <christophe.gisquet@free.fr>
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet, ParserError,
+from hachoir.field import (FieldSet, ParserError,
     String, RawBytes)
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.tools import makePrintable, timestampUNIX, humanFilesize

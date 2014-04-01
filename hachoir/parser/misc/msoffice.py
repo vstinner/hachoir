@@ -10,7 +10,7 @@ Author: Robert Xiao, Victor Stinner
 Creation: 8 january 2005
 """
 
-from hachoir.core.field import (SubFile, FieldSet,
+from hachoir.field import (SubFile, FieldSet,
     UInt8, UInt16, Int32, UInt32, Enum, String, CString,
     Bits, RawBytes)
 from hachoir.core.text_handler import textHandler, hexadecimal

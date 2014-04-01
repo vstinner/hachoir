@@ -11,7 +11,7 @@ Sources:
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet, ParserError,
+from hachoir.field import (FieldSet, ParserError,
     Bit, Bits, UInt8, UInt16, UInt32,
     Enum, String, TimestampUnix32, RawBytes, NullBytes)
 from hachoir.core.tools import (alignValue,

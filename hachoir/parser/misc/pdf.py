@@ -5,7 +5,7 @@ Author: Christophe Gisquet <christophe.gisquet@free.fr>
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (
+from hachoir.field import (
     Field, FieldSet,
     ParserError,
     GenericVector,

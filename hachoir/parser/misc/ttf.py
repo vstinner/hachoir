@@ -11,7 +11,7 @@ Creation date: 2007-02-08
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet, ParserError,
+from hachoir.field import (FieldSet, ParserError,
     UInt16, UInt32, Bit, Bits,
     PaddingBits, NullBytes,
     String, RawBytes, Bytes, Enum,

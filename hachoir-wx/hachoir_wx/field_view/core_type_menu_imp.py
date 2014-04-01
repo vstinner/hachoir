@@ -1,4 +1,4 @@
-from hachoir.core.field import available_types
+from hachoir.field import available_types
 from hachoir_wx.field_view.mutator import convert_field
 from hachoir_wx.field_view.stubs import can_convert
 

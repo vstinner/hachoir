@@ -1,4 +1,4 @@
-from hachoir.core.field import BasicFieldSet, GenericFieldSet
+from hachoir.field import BasicFieldSet, GenericFieldSet
 
 class FieldSet(GenericFieldSet):
     def __init__(self, parent, name, *args, **kw):

@@ -1,4 +1,4 @@
-from hachoir.core.field import FieldSet, Field, Bits
+from hachoir.field import FieldSet, Field, Bits
 from hachoir.core.bits import str2hex
 from hachoir.parser.network.ouid import REGISTERED_OUID
 from hachoir.core.endian import BIG_ENDIAN

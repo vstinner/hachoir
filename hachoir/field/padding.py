@@ -1,4 +1,4 @@
-from hachoir.core.field import Bits, Bytes
+from hachoir.field import Bits, Bytes
 from hachoir.core.tools import makePrintable, humanFilesize
 from hachoir.core import config
 

@@ -5,7 +5,7 @@ Documents:
    http://www.wotsit.org/download.asp?f=word2&sc=275927573
 """
 
-from hachoir.core.field import (FieldSet, Enum,
+from hachoir.field import (FieldSet, Enum,
     Bit, Bits,
     UInt8, Int16, UInt16, UInt32, Int32,
     NullBytes, Bytes, RawBytes, PascalString16,

@@ -11,7 +11,7 @@ Sources:
 Author: Victor Stinner
 """
 
-from hachoir.core.field import (FieldSet, ParserError,
+from hachoir.field import (FieldSet, ParserError,
     UInt8, UInt16, String, RawBytes, NullBytes)
 from hachoir.core.text_handler import textHandler, hexadecimal
 

@@ -6,7 +6,7 @@ Creation: 18 december 2006
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import FieldSet, UInt8, UInt16, Enum, RawBytes
+from hachoir.field import FieldSet, UInt8, UInt16, Enum, RawBytes
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.parser.image.common import PaletteRGB
 

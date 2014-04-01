@@ -3,7 +3,7 @@
 Test hachoir-parser using the testcase.
 """
 
-from hachoir.core.field import FieldError
+from hachoir.field import FieldError
 from hachoir.core.error import error
 from hachoir.core.stream import InputStreamError, StringInputStream
 from hachoir.parser import createParser, HachoirParserList, ValidateError

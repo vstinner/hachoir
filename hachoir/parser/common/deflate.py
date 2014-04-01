@@ -1,4 +1,4 @@
-from hachoir.core.field import CompressedField
+from hachoir.field import CompressedField
 
 try:
     from zlib import decompressobj, MAX_WBITS

@@ -1,5 +1,5 @@
 from hachoir.core.endian import BIG_ENDIAN, LITTLE_ENDIAN, MIDDLE_ENDIAN
-from hachoir.core.field import GenericFieldSet
+from hachoir.field import GenericFieldSet
 from hachoir.core.log import Logger
 import hachoir.core.config as config
 

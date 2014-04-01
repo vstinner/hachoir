@@ -5,7 +5,7 @@
 #
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet, Link,
+from hachoir.field import (FieldSet, Link,
     MissingField, ParserError,
     Enum as _Enum, String as _String,
     Float32, Float64,

@@ -14,7 +14,7 @@ Author: Victor Stinner
 SECTOR_SIZE = 512
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet, Enum,
+from hachoir.field import (FieldSet, Enum,
     UInt8, UInt16, UInt32, UInt64, TimestampWin64,
     String, Bytes, Bit,
     NullBits, NullBytes, PaddingBytes, RawBytes)

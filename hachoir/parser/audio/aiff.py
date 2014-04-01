@@ -6,7 +6,7 @@ Creation: 27 december 2006
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet,
+from hachoir.field import (FieldSet,
     UInt16, UInt32, Float80, TimestampMac32,
     RawBytes, NullBytes,
     String, Enum, PascalString32)

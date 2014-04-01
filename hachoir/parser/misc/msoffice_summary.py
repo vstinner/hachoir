@@ -9,7 +9,7 @@ Documents
 """
 from hachoir.core.endian import BIG_ENDIAN,LITTLE_ENDIAN
 from hachoir.parser import HachoirParser
-from hachoir.core.field import (FieldSet, ParserError,
+from hachoir.field import (FieldSet, ParserError,
     SeekableFieldSet,
     Bit, Bits, NullBits,
     UInt8, UInt16, UInt32, TimestampWin64, TimedeltaWin64, Enum,

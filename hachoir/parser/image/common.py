@@ -1,4 +1,4 @@
-from hachoir.core.field import FieldSet, UserVector, UInt8
+from hachoir.field import FieldSet, UserVector, UInt8
 
 class RGB(FieldSet):
     color_name = {

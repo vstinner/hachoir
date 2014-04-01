@@ -1,4 +1,4 @@
-from hachoir.core.field import (FieldSet, ParserError,
+from hachoir.field import (FieldSet, ParserError,
     Bit, UInt8, UInt16, UInt32, TimestampUnix32,
     Bytes, String, Enum,
     PaddingBytes, PaddingBits, NullBytes, NullBits)

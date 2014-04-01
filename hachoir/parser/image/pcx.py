@@ -3,7 +3,7 @@ PCX picture filter.
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (
+from hachoir.field import (
     UInt8, UInt16,
     PaddingBytes, RawBytes,
     Enum)

@@ -5,7 +5,7 @@
 #
 
 from hachoir.parser import Parser
-from hachoir.core.field import (Field, FieldSet, createOrphanField,
+from hachoir.field import (Field, FieldSet, createOrphanField,
     NullBits, Bit, Bits, Enum, Fragment, MissingField, ParserError,
     UInt8, UInt16, UInt24, UInt32, UInt64,
     RawBytes, String, PascalString32, NullBytes)

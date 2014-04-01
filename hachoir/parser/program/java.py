@@ -60,7 +60,7 @@ TODO/FIXME:
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (
+from hachoir.field import (
         ParserError, FieldSet, StaticFieldSet,
         Enum, RawBytes, PascalString16, Float32, Float64,
         Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64,

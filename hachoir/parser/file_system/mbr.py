@@ -13,7 +13,7 @@ Master Boot Record.
 # 3. 255 heads and 63 sectors/cylinder.
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet,
+from hachoir.field import (FieldSet,
     Enum, Bits, UInt8, UInt16, UInt32,
     RawBytes)
 from hachoir.core.endian import LITTLE_ENDIAN

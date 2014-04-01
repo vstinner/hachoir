@@ -5,7 +5,7 @@ from hachoir.parser.image.jpeg import (
     JpegFile, JpegChunk,
     QUALITY_HASH_COLOR, QUALITY_SUM_COLOR,
     QUALITY_HASH_GRAY, QUALITY_SUM_GRAY)
-from hachoir.core.field import MissingField
+from hachoir.field import MissingField
 from hachoir.core.tools import makeUnicode
 from hachoir.metadata.safe import fault_tolerant
 from datetime import datetime

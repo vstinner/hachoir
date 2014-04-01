@@ -1,4 +1,4 @@
-from hachoir.core.field import MissingField
+from hachoir.field import MissingField
 from hachoir.metadata.metadata import (registerExtractor,
     Metadata, RootMetadata, MultipleMetadata)
 from hachoir.metadata.metadata_item import QUALITY_GOOD

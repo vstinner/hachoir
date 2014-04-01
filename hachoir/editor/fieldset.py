@@ -1,5 +1,5 @@
 from hachoir.core.dict import UniqKeyError
-from hachoir.core.field import MissingField, Float32, Float64, FakeArray
+from hachoir.field import MissingField, Float32, Float64, FakeArray
 from hachoir.editor import createEditableField, EditorError
 from collections import deque # Python 2.4
 import weakref # Python 2.1

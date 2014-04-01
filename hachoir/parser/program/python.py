@@ -12,7 +12,7 @@ Creation: 25 march 2005
 DISASSEMBLE = False
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet, UInt8,
+from hachoir.field import (FieldSet, UInt8,
     UInt16, Int32, UInt32, Int64, ParserError, Float64, Enum,
     Character, Bytes, RawBytes, PascalString8, TimestampUnix32)
 from hachoir.core.endian import LITTLE_ENDIAN

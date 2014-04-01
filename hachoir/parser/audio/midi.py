@@ -9,7 +9,7 @@ Creation: 27 december 2006
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet, Bits, ParserError,
+from hachoir.field import (FieldSet, Bits, ParserError,
     String, UInt32, UInt24, UInt16, UInt8, Enum, RawBits, RawBytes)
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal

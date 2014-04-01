@@ -5,7 +5,7 @@ Author: Victor Stinner
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet,
+from hachoir.field import (FieldSet,
     Enum, UInt8, SubFile, String, NullBytes)
 from hachoir.core.tools import humanFilesize, paddingSize, timestampUNIX
 from hachoir.core.endian import BIG_ENDIAN

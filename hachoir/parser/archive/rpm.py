@@ -5,7 +5,7 @@ Author: Victor Stinner, 1st December 2005.
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet, ParserError,
+from hachoir.field import (FieldSet, ParserError,
     UInt8, UInt16, UInt32, UInt64, Enum,
     NullBytes, Bytes, RawBytes, SubFile,
     Character, CString, String)

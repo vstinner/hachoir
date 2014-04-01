@@ -15,7 +15,7 @@ Note: For PascalStringXX, prefixed value is the number of bytes and not
       of characters!
 """
 
-from hachoir.core.field import FieldError, Bytes
+from hachoir.field import FieldError, Bytes
 from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir.core.tools import alignValue, makePrintable
 from hachoir.core.i18n import guessBytesCharset

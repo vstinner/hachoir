@@ -12,7 +12,7 @@ Creation date: 19 january 2006
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (StaticFieldSet, FieldSet,
+from hachoir.field import (StaticFieldSet, FieldSet,
     Bit, Bits, NullBits, RawBytes, Enum,
     UInt8, UInt16, UInt32,
     PascalString8, PascalString16, String,

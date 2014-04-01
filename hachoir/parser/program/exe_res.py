@@ -9,7 +9,7 @@ Author: Victor Stinner
 Creation date: 2007-01-19
 """
 
-from hachoir.core.field import (FieldSet, ParserError, Enum,
+from hachoir.field import (FieldSet, ParserError, Enum,
     Bit, Bits, SeekableFieldSet,
     UInt16, UInt32, TimestampUnix32,
     RawBytes, PaddingBytes, NullBytes, NullBits,

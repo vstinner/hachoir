@@ -10,7 +10,7 @@ File format references:
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (ParserError,
+from hachoir.field import (ParserError,
     UInt8, UInt16, UInt32, UInt64, String, RawBytes, SubFile, FieldSet, NullBits, Bit, Bits, Bytes,
     SeekableFieldSet, RootSeekableFieldSet)
 from hachoir.core.text_handler import textHandler, hexadecimal

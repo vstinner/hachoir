@@ -10,7 +10,7 @@ References:
     http://partners.adobe.com/public/developer/en/tiff/TIFF6.pdf
 """
 
-from hachoir.core.field import (FieldSet, SeekableFieldSet, ParserError,
+from hachoir.field import (FieldSet, SeekableFieldSet, ParserError,
     UInt8, UInt16, UInt32,
     Int8, Int16, Int32,
     Float32, Float64,

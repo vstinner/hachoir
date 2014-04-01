@@ -1,4 +1,4 @@
-from hachoir.core.field import (MissingField, BasicFieldSet, Field, ParserError,
+from hachoir.field import (MissingField, BasicFieldSet, Field, ParserError,
     createRawField, createNullField, createPaddingField, FakeArray)
 from hachoir.core.dict import Dict, UniqKeyError
 from hachoir.core.tools import lowerBound, makeUnicode

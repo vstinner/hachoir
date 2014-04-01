@@ -1,4 +1,4 @@
-from hachoir.core.field import (FieldSet,
+from hachoir.field import (FieldSet,
     Bit, UInt8, UInt16, UInt32, Bytes,
     PaddingBits, PaddingBytes, NullBits, NullBytes)
 from hachoir.core.text_handler import textHandler, hexadecimal, filesizeHandler

@@ -10,7 +10,7 @@ Creation: 11 july 2006
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet, ParserError,
+from hachoir.field import (FieldSet, ParserError,
     UInt8, UInt32, UInt64, Enum,
     NullBytes, RawBytes, String)
 from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN

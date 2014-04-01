@@ -9,7 +9,7 @@ Samples:
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet,
+from hachoir.field import (FieldSet,
     UInt8, UInt16, UInt32,
     Bytes, RawBytes, String,
     PascalString8)

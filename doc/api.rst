@@ -42,7 +42,7 @@ Basic parser
 
 We will parse the data used in the last section::
 
-   >>> from hachoir.core.field import Parser, CString, UInt16
+   >>> from hachoir.field import Parser, CString, UInt16
    >>> class Point(Parser):
    ...     endian = LITTLE_ENDIAN
    ...     def createFields(self):
@@ -84,7 +84,7 @@ Parser with sub-field sets
 After learning basic API, let's see a more complex parser: parser with
 sub-field sets::
 
-   >>> from hachoir.core.field import FieldSet, UInt8, Character, String
+   >>> from hachoir.field import FieldSet, UInt8, Character, String
    >>> class Entry(FieldSet):
    ...     def createFields(self):
    ...         yield Character(self, "letter")

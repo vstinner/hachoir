@@ -15,7 +15,7 @@ Creation date: 15 september 2006
 
 from hachoir.parser import Parser
 from hachoir.parser.audio.mpeg_audio import MpegAudioFile
-from hachoir.core.field import (FieldSet,
+from hachoir.field import (FieldSet,
     FieldError, ParserError,
     Bit, Bits, Bytes, RawBits, PaddingBits, NullBits,
     UInt8, UInt16,

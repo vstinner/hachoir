@@ -1,7 +1,7 @@
 from hachoir.core.i18n import getTerminalCharset
 from hachoir.core.cmd_line import (getHachoirOptions,
     configureHachoir)
-from hachoir.core.field import isString
+from hachoir.field import isString
 from hachoir.core.benchmark import Benchmark
 from hachoir.core.error import error
 from hachoir.core.stream import InputStreamError

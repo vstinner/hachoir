@@ -5,7 +5,7 @@ Author: Victor Stinner
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (
+from hachoir.field import (
     UInt8, UInt16, UInt32, Enum, TimestampUnix32,
     Bit, CString, SubFile,
     NullBits, Bytes, RawBytes)

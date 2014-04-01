@@ -6,7 +6,7 @@ Author: Victor Stinner, Robert Xiao
 
 from hachoir.parser import Parser
 from hachoir.core.tools import paddingSize
-from hachoir.core.field import (Field, FieldSet, GenericVector,
+from hachoir.field import (Field, FieldSet, GenericVector,
     ParserError, String,
     PaddingBits, Bit, Bits, Character,
     UInt32, Enum, CompressedField)

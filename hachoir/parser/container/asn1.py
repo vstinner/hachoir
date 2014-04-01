@@ -40,7 +40,7 @@ Creation date: 24 september 2006
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet,
+from hachoir.field import (FieldSet,
     FieldError, ParserError,
     Bit, Bits, Bytes, UInt8, GenericInteger, String,
     Field, Enum, RawBytes)

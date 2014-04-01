@@ -9,7 +9,7 @@ Author: Victor Stinner
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet, Fragment,
+from hachoir.field import (FieldSet, Fragment,
     ParserError, MissingField,
     UInt8, UInt16, UInt32,
     String, CString,

@@ -9,7 +9,7 @@ Creation date: 19 august 2006
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet,
+from hachoir.field import (FieldSet,
     UInt8, UInt16, UInt32, Int32, UInt64, TimestampMac32,
     String, Float32, NullBytes, Enum, RawBytes)
 from hachoir.core.endian import LITTLE_ENDIAN

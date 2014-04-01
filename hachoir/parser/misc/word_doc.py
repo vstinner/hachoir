@@ -11,7 +11,7 @@ Documents:
    section. Revised Dec 21 1998, added missing Document Properties (section).
 """
 
-from hachoir.core.field import (FieldSet, Enum,
+from hachoir.field import (FieldSet, Enum,
     Bit, Bits,
     UInt8, Int16, UInt16, UInt32, Int32,
     NullBytes, Bytes, RawBytes, PascalString8, PascalString16, CString, String,

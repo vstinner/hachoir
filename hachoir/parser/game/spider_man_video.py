@@ -8,7 +8,7 @@ File samples: http://samples.mplayerhq.hu/game-formats/spiderman-segacd-bin/
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import FieldSet, UInt32, String, RawBytes
+from hachoir.field import FieldSet, UInt32, String, RawBytes
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal
 

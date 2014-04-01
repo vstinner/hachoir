@@ -10,7 +10,7 @@ Creation date: 25 december 2006 (christmas ;-))
 """
 
 from hachoir.parser import Parser
-from hachoir.core.field import (ParserError, GenericVector,
+from hachoir.field import (ParserError, GenericVector,
     UInt32, String,
     Bytes, NullBytes, RawBytes)
 from hachoir.core.endian import LITTLE_ENDIAN

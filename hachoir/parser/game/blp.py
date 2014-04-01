@@ -13,7 +13,7 @@ Creation date: July 10 2007
 """
 
 from hachoir.core.endian import LITTLE_ENDIAN
-from hachoir.core.field import String, UInt32, UInt8, Enum, FieldSet, RawBytes, GenericVector, Bit, Bits
+from hachoir.field import String, UInt32, UInt8, Enum, FieldSet, RawBytes, GenericVector, Bit, Bits
 from hachoir.parser.parser import Parser
 from hachoir.parser.image.common import PaletteRGBA
 from hachoir.core.tools import alignValue

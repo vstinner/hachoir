@@ -1,9 +1,9 @@
 from hachoir.parser import Parser
-from hachoir.core.field import (FieldSet, StaticFieldSet,
+from hachoir.field import (FieldSet, StaticFieldSet,
     RawBytes, PaddingBytes, createPaddingField, Link, Fragment,
     Bit, Bits, UInt8, UInt16, UInt32,
     String, Bytes, NullBytes)
-from hachoir.core.field.integer import GenericInteger
+from hachoir.field.integer import GenericInteger
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal
 from hachoir.core.error import error
