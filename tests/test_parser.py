@@ -20,555 +20,473 @@ import sys
 import unittest
 
 DATADIR = os.path.join(os.path.dirname(__file__), 'files')
-VERBOSE = False
-
-###########################################################################
-
-def checkValue(parser, path, value):
-    if VERBOSE:
-        sys.stdout.write("  - Check field %s.value=%s (%s): "
-            % (path, repr(value), value.__class__.__name__))
-        sys.stdout.flush()
-    try:
-        read = parser[path].value
-        if read == value:
-            if VERBOSE:
-                sys.stdout.write("ok\n")
-            return True
-        else:
-            if VERBOSE:
-                sys.stdout.write("wrong value (%s, %s)\n"
-                    % (repr(read), read.__class__.__name__))
-            return False
-    except FieldError as err:
-        if VERBOSE:
-            sys.stdout.write("field error: %s\n" % str(err))
-        return False
-
-def checkDisplay(parser, path, value):
-    if VERBOSE:
-        sys.stdout.write("  - Check field %s.display=%s (%s): "
-            % (path, repr(value), value.__class__.__name__))
-        sys.stdout.flush()
-    try:
-        read = parser[path].display
-        if read == value:
-            if VERBOSE:
-                sys.stdout.write("ok\n")
-            return True
-        else:
-            if VERBOSE:
-                sys.stdout.write("wrong value (%s, %s)\n"
-                    % (repr(read), read.__class__.__name__))
-            return False
-    except FieldError as err:
-        if VERBOSE:
-            sys.stdout.write("field error: %s\n" % str(err))
-        return False
-
-def checkDesc(parser, path, value):
-    if VERBOSE:
-        sys.stdout.write("  - Check field %s.description=%s (%s): "
-            % (path, repr(value), value.__class__.__name__))
-        sys.stdout.flush()
-    try:
-        read = parser[path].description
-        if read == value:
-            if VERBOSE:
-                sys.stdout.write("ok\n")
-            return True
-        else:
-            if VERBOSE:
-                sys.stdout.write("wrong value (%s, %s)\n"
-                    % (repr(read), read.__class__.__name__))
-            return False
-    except FieldError as err:
-        if VERBOSE:
-            sys.stdout.write("field error: %s\n" % str(err))
-        return False
-
-def checkNames(parser, path, names):
-    if VERBOSE:
-        sys.stdout.write("  - Check field names %s=(%s) (%u): "
-            % (path, ", ".join(names), len(names)))
-        sys.stdout.flush()
-    try:
-        fieldset = parser[path]
-        if len(fieldset) != len(names):
-            if VERBOSE:
-                sys.stdout.write("invalid length (%u)\n" % len(fieldset))
-            return False
-        names = list(names)
-        read = list(field.name for field in fieldset)
-        if names != read:
-            if VERBOSE:
-                sys.stdout.write("wrong names (%s)\n" % ", ".join(read))
-            return True
-        else:
-            if VERBOSE:
-                sys.stdout.write("ok\n")
-            return True
-    except FieldError as err:
-        if VERBOSE:
-            sys.stdout.write("field error: %s\n" % str(err))
-        return False
-
-###########################################################################
-
-def checkYellowdude(parser): return (
-    checkValue(parser, "/main/version/version", 2),
-    checkNames(parser, "/main", ("type", "size", "version", "obj_mat")))
-
-def checkLogoUbuntu(parser): return (
-    checkValue(parser, "/header/width", 331),
-    checkValue(parser, "/time/second", 46))
-
-def checkClick(parser): return (
-    checkValue(parser, "/info/producer/text", "Sound Forge 4.5"),
-    checkValue(parser, "/format/sample_per_sec", 22050))
-
-def checkMBR(parser): return (
-    checkValue(parser, "/mbr/header[1]/size", 65545200),
-    checkDisplay(parser, "/mbr/signature", "0xaa55"))
-
-def checkFlashMob(parser): return (
-    checkValue(parser, "/Segment[0]/Cues/CuePoint[1]/CueTrackPositions[0]"
-          + "/CueClusterPosition/cluster/BlockGroup[14]/Block/block/timecode", 422),
-    checkValue(parser, "/Segment[0]/Tags[0]/Tag[0]/SimpleTag[3]/TagString/unicode",
-          "\xa9 dadaprod, licence Creative Commons by-nc-sa 2.0 fr"))
-
-def check10min(parser): return (
-    checkValue(parser, "/Segment[0]/size", None),
-    checkValue(parser, "/Segment[0]/Tracks[0]/TrackEntry[0]/CodecID/string", "V_MPEG4/ISO/AVC"))
-
-def checkWormuxICO(parser): return (
-    checkValue(parser, "icon_header[0]/height", 16),
-    checkValue(parser, "icon_data[0]/header/hdr_size", 40))
-
-def checkCDA(parser): return (
-    checkValue(parser, "filesize", 36),
-    checkValue(parser, "/cdda/track_no", 4),
-    checkDisplay(parser, "/cdda/disc_serial", "0008-5C48"),
-    checkValue(parser, "/cdda/rb_length/second", 53))
-
-def checkSheepMP3(parser): return (
-    checkValue(parser, "/id3v2/field[6]/content/text",
-        'Stainless Steel Provider is compilated to the car of Twinstar.'),
-    checkValue(parser, "/frames/frame[0]/use_padding", False))
-
-def checkAU(parser): return (
-    checkValue(parser, "info", "../tmp/temp.snd"),
-    checkDisplay(parser, "codec", "8-bit ISDN u-law"))
-
-def checkGzip(parser):
-    return (checkValue(parser, "filename", "test.txt"),)
-
-def checkSteganography(parser): return (
-    checkValue(parser, "/frames/padding[0]", b"misc est un canard\r"),
-    checkDesc(parser, "/frames", 'Frames: Variable bit rate (VBR)'),
-    checkDesc(parser, "/frames/frame[1]", 'MPEG-1 layer III, 160.0 Kbit/sec, 44.1 kHz'))
-
-def checkRPM(parser): return (
-    checkValue(parser, "name", "ftp-0.17-537"),
-    checkValue(parser, "os", 1),
-    checkValue(parser, "checksum/content_item[2]/value", 50823),
-    checkValue(parser, "header/content_item[15]/value", "ftp://ftp.uk.linux.org/pub/linux/Networking/netkit"))
-
-def checkJPEG(parser): return (
-    checkValue(parser, "app0/content/jfif", "JFIF\x00"),
-    checkValue(parser, "app0/content/ver_maj", 1),
-    checkValue(parser, "photoshop/content/signature", "Photoshop 3.0"),
-    checkValue(parser, "photoshop/content/copyright_flag/content", 0),
-    checkValue(parser, "exif/content/header", "Exif\0\0"),
-    checkValue(parser, "exif/content/version", 42))
-
-def checkTAR(parser): return (
-    checkDisplay(parser, "file[0]/name", '"dummy.txt"'),
-    checkDisplay(parser, "file[1]/mode", '"0000755"'),
-    checkDisplay(parser, "file[1]/type", 'Directory'),
-    checkDisplay(parser, "file[2]/devmajor", '(empty)'),
-)
-
-def checkRAR(parser): return (
-    checkValue(parser, "archive_start/crc16", 0x77E1),
-    checkValue(parser, "new_sub_block[0]/crc16", 0x2994),
-    checkValue(parser, "file[0]/crc32", 0x4C6D13ED),
-    checkValue(parser, "new_sub_block[1]/crc32", 0x34528E23),
-    checkValue(parser, "file[1]/filename", ".svn\prop-base\README.svn-base"),
-    checkValue(parser, "new_sub_block[1]/filename", 'ACL'),
-    #archive_end bad candidate for checking
-    checkValue(parser, "new_sub_block[362]/crc32", 0x6C84C95E),
-)
-
-def checkACE(parser): return (
-    checkValue(parser, "header/crc16", 0xA9BE),
-    checkValue(parser, "file[0]/reserved", 0x4554),
-    checkValue(parser, "file[1]/filename", "hachoir_core\.svn"),
-    checkValue(parser, "file[2]/parameters", 0x000A),
-    #End of archive, lots of work...
-    #checkValue(parser, "new_recovery[0]/signature", "**ACE**"),
-)
-
-def checkCornerBMP(parser): return (
-    checkValue(parser, "header/width", 189),
-    checkValue(parser, "header/used_colors", 70),
-    checkDesc(parser, "palette/color[1]", "RGB color: White (opacity: 0%)"),
-    checkValue(parser, "pixels/line[26]/pixel[14]", 28),
-)
-
-def checkCACertClass3(parser): return (
-    checkDisplay(parser, "seq[0]/class", 'universal'),
-    checkDesc(parser, "seq[0]/seq[0]/seq[1]/obj_id[0]", "Object identifier: 1.2.840.113549.1.1.4"),
-    checkValue(parser, "seq[0]/seq[0]/seq[2]/set[0]/seq[0]/print_str[0]/value", "Root CA"),
-    checkValue(parser, "seq[0]/seq[0]/seq[2]/set[3]/seq[0]/ia5_str[0]/value", "support@cacert.org"),
-    checkValue(parser, "seq[0]/bit_str[0]/size", 513),
-)
-
-def checkPYC(parser): return (
-    checkValue(parser, "/content/consts/item[0]", 42),
-    checkValue(parser, "/content/stack_size", 4),
-    checkValue(parser, "/content/consts/item[1]", 2535301200456458802993406410752),
-    checkValue(parser, "/content/consts/item[4]", 0.3j),
-    checkValue(parser, "/content/consts/item[8]", b"abc"),
-    checkValue(parser, "/content/filename", b"pyc_example.py"))
-
-def checkReferenceMapClass(parser): return (
-    checkValue(parser, "/minor_version", 3),
-    checkValue(parser, "/major_version", 45),
-    checkValue(parser, "/constant_pool_count", 326),
-    checkValue(parser, "/constant_pool/constant_pool[324]/bytes", "([Ljava/lang/Object;Ljava/lang/Object;)V"),
-    checkValue(parser, "/super_class", 80),
-    checkValue(parser, "/interfaces_count", 0),
-    checkValue(parser, "/fields_count", 16),
-    checkValue(parser, "/fields/fields[3]/attributes/attributes[0]/attribute_name_index", 93),
-    checkValue(parser, "/methods_count", 31),
-    checkValue(parser, "/methods/methods[30]/attributes/attributes[0]/code_length", 5),
-    checkValue(parser, "/attributes_count", 3),
-    checkValue(parser, "/attributes/attributes[2]/classes/classes[1]/inner_name_index", 83))
-
-def checkClaqueBeignet(parser): return (
-    checkDesc(parser, "rect", "Rectangle: 550x400"),
-    checkDisplay(parser, "frame_rate", "24.0"),
-    checkDesc(parser, "bkgd_color[0]/color", "RGB color: #CC9933"),
-    checkDisplay(parser, "def_sound[0]/rate", "11.0 kHz"),
-    checkValue(parser, "def_sound[0]/len", 1661),
-    checkValue(parser, "sound_hdr2[0]/sound_is_16bit", False),
-    checkValue(parser, "export[0]/export[0]/name", "C bras"),
-)
-
-def checkBreakdance(parser): return (
-    checkDisplay(parser, "/audio[0]/codec", "MP3"),
-    checkValue(parser, "/audio[2]/timestamp", 52),
-    checkDisplay(parser, "/video[0]/codec", "Sorensen H.263"),
-    checkValue(parser, "/metadata/entry[1]/item[8]/attr[1]/item[4]/value/exponent", 20),
-)
-
-def checkArpDnsPingDns(parser): return (
-    checkValue(parser, "/packet[5]/ipv4/ttl", 120),
-    checkDisplay(parser, "/packet[3]/ts_epoch", "2006-11-23 23:13:19"),
-    checkValue(parser, "/packet[3]/ipv4/src", "212.27.54.252"),
-    checkDisplay(parser, "/packet[7]/udp/src", "DNS"),
-)
-
-def checkExt2(parser): return (
-    checkDisplay(parser, "/superblock/last_check", '2006-12-04 22:56:37'),
-    checkDisplay(parser, "/superblock/creator_os", "Linux"),
-    checkValue(parser, "/group_desc/group[0]/block_bitmap", 3),
-    checkValue(parser, "/group_desc/group[0]/free_blocks_count", 44),
-    checkValue(parser, "/group[0]/block_bitmap/item[9]", False),
-    checkDisplay(parser, "/group[0]/inode_table/inode[1]/file_type", "Directory"),
-    checkDesc(parser, "/group[0]/inode_table/inode[10]", "Inode 11: file, size=1024 bytes, mode=drwxr-xr-x"),
-    checkValue(parser, "/group[0]/inode_table/inode[11]/size", 1816),
-    checkDisplay(parser, "/group[0]/inode_table/inode[11]/ctime", '2006-12-04 23:22:00'),
-)
-
-def checkArticle01(parser): return (
-    checkDisplay(parser, "/header/red_mask", '0x00ff0000'),
-    checkDisplay(parser, "/header/color_space", "Business (Saturation)"),
-    checkValue(parser, "/pixels/line[94]/pixel[11]", 15265520),
-)
-
-def checkReiserFS3(parser): return (
-    checkValue(parser, "/superblock/root_block", 645),
-    checkDisplay(parser, "/superblock/hash_function", "R5_HASH"),
-    checkValue(parser, "/superblock/tree_height", 3),
-)
-
-def checkLaraCroft(parser): return (
-    checkDesc(parser, "/palette_4bits/color[8]", "RGB color: #100000"),
-    checkDesc(parser, "/palette_8bits/color[0]", "RGB color: Black"),
-    checkValue(parser, "/compression", 1),
-    checkValue(parser, "/horiz_dpi", 500),
-)
-
-def checkLinuxSwap(parser): return (
-    checkValue(parser, "/version", 1),
-    checkValue(parser, "/last_page", 9),
-    checkValue(parser, "/magic", "SWAPSPACE2"),
-)
-
-def checkPikachu(parser): return (
-    checkValue(parser, "/max_record_size", 510),
-    checkValue(parser, "/func[2]/y", 10094),
-    checkDisplay(parser, "/func[4]/brush_style", "Solid"),
-    checkValue(parser, "/func[10]/object_id", 2),
-)
-
-def checkGlobe(parser): return (
-    checkValue(parser, "/file_size", 3923),
-    checkValue(parser, "/func[1]/x", 9989),
-    checkDisplay(parser, "/func[4]/operation", "Copy pen (P)"),
-    checkDisplay(parser, "/func[9]/brush_style", "Null"),
-)
-
-def checkIndiana(parser): return (
-    checkDesc(parser, "/header", "Multiple tracks, synchronous; 3 tracks"),
-    checkDisplay(parser, "/track[0]/command[1]/microsec_quarter", "300.00 ms"),
-    checkDisplay(parser, "/track[1]/command[6]/note", "A (octave 5)"),
-    checkValue(parser, "/track[1]/command[8]/time", 408),
-    checkValue(parser, "/track[1]/command[8]/velocity", 80),
-)
-
-def checkGrassLogo(parser): return (
-    checkValue(parser, "/func[4]/y", 297),
-    checkDesc(parser, "/func[15]", "Begin path"),
-    checkDesc(parser, "/func[40]/color", "RGB color: #008F00 (opacity: 0%)"),
-    checkValue(parser, "/emf_header/maj_ver", 1),
-    checkValue(parser, "/emf_header/width_px", 1024),
-    checkValue(parser, "/emf_header/width_mm", 270),
-    checkValue(parser, "/emf_header/description", "Adobe Illustrator EMF 8.0"),
-)
-
-def checkIndiaMap(parser): return (
-    checkValue(parser, "/screen/global_map", True),
-    checkDesc(parser, "/color_map/color[0]", "RGB color: Black"),
-    checkValue(parser, "/image[0]/height", 794),
-)
-
-def checkCercle(parser): return (
-    checkValue(parser, "/msdos/reloc_offset", 28),
-    checkDisplay(parser, "/msdos/init_cs_ip", "0x00000315"),
-)
-
-def checkEula(parser): return (
-    checkDisplay(parser, "/pe_header/cpu", "Intel 80386"),
-    checkDisplay(parser, "/pe_opt_header/subsystem", "Windows GUI"),
-    checkDisplay(parser, "/pe_opt_header/import/rva", "0x00008314"),
-    checkDisplay(parser, "/section_hdr[1]/mem_size", "4632 bytes"),
-    checkValue(parser, "/section_hdr[1]/is_readable", True),
-    checkValue(parser, "/section_hdr[1]/is_executable", False),
-    checkValue(parser, "/section_rsrc/version_info/node[0]/node[1]/node[0]/node[0]/value", "Dell Inc"),
-    checkDesc(parser, "/section_rsrc/icon[0]/bmp_header", "Bitmap info header: 16x32 pixels, 4 bits/pixel"),
-    checkDesc(parser, "/section_rsrc/icon[1]", "Resource #296 content: type=3"),
-)
-
-def checkOCR10(parser): return (
-    checkValue(parser, "/chars/char[3]/data_offset", 201),
-    checkValue(parser, "/chars/char[8]/width_pixels", 10),
-)
-
-def checkKino14(parser): return (
-    checkValue(parser, "/max_char_width", 26),
-    checkValue(parser, "/char_codes/char[5]", 5),
-    checkValue(parser, "/chars/char[1]/data_offset", 1),
-    checkValue(parser, "/chars/char[1]/height_pixels", 13),
-    checkValue(parser, "/char_data/char_bitmap[3]/line[1]/pixel[0]", 128),
-)
-
-def checkFreeSoftwareSong(parser): return (
-    checkDisplay(parser, "/blocksize", "'9'"),
-    checkDisplay(parser, "/file/crc32", "0x8c3c1b7b"),
-)
-
-def checkPing(parser): return (
-    checkDisplay(parser, "/header/class", "32 bits"),
-    checkDisplay(parser, "/header/endian", "Little endian"),
-    checkDisplay(parser, "/header/type", "Executable file"),
-    checkDisplay(parser, "/header/machine", "Intel 80386"),
-    checkValue(parser, "/header/phentsize", 32),
-    checkDisplay(parser, "/prg_header[1]/type", "Program interpreter"),
-)
-
-def checkGeorgia(parser): return (
-    checkDisplay(parser, "/minor_version", "3"),
-    checkDisplay(parser, "/major_version", "1"),
-    checkDesc(parser, "/file[0]", 'File "fontinst.inf" (64 bytes)'),
-    checkValue(parser, "/file[1]/filename", "Georgiaz.TTF"),
-)
-
-def checkDebianTorrent(parser): return (
-    checkValue(parser, "/root/announce", "http://bttracker.acc.umu.se:6969/announce"),
-    checkValue(parser, "/root/comment", '"Debian CD from cdimage.debian.org"'),
-    checkDisplay(parser, "/root/creation_date", '2006-11-16 21:44:37'),
-    checkDisplay(parser, "/root/info/value/length", "638.7 MB"),
-    checkDisplay(parser, "/root/info/value/piece_length", "512.0 KB"),
-)
-
-def checkDell8FAT16(parser): return (
-    checkValue(parser, "/boot/oem_name", "Dell 8.0"),
-    checkDisplay(parser, "/boot/serial", "0x07d6090d"),
-    checkValue(parser, "/boot/label", "DellUtility"),
-    checkValue(parser, "/boot/fs_type", "FAT16"),
-    checkValue(parser, "/fat[1]/group[0]/entry[2]", 3),
-    checkDisplay(parser, "/fat[0]/group[4]/entry[8]", "free cluster"),
-    checkDesc(parser, "/root[0]/entry[0]", "Long filename part: 'command.com' [65]"),
-    checkDesc(parser, "/root[0]/entry[1]", "File: 'COMMAND.COM'"),
-    checkValue(parser, "/root[0]/entry[2]/hidden", True),
-    checkDesc(parser, "/root[0]/entry[2]/create", "2006-09-13 15:01:16"),
-    checkDesc(parser, "/root[0]/entry[2]/access", "2006-09-13"),
-    checkDesc(parser, "/root[0]/entry[2]/modify", "2005-07-26 00:48:26"),
-    checkValue(parser, "/root[0]/entry[2]/size", 29690),
-)
-
-def checkXM(parser): return (
-    checkValue(parser, "/header/title", "Dont you... voguemix"),
-    checkValue(parser, "/header/bpm", 128),
-    checkValue(parser, "/pattern[0]/data_size", 708),
-    checkDisplay(parser, "/pattern[0]/row[0]/note[0]/note", "F (octave 5)"),
-    checkValue(parser, "/pattern[0]/row[0]/note[0]/effect_parameter", 0x0A),
-    checkDisplay(parser, "/pattern[0]/row[0]/note[1]/note", "A (octave 5)"),
-    checkValue(parser, "/pattern[0]/row[0]/note[1]/effect_parameter", 0x80),
-    checkValue(parser, "/pattern[20]/data_size", 1129),
-    checkDisplay(parser, "/pattern[20]/row[0]/note[0]/note", "C# (octave 5)"),
-    checkValue(parser, "/pattern[20]/row[0]/note[0]/instrument", 5),
-    checkValue(parser, "/instrument[3]/name", "Vogue of Triton"),
-    checkValue(parser, "/instrument[4]/second_header/panning_points", 6),
-    checkValue(parser, "/instrument[20]/name", "808-hi5.smp"),
-)
-
-def checkS3M(parser): return (
-    checkValue(parser, "/header/title", "Satellite one."),
-    checkValue(parser, "/instrument[0]/sample_offset", 27024),
-    checkValue(parser, "/instrument[0]/c4_speed", 8363),
-    checkValue(parser, "/instrument[0]/name", "By Purple Motion of"),
-    checkValue(parser, "/instrument[1]/name", "Future Crew - 1993"),
-    checkValue(parser, "/pattern[0]/row[0]/note[0]/volume", 54),
-)
-
-def checkPTM(parser): return (
-    checkValue(parser, "/header/title", "Anti-arpeggio tune!-VV/AcMe"),
-    checkValue(parser, "/instrument[0]/sample_offset", 30928),
-    checkValue(parser, "/instrument[0]/c4_speed", 8363),
-    checkValue(parser, "/instrument[0]/name", "Yep guess wat...."),
-    checkValue(parser, "/instrument[1]/name", "Mag ik even mijn ongenoegen"),
-    checkValue(parser, "/instrument[1]/gus_loop_flags", 0),
-    checkValue(parser, "/pattern[0]/row[0]/note[0]/effect", 15),
-)
-
-def checkVimLNK(parser): return (
-    checkValue(parser, "/creation_time", datetime(2006, 5, 7, 14, 18, 32)),
-    checkValue(parser, "/target_filesize", 1363968),
-)
-
-def checkSevenzipCHM(parser): return (
-    checkValue(parser, "/itsf/version", 3),
-    checkDisplay(parser, "/itsf/lang_id", "Russian"),
-    checkValue(parser, "/itsf/dir_uuid/time", datetime(1997, 1, 31, 20, 42, 14, 890626)),
-    checkDisplay(parser, "/itsf/stream_uuid/variant", "Microsoft Corporation"),
-    checkDisplay(parser, "/itsf/stream_uuid/mac", 'INTEL CORPORATION - HF1-06 [22:e6:ec]'),
-    checkDisplay(parser, "/file_size/file_size", "75.6 KB"),
-    checkDisplay(parser, "/dir/itsp/lang_id", "English United States"),
-    checkValue(parser, "/dir/pmgl[0]/entry[1]/name", "/#IDXHDR"),
-)
-
-def checkSwat(parser): return (
-    checkValue(parser, "flags", 8),
-    checkValue(parser, "height", 256),
-    checkValue(parser, "width", 256),
-    checkValue(parser, "jpeg_header_len", 10),
-)
-
-def checkNds(parser): return (
-    checkValue(parser, "/header/game_title", '.'),
-    checkValue(parser, "/header/header_crc16", 29398),
-    checkValue(parser, "/banner/icon_data/tile[3,3]/pixel[7,6]", 5),
-    checkValue(parser, "/banner/palette_color[13]/blue", 28),
-    checkValue(parser, "/filename_table/directory[3]/entry[1]/name", "subsubdir1"),
-    checkValue(parser, "/filename_table/directory[3]/entry[1]/dir_id", 61444),
-    checkValue(parser, "/filename_table/directory[4]/entry[0]/name", "file2.txt"),
-    checkValue(parser, "/filename_table/directory[4]/entry[0]/is_directory", False),
-    checkValue(parser, "/file[1]", b"Hello from file2.txt\n\n"),
-)
-
-testcase_files = (
-    ("yellowdude.3ds", checkYellowdude),
-    ("logo-kubuntu.png", checkLogoUbuntu),
-    ("mbr_linux_and_ext", checkMBR),
-    ("kde_click.wav", checkClick),
-    ("test.txt.gz", checkGzip),
-    ("flashmob.mkv", checkFlashMob),
-    ("10min.mkv", check10min),
-    ("cd_0008_5C48_1m53s.cda", checkCDA),
-    ("wormux_32x32_16c.ico", checkWormuxICO),
-    ("audio_8khz_8bit_ulaw_4s39.au", checkAU),
-    ("sheep_on_drugs.mp3", checkSheepMP3),
-    ("pyc_example_1.5.2.pyc", checkPYC),
-    ("pyc_example_2.2.3.pyc", checkPYC),
-    ("pyc_example_2.5c1.pyc", checkPYC),
-    ("ftp-0.17-537.i586.rpm", checkRPM),
-    # cross.xcf
-    ("jpeg.exif.photoshop.jpg", checkJPEG),
-    ("small_text.tar", checkTAR),
-    ("cacert_class3.der", checkCACertClass3),
-    ("kde_haypo_corner.bmp", checkCornerBMP),
-    # png_331x90x8_truncated.png
-    ("steganography.mp3", checkSteganography),
-    # smallville.s03e02.avi
-    # 08lechat_hq_fr.mp3
-    ("ReferenceMap.class", checkReferenceMapClass),
-    ("claque-beignet.swf", checkClaqueBeignet),
-    # interlude_david_aubrun.ogg
-    ("breakdance.flv", checkBreakdance),
-    ("arp_dns_ping_dns.tcpdump", checkArpDnsPingDns),
-    # matrix_ping_pong.wmv
-    # usa_railroad.jpg
-    ("my60k.ext2", checkExt2),
-    ("article01.bmp", checkArticle01),
-    ("reiserfs_v3_332k.bin", checkReiserFS3),
-    ("lara_croft.pcx", checkLaraCroft),
-    # hero.tga
-    # firstrun.rm
-    ("linux_swap_9pages", checkLinuxSwap),
-    ("pikachu.wmf", checkPikachu),
-    ("globe.wmf", checkGlobe),
-    ("indiana.mid", checkIndiana),
-    # 25min.aifc
-    ("grasslogo_vector.emf", checkGrassLogo),
-    ("ocr10.laf", checkOCR10),
-    ("kino14s.laf", checkKino14),
-    # ladouce_1h15.wav
-    ("hachoir-core.ace", checkACE),
-    ("hachoir-core.rar", checkRAR),
-    ("debian-31r4-i386-binary-1.iso.torrent", checkDebianTorrent),
-    ("india_map.gif", checkIndiaMap),
-    ("cercle.exe", checkCercle),
-    ("eula.exe", checkEula),
-    ("free-software-song.midi.bz2", checkFreeSoftwareSong),
-    ("ping_20020927-3ubuntu2", checkPing),
-    ("georgia.cab", checkGeorgia),
-    # hachoir.org.sxw
-    ("dell8.fat16", checkDell8FAT16),
-    ("dontyou.xm", checkXM),
-    ("satellite_one.s3m", checkS3M),
-    ("anti-arpeggio_tune.ptm", checkPTM),
-    # deja_vu_serif-2.7.ttf
-    # twunk_16.exe
-    ("vim.lnk", checkVimLNK),
-    ("7zip.chm", checkSevenzipCHM),
-    # green_fire.jpg
-    # marc_kravetz.mp3
-    # pentax_320x240.mov
-    # gps.jpg
-    # angle-bear-48x48.ani
-    # hotel_california.flac
-    # radpoor.doc
-    # quicktime.mp4
-    ("swat.blp", checkSwat),
-    ("nitrodir.nds", checkNds),
-)
 
 class TestParsers(unittest.TestCase):
-    def testRandom(self, tests=(1, 8)):
+    verbose = False
+
+    def parse(self, filename):
+        if self.verbose:
+            print("[+] Test %s:" % filename)
+            sys.stdout.write("  - Create parser: ")
+            sys.stdout.flush()
+
+        fullname = os.path.join(DATADIR, filename)
+        parser = createParser(fullname)
+        if not parser:
+            self.fail("unable to create parser")
+
+        if self.verbose:
+            sys.stdout.write("ok\n")
+        return parser
+
+    def checkValue(self, parser, path, value):
+        if self.verbose:
+            sys.stdout.write("  - Check field %s.value=%s (%s): "
+                % (path, repr(value), value.__class__.__name__))
+            sys.stdout.flush()
+        read = parser[path].value
+        self.assertEqual(read, value,
+                         "wrong value (%s, %s)"
+                         % (repr(read), read.__class__.__name__))
+
+    def checkDisplay(self, parser, path, value):
+        if self.verbose:
+            sys.stdout.write("  - Check field %s.display=%s (%s): "
+                % (path, repr(value), value.__class__.__name__))
+            sys.stdout.flush()
+        read = parser[path].display
+        self.assertEqual(read, value,
+                         "wrong value (%s, %s)"
+                         % (repr(read), read.__class__.__name__))
+
+    def checkDesc(self, parser, path, value):
+        if self.verbose:
+            sys.stdout.write("  - Check field %s.description=%s (%s): "
+                % (path, repr(value), value.__class__.__name__))
+            sys.stdout.flush()
+        read = parser[path].description
+        self.assertEqual(read, value,
+                         "wrong value (%s, %s)"
+                         % (repr(read), read.__class__.__name__))
+
+    def checkNames(self, parser, path, names):
+        if self.verbose:
+            sys.stdout.write("  - Check field names %s=(%s) (%u): "
+                % (path, ", ".join(names), len(names)))
+            sys.stdout.flush()
+        fieldset = parser[path]
+        if len(fieldset) != len(names):
+            self.fail("invalid length (%u)" % len(fieldset))
+        names = list(names)
+        read = list(field.name for field in fieldset)
+        self.assertEqual(names, read,
+                         "wrong names (%s)" % ", ".join(read))
+
+    def test_3ds(self):
+        parser = self.parse("yellowdude.3ds")
+        self.checkValue(parser, "/main/version/version", 2)
+        self.checkNames(parser, "/main", ("type", "size", "version", "obj_mat"))
+
+    def test_png(self):
+        parser = self.parse("logo-kubuntu.png")
+        self.checkValue(parser, "/header/width", 331)
+        self.checkValue(parser, "/time/second", 46)
+
+    def test_wav(self):
+        parser = self.parse("kde_click.wav")
+        self.checkValue(parser, "/info/producer/text", "Sound Forge 4.5")
+        self.checkValue(parser, "/format/sample_per_sec", 22050)
+
+    def test_mbr(self):
+        parser = self.parse("mbr_linux_and_ext")
+        self.checkValue(parser, "/mbr/header[1]/size", 65545200)
+        self.checkDisplay(parser, "/mbr/signature", "0xaa55")
+
+    def test_mkv(self):
+        parser = self.parse("flashmob.mkv")
+        self.checkValue(parser, "/Segment[0]/Cues/CuePoint[1]/CueTrackPositions[0]"
+              + "/CueClusterPosition/cluster/BlockGroup[14]/Block/block/timecode", 422)
+        self.checkValue(parser, "/Segment[0]/Tags[0]/Tag[0]/SimpleTag[3]/TagString/unicode",
+              "\xa9 dadaprod, licence Creative Commons by-nc-sa 2.0 fr")
+
+    def test_mkv2(self):
+        parser = self.parse("10min.mkv")
+        self.checkValue(parser, "/Segment[0]/size", None)
+        self.checkValue(parser, "/Segment[0]/Tracks[0]/TrackEntry[0]/CodecID/string", "V_MPEG4/ISO/AVC")
+
+    def test_ico(self):
+        parser = self.parse("wormux_32x32_16c.ico")
+        self.checkValue(parser, "icon_header[0]/height", 16)
+        self.checkValue(parser, "icon_data[0]/header/hdr_size", 40)
+
+    def test_cda(self):
+        parser = self.parse("cd_0008_5C48_1m53s.cda")
+        self.checkValue(parser, "filesize", 36)
+        self.checkValue(parser, "/cdda/track_no", 4)
+        self.checkDisplay(parser, "/cdda/disc_serial", "0008-5C48")
+        self.checkValue(parser, "/cdda/rb_length/second", 53)
+
+    def test_mp3(self):
+        parser = self.parse("sheep_on_drugs.mp3")
+        self.checkValue(parser, "/id3v2/field[6]/content/text",
+            'Stainless Steel Provider is compilated to the car of Twinstar.')
+        self.checkValue(parser, "/frames/frame[0]/use_padding", False)
+
+    def test_au(self):
+        parser = self.parse("audio_8khz_8bit_ulaw_4s39.au")
+        self.checkValue(parser, "info", "../tmp/temp.snd")
+        self.checkDisplay(parser, "codec", "8-bit ISDN u-law")
+
+    def test_gzip(self):
+        parser = self.parse("test.txt.gz")
+        self.checkValue(parser, "filename", "test.txt")
+
+    def test_mp3_steganography(self):
+        parser = self.parse("steganography.mp3")
+        self.checkValue(parser, "/frames/padding[0]", b"misc est un canard\r")
+        self.checkDesc(parser, "/frames", 'Frames: Variable bit rate (VBR)')
+        self.checkDesc(parser, "/frames/frame[1]", 'MPEG-1 layer III, 160.0 Kbit/sec, 44.1 kHz')
+
+    def test_rpm(self):
+        parser = self.parse("ftp-0.17-537.i586.rpm")
+        self.checkValue(parser, "name", "ftp-0.17-537")
+        self.checkValue(parser, "os", 1)
+        self.checkValue(parser, "checksum/content_item[2]/value", 50823)
+        self.checkValue(parser, "header/content_item[15]/value", "ftp://ftp.uk.linux.org/pub/linux/Networking/netkit")
+
+    def test_jpeg(self):
+        parser = self.parse("jpeg.exif.photoshop.jpg")
+        self.checkValue(parser, "app0/content/jfif", "JFIF\x00")
+        self.checkValue(parser, "app0/content/ver_maj", 1)
+        self.checkValue(parser, "photoshop/content/signature", "Photoshop 3.0")
+        self.checkValue(parser, "photoshop/content/copyright_flag/content", 0)
+        self.checkValue(parser, "exif/content/header", "Exif\0\0")
+        self.checkValue(parser, "exif/content/version", 42)
+
+    def test_tar(self):
+        parser = self.parse("small_text.tar")
+        self.checkDisplay(parser, "file[0]/name", '"dummy.txt"')
+        self.checkDisplay(parser, "file[1]/mode", '"0000755"')
+        self.checkDisplay(parser, "file[1]/type", 'Directory')
+        self.checkDisplay(parser, "file[2]/devmajor", '(empty)')
+
+    def test_rar(self):
+        parser = self.parse("hachoir-core.rar")
+        self.checkValue(parser, "archive_start/crc16", 0x77E1)
+        self.checkValue(parser, "new_sub_block[0]/crc16", 0x2994)
+        self.checkValue(parser, "file[0]/crc32", 0x4C6D13ED)
+        self.checkValue(parser, "new_sub_block[1]/crc32", 0x34528E23)
+        self.checkValue(parser, "file[1]/filename", ".svn\prop-base\README.svn-base")
+        self.checkValue(parser, "new_sub_block[1]/filename", 'ACL')
+        #archive_end bad candidate for checking
+        self.checkValue(parser, "new_sub_block[362]/crc32", 0x6C84C95E)
+
+    def test_ace(self):
+        parser = self.parse("hachoir-core.ace")
+        self.checkValue(parser, "header/crc16", 0xA9BE)
+        self.checkValue(parser, "file[0]/reserved", 0x4554)
+        self.checkValue(parser, "file[1]/filename", "hachoir_core\.svn")
+        self.checkValue(parser, "file[2]/parameters", 0x000A)
+        #End of archive, lots of work...
+        #self.checkValue(parser, "new_recovery[0]/signature", "**ACE**")
+
+    def test_bmp(self):
+        parser = self.parse("kde_haypo_corner.bmp")
+        self.checkValue(parser, "header/width", 189)
+        self.checkValue(parser, "header/used_colors", 70)
+        self.checkDesc(parser, "palette/color[1]", "RGB color: White (opacity: 0%)")
+        self.checkValue(parser, "pixels/line[26]/pixel[14]", 28)
+
+    def test_der(self):
+        parser = self.parse("cacert_class3.der")
+        self.checkDisplay(parser, "seq[0]/class", 'universal')
+        self.checkDesc(parser, "seq[0]/seq[0]/seq[1]/obj_id[0]", "Object identifier: 1.2.840.113549.1.1.4")
+        self.checkValue(parser, "seq[0]/seq[0]/seq[2]/set[0]/seq[0]/print_str[0]/value", "Root CA")
+        self.checkValue(parser, "seq[0]/seq[0]/seq[2]/set[3]/seq[0]/ia5_str[0]/value", "support@cacert.org")
+        self.checkValue(parser, "seq[0]/bit_str[0]/size", 513)
+
+    def check_pyc(self, parser):
+        self.checkValue(parser, "/content/consts/item[0]", 42)
+        self.checkValue(parser, "/content/stack_size", 4)
+        self.checkValue(parser, "/content/consts/item[1]", 2535301200456458802993406410752)
+        self.checkValue(parser, "/content/consts/item[4]", 0.3j)
+        self.checkValue(parser, "/content/consts/item[8]", b"abc")
+        self.checkValue(parser, "/content/filename", b"pyc_example.py")
+
+    def test_pyc_1_5(self):
+        parser = self.parse("pyc_example_1.5.2.pyc")
+        self.check_pyc(parser)
+
+    def test_pyc_2_2(self):
+        parser = self.parse("pyc_example_2.2.3.pyc")
+        self.check_pyc(parser)
+
+    def test_pyc_2_5(self):
+        parser = self.parse("pyc_example_2.5c1.pyc")
+        self.check_pyc(parser)
+
+    def test_java(self):
+        parser = self.parse("ReferenceMap.class")
+        self.checkValue(parser, "/minor_version", 3)
+        self.checkValue(parser, "/major_version", 45)
+        self.checkValue(parser, "/constant_pool_count", 326)
+        self.checkValue(parser, "/constant_pool/constant_pool[324]/bytes", "([Ljava/lang/Object;Ljava/lang/Object;)V")
+        self.checkValue(parser, "/super_class", 80)
+        self.checkValue(parser, "/interfaces_count", 0)
+        self.checkValue(parser, "/fields_count", 16)
+        self.checkValue(parser, "/fields/fields[3]/attributes/attributes[0]/attribute_name_index", 93)
+        self.checkValue(parser, "/methods_count", 31)
+        self.checkValue(parser, "/methods/methods[30]/attributes/attributes[0]/code_length", 5)
+        self.checkValue(parser, "/attributes_count", 3)
+        self.checkValue(parser, "/attributes/attributes[2]/classes/classes[1]/inner_name_index", 83)
+
+    def test_swf(self):
+        parser = self.parse("claque-beignet.swf")
+        self.checkDesc(parser, "rect", "Rectangle: 550x400")
+        self.checkDisplay(parser, "frame_rate", "24.0")
+        self.checkDesc(parser, "bkgd_color[0]/color", "RGB color: #CC9933")
+        self.checkDisplay(parser, "def_sound[0]/rate", "11.0 kHz")
+        self.checkValue(parser, "def_sound[0]/len", 1661)
+        self.checkValue(parser, "sound_hdr2[0]/sound_is_16bit", False)
+        self.checkValue(parser, "export[0]/export[0]/name", "C bras")
+
+    def test_flv(self):
+        parser = self.parse("breakdance.flv")
+        self.checkDisplay(parser, "/audio[0]/codec", "MP3")
+        self.checkValue(parser, "/audio[2]/timestamp", 52)
+        self.checkDisplay(parser, "/video[0]/codec", "Sorensen H.263")
+        self.checkValue(parser, "/metadata/entry[1]/item[8]/attr[1]/item[4]/value/exponent", 20)
+
+    def test_tcpdump(self):
+        parser = self.parse("arp_dns_ping_dns.tcpdump")
+        self.checkValue(parser, "/packet[5]/ipv4/ttl", 120)
+        self.checkDisplay(parser, "/packet[3]/ts_epoch", "2006-11-23 23:13:19")
+        self.checkValue(parser, "/packet[3]/ipv4/src", "212.27.54.252")
+        self.checkDisplay(parser, "/packet[7]/udp/src", "DNS")
+
+    def test_ext2(self):
+        parser = self.parse("my60k.ext2")
+        self.checkDisplay(parser, "/superblock/last_check", '2006-12-04 22:56:37')
+        self.checkDisplay(parser, "/superblock/creator_os", "Linux")
+        self.checkValue(parser, "/group_desc/group[0]/block_bitmap", 3)
+        self.checkValue(parser, "/group_desc/group[0]/free_blocks_count", 44)
+        self.checkValue(parser, "/group[0]/block_bitmap/item[9]", False)
+        self.checkDisplay(parser, "/group[0]/inode_table/inode[1]/file_type", "Directory")
+        self.checkDesc(parser, "/group[0]/inode_table/inode[10]", "Inode 11: file, size=1024 bytes, mode=drwxr-xr-x")
+        self.checkValue(parser, "/group[0]/inode_table/inode[11]/size", 1816)
+        self.checkDisplay(parser, "/group[0]/inode_table/inode[11]/ctime", '2006-12-04 23:22:00')
+
+    def test_bmp2(self):
+        parser = self.parse("article01.bmp")
+        self.checkDisplay(parser, "/header/red_mask", '0x00ff0000')
+        self.checkDisplay(parser, "/header/color_space", "Business (Saturation)")
+        self.checkValue(parser, "/pixels/line[94]/pixel[11]", 15265520)
+
+    def test_reiserfs3(self):
+        parser = self.parse("reiserfs_v3_332k.bin")
+        self.checkValue(parser, "/superblock/root_block", 645)
+        self.checkDisplay(parser, "/superblock/hash_function", "R5_HASH")
+        self.checkValue(parser, "/superblock/tree_height", 3)
+
+    def test_pcx(self):
+        parser = self.parse("lara_croft.pcx")
+        self.checkDesc(parser, "/palette_4bits/color[8]", "RGB color: #100000")
+        self.checkDesc(parser, "/palette_8bits/color[0]", "RGB color: Black")
+        self.checkValue(parser, "/compression", 1)
+        self.checkValue(parser, "/horiz_dpi", 500)
+
+    def test_linux_swap(self):
+        parser = self.parse("linux_swap_9pages")
+        self.checkValue(parser, "/version", 1)
+        self.checkValue(parser, "/last_page", 9)
+        self.checkValue(parser, "/magic", "SWAPSPACE2")
+
+    def test_wmf(self):
+        parser = self.parse("pikachu.wmf")
+        self.checkValue(parser, "/max_record_size", 510)
+        self.checkValue(parser, "/func[2]/y", 10094)
+        self.checkDisplay(parser, "/func[4]/brush_style", "Solid")
+        self.checkValue(parser, "/func[10]/object_id", 2)
+
+    def test_wmf2(self):
+        parser = self.parse("globe.wmf")
+        self.checkValue(parser, "/file_size", 3923)
+        self.checkValue(parser, "/func[1]/x", 9989)
+        self.checkDisplay(parser, "/func[4]/operation", "Copy pen (P)")
+        self.checkDisplay(parser, "/func[9]/brush_style", "Null")
+
+    def test_midi(self):
+        parser = self.parse("indiana.mid")
+        self.checkDesc(parser, "/header", "Multiple tracks, synchronous; 3 tracks")
+        self.checkDisplay(parser, "/track[0]/command[1]/microsec_quarter", "300.00 ms")
+        self.checkDisplay(parser, "/track[1]/command[6]/note", "A (octave 5)")
+        self.checkValue(parser, "/track[1]/command[8]/time", 408)
+        self.checkValue(parser, "/track[1]/command[8]/velocity", 80)
+
+    def test_wmf_emf(self):
+        parser = self.parse("grasslogo_vector.emf")
+        self.checkValue(parser, "/func[4]/y", 297)
+        self.checkDesc(parser, "/func[15]", "Begin path")
+        self.checkDesc(parser, "/func[40]/color", "RGB color: #008F00 (opacity: 0%)")
+        self.checkValue(parser, "/emf_header/maj_ver", 1)
+        self.checkValue(parser, "/emf_header/width_px", 1024)
+        self.checkValue(parser, "/emf_header/width_mm", 270)
+        self.checkValue(parser, "/emf_header/description", "Adobe Illustrator EMF 8.0")
+
+    def test_gif(self):
+        parser = self.parse("india_map.gif")
+        self.checkValue(parser, "/screen/global_map", True)
+        self.checkDesc(parser, "/color_map/color[0]", "RGB color: Black")
+        self.checkValue(parser, "/image[0]/height", 794)
+
+    def test_exe_msdos(self):
+        parser = self.parse("cercle.exe")
+        self.checkValue(parser, "/msdos/reloc_offset", 28)
+        self.checkDisplay(parser, "/msdos/init_cs_ip", "0x00000315")
+
+    def test_exe_pe(self):
+        parser = self.parse("eula.exe")
+        self.checkDisplay(parser, "/pe_header/cpu", "Intel 80386")
+        self.checkDisplay(parser, "/pe_opt_header/subsystem", "Windows GUI")
+        self.checkDisplay(parser, "/pe_opt_header/import/rva", "0x00008314")
+        self.checkDisplay(parser, "/section_hdr[1]/mem_size", "4632 bytes")
+        self.checkValue(parser, "/section_hdr[1]/is_readable", True)
+        self.checkValue(parser, "/section_hdr[1]/is_executable", False)
+        self.checkValue(parser, "/section_rsrc/version_info/node[0]/node[1]/node[0]/node[0]/value", "Dell Inc")
+        self.checkDesc(parser, "/section_rsrc/icon[0]/bmp_header", "Bitmap info header: 16x32 pixels, 4 bits/pixel")
+        self.checkDesc(parser, "/section_rsrc/icon[1]", "Resource #296 content: type=3")
+
+    def test_laf(self):
+        parser = self.parse("ocr10.laf")
+        self.checkValue(parser, "/chars/char[3]/data_offset", 201)
+        self.checkValue(parser, "/chars/char[8]/width_pixels", 10)
+
+    def test_laf2(self):
+        parser = self.parse("kino14s.laf")
+        self.checkValue(parser, "/max_char_width", 26)
+        self.checkValue(parser, "/char_codes/char[5]", 5)
+        self.checkValue(parser, "/chars/char[1]/data_offset", 1)
+        self.checkValue(parser, "/chars/char[1]/height_pixels", 13)
+        self.checkValue(parser, "/char_data/char_bitmap[3]/line[1]/pixel[0]", 128)
+
+    def test_bz2(self):
+        parser = self.parse("free-software-song.midi.bz2")
+        self.checkDisplay(parser, "/blocksize", "'9'")
+        self.checkDisplay(parser, "/file/crc32", "0x8c3c1b7b")
+
+    def test_elf_program(self):
+        parser = self.parse("ping_20020927-3ubuntu2")
+        self.checkDisplay(parser, "/header/class", "32 bits")
+        self.checkDisplay(parser, "/header/endian", "Little endian")
+        self.checkDisplay(parser, "/header/type", "Executable file")
+        self.checkDisplay(parser, "/header/machine", "Intel 80386"),
+        self.checkValue(parser, "/header/phentsize", 32)
+        self.checkDisplay(parser, "/prg_header[1]/type", "Program interpreter")
+
+    def test_cab(self):
+        parser = self.parse("georgia.cab")
+        self.checkDisplay(parser, "/minor_version", "3")
+        self.checkDisplay(parser, "/major_version", "1")
+        self.checkDesc(parser, "/file[0]", 'File "fontinst.inf" (64 bytes)')
+        self.checkValue(parser, "/file[1]/filename", "Georgiaz.TTF")
+
+    def test_torrent(self):
+        parser = self.parse("debian-31r4-i386-binary-1.iso.torrent")
+        self.checkValue(parser, "/root/announce", "http://bttracker.acc.umu.se:6969/announce")
+        self.checkValue(parser, "/root/comment", '"Debian CD from cdimage.debian.org"')
+        self.checkDisplay(parser, "/root/creation_date", '2006-11-16 21:44:37')
+        self.checkDisplay(parser, "/root/info/value/length", "638.7 MB")
+        self.checkDisplay(parser, "/root/info/value/piece_length", "512.0 KB")
+
+    def test_fat16(self):
+        parser = self.parse("dell8.fat16")
+        self.checkValue(parser, "/boot/oem_name", "Dell 8.0")
+        self.checkDisplay(parser, "/boot/serial", "0x07d6090d")
+        self.checkValue(parser, "/boot/label", "DellUtility")
+        self.checkValue(parser, "/boot/fs_type", "FAT16")
+        self.checkValue(parser, "/fat[1]/group[0]/entry[2]", 3)
+        self.checkDisplay(parser, "/fat[0]/group[4]/entry[8]", "free cluster")
+        self.checkDesc(parser, "/root[0]/entry[0]", "Long filename part: 'command.com' [65]")
+        self.checkDesc(parser, "/root[0]/entry[1]", "File: 'COMMAND.COM'")
+        self.checkValue(parser, "/root[0]/entry[2]/hidden", True)
+        self.checkDesc(parser, "/root[0]/entry[2]/create", "2006-09-13 15:01:16")
+        self.checkDesc(parser, "/root[0]/entry[2]/access", "2006-09-13")
+        self.checkDesc(parser, "/root[0]/entry[2]/modify", "2005-07-26 00:48:26")
+        self.checkValue(parser, "/root[0]/entry[2]/size", 29690)
+
+    def test_xm(self):
+        parser = self.parse("dontyou.xm")
+        self.checkValue(parser, "/header/title", "Dont you... voguemix")
+        self.checkValue(parser, "/header/bpm", 128)
+        self.checkValue(parser, "/pattern[0]/data_size", 708)
+        self.checkDisplay(parser, "/pattern[0]/row[0]/note[0]/note", "F (octave 5)")
+        self.checkValue(parser, "/pattern[0]/row[0]/note[0]/effect_parameter", 0x0A)
+        self.checkDisplay(parser, "/pattern[0]/row[0]/note[1]/note", "A (octave 5)")
+        self.checkValue(parser, "/pattern[0]/row[0]/note[1]/effect_parameter", 0x80)
+        self.checkValue(parser, "/pattern[20]/data_size", 1129)
+        self.checkDisplay(parser, "/pattern[20]/row[0]/note[0]/note", "C# (octave 5)")
+        self.checkValue(parser, "/pattern[20]/row[0]/note[0]/instrument", 5)
+        self.checkValue(parser, "/instrument[3]/name", "Vogue of Triton")
+        self.checkValue(parser, "/instrument[4]/second_header/panning_points", 6)
+        self.checkValue(parser, "/instrument[20]/name", "808-hi5.smp")
+
+    def test_s3m(self):
+        parser = self.parse("satellite_one.s3m")
+        self.checkValue(parser, "/header/title", "Satellite one.")
+        self.checkValue(parser, "/instrument[0]/sample_offset", 27024)
+        self.checkValue(parser, "/instrument[0]/c4_speed", 8363)
+        self.checkValue(parser, "/instrument[0]/name", "By Purple Motion of")
+        self.checkValue(parser, "/instrument[1]/name", "Future Crew - 1993")
+        self.checkValue(parser, "/pattern[0]/row[0]/note[0]/volume", 54)
+
+    def test_ptm(self):
+        parser = self.parse("anti-arpeggio_tune.ptm")
+        self.checkValue(parser, "/header/title", "Anti-arpeggio tune!-VV/AcMe")
+        self.checkValue(parser, "/instrument[0]/sample_offset", 30928)
+        self.checkValue(parser, "/instrument[0]/c4_speed", 8363)
+        self.checkValue(parser, "/instrument[0]/name", "Yep guess wat....")
+        self.checkValue(parser, "/instrument[1]/name", "Mag ik even mijn ongenoegen")
+        self.checkValue(parser, "/instrument[1]/gus_loop_flags", 0)
+        self.checkValue(parser, "/pattern[0]/row[0]/note[0]/effect", 15)
+
+    def test_lnk(self):
+        parser = self.parse("vim.lnk")
+        self.checkValue(parser, "/creation_time", datetime(2006, 5, 7, 14, 18, 32))
+        self.checkValue(parser, "/target_filesize", 1363968)
+
+    def test_chm(self):
+        parser = self.parse("7zip.chm")
+        self.checkValue(parser, "/itsf/version", 3)
+        self.checkDisplay(parser, "/itsf/lang_id", "Russian")
+        self.checkValue(parser, "/itsf/dir_uuid/time", datetime(1997, 1, 31, 20, 42, 14, 890626))
+        self.checkDisplay(parser, "/itsf/stream_uuid/variant", "Microsoft Corporation")
+        self.checkDisplay(parser, "/itsf/stream_uuid/mac", 'INTEL CORPORATION - HF1-06 [22:e6:ec]')
+        self.checkDisplay(parser, "/file_size/file_size", "75.6 KB")
+        self.checkDisplay(parser, "/dir/itsp/lang_id", "English United States")
+        self.checkValue(parser, "/dir/pmgl[0]/entry[1]/name", "/#IDXHDR")
+
+    def test_blp(self):
+        parser = self.parse("swat.blp")
+        self.checkValue(parser, "flags", 8)
+        self.checkValue(parser, "height", 256)
+        self.checkValue(parser, "width", 256)
+        self.checkValue(parser, "jpeg_header_len", 10)
+
+    def checkNds(self):
+        parser = self.parse("nitrodir.nds")
+        self.checkValue(parser, "/header/game_title", '.')
+        self.checkValue(parser, "/header/header_crc16", 29398)
+        self.checkValue(parser, "/banner/icon_data/tile[3,3]/pixel[7,6]", 5)
+        self.checkValue(parser, "/banner/palette_color[13]/blue", 28)
+        self.checkValue(parser, "/filename_table/directory[3]/entry[1]/name", "subsubdir1")
+        self.checkValue(parser, "/filename_table/directory[3]/entry[1]/dir_id", 61444)
+        self.checkValue(parser, "/filename_table/directory[4]/entry[0]/name", "file2.txt")
+        self.checkValue(parser, "/filename_table/directory[4]/entry[0]/is_directory", False)
+        self.checkValue(parser, "/file[1]", b"Hello from file2.txt\n\n")
+
+
+class TestParserRandomStream(unittest.TestCase):
+    def test_random_stream(self, tests=(1, 8)):
         a = array('L')
         parser_list = HachoirParserList()
         n = max(tests) * max(parser.getParserTags()["min_size"] for parser in parser_list)
@@ -586,28 +504,6 @@ class TestParsers(unittest.TestCase):
                 except ValidateError:
                     continue
 
-    def check_file(self, filename, check_parser, verbose=False):
-        if verbose:
-            print("[+] Test %s:" % filename)
-            sys.stdout.write("  - Create parser: ")
-            sys.stdout.flush()
-        try:
-            parser = createParser(filename)
-        except InputStreamError as err:
-            sys.stdout.write("stream error! %s\n" % str(err))
-            sys.exit(1)
-        if not parser:
-            self.fail("unable to create parser\n")
-            return False
-        if verbose:
-            sys.stdout.write("ok\n")
-        if not all(check_parser(parser)):
-            self.fail("test failed")
-
-    def test_files(self):
-        for filename, check_parser in testcase_files:
-            fullname = os.path.join(DATADIR, filename)
-            self.check_file(fullname, check_parser)
 
 if __name__ == "__main__":
     from locale import setlocale, LC_ALL
