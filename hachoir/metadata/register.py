@@ -122,7 +122,7 @@ def registerAllItems(meta):
                        conversion=setDatetime))
     meta.register(Data("latitude", 510, "Latitude", type=float))
     meta.register(Data("longitude", 511, "Longitude", type=float))
-    meta.register(Data("altitude", 511, "Altitude", type=float,
+    meta.register(Data("altitude", 512, "Altitude", type=float,
                        text_handler=humanAltitude))
     meta.register(Data("location", 530, "Location", type=str))
     meta.register(Data("city", 531, "City", type=str))

@@ -11,10 +11,12 @@ from hachoir.metadata.timezone import createTimezone
 from hachoir.test import setup_tests
 from datetime import date, timedelta, datetime
 import os
+import subprocess
 import sys
 import unittest
 
 DATADIR = os.path.join(os.path.dirname(__file__), 'files')
+PROGRAM = os.path.join(os.path.dirname(__file__), "..", "hachoir-metadata")
 
 class TestMetadata(unittest.TestCase):
     verbose = False
@@ -397,6 +399,34 @@ class TestMetadata(unittest.TestCase):
         self.check_attr(meta, 'height', 240)
         self.check_attr(meta, 'creation_date', datetime(2005, 10, 28, 17, 46, 46))
         self.check_attr(meta, 'mime_type', 'video/mp4')
+
+
+class TestMetadataCommandLine(unittest.TestCase):
+    def test_metadata(self):
+        filename = os.path.join(DATADIR, 'gps.jpg')
+        args = [sys.executable, PROGRAM, filename]
+        proc = subprocess.Popen(args,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.STDOUT)
+        stdout, _ = proc.communicate()
+        stdout = stdout.decode('ascii', 'replace').strip()
+        self.assertEqual(stdout, """Metadata:
+- Title: 030524_2221~01
+- Image width: 144 pixels
+- Image height: 176 pixels
+- Image orientation: Horizontal (normal)
+- Bits/pixel: 24
+- Pixel format: YCbCr
+- Creation date: 2003-05-24 22:29:14
+- Latitude: 35.61601944444445
+- Longitude: 139.69731666666667
+- Altitude: 78.0 meters
+- Camera model: A5301T
+- Camera manufacturer: KDDI-TS
+- Compression: JPEG (Baseline)
+- Comment: JPEG quality: 90%
+- MIME type: image/jpeg
+- Endianness: Big endian""")
 
 
 if __name__ == "__main__":
