@@ -20,7 +20,7 @@ def computeCompressionRate(meta):
     Compute compression rate, sizes have to be in byte.
     """
     if (not meta.has("file_size")
-        or not meta.get("compr_size", 0):
+        or not meta.get("compr_size", 0)):
         return
     file_size = meta.get("file_size")
     if not file_size:
