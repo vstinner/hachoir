@@ -48,16 +48,18 @@ class TestDoc(unittest.TestCase):
     def test_tests_directory(self):
         self.check_doc('regex_regression.rst', subdir='.')
 
-    def test_modules(self):
+    def test_hachoir_core(self):
         self.check_module("hachoir.core.bits")
         self.check_module("hachoir.core.dict")
         self.check_module("hachoir.core.i18n")
         self.check_module("hachoir.core.text_handler")
         self.check_module("hachoir.core.tools")
 
+    def test_hachoir_metadata(self):
         self.check_module("hachoir.metadata.metadata")
         self.check_module("hachoir.metadata.setter")
 
+    def test_hachoir_regex(self):
         self.check_module("hachoir.regex.parser")
         self.check_module("hachoir.regex.regex")
         self.check_module("hachoir.regex.pattern")
