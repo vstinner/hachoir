@@ -3,7 +3,8 @@ from hotshot.stats import load as loadStats
 from os import unlink
 
 
-def runProfiler(func, args=tuple(), kw={}, verbose=True, nb_func=25, sort_by=('cumulative', 'calls')):
+def runProfiler(func, args=tuple(), kw={}, verbose=True, nb_func=25,
+                sort_by=('cumulative', 'calls')):
     profile_filename = "/tmp/profiler"
     prof = Profile(profile_filename)
     try:
@@ -29,4 +30,3 @@ def runProfiler(func, args=tuple(), kw={}, verbose=True, nb_func=25, sort_by=('c
         return result
     finally:
         unlink(profile_filename)
-

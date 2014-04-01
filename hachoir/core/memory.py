@@ -45,7 +45,7 @@ def clearCaches():
     # import re; re.purge()
 
 try:
-# ---- 'resource' implementation ---------------------------------------------
+    # ---- 'resource' implementation -----------------------------------
     from resource import getpagesize, getrlimit, setrlimit, RLIMIT_AS
 
     PAGE_SIZE = getpagesize()
@@ -101,4 +101,3 @@ def limitedMemory(limit, func, *args, **kw):
 
         # After calling the function: clear all caches
         clearCaches()
-

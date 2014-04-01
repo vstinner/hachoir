@@ -3,8 +3,8 @@ Functions to display an error (error, warning or information) message.
 """
 
 from hachoir.core.log import log
-from hachoir.core.tools import makePrintable
-import sys, traceback
+import sys
+import traceback
 
 
 def getBacktrace(empty="Empty backtrace."):
@@ -22,6 +22,6 @@ def getBacktrace(empty="Empty backtrace."):
         return "Error while trying to get backtrace"
     return empty
 
-info    = log.info
+info = log.info
 warning = log.warning
-error   = log.error
+error = log.error

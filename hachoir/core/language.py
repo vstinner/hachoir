@@ -21,7 +21,7 @@ class Language:
         return self.code < other.code
 
     def __str__(self):
-       return ISO639_2[self.code]
+        return ISO639_2[self.code]
 
     def __repr__(self):
         return "<Language '%s', code=%r>" % (str(self), self.code)

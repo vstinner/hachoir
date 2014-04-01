@@ -9,10 +9,7 @@ WARNING: Loading this module indirectly calls initLocale() which sets
          settings.
 """
 
-import hachoir.core.config as config
-import hachoir.core
 import locale
-from os import path
 import sys
 from codecs import BOM_UTF8, BOM_UTF16_LE, BOM_UTF16_BE
 
@@ -93,7 +90,7 @@ CHARSET_CHARACTERS = (
 )
 
 
-def guessBytesCharset(bytes, default=None):
+def guessBytesCharset(data, default=None):
     r"""
     >>> guessBytesCharset(b"abc")
     'ASCII'
@@ -107,30 +104,32 @@ def guessBytesCharset(bytes, default=None):
     'ISO-8859-1'
     >>> guessBytesCharset(b"100 \xA4")
     'ISO-8859-15'
-    >>> guessBytesCharset(b'Word \xb8\xea\xe4\xef\xf3\xe7 - Microsoft Outlook 97 - \xd1\xf5\xe8\xec\xdf\xf3\xe5\xe9\xf2 e-mail')
+    >>> guessBytesCharset(b'Word \xb8\xea\xe4\xef\xf3\xe7'
+    ...                   b' - Microsoft Outlook 97'
+    ...                   b' - \xd1\xf5\xe8\xec\xdf\xf3\xe5\xe9\xf2 e-mail')
     'ISO-8859-7'
     """
     # Check for UTF BOM
     for bom_bytes, charset in UTF_BOMS:
-        if bytes.startswith(bom_bytes):
+        if data.startswith(bom_bytes):
             return charset
 
     # Pure ASCII?
     try:
-        text = str(bytes, 'ASCII', 'strict')
+        data.decode('ascii', 'strict')
         return 'ASCII'
     except UnicodeDecodeError:
         pass
 
     # Valid UTF-8?
     try:
-        text = str(bytes, 'UTF-8', 'strict')
+        data.decode('utf-8', 'strict')
         return 'UTF-8'
     except UnicodeDecodeError:
         pass
 
     # Create a set of non-ASCII characters
-    non_ascii_set = set(byte for byte in bytes if byte >= 128)
+    non_ascii_set = set(byte for byte in data if byte >= 128)
     for characters, charset in CHARSET_CHARACTERS:
         if characters.issuperset(non_ascii_set):
             return charset

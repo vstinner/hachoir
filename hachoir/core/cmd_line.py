@@ -1,6 +1,5 @@
 from optparse import OptionGroup
 from hachoir.core.log import log
-from hachoir.core.tools import makePrintable
 from hachoir import version
 import hachoir.core.config as config
 import sys
@@ -20,24 +19,25 @@ def getHachoirOptions(parser):
     def setLogFilename(*args):
         log.setFilename(args[2])
 
-    common = OptionGroup(parser, "Hachoir library", \
-        "Configure Hachoir library")
+    common = OptionGroup(parser, "Hachoir library",
+                         "Configure Hachoir library")
     common.add_option("--verbose", help="Verbose mode",
-        default=False, action="store_true")
+                      default=False, action="store_true")
     common.add_option("--log", help="Write log in a file",
-        type="string", action="callback", callback=setLogFilename)
+                      type="string", action="callback",
+                      callback=setLogFilename)
     common.add_option("--quiet", help="Quiet mode (don't display warning)",
-        default=False, action="store_true")
+                      default=False, action="store_true")
     common.add_option("--debug", help="Debug mode",
-        default=False, action="store_true")
+                      default=False, action="store_true")
     return common
 
 
 def configureHachoir(option):
     # Configure Hachoir using "option" (value from optparse)
     if option.quiet:
-      config.quiet = True
+        config.quiet = True
     if option.verbose:
-      config.verbose = True
+        config.verbose = True
     if option.debug:
-      config.debug = True
+        config.debug = True

@@ -400,6 +400,24 @@ def lowerBound(seq, cmp_func):
     return f
 
 
+def _ftypelet(mode):
+    if stat.S_ISREG(mode) or not stat.S_IFMT(mode):
+        return '-'
+    if stat.S_ISBLK(mode):
+        return 'b'
+    if stat.S_ISCHR(mode):
+        return 'c'
+    if stat.S_ISDIR(mode):
+        return 'd'
+    if stat.S_ISFIFO(mode):
+        return 'p'
+    if stat.S_ISLNK(mode):
+        return 'l'
+    if stat.S_ISSOCK(mode):
+        return 's'
+    return '?'
+
+
 def humanUnixAttributes(mode):
     """
     Convert a Unix file attributes (or "file mode") to an unicode string.
@@ -413,18 +431,7 @@ def humanUnixAttributes(mode):
     '-rwxr-sr-x (2755)'
     """
 
-    def ftypelet(mode):
-        if stat.S_ISREG (mode) or not stat.S_IFMT(mode):
-            return '-'
-        if stat.S_ISBLK (mode): return 'b'
-        if stat.S_ISCHR (mode): return 'c'
-        if stat.S_ISDIR (mode): return 'd'
-        if stat.S_ISFIFO(mode): return 'p'
-        if stat.S_ISLNK (mode): return 'l'
-        if stat.S_ISSOCK(mode): return 's'
-        return '?'
-
-    chars = [ ftypelet(mode), 'r', 'w', 'x', 'r', 'w', 'x', 'r', 'w', 'x' ]
+    chars = [_ftypelet(mode), 'r', 'w', 'x', 'r', 'w', 'x', 'r', 'w', 'x']
     for i in range(1, 10):
         if not mode & 1 << 9 - i:
             chars[i] = '-'
@@ -457,7 +464,7 @@ def createDict(data, index):
     >>> createDict(data, 2)
     {10: 'a', 20: 'b'}
     """
-    return dict( (key,values[index]) for key, values in data.items() )
+    return dict((key, values[index]) for key, values in data.items())
 
 # Start of UNIX timestamp (Epoch): 1st January 1970 at 00:00
 UNIX_TIMESTAMP_T0 = datetime(1970, 1, 1)
@@ -542,7 +549,8 @@ def timestampWin64(value):
     try:
         return WIN64_TIMESTAMP_T0 + durationWin64(value)
     except OverflowError:
-        raise ValueError("date newer than year %s (value=%s)" % (MAXYEAR, value))
+        raise ValueError("date newer than year %s (value=%s)"
+                         % (MAXYEAR, value))
 
 # Start of 60-bit UUID timestamp: 15 October 1582 at 00:00
 UUID60_TIMESTAMP_T0 = datetime(1582, 10, 15, 0, 0, 0)
@@ -604,4 +612,3 @@ def normalizeNewline(text):
     text = text.replace("\r\n", "\n")
     text = text.replace("\r", "\n")
     return NEWLINES_REGEX.sub("\n", text)
-

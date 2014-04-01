@@ -24,4 +24,3 @@ else:
 # Parser global options
 autofix = True            # Enable Autofix? see hachoir.field.GenericFieldSet
 check_padding_pattern = True   # Check padding fields pattern?
-

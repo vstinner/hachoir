@@ -62,4 +62,3 @@ def hexadecimal(field):
     padding = alignValue(size, 4) // 4
     pattern = "0x%%0%ux" % padding
     return pattern % field.value
-

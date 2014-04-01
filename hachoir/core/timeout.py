@@ -77,4 +77,3 @@ if not IMPLEMENTATION:
         IMPLEMENTATION = "resource.setrlimit(RLIMIT_CPU)"
     except ImportError:
         pass
-

@@ -23,7 +23,7 @@ class Dict(object):
         self._value_list = []   # index => value
         if values:
             for key, value in values:
-                self.append(key,value)
+                self.append(key, value)
 
     def _getValues(self):
         return self._value_list
@@ -138,7 +138,7 @@ class Dict(object):
             index += len(self._value_list)
         if not (0 <= index < len(self._value_list)):
             raise IndexError("list assignment index out of range (%s/%s)"
-                % (index, len(self._value_list)))
+                             % (index, len(self._value_list)))
         del self._value_list[index]
         del self._key_list[index]
 
@@ -179,4 +179,3 @@ class Dict(object):
     def __repr__(self):
         items = ("%r: %r" % (key, value) for key, value in self.items())
         return "{%s}" % ", ".join(items)
-

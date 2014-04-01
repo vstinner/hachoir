@@ -23,4 +23,3 @@ class EventHandler(object):
             return
         for handler in self.handlers[event_name]:
             handler(*args)
-

@@ -554,4 +554,3 @@ for line in _ISO639:
     for key in line[1].split("/"):
         ISO639_2[key] = line[0]
 del _ISO639
-

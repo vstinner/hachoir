@@ -1,11 +1,13 @@
-import os, sys, time
+import os
+import sys
+import time
 import hachoir.core.config as config
 
 
 class Log:
-    LOG_INFO   = 0
-    LOG_WARN   = 1
-    LOG_ERROR  = 2
+    LOG_INFO = 0
+    LOG_WARN = 1
+    LOG_ERROR = 2
 
     level_name = {
         LOG_WARN: "[warn]",
@@ -18,7 +20,8 @@ class Log:
         self.__file = None
         self.use_print = True
         self.use_buffer = False
-        self.on_new_message = None # Prototype: def func(level, prefix, text, context)
+        # Prototype: def func(level, prefix, text, context)
+        self.on_new_message = None
 
     def shutdown(self):
         if self.__file:
@@ -49,7 +52,8 @@ class Log:
         except IOError as err:
             if err.errno == 2:
                 self.__file = None
-                self.info("[Log] setFilename(%s) fails: no such file" % filename)
+                self.info("[Log] setFilename(%s) fails: no such file"
+                          % filename)
             else:
                 raise
 
@@ -108,7 +112,7 @@ class Log:
 
         # Use callback (if used)
         if self.on_new_message:
-            self.on_new_message (level, prefix, _text, ctxt)
+            self.on_new_message(level, prefix, _text, ctxt)
 
     def info(self, text):
         """
@@ -137,9 +141,12 @@ log = Log()
 class Logger(object):
     def _logger(self):
         return "<%s>" % self.__class__.__name__
+
     def info(self, text):
         log.newMessage(Log.LOG_INFO, text, self)
+
     def warning(self, text):
         log.newMessage(Log.LOG_WARN, text, self)
+
     def error(self, text):
         log.newMessage(Log.LOG_ERROR, text, self)

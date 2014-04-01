@@ -4,7 +4,6 @@ string, number, hexadecimal, etc.
 """
 
 from hachoir.core.endian import BIG_ENDIAN, LITTLE_ENDIAN, MIDDLE_ENDIAN
-from itertools import chain, repeat
 from struct import calcsize, unpack, error as struct_error
 
 
@@ -26,21 +25,22 @@ def swap32(value):
     '78563412'
     """
     value = int(value)
-    return ((value & 0x000000FF) << 24) \
-         | ((value & 0x0000FF00) << 8) \
-         | ((value & 0x00FF0000) >> 8) \
-         | ((value & 0xFF000000) >> 24)
+    return (((value & 0x000000FF) << 24)
+            | ((value & 0x0000FF00) << 8)
+            | ((value & 0x00FF0000) >> 8)
+            | ((value & 0xFF000000) >> 24))
 
 
 def arrswapmid(data):
     r"""
-    Convert an array of characters from middle-endian to big-endian and vice-versa.
+    Convert an array of characters from middle-endian to big-endian and
+    vice-versa.
 
     >>> bytes(arrswapmid(b"badcfehg"))
     b'abcdefgh'
     """
-    assert len(data)%2 == 0
-    ret = [b'']*len(data)
+    assert len(data) % 2 == 0
+    ret = [b''] * len(data)
     ret[1::2] = data[0::2]
     ret[0::2] = data[1::2]
     return ret
@@ -69,8 +69,8 @@ def bin2long(text, endian):
     3
     """
     assert endian in (LITTLE_ENDIAN, BIG_ENDIAN)
-    bits = [ (ord(character)-ord("0")) \
-        for character in text if character in "01" ]
+    bits = [(ord(character)-ord("0"))
+            for character in text if character in "01"]
     if endian is not BIG_ENDIAN:
         bits = bits[::-1]
     size = len(bits)
@@ -123,7 +123,7 @@ def countBits(value):
     count = 1
     bits = 1
     while (1 << bits) <= value:
-        count  += bits
+        count += bits
         value >>= bits
         bits <<= 1
     while 2 <= value:
@@ -132,7 +132,7 @@ def countBits(value):
         else:
             bits -= 1
         while (1 << bits) <= value:
-            count  += bits
+            count += bits
             value >>= bits
     return count
 
@@ -282,7 +282,8 @@ def str2long(data, endian):
     True
     >>> str2long(b"\x00\x01\x02\x03", LITTLE_ENDIAN) == 0x3020100
     True
-    >>> str2long(b"\xff\x14\x2a\x10\xab\x00\xd9\x0e", BIG_ENDIAN) == 0xff142a10ab00d90e
+    >>> (str2long(b"\xff\x14\x2a\x10\xab\x00\xd9\x0e", BIG_ENDIAN)
+    ...  == 0xff142a10ab00d90e)
     True
     >>> str2long(b"\xff\xff\xff\xff\xff\xff\xff\xff", BIG_ENDIAN) == (2**64-1)
     True
