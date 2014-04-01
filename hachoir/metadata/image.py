@@ -1,5 +1,5 @@
-from hachoir.metadata.metadata import (registerExtractor,
-    Metadata, RootMetadata, MultipleMetadata)
+from hachoir.metadata.metadata import (registerExtractor, Metadata,
+                                       RootMetadata, MultipleMetadata)
 from hachoir.parser.image import (
     BmpFile, IcoFile, PcxFile, GifFile, PngFile, TiffFile,
     XcfFile, TargaFile, WMF_File, PsdFile)
@@ -16,9 +16,9 @@ def computeComprRate(meta, compr_size):
 
     Set "compr_data" with a string like "1.52x".
     """
-    if not meta.has("width") \
-    or not meta.has("height") \
-    or not meta.has("bits_per_pixel"):
+    if (not meta.has("width")
+       or not meta.has("height")
+       or not meta.has("bits_per_pixel")):
         return
     if not compr_size:
         return
@@ -39,7 +39,8 @@ class BmpMetadata(RootMetadata):
                 self.nb_colors = hdr["used_colors"].value
             self.bits_per_pixel = bpp
         self.compression = hdr["compression"].display
-        self.format_version = "Microsoft Bitmap version %s" % hdr.getFormatVersion()
+        self.format_version = ("Microsoft Bitmap version %s"
+                               % hdr.getFormatVersion())
 
         self.width_dpi = hdr["horizontal_dpi"].value
         self.height_dpi = hdr["vertical_dpi"].value
@@ -58,6 +59,7 @@ class TiffMetadata(RootMetadata):
 #        "doc_name": "title",
 #        "orientation": "image_orientation",
     }
+
     def extract(self, tiff):
         if "ifd" in tiff:
             self.useIFD(tiff["ifd"])
@@ -98,7 +100,9 @@ class IcoMetadata(MultipleMetadata):
                 bpp = 8
             image.bits_per_pixel = bpp
             image.setHeader("Icon #%u (%sx%s)"
-                % (1+index, image.get("width", "?"), image.get("height", "?")))
+                            % (1+index,
+                               image.get("width", "?"),
+                               image.get("height", "?")))
 
             # Read compression from data (if available)
             key = "icon_data[%u]/header/codec" % index
@@ -136,7 +140,7 @@ class XcfMetadata(RootMetadata):
         self.width = xcf["width"].value
         self.height = xcf["height"].value
         try:
-            self.bits_per_pixel = self.TYPE_TO_BPP[ xcf["type"].value ]
+            self.bits_per_pixel = self.TYPE_TO_BPP[xcf["type"].value]
         except KeyError:
             pass
         self.format_version = xcf["type"].display
@@ -187,7 +191,7 @@ class PngMetadata(RootMetadata):
                     self.comment = "%s=%s" % (keyword, text)
                 else:
                     self.comment = text
-        compr_size = sum( data.size for data in png.array("data") )
+        compr_size = sum(data.size for data in png.array("data"))
         computeComprRate(self, compr_size)
 
     @fault_tolerant
@@ -234,11 +238,12 @@ class GifMetadata(RootMetadata):
         if self.has("bits_per_pixel"):
             self.nb_colors = (1 << self.get('bits_per_pixel'))
         self.compression = "LZW"
-        self.format_version =  "GIF version %s" % gif["version"].value
+        self.format_version = "GIF version %s" % gif["version"].value
         for comments in gif.array("comments"):
             for comment in gif.array(comments.name + "/comment"):
                 self.comment = comment.value
-        if "graphic_ctl/has_transp" in gif and gif["graphic_ctl/has_transp"].value:
+        if ("graphic_ctl/has_transp" in gif
+           and gif["graphic_ctl/has_transp"].value):
             self.pixel_format = "Color index with transparency"
         else:
             self.pixel_format = "Color index"
@@ -306,4 +311,3 @@ registerExtractor(PngFile, PngMetadata)
 registerExtractor(TiffFile, TiffMetadata)
 registerExtractor(WMF_File, WmfMetadata)
 registerExtractor(PsdFile, PsdMetadata)
-

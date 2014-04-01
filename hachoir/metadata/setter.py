@@ -13,10 +13,12 @@ YEAR_REGEX1 = re.compile("^([0-9]{4})$")
 DATE_REGEX1 = re.compile("^([0-9]{4})~([01][0-9])~([0-9]{2})$")
 
 # Date regex: YYYY-MM-DD HH:MM:SS (US format)
-DATETIME_REGEX1 = re.compile("^([0-9]{4})~([01][0-9])~([0-9]{2})~([0-9]{1,2})~([0-9]{2})~([0-9]{2})$")
+DATETIME_REGEX1 = re.compile("^([0-9]{4})~([01][0-9])~([0-9]{2})"
+                             "~([0-9]{1,2})~([0-9]{2})~([0-9]{2})$")
 
 # Datetime regex: "MM-DD-YYYY HH:MM:SS" (FR format)
-DATETIME_REGEX2 = re.compile("^([01]?[0-9])~([0-9]{2})~([0-9]{4})~([0-9]{1,2})~([0-9]{2})~([0-9]{2})$")
+DATETIME_REGEX2 = re.compile("^([01]?[0-9])~([0-9]{2})~([0-9]{4})"
+                             "~([0-9]{1,2})~([0-9]{2})~([0-9]{2})$")
 
 # Timezone regex: "(...) +0200"
 TIMEZONE_REGEX = re.compile("^(.*)~([+-][0-9]{2})00$")
@@ -174,4 +176,3 @@ def normalizeString(text):
     if config.RAW_OUTPUT:
         return text
     return text.strip(" \t\v\n\r\0")
-

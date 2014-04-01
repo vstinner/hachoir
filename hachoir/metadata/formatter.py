@@ -26,4 +26,3 @@ def humanPixelSize(value):
 
 def humanDPI(value):
     return "%s DPI" % value
-

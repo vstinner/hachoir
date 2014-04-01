@@ -1,19 +1,21 @@
-from hachoir.metadata.metadata import (registerExtractor,
-    Metadata, RootMetadata, MultipleMetadata)
-from hachoir.parser.audio import AuFile, MpegAudioFile, RealAudioFile, AiffFile, FlacParser
+from hachoir.metadata.metadata import (registerExtractor, Metadata,
+                                       RootMetadata, MultipleMetadata)
+from hachoir.parser.audio import (AuFile, MpegAudioFile, RealAudioFile,
+                                  AiffFile, FlacParser)
 from hachoir.parser.container import OggFile, RealMediaFile
 from hachoir.core.tools import makePrintable, timedelta2seconds, humanBitRate
 from datetime import timedelta
-from hachoir.metadata.metadata_item import QUALITY_FAST, QUALITY_NORMAL, QUALITY_BEST
+from hachoir.metadata.metadata_item import (QUALITY_FAST, QUALITY_NORMAL,
+                                            QUALITY_BEST)
 from hachoir.metadata.safe import fault_tolerant, getValue
 
 
 def computeComprRate(meta, size):
-    if not meta.has("duration") \
-    or not meta.has("sample_rate") \
-    or not meta.has("bits_per_sample") \
-    or not meta.has("nb_channel") \
-    or not size:
+    if (not meta.has("duration")
+        or not meta.has("sample_rate")
+        or not meta.has("bits_per_sample")
+        or not meta.has("nb_channel")
+        or not size):
         return
     orig_size = timedelta2seconds(meta.get("duration")) * meta.get('sample_rate') * meta.get('bits_per_sample') * meta.get('nb_channel')
     meta.compr_rate = float(orig_size) / size

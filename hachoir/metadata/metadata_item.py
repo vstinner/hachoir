@@ -20,7 +20,7 @@ class DataValue:
 
 class Data:
     def __init__(self, key, priority, description,
-    text_handler=None, type=None, filter=None, conversion=None):
+                 text_handler=None, type=None, filter=None, conversion=None):
         """
         handler is only used if value is not string nor unicode, prototype:
            def handler(value) -> str/unicode
@@ -56,7 +56,8 @@ class Data:
     def add(self, value):
         if isinstance(value, tuple):
             if len(value) != 2:
-                raise ValueError("Data.add() only accept tuple of 2 elements: (value,text)")
+                raise ValueError("Data.add() only accept "
+                                 "tuple of 2 elements: (value,text)")
             value, text = value
         else:
             text = None
@@ -75,11 +76,12 @@ class Data:
             try:
                 new_value = self.conversion(self.metadata, self.key, value)
             except Exception as err:
-                self.metadata.warning("Error during conversion of %r value: %s" % (
-                    self.key, err))
+                self.metadata.warning("Error during conversion of %r value: %s"
+                                      % (self.key, err))
                 return
             if new_value is None:
-                dest_types = " or ".join(str(item.__name__) for item in self.type)
+                dest_types = " or ".join(str(item.__name__)
+                                         for item in self.type)
                 self.metadata.warning("Unable to convert %s=%r (%s) to %s" % (
                     self.key, value, type(value).__name__, dest_types))
                 return
@@ -102,8 +104,8 @@ class Data:
         # Skip empty strings
         if isinstance(value, str):
             value = normalizeNewline(value)
-            if config.MAX_STR_LENGTH \
-            and config.MAX_STR_LENGTH < len(value):
+            if (config.MAX_STR_LENGTH
+               and config.MAX_STR_LENGTH < len(value)):
                 value = value[:config.MAX_STR_LENGTH] + "(...)"
 
         # Skip duplicates
@@ -112,7 +114,8 @@ class Data:
 
         # Use filter
         if self.filter and not self.filter(value):
-            self.metadata.warning("Skip value %s=%r (filter)" % (self.key, value))
+            self.metadata.warning("Skip value %s=%r (filter)"
+                                  % (self.key, value))
             return
 
         # For string, if you have "verlongtext" and "verylo",

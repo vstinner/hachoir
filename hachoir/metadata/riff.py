@@ -2,7 +2,8 @@
 Extract metadata from RIFF file format: AVI video and WAV sound.
 """
 
-from hachoir.metadata.metadata import Metadata, MultipleMetadata, registerExtractor
+from hachoir.metadata.metadata import (Metadata, MultipleMetadata,
+                                       registerExtractor)
 from hachoir.metadata.safe import fault_tolerant, getValue
 from hachoir.parser.container.riff import RiffFile
 from hachoir.parser.video.fourcc import UNCOMPRESSED_AUDIO
@@ -60,15 +61,15 @@ class RiffMetadata(MultipleMetadata):
         self.sample_rate = format["sample_per_sec"].value
 
         self.compression = format["codec"].display
-        if "nb_sample/nb_sample" in wav \
-        and 0 < format["sample_per_sec"].value:
+        if ("nb_sample/nb_sample" in wav
+           and 0 < format["sample_per_sec"].value):
             self.duration = timedelta(seconds=float(wav["nb_sample/nb_sample"].value) / format["sample_per_sec"].value)
         if format["codec"].value in UNCOMPRESSED_AUDIO:
             # Codec with fixed bit rate
             self.bit_rate = format["nb_channel"].value * format["bit_per_sample"].value * format["sample_per_sec"].value
-            if not self.has("duration") \
-            and "audio_data/size" in wav \
-            and self.has("bit_rate"):
+            if (not self.has("duration")
+               and "audio_data/size" in wav
+               and self.has("bit_rate")):
                 duration = float(wav["audio_data/size"].value)*8 / self.get('bit_rate')
                 self.duration = timedelta(seconds=duration)
 
@@ -157,7 +158,8 @@ class RiffMetadata(MultipleMetadata):
                 if "stream_fmt" in stream:
                     meta = Metadata(self)
                     self.extractAVIAudio(stream["stream_fmt"], meta)
-                    self.addGroup("audio[%u]" % audio_index, meta, "Audio stream")
+                    self.addGroup("audio[%u]" % audio_index,
+                                  meta, "Audio stream")
                     audio_index += 1
         if "avi_hdr" in headers:
             self.useAviHeader(headers["avi_hdr"])
@@ -187,4 +189,3 @@ class RiffMetadata(MultipleMetadata):
             self.frame_rate = 60.0 / riff["anim_hdr/jiffie_rate"].value
 
 registerExtractor(RiffFile, RiffMetadata)
-

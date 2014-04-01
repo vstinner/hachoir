@@ -3,7 +3,7 @@ from hachoir.metadata.safe import fault_tolerant, getValue
 from hachoir.metadata.metadata import (
     RootMetadata, Metadata, MultipleMetadata, registerExtractor)
 from hachoir.parser.archive import (Bzip2Parser, CabFile, GzipParser,
-    TarFile, ZipFile, MarFile)
+                                    TarFile, ZipFile, MarFile)
 from hachoir.core.tools import humanUnixAttributes
 
 
@@ -19,8 +19,8 @@ def computeCompressionRate(meta):
     """
     Compute compression rate, sizes have to be in byte.
     """
-    if not meta.has("file_size") \
-    or not meta.get("compr_size", 0):
+    if (not meta.has("file_size")
+        or not meta.get("compr_size", 0):
         return
     file_size = meta.get("file_size")
     if not file_size:
@@ -58,7 +58,9 @@ class ZipMetadata(MultipleMetadata):
         max_nb = maxNbFile(self)
         for index, field in enumerate(zip.array("file")):
             if max_nb is not None and max_nb <= index:
-                self.warning("ZIP archive contains many files, but only first %s files are processed" % max_nb)
+                self.warning("ZIP archive contains many files, "
+                             "but only first %s files are processed"
+                             % max_nb)
                 break
             self.processFile(field)
 
@@ -85,7 +87,9 @@ class TarMetadata(MultipleMetadata):
         max_nb = maxNbFile(self)
         for index, field in enumerate(tar.array("file")):
             if max_nb is not None and max_nb <= index:
-                self.warning("TAR archive contains many files, but only first %s files are processed" % max_nb)
+                self.warning("TAR archive contains many files, "
+                             "but only first %s files are processed"
+                             % max_nb)
                 break
             meta = Metadata(self)
             self.extractFile(field, meta)
@@ -115,13 +119,17 @@ class CabMetadata(MultipleMetadata):
     def extract(self, cab):
         if "folder[0]" in cab:
             self.useFolder(cab["folder[0]"])
-        self.format_version = "Microsoft Cabinet version %s.%s" % (cab["major_version"].display, cab["minor_version"].display)
+        self.format_version = ("Microsoft Cabinet version %s.%s"
+                               % (cab["major_version"].display,
+                                  cab["minor_version"].display))
         self.comment = "%s folders, %s files" % (
             cab["nb_folder"].value, cab["nb_files"].value)
         max_nb = maxNbFile(self)
         for index, field in enumerate(cab.array("file")):
             if max_nb is not None and max_nb <= index:
-                self.warning("CAB archive contains many files, but only first %s files are processed" % max_nb)
+                self.warning("CAB archive contains many files, "
+                             "but only first %s files are processed"
+                             % max_nb)
                 break
             self.useFile(field)
 
@@ -151,17 +159,21 @@ class CabMetadata(MultipleMetadata):
 class MarMetadata(MultipleMetadata):
     def extract(self, mar):
         self.comment = "Contains %s files" % mar["nb_file"].value
-        self.format_version = "Microsoft Archive version %s" % mar["version"].value
+        self.format_version = ("Microsoft Archive version %s"
+                               % mar["version"].value)
         max_nb = maxNbFile(self)
         for index, field in enumerate(mar.array("file")):
             if max_nb is not None and max_nb <= index:
-                self.warning("MAR archive contains many files, but only first %s files are processed" % max_nb)
+                self.warning("MAR archive contains many files, "
+                             "but only first %s files are processed"
+                             % max_nb)
                 break
             meta = Metadata(self)
             meta.filename = field["filename"].value
             meta.compression = "None"
             meta.file_size = field["filesize"].value
-            self.addGroup(field.name, meta, "File \"%s\"" % meta.getText('filename'))
+            self.addGroup(field.name, meta,
+                          "File \"%s\"" % meta.getText('filename'))
 
 registerExtractor(CabFile, CabMetadata)
 registerExtractor(GzipParser, GzipMetadata)
@@ -169,4 +181,3 @@ registerExtractor(Bzip2Parser, Bzip2Metadata)
 registerExtractor(TarFile, TarMetadata)
 registerExtractor(ZipFile, ZipMetadata)
 registerExtractor(MarFile, MarMetadata)
-

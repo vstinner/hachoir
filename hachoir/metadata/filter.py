@@ -30,8 +30,8 @@ class NumberFilter(Filter):
 class DatetimeFilter(Filter):
     def __init__(self, min=None, max=None):
         Filter.__init__(self, (date, datetime),
-            datetime(MIN_YEAR, 1, 1),
-            datetime(MAX_YEAR, 12, 31))
+                        datetime(MIN_YEAR, 1, 1),
+                        datetime(MAX_YEAR, 12, 31))
         self.min_date = date(MIN_YEAR, 1, 1)
         self.max_date = date(MAX_YEAR, 12, 31)
         self.min_tz = datetime(MIN_YEAR, 1, 1, tzinfo=UTC)
