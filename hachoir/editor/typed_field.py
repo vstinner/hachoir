@@ -2,8 +2,11 @@ from hachoir.field import (
     RawBits, Bit, Bits, PaddingBits,
     RawBytes, Bytes, PaddingBytes,
     GenericString, Character,
+    TimestampMac32,
     isInteger, isString)
+from hachoir.core.tools import timestampMac32
 from hachoir.editor import FakeField
+from datetime import datetime
 
 
 class EditableField(FakeField):
@@ -254,11 +257,38 @@ class EditableInteger(EditableFixedField):
             self.value, self._signed, self._size // 8, self._parent.endian)
 
 
+class EditableTimestampMac32(EditableFixedField):
+    minval, maxval = timestampMac32(0), timestampMac32(2**32-1)
+
+    def __init__(self, parent, name, *args):
+        if args:
+            if len(args) != 3:
+                raise TypeError(
+                    "Wrong argument count, EditableTimestampMac32 constructor prototype is: "
+                    "(parent, name, [value])")
+            value = args[0]
+            assert isinstance(value, datetime)
+        else:
+            value = None
+        EditableFixedField.__init__(self, parent, name, value, 32)
+
+    def _setValue(self, value):
+        if not(self.minval <= value <= self.maxval):
+            raise ValueError("Invalid value, must be in range %s..%s"
+                % (self.minval, self.maxval))
+        self._value = value
+
+    def _write(self, output):
+        timestamp = int((self.value - self.minval).total_seconds())
+        output.writeBits(self._size, timestamp, self._parent.endian)
+
 def createEditableField(fieldset, field):
     if isInteger(field):
         cls = EditableInteger
     elif isString(field):
         cls = EditableString
+    elif field.__class__ == TimestampMac32:
+        cls = EditableTimestampMac32
     elif field.__class__ in (RawBytes, Bytes, PaddingBytes):
         cls = EditableBytes
     elif field.__class__ in (RawBits, Bits, Bit, PaddingBits):
