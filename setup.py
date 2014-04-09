@@ -64,7 +64,7 @@ def main():
 
     install_options = {
         "name": hachoir.PACKAGE,
-        "version": hachoir.__version__,
+        "version": hachoir.VERSION,
         "url": hachoir.WEBSITE,
         "author": "Hachoir team (see AUTHORS file)",
         "description": "Package of Hachoir parsers used to open binary files",
