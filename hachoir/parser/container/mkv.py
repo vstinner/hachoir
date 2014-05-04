@@ -242,7 +242,7 @@ class Block(FieldSet):
             yield Bit(self, 'invisible')
             yield self.lacing()
             yield NullBits(self, 'reserved[]', 1)
-        elif self.parent._name == 'SimpleBlock[]':
+        elif self.parent._name.startswith('SimpleBlock'):
             yield Bit(self, 'keyframe')
             yield NullBits(self, 'reserved', 3)
             yield Bit(self, 'invisible')
