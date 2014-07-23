@@ -210,15 +210,15 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "/content/filename", b"pyc_example.py")
 
     def test_pyc_1_5(self):
-        parser = self.parse("pyc_example_1.5.2.pyc")
+        parser = self.parse("pyc_example_1.5.2_pyc.bin")
         self.check_pyc(parser)
 
     def test_pyc_2_2(self):
-        parser = self.parse("pyc_example_2.2.3.pyc")
+        parser = self.parse("pyc_example_2.2.3_pyc.bin")
         self.check_pyc(parser)
 
     def test_pyc_2_5(self):
-        parser = self.parse("pyc_example_2.5c1.pyc")
+        parser = self.parse("pyc_example_2.5c1_pyc.bin")
         self.check_pyc(parser)
 
     def test_java(self):
