@@ -409,7 +409,7 @@ class SwfFile(Parser):
                 data = Deflate(Bytes(self, "compressed_data", size), False)
                 def createInputStream(cis, source=None, **args):
                     stream = cis(source=source)
-                    header = StringInputStream("FWS" + self.stream.readBytes(3*8, 5))
+                    header = StringInputStream(b"FWS" + self.stream.readBytes(3*8, 5))
                     args.setdefault("tags",[]).append(("class", SwfFile))
                     return ConcatStream((header, stream), source=stream.source, **args)
                 data.setSubIStream(createInputStream)
