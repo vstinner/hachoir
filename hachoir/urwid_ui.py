@@ -360,7 +360,7 @@ class Walker(ListWalker):
         try:
             fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
         except OSError as err:
-            hachoir_log.error(str(str(err), self.charset))
+            hachoir_log.error(str(err))
         else:
             field = self.focus.field
             if raw:
