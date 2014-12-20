@@ -12,7 +12,7 @@ try:
 
         def __call__(self, size, data=None):
             if data is None:
-                data = ''
+                data = b''
             return self.gzip.decompress(self.gzip.unconsumed_tail+data, size)
 
     class DeflateStreamWbits(DeflateStream):
