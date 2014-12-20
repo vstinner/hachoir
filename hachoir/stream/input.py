@@ -361,7 +361,7 @@ class InputPipe(object):
                 break
             self._append(data)
         block, offset = divmod(self.address, 1 << self.buffer_size)
-        data = ''.join(self._get(index)
+        data = b''.join(self._get(index)
                 for index in range(block, (end - 1 >> self.buffer_size) + 1)
             )[offset:offset+size]
         self._flush()
