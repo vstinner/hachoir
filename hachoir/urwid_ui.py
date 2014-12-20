@@ -367,7 +367,7 @@ class Walker(ListWalker):
                 stream = InputFieldStream(field)
             else:
                 stream = field.getSubIStream()
-            copyfileobj(stream.file(), os.fdopen(fd, 'w'))
+            copyfileobj(stream.file(), os.fdopen(fd, 'wb'))
 
 
 class TreeBox(ListBox):
