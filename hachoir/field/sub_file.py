@@ -35,7 +35,7 @@ class CompressedStream:
     def __init__(self, stream, decompressor):
         self.stream = stream
         self.decompressor = decompressor(stream)
-        self._buffer = ''
+        self._buffer = b''
 
     def read(self, size):
         d = self._buffer
@@ -57,7 +57,7 @@ class CompressedStream:
                 data.append(d[:size])
                 size -= len(d)
         self._buffer = d[size+len(d):]
-        return ''.join(data)
+        return b''.join(data)
 
 
 def CompressedField(field, decompressor):
