@@ -66,11 +66,6 @@ class Data:
         if value is None:
             return
 
-        if isinstance(value, str):
-            value = normalizeString(value)
-            if not value:
-                return
-
         # Convert string to Unicode string using charset ISO-8859-1
         if self.conversion:
             try:
@@ -94,6 +89,11 @@ class Data:
                 value = new_value
         elif isinstance(value, bytes):
             value = str(value, "ISO-8859-1")
+
+        if isinstance(value, str):
+            value = normalizeString(value)
+            if not value:
+                return
 
         if self.type and not isinstance(value, self.type):
             dest_types = " or ".join(str(item.__name__) for item in self.type)
