@@ -12,7 +12,6 @@ TODO list
 * run flake8
 * convert all methods names to PEP8!!!
 * run pyflakes
-* urwid help is broken
 * test hachoir-gtk
 * test hachoir-http
 * convert remaining wiki pages

@@ -10,8 +10,8 @@ from hachoir.stream import InputFieldStream, InputStreamError, FileInputStream
 from hachoir.parser import guessParser
 from hachoir.parser import guessParser, HachoirParserList
 from hachoir.version import VERSION, WEBSITE
-from urwid import (AttrWrap, BoxAdapter, BoxWidget, CanvasJoin, Edit, Frame,
-                   ListBox, Pile, Text)
+from urwid import (AttrWrap, BoxAdapter, CanvasJoin, Edit, Frame, ListBox,
+                   Pile, Text, WidgetPlaceholder)
 from shutil import copyfileobj
 from weakref import WeakKeyDictionary
 from optparse import OptionGroup, OptionParser
@@ -397,26 +397,27 @@ class TreeBox(ListBox):
         return canvas
 
 
-class Tabbed(BoxWidget):
+class Tabbed(WidgetPlaceholder):
     tabs = []
     active = None
 
     def __init__(self, title):
+        WidgetPlaceholder.__init__(self, None)
         self.title = title
 
     def select(self, pos):
         self.active = pos
         if pos is None:
-            self.box_widget = None
+            self.original_widget = None
         else:
-            self.box_widget = self.tabs[pos][1]
+            self.original_widget = self.tabs[pos][1]
         tabs = []
         for i, t in enumerate(self.tabs):
             tab = " %u %s " % (i, t[0])
             if i == pos:
                 tab = ('focus', tab)
             tabs.append(tab)
-        self.title.set_text(tabs)
+        self.title.set_text(tabs if tabs else '')
 
     def append(self, tab):
         pos = len(self.tabs)
@@ -433,16 +434,13 @@ class Tabbed(BoxWidget):
                 pos = None
         self.select(pos)
 
-    def render(self, *args, **kw):
-        return self.box_widget.render(*args, **kw)
-
     def keypress(self, size, key):
         if key == '<':
             pos = self.active - 1
         elif key == '>':
             pos = self.active + 1
         else:
-            return self.box_widget.keypress(size, key)
+            return self.original_widget.keypress(size, key)
         self.select(pos % len(self.tabs))
 
 
@@ -644,7 +642,7 @@ def exploreFieldSet(field_set, args, options={}):
                                 resize = log.height
                         elif e in ('esc', 'ctrl w'):
                             body.close()
-                            if body.box_widget is None:
+                            if body.original_widget is None:
                                 return
                             resize = log.height
                         elif e == '+':
