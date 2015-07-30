@@ -54,7 +54,7 @@ Search speed is proportional to the number of used parsers.
 Examples
 ========
 
-Find files in a hard drive:
+Find files in a hard drive::
 
     $ hachoir-subfile /dev/sda --size=34200100 --quiet
     [+] Start search (32.6 MB)
@@ -76,7 +76,7 @@ Find files in a hard drive:
     Total time: 20.08 sec -- 1.6 MB/sec
 
 
-PowerPoint document:
+PowerPoint document::
 
     $ hachoir-subfile chiens.PPS
     [+] Start search (828.5 KB)
