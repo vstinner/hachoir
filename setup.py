@@ -18,6 +18,7 @@
 from imp import load_source
 from os import path
 from sys import argv
+from setuptools import find_packages
 
 SCRIPTS = [
     "hachoir-grep",
@@ -71,7 +72,7 @@ def main():
         "long_description": long_description,
         "classifiers": CLASSIFIERS,
         "license": hachoir.LICENSE,
-        "packages": ['hachoir'],
+        "packages": find_packages(),
         "scripts": SCRIPTS,
     }
     if use_setuptools:
