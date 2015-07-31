@@ -225,7 +225,7 @@ class Walker(ListWalker):
                     self.set_focus(self.fromField(root, target.path))
                 return
         elif key == ' ':
-            if self.focus.parent and self.focus.field.size != 0:
+            if 0 < self.focus.field.size < self.getRoot().field.stream.size:
                 raise NewTab_Stream(self.focus.field)
             return
         else:
