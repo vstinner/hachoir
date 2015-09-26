@@ -62,7 +62,7 @@ class ExeFile(HachoirParser, RootSeekableFieldSet):
     PARSER_TAGS = {
         "id": "exe",
         "category": "program",
-        "file_ext": ("exe", "dll", "ocx"),
+        "file_ext": ("exe", "dll", "ocx", "pyd", "scr"),
         "mime": ("application/x-dosexec",),
         "min_size": 64 * 8,
         # "magic": (("MZ", 0),),
