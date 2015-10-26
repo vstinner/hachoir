@@ -4,3 +4,4 @@ from hachoir.parser.program.python import PythonCompiledFile  # noqa
 from hachoir.parser.program.java import JavaCompiledClassFile  # noqa
 from hachoir.parser.program.prc import PRCFile  # noqa
 from hachoir.parser.program.nds import NdsFile  # noqa
+from hachoir.parser.program.java_serialized import JavaSerializedFile  # noqa
