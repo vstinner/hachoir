@@ -14,11 +14,11 @@ DATE_REGEX1 = re.compile("^([0-9]{4})~([01][0-9])~([0-9]{2})$")
 
 # Date regex: YYYY-MM-DD HH:MM:SS (US format)
 DATETIME_REGEX1 = re.compile("^([0-9]{4})~([01][0-9])~([0-9]{2})"
-                             "~([0-9]{1,2})~([0-9]{2})~([0-9]{2})$")
+                             "~([0-9]{1,2})~([0-9]{2})~([0-9]{1,2})$")
 
 # Datetime regex: "MM-DD-YYYY HH:MM:SS" (FR format)
 DATETIME_REGEX2 = re.compile("^([01]?[0-9])~([0-9]{2})~([0-9]{4})"
-                             "~([0-9]{1,2})~([0-9]{2})~([0-9]{2})$")
+                             "~([0-9]{1,2})~([0-9]{2})~([0-9]{1,2})$")
 
 # Timezone regex: "(...) +0200"
 TIMEZONE_REGEX = re.compile("^(.*)~([+-][0-9]{2})00$")
