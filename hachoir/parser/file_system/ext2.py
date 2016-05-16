@@ -209,6 +209,18 @@ class GroupDescriptor(FieldSet):
         yield UInt16(self, "padding", "Padding")
         yield NullBytes(self, "reserved", 12, "Reserved")
 
+class FeatureCompat(FieldSet):
+    def __init__(self, *args):
+        FieldSet.__init__(self, *args)
+    def createFields(self):
+        yield Bit(self, "DIR_PREALLOC")
+        yield Bit(self, "IMAGIC_INODES")
+        yield Bit(self, "HAS_JOURNAL")
+        yield Bit(self, "EXT_ATTR")
+        yield Bit(self, "RESIZE_INO")
+        yield Bit(self, "DIR_INDEX")
+        yield Bits(self, "UNSUED", 26)
+
 class SuperBlock(FieldSet):
     static_size = 433*8
 
@@ -234,7 +246,7 @@ class SuperBlock(FieldSet):
         self._group_count = None
 
     def createDescription(self):
-        if self["feature_compat"].value & 4:
+        if self["feature_compat"]["HAS_JOURNAL"]:
             fstype = "ext3"
         else:
             fstype = "ext2"
@@ -269,7 +281,7 @@ class SuperBlock(FieldSet):
         yield UInt32(self, "first_ino", "First non-reserved inode")
         yield UInt16(self, "inode_size", "Size of inode structure")
         yield UInt16(self, "block_group_nr", "Block group # of this superblock")
-        yield UInt32(self, "feature_compat", "Compatible feature set")
+        yield FeatureCompat(self, "feature_compat", "Compatible feature set")
         yield UInt32(self, "feature_incompat", "Incompatible feature set")
         yield UInt32(self, "feature_ro_compat", "Read-only compatible feature set")
         yield RawBytes(self, "uuid", 16, "128-bit uuid for volume")
