@@ -276,6 +276,7 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "/superblock/feature_compat/HAS_JOURNAL", False)
         self.checkValue(parser, "/superblock/feature_compat/EXT_ATTR", False)
         self.checkValue(parser, "/superblock/feature_compat/RESIZE_INO", True)
+        self.checkValue(parser, "/superblock/feature_compat/DIR_INDEX", True)        
 
     def test_bmp2(self):
         parser = self.parse("article01.bmp")
