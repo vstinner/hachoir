@@ -271,6 +271,11 @@ class TestParsers(unittest.TestCase):
         self.checkDesc(parser, "/group[0]/inode_table/inode[10]", "Inode 11: file, size=1024 bytes, mode=drwxr-xr-x")
         self.checkValue(parser, "/group[0]/inode_table/inode[11]/size", 1816)
         self.checkDisplay(parser, "/group[0]/inode_table/inode[11]/ctime", '2006-12-04 23:22:00')
+        self.checkValue(parser, "/superblock/feature_compat/DIR_PREALLOC", False)
+        self.checkValue(parser, "/superblock/feature_compat/IMAGIC_INODES", False)
+        self.checkValue(parser, "/superblock/feature_compat/HAS_JOURNAL", False)
+        self.checkValue(parser, "/superblock/feature_compat/EXT_ATTR", False)
+        self.checkValue(parser, "/superblock/feature_compat/RESIZE_INO", True)
 
     def test_bmp2(self):
         parser = self.parse("article01.bmp")
