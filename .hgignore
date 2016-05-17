@@ -11,3 +11,6 @@ hachoir-metadata/hachoir_metadata/qt/dialog_ui.py
 
 # build/ subdirectories
 build
+
+# build by the tox command
+.tox/
