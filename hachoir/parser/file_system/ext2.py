@@ -232,6 +232,15 @@ class FeatureIncompat(FieldSet):
         yield Bit(self, "META_BG")
         yield Bits(self, "UNSUED", 27)
 
+class FeatureRocompat(FieldSet):
+    def __init__(self, *args):
+        FieldSet.__init__(self, *args)
+    def createFields(self):
+        yield Bit(self, "SPARSE_SUPER")
+        yield Bit(self, "LARGE_FILE")
+        yield Bit(self, "BTREE_DIR")
+        yield Bits(self, "UNSUED", 29)
+
 class DefaultMountOpts(FieldSet):
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
@@ -314,7 +323,7 @@ class SuperBlock(FieldSet):
         yield UInt16(self, "block_group_nr", "Block group # of this superblock")
         yield FeatureCompat(self, "feature_compat", "Compatible feature set")
         yield FeatureIncompat(self, "feature_incompat", "Incompatible feature set")
-        yield UInt32(self, "feature_ro_compat", "Read-only compatible feature set")
+        yield FeatureRocompat(self, "feature_ro_compat", "Read-only compatible feature set")
         yield RawBytes(self, "uuid", 16, "128-bit uuid for volume")
         yield String(self, "volume_name", 16, "Volume name", strip="\0")
         yield String(self, "last_mounted", 64, "Directory where last mounted", strip="\0")
