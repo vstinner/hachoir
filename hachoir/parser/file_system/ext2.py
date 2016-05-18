@@ -53,6 +53,36 @@ class DirectoryEntry(FieldSet):
         else:
             return "Directory entry (empty)"
 
+class InodeFlags(FieldSet):
+    def __init__(self, *args):
+        FieldSet.__init__(self, *args)
+    def createFields(self):
+        yield Bit(self, "SECRM", "Secure deletion")
+        yield Bit(self, "UNRM",  "Undelete")
+        yield Bit(self, "COMPR", "Compress file")
+        yield Bit(self, "SYNC",  "Synchronous updates")
+        yield Bit(self, "IMMUTABLE", "Immutable file")
+        yield Bit(self, "APPEND", "writes to file may only append")
+        yield Bit(self, "NODUMP", "do not dump file")
+        yield Bit(self, "NOATIME", "do not update atime")
+        yield Bit(self, "DIRTY")
+        yield Bit(self, "COMPRBLK", "One or more compressed clusters")
+        yield Bit(self, "NOCOMP", "Don't compress")
+        yield Bit(self, "ECOMPR", "Compression error")
+        yield Bit(self, "BTREE/INDEX", "btree format dir/hash-indexed directory")
+        yield Bit(self, "IMAGIC", "AFS directory")
+        yield Bit(self, "JOURNAL_DATA", "Reserved for ext3")
+        yield Bit(self, "NOTAIL", "file tail should not be merged")
+        yield Bit(self, "DIRSYNC", "dirsync behaviour (directories only)")
+        yield Bit(self, "TOPDIR", "Top of directory hierarchies")
+        yield Bit(self, "UNUSED0")
+        yield Bit(self, "EXTENT", "Extents")
+        yield Bit(self, "DIRECTIO", "Use direct i/o")
+        yield Bits(self, "UNUSED1", 2)
+        yield Bit(self, "NOCOW", "Do not cow file")
+        yield Bits(self, "UNSUED2", 7)
+        yield Bit(self, "RESERVED", "reserved for ext2 lib")
+
 class Inode(FieldSet):
     inode_type_name = {
         1: "list of bad blocks",
@@ -146,7 +176,7 @@ class Inode(FieldSet):
         yield UInt16(self, "gid", "Group ID")
         yield UInt16(self, "links_count", "Links count")
         yield UInt32(self, "blocks", "Number of blocks")
-        yield UInt32(self, "flags", "Flags")
+        yield InodeFlags(self, "flags", "Flags")
         yield NullBytes(self, "reserved[]", 4, "Reserved")
         for index in range(15):
             yield UInt32(self, "block[]")
