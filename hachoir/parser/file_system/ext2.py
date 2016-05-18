@@ -221,6 +221,21 @@ class FeatureCompat(FieldSet):
         yield Bit(self, "DIR_INDEX")
         yield Bits(self, "UNSUED", 26)
 
+class DefaultMountOpts(FieldSet):
+    def __init__(self, *args):
+        FieldSet.__init__(self, *args)
+    def createFields(self):
+        yield Bit(self, "DEBUG")
+        yield Bit(self, "BSDGROUPS")
+        yield Bit(self, "XATTR_USER")
+        yield Bit(self, "ACL")
+        yield Bit(self, "UID16")
+        yield Bit(self, "JMODE")
+        yield Bit(self, "JMODE_DATA")
+        yield Bit(self, "JMODE_ORDERED")
+        yield Bit(self, "JMODE_WBACK")
+        yield Bits(self, "UNSUED", 32 - 9)
+
 class SuperBlock(FieldSet):
     static_size = 433*8
 
@@ -240,6 +255,11 @@ class SuperBlock(FieldSet):
         4: "Orphan FS (Orphans being recovered)",
     }
     error_handling_desc = { 1: "Continue" }
+    hash_version = {
+        0: "Legacy",
+        1: "Half MD4",
+        2: "Tea"
+    }
 
     def __init__(self, parent, name):
         FieldSet.__init__(self, parent, name)
@@ -295,7 +315,14 @@ class SuperBlock(FieldSet):
         yield UInt32(self, "journal_inum", "inode number of journal file")
         yield UInt32(self, "journal_dev", "device number of journal file")
         yield UInt32(self, "last_orphan", "start of list of inodes to delete")
-        yield RawBytes(self, "reserved", 197, "Reserved")
+        for index in range(0, 4):
+            yield UInt32(self, "hash_seed[]", "HTREE hash seed")
+        yield Enum(UInt8(self, "def_hash_version", "Default hash version to use"), self.hash_version)
+        yield UInt8(self, "reserved_char_pad", "Padding - Reserved area")
+        yield UInt16(self, "reserved_word_pad", "Padding - Reserved area")
+        yield DefaultMountOpts(self, "default_mount_opts", "default mount option")
+        yield UInt32(self, "first_meta_bg", "First metablock block group")
+        yield RawBytes(self, "reserved", 169, "Reserved")
 
     def _getGroupCount(self):
         if self._group_count is None:
