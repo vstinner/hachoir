@@ -294,6 +294,7 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "/superblock/hash_seed[3]", 847697135)
         self.checkDisplay(parser, "/superblock/def_hash_version", "Tea")
         self.checkValue(parser, "/group[0]/inode_table/inode[0]/flags/SECRM", False)
+        self.checkDisplay(parser, "/superblock/rev_level", "V2 format w/ dynamic inode sizes")
 
         parser = self.parse("default_mount_opts.ext2")
         self.checkValue(parser, "/superblock/default_mount_opts/DEBUG", False)

@@ -309,6 +309,10 @@ class SuperBlock(FieldSet):
         2: "Readonly",
         3: "Panic",
     }
+    revision_levels = {
+        0: "The good old (original) format",
+        1: "V2 format w/ dynamic inode sizes",
+    }
     hash_version = {
         0: "Legacy",
         1: "Half MD4",
@@ -349,7 +353,7 @@ class SuperBlock(FieldSet):
         yield TimestampUnix32(self, "last_check", "Time of last check")
         yield textHandler(UInt32(self, "check_interval", "Maximum time between checks"), self.postMaxTime)
         yield Enum(UInt32(self, "creator_os", "Creator OS"), self.os_name)
-        yield UInt32(self, "rev_level", "Revision level")
+        yield Enum(UInt32(self, "rev_level", "Revision level"), self.revision_levels)
         yield UInt16(self, "def_resuid", "Default uid for reserved blocks")
         yield UInt16(self, "def_resgid", "Default gid for reserved blocks")
         yield UInt32(self, "first_ino", "First non-reserved inode")
