@@ -37,6 +37,7 @@ Table Of Contents
    grep
    strip
    contact
+   hacking
    authors
    changelog
 
