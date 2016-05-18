@@ -264,6 +264,7 @@ class TestParsers(unittest.TestCase):
         parser = self.parse("my60k.ext2")
         self.checkDisplay(parser, "/superblock/last_check", '2006-12-04 22:56:37')
         self.checkDisplay(parser, "/superblock/creator_os", "Linux")
+        self.checkDisplay(parser, "/superblock/errors", "Continue")
         self.checkValue(parser, "/group_desc/group[0]/block_bitmap", 3)
         self.checkValue(parser, "/group_desc/group[0]/free_blocks_count", 44)
         self.checkValue(parser, "/group[0]/block_bitmap/item[9]", False)

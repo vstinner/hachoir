@@ -304,7 +304,11 @@ class SuperBlock(FieldSet):
         2: "Error (Errors detected)",
         4: "Orphan FS (Orphans being recovered)",
     }
-    error_handling_desc = { 1: "Continue" }
+    error_handling_desc = {
+        1: "Continue",
+        2: "Readonly",
+        3: "Panic",
+    }
     hash_version = {
         0: "Legacy",
         1: "Half MD4",
