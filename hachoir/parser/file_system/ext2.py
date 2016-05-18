@@ -221,6 +221,17 @@ class FeatureCompat(FieldSet):
         yield Bit(self, "DIR_INDEX")
         yield Bits(self, "UNSUED", 26)
 
+class FeatureIncompat(FieldSet):
+    def __init__(self, *args):
+        FieldSet.__init__(self, *args)
+    def createFields(self):
+        yield Bit(self, "COMPRESSION")
+        yield Bit(self, "FILETYPE")
+        yield Bit(self, "RECOVER")
+        yield Bit(self, "JOURNAL_DEV")
+        yield Bit(self, "META_BG")
+        yield Bits(self, "UNSUED", 27)
+
 class DefaultMountOpts(FieldSet):
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
@@ -302,7 +313,7 @@ class SuperBlock(FieldSet):
         yield UInt16(self, "inode_size", "Size of inode structure")
         yield UInt16(self, "block_group_nr", "Block group # of this superblock")
         yield FeatureCompat(self, "feature_compat", "Compatible feature set")
-        yield UInt32(self, "feature_incompat", "Incompatible feature set")
+        yield FeatureIncompat(self, "feature_incompat", "Incompatible feature set")
         yield UInt32(self, "feature_ro_compat", "Read-only compatible feature set")
         yield RawBytes(self, "uuid", 16, "128-bit uuid for volume")
         yield String(self, "volume_name", 16, "Volume name", strip="\0")
