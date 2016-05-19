@@ -53,6 +53,36 @@ class DirectoryEntry(FieldSet):
         else:
             return "Directory entry (empty)"
 
+class InodeFlags(FieldSet):
+    def __init__(self, *args):
+        FieldSet.__init__(self, *args)
+    def createFields(self):
+        yield Bit(self, "SECRM", "Secure deletion")
+        yield Bit(self, "UNRM",  "Undelete")
+        yield Bit(self, "COMPR", "Compress file")
+        yield Bit(self, "SYNC",  "Synchronous updates")
+        yield Bit(self, "IMMUTABLE", "Immutable file")
+        yield Bit(self, "APPEND", "writes to file may only append")
+        yield Bit(self, "NODUMP", "do not dump file")
+        yield Bit(self, "NOATIME", "do not update atime")
+        yield Bit(self, "DIRTY")
+        yield Bit(self, "COMPRBLK", "One or more compressed clusters")
+        yield Bit(self, "NOCOMP", "Don't compress")
+        yield Bit(self, "ECOMPR", "Compression error")
+        yield Bit(self, "BTREE/INDEX", "btree format dir/hash-indexed directory")
+        yield Bit(self, "IMAGIC", "AFS directory")
+        yield Bit(self, "JOURNAL_DATA", "Reserved for ext3")
+        yield Bit(self, "NOTAIL", "file tail should not be merged")
+        yield Bit(self, "DIRSYNC", "dirsync behaviour (directories only)")
+        yield Bit(self, "TOPDIR", "Top of directory hierarchies")
+        yield Bit(self, "UNUSED0")
+        yield Bit(self, "EXTENT", "Extents")
+        yield Bit(self, "DIRECTIO", "Use direct i/o")
+        yield Bits(self, "UNUSED1", 2)
+        yield Bit(self, "NOCOW", "Do not cow file")
+        yield Bits(self, "UNSUED2", 7)
+        yield Bit(self, "RESERVED", "reserved for ext2 lib")
+
 class Inode(FieldSet):
     inode_type_name = {
         1: "list of bad blocks",
@@ -146,7 +176,7 @@ class Inode(FieldSet):
         yield UInt16(self, "gid", "Group ID")
         yield UInt16(self, "links_count", "Links count")
         yield UInt32(self, "blocks", "Number of blocks")
-        yield UInt32(self, "flags", "Flags")
+        yield InodeFlags(self, "flags", "Flags")
         yield NullBytes(self, "reserved[]", 4, "Reserved")
         for index in range(15):
             yield UInt32(self, "block[]")
@@ -221,6 +251,41 @@ class FeatureCompat(FieldSet):
         yield Bit(self, "DIR_INDEX")
         yield Bits(self, "UNSUED", 26)
 
+class FeatureIncompat(FieldSet):
+    def __init__(self, *args):
+        FieldSet.__init__(self, *args)
+    def createFields(self):
+        yield Bit(self, "COMPRESSION")
+        yield Bit(self, "FILETYPE")
+        yield Bit(self, "RECOVER")
+        yield Bit(self, "JOURNAL_DEV")
+        yield Bit(self, "META_BG")
+        yield Bits(self, "UNSUED", 27)
+
+class FeatureRocompat(FieldSet):
+    def __init__(self, *args):
+        FieldSet.__init__(self, *args)
+    def createFields(self):
+        yield Bit(self, "SPARSE_SUPER")
+        yield Bit(self, "LARGE_FILE")
+        yield Bit(self, "BTREE_DIR")
+        yield Bits(self, "UNSUED", 29)
+
+class DefaultMountOpts(FieldSet):
+    def __init__(self, *args):
+        FieldSet.__init__(self, *args)
+    def createFields(self):
+        yield Bit(self, "DEBUG")
+        yield Bit(self, "BSDGROUPS")
+        yield Bit(self, "XATTR_USER")
+        yield Bit(self, "ACL")
+        yield Bit(self, "UID16")
+        yield Bit(self, "JMODE")
+        yield Bit(self, "JMODE_DATA")
+        yield Bit(self, "JMODE_ORDERED")
+        yield Bit(self, "JMODE_WBACK")
+        yield Bits(self, "UNSUED", 32 - 9)
+
 class SuperBlock(FieldSet):
     static_size = 433*8
 
@@ -239,7 +304,20 @@ class SuperBlock(FieldSet):
         2: "Error (Errors detected)",
         4: "Orphan FS (Orphans being recovered)",
     }
-    error_handling_desc = { 1: "Continue" }
+    error_handling_desc = {
+        1: "Continue",
+        2: "Readonly",
+        3: "Panic",
+    }
+    revision_levels = {
+        0: "The good old (original) format",
+        1: "V2 format w/ dynamic inode sizes",
+    }
+    hash_version = {
+        0: "Legacy",
+        1: "Half MD4",
+        2: "Tea"
+    }
 
     def __init__(self, parent, name):
         FieldSet.__init__(self, parent, name)
@@ -275,15 +353,15 @@ class SuperBlock(FieldSet):
         yield TimestampUnix32(self, "last_check", "Time of last check")
         yield textHandler(UInt32(self, "check_interval", "Maximum time between checks"), self.postMaxTime)
         yield Enum(UInt32(self, "creator_os", "Creator OS"), self.os_name)
-        yield UInt32(self, "rev_level", "Revision level")
+        yield Enum(UInt32(self, "rev_level", "Revision level"), self.revision_levels)
         yield UInt16(self, "def_resuid", "Default uid for reserved blocks")
         yield UInt16(self, "def_resgid", "Default gid for reserved blocks")
         yield UInt32(self, "first_ino", "First non-reserved inode")
         yield UInt16(self, "inode_size", "Size of inode structure")
         yield UInt16(self, "block_group_nr", "Block group # of this superblock")
         yield FeatureCompat(self, "feature_compat", "Compatible feature set")
-        yield UInt32(self, "feature_incompat", "Incompatible feature set")
-        yield UInt32(self, "feature_ro_compat", "Read-only compatible feature set")
+        yield FeatureIncompat(self, "feature_incompat", "Incompatible feature set")
+        yield FeatureRocompat(self, "feature_ro_compat", "Read-only compatible feature set")
         yield RawBytes(self, "uuid", 16, "128-bit uuid for volume")
         yield String(self, "volume_name", 16, "Volume name", strip="\0")
         yield String(self, "last_mounted", 64, "Directory where last mounted", strip="\0")
@@ -295,7 +373,14 @@ class SuperBlock(FieldSet):
         yield UInt32(self, "journal_inum", "inode number of journal file")
         yield UInt32(self, "journal_dev", "device number of journal file")
         yield UInt32(self, "last_orphan", "start of list of inodes to delete")
-        yield RawBytes(self, "reserved", 197, "Reserved")
+        for index in range(0, 4):
+            yield UInt32(self, "hash_seed[]", "HTREE hash seed")
+        yield Enum(UInt8(self, "def_hash_version", "Default hash version to use"), self.hash_version)
+        yield UInt8(self, "reserved_char_pad", "Padding - Reserved area")
+        yield UInt16(self, "reserved_word_pad", "Padding - Reserved area")
+        yield DefaultMountOpts(self, "default_mount_opts", "default mount option")
+        yield UInt32(self, "first_meta_bg", "First metablock block group")
+        yield RawBytes(self, "reserved", 169, "Reserved")
 
     def _getGroupCount(self):
         if self._group_count is None:
