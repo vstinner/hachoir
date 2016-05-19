@@ -296,6 +296,7 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "/group[0]/inode_table/inode[0]/flags/SECRM", False)
         self.checkDisplay(parser, "/superblock/rev_level", "V2 format w/ dynamic inode sizes")
 
+    def test_ext2_default_mount_opts(self):
         parser = self.parse("default_mount_opts.ext2")
         self.checkValue(parser, "/superblock/default_mount_opts/DEBUG", False)
         self.checkValue(parser, "/superblock/default_mount_opts/BSDGROUPS", False)
