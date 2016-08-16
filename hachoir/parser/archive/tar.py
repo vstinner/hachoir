@@ -51,7 +51,8 @@ class FileEntry(FieldSet):
         yield String(self, "gname", 32, "Group name", strip=" \0", charset="ISO-8859-1")
         yield String(self, "devmajor", 8, "Dev major", strip=" \0", charset="ASCII")
         yield String(self, "devminor", 8, "Dev minor", strip=" \0", charset="ASCII")
-        yield NullBytes(self, "padding", 167, "Padding (zero)")
+        yield String(self, "prefix", 155, "Prefix for filename", strip="\0", charset="ASCII")
+        yield NullBytes(self, "padding", 12, "Padding (zero)")
 
         filesize = self.getOctal("size")
         if filesize:
@@ -78,6 +79,8 @@ class FileEntry(FieldSet):
             desc = "(terminator, empty header)"
         else:
             filename = self["name"].value
+            if self["prefix"].value:
+                filename = self["prefix"].value + '/' + filename
             filesize = humanFilesize(self.getOctal("size"))
             desc = "(%s: %s, %s)" % \
                 (filename, self["type"].display, filesize)
