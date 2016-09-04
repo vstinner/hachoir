@@ -14,7 +14,7 @@ Author: Victor Stinner
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, Enum,
                            UInt8, UInt16, UInt32, UInt64, TimestampWin64,
-                           String, Bytes, Bit,
+                           String, Bytes, Bit, Bits,
                            NullBits, NullBytes, PaddingBytes, RawBytes)
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal, filesizeHandler
@@ -94,6 +94,56 @@ class MFT_Flags(FieldSet):
         yield NullBits(self, "padding", 14)
 
 
+class RunListEntry(FieldSet):
+    def createFields(self):
+        header = UInt8(self, "header")
+        yield header
+        if header.value == 0:
+            return
+
+        offlen = header.value >> 4
+        lenlen = header.value & 0xf
+
+        if lenlen:
+            yield Bits(self, "length", lenlen * 8)
+        if offlen:
+            yield Bits(self, "offset", offlen * 8)
+
+    def createValue(self):
+        if 'length' in self:
+            length = self['length'].value
+        else:
+            length = 0
+
+        if 'offset' in self:
+            offset = self['offset'].value
+            offlen = self['offset'].size
+            if offset & (1 << (offlen - 1)):
+                offset -= 1 << offlen
+        else:
+            offset = 0
+
+        return (length, offset)
+
+
+class RunList(FieldSet):
+    def createFields(self):
+        while 1:
+            entry = RunListEntry(self, "entry[]")
+            yield entry
+            if entry['header'].value == 0:
+                break
+
+    def createValue(self):
+        runs = []
+        curoff = 0
+        for entry in self.array('entry'):
+            length, offset = entry.value
+            curoff += offset
+            runs.append((length, curoff))
+        return runs
+
+
 class Attribute(FieldSet):
     # --- Common code ---
 
@@ -113,16 +163,49 @@ class Attribute(FieldSet):
         yield UInt16(self, "name_offset", "Name offset")
         yield UInt16(self, "flags")
         yield textHandler(UInt16(self, "attribute_id"), hexadecimal)
-        yield UInt32(self, "length_attr", "Length of the Attribute")
-        yield UInt16(self, "offset_attr", "Offset of the Attribute")
-        yield UInt8(self, "indexed_flag")
-        yield NullBytes(self, "padding", 1)
-        if self._parser:
-            yield from self._parser(self)
+        if self['non_resident'].value:
+            yield UInt64(self, "runlist_start", "Starting Virtual Cluster Number of the runlist")
+            yield UInt64(self, "runlist_stop", "Ending Virtual Cluster Number of the runlist")
+            yield UInt16(self, "runlist_offset", "Offset to the runlist")
+            yield UInt16(self, "compression_unit", "Compression unit size")
+            yield UInt32(self, "unused[]")
+            yield UInt64(self, "size_allocated", "Allocated size of the attribute content")
+            yield UInt64(self, "size_actual", "Actual size of the attribute content")
+            yield UInt64(self, "size_initialized", "Initialized size of the attribute content")
+
+            if self['name_length'].value:
+                padding = self.seekByte(self['name_offset'].value)
+                if padding:
+                    yield padding
+                yield String(self, "name", self['name_length'].value * 2, charset="UTF-16-LE")
+
+            padding = self.seekByte(self['runlist_offset'].value)
+            if padding:
+                yield padding
+            yield RunList(self, "runlist")
+
         else:
-            size = self["length_attr"].value
-            if size:
-                yield RawBytes(self, "data", size)
+            yield UInt32(self, "length_attr", "Length of the Attribute")
+            yield UInt16(self, "offset_attr", "Offset of the Attribute")
+            yield UInt8(self, "indexed_flag")
+
+            if self['name_length'].value:
+                padding = self.seekByte(self['name_offset'].value)
+                if padding:
+                    yield padding
+                yield String(self, "name", self['name_length'].value * 2, charset="UTF-16-LE")
+
+            padding = self.seekByte(self['offset_attr'].value)
+            if padding:
+                yield padding
+
+            if self._parser:
+                yield from self._parser(self)
+            else:
+                size = self["length_attr"].value
+                if size:
+                    yield RawBytes(self, "data", size)
+
         size = (self.size - self.current_size) // 8
         if size:
             yield PaddingBytes(self, "end_padding", size)
