@@ -2,6 +2,9 @@
 #
 # Procedure to release Hachoir:
 #
+# FIXME: update this procedure which was written for hachoir using Python 2
+# FIXME: and using Mercurial.
+#
 #  - check version: hachoir/version.py and doc/conf.py
 #  - run: ./runtests.py
 #  - edit doc/changelog.rst (set release date)
@@ -11,7 +14,7 @@
 #  - run: ./README.py
 #  - run: ./setup.py --setuptools register sdist upload
 #  - run: rm README
-#  - check http://pypi.python.org/pypi/hachoir
+#  - check http://pypi.python.org/pypi/hachoir3
 #  - update doc/install.rst
 #  - set version to N+1: hachoir/version.py and doc/conf.py
 
