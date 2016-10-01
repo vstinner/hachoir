@@ -118,7 +118,7 @@ class ConsoleGrep(Grep):
             text.append(filename)
         if self.display_address:
             if (addr % 8) == 0:
-                text.append(str(addr/8))
+                text.append(str(addr // 8))
             else:
                 text.append("%u.%u" % (addr // 8, addr % 8))
         if self.display_path:

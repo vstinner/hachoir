@@ -381,10 +381,22 @@ segment_clusters = {
     0xA3: ('SimpleBlock[]', Block)
 }
 
+
+def stereo_mode(parent):
+    return Enum(parent, ['mono', 'right eye', 'left eye', 'both eyes'])
+
+
+def display_unit(parent):
+    return Enum(parent, ['pixels', 'centimeters', 'inches'])
+
+
+def aspect_ratio_type(parent):
+    return Enum(parent, ['free resizing', 'keep aspect ratio', 'fixed'])
+
+
 tracks_video = {
     0x9A: ('FlagInterlaced', Bool),
-    0x53B8: ('StereoMode', lambda parent: Enum(parent,
-                                                   ['mono', 'right eye', 'left eye', 'both eyes'])),
+    0x53B8: ('StereoMode', stereo_mode),
     0xB0: ('PixelWidth', UInt),
     0xBA: ('PixelHeight', UInt),
     0x54AA: ('PixelCropBottom', UInt),
@@ -393,10 +405,8 @@ tracks_video = {
     0x54DD: ('PixelCropRight', UInt),
     0x54B0: ('DisplayWidth', UInt),
     0x54BA: ('DisplayHeight', UInt),
-    0x54B2: ('DisplayUnit', lambda parent: Enum(parent,
-                                                    ['pixels', 'centimeters', 'inches'])),
-    0x54B3: ('AspectRatioType', lambda parent: Enum(parent,
-                                                        ['free resizing', 'keep aspect ratio', 'fixed'])),
+    0x54B2: ('DisplayUnit', display_unit),
+    0x54B3: ('AspectRatioType', aspect_ratio_type),
     0x2EB524: ('ColourSpace', Binary),
     0x2FB523: ('GammaValue', Float)
 }

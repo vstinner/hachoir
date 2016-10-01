@@ -398,7 +398,7 @@ class RiffFile(Parser):
     VALID_TYPES = {
         "WAVE": (ChunkWAVE, "audio/x-wav", "Microsoft WAVE audio", ".wav"),
         "CDDA": (ChunkCDDA, "audio/x-cda", "Microsoft Windows audio CD file (cda)", ".cda"),
-        "AVI ": (ChunkAVI,  "video/x-msvideo", "Microsoft AVI video", ".avi"),
+        "AVI ": (ChunkAVI, "video/x-msvideo", "Microsoft AVI video", ".avi"),
         "ACON": (ChunkACON, "image/x-ani", "Microsoft Windows animated cursor", ".ani"),
     }
     endian = LITTLE_ENDIAN

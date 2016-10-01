@@ -41,7 +41,7 @@ class FakeArray:
         if not self._known_size:
             for index in itertools.count(total):
                 try:
-                    field = self[index]
+                    self[index]
                     total += 1
                 except MissingField:
                     break
