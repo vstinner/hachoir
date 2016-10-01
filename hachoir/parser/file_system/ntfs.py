@@ -11,8 +11,6 @@ Creation date: 3rd january 2007
 Author: Victor Stinner
 """
 
-SECTOR_SIZE = 512
-
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, Enum,
                            UInt8, UInt16, UInt32, UInt64, TimestampWin64,
@@ -22,6 +20,8 @@ from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal, filesizeHandler
 from hachoir.core.tools import humanFilesize, createDict
 from hachoir.parser.common.msdos import MSDOSFileAttr32
+
+SECTOR_SIZE = 512
 
 
 class BiosParameterBlock(FieldSet):

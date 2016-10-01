@@ -14,7 +14,7 @@ Documents:
 from hachoir.field import (FieldSet, Enum,
                            Bit, Bits,
                            UInt8, Int16, UInt16, UInt32, Int32,
-                           NullBytes, Bytes, RawBytes, PascalString8, PascalString16, CString, String,
+                           NullBytes, Bytes, RawBytes, PascalString8, CString, String,
                            TimestampMac32, TimestampWin64)
 from hachoir.core.text_handler import displayHandler
 from hachoir.core.endian import LITTLE_ENDIAN
@@ -287,8 +287,8 @@ class WordDocumentParser(OLE2FragmentParser):
 
     def createFields(self):
         yield FIB(self, "FIB", "File Information Block")
-        table = getOLE2Parser(self.ole2, "table" +
-                              str(self["FIB/fWhichTblStm"].value))
+        getOLE2Parser(self.ole2, "table" +
+                      str(self["FIB/fWhichTblStm"].value))
 
         padding = (self['FIB/fcMin'].value - self.current_size // 8)
         if padding:

@@ -167,7 +167,8 @@ class ImageData(Fragment):
             first = first[name]
         try:
             _next = parent[data % next]
-            next = lambda: _next[name]
+            def next():
+                return _next[name]
         except MissingField:
             next = None
         self.setLinks(first, next)

@@ -7,8 +7,7 @@ Documents
  - Apache POI (HPSF Internals):
    http://poi.apache.org/hpsf/internals.html
 """
-from hachoir.core.endian import BIG_ENDIAN, LITTLE_ENDIAN
-from hachoir.parser import HachoirParser
+from hachoir.core.endian import BIG_ENDIAN
 from hachoir.field import (FieldSet, ParserError,
                            SeekableFieldSet,
                            Bit, Bits, NullBits,
@@ -39,7 +38,7 @@ class OSConfig:
             self.utf16 = "UTF-16-BE"
         else:
             # FIXME: Don't guess the charset, use ISO-8859-1 or UTF-8
-            #self.charset = "ISO-8859-1"
+            # self.charset = "ISO-8859-1"
             self.charset = None
             self.utf16 = "UTF-16-LE"
 
@@ -339,7 +338,7 @@ class Summary(OLE2FragmentParser):
 
     def __init__(self, stream, **args):
         OLE2FragmentParser.__init__(self, stream, **args)
-        #self.osconfig = OSConfig(self["os_type"].value == OS_MAC)
+        # self.osconfig = OSConfig(self["os_type"].value == OS_MAC)
         self.osconfig = OSConfig(self.endian == BIG_ENDIAN)
 
     def createFields(self):
@@ -398,7 +397,7 @@ class CompObj(OLE2FragmentParser):
         if self._current_size // 8 == self.datasize:
             return
 
-        #-- OLE 2.01 ---
+        # -- OLE 2.01 ---
 
         # Program ID
         yield PascalString32(self, "prog_id", strip="\0")

@@ -23,9 +23,10 @@ from hachoir.field import (ParserError, FieldSet, MissingField,
                            Enum,
                            Bit, NullBits, Bits, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, TimestampMac32,
                            String, PascalString8, PascalString16, CString,
-                           RawBytes, NullBytes, PaddingBytes)
+                           RawBytes, NullBytes)
+from hachoir.field.timestamp import timestampFactory
 from hachoir.core.endian import BIG_ENDIAN
-from hachoir.core.text_handler import textHandler, hexadecimal
+from hachoir.core.text_handler import textHandler
 
 from hachoir.core.tools import MAC_TIMESTAMP_T0, timedelta
 
@@ -34,7 +35,6 @@ def timestampMac64(value):
     if not isinstance(value, (float, int)):
         raise TypeError("an integer or float is required")
     return MAC_TIMESTAMP_T0 + timedelta(seconds=value)
-from hachoir.field.timestamp import timestampFactory
 TimestampMac64 = timestampFactory("TimestampMac64", timestampMac64, 64)
 
 

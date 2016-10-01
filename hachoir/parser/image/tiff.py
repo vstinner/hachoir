@@ -6,7 +6,7 @@ Creation date: 30 september 2006
 """
 
 from hachoir.parser import Parser
-from hachoir.field import FieldSet, SeekableFieldSet, RootSeekableFieldSet, Bytes
+from hachoir.field import SeekableFieldSet, RootSeekableFieldSet, Bytes
 from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir.parser.image.exif import TIFF
 

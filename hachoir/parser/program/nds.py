@@ -10,11 +10,10 @@ File format references:
 """
 
 from hachoir.parser import Parser
-from hachoir.field import (ParserError,
-                           UInt8, UInt16, UInt32, UInt64, String, RawBytes, SubFile, FieldSet, NullBits, Bit, Bits, Bytes,
+from hachoir.field import (UInt8, UInt16, UInt32, UInt64, String, RawBytes, SubFile, FieldSet, NullBits, Bit, Bits, Bytes,
                            SeekableFieldSet, RootSeekableFieldSet)
 from hachoir.core.text_handler import textHandler, hexadecimal
-from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
+from hachoir.core.endian import LITTLE_ENDIAN
 
 
 """

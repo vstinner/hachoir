@@ -97,7 +97,7 @@ class Journal_params(FieldSet):
 
 
 class SuperBlock(FieldSet):
-    #static_size = 204*8
+    # static_size = 204*8
 
     UMOUNT_STATE = {1: "unmounted", 2: "not unmounted"}
     HASH_FUNCTIONS = {

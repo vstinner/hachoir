@@ -3,10 +3,10 @@ from hachoir.field import FieldSet, UserVector, UInt8
 
 class RGB(FieldSet):
     color_name = {
-        (0,   0,   0): "Black",
-        (255,   0,   0): "Red",
-        (0, 255,   0): "Green",
-        (0,   0, 255): "Blue",
+        (0, 0, 0): "Black",
+        (255, 0, 0): "Red",
+        (0, 255, 0): "Green",
+        (0, 0, 255): "Blue",
         (255, 255, 255): "White",
     }
     static_size = 24

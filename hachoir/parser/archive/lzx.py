@@ -11,9 +11,8 @@ from hachoir.field import (FieldSet,
                            UInt32, Bit, Bits, PaddingBits,
                            RawBytes, ParserError)
 from hachoir.core.endian import MIDDLE_ENDIAN, LITTLE_ENDIAN
-from hachoir.core.tools import paddingSize, alignValue
+from hachoir.core.tools import paddingSize
 from hachoir.parser.archive.zlib import build_tree, HuffmanCode, extend_data
-from hachoir.core.bits import str2long
 
 
 class LZXPreTreeEncodedTree(FieldSet):

@@ -26,7 +26,7 @@ class XcfCompression(FieldSet):
     }
 
     def createFields(self):
-        yield Enum(UInt8(self, "compression",  "Compression method"), self.COMPRESSION_NAME)
+        yield Enum(UInt8(self, "compression", "Compression method"), self.COMPRESSION_NAME)
 
 
 class XcfResolution(StaticFieldSet):
@@ -252,7 +252,7 @@ class XcfProperty(FieldSet):
         self._size = (8 + self["size"].value) * 8
 
     def createFields(self):
-        yield Enum(UInt32(self, "type",  "Property type"), self.TYPE_NAME)
+        yield Enum(UInt32(self, "type", "Property type"), self.TYPE_NAME)
         yield UInt32(self, "size", "Property size")
 
         size = self["size"].value
@@ -303,7 +303,7 @@ class XcfFile(Parser):
 
     def createFields(self):
         # Read signature
-        yield String(self, "signature", 14,  "Gimp picture signature (ends with nul byte)", charset="ASCII")
+        yield String(self, "signature", 14, "Gimp picture signature (ends with nul byte)", charset="ASCII")
 
         # Read image general informations (width, height, type)
         yield UInt32(self, "width", "Image width")

@@ -360,7 +360,7 @@ class PE_Resource(SeekableFieldSet):
             if index["is_subdir"].value:
                 indexes.append(index)
 
-        #indexes.sort(key=lambda index: index["offset"].value)
+        # indexes.sort(key=lambda index: index["offset"].value)
         for index in indexes:
             self.seekByte(index["offset"].value)
             if depth == 1:

@@ -20,11 +20,11 @@ ENDMAGIC = b"%%EOF"
 
 
 def getLineEnd(s, pos=None):
-    if pos == None:
+    if pos is None:
         pos = (s.absolute_address + s.current_size) // 8
     end = s.stream.searchBytesLength(b"\x0D", False, 8 * pos)
     other_end = s.stream.searchBytesLength(b"\x0A", False, 8 * pos)
-    if end == None or (other_end != None and other_end < end):
+    if end is None or (other_end is not None and other_end < end):
         return other_end
     return end
 
@@ -37,8 +37,8 @@ def getElementEnd(s, limit=b' ', offset=0):
     addr = s.absolute_address + s.current_size
     addr += 8 * offset
     pos = s.stream.searchBytesLength(limit, True, addr)
-    if pos == None:
-        #s.info("Can't find '%s' starting at %u" % (limit, addr))
+    if pos is None:
+        # s.info("Can't find '%s' starting at %u" % (limit, addr))
         return None
     return pos
 
@@ -55,9 +55,9 @@ class PDFNumber(Field):
         size = getElementEnd(parent)
         for limit in self.LIMITS:
             other_size = getElementEnd(parent, limit)
-            if other_size != None:
+            if other_size is not None:
                 other_size -= 1
-                if size == None or other_size < size:
+                if size is None or other_size < size:
                     size = other_size
 
         self._size = 8 * size
@@ -120,15 +120,15 @@ class PDFName(Field):
             raise ParserError("Unknown PDFName '%s'" %
                               parent.stream.readBytes(self.absolute_address, 10))
         size = getElementEnd(parent, offset=1)
-        #other_size = getElementEnd(parent, '[')-1
-        # if size == None or (other_size != None and other_size < size):
-        #    size = other_size
+        # other_size = getElementEnd(parent, '[')-1
+        #  if size is None or (other_size is not None and other_size < size):
+        #     size = other_size
         for limit in self.LIMITS:
             other_size = getElementEnd(parent, limit, 1)
-            if other_size != None:
+            if other_size is not None:
                 other_size -= 1
-                if size == None or other_size < size:
-                    #self.info("New size: %u" % other_size)
+                if size is None or other_size < size:
+                    # self.info("New size: %u" % other_size)
                     size = other_size
 
         self._size = 8 * (size + 1)
@@ -241,9 +241,9 @@ def parsePDFType(s):
         size = getElementEnd(s)
         for limit in ['/', '>', '<']:
             other_size = getElementEnd(s, limit)
-            if other_size != None:
+            if other_size is not None:
                 other_size -= 1
-                if size == None or (other_size > 0 and other_size < size):
+                if size is None or (other_size > 0 and other_size < size):
                     size = other_size
 
         # Get element
@@ -268,8 +268,8 @@ class Header(FieldSet):
     def createFields(self):
         yield String(self, "marker", 5, MAGIC)
         length = getLineEnd(self, 4)
-        if length != None:
-            #self.info("Found at position %08X" % len)
+        if length is not None:
+            # self.info("Found at position %08X" % len)
             yield String(self, "version", length - 1)
             yield LineEnd(self, "line_end")
         else:
@@ -284,7 +284,7 @@ class Body(FieldSet):
     def __init__(self, parent, name, desc=None):
         FieldSet.__init__(self, parent, name, desc)
         pos = self.stream.searchBytesLength(CrossReferenceTable.MAGIC, False)
-        if pos == None:
+        if pos is None:
             raise ParserError("Can't find xref starting at %u" %
                               (self.absolute_address // 8))
         self._size = 8 * pos - self.absolute_address
@@ -302,7 +302,7 @@ class Body(FieldSet):
                 RawBytes(self, "unknown_data[]", size)
             yield LineEnd(self, "line_end[]")
 
-        #abs_offset = self.current_size//8
+        # abs_offset = self.current_size//8
         # TODO: yield objects that read offsets and deduce size from
         # "/cross_ref_table/sub_section[]/entries/item[]"
         offsets = []
@@ -374,7 +374,7 @@ class CrossReferenceTable(FieldSet):
     def __init__(self, parent, name, desc=None):
         FieldSet.__init__(self, parent, name, description=desc)
         pos = self.stream.searchBytesLength(Trailer.MAGIC, False)
-        if pos == None:
+        if pos is None:
             raise ParserError("Can't find '%s' starting at %u"
                               (Trailer.MAGIC, self.absolute_address // 8))
         self._size = 8 * pos - self.absolute_address
@@ -391,12 +391,12 @@ class Catalog(FieldSet):
 
     def __init__(self, parent, name, size=None, desc=None):
         FieldSet.__init__(self, parent, name, description=desc)
-        if size != None:
+        if size is not None:
             self._size = 8 * size
         # object catalogs are ended with "obj"
         elif self["object"].value == "obj":
             size = self.stream.searchBytesLength(b"endobj", False)
-            if size != None:
+            if size is not None:
                 self._size = 8 * (size + 2)
 
     def createFields(self):
@@ -405,7 +405,7 @@ class Catalog(FieldSet):
         length = getElementEnd(self)
         for limit in self.END_NAME:
             new_length = getElementEnd(self, limit) - len(limit)
-            if length == None or (new_length != None and new_length < length):
+            if length is None or (new_length is not None and new_length < length):
                 length = new_length
         yield String(self, "object", length, strip=' ')
         if self.stream.readBytes(self.absolute_address + self.current_size, 2) == b'<<':

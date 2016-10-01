@@ -8,8 +8,8 @@ Documents:
 from hachoir.field import (FieldSet, Enum,
                            Bit, Bits,
                            UInt8, Int16, UInt16, UInt32, Int32,
-                           NullBytes, Bytes, RawBytes, PascalString16,
-                           DateTimeMSDOS32, TimeDateMSDOS32)
+                           NullBytes, Bytes, RawBytes,
+                           DateTimeMSDOS32)
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.parser.misc.ole2_util import OLE2FragmentParser
 from hachoir.core.tools import paddingSize

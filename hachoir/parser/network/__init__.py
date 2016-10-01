@@ -1,1 +1,1 @@
-from hachoir.parser.network.tcpdump import TcpdumpFile
+from hachoir.parser.network.tcpdump import TcpdumpFile  # noqa

@@ -61,9 +61,9 @@ class InodeFlags(FieldSet):
 
     def createFields(self):
         yield Bit(self, "SECRM", "Secure deletion")
-        yield Bit(self, "UNRM",  "Undelete")
+        yield Bit(self, "UNRM", "Undelete")
         yield Bit(self, "COMPR", "Compress file")
-        yield Bit(self, "SYNC",  "Synchronous updates")
+        yield Bit(self, "SYNC", "Synchronous updates")
         yield Bit(self, "IMMUTABLE", "Immutable file")
         yield Bit(self, "APPEND", "writes to file may only append")
         yield Bit(self, "NODUMP", "do not dump file")

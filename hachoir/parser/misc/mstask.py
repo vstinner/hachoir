@@ -12,16 +12,12 @@ http://technet.microsoft.com/en-us/library/bb490996.aspx
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, RootSeekableFieldSet,
-                           CString, String, PascalString16,
-                           UInt32, UInt16, UInt8,
-                           Bit, Bits, PaddingBits,
+                           UInt32, UInt16,
+                           Bit, PaddingBits,
                            TimestampWin64, DateTimeMSDOS32,
-                           NullBytes, PaddingBytes, RawBits, RawBytes, Enum)
-from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
-from hachoir.core.text_handler import textHandler, hexadecimal
+                           RawBits, RawBytes, Enum)
+from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.parser.common.win32 import PascalStringWin16, GUID
-from hachoir.parser.common.msdos import MSDOSFileAttr16, MSDOSFileAttr32
-from hachoir.core.text_handler import filesizeHandler
 
 
 class TaskTrigger(FieldSet):

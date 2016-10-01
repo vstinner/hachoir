@@ -14,8 +14,6 @@ Author: Victor Stinner
 Creation date: 26 december 2006
 """
 
-MAX_FILESIZE = 50 * 1024 * 1024
-
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, StaticFieldSet, Enum,
                            MissingField, ParserError,
@@ -24,6 +22,8 @@ from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal
 from hachoir.core.tools import createDict
 from hachoir.parser.image.common import RGBA
+
+MAX_FILESIZE = 50 * 1024 * 1024
 
 POLYFILL_MODE = {1: "Alternate", 2: "Winding"}
 
@@ -195,7 +195,7 @@ META = {
 META_NAME = createDict(META, 0)
 META_DESC = createDict(META, 1)
 
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # EMF constants
 
 # EMF mapping modes
@@ -210,7 +210,7 @@ EMF_MAPPING_MODE = {
     8: "ANISOTROPIC",
 }
 
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # EMF parser
 
 

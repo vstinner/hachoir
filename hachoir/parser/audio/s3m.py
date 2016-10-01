@@ -24,7 +24,7 @@ class Chunk:
 
     def __init__(self, cls, name, offset, size, *args):
         # Todo: swap and have None=unknown instead of now: 0=unknown
-        assert size != None and size >= 0
+        assert size is not None and size >= 0
         self.cls = cls
         self.name = name
         self.offset = offset
@@ -83,7 +83,7 @@ class ChunkIndexer:
                 count += 1
                 chunk = self.chunks.pop()
                 # Unfortunaly, we also pass the underlying chunks
-                if chunk == None:
+                if chunk is None:
                     obj.info("Couldn't resynch: %u object skipped to reach %u" %
                              (count, current_pos))
                     return
@@ -99,8 +99,6 @@ class ChunkIndexer:
             obj.info("Yielding element of size %u at offset %u" %
                      (chunk.size, chunk.offset))
             field = chunk.cls(obj, chunk.name, chunk.size, *chunk.args)
-            # Not tested, probably wrong:
-            #if chunk.size: field.static_size = 8*chunk.size
             yield field
 
             if hasattr(field, "getSubChunks"):
@@ -180,7 +178,7 @@ class SizeFieldSet(FieldSet):
         FieldSet.__init__(self, parent, name, desc)
         if size:
             self.real_size = size
-            if self.static_size == None:
+            if self.static_size is None:
                 self.setCheckedSizes(size)
 
     def setCheckedSizes(self, size):
@@ -303,7 +301,8 @@ class S3MHeader(Header):
         yield UInt16(self, "custom_data_parapointer",
                      "Parapointer to special custom data (not used by ST3.01)")
 
-    def getNumOrders(self): return self["num_orders"].value
+    def getNumOrders(self):
+        return self["num_orders"].value
 
     def getHeaderEndFields(self):
         instr = self["num_instruments"].value
@@ -358,7 +357,8 @@ class PTMHeader(Header):
     def getLastProperties(self):
         yield RawBytes(self, "reserved[]", 16)
 
-    def getNumOrders(self): return 256
+    def getNumOrders(self):
+        return 256
 
     def getHeaderEndFields(self):
         yield GenericVector(self, "pattern_pptr", 128, UInt16, "offset")
@@ -519,15 +519,15 @@ class PTMType(FieldSet):
         yield Bit(self, "loop")
         yield Enum(Bits(self, "origin", 2), self.TYPES)
 
-# class PTMType(StaticFieldSet):
-# format = (
-##        (Bits, "unused", 2),
-##        (Bit, "is_tonable"),
-##        (Bit, "16bits"),
-##        (Bit, "loop_bidir"),
-##        (Bit, "loop"),
-##        (Bits, "origin", 2),
-# )
+#  class PTMType(StaticFieldSet):
+#  format = (
+# #        (Bits, "unused", 2),
+# #        (Bit, "is_tonable"),
+# #        (Bit, "16bits"),
+# #        (Bit, "loop_bidir"),
+# #        (Bit, "loop"),
+# #        (Bits, "origin", 2),
+#  )
 
 
 class PTMInstrument(Instrument):
@@ -693,15 +693,15 @@ class S3MModule(Module):
     MARKER = b"SCRM"
     HEADER = S3MHeader
 
-# def createContentSize(self):
-##        hdr = Header(self, "header")
-##        max_offset = hdr._size//8
+#  def createContentSize(self):
+# #        hdr = Header(self, "header")
+# #        max_offset = hdr._size//8
 
-##        instr_size = Instrument._size//8
-# for index in xrange(self["header/num_instruments"].value):
-##            offset = 16*hdr["instr_pptr/offset[%u]" % index].value
-##            max_offset = max(offset+instr_size, max_offset)
-##            addr = self.absolute_address + 8*offset
+# #        instr_size = Instrument._size//8
+#  for index in xrange(self["header/num_instruments"].value):
+# #            offset = 16*hdr["instr_pptr/offset[%u]" % index].value
+# #            max_offset = max(offset+instr_size, max_offset)
+# #            addr = self.absolute_address + 8*offset
 
 
 class PTMModule(Module):

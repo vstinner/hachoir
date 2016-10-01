@@ -14,22 +14,26 @@ Creation: 23 march 2006
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, ParserError,
-    Enum, Bytes, NullBytes, RawBytes,
-    UInt8, UInt16, UInt32, Int32, TimestampUnix32,
-    Bit, Bits, NullBits)
+                           Enum, Bytes, NullBytes, RawBytes,
+                           UInt8, UInt16, UInt32, Int32, TimestampUnix32,
+                           Bit, Bits, NullBits)
 from hachoir.core.endian import NETWORK_ENDIAN, LITTLE_ENDIAN
 from hachoir.core.tools import humanDuration
 from hachoir.core.text_handler import textHandler, hexadecimal
 from hachoir.core.tools import createDict
 from hachoir.parser.network.common import MAC48_Address, IPv4_Address, IPv6_Address
 
+
 def diff(field):
-    return humanDuration(field.value*1000)
+    return humanDuration(field.value * 1000)
+
 
 class Layer(FieldSet):
     endian = NETWORK_ENDIAN
+
     def parseNext(self, parent):
         return None
+
 
 class ARP(Layer):
     opcode_name = {
@@ -59,6 +63,7 @@ class ARP(Layer):
         elif opcode == 2:
             desc += " from %s" % src_ip
         return desc
+
 
 class TCP_Option(FieldSet):
     NOP = 1
@@ -103,6 +108,7 @@ class TCP_Option(FieldSet):
     def createDescription(self):
         return "TCP option: %s" % self["code"].display
 
+
 class TCP(Layer):
     port_name = {
         13: "daytime",
@@ -143,7 +149,7 @@ class TCP(Layer):
         yield textHandler(UInt16(self, "checksum"), hexadecimal)
         yield UInt16(self, "urgent")
 
-        size = self["hdrlen"].value*8 - self.current_size
+        size = self["hdrlen"].value * 8 - self.current_size
         while 0 < size:
             option = TCP_Option(self, "option[]")
             yield option
@@ -164,11 +170,11 @@ class TCP(Layer):
         else:
             dst = None
         desc = "TCP"
-        if src != None and dst != None:
+        if src is not None and dst is not None:
             desc += " (%s->%s)" % (src, dst)
-        elif src != None:
+        elif src is not None:
             desc += " (%s->)" % (src)
-        elif dst != None:
+        elif dst is not None:
             desc += " (->%s)" % (dst)
 
         # Get flags
@@ -184,6 +190,7 @@ class TCP(Layer):
         if flags:
             desc += " [%s]" % (",".join(flags))
         return desc
+
 
 class UDP(Layer):
     port_name = {
@@ -206,6 +213,7 @@ class UDP(Layer):
 
     def createDescription(self):
         return "UDP (%s->%s)" % (self["src"].display, self["dst"].display)
+
 
 class ICMP(Layer):
     REJECT = 3
@@ -248,7 +256,7 @@ class ICMP(Layer):
 
         # Options
         yield textHandler(UInt16(self, "checksum"), hexadecimal)
-        if type in (self.PING, self.PONG): # and self["code"].value == 0:
+        if type in (self.PING, self.PONG):  # and self["code"].value == 0:
             yield UInt16(self, "id")
             yield UInt16(self, "seq_num")
             # follow: ping data
@@ -268,6 +276,7 @@ class ICMP(Layer):
             return IPv4(parent, "rejected_ipv4")
         else:
             return None
+
 
 class ICMPv6(Layer):
     ECHO_REQUEST = 128
@@ -292,12 +301,13 @@ class ICMPv6(Layer):
         else:
             return "ICMPv6 (%s)" % self["type"].display
 
+
 class IP(Layer):
     PROTOCOL_INFO = {
-         1: ("icmp", ICMP, "ICMP"),
-        6: ("tcp",  TCP, "TCP"),
-        17: ("udp",  UDP, "UDP"),
-        58: ("icmpv6",  ICMPv6, "ICMPv6"),
+        1: ("icmp", ICMP, "ICMP"),
+        6: ("tcp", TCP, "TCP"),
+        17: ("udp", UDP, "UDP"),
+        58: ("icmpv6", ICMPv6, "ICMPv6"),
         60: ("ipv6_opts", None, "IPv6 destination option"),
     }
     PROTOCOL_NAME = createDict(PROTOCOL_INFO, 2)
@@ -310,6 +320,7 @@ class IP(Layer):
         if not parser:
             return None
         return parser(parent, name)
+
 
 class IPv4(IP):
     precedence_name = {
@@ -359,6 +370,7 @@ class IPv4(IP):
     def createDescription(self):
         return "IPv4 (%s>%s)" % (self["src"].display, self["dst"].display)
 
+
 class IPv6(IP):
     static_size = 40 * 8
     endian = NETWORK_ENDIAN
@@ -376,25 +388,28 @@ class IPv6(IP):
     def createDescription(self):
         return "IPv6 (%s>%s)" % (self["src"].display, self["dst"].display)
 
+
 class Layer2(Layer):
     PROTO_INFO = {
         0x0800: ("ipv4", IPv4, "IPv4"),
-        0x0806: ("arp",  ARP,  "ARP"),
+        0x0806: ("arp", ARP, "ARP"),
         0x86dd: ("ipv6", IPv6, "IPv6"),
     }
     PROTO_DESC = createDict(PROTO_INFO, 2)
 
     def parseNext(self, parent):
         try:
-            name, parser, desc = self.PROTO_INFO[ self["protocol"].value ]
+            name, parser, desc = self.PROTO_INFO[self["protocol"].value]
             return parser(parent, name)
         except KeyError:
             return None
+
 
 class Unicast(Layer2):
     packet_type_name = {
         0: "Unicast to us"
     }
+
     def createFields(self):
         yield Enum(UInt16(self, "packet_type"), self.packet_type_name)
         yield UInt16(self, "addr_type", "Link-layer address type")
@@ -405,8 +420,10 @@ class Unicast(Layer2):
             yield RawBytes(self, "source", length)
         yield Enum(UInt16(self, "protocol"), self.PROTO_DESC)
 
+
 class Ethernet(Layer2):
-    static_size = 14*8
+    static_size = 14 * 8
+
     def createFields(self):
         yield MAC48_Address(self, "dst")
         yield MAC48_Address(self, "src")
@@ -415,6 +432,7 @@ class Ethernet(Layer2):
     def createDescription(self):
         return "Ethernet: %s>%s (%s)" % \
             (self["src"].display, self["dst"].display, self["protocol"].display)
+
 
 class Packet(FieldSet):
     endian = LITTLE_ENDIAN
@@ -451,7 +469,7 @@ class Packet(FieldSet):
         t0 = self["/packet[0]"].getTimestamp()
 #        ts = max(self.getTimestamp() - t0, t0)
         ts = self.getTimestamp() - t0
-        #text = ["%1.6f: " % ts]
+        # text = ["%1.6f: " % ts]
         text = ["%s: " % ts]
         if "icmp" in self:
             text.append(self["icmp"].description)
@@ -465,18 +483,19 @@ class Packet(FieldSet):
             text.append("Packet")
         return "".join(text)
 
+
 class TcpdumpFile(Parser):
     PARSER_TAGS = {
         "id": "tcpdump",
         "category": "misc",
-        "min_size": 24*8,
+        "min_size": 24 * 8,
         "description": "Tcpdump file (network)",
         "magic": (("\xd4\xc3\xb2\xa1", 0),),
     }
     endian = LITTLE_ENDIAN
 
     LINK_TYPE = {
-          1: ("ethernet", Ethernet),
+        1: ("ethernet", Ethernet),
         113: ("unicast", Unicast),
     }
     LINK_TYPE_DESC = createDict(LINK_TYPE, 0)
@@ -502,4 +521,3 @@ class TcpdumpFile(Parser):
         name, parser = self.LINK_TYPE[link]
         while self.current_size < self.size:
             yield Packet(self, "packet[]", parser, name)
-

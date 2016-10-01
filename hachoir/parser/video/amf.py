@@ -67,20 +67,20 @@ class AMFObject(FieldSet):
         1: (parseBool, "Boolean"),
         2: (parseUTF8, "UTF-8 string"),
         3: (parseObjectAttributes, "Object attributes"),
-        #MOVIECLIP = '\x04',
-        #NULL = '\x05',
-        #UNDEFINED = '\x06',
-        #REFERENCE = '\x07',
+        # MOVIECLIP = '\x04',
+        # NULL = '\x05',
+        # UNDEFINED = '\x06',
+        # REFERENCE = '\x07',
         8: (parseMixedArray, "Mixed array"),
         9: (parseNothing, "End of object"),
         10: (parseArray, "Array"),
         CODE_DATE: (parseDate, "Date"),
-        #LONGUTF8 = '\x0c',
-        #UNSUPPORTED = '\x0d',
-        # Server-to-client only
-        #RECORDSET = '\x0e',
-        #XML = '\x0f',
-        #TYPEDOBJECT = '\x10',
+        # LONGUTF8 = '\x0c',
+        # UNSUPPORTED = '\x0d',
+        #  Server-to-client only
+        # RECORDSET = '\x0e',
+        # XML = '\x0f',
+        # TYPEDOBJECT = '\x10',
     }
 
     def __init__(self, *args, **kw):

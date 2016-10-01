@@ -1,17 +1,17 @@
-from hachoir.parser.misc.file_3do import File3do
-from hachoir.parser.misc.file_3ds import File3ds
-from hachoir.parser.misc.torrent import TorrentFile
-from hachoir.parser.misc.ttf import TrueTypeFontFile
-from hachoir.parser.misc.chm import ChmFile
-from hachoir.parser.misc.lnk import LnkFile
-from hachoir.parser.misc.pcf import PcfFile
-from hachoir.parser.misc.ole2 import OLE2_File
-from hachoir.parser.misc.pdf import PDFDocument
-from hachoir.parser.misc.pifv import PIFVFile
-from hachoir.parser.misc.hlp import HlpFile
-from hachoir.parser.misc.gnome_keyring import GnomeKeyring
-from hachoir.parser.misc.bplist import BPList
-from hachoir.parser.misc.dsstore import DSStore
-from hachoir.parser.misc.word_doc import WordDocumentParser
-from hachoir.parser.misc.word_2 import Word2DocumentParser
-from hachoir.parser.misc.mstask import MSTaskFile
+from hachoir.parser.misc.file_3do import File3do  # noqa
+from hachoir.parser.misc.file_3ds import File3ds  # noqa
+from hachoir.parser.misc.torrent import TorrentFile  # noqa
+from hachoir.parser.misc.ttf import TrueTypeFontFile  # noqa
+from hachoir.parser.misc.chm import ChmFile  # noqa
+from hachoir.parser.misc.lnk import LnkFile  # noqa
+from hachoir.parser.misc.pcf import PcfFile  # noqa
+from hachoir.parser.misc.ole2 import OLE2_File  # noqa
+from hachoir.parser.misc.pdf import PDFDocument  # noqa
+from hachoir.parser.misc.pifv import PIFVFile  # noqa
+from hachoir.parser.misc.hlp import HlpFile  # noqa
+from hachoir.parser.misc.gnome_keyring import GnomeKeyring  # noqa
+from hachoir.parser.misc.bplist import BPList  # noqa
+from hachoir.parser.misc.dsstore import DSStore  # noqa
+from hachoir.parser.misc.word_doc import WordDocumentParser  # noqa
+from hachoir.parser.misc.word_2 import Word2DocumentParser  # noqa
+from hachoir.parser.misc.mstask import MSTaskFile  # noqa

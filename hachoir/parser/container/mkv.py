@@ -286,18 +286,18 @@ signature = {
 
 chapter_atom = {
     0x73C4: ('ChapterUID', UInt),
-    0x91:   ('ChapterTimeStart', UInt),
-    0x92:   ('ChapterTimeEnd', UInt),
-    0x98:   ('ChapterFlagHidden', Bool),
+    0x91: ('ChapterTimeStart', UInt),
+    0x92: ('ChapterTimeEnd', UInt),
+    0x98: ('ChapterFlagHidden', Bool),
     0x4598: ('ChapterFlagEnabled', Bool),
     0x6E67: ('ChapterSegmentUID', Binary),
     0x6EBC: ('ChapterSegmentEditionUID', Binary),
     0x63C3: ('ChapterPhysicalEquiv', UInt),
-    0x8F:   ('ChapterTrack', {
-        0x89:   ('ChapterTrackNumber[]', UInt)
+    0x8F: ('ChapterTrack', {
+        0x89: ('ChapterTrackNumber[]', UInt)
     }),
-    0x80:   ('ChapterDisplay[]', {
-        0x85:   ('ChapString', UTF8),
+    0x80: ('ChapterDisplay[]', {
+        0x85: ('ChapString', UTF8),
         0x437C: ('ChapLanguage[]', String),
         0x437E: ('ChapCountry[]', String)
     }),
@@ -320,120 +320,120 @@ simple_tag = {
 }
 
 segment_seek = {
-    0x4DBB:     ('Seek[]', {
-        0x53AB:     ('SeekID', SeekID),
-        0x53AC:     ('SeekPosition', UInt)
+    0x4DBB: ('Seek[]', {
+        0x53AB: ('SeekID', SeekID),
+        0x53AC: ('SeekPosition', UInt)
     })
 }
 
 segment_info = {
-    0x73A4:     ('SegmentUID', Binary),
-    0x7384:     ('SegmentFilename', UTF8),
-    0x3CB923:   ('PrevUID', Binary),
-    0x3C83AB:   ('PrevFilename', UTF8),
-    0x3EB923:   ('NextUID', Binary),
-    0x3E83BB:   ('NextFilename', UTF8),
-    0x4444:     ('SegmentFamily[]', Binary),
-    0x6924:     ('ChapterTranslate[]', {
-        0x69FC:     ('ChapterTranslateEditionUID[]', UInt),
-        0x69BF:     ('ChapterTranslateCodec', UInt),
-        0x69A5:     ('ChapterTranslateID', Binary)
+    0x73A4: ('SegmentUID', Binary),
+    0x7384: ('SegmentFilename', UTF8),
+    0x3CB923: ('PrevUID', Binary),
+    0x3C83AB: ('PrevFilename', UTF8),
+    0x3EB923: ('NextUID', Binary),
+    0x3E83BB: ('NextFilename', UTF8),
+    0x4444: ('SegmentFamily[]', Binary),
+    0x6924: ('ChapterTranslate[]', {
+        0x69FC: ('ChapterTranslateEditionUID[]', UInt),
+        0x69BF: ('ChapterTranslateCodec', UInt),
+        0x69A5: ('ChapterTranslateID', Binary)
     }),
-    0x2AD7B1:   ('TimecodeScale', UInt),
-    0x4489:     ('Duration', Float),
-    0x4461:     ('DateUTC', Date),
-    0x7BA9:     ('Title', UTF8),
-    0x4D80:     ('MuxingApp', UTF8),
-    0x5741:     ('WritingApp', UTF8)
+    0x2AD7B1: ('TimecodeScale', UInt),
+    0x4489: ('Duration', Float),
+    0x4461: ('DateUTC', Date),
+    0x7BA9: ('Title', UTF8),
+    0x4D80: ('MuxingApp', UTF8),
+    0x5741: ('WritingApp', UTF8)
 }
 
 segment_clusters = {
-    0xE7:       ('Timecode', UInt),
-    0x5854:     ('SilentTracks', {
-        0x58D7:     ('SilentTrackNumber[]', UInt)
+    0xE7: ('Timecode', UInt),
+    0x5854: ('SilentTracks', {
+        0x58D7: ('SilentTrackNumber[]', UInt)
     }),
-    0xA7:       ('Position', UInt),
-    0xAB:       ('PrevSize', UInt),
-    0xA0:       ('BlockGroup[]', {
-        0xA1:       ('Block', Block),
-        0xA2:       ('BlockVirtual[]', Block),
-        0x75A1:     ('BlockAdditions', {
-            0xA6:       ('BlockMore[]', {
-                0xEE:       ('BlockAddID', UInt),
-                0xA5:       ('BlockAdditional', Binary)
+    0xA7: ('Position', UInt),
+    0xAB: ('PrevSize', UInt),
+    0xA0: ('BlockGroup[]', {
+        0xA1: ('Block', Block),
+        0xA2: ('BlockVirtual[]', Block),
+        0x75A1: ('BlockAdditions', {
+            0xA6: ('BlockMore[]', {
+                0xEE: ('BlockAddID', UInt),
+                0xA5: ('BlockAdditional', Binary)
             })
         }),
-        0x9B:       ('BlockDuration', UInt),
-        0xFA:       ('ReferencePriority', UInt),
-        0xFB:       ('ReferenceBlock[]', SInt),
-        0xFD:       ('ReferenceVirtual', SInt),
-        0xA4:       ('CodecState', Binary),
-        0x8E:       ('Slices[]', {
-            0xE8:       ('TimeSlice[]', {
-                0xCC:       ('LaceNumber', UInt),
-                0xCD:       ('FrameNumber', UInt),
-                0xCB:       ('BlockAdditionID', UInt),
-                0xCE:       ('Delay', UInt),
-                0xCF:       ('Duration', UInt)
+        0x9B: ('BlockDuration', UInt),
+        0xFA: ('ReferencePriority', UInt),
+        0xFB: ('ReferenceBlock[]', SInt),
+        0xFD: ('ReferenceVirtual', SInt),
+        0xA4: ('CodecState', Binary),
+        0x8E: ('Slices[]', {
+            0xE8: ('TimeSlice[]', {
+                0xCC: ('LaceNumber', UInt),
+                0xCD: ('FrameNumber', UInt),
+                0xCB: ('BlockAdditionID', UInt),
+                0xCE: ('Delay', UInt),
+                0xCF: ('Duration', UInt)
             })
         })
     }),
-    0xA3:       ('SimpleBlock[]', Block)
+    0xA3: ('SimpleBlock[]', Block)
 }
 
 tracks_video = {
-    0x9A:       ('FlagInterlaced', Bool),
-    0x53B8:     ('StereoMode', lambda parent: Enum(parent,
+    0x9A: ('FlagInterlaced', Bool),
+    0x53B8: ('StereoMode', lambda parent: Enum(parent,
                                                    ['mono', 'right eye', 'left eye', 'both eyes'])),
-    0xB0:       ('PixelWidth', UInt),
-    0xBA:       ('PixelHeight', UInt),
-    0x54AA:     ('PixelCropBottom', UInt),
-    0x54BB:     ('PixelCropTop', UInt),
-    0x54CC:     ('PixelCropLeft', UInt),
-    0x54DD:     ('PixelCropRight', UInt),
-    0x54B0:     ('DisplayWidth', UInt),
-    0x54BA:     ('DisplayHeight', UInt),
-    0x54B2:     ('DisplayUnit', lambda parent: Enum(parent,
+    0xB0: ('PixelWidth', UInt),
+    0xBA: ('PixelHeight', UInt),
+    0x54AA: ('PixelCropBottom', UInt),
+    0x54BB: ('PixelCropTop', UInt),
+    0x54CC: ('PixelCropLeft', UInt),
+    0x54DD: ('PixelCropRight', UInt),
+    0x54B0: ('DisplayWidth', UInt),
+    0x54BA: ('DisplayHeight', UInt),
+    0x54B2: ('DisplayUnit', lambda parent: Enum(parent,
                                                     ['pixels', 'centimeters', 'inches'])),
-    0x54B3:     ('AspectRatioType', lambda parent: Enum(parent,
+    0x54B3: ('AspectRatioType', lambda parent: Enum(parent,
                                                         ['free resizing', 'keep aspect ratio', 'fixed'])),
-    0x2EB524:   ('ColourSpace', Binary),
-    0x2FB523:   ('GammaValue', Float)
+    0x2EB524: ('ColourSpace', Binary),
+    0x2FB523: ('GammaValue', Float)
 }
 
 tracks_audio = {
-    0xB5:       ('SamplingFrequency', Float),
-    0x78B5:     ('OutputSamplingFrequency', Float),
-    0x9F:       ('Channels', UInt),
-    0x7D7B:     ('ChannelPositions', Binary),
-    0x6264:     ('BitDepth', UInt)
+    0xB5: ('SamplingFrequency', Float),
+    0x78B5: ('OutputSamplingFrequency', Float),
+    0x9F: ('Channels', UInt),
+    0x7D7B: ('ChannelPositions', Binary),
+    0x6264: ('BitDepth', UInt)
 }
 
 tracks_content_encodings = {
-    0x6240:     ('ContentEncoding[]', {
-        0x5031:     ('ContentEncodingOrder', UInt),
-        0x5032:     ('ContentEncodingScope', UInt),
-        0x5033:     ('ContentEncodingType', UInt),
-        0x5034:     ('ContentCompression', {
-            0x4254:     ('ContentCompAlgo', UInt),
-            0x4255:     ('ContentCompSettings', Binary)
+    0x6240: ('ContentEncoding[]', {
+        0x5031: ('ContentEncodingOrder', UInt),
+        0x5032: ('ContentEncodingScope', UInt),
+        0x5033: ('ContentEncodingType', UInt),
+        0x5034: ('ContentCompression', {
+            0x4254: ('ContentCompAlgo', UInt),
+            0x4255: ('ContentCompSettings', Binary)
         }),
-        0x5035:     ('ContentEncryption', {
-            0x47e1:     ('ContentEncAlgo', UInt),
-            0x47e2:     ('ContentEncKeyID', Binary),
-            0x47e3:     ('ContentSignature', Binary),
-            0x47e4:     ('ContentSigKeyID', Binary),
-            0x47e5:     ('ContentSigAlgo', UInt),
-            0x47e6:     ('ContentSigHashAlgo', UInt),
+        0x5035: ('ContentEncryption', {
+            0x47e1: ('ContentEncAlgo', UInt),
+            0x47e2: ('ContentEncKeyID', Binary),
+            0x47e3: ('ContentSignature', Binary),
+            0x47e4: ('ContentSigKeyID', Binary),
+            0x47e5: ('ContentSigAlgo', UInt),
+            0x47e6: ('ContentSigHashAlgo', UInt),
         })
     })
 }
 
 segment_tracks = {
-    0xAE:       ('TrackEntry[]', {
-        0xD7:       ('TrackNumber', UInt),
-        0x73C5:     ('TrackUID', UInt),
-        0x83:       ('TrackType', lambda parent: Enum(parent, {
+    0xAE: ('TrackEntry[]', {
+        0xD7: ('TrackNumber', UInt),
+        0x73C5: ('TrackUID', UInt),
+        0x83: ('TrackType', lambda parent: Enum(parent, {
             0x01: 'video',
             0x02: 'audio',
             0x03: 'complex',
@@ -442,88 +442,88 @@ segment_tracks = {
             0x12: 'buttons',
             0x20: 'control'
         })),
-        0xB9:       ('FlagEnabled', Bool),
-        0x88:       ('FlagDefault', Bool),
-        0x55AA:     ('FlagForced[]', Bool),
-        0x9C:       ('FlagLacing', Bool),
-        0x6DE7:     ('MinCache', UInt),
-        0x6DF8:     ('MaxCache', UInt),
-        0x23E383:   ('DefaultDuration', UInt),
-        0x23314F:   ('TrackTimecodeScale', Float),
-        0x537F:     ('TrackOffset', SInt),
-        0x55EE:     ('MaxBlockAdditionID', UInt),
-        0x536E:     ('Name', UTF8),
-        0x22B59C:   ('Language', lambda parent: EnumString(parent, ISO639_2)),
-        0x86:       ('CodecID', String),
-        0x63A2:     ('CodecPrivate', Binary),
-        0x258688:   ('CodecName', UTF8),
-        0x7446:     ('AttachmentLink', UInt),
-        0x3A9697:   ('CodecSettings', UTF8),
-        0x3B4040:   ('CodecInfoURL[]', String),
-        0x26B240:   ('CodecDownloadURL[]', String),
-        0xAA:       ('CodecDecodeAll', Bool),
-        0x6FAB:     ('TrackOverlay[]', UInt),
-        0x6624:     ('TrackTranslate[]', {
-            0x66FC:     ('TrackTranslateEditionUID[]', UInt),
-            0x66BF:     ('TrackTranslateCodec', UInt),
-            0x66A5:     ('TrackTranslateTrackID', Binary)
+        0xB9: ('FlagEnabled', Bool),
+        0x88: ('FlagDefault', Bool),
+        0x55AA: ('FlagForced[]', Bool),
+        0x9C: ('FlagLacing', Bool),
+        0x6DE7: ('MinCache', UInt),
+        0x6DF8: ('MaxCache', UInt),
+        0x23E383: ('DefaultDuration', UInt),
+        0x23314F: ('TrackTimecodeScale', Float),
+        0x537F: ('TrackOffset', SInt),
+        0x55EE: ('MaxBlockAdditionID', UInt),
+        0x536E: ('Name', UTF8),
+        0x22B59C: ('Language', lambda parent: EnumString(parent, ISO639_2)),
+        0x86: ('CodecID', String),
+        0x63A2: ('CodecPrivate', Binary),
+        0x258688: ('CodecName', UTF8),
+        0x7446: ('AttachmentLink', UInt),
+        0x3A9697: ('CodecSettings', UTF8),
+        0x3B4040: ('CodecInfoURL[]', String),
+        0x26B240: ('CodecDownloadURL[]', String),
+        0xAA: ('CodecDecodeAll', Bool),
+        0x6FAB: ('TrackOverlay[]', UInt),
+        0x6624: ('TrackTranslate[]', {
+            0x66FC: ('TrackTranslateEditionUID[]', UInt),
+            0x66BF: ('TrackTranslateCodec', UInt),
+            0x66A5: ('TrackTranslateTrackID', Binary)
         }),
-        0xE0:       ('Video', tracks_video),
-        0xE1:       ('Audio', tracks_audio),
-        0x6d80:     ('ContentEncodings', tracks_content_encodings)
+        0xE0: ('Video', tracks_video),
+        0xE1: ('Audio', tracks_audio),
+        0x6d80: ('ContentEncodings', tracks_content_encodings)
     })
 }
 
 segment_cues = {
-    0xBB:       ('CuePoint[]', {
-        0xB3:       ('CueTime', UInt),
-        0xB7:       ('CueTrackPositions[]', CueTrackPositions, {
-            0xF7:       ('CueTrack', UInt),
-            0xF1:       ('CueClusterPosition', CueClusterPosition, UInt),
-            0x5378:     ('CueBlockNumber', UInt),
-            0xEA:       ('CueCodecState', UInt),
-            0xDB:       ('CueReference[]', {
-                0x96:       ('CueRefTime', UInt),
-                0x97:       ('CueRefCluster', UInt),
-                0x535F:     ('CueRefNumber', UInt),
-                0xEB:       ('CueRefCodecState', UInt)
+    0xBB: ('CuePoint[]', {
+        0xB3: ('CueTime', UInt),
+        0xB7: ('CueTrackPositions[]', CueTrackPositions, {
+            0xF7: ('CueTrack', UInt),
+            0xF1: ('CueClusterPosition', CueClusterPosition, UInt),
+            0x5378: ('CueBlockNumber', UInt),
+            0xEA: ('CueCodecState', UInt),
+            0xDB: ('CueReference[]', {
+                0x96: ('CueRefTime', UInt),
+                0x97: ('CueRefCluster', UInt),
+                0x535F: ('CueRefNumber', UInt),
+                0xEB: ('CueRefCodecState', UInt)
             })
         })
     })
 }
 
 segment_attachments = {
-    0x61A7:     ('AttachedFile[]', {
-        0x467E:     ('FileDescription', UTF8),
-        0x466E:     ('FileName', UTF8),
-        0x4660:     ('FileMimeType', String),
-        0x465C:     ('FileData', AttachedFile),
-        0x46AE:     ('FileUID', UInt),
-        0x4675:     ('FileReferral', Binary)
+    0x61A7: ('AttachedFile[]', {
+        0x467E: ('FileDescription', UTF8),
+        0x466E: ('FileName', UTF8),
+        0x4660: ('FileMimeType', String),
+        0x465C: ('FileData', AttachedFile),
+        0x46AE: ('FileUID', UInt),
+        0x4675: ('FileReferral', Binary)
     })
 }
 
 segment_chapters = {
-    0x45B9:     ('EditionEntry[]', {
-        0x45BC:     ('EditionUID', UInt),
-        0x45BD:     ('EditionFlagHidden', Bool),
-        0x45DB:     ('EditionFlagDefault', Bool),
-        0x45DD:     ('EditionFlagOrdered', Bool),
-        0xB6:       ('ChapterAtom[]', chapter_atom)
+    0x45B9: ('EditionEntry[]', {
+        0x45BC: ('EditionUID', UInt),
+        0x45BD: ('EditionFlagHidden', Bool),
+        0x45DB: ('EditionFlagDefault', Bool),
+        0x45DD: ('EditionFlagOrdered', Bool),
+        0xB6: ('ChapterAtom[]', chapter_atom)
     })
 }
 
 segment_tags = {
-    0x7373:     ('Tag[]', {
-        0x63C0:     ('Targets', {
-            0x68CA:     ('TargetTypeValue', UInt),
-            0x63CA:     ('TargetType', String),
-            0x63C5:     ('TrackUID[]', UInt),
-            0x63C9:     ('EditionUID[]', UInt),
-            0x63C4:     ('ChapterUID[]', UInt),
-            0x63C6:     ('AttachmentUID[]', UInt)
+    0x7373: ('Tag[]', {
+        0x63C0: ('Targets', {
+            0x68CA: ('TargetTypeValue', UInt),
+            0x63CA: ('TargetType', String),
+            0x63C5: ('TrackUID[]', UInt),
+            0x63C9: ('EditionUID[]', UInt),
+            0x63C4: ('ChapterUID[]', UInt),
+            0x63C6: ('AttachmentUID[]', UInt)
         }),
-        0x67C8:     ('SimpleTag[]', simple_tag)
+        0x67C8: ('SimpleTag[]', simple_tag)
     })
 }
 

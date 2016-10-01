@@ -123,7 +123,7 @@ class GUID(FieldSet):
 
     def createValue(self):
         addr = self.absolute_address
-        a = self.stream.readBits(addr,      32, self.endian)
+        a = self.stream.readBits(addr, 32, self.endian)
         b = self.stream.readBits(addr + 32, 16, self.endian)
         c = self.stream.readBits(addr + 48, 16, self.endian)
         d = self.stream.readBytes(addr + 64, 2)

@@ -26,7 +26,7 @@ from hachoir.field import (
     UInt8, UInt16, UInt32, UInt64, TimestampWin64, Enum,
     Bytes, NullBytes, String)
 from hachoir.core.text_handler import filesizeHandler
-from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
+from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.parser.common.win32 import GUID
 from hachoir.parser.misc.msoffice import PROPERTY_NAME, RootEntry, RawParser, CustomFragment
 
@@ -223,7 +223,7 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
         self.items_per_ssfat = self.items_per_bbfat
 
         # Read DIFAT (one level of indirection)
-        yield DIFat(self, "difat",  header["db_start"].value, header["db_count"].value, "Double Indirection FAT")
+        yield DIFat(self, "difat", header["db_start"].value, header["db_count"].value, "Double Indirection FAT")
 
         # Read FAT (one level of indirection)
         yield from self.readBFAT()

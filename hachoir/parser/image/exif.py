@@ -15,9 +15,8 @@ from hachoir.field import (FieldSet, SeekableFieldSet, ParserError,
                            Int8, Int16, Int32,
                            Float32, Float64,
                            Enum, String, Bytes, SubFile,
-                           NullBits, NullBytes, createPaddingField)
-from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN, NETWORK_ENDIAN
-from hachoir.core.text_handler import textHandler, hexadecimal
+                           NullBits, NullBytes)
+from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir.core.tools import createDict
 
 # maximum number of array entries in an IFD entry (excluding string types)

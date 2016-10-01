@@ -53,12 +53,12 @@ class Boot(FieldSet):
 class FSInfo(StaticFieldSet):
     format = (
         (String, "lead_sig", 4, 'Signature ("RRaA")'),
-        (NullBytes,  "reserved[]", 480),
+        (NullBytes, "reserved[]", 480),
         (String, "struct_sig", 4, 'Signature ("rrAa")'),
         (UInt32, "free_count", "Last known free cluster count on the volume"),
         (UInt32, "nxt_free",),
-        (NullBytes,  "reserved[]", 12),
-        (Bytes,  "trail_sig", 4, "Signature (0x00 0x00 0x55 0xAA)")
+        (NullBytes, "reserved[]", 12),
+        (Bytes, "trail_sig", 4, "Signature (0x00 0x00 0x55 0xAA)")
     )
 
 
@@ -265,7 +265,7 @@ class FileEntry(FieldSet):
             yield String(self, "name[]", 12, "(6 UTF-16 characters)",
                          charset="UTF-16-LE")
             yield UInt16(self, "first_cluster", "(always 0)")
-            yield String(self, "name[]",  4, "(2 UTF-16 characters)",
+            yield String(self, "name[]", 4, "(2 UTF-16 characters)",
                          charset="UTF-16-LE")
 
 
@@ -327,7 +327,8 @@ class InodeGen:
         if last:
             next = None
         else:
-            next = lambda: self(field)
+            def next():
+                return self(field)
         field.setLinks(prev.first, next)
         self.root.writeFieldsIn(padding, address, (field,))
         return field

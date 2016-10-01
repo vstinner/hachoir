@@ -14,7 +14,7 @@ from hachoir.field import (RootSeekableFieldSet, FieldSet,
                            Link,
                            ParserError)
 from hachoir.core.endian import BIG_ENDIAN
-from hachoir.core.text_handler import displayHandler, hexadecimal
+from hachoir.core.text_handler import displayHandler
 from hachoir.core.tools import paddingSize
 
 

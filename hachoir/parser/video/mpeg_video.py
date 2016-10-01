@@ -409,13 +409,13 @@ class VideoSlice(FieldSet):
 
 class VideoChunk(FieldSet):
     tag_info = {
-        0x00: ("pict_start[]",   VideoPicture,  "Picture start"),
-        0xB2: ("data_start[]",   None,          "Data start"),
-        0xB3: ("seq_hdr[]",      VideoSeqHeader, "Sequence header"),
-        0xB4: ("seq_err[]",      None,          "Sequence error"),
-        0xB5: ("ext_start[]",    VideoExtension, "Extension start"),
-        0xB7: ("seq_end[]",      None,          "Sequence end"),
-        0xB8: ("group_start[]",  GroupStart,    "Group start"),
+        0x00: ("pict_start[]", VideoPicture, "Picture start"),
+        0xB2: ("data_start[]", None, "Data start"),
+        0xB3: ("seq_hdr[]", VideoSeqHeader, "Sequence header"),
+        0xB4: ("seq_err[]", None, "Sequence error"),
+        0xB5: ("ext_start[]", VideoExtension, "Extension start"),
+        0xB7: ("seq_end[]", None, "Sequence end"),
+        0xB8: ("group_start[]", GroupStart, "Group start"),
     }
 
     def __init__(self, *args):
@@ -517,14 +517,14 @@ class Stream(FieldSet):
 class Chunk(FieldSet):
     ISO_END_CODE = 0xB9
     tag_info = {
-        0xB9: ("end",            None,          "End"),
-        0xBA: ("pack_start[]",   PackHeader,    "Pack start"),
-        0xBB: ("system_start[]", SystemHeader,  "System start"),
+        0xB9: ("end", None, "End"),
+        0xBA: ("pack_start[]", PackHeader, "Pack start"),
+        0xBB: ("system_start[]", SystemHeader, "System start"),
         # streams
-        0xBD: ("private[]",      Stream,        "Private elementary"),
-        0xBE: ("padding[]",      Stream,        "Padding"),
+        0xBD: ("private[]", Stream, "Private elementary"),
+        0xBE: ("padding[]", Stream, "Padding"),
         # 0xC0 to 0xFE handled specially
-        0xFF: ("directory[]",    Stream,        "Program Stream Directory"),
+        0xFF: ("directory[]", Stream, "Program Stream Directory"),
     }
 
     def __init__(self, *args):

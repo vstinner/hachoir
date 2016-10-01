@@ -6,7 +6,7 @@ Creation date: 08 may 2006
 """
 
 from hachoir.parser import HachoirParser
-from hachoir.field import (RootSeekableFieldSet, FieldSet, ParserError, Bit, NullBits, RawBits,
+from hachoir.field import (RootSeekableFieldSet, FieldSet, Bit, NullBits, RawBits,
                            UInt8, UInt16, UInt32, UInt64, Enum,
                            String, RawBytes, Bytes)
 from hachoir.core.text_handler import textHandler, hexadecimal
