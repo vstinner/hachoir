@@ -346,7 +346,7 @@ class GenericFieldSet(BasicFieldSet):
         oldlen = len(self._fields)
         try:
             for index in range(number):
-                self._addField( next(self._field_generator) )
+                self._addField(next(self._field_generator))
         except StopIteration:
             self._stopFeeding()
         except Exception as err:

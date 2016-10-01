@@ -1,8 +1,6 @@
-from hachoir.editor.field import (
-    EditorError, FakeField)
-from hachoir.editor.typed_field import (
-    EditableField, EditableBits, EditableBytes,
-    EditableInteger, EditableString,
-    createEditableField)
-from hachoir.editor.fieldset import EditableFieldSet, NewFieldSet, createEditor
-
+from hachoir.editor.field import EditorError, FakeField  # noqa
+from hachoir.editor.typed_field import (EditableField, EditableBits, # noqa
+                                        EditableBytes, EditableInteger,
+                                        EditableString, createEditableField)
+from hachoir.editor.fieldset import (EditableFieldSet, NewFieldSet,  # noqa
+                                     createEditor)

@@ -1,8 +1,7 @@
 from hachoir.core.i18n import getTerminalCharset
 from hachoir.core.tools import humanFilesize, humanBitSize, makePrintable
 from hachoir.core.log import log as hachoir_log
-from hachoir.core.cmd_line import (getHachoirOptions,
-    configureHachoir)
+from hachoir.core.cmd_line import getHachoirOptions, configureHachoir
 from hachoir.core.cmd_line import displayVersion
 
 from hachoir.field import Field, MissingField
@@ -101,15 +100,15 @@ class Node:
     def sync(self):
         start, end = len(self.childs), self.field.current_length
         if start < end:
-            self.childs += [ Node(i, self) for i in range(start, end) ]
+            self.childs += [Node(i, self) for i in range(start, end)]
 
     def refresh(self):
         if self.flags:
             self.flags = 0
         if self.childs:
             for index, child in enumerate(self.childs):
-                if index >= self.field.current_length \
-                or child.field != self.field[index]:
+                if (index >= self.field.current_length
+                   or child.field != self.field[index]):
                     del self.childs[index:]
                     break
                 child.refresh()
@@ -117,14 +116,14 @@ class Node:
 
 
 class Walker(ListWalker):
-    valid                 = 1 << 0
-    display_value         = 1 << 1
-    display_size          = 1 << 2
-    human_size            = 1 << 3
-    use_absolute_address  = 1 << 4
-    hex_address           = 1 << 5
-    display_description   = 1 << 6
-    display_type          = 1 << 7
+    valid = 1 << 0
+    display_value = 1 << 1
+    display_size = 1 << 2
+    human_size = 1 << 3
+    use_absolute_address = 1 << 4
+    hex_address = 1 << 5
+    display_description = 1 << 6
+    display_type = 1 << 7
     flags = valid
     start = 0
     event = False
@@ -286,7 +285,7 @@ class Walker(ListWalker):
                 tmp_text.append(node.field.getFieldType())
             if self.flags & self.display_size:
                 if node.field.size % 8:
-                    tmp_text.append( humanBitSize(node.field.size) )
+                    tmp_text.append(humanBitSize(node.field.size))
                 else:
                     size = node.field.size // 8
                     if not self.flags & self.human_size:
