@@ -3,6 +3,8 @@ Very basic field: raw content with a size in byte. Use this class for
 unknown content.
 """
 
+import types
+
 from hachoir.field import Field, FieldError
 from hachoir.core.tools import makePrintable
 from hachoir.core.bits import str2hex
@@ -28,7 +30,7 @@ class RawBytes(Field):
 
     def _createDisplay(self, human):
         max_bytes = config.max_byte_length
-        if type(self._getValue) is type(lambda: None):
+        if isinstance(self._getValue, types.FunctionType):
             display = makePrintable(self.value[:max_bytes], "ASCII")
         else:
             if self._display is None:
@@ -71,4 +73,3 @@ class Bytes(RawBytes):
     @see: L{RawBytes}
     """
     pass
-

@@ -6,9 +6,7 @@ from hachoir.core.cmd_line import displayVersion
 
 from hachoir.field import Field, MissingField
 from hachoir.stream import InputFieldStream, InputStreamError, FileInputStream
-from hachoir.parser import guessParser
 from hachoir.parser import guessParser, HachoirParserList
-from hachoir.version import VERSION, WEBSITE
 from urwid import (AttrWrap, BoxAdapter, CanvasJoin, Edit, Frame, ListBox,
                    Pile, Text, WidgetPlaceholder)
 from shutil import copyfileobj
