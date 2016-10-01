@@ -53,29 +53,42 @@ class BmpMetadata(RootMetadata):
 
 class TiffMetadata(RootMetadata):
     key_to_attr = {
-        "img_width": "width",
-        "img_height": "width",
-
-        # TODO: Enable that (need link to value)
-        #        "description": "comment",
-        #        "doc_name": "title",
-        #        "orientation": "image_orientation",
+        "ImageWidth": "width",
+        "ImageLength": "height",
+        "Software": "producer",
+        "ImageDescription": "comment",
+        "DocumentName": "title",
+        "XResolution": "width_dpi",
+        "YResolution": "height_dpi",
     }
 
     def extract(self, tiff):
-        if "ifd" in tiff:
-            self.useIFD(tiff["ifd"])
+        if "ifd[0]" in tiff:
+            self.useIFD(tiff["ifd[0]"])
 
     def useIFD(self, ifd):
-        for field in ifd:
-            try:
-                attrname = self.key_to_attr[field.name]
-            except KeyError:
-                continue
-            if "value" not in field:
-                continue
-            value = field["value"].value
-            setattr(self, attrname, value)
+        attr = {}
+        for entry in ifd.array("entry"):
+            self.processIfdEntry(ifd, entry, attr)
+        if 'BitsPerSample' in attr and 'SamplesPerPixel' in attr:
+            self.bits_per_pixel = attr['BitsPerSample'] * attr['SamplesPerPixel']
+
+    @fault_tolerant
+    def processIfdEntry(self, ifd, entry, attr):
+        tag = entry["tag"].display
+        if tag in {"BitsPerSample", "SamplesPerPixel"}:
+            value = ifd.getEntryValues(entry)[0].value
+            attr[tag] = value
+            return
+
+        try:
+            attrname = self.key_to_attr[tag]
+        except KeyError:
+            return
+        value = ifd.getEntryValues(entry)[0].value
+        if tag in {"XResolution", "YResolution"}:
+            value = round(value)
+        setattr(self, attrname, value)
 
 
 class IcoMetadata(MultipleMetadata):

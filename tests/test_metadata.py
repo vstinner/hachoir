@@ -400,6 +400,14 @@ class TestMetadata(unittest.TestCase):
         self.check_attr(meta, 'creation_date', datetime(2005, 10, 28, 17, 46, 46))
         self.check_attr(meta, 'mime_type', 'video/mp4')
 
+    def test_tiff(self):
+        meta = self.extract("sample.tif")
+        self.check_attr(meta, 'width', 1600)
+        self.check_attr(meta, 'height', 2100)
+        self.check_attr(meta, 'width_dpi', 200)
+        self.check_attr(meta, 'height_dpi', 200)
+        self.check_attr(meta, 'producer', 'mieconvert')
+
 
 class TestMetadataCommandLine(unittest.TestCase):
     def test_metadata(self):
