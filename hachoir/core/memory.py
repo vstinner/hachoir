@@ -50,7 +50,7 @@ try:
 
     PAGE_SIZE = getpagesize()
 
-    def getMemoryLimit():
+    def getMemoryLimit():  # noqa
         try:
             limit = getrlimit(RLIMIT_AS)[0]
             if 0 < limit:
@@ -59,7 +59,7 @@ try:
         except ValueError:
             return None
 
-    def setMemoryLimit(max_mem):
+    def setMemoryLimit(max_mem):  # noqa
         if max_mem is None:
             max_mem = -1
         try:

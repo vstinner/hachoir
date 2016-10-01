@@ -135,19 +135,19 @@ class Walker(ListWalker):
 
     def __init__(self, charset, root, preload_fields, focus, options):
         self.charset = charset
-        if options.get("display_value",      True):
+        if options.get("display_value", True):
             self.flags |= self.display_value
-        if options.get("description",      True):
+        if options.get("description", True):
             self.flags |= self.display_description
-        if options.get("display_type",     False):
+        if options.get("display_type", False):
             self.flags |= self.display_type
-        if options.get("display_size",     True):
+        if options.get("display_size", True):
             self.flags |= self.display_size
-        if options.get("human-size",       True):
+        if options.get("human-size", True):
             self.flags |= self.human_size
         if options.get("absolute-address", False):
             self.flags |= self.use_absolute_address
-        if options.get("hex-address",      False):
+        if options.get("hex-address", False):
             self.flags |= self.hex_address
         assert preload_fields > 0
         self.preload_fields = preload_fields
@@ -553,10 +553,10 @@ class Input(Edit):
 
 def getHelpMessage():
     actions = ("Application:",
-               ("q",      "exit"),
-               ("F1",     "help"),
-               ("< / >",  "prev/next tab"),
-               ("+ / -",  "move separator vertically"),
+               ("q", "exit"),
+               ("F1", "help"),
+               ("< / >", "prev/next tab"),
+               ("+ / -", "move separator vertically"),
                ("esc/^W", "close current tab"),
                ), ("Parser window:",
                    ("a", "absolute address"),
@@ -739,7 +739,7 @@ def exploreFieldSet(field_set, args, options={}):
     try:
         ui.run_wrapper(run)
     except Exception:
-        pending = [ msg.get_text()[0] for msg in msgs[1][msgs[2]:] ] + \
+        pending = [msg.get_text()[0] for msg in msgs[1][msgs[2]:]] + \
                   ["[*]%s %s" % (prefix, text)
                    for level, prefix, text in msgs[0]]
         if pending:
@@ -824,7 +824,7 @@ def main():
 
     # Explore file
     if values.profiler:
-        ok = profile(exploreFieldSet, parser, values)
+        profile(exploreFieldSet, parser, values)
     else:
         exploreFieldSet(parser, values, {
             "display_size": values.display_size,

@@ -7,7 +7,6 @@ import types
 
 from hachoir.field import Field, FieldError
 from hachoir.core.tools import makePrintable
-from hachoir.core.bits import str2hex
 from hachoir.core import config
 
 MAX_LENGTH = (2**64)
@@ -19,13 +18,13 @@ class RawBytes(Field):
 
     @see: L{Bytes}
     """
-    static_size = staticmethod(lambda *args, **kw: args[1]*8)
+    static_size = staticmethod(lambda *args, **kw: args[1] * 8)
 
     def __init__(self, parent, name, length, description="Raw data"):
         assert issubclass(parent.__class__, Field)
         if not(0 < length <= MAX_LENGTH):
             raise FieldError("Invalid RawBytes length (%s)!" % length)
-        Field.__init__(self, parent, name, length*8, description)
+        Field.__init__(self, parent, name, length * 8, description)
         self._display = None
 
     def _createDisplay(self, human):

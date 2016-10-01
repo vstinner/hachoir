@@ -18,7 +18,7 @@ class FakeArray:
         pos = name.rfind("/")
         if pos != -1:
             self.fieldset = fieldset[name[:pos]]
-            self.name = name[pos+1:]
+            self.name = name[pos + 1:]
         else:
             self.fieldset = fieldset
             self.name = name
@@ -36,7 +36,7 @@ class FakeArray:
 
     def __len__(self):
         "Number of fields in the array"
-        total = self._max_index+1
+        total = self._max_index + 1
         if not self._known_size:
             for index in itertools.count(total):
                 try:
@@ -48,7 +48,7 @@ class FakeArray:
 
     def __contains__(self, index):
         try:
-            field = self[index]
+            self[index]
             return True
         except MissingField:
             return False

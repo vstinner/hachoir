@@ -43,7 +43,7 @@ class HachoirParser(object):
             raise ValidateError(res or "no reason given")
         self._autofix = True
 
-    #--- Methods that can be overridden -------------------------------------
+    # --- Methods that can be overridden -------------------------------------
     def createDescription(self):
         """
         Create an Unicode description
@@ -69,7 +69,7 @@ class HachoirParser(object):
         """
         raise NotImplementedError()
 
-    #--- Getter methods -----------------------------------------------------
+    # --- Getter methods -----------------------------------------------------
     def _getDescription(self):
         if self._description is None:
             try:

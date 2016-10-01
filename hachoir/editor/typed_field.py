@@ -88,7 +88,7 @@ class EditableBits(EditableFixedField):
                     "(parent, name, [size, value])")
             size = args[0]
             value = args[1]
-            assert isinstance(value, (int, long))
+            assert isinstance(value, int)
         else:
             size = None
             value = None
@@ -226,7 +226,7 @@ class EditableInteger(EditableFixedField):
                     "(parent, name, [signed, size, value])")
             size = args[1]
             value = args[2]
-            assert isinstance(value, (int, long))
+            assert isinstance(value, int)
         else:
             size = None
             value = None

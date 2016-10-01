@@ -89,13 +89,13 @@ class GenericString(Bytes):
     # Suffix format: value is suffix (string)
     SUFFIX_FORMAT = {
         "C": {
-            8: {LITTLE_ENDIAN: b"\0",       BIG_ENDIAN: b"\0"},
-            16: {LITTLE_ENDIAN: b"\0\0",     BIG_ENDIAN: b"\0\0"},
+            8: {LITTLE_ENDIAN: b"\0", BIG_ENDIAN: b"\0"},
+            16: {LITTLE_ENDIAN: b"\0\0", BIG_ENDIAN: b"\0\0"},
             32: {LITTLE_ENDIAN: b"\0\0\0\0", BIG_ENDIAN: b"\0\0\0\0"},
         },
         "UnixLine": {
-            8: {LITTLE_ENDIAN: b"\n",       BIG_ENDIAN: b"\n"},
-            16: {LITTLE_ENDIAN: b"\n\0",     BIG_ENDIAN: b"\0\n"},
+            8: {LITTLE_ENDIAN: b"\n", BIG_ENDIAN: b"\n"},
+            16: {LITTLE_ENDIAN: b"\n\0", BIG_ENDIAN: b"\0\n"},
             32: {LITTLE_ENDIAN: b"\n\0\0\0", BIG_ENDIAN: b"\0\0\0\n"},
         },
 
@@ -103,7 +103,7 @@ class GenericString(Bytes):
 
     # Pascal format: value is the size of the prefix in bits
     PASCAL_FORMATS = {
-        "Pascal8":  1,
+        "Pascal8": 1,
         "Pascal16": 2,
         "Pascal32": 4
     }
@@ -233,8 +233,8 @@ class GenericString(Bytes):
         # Try to convert to Unicode
         try:
             return str(text, self._charset, "strict")
-        except UnicodeDecodeError as err:
-            pass
+        except UnicodeDecodeError as exc:
+            err = exc
 
         # --- Conversion error ---
 

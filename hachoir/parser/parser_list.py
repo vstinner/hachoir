@@ -4,7 +4,7 @@ from hachoir.core.error import error
 from hachoir.parser import Parser, HachoirParser
 import sys
 
-### Parser list ################################################################
+# Parser list ################################################################
 
 
 class ParserList(object):
@@ -14,7 +14,7 @@ class ParserList(object):
 
     def __init__(self):
         self.parser_list = []
-        self.bytag = { "id": {}, "category": {} }
+        self.bytag = {"id": {}, "category": {}}
 
     def translate(self, name, value):
         if name in ("magic",):
@@ -78,9 +78,9 @@ class ParserList(object):
         self.parser_list.append(parser)
 
         for name, values in _tags:
-            byname = self.bytag.setdefault(name,{})
+            byname = self.bytag.setdefault(name, {})
             for value in values:
-                byname.setdefault(value,[]).append(parser)
+                byname.setdefault(value, []).append(parser)
 
     def __iter__(self):
         return iter(self.parser_list)
@@ -114,7 +114,7 @@ class ParserList(object):
             extensions.sort()
 
             # Print list
-            text = ", ".join( str(item) for item in extensions )
+            text = ", ".join(str(item) for item in extensions)
             if format == "file-ext":
                 print("File extensions: %s." % text, file=out)
                 print(file=out)
@@ -141,7 +141,7 @@ class ParserList(object):
         bycategory = self.bytag["category"]
         for category in sorted(bycategory.keys()):
             if format == "one_line":
-                parser_list = [ parser.PARSER_TAGS["id"] for parser in bycategory[category] ]
+                parser_list = [parser.PARSER_TAGS["id"] for parser in bycategory[category]]
                 parser_list.sort()
                 print("- %s: %s" % (category.title(), ", ".join(parser_list)), file=out)
             else:

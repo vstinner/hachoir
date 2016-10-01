@@ -254,7 +254,7 @@ def _createStructFormat():
     by str2long() to convert raw data to positive integer.
     """
     format = {
-        BIG_ENDIAN:    {},
+        BIG_ENDIAN: {},
         LITTLE_ENDIAN: {},
     }
     for struct_format in "BHILQ":

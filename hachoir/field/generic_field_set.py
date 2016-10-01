@@ -167,7 +167,7 @@ class GenericFieldSet(BasicFieldSet):
         # Compute field size and check that there is enough place for it
         self.__is_feeding = True
         try:
-            field_size = field.size
+            field.size
         except Exception as err:
             if field.is_field_set and field.current_length and field.eof:
                 self.warning(
