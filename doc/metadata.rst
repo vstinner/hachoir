@@ -233,7 +233,7 @@ hachoir-metadata library is used by:
 
 * `Plone4artist <http://plone.org/products/plone4artistsvideo/>`_
 * `amplee <http://trac.defuze.org/wiki/amplee>`_ (implementation of the Atom Publishing Protocol, APP)
-* `django-massmedia <http://opensource.washingtontimes.com/projects/django-massmedia/>`_ (Washington Post open source library)
+* `django-massmedia <https://github.com/callowayproject/django-massmedia>`_ (Calloway open source library)
 * `pyrenamer <http://www.infinicode.org/code/pyrenamer/>`_
 
 Informations
