@@ -1,5 +1,5 @@
 from hachoir.core.endian import endian_name
-from hachoir.core.tools import makePrintable, makeUnicode
+from hachoir.core.tools import makeUnicode
 from hachoir.core.dict import Dict
 from hachoir.core.error import error
 from hachoir.core.log import Logger
@@ -87,7 +87,7 @@ class Metadata(Logger):
             data = self.__data[key]
         except LookupError:
             raise ValueError("Metadata has no value '%s'" % key)
-        return [ item.value for item in data ]
+        return [item.value for item in data]
 
     def getText(self, key, default=None, index=0):
         """
@@ -188,6 +188,7 @@ class RootMetadata(Metadata):
 
 class MultipleMetadata(RootMetadata):
     header = "Common"
+
     def __init__(self, quality=QUALITY_NORMAL):
         RootMetadata.__init__(self, quality)
         object.__setattr__(self, "_MultipleMetadata__groups", Dict())

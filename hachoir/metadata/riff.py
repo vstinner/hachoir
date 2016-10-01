@@ -30,7 +30,7 @@ class RiffMetadata(MultipleMetadata):
             self.extractWAVE(riff)
             size = getValue(riff, "audio_data/size")
             if size:
-                computeAudioComprRate(self, size*8)
+                computeAudioComprRate(self, size * 8)
         elif type == "AVI ":
             if "headers" in riff:
                 self.extractAVI(riff["headers"])
@@ -70,7 +70,7 @@ class RiffMetadata(MultipleMetadata):
             if (not self.has("duration")
                and "audio_data/size" in wav
                and self.has("bit_rate")):
-                duration = float(wav["audio_data/size"].value)*8 / self.get('bit_rate')
+                duration = float(wav["audio_data/size"].value) * 8 / self.get('bit_rate')
                 self.duration = timedelta(seconds=duration)
 
     def extractInfo(self, fieldset):
@@ -171,7 +171,7 @@ class RiffMetadata(MultipleMetadata):
         # Video has index?
         if "/index" in headers:
             self.comment = "Has audio/video index (%s)" \
-                % humanFilesize(headers["/index"].size//8)
+                % humanFilesize(headers["/index"].size // 8)
 
     @fault_tolerant
     def extractAnim(self, riff):
