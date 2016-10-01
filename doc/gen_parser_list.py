@@ -1,22 +1,8 @@
 #!/usr/bin/env python3
-
+import os.path
 
 def writeReadme(out):
     from hachoir.parser.parser_list import HachoirParserList
-
-    # Write header
-    for line in open('README.header'):
-        line = line.rstrip()
-        print(line, file=out)
-    if line:
-        print(file=out)
-
-    # Write changelog
-    for line in open('ChangeLog'):
-        line = line.rstrip()
-        print(line, file=out)
-    if line:
-        print(file=out)
 
     # Write parser list
     format = "rest"
@@ -27,9 +13,11 @@ def writeReadme(out):
     HachoirParserList().print_(out=out, format=format)
 
 def main():
-    with open('README', 'w') as readme:
+    path = os.path.dirname(__file__)
+    filename = os.path.join(path, 'parser_list.rst')
+    with open(filename, 'w') as readme:
         writeReadme(readme)
-    print("README updated.")
+    print("%s regenerated" % filename)
 
 if __name__ == "__main__":
     main()

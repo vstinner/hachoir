@@ -24,6 +24,7 @@ Table Of Contents
 
    core
    parser
+   parser_list
    metadata
    install
    urwid
