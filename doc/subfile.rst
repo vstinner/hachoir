@@ -1,6 +1,8 @@
-hachoir-subfile is a tool based on hachoir-parser to find subfiles in any binary stream.
++++++++
+Subfile
++++++++
 
-Website: http://bitbucket.org/haypo/hachoir/wiki/hachoir-subfile
+hachoir-subfile is a tool based on hachoir-parser to find subfiles in any binary stream.
 
 Changelog
 =========
@@ -28,28 +30,63 @@ Version 0.5 (2007-07-11):
 Usage
 =====
 
-Search JPEG images:
+Search JPEG images::
 
     hachoir-subfile input --parser=jpeg
 
-Search images:
+Search images::
 
     hachoir-subfile input --category=image
 
-Search images, videos and SWF files:
+Search images, videos and SWF files::
 
     hachoir-subfile input --category=image,video --parser=swf
 
-Search all subfiles and store them in /tmp/subfiles/:
+Search all subfiles and store them in ``/tmp/subfiles/``::
 
     hachoir-subfile input /tmp/subfiles/
 
 Other options:
 
- * --offset: start search at specified offset in bytes
- * --size: limit search to specified size in bytes
+* --offset: start search at specified offset in bytes
+* --size: limit search to specified size in bytes
 
 Search speed is proportional to the number of used parsers.
+
+
+How does it work?
+=================
+
+Find file start
+---------------
+
+To find file start, hachoir-subfile use "magic number": short string (2 to 16
+bytes) typical to a file format. Examples:
+
+ * "MZ" for MS-Dos (and Windows) executable
+ * "\xFF\xD8\xFF" for JPEG
+ * "FAT16   " for FAT16 file system
+
+When a magic number is found, a parser of hachoir parser is opened. The
+validate() method is used to make sure that the file is in the right file
+format. Some values of the header are tested:
+
+ * TAR archive: check magic number, check first file entry (user/group
+   identifier, file size)
+ * SWF animation: check magic number, check version, check rectangle padding
+   value
+ * etc.
+
+Find file length
+----------------
+
+To find (guess) file length, each parser requires a method called
+"createContentSize()". Examples:
+
+ * RIFF container: read "/filesize" field value
+ * JPEG picture: search "\xFF\xD9" (End of image chunk) string
+ * etc.
+
 
 Examples
 ========
@@ -103,3 +140,30 @@ PowerPoint document::
     [+] Search done -- offset=848384 (828.5 KB)
     Total time: 1.30 sec -- 635.1 KB/sec
 
+
+Filter
+======
+
+It's possible to filter files using your own function. Example to skip images
+smaller than 256x256::
+
+    from hachoir_metadata import extractMetadata
+    import sys
+
+    def metadataFilter(parser):
+        try:
+            metadata = extractMetadata(parser)
+        except HachoirError, err:
+            metadata = None
+
+        if metadata:
+            if hasattr(metadata, "width") and metadata.width[0]] < 256:
+                print("Skip picture with width < 256 pixels", file=sys.stderr)
+                return False
+            if hasattr(metadata, "height") and metadata.height[[0]|< 256:
+                print("Skip picture with height < 256 pixels", file=sys.stderr)
+                return False
+        return True
+
+    subfile = HachoirSubfile(...)
+    subfile.filter = metadataFilter
