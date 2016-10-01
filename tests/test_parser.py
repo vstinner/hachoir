@@ -3,9 +3,8 @@
 Test hachoir-parser using the testcase.
 """
 
-from hachoir.field import FieldError
 from hachoir.core.error import error
-from hachoir.stream import InputStreamError, StringInputStream
+from hachoir.stream import StringInputStream
 from hachoir.parser import createParser, HachoirParserList, ValidateError
 from hachoir.test import setup_tests
 from array import array
@@ -16,6 +15,7 @@ import sys
 import unittest
 
 DATADIR = os.path.join(os.path.dirname(__file__), 'files')
+
 
 class TestParsers(unittest.TestCase):
     verbose = False
@@ -38,7 +38,7 @@ class TestParsers(unittest.TestCase):
     def checkValue(self, parser, path, value):
         if self.verbose:
             sys.stdout.write("  - Check field %s.value=%s (%s): "
-                % (path, repr(value), value.__class__.__name__))
+                             % (path, repr(value), value.__class__.__name__))
             sys.stdout.flush()
         read = parser[path].value
         self.assertEqual(read, value,
@@ -48,7 +48,7 @@ class TestParsers(unittest.TestCase):
     def checkDisplay(self, parser, path, value):
         if self.verbose:
             sys.stdout.write("  - Check field %s.display=%s (%s): "
-                % (path, repr(value), value.__class__.__name__))
+                             % (path, repr(value), value.__class__.__name__))
             sys.stdout.flush()
         read = parser[path].display
         self.assertEqual(read, value,
@@ -58,7 +58,7 @@ class TestParsers(unittest.TestCase):
     def checkDesc(self, parser, path, value):
         if self.verbose:
             sys.stdout.write("  - Check field %s.description=%s (%s): "
-                % (path, repr(value), value.__class__.__name__))
+                             % (path, repr(value), value.__class__.__name__))
             sys.stdout.flush()
         read = parser[path].description
         self.assertEqual(read, value,
@@ -68,7 +68,7 @@ class TestParsers(unittest.TestCase):
     def checkNames(self, parser, path, names):
         if self.verbose:
             sys.stdout.write("  - Check field names %s=(%s) (%u): "
-                % (path, ", ".join(names), len(names)))
+                             % (path, ", ".join(names), len(names)))
             sys.stdout.flush()
         fieldset = parser[path]
         if len(fieldset) != len(names):
@@ -81,7 +81,8 @@ class TestParsers(unittest.TestCase):
     def test_3ds(self):
         parser = self.parse("yellowdude.3ds")
         self.checkValue(parser, "/main/version/version", 2)
-        self.checkNames(parser, "/main", ("type", "size", "version", "obj_mat"))
+        self.checkNames(parser, "/main",
+                        ("type", "size", "version", "obj_mat"))
 
     def test_png(self):
         parser = self.parse("logo-kubuntu.png")
@@ -101,14 +102,15 @@ class TestParsers(unittest.TestCase):
     def test_mkv(self):
         parser = self.parse("flashmob.mkv")
         self.checkValue(parser, "/Segment[0]/Cues/CuePoint[1]/CueTrackPositions[0]"
-              + "/CueClusterPosition/cluster/BlockGroup[14]/Block/block/timecode", 422)
+                        + "/CueClusterPosition/cluster/BlockGroup[14]/Block/block/timecode", 422)
         self.checkValue(parser, "/Segment[0]/Tags[0]/Tag[0]/SimpleTag[3]/TagString/unicode",
-              "\xa9 dadaprod, licence Creative Commons by-nc-sa 2.0 fr")
+                        "\xa9 dadaprod, licence Creative Commons by-nc-sa 2.0 fr")
 
     def test_mkv2(self):
         parser = self.parse("10min.mkv")
         self.checkValue(parser, "/Segment[0]/size", None)
-        self.checkValue(parser, "/Segment[0]/Tracks[0]/TrackEntry[0]/CodecID/string", "V_MPEG4/ISO/AVC")
+        self.checkValue(
+            parser, "/Segment[0]/Tracks[0]/TrackEntry[0]/CodecID/string", "V_MPEG4/ISO/AVC")
 
     def test_ico(self):
         parser = self.parse("wormux_32x32_16c.ico")
@@ -125,7 +127,7 @@ class TestParsers(unittest.TestCase):
     def test_mp3(self):
         parser = self.parse("sheep_on_drugs.mp3")
         self.checkValue(parser, "/id3v2/field[6]/content/text",
-            'Stainless Steel Provider is compilated to the car of Twinstar.')
+                        'Stainless Steel Provider is compilated to the car of Twinstar.')
         self.checkValue(parser, "/frames/frame[0]/use_padding", False)
 
     def test_au(self):
@@ -141,14 +143,16 @@ class TestParsers(unittest.TestCase):
         parser = self.parse("steganography.mp3")
         self.checkValue(parser, "/frames/padding[0]", b"misc est un canard\r")
         self.checkDesc(parser, "/frames", 'Frames: Variable bit rate (VBR)')
-        self.checkDesc(parser, "/frames/frame[1]", 'MPEG-1 layer III, 160.0 Kbit/sec, 44.1 kHz')
+        self.checkDesc(
+            parser, "/frames/frame[1]", 'MPEG-1 layer III, 160.0 Kbit/sec, 44.1 kHz')
 
     def test_rpm(self):
         parser = self.parse("ftp-0.17-537.i586.rpm")
         self.checkValue(parser, "name", "ftp-0.17-537")
         self.checkValue(parser, "os", 1)
         self.checkValue(parser, "checksum/content_item[2]/value", 50823)
-        self.checkValue(parser, "header/content_item[15]/value", "ftp://ftp.uk.linux.org/pub/linux/Networking/netkit")
+        self.checkValue(
+            parser, "header/content_item[15]/value", "ftp://ftp.uk.linux.org/pub/linux/Networking/netkit")
 
     def test_jpeg(self):
         parser = self.parse("jpeg.exif.photoshop.jpg")
@@ -172,7 +176,8 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "new_sub_block[0]/crc16", 0x2994)
         self.checkValue(parser, "file[0]/crc32", 0x4C6D13ED)
         self.checkValue(parser, "new_sub_block[1]/crc32", 0x34528E23)
-        self.checkValue(parser, "file[1]/filename", ".svn\prop-base\README.svn-base")
+        self.checkValue(parser, "file[1]/filename",
+                        ".svn\prop-base\README.svn-base")
         self.checkValue(parser, "new_sub_block[1]/filename", 'ACL')
         # archive_end bad candidate for checking
         self.checkValue(parser, "new_sub_block[362]/crc32", 0x6C84C95E)
@@ -190,21 +195,26 @@ class TestParsers(unittest.TestCase):
         parser = self.parse("kde_haypo_corner.bmp")
         self.checkValue(parser, "header/width", 189)
         self.checkValue(parser, "header/used_colors", 70)
-        self.checkDesc(parser, "palette/color[1]", "RGB color: White (opacity: 0%)")
+        self.checkDesc(
+            parser, "palette/color[1]", "RGB color: White (opacity: 0%)")
         self.checkValue(parser, "pixels/line[26]/pixel[14]", 28)
 
     def test_der(self):
         parser = self.parse("cacert_class3.der")
         self.checkDisplay(parser, "seq[0]/class", 'universal')
-        self.checkDesc(parser, "seq[0]/seq[0]/seq[1]/obj_id[0]", "Object identifier: 1.2.840.113549.1.1.4")
-        self.checkValue(parser, "seq[0]/seq[0]/seq[2]/set[0]/seq[0]/print_str[0]/value", "Root CA")
-        self.checkValue(parser, "seq[0]/seq[0]/seq[2]/set[3]/seq[0]/ia5_str[0]/value", "support@cacert.org")
+        self.checkDesc(parser, "seq[0]/seq[0]/seq[1]/obj_id[0]",
+                       "Object identifier: 1.2.840.113549.1.1.4")
+        self.checkValue(
+            parser, "seq[0]/seq[0]/seq[2]/set[0]/seq[0]/print_str[0]/value", "Root CA")
+        self.checkValue(
+            parser, "seq[0]/seq[0]/seq[2]/set[3]/seq[0]/ia5_str[0]/value", "support@cacert.org")
         self.checkValue(parser, "seq[0]/bit_str[0]/size", 513)
 
     def check_pyc(self, parser):
         self.checkValue(parser, "/content/consts/item[0]", 42)
         self.checkValue(parser, "/content/stack_size", 4)
-        self.checkValue(parser, "/content/consts/item[1]", 2535301200456458802993406410752)
+        self.checkValue(
+            parser, "/content/consts/item[1]", 2535301200456458802993406410752)
         self.checkValue(parser, "/content/consts/item[4]", 0.3j)
         self.checkValue(parser, "/content/consts/item[8]", b"abc")
         self.checkValue(parser, "/content/filename", b"pyc_example.py")
@@ -226,15 +236,19 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "/minor_version", 3)
         self.checkValue(parser, "/major_version", 45)
         self.checkValue(parser, "/constant_pool_count", 326)
-        self.checkValue(parser, "/constant_pool/constant_pool[324]/bytes", "([Ljava/lang/Object;Ljava/lang/Object;)V")
+        self.checkValue(
+            parser, "/constant_pool/constant_pool[324]/bytes", "([Ljava/lang/Object;Ljava/lang/Object;)V")
         self.checkValue(parser, "/super_class", 80)
         self.checkValue(parser, "/interfaces_count", 0)
         self.checkValue(parser, "/fields_count", 16)
-        self.checkValue(parser, "/fields/fields[3]/attributes/attributes[0]/attribute_name_index", 93)
+        self.checkValue(
+            parser, "/fields/fields[3]/attributes/attributes[0]/attribute_name_index", 93)
         self.checkValue(parser, "/methods_count", 31)
-        self.checkValue(parser, "/methods/methods[30]/attributes/attributes[0]/code_length", 5)
+        self.checkValue(
+            parser, "/methods/methods[30]/attributes/attributes[0]/code_length", 5)
         self.checkValue(parser, "/attributes_count", 3)
-        self.checkValue(parser, "/attributes/attributes[2]/classes/classes[1]/inner_name_index", 83)
+        self.checkValue(
+            parser, "/attributes/attributes[2]/classes/classes[1]/inner_name_index", 83)
 
     def test_swf(self):
         parser = self.parse("claque-beignet.swf")
@@ -251,7 +265,8 @@ class TestParsers(unittest.TestCase):
         self.checkDisplay(parser, "/audio[0]/codec", "MP3")
         self.checkValue(parser, "/audio[2]/timestamp", 52)
         self.checkDisplay(parser, "/video[0]/codec", "Sorensen H.263")
-        self.checkValue(parser, "/metadata/entry[1]/item[8]/attr[1]/item[4]/value/exponent", 20)
+        self.checkValue(
+            parser, "/metadata/entry[1]/item[8]/attr[1]/item[4]/value/exponent", 20)
 
     def test_tcpdump(self):
         parser = self.parse("arp_dns_ping_dns.tcpdump")
@@ -262,30 +277,42 @@ class TestParsers(unittest.TestCase):
 
     def test_ext2(self):
         parser = self.parse("my60k.ext2")
-        self.checkDisplay(parser, "/superblock/last_check", '2006-12-04 22:56:37')
+        self.checkDisplay(parser, "/superblock/last_check",
+                          '2006-12-04 22:56:37')
         self.checkDisplay(parser, "/superblock/creator_os", "Linux")
         self.checkDisplay(parser, "/superblock/errors", "Continue")
         self.checkValue(parser, "/group_desc/group[0]/block_bitmap", 3)
         self.checkValue(parser, "/group_desc/group[0]/free_blocks_count", 44)
         self.checkValue(parser, "/group[0]/block_bitmap/item[9]", False)
-        self.checkDisplay(parser, "/group[0]/inode_table/inode[1]/file_type", "Directory")
-        self.checkDesc(parser, "/group[0]/inode_table/inode[10]", "Inode 11: file, size=1024 bytes, mode=drwxr-xr-x")
+        self.checkDisplay(
+            parser, "/group[0]/inode_table/inode[1]/file_type", "Directory")
+        self.checkDesc(parser, "/group[0]/inode_table/inode[10]",
+                       "Inode 11: file, size=1024 bytes, mode=drwxr-xr-x")
         self.checkValue(parser, "/group[0]/inode_table/inode[11]/size", 1816)
-        self.checkDisplay(parser, "/group[0]/inode_table/inode[11]/ctime", '2006-12-04 23:22:00')
-        self.checkValue(parser, "/superblock/feature_compat/DIR_PREALLOC", False)
-        self.checkValue(parser, "/superblock/feature_compat/IMAGIC_INODES", False)
-        self.checkValue(parser, "/superblock/feature_compat/HAS_JOURNAL", False)
+        self.checkDisplay(
+            parser, "/group[0]/inode_table/inode[11]/ctime", '2006-12-04 23:22:00')
+        self.checkValue(
+            parser, "/superblock/feature_compat/DIR_PREALLOC", False)
+        self.checkValue(
+            parser, "/superblock/feature_compat/IMAGIC_INODES", False)
+        self.checkValue(
+            parser, "/superblock/feature_compat/HAS_JOURNAL", False)
         self.checkValue(parser, "/superblock/feature_compat/EXT_ATTR", False)
         self.checkValue(parser, "/superblock/feature_compat/RESIZE_INO", True)
         self.checkValue(parser, "/superblock/feature_compat/DIR_INDEX", True)
-        self.checkValue(parser, "/superblock/feature_incompat/COMPRESSION", False)
+        self.checkValue(
+            parser, "/superblock/feature_incompat/COMPRESSION", False)
         self.checkValue(parser, "/superblock/feature_incompat/FILETYPE", True)
         self.checkValue(parser, "/superblock/feature_incompat/RECOVER", False)
-        self.checkValue(parser, "/superblock/feature_incompat/JOURNAL_DEV", False)
+        self.checkValue(
+            parser, "/superblock/feature_incompat/JOURNAL_DEV", False)
         self.checkValue(parser, "/superblock/feature_incompat/META_BG", False)
-        self.checkValue(parser, "/superblock/feature_ro_compat/SPARSE_SUPER", True)
-        self.checkValue(parser, "/superblock/feature_ro_compat/LARGE_FILE", False)
-        self.checkValue(parser, "/superblock/feature_ro_compat/BTREE_DIR", False)
+        self.checkValue(
+            parser, "/superblock/feature_ro_compat/SPARSE_SUPER", True)
+        self.checkValue(
+            parser, "/superblock/feature_ro_compat/LARGE_FILE", False)
+        self.checkValue(
+            parser, "/superblock/feature_ro_compat/BTREE_DIR", False)
         self.checkValue(parser, "/superblock/feature_incompat/FILETYPE", True)
         self.checkValue(parser, "/superblock/feature_incompat/RECOVER", False)
         self.checkValue(parser, "/superblock/hash_seed[0]", 721772090)
@@ -293,25 +320,33 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "/superblock/hash_seed[2]", 682462885)
         self.checkValue(parser, "/superblock/hash_seed[3]", 847697135)
         self.checkDisplay(parser, "/superblock/def_hash_version", "Tea")
-        self.checkValue(parser, "/group[0]/inode_table/inode[0]/flags/SECRM", False)
-        self.checkDisplay(parser, "/superblock/rev_level", "V2 format w/ dynamic inode sizes")
+        self.checkValue(
+            parser, "/group[0]/inode_table/inode[0]/flags/SECRM", False)
+        self.checkDisplay(parser, "/superblock/rev_level",
+                          "V2 format w/ dynamic inode sizes")
 
     def test_ext2_default_mount_opts(self):
         parser = self.parse("default_mount_opts.ext2")
         self.checkValue(parser, "/superblock/default_mount_opts/DEBUG", False)
-        self.checkValue(parser, "/superblock/default_mount_opts/BSDGROUPS", False)
-        self.checkValue(parser, "/superblock/default_mount_opts/XATTR_USER", True)
+        self.checkValue(
+            parser, "/superblock/default_mount_opts/BSDGROUPS", False)
+        self.checkValue(
+            parser, "/superblock/default_mount_opts/XATTR_USER", True)
         self.checkValue(parser, "/superblock/default_mount_opts/ACL", True)
         self.checkValue(parser, "/superblock/default_mount_opts/UID16", False)
         self.checkValue(parser, "/superblock/default_mount_opts/JMODE", False)
-        self.checkValue(parser, "/superblock/default_mount_opts/JMODE_DATA", False)
-        self.checkValue(parser, "/superblock/default_mount_opts/JMODE_ORDERED", False)
-        self.checkValue(parser, "/superblock/default_mount_opts/JMODE_WBACK", False)
+        self.checkValue(
+            parser, "/superblock/default_mount_opts/JMODE_DATA", False)
+        self.checkValue(
+            parser, "/superblock/default_mount_opts/JMODE_ORDERED", False)
+        self.checkValue(
+            parser, "/superblock/default_mount_opts/JMODE_WBACK", False)
 
     def test_bmp2(self):
         parser = self.parse("article01.bmp")
         self.checkDisplay(parser, "/header/red_mask", '0x00ff0000')
-        self.checkDisplay(parser, "/header/color_space", "Business (Saturation)")
+        self.checkDisplay(parser, "/header/color_space",
+                          "Business (Saturation)")
         self.checkValue(parser, "/pixels/line[94]/pixel[11]", 15265520)
 
     def test_reiserfs3(self):
@@ -349,8 +384,10 @@ class TestParsers(unittest.TestCase):
 
     def test_midi(self):
         parser = self.parse("indiana.mid")
-        self.checkDesc(parser, "/header", "Multiple tracks, synchronous; 3 tracks")
-        self.checkDisplay(parser, "/track[0]/command[1]/microsec_quarter", "300.00 ms")
+        self.checkDesc(parser, "/header",
+                       "Multiple tracks, synchronous; 3 tracks")
+        self.checkDisplay(
+            parser, "/track[0]/command[1]/microsec_quarter", "300.00 ms")
         self.checkDisplay(parser, "/track[1]/command[6]/note", "A (octave 5)")
         self.checkValue(parser, "/track[1]/command[8]/time", 408)
         self.checkValue(parser, "/track[1]/command[8]/velocity", 80)
@@ -359,11 +396,13 @@ class TestParsers(unittest.TestCase):
         parser = self.parse("grasslogo_vector.emf")
         self.checkValue(parser, "/func[4]/y", 297)
         self.checkDesc(parser, "/func[15]", "Begin path")
-        self.checkDesc(parser, "/func[40]/color", "RGB color: #008F00 (opacity: 0%)")
+        self.checkDesc(parser, "/func[40]/color",
+                       "RGB color: #008F00 (opacity: 0%)")
         self.checkValue(parser, "/emf_header/maj_ver", 1)
         self.checkValue(parser, "/emf_header/width_px", 1024)
         self.checkValue(parser, "/emf_header/width_mm", 270)
-        self.checkValue(parser, "/emf_header/description", "Adobe Illustrator EMF 8.0")
+        self.checkValue(parser, "/emf_header/description",
+                        "Adobe Illustrator EMF 8.0")
 
     def test_gif(self):
         parser = self.parse("india_map.gif")
@@ -384,9 +423,12 @@ class TestParsers(unittest.TestCase):
         self.checkDisplay(parser, "/section_hdr[1]/mem_size", "4632 bytes")
         self.checkValue(parser, "/section_hdr[1]/is_readable", True)
         self.checkValue(parser, "/section_hdr[1]/is_executable", False)
-        self.checkValue(parser, "/section_rsrc/version_info/node[0]/node[1]/node[0]/node[0]/value", "Dell Inc")
-        self.checkDesc(parser, "/section_rsrc/icon[0]/bmp_header", "Bitmap info header: 16x32 pixels, 4 bits/pixel")
-        self.checkDesc(parser, "/section_rsrc/icon[1]", "Resource #296 content: type=3")
+        self.checkValue(
+            parser, "/section_rsrc/version_info/node[0]/node[1]/node[0]/node[0]/value", "Dell Inc")
+        self.checkDesc(
+            parser, "/section_rsrc/icon[0]/bmp_header", "Bitmap info header: 16x32 pixels, 4 bits/pixel")
+        self.checkDesc(
+            parser, "/section_rsrc/icon[1]", "Resource #296 content: type=3")
 
     def test_laf(self):
         parser = self.parse("ocr10.laf")
@@ -399,7 +441,8 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "/char_codes/char[5]", 5)
         self.checkValue(parser, "/chars/char[1]/data_offset", 1)
         self.checkValue(parser, "/chars/char[1]/height_pixels", 13)
-        self.checkValue(parser, "/char_data/char_bitmap[3]/line[1]/pixel[0]", 128)
+        self.checkValue(
+            parser, "/char_data/char_bitmap[3]/line[1]/pixel[0]", 128)
 
     def test_bz2(self):
         parser = self.parse("free-software-song.midi.bz2")
@@ -424,8 +467,10 @@ class TestParsers(unittest.TestCase):
 
     def test_torrent(self):
         parser = self.parse("debian-31r4-i386-binary-1.iso.torrent")
-        self.checkValue(parser, "/root/announce", "http://bttracker.acc.umu.se:6969/announce")
-        self.checkValue(parser, "/root/comment", '"Debian CD from cdimage.debian.org"')
+        self.checkValue(parser, "/root/announce",
+                        "http://bttracker.acc.umu.se:6969/announce")
+        self.checkValue(parser, "/root/comment",
+                        '"Debian CD from cdimage.debian.org"')
         self.checkDisplay(parser, "/root/creation_date", '2006-11-16 21:44:37')
         self.checkDisplay(parser, "/root/info/value/length", "638.7 MB")
         self.checkDisplay(parser, "/root/info/value/piece_length", "512.0 KB")
@@ -438,12 +483,15 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "/boot/fs_type", "FAT16")
         self.checkValue(parser, "/fat[1]/group[0]/entry[2]", 3)
         self.checkDisplay(parser, "/fat[0]/group[4]/entry[8]", "free cluster")
-        self.checkDesc(parser, "/root[0]/entry[0]", "Long filename part: 'command.com' [65]")
+        self.checkDesc(parser, "/root[0]/entry[0]",
+                       "Long filename part: 'command.com' [65]")
         self.checkDesc(parser, "/root[0]/entry[1]", "File: 'COMMAND.COM'")
         self.checkValue(parser, "/root[0]/entry[2]/hidden", True)
-        self.checkDesc(parser, "/root[0]/entry[2]/create", "2006-09-13 15:01:16")
+        self.checkDesc(
+            parser, "/root[0]/entry[2]/create", "2006-09-13 15:01:16")
         self.checkDesc(parser, "/root[0]/entry[2]/access", "2006-09-13")
-        self.checkDesc(parser, "/root[0]/entry[2]/modify", "2005-07-26 00:48:26")
+        self.checkDesc(
+            parser, "/root[0]/entry[2]/modify", "2005-07-26 00:48:26")
         self.checkValue(parser, "/root[0]/entry[2]/size", 29690)
 
     def test_xm(self):
@@ -451,15 +499,21 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "/header/title", "Dont you... voguemix")
         self.checkValue(parser, "/header/bpm", 128)
         self.checkValue(parser, "/pattern[0]/data_size", 708)
-        self.checkDisplay(parser, "/pattern[0]/row[0]/note[0]/note", "F (octave 5)")
-        self.checkValue(parser, "/pattern[0]/row[0]/note[0]/effect_parameter", 0x0A)
-        self.checkDisplay(parser, "/pattern[0]/row[0]/note[1]/note", "A (octave 5)")
-        self.checkValue(parser, "/pattern[0]/row[0]/note[1]/effect_parameter", 0x80)
+        self.checkDisplay(
+            parser, "/pattern[0]/row[0]/note[0]/note", "F (octave 5)")
+        self.checkValue(
+            parser, "/pattern[0]/row[0]/note[0]/effect_parameter", 0x0A)
+        self.checkDisplay(
+            parser, "/pattern[0]/row[0]/note[1]/note", "A (octave 5)")
+        self.checkValue(
+            parser, "/pattern[0]/row[0]/note[1]/effect_parameter", 0x80)
         self.checkValue(parser, "/pattern[20]/data_size", 1129)
-        self.checkDisplay(parser, "/pattern[20]/row[0]/note[0]/note", "C# (octave 5)")
+        self.checkDisplay(
+            parser, "/pattern[20]/row[0]/note[0]/note", "C# (octave 5)")
         self.checkValue(parser, "/pattern[20]/row[0]/note[0]/instrument", 5)
         self.checkValue(parser, "/instrument[3]/name", "Vogue of Triton")
-        self.checkValue(parser, "/instrument[4]/second_header/panning_points", 6)
+        self.checkValue(
+            parser, "/instrument[4]/second_header/panning_points", 6)
         self.checkValue(parser, "/instrument[20]/name", "808-hi5.smp")
 
     def test_s3m(self):
@@ -477,22 +531,27 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "/instrument[0]/sample_offset", 30928)
         self.checkValue(parser, "/instrument[0]/c4_speed", 8363)
         self.checkValue(parser, "/instrument[0]/name", "Yep guess wat....")
-        self.checkValue(parser, "/instrument[1]/name", "Mag ik even mijn ongenoegen")
+        self.checkValue(
+            parser, "/instrument[1]/name", "Mag ik even mijn ongenoegen")
         self.checkValue(parser, "/instrument[1]/gus_loop_flags", 0)
         self.checkValue(parser, "/pattern[0]/row[0]/note[0]/effect", 15)
 
     def test_lnk(self):
         parser = self.parse("vim.lnk")
-        self.checkValue(parser, "/creation_time", datetime(2006, 5, 7, 14, 18, 32))
+        self.checkValue(parser, "/creation_time",
+                        datetime(2006, 5, 7, 14, 18, 32))
         self.checkValue(parser, "/target_filesize", 1363968)
 
     def test_chm(self):
         parser = self.parse("7zip.chm")
         self.checkValue(parser, "/itsf/version", 3)
         self.checkDisplay(parser, "/itsf/lang_id", "Russian")
-        self.checkValue(parser, "/itsf/dir_uuid/time", datetime(1997, 1, 31, 20, 42, 14, 890626))
-        self.checkDisplay(parser, "/itsf/stream_uuid/variant", "Microsoft Corporation")
-        self.checkDisplay(parser, "/itsf/stream_uuid/mac", 'INTEL CORPORATION - HF1-06 [22:e6:ec]')
+        self.checkValue(parser, "/itsf/dir_uuid/time",
+                        datetime(1997, 1, 31, 20, 42, 14, 890626))
+        self.checkDisplay(parser, "/itsf/stream_uuid/variant",
+                          "Microsoft Corporation")
+        self.checkDisplay(parser, "/itsf/stream_uuid/mac",
+                          'INTEL CORPORATION - HF1-06 [22:e6:ec]')
         self.checkDisplay(parser, "/file_size/file_size", "75.6 KB")
         self.checkDisplay(parser, "/dir/itsp/lang_id", "English United States")
         self.checkValue(parser, "/dir/pmgl[0]/entry[1]/name", "/#IDXHDR")
@@ -510,18 +569,24 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "/header/header_crc16", 29398)
         self.checkValue(parser, "/banner/icon_data/tile[3,3]/pixel[7,6]", 5)
         self.checkValue(parser, "/banner/palette_color[13]/blue", 28)
-        self.checkValue(parser, "/filename_table/directory[3]/entry[1]/name", "subsubdir1")
-        self.checkValue(parser, "/filename_table/directory[3]/entry[1]/dir_id", 61444)
-        self.checkValue(parser, "/filename_table/directory[4]/entry[0]/name", "file2.txt")
-        self.checkValue(parser, "/filename_table/directory[4]/entry[0]/is_directory", False)
+        self.checkValue(
+            parser, "/filename_table/directory[3]/entry[1]/name", "subsubdir1")
+        self.checkValue(
+            parser, "/filename_table/directory[3]/entry[1]/dir_id", 61444)
+        self.checkValue(
+            parser, "/filename_table/directory[4]/entry[0]/name", "file2.txt")
+        self.checkValue(
+            parser, "/filename_table/directory[4]/entry[0]/is_directory", False)
         self.checkValue(parser, "/file[1]", b"Hello from file2.txt\n\n")
 
 
 class TestParserRandomStream(unittest.TestCase):
+
     def test_random_stream(self, tests=(1, 8)):
         a = array('L')
         parser_list = HachoirParserList()
-        n = max(tests) * max(parser.getParserTags()["min_size"] for parser in parser_list)
+        n = max(tests) * max(parser.getParserTags()
+                             ["min_size"] for parser in parser_list)
         k = 8 * a.itemsize
         for i in range((n - 1) // k + 1):
             a.append(random.getrandbits(k))
@@ -532,7 +597,8 @@ class TestParserRandomStream(unittest.TestCase):
                 a._size = a._current_size = size * test
                 try:
                     parser(a, validate=True)
-                    error("[%s] Parser didn't reject random data" % parser.__name__)
+                    error("[%s] Parser didn't reject random data" %
+                          parser.__name__)
                 except ValidateError:
                     continue
 
@@ -540,4 +606,3 @@ class TestParserRandomStream(unittest.TestCase):
 if __name__ == "__main__":
     setup_tests()
     unittest.main()
-

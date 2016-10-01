@@ -10,6 +10,7 @@ DATADIR = os.path.join(os.path.dirname(__file__), "files")
 KDE_CLICK = os.path.join(DATADIR, 'kde_click.wav')
 PROGRAM = os.path.join(os.path.dirname(__file__), "..", "hachoir-strip")
 
+
 def checksum(filename):
     hash = hashlib.sha1()
     with open(filename, 'rb') as fp:
@@ -17,7 +18,9 @@ def checksum(filename):
         hash.update(chunk)
     return hash.hexdigest()
 
+
 class TestStripCommandLine(unittest.TestCase):
+
     def test_strip_all(self):
         self.assertEqual(checksum(KDE_CLICK),
                          'dcafdef2048985aa925df5f86053bda5a87eb64b')
@@ -43,4 +46,3 @@ class TestStripCommandLine(unittest.TestCase):
 if __name__ == "__main__":
     setup_tests()
     unittest.main()
-

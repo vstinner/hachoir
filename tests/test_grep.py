@@ -11,11 +11,14 @@ DATADIR = os.path.join(os.path.dirname(__file__), "files")
 GEORGIA_CAB = os.path.join(DATADIR, 'georgia.cab')
 PROGRAM = os.path.join(os.path.dirname(__file__), "..", "hachoir-grep")
 
+
 class TestGrepClass(unittest.TestCase):
+
     def test_grep(self):
         fields = []
 
         class TestGrep(Grep):
+
             def onMatch(self, field):
                 fields.append(field)
 
@@ -25,15 +28,17 @@ class TestGrepClass(unittest.TestCase):
         fields = [(field.absolute_address, field.path, field.value)
                   for field in fields]
         self.assertEqual(fields,
-                [(0, '/magic', 'MSCF'),
-                 (480, '/file[0]/filename', 'fontinst.inf'),
-                 (712, '/file[1]/filename', 'Georgiaz.TTF'),
-                 (944, '/file[2]/filename', 'Georgiab.TTF'),
-                 (1176, '/file[3]/filename', 'Georgiai.TTF'),
-                 (1408, '/file[4]/filename', 'Georgia.TTF'),
-                 (1632, '/file[5]/filename', 'fontinst.exe')])
+                         [(0, '/magic', 'MSCF'),
+                          (480, '/file[0]/filename', 'fontinst.inf'),
+                             (712, '/file[1]/filename', 'Georgiaz.TTF'),
+                             (944, '/file[2]/filename', 'Georgiab.TTF'),
+                             (1176, '/file[3]/filename', 'Georgiai.TTF'),
+                             (1408, '/file[4]/filename', 'Georgia.TTF'),
+                             (1632, '/file[5]/filename', 'fontinst.exe')])
+
 
 class TestGrepCommandLine(unittest.TestCase):
+
     def test_grep(self):
         args = [sys.executable, PROGRAM, "--all", "--path", GEORGIA_CAB]
         proc = subprocess.Popen(args,
@@ -55,4 +60,3 @@ class TestGrepCommandLine(unittest.TestCase):
 if __name__ == "__main__":
     setup_tests()
     unittest.main()
-

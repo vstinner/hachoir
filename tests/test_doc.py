@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 import doctest
-import hachoir.core.i18n   # import it because it does change the locale
+import hachoir.core.i18n   # noqa: import it because it does change the locale
 from hachoir.test import setup_tests
 import os
-import sys
 import unittest
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), '..'))
+
 
 def importModule(name):
     mod = __import__(name)
@@ -14,6 +14,7 @@ def importModule(name):
     for comp in components[1:]:
         mod = getattr(mod, comp)
     return mod
+
 
 class TestDoc(unittest.TestCase):
     verbose = False
