@@ -4,6 +4,7 @@ from hachoir.parser.network.ouid import REGISTERED_OUID
 from hachoir.core.endian import BIG_ENDIAN
 from socket import gethostbyaddr, herror as socket_host_error
 
+
 def ip2name(addr):
     if not ip2name.resolve:
         return addr
@@ -26,7 +27,9 @@ def ip2name(addr):
 ip2name.cache = {}
 ip2name.resolve = True
 
+
 class IPv4_Address(Field):
+
     def __init__(self, parent, name, description=None):
         Field.__init__(self, parent, name, 32, description)
 
@@ -37,12 +40,15 @@ class IPv4_Address(Field):
     def createDisplay(self):
         return ip2name(self.value)
 
+
 class IPv6_Address(Field):
+
     def __init__(self, parent, name, description=None):
         Field.__init__(self, parent, name, 128, description)
 
     def createValue(self):
-        value = self._parent.stream.readBits(self.absolute_address, 128, self.parent.endian)
+        value = self._parent.stream.readBits(
+            self.absolute_address, 128, self.parent.endian)
         parts = []
         for index in range(8):
             part = "%04x" % (value & 0xffff)
@@ -52,6 +58,7 @@ class IPv6_Address(Field):
 
     def createDisplay(self):
         return self.value
+
 
 class OrganizationallyUniqueIdentifier(Bits):
     """
@@ -79,6 +86,7 @@ class OrganizationallyUniqueIdentifier(Bits):
         c = value & 0xFF
         return "%02X-%02X-%02X" % (a, b, c)
 
+
 class NIC24(Bits):
     static_size = 24
 
@@ -94,6 +102,7 @@ class NIC24(Bits):
 
     def createRawDisplay(self):
         return "0x%06X" % self.value
+
 
 class MAC48_Address(FieldSet):
     """
@@ -115,4 +124,3 @@ class MAC48_Address(FieldSet):
 
     def createDisplay(self):
         return "%s [%s]" % (self["organization"].display, self["nic"].display)
-

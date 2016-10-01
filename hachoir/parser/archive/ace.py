@@ -13,10 +13,10 @@ Creation date: 19 january 2006
 
 from hachoir.parser import Parser
 from hachoir.field import (StaticFieldSet, FieldSet,
-    Bit, Bits, NullBits, RawBytes, Enum,
-    UInt8, UInt16, UInt32,
-    PascalString8, PascalString16, String,
-    TimeDateMSDOS32)
+                           Bit, Bits, NullBits, RawBytes, Enum,
+                           UInt8, UInt16, UInt32,
+                           PascalString8, PascalString16, String,
+                           TimeDateMSDOS32)
 from hachoir.core.text_handler import textHandler, filesizeHandler, hexadecimal
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.parser.common.msdos import MSDOSFileAttr32
@@ -55,9 +55,10 @@ COMPRESSION_MODE = {
 }
 
 # TODO: Computing the CRC16 would also prove useful
-#def markerValidate(self):
+# def markerValidate(self):
 #    return not self["extend"].value and self["signature"].value == MAGIC and \
 #           self["host_os"].value<12
+
 
 class MarkerFlags(StaticFieldSet):
     format = (
@@ -73,8 +74,10 @@ class MarkerFlags(StaticFieldSet):
         (Bit, "solid", "Archive uses solid compression")
     )
 
+
 def markerFlags(self):
     yield MarkerFlags(self, "flags", "Marker flags")
+
 
 def markerHeader(self):
     yield String(self, "signature", 7, "Signature")
@@ -91,8 +94,9 @@ def markerHeader(self):
         size = filesizeHandler(UInt16(self, "comment_size", "Comment size"))
         yield size
         if size.value > 0:
-            yield RawBytes(self, "compressed_comment", size.value, \
+            yield RawBytes(self, "compressed_comment", size.value,
                            "Compressed comment")
+
 
 class FileFlags(StaticFieldSet):
     format = (
@@ -105,8 +109,10 @@ class FileFlags(StaticFieldSet):
         (Bit, "solid", "File compressed using previously archived files")
     )
 
+
 def fileFlags(self):
     yield FileFlags(self, "flags", "File flags")
+
 
 def fileHeader(self):
     yield filesizeHandler(UInt32(self, "compressed_size", "Size of the compressed file"))
@@ -129,21 +135,24 @@ def fileHeader(self):
         if self["comment_size"].value > 0:
             yield RawBytes(self, "comment_data", self["comment_size"].value, "Comment data")
 
+
 def fileBody(self):
     size = self["compressed_size"].value
     if size > 0:
         yield RawBytes(self, "compressed_data", size, "Compressed data")
 
+
 def fileDesc(self):
     return "File entry: %s (%s)" % (self["filename"].value, self["compressed_size"].display)
+
 
 def recoveryHeader(self):
     yield filesizeHandler(UInt32(self, "rec_blk_size", "Size of recovery data"))
     self.body_size = self["rec_blk_size"].size
     yield String(self, "signature", 7, "Signature, normally '**ACE**'")
     yield textHandler(UInt32(self, "relative_start",
-         "Relative start (to this block) of the data this block is mode of"),
-         hexadecimal)
+                             "Relative start (to this block) of the data this block is mode of"),
+                      hexadecimal)
     yield UInt32(self, "num_blocks", "Number of blocks the data is split into")
     yield UInt32(self, "size_blocks", "Size of these blocks")
     yield UInt16(self, "crc16_blocks", "CRC16 over recovery data")
@@ -154,8 +163,10 @@ def recoveryHeader(self):
         yield RawBytes(self, "data[]", size, "Recovery block %i" % index)
     yield RawBytes(self, "xor_data", size, "The XOR value of the above data blocks")
 
+
 def recoveryDesc(self):
     return "Recovery block, size=%u" % self["body_size"].display
+
 
 def newRecoveryHeader(self):
     """
@@ -165,12 +176,13 @@ def newRecoveryHeader(self):
         yield filesizeHandler(UInt32(self, "body_size", "Size of the unknown body following"))
         self.body_size = self["body_size"].value
     yield textHandler(UInt32(self, "unknown[]", "Unknown field, probably 0"),
-        hexadecimal)
+                      hexadecimal)
     yield String(self, "signature", 7, "Signature, normally '**ACE**'")
     yield textHandler(UInt32(self, "relative_start",
-        "Offset (=crc16's) of this block in the file"), hexadecimal)
+                             "Offset (=crc16's) of this block in the file"), hexadecimal)
     yield textHandler(UInt32(self, "unknown[]",
-        "Unknown field, probably 0"), hexadecimal)
+                             "Unknown field, probably 0"), hexadecimal)
+
 
 class BaseFlags(StaticFieldSet):
     format = (
@@ -178,17 +190,21 @@ class BaseFlags(StaticFieldSet):
         (NullBits, "unused", 15, "Unused bit flags")
     )
 
+
 def parseFlags(self):
     yield BaseFlags(self, "flags", "Unknown flags")
+
 
 def parseHeader(self):
     if self["flags/extend"].value:
         yield filesizeHandler(UInt32(self, "body_size", "Size of the unknown body following"))
         self.body_size = self["body_size"].value
 
+
 def parseBody(self):
     if self.body_size > 0:
         yield RawBytes(self, "body_data", self.body_size, "Body data, unhandled")
+
 
 class Block(FieldSet):
     TAG_INFO = {
@@ -204,7 +220,8 @@ class Block(FieldSet):
         self.desc_func = None
         type = self["block_type"].value
         if type in self.TAG_INFO:
-            self._name, desc, self.parseFlags, self.parseHeader, self.parseBody = self.TAG_INFO[type]
+            self._name, desc, self.parseFlags, self.parseHeader, self.parseBody = self.TAG_INFO[
+                type]
             if desc:
                 if isinstance(desc, str):
                     self._description = desc
@@ -230,7 +247,7 @@ class Block(FieldSet):
         # Rest of the header
         yield from self.parseHeader(self)
 
-        size = self["head_size"].value - (self.current_size//8) + (2+2)
+        size = self["head_size"].value - (self.current_size // 8) + (2 + 2)
         if size > 0:
             yield RawBytes(self, "extra_data", size, "Extra header data, unhandled")
 
@@ -243,6 +260,7 @@ class Block(FieldSet):
         else:
             return "Block: %s" % self["type"].display
 
+
 class AceFile(Parser):
     endian = LITTLE_ENDIAN
     PARSER_TAGS = {
@@ -250,16 +268,15 @@ class AceFile(Parser):
         "category": "archive",
         "file_ext": ("ace",),
         "mime": ("application/x-ace-compressed",),
-        "min_size": 50*8,
+        "min_size": 50 * 8,
         "description": "ACE archive"
     }
 
     def validate(self):
-        if self.stream.readBytes(7*8, len(MAGIC)) != MAGIC:
+        if self.stream.readBytes(7 * 8, len(MAGIC)) != MAGIC:
             return "Invalid magic"
         return True
 
     def createFields(self):
         while not self.eof:
             yield Block(self, "block[]")
-

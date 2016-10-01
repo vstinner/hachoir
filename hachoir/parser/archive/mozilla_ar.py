@@ -7,12 +7,14 @@ Creation date: July 10, 2007
 
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.field import (RootSeekableFieldSet, FieldSet,
-    String, CString, UInt32, RawBytes)
+                           String, CString, UInt32, RawBytes)
 from hachoir.core.text_handler import displayHandler, filesizeHandler
 from hachoir.core.tools import humanUnixAttributes
 from hachoir.parser import HachoirParser
 
+
 class IndexEntry(FieldSet):
+
     def createFields(self):
         yield UInt32(self, "offset", "Offset in bytes relative to start of archive")
         yield filesizeHandler(UInt32(self, "length", "Length in bytes"))
@@ -20,8 +22,9 @@ class IndexEntry(FieldSet):
         yield CString(self, "name", "Filename (byte array)")
 
     def createDescription(self):
-        return 'File %s, Size %s, Mode %s'%(
+        return 'File %s, Size %s, Mode %s' % (
             self["name"].display, self["length"].display, self["flags"].display)
+
 
 class MozillaArchive(HachoirParser, RootSeekableFieldSet):
     MAGIC = b"MAR1"
@@ -29,14 +32,15 @@ class MozillaArchive(HachoirParser, RootSeekableFieldSet):
         "id": "mozilla_ar",
         "category": "archive",
         "file_ext": ("mar",),
-        "min_size": (8+4+13)*8,  # Header, Index Header, 1 Index Entry
+        "min_size": (8 + 4 + 13) * 8,  # Header, Index Header, 1 Index Entry
         "magic": ((MAGIC, 0),),
         "description": "Mozilla Archive",
     }
     endian = BIG_ENDIAN
 
     def __init__(self, stream, **args):
-        RootSeekableFieldSet.__init__(self, None, "root", stream, None, stream.askSize(self))
+        RootSeekableFieldSet.__init__(
+            self, None, "root", stream, None, stream.askSize(self))
         HachoirParser.__init__(self, stream, **args)
 
     def validate(self):
@@ -49,10 +53,11 @@ class MozillaArchive(HachoirParser, RootSeekableFieldSet):
         yield UInt32(self, "index_offset", "Offset to index relative to file start")
         self.seekByte(self["index_offset"].value, False)
         yield UInt32(self, "index_size", "size of index in bytes")
-        current_index_size = 0 # bytes
+        current_index_size = 0  # bytes
         while current_index_size < self["index_size"].value:
             # plus 4 compensates for index_size
-            self.seekByte(self["index_offset"].value + current_index_size + 4, False)
+            self.seekByte(self["index_offset"].value +
+                          current_index_size + 4, False)
             entry = IndexEntry(self, "index_entry[]")
             yield entry
             current_index_size += entry.size // 8

@@ -10,7 +10,7 @@ Creation: 27 december 2006
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, Bits, ParserError,
-    String, UInt32, UInt24, UInt16, UInt8, Enum, RawBits, RawBytes)
+                           String, UInt32, UInt24, UInt16, UInt8, Enum, RawBits, RawBytes)
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal
 from hachoir.core.tools import createDict, humanDurationNanosec
@@ -18,7 +18,9 @@ from hachoir.parser.common.tracker import NOTE_NAME
 
 MAX_FILESIZE = 10 * 1024 * 1024
 
+
 class Integer(Bits):
+
     def __init__(self, parent, name, description=None):
         Bits.__init__(self, parent, name, 8, description)
         stream = parent.stream
@@ -35,42 +37,52 @@ class Integer(Bits):
                 raise ParserError("Integer size is bigger than 32-bit")
         self.createValue = lambda: value
 
+
 def parseNote(parser):
     yield Enum(UInt8(parser, "note", "Note number"), NOTE_NAME)
     yield UInt8(parser, "velocity")
+
 
 def parseControl(parser):
     yield UInt8(parser, "control", "Controller number")
     yield UInt8(parser, "value", "New value")
 
+
 def parsePatch(parser):
     yield UInt8(parser, "program", "New program number")
 
+
 def parseChannel(parser, size=1):
     yield UInt8(parser, "channel", "Channel number")
+
 
 def parsePitch(parser):
     yield UInt8(parser, "bottom", "(least sig) 7 bits of value")
     yield UInt8(parser, "top", "(most sig) 7 bits of value")
 
+
 def parseText(parser, size):
     yield String(parser, "text", size)
+
 
 def parseSMPTEOffset(parser, size):
     yield RawBits(parser, "padding", 1)
     yield Enum(Bits(parser, "frame_rate", 2),
-        {0:"24 fps", 1:"25 fps", 2:"30 fps (drop frame)", 3:"30 fps"})
+               {0: "24 fps", 1: "25 fps", 2: "30 fps (drop frame)", 3: "30 fps"})
     yield Bits(parser, "hour", 5)
     yield UInt8(parser, "minute")
     yield UInt8(parser, "second")
     yield UInt8(parser, "frame")
     yield UInt8(parser, "subframe", "100 subframes per frame")
 
+
 def formatTempo(field):
-    return humanDurationNanosec(field.value*1000)
+    return humanDurationNanosec(field.value * 1000)
+
 
 def parseTempo(parser, size):
     yield textHandler(UInt24(parser, "microsec_quarter", "Microseconds per quarter note"), formatTempo)
+
 
 def parseTimeSignature(parser, size):
     yield UInt8(parser, "numerator", "Numerator of time signature")
@@ -78,16 +90,23 @@ def parseTimeSignature(parser, size):
     yield UInt8(parser, "nb_tick", "Number of ticks in metronome click")
     yield UInt8(parser, "nb_32nd_note", "Number of 32nd notes to the quarter note")
 
+
 class Command(FieldSet):
     COMMAND = {}
     for channel in range(16):
-        COMMAND[0x80+channel] = ("Note off (channel %u)" % channel, parseNote)
-        COMMAND[0x90+channel] = ("Note on (channel %u)" % channel, parseNote)
-        COMMAND[0xA0+channel] = ("Key after-touch (channel %u)" % channel, parseNote)
-        COMMAND[0xB0+channel] = ("Control change (channel %u)" % channel, parseControl)
-        COMMAND[0xC0+channel] = ("Program (patch) change (channel %u)" % channel, parsePatch)
-        COMMAND[0xD0+channel] = ("Channel after-touch (channel %u)" % channel, parseChannel)
-        COMMAND[0xE0+channel] = ("Pitch wheel change (channel %u)" % channel, parsePitch)
+        COMMAND[0x80 + channel] = ("Note off (channel %u)" %
+                                   channel, parseNote)
+        COMMAND[0x90 + channel] = ("Note on (channel %u)" % channel, parseNote)
+        COMMAND[
+            0xA0 + channel] = ("Key after-touch (channel %u)" % channel, parseNote)
+        COMMAND[0xB0 + channel] = ("Control change (channel %u)" %
+                                   channel, parseControl)
+        COMMAND[
+            0xC0 + channel] = ("Program (patch) change (channel %u)" % channel, parsePatch)
+        COMMAND[
+            0xD0 + channel] = ("Channel after-touch (channel %u)" % channel, parseChannel)
+        COMMAND[
+            0xE0 + channel] = ("Pitch wheel change (channel %u)" % channel, parsePitch)
     COMMAND_DESC = createDict(COMMAND, 0)
     COMMAND_PARSER = createDict(COMMAND, 1)
 
@@ -124,11 +143,13 @@ class Command(FieldSet):
 
     def createFields(self):
         yield Integer(self, "time", "Delta time in ticks")
-        next = self.stream.readBits(self.absolute_address+self.current_size, 8, self.root.endian)
+        next = self.stream.readBits(
+            self.absolute_address + self.current_size, 8, self.root.endian)
         if next & 0x80 == 0:
             # "Running Status" command
             if self.prev_command is None:
-                raise ParserError("Running Status command not preceded by another command.")
+                raise ParserError(
+                    "Running Status command not preceded by another command.")
             self.command = self.prev_command.command
         else:
             yield Enum(textHandler(UInt8(self, "command"), hexadecimal), self.COMMAND_DESC)
@@ -149,7 +170,8 @@ class Command(FieldSet):
                     yield RawBytes(self, "data", size)
         else:
             if self.command not in self.COMMAND_PARSER:
-                raise ParserError("Unknown command: %s" % self["command"].display)
+                raise ParserError("Unknown command: %s" %
+                                  self["command"].display)
             parser = self.COMMAND_PARSER[self.command]
             yield from parser(self)
 
@@ -159,7 +181,9 @@ class Command(FieldSet):
         else:
             return self.COMMAND_DESC[self.command]
 
+
 class Track(FieldSet):
+
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
         self._size = (8 + self["size"].value) * 8
@@ -180,14 +204,15 @@ class Track(FieldSet):
     def createDescription(self):
         command = self["command[0]"]
         if "meta_command" in command \
-        and command["meta_command"].value in (Command.META_COMMAND_TEXT, Command.META_COMMAND_NAME) \
-        and "text" in command:
+                and command["meta_command"].value in (Command.META_COMMAND_TEXT, Command.META_COMMAND_NAME) \
+                and "text" in command:
             return command["text"].value.strip("\r\n")
         else:
             return ""
 
+
 class Header(FieldSet):
-    static_size = 10*8
+    static_size = 10 * 8
     FILE_FORMAT = {
         0: "Single track",
         1: "Multiple tracks, synchronous",
@@ -203,6 +228,7 @@ class Header(FieldSet):
     def createDescription(self):
         return "%s; %s tracks" % (
             self["file_format"].display, self["nb_track"].value)
+
 
 class MidiFile(Parser):
     MAGIC = b"MThd"
@@ -237,8 +263,7 @@ class MidiFile(Parser):
         count = self["/header/nb_track"].value - 1
         start = self["track[%u]" % count].absolute_address
         # Search "End of track" of last track
-        end = self.stream.searchBytes(b"\xff\x2f\x00", start, MAX_FILESIZE*8)
+        end = self.stream.searchBytes(b"\xff\x2f\x00", start, MAX_FILESIZE * 8)
         if end is not None:
-            return end + 3*8
+            return end + 3 * 8
         return None
-

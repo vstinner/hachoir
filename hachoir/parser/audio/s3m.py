@@ -11,32 +11,36 @@ Creation: 11th February 2007
 
 from hachoir.parser import Parser
 from hachoir.field import (StaticFieldSet, FieldSet, Field,
-    Bit, Bits,
-    UInt32, UInt16, UInt8, Enum,
-    PaddingBytes, RawBytes, NullBytes,
-    String, GenericVector, ParserError)
+                           Bit, Bits,
+                           UInt32, UInt16, UInt8, Enum,
+                           PaddingBytes, RawBytes, NullBytes,
+                           String, GenericVector, ParserError)
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal
 from hachoir.core.tools import alignValue
 
+
 class Chunk:
+
     def __init__(self, cls, name, offset, size, *args):
         # Todo: swap and have None=unknown instead of now: 0=unknown
-        assert size != None and size>=0
+        assert size != None and size >= 0
         self.cls = cls
         self.name = name
         self.offset = offset
         self.size = size
         self.args = args
 
+
 class ChunkIndexer:
+
     def __init__(self):
-        self.chunks = [ ]
+        self.chunks = []
 
     # Check if a chunk fits
     def canHouse(self, chunk, index):
         if index > 1:
-            if chunk.offset + chunk.size > self.chunks[index-1].offset:
+            if chunk.offset + chunk.size > self.chunks[index - 1].offset:
                 return False
         # We could test now that it fits in the memory
         return True
@@ -49,7 +53,8 @@ class ChunkIndexer:
             offset = self.chunks[index].offset
             if offset < new_chunk.offset:
                 if not self.canHouse(new_chunk, index):
-                    raise ParserError("Chunk '%s' doesn't fit!" % new_chunk.name)
+                    raise ParserError("Chunk '%s' doesn't fit!" %
+                                      new_chunk.name)
                 self.chunks.insert(index, new_chunk)
                 return
             index += 1
@@ -61,15 +66,15 @@ class ChunkIndexer:
     def yieldChunks(self, obj):
         while len(self.chunks) > 0:
             chunk = self.chunks.pop()
-            current_pos = obj.current_size//8
+            current_pos = obj.current_size // 8
 
             # Check if padding needed
             size = chunk.offset - current_pos
             if size > 0:
-                obj.info("Padding of %u bytes needed: curr=%u offset=%u" % \
+                obj.info("Padding of %u bytes needed: curr=%u offset=%u" %
                          (size, current_pos, chunk.offset))
                 yield PaddingBytes(obj, "padding[]", size)
-                current_pos = obj.current_size//8
+                current_pos = obj.current_size // 8
 
             # Find resynch point if needed
             count = 0
@@ -79,19 +84,19 @@ class ChunkIndexer:
                 chunk = self.chunks.pop()
                 # Unfortunaly, we also pass the underlying chunks
                 if chunk == None:
-                    obj.info("Couldn't resynch: %u object skipped to reach %u" % \
+                    obj.info("Couldn't resynch: %u object skipped to reach %u" %
                              (count, current_pos))
                     return
 
             # Resynch
-            size = chunk.offset-current_pos
+            size = chunk.offset - current_pos
             if size > 0:
-                obj.info("Skipped %u objects to resynch to %u; chunk offset: %u->%u" % \
+                obj.info("Skipped %u objects to resynch to %u; chunk offset: %u->%u" %
                          (count, current_pos, old_off, chunk.offset))
                 yield RawBytes(obj, "resynch[]", size)
 
             # Yield
-            obj.info("Yielding element of size %u at offset %u" % \
+            obj.info("Yielding element of size %u at offset %u" %
                      (chunk.size, chunk.offset))
             field = chunk.cls(obj, chunk.name, chunk.size, *chunk.args)
             # Not tested, probably wrong:
@@ -100,18 +105,20 @@ class ChunkIndexer:
 
             if hasattr(field, "getSubChunks"):
                 for sub_chunk in field.getSubChunks():
-                    obj.info("Adding sub chunk: position=%u size=%u name='%s'" % \
+                    obj.info("Adding sub chunk: position=%u size=%u name='%s'" %
                              (sub_chunk.offset, sub_chunk.size, sub_chunk.name))
                     self.addChunk(sub_chunk)
 
             # Let missing padding be done by next chunk
+
 
 class S3MFlags(StaticFieldSet):
     format = (
         (Bit, "st2_vibrato", "Vibrato (File version 1/ScreamTrack 2)"),
         (Bit, "st2_tempo", "Tempo (File version 1/ScreamTrack 2)"),
         (Bit, "amiga_slides", "Amiga slides (File version 1/ScreamTrack 2)"),
-        (Bit, "zero_vol_opt", "Automatically turn off looping notes whose volume is zero for >2 note rows"),
+        (Bit, "zero_vol_opt",
+         "Automatically turn off looping notes whose volume is zero for >2 note rows"),
         (Bit, "amiga_limits", "Disallow notes beyond Amiga hardware specs"),
         (Bit, "sb_processing", "Enable filter/SFX with SoundBlaster"),
         (Bit, "vol_slide", "Volume slide also performed on first row"),
@@ -119,24 +126,29 @@ class S3MFlags(StaticFieldSet):
         (Bits, "unused[]", 8)
     )
 
+
 def parseChannelType(val):
     val = val.value
-    if val<8:
+    if val < 8:
         return "Left Sample Channel %u" % val
-    if val<16:
-        return "Right Sample Channel %u" % (val-8)
-    if val<32:
-        return "Adlib channel %u" % (val-16)
+    if val < 16:
+        return "Right Sample Channel %u" % (val - 8)
+    if val < 32:
+        return "Adlib channel %u" % (val - 16)
     return "Value %u unknown" % val
+
 
 class ChannelSettings(FieldSet):
     static_size = 8
+
     def createFields(self):
         yield textHandler(Bits(self, "type", 7), parseChannelType)
         yield Bit(self, "enabled")
 
+
 class ChannelPanning(FieldSet):
     static_size = 8
+
     def createFields(self):
         yield Bits(self, "default_position", 4, "Default pan position")
         yield Bit(self, "reserved[]")
@@ -144,6 +156,8 @@ class ChannelPanning(FieldSet):
         yield Bits(self, "reserved[]", 2)
 
 # Provide an automatic constructor
+
+
 class SizeFieldSet(FieldSet):
     """
     Provide an automatic constructor for a sized field that can be aligned
@@ -161,6 +175,7 @@ class SizeFieldSet(FieldSet):
     - derive a class with ALIGN = 0.
     """
     ALIGN = 16
+
     def __init__(self, parent, name, size, desc=None):
         FieldSet.__init__(self, parent, name, desc)
         if size:
@@ -173,8 +188,8 @@ class SizeFieldSet(FieldSet):
         self.real_size = size
         size *= 8
         if self.ALIGN:
-            size = alignValue(self.absolute_address+size, 8*self.ALIGN) \
-                   - self.absolute_address
+            size = alignValue(self.absolute_address + size, 8 * self.ALIGN) \
+                - self.absolute_address
 
         if self._parent._size:
             if self._parent.current_size + size > self._parent._size:
@@ -184,11 +199,13 @@ class SizeFieldSet(FieldSet):
 
     def createFields(self):
         yield from self.createUnpaddedFields()
-        size = (self._size - self.current_size)//8
+        size = (self._size - self.current_size) // 8
         if size > 0:
             yield PaddingBytes(self, "padding", size)
 
+
 class Header(SizeFieldSet):
+
     def createDescription(self):
         return "%s (%u patterns, %u instruments)" % \
                (self["title"].value, self["num_patterns"].value,
@@ -221,6 +238,7 @@ class Header(SizeFieldSet):
 
         yield from self.getHeaderEndFields()
 
+
 class S3MHeader(Header):
     """
           0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
@@ -249,12 +267,13 @@ class S3MHeader(Header):
         xxx2=70h+orders+instruments*2
         xxx3=70h+orders+instruments*2+patterns*2
     """
+
     def __init__(self, parent, name, size, desc=None):
         Header.__init__(self, parent, name, size, desc)
 
         # Overwrite real_size
         size = 0x60 + self["num_orders"].value + \
-               2*(self["num_instruments"].value + self["num_patterns"].value)
+            2 * (self["num_instruments"].value + self["num_patterns"].value)
         if self["panning_info"].value == 252:
             size += 32
 
@@ -297,30 +316,31 @@ class S3MHeader(Header):
 
         # S3M 3.20 extension
         if self["creation_version_major"].value >= 3 \
-        and self["creation_version_minor"].value >= 0x20 \
-        and self["panning_info"].value == 252:
+                and self["creation_version_minor"].value >= 0x20 \
+                and self["panning_info"].value == 252:
             yield GenericVector(self, "channel_panning", 32, ChannelPanning, "channel")
 
         # Padding required for 16B alignment
         size = self._size - self.current_size
         if size > 0:
-            yield PaddingBytes(self, "padding", size//8)
+            yield PaddingBytes(self, "padding", size // 8)
 
     def getSubChunks(self):
         # Instruments -  no warranty that they are concatenated
         for index in range(self["num_instruments"].value):
             yield Chunk(S3MInstrument, "instrument[]",
-                        16*self["instr_pptr/offset[%u]" % index].value,
-                        S3MInstrument.static_size//8)
+                        16 * self["instr_pptr/offset[%u]" % index].value,
+                        S3MInstrument.static_size // 8)
 
         # Patterns - size unknown but listed in their headers
         for index in range(self["num_patterns"].value):
             yield Chunk(S3MPattern, "pattern[]",
-                        16*self["pattern_pptr/offset[%u]" % index].value, 0)
+                        16 * self["pattern_pptr/offset[%u]" % index].value, 0)
+
 
 class PTMHeader(Header):
     # static_size should prime over _size, right?
-    static_size = 8*608
+    static_size = 8 * 608
 
     def getTrackerVersion(self, val):
         val = val.value
@@ -332,7 +352,7 @@ class PTMHeader(Header):
 
     def getFirstProperties(self):
         yield UInt16(self, "channels")
-        yield UInt16(self, "flags") # 0 => NullBytes
+        yield UInt16(self, "flags")  # 0 => NullBytes
         yield UInt16(self, "reserved[]")
 
     def getLastProperties(self):
@@ -347,7 +367,7 @@ class PTMHeader(Header):
         # It goes like this in the BS: patterns->instruments->instr. samples
 
         if self._parent._size:
-            min_off = self.absolute_address+self._parent._size
+            min_off = self.absolute_address + self._parent._size
         else:
             min_off = 99999999999
 
@@ -355,22 +375,25 @@ class PTMHeader(Header):
         count = self["num_instruments"].value
         addr = self.absolute_address
         for index in range(count):
-            offset = (self.static_size+index*PTMInstrument.static_size)//8
+            offset = (self.static_size + index *
+                      PTMInstrument.static_size) // 8
             yield Chunk(PTMInstrument, "instrument[]", offset,
-                        PTMInstrument.static_size//8)
-            offset = self.stream.readBits(addr+8*(offset+18), 32, LITTLE_ENDIAN)
+                        PTMInstrument.static_size // 8)
+            offset = self.stream.readBits(
+                addr + 8 * (offset + 18), 32, LITTLE_ENDIAN)
             min_off = min(min_off, offset)
 
         # Patterns
         count = self["num_patterns"].value
-        prev_off = 16*self["pattern_pptr/offset[0]"].value
+        prev_off = 16 * self["pattern_pptr/offset[0]"].value
         for index in range(1, count):
-            offset = 16*self["pattern_pptr/offset[%u]" % index].value
-            yield Chunk(PTMPattern, "pattern[]", prev_off, offset-prev_off)
+            offset = 16 * self["pattern_pptr/offset[%u]" % index].value
+            yield Chunk(PTMPattern, "pattern[]", prev_off, offset - prev_off)
             prev_off = offset
 
         # Difficult to account for
-        yield Chunk(PTMPattern, "pattern[]", prev_off, min_off-prev_off)
+        yield Chunk(PTMPattern, "pattern[]", prev_off, min_off - prev_off)
+
 
 class SampleFlags(StaticFieldSet):
     format = (
@@ -380,23 +403,30 @@ class SampleFlags(StaticFieldSet):
         (Bits, "unused", 5)
     )
 
+
 class S3MUInt24(Field):
     static_size = 24
+
     def __init__(self, parent, name, desc=None):
         Field.__init__(self, parent, name, size=24, description=desc)
         addr = self.absolute_address
         val = parent.stream.readBits(addr, 8, LITTLE_ENDIAN) << 20
-        val += parent.stream.readBits(addr+8, 16, LITTLE_ENDIAN) << 4
+        val += parent.stream.readBits(addr + 8, 16, LITTLE_ENDIAN) << 4
         self.createValue = lambda: val
 
+
 class SampleData(SizeFieldSet):
+
     def createUnpaddedFields(self):
         yield RawBytes(self, "data", self.real_size)
+
+
 class PTMSampleData(SampleData):
     ALIGN = 0
 
+
 class Instrument(SizeFieldSet):
-    static_size = 8*0x50
+    static_size = 8 * 0x50
 
     def createDescription(self):
         info = [self["c4_speed"].display]
@@ -422,6 +452,7 @@ class Instrument(SizeFieldSet):
     def createValue(self):
         return self["name"].value
 
+
 class S3MInstrument(Instrument):
     """
     In fact a sample. Description follows:
@@ -441,14 +472,14 @@ class S3MInstrument(Instrument):
   xxxx: sampledata
     """
     MAGIC = b"SCRS"
-    PACKING = {0: "Unpacked", 1: "DP30ADPCM" }
-    TYPE = {0: "Unknown", 1: "Sample", 2: "adlib melody", 3: "adlib drum2" }
+    PACKING = {0: "Unpacked", 1: "DP30ADPCM"}
+    TYPE = {0: "Unknown", 1: "Sample", 2: "adlib melody", 3: "adlib drum2"}
 
     def getType(self):
         return Enum(UInt8(self, "type"), self.TYPE)
 
     def getSampleBits(self):
-        return 8*(1+self["flags/16bits"].value)
+        return 8 * (1 + self["flags/16bits"].value)
 
     def getInstrumentFields(self):
         yield S3MUInt24(self, "sample_offset")
@@ -467,15 +498,19 @@ class S3MInstrument(Instrument):
 
     def getSubChunks(self):
         size = self["sample_size"].value
-        if self["flags/stereo"].value: size *= 2
-        if self["flags/16bits"].value: size *= 2
+        if self["flags/stereo"].value:
+            size *= 2
+        if self["flags/16bits"].value:
+            size *= 2
         yield Chunk(SampleData, "sample_data[]",
                     self["sample_offset"].value, size)
 
 
 class PTMType(FieldSet):
-    TYPES = {0: "No sample", 1: "Regular", 2: "OPL2/OPL2 instrument", 3: "MIDI instrument" }
+    TYPES = {0: "No sample", 1: "Regular",
+             2: "OPL2/OPL2 instrument", 3: "MIDI instrument"}
     static_size = 8
+
     def createFields(self):
         yield Bits(self, "unused", 2)
         yield Bit(self, "is_tonable")
@@ -484,22 +519,23 @@ class PTMType(FieldSet):
         yield Bit(self, "loop")
         yield Enum(Bits(self, "origin", 2), self.TYPES)
 
-##class PTMType(StaticFieldSet):
-##    format = (
+# class PTMType(StaticFieldSet):
+# format = (
 ##        (Bits, "unused", 2),
 ##        (Bit, "is_tonable"),
 ##        (Bit, "16bits"),
 ##        (Bit, "loop_bidir"),
 ##        (Bit, "loop"),
 ##        (Bits, "origin", 2),
-##    )
+# )
+
 
 class PTMInstrument(Instrument):
     MAGIC = b"PTMI"
     ALIGN = 0
 
     def getType(self):
-        return PTMType(self, "flags") # Hack to have more common code
+        return PTMType(self, "flags")  # Hack to have more common code
 
     # PTM doesn't pretend to manage 16bits
     def getSampleBits(self):
@@ -517,7 +553,7 @@ class PTMInstrument(Instrument):
         yield UInt32(self, "gus_loop_start")
         yield UInt32(self, "gus_loop_end")
         yield textHandler(UInt8(self, "gus_loop_flags"), hexadecimal)
-        yield UInt8(self, "reserved[]") # Should be 0
+        yield UInt8(self, "reserved[]")  # Should be 0
 
     def getSubChunks(self):
         # Samples are NOT padded, and the size is already the correct one
@@ -541,6 +577,7 @@ class S3MNoteInfo(StaticFieldSet):
         (Bit, "has_effect")
     )
 
+
 class PTMNoteInfo(StaticFieldSet):
     format = (
         (Bits, "channel", 5),
@@ -549,7 +586,9 @@ class PTMNoteInfo(StaticFieldSet):
         (Bit, "has_volume")
     )
 
+
 class Note(FieldSet):
+
     def createFields(self):
         # Used by Row to check if end of Row
         info = self.NOTE_INFO(self, "info")
@@ -563,12 +602,17 @@ class Note(FieldSet):
             yield UInt8(self, "effect")
             yield UInt8(self, "param")
 
+
 class S3MNote(Note):
     NOTE_INFO = S3MNoteInfo
+
+
 class PTMNote(Note):
     NOTE_INFO = PTMNoteInfo
 
+
 class Row(FieldSet):
+
     def createFields(self):
         addr = self.absolute_address
         while True:
@@ -582,20 +626,27 @@ class Row(FieldSet):
             yield note
             addr += note.size
 
+
 class S3MRow(Row):
     NOTE = S3MNote
+
+
 class PTMRow(Row):
     NOTE = PTMNote
 
+
 class Pattern(SizeFieldSet):
+
     def createUnpaddedFields(self):
         count = 0
         while count < 64 and not self.eof:
             yield self.ROW(self, "row[]")
             count += 1
 
+
 class S3MPattern(Pattern):
     ROW = S3MRow
+
     def __init__(self, parent, name, size, desc=None):
         Pattern.__init__(self, parent, name, size, desc)
 
@@ -604,18 +655,20 @@ class S3MPattern(Pattern):
         size = self.stream.readBits(addr, 16, LITTLE_ENDIAN)
         self.setCheckedSizes(size)
 
+
 class PTMPattern(Pattern):
     ROW = PTMRow
+
 
 class Module(Parser):
     # MARKER / HEADER are defined in derived classes
     endian = LITTLE_ENDIAN
 
     def validate(self):
-        marker = self.stream.readBits(0x1C*8, 8, LITTLE_ENDIAN)
+        marker = self.stream.readBits(0x1C * 8, 8, LITTLE_ENDIAN)
         if marker != 0x1A:
             return "Invalid start marker %u" % marker
-        marker = self.stream.readBytes(0x2C*8, 4)
+        marker = self.stream.readBytes(0x2C * 8, 4)
         if marker != self.MARKER:
             return "Invalid marker %s!=%s" % (marker, self.MARKER)
         return True
@@ -634,28 +687,29 @@ class S3MModule(Module):
         "category": "audio",
         "file_ext": ("s3m",),
         "mime": ('audio/s3m', 'audio/x-s3m'),
-        "min_size": 64*8,
+        "min_size": 64 * 8,
         "description": "ScreamTracker3 module"
     }
     MARKER = b"SCRM"
     HEADER = S3MHeader
 
-##    def createContentSize(self):
+# def createContentSize(self):
 ##        hdr = Header(self, "header")
 ##        max_offset = hdr._size//8
 
 ##        instr_size = Instrument._size//8
-##        for index in xrange(self["header/num_instruments"].value):
+# for index in xrange(self["header/num_instruments"].value):
 ##            offset = 16*hdr["instr_pptr/offset[%u]" % index].value
 ##            max_offset = max(offset+instr_size, max_offset)
 ##            addr = self.absolute_address + 8*offset
+
 
 class PTMModule(Module):
     PARSER_TAGS = {
         "id": "ptm",
         "category": "audio",
         "file_ext": ("ptm",),
-        "min_size": 64*8,
+        "min_size": 64 * 8,
         "description": "PolyTracker module (v1.17)"
     }
     MARKER = b"PTMF"

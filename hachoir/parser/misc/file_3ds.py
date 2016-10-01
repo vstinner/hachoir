@@ -5,11 +5,12 @@ Author: Victor Stinner
 
 from hachoir.parser import Parser
 from hachoir.field import (StaticFieldSet, FieldSet,
-    UInt16, UInt32, RawBytes, Enum, CString)
+                           UInt16, UInt32, RawBytes, Enum, CString)
 from hachoir.parser.image.common import RGB
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal
 from hachoir.parser.misc.common import Vertex, MapUV
+
 
 def readObject(parent):
     yield CString(parent, "name", "Object name")
@@ -17,14 +18,18 @@ def readObject(parent):
     while parent.current_size < size:
         yield Chunk(parent, "chunk[]")
 
+
 def readTextureFilename(parent):
     yield CString(parent, "filename", "Texture filename")
+
 
 def readVersion(parent):
     yield UInt32(parent, "version", "3DS file format version")
 
+
 def readMaterialName(parent):
     yield CString(parent, "name", "Material name")
+
 
 class Polygon(StaticFieldSet):
     format = (
@@ -33,18 +38,22 @@ class Polygon(StaticFieldSet):
         (UInt16, "c", "Vertex C"),
         (UInt16, "flags", "Flags"))
 
+
 def readMapList(parent):
     yield UInt16(parent, "count", "Map count")
     for index in range(parent["count"].value):
         yield MapUV(parent, "map_uv[]", "Mapping UV")
 
+
 def readColor(parent):
     yield RGB(parent, "color")
+
 
 def readVertexList(parent):
     yield UInt16(parent, "count", "Vertex count")
     for index in range(0, parent["count"].value):
         yield Vertex(parent, "vertex[]", "Vertex")
+
 
 def readPolygonList(parent):
     count = UInt16(parent, "count", "Vertex count")
@@ -54,6 +63,7 @@ def readPolygonList(parent):
     size = parent["size"].value * 8
     while parent.current_size < size:
         yield Chunk(parent, "chunk[]")
+
 
 class Chunk(FieldSet):
     # List of chunk type name
@@ -151,6 +161,7 @@ class Chunk(FieldSet):
             else:
                 yield RawBytes(self, "data", content_size)
 
+
 class File3ds(Parser):
     endian = LITTLE_ENDIAN
     PARSER_TAGS = {
@@ -158,7 +169,7 @@ class File3ds(Parser):
         "category": "misc",
         "file_ext": ("3ds",),
         "mime": ("image/x-3ds",),
-        "min_size": 16*8,
+        "min_size": 16 * 8,
         "description": "3D Studio Max model"
     }
 
@@ -172,4 +183,3 @@ class File3ds(Parser):
     def createFields(self):
         while not self.eof:
             yield Chunk(self, "chunk[]")
-

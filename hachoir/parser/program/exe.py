@@ -12,8 +12,8 @@ Creation date: 2006-08-13
 from hachoir.parser import HachoirParser
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.field import (FieldSet, RootSeekableFieldSet,
-    UInt16, UInt32, String,
-    RawBytes, PaddingBytes)
+                           UInt16, UInt32, String,
+                           RawBytes, PaddingBytes)
 from hachoir.core.text_handler import textHandler, hexadecimal
 from hachoir.parser.program.exe_ne import NE_Header
 from hachoir.parser.program.exe_pe import PE_Header, PE_OptHeader, SectionHeader
@@ -21,8 +21,9 @@ from hachoir.parser.program.exe_res import PE_Resource, NE_VersionInfoNode
 
 MAX_NB_SECTION = 50
 
+
 class MSDosHeader(FieldSet):
-    static_size = 64*8
+    static_size = 64 * 8
 
     def createFields(self):
         yield String(self, "header", 2, "File header (MZ)", charset="ASCII")
@@ -56,13 +57,14 @@ class MSDosHeader(FieldSet):
                 return "Invalid value of next_offset"
         return ""
 
+
 class ExeFile(HachoirParser, RootSeekableFieldSet):
     PARSER_TAGS = {
         "id": "exe",
         "category": "program",
         "file_ext": ("exe", "dll", "ocx"),
         "mime": ("application/x-dosexec",),
-        "min_size": 64*8,
+        "min_size": 64 * 8,
         #"magic": (("MZ", 0),),
         "magic_regex": ((b"MZ.[\0\1].{4}[^\0\1\2\3]", 0),),
         "description": "Microsoft Windows Portable Executable"
@@ -70,7 +72,8 @@ class ExeFile(HachoirParser, RootSeekableFieldSet):
     endian = LITTLE_ENDIAN
 
     def __init__(self, stream, **args):
-        RootSeekableFieldSet.__init__(self, None, "root", stream, None, stream.askSize(self))
+        RootSeekableFieldSet.__init__(
+            self, None, "root", stream, None, stream.askSize(self))
         HachoirParser.__init__(self, stream, **args)
 
     def validate(self):
@@ -78,7 +81,7 @@ class ExeFile(HachoirParser, RootSeekableFieldSet):
             return "Wrong header"
         err = self["msdos"].isValid()
         if err:
-            return "Invalid MSDOS header: "+err
+            return "Invalid MSDOS header: " + err
         if self.isPE():
             if MAX_NB_SECTION < self["pe_header/nb_section"].value:
                 return "Invalid number of section (%s)" \
@@ -108,7 +111,7 @@ class ExeFile(HachoirParser, RootSeekableFieldSet):
         start = self.current_size
         addr = self.stream.searchBytes(b'VS_VERSION_INFO', start)
         if addr:
-            self.seekBit(addr-32)
+            self.seekBit(addr - 32)
             yield NE_VersionInfoNode(self, "info")
 
     def parsePortableExecutable(self):
@@ -119,7 +122,7 @@ class ExeFile(HachoirParser, RootSeekableFieldSet):
         size = self["pe_header/opt_hdr_size"].value
         rsrc_rva = None
         if size:
-            yield PE_OptHeader(self, "pe_opt_header", size=size*8)
+            yield PE_OptHeader(self, "pe_opt_header", size=size * 8)
             if "pe_opt_header/resource/rva" in self:
                 rsrc_rva = self["pe_opt_header/resource/rva"].value
 
@@ -139,7 +142,7 @@ class ExeFile(HachoirParser, RootSeekableFieldSet):
             if size:
                 name = section.createSectionName()
                 if rsrc_rva is not None and section["rva"].value == rsrc_rva:
-                    yield PE_Resource(self, name, section, size=size*8)
+                    yield PE_Resource(self, name, section, size=size * 8)
                 else:
                     yield RawBytes(self, name, size)
 
@@ -147,9 +150,9 @@ class ExeFile(HachoirParser, RootSeekableFieldSet):
         if not hasattr(self, "_is_pe"):
             self._is_pe = False
             offset = self["msdos/next_offset"].value * 8
-            if 2*8 <= offset \
-            and (offset+PE_Header.static_size) <= self.size \
-            and self.stream.readBytes(offset, 4) == b'PE\0\0':
+            if 2 * 8 <= offset \
+                    and (offset + PE_Header.static_size) <= self.size \
+                    and self.stream.readBytes(offset, 4) == b'PE\0\0':
                 self._is_pe = True
         return self._is_pe
 
@@ -157,9 +160,9 @@ class ExeFile(HachoirParser, RootSeekableFieldSet):
         if not hasattr(self, "_is_ne"):
             self._is_ne = False
             offset = self["msdos/next_offset"].value * 8
-            if 64*8 <= offset \
-            and (offset+NE_Header.static_size) <= self.size \
-            and self.stream.readBytes(offset, 2) == b'NE':
+            if 64 * 8 <= offset \
+                    and (offset + NE_Header.static_size) <= self.size \
+                    and self.stream.readBytes(offset, 2) == b'NE':
                 self._is_ne = True
         return self._is_ne
 
@@ -215,8 +218,8 @@ class ExeFile(HachoirParser, RootSeekableFieldSet):
             # TODO: Guess NE size
             return None
         else:
-            size = self["msdos/size_mod_512"].value + (self["msdos/size_div_512"].value-1) * 512
+            size = self["msdos/size_mod_512"].value + \
+                (self["msdos/size_div_512"].value - 1) * 512
             if size < 0:
                 return None
-        return size*8
-
+        return size * 8

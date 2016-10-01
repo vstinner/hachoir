@@ -1,10 +1,12 @@
 from hachoir.field import (FieldSet,
-    Bit, UInt8, UInt16, UInt32, Bytes,
-    PaddingBits, PaddingBytes, NullBits, NullBytes)
+                           Bit, UInt8, UInt16, UInt32, Bytes,
+                           PaddingBits, PaddingBytes, NullBits, NullBytes)
 from hachoir.core.text_handler import textHandler, hexadecimal, filesizeHandler
 
+
 class NE_Header(FieldSet):
-    static_size = 64*8
+    static_size = 64 * 8
+
     def createFields(self):
         yield Bytes(self, "signature", 2, "New executable signature (NE)")
         yield UInt8(self, "link_ver", "Linker version number")
@@ -57,4 +59,3 @@ class NE_Header(FieldSet):
 
         yield NullBytes(self, "reserved[]", 2)
         yield textHandler(UInt16(self, "win_version", "Expected Windows version number"), hexadecimal)
-

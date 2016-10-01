@@ -15,12 +15,15 @@ from hachoir.stream import BIG_ENDIAN, LITTLE_ENDIAN
 from hachoir.core.tools import createDict
 from hachoir.parser.container.ogg import parseVorbisComment
 
+
 class VorbisComment(FieldSet):
     endian = LITTLE_ENDIAN
     createFields = parseVorbisComment
 
+
 class StreamInfo(FieldSet):
-    static_size = 34*8
+    static_size = 34 * 8
+
     def createFields(self):
         yield UInt16(self, "min_block_size", "The minimum block size (in samples) used in the stream")
         yield UInt16(self, "max_block_size", "The maximum block size (in samples) used in the stream")
@@ -32,16 +35,21 @@ class StreamInfo(FieldSet):
         yield Bits(self, "total_samples", 36, "Total samples in stream")
         yield RawBytes(self, "md5sum", 16, "MD5 signature of the unencoded audio data")
 
+
 class SeekPoint(FieldSet):
+
     def createFields(self):
         yield Bits(self, "sample_number", 64, "Sample number")
         yield Bits(self, "offset", 64, "Offset in bytes")
         yield Bits(self, "nb_sample", 16)
 
+
 class SeekTable(FieldSet):
+
     def createFields(self):
         while not self.eof:
             yield SeekPoint(self, "point[]")
+
 
 class MetadataBlock(FieldSet):
     "Metadata block field: http://flac.sourceforge.net/format.html#metadata_block"
@@ -80,19 +88,22 @@ class MetadataBlock(FieldSet):
         except KeyError:
             handler = None
         if handler:
-            yield handler(self, "content", size=size*8)
+            yield handler(self, "content", size=size * 8)
         elif self["block_type"].value == 1:
             yield NullBytes(self, "padding", size)
         else:
             yield RawBytes(self, "rawdata", size)
 
+
 class Metadata(FieldSet):
+
     def createFields(self):
         while not self.eof:
-            field = MetadataBlock(self,"metadata_block[]")
+            field = MetadataBlock(self, "metadata_block[]")
             yield field
             if field["last_metadata_block"].value:
                 break
+
 
 class Frame(FieldSet):
     SAMPLE_RATES = {
@@ -124,12 +135,15 @@ class Frame(FieldSet):
         yield Bit(self, "reserved[]")
         # FIXME: Finish frame header parser
 
+
 class Frames(FieldSet):
+
     def createFields(self):
         while not self.eof:
             yield Frame(self, "frame[]")
             # FIXME: Parse all frames
             return
+
 
 class FlacParser(Parser):
     "Parse FLAC audio files: FLAC is a lossless audio codec"
@@ -140,7 +154,7 @@ class FlacParser(Parser):
         "file_ext": ("flac",),
         "mime": ("audio/x-flac",),
         "magic": ((MAGIC, 0),),
-        "min_size": 4*8,
+        "min_size": 4 * 8,
         "description": "FLAC audio",
     }
     endian = BIG_ENDIAN
@@ -151,7 +165,6 @@ class FlacParser(Parser):
         return True
 
     def createFields(self):
-        yield String(self, "signature", 4,charset="ASCII", description="FLAC signature: fLaC string")
-        yield Metadata(self,"metadata")
-        yield Frames(self,"frames")
-
+        yield String(self, "signature", 4, charset="ASCII", description="FLAC signature: fLaC string")
+        yield Metadata(self, "metadata")
+        yield Frames(self, "frames")

@@ -12,16 +12,17 @@ http://technet.microsoft.com/en-us/library/bb490996.aspx
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, RootSeekableFieldSet,
-    CString, String, PascalString16,
-    UInt32, UInt16, UInt8,
-    Bit, Bits, PaddingBits,
-    TimestampWin64, DateTimeMSDOS32,
-    NullBytes, PaddingBytes, RawBits, RawBytes, Enum)
+                           CString, String, PascalString16,
+                           UInt32, UInt16, UInt8,
+                           Bit, Bits, PaddingBits,
+                           TimestampWin64, DateTimeMSDOS32,
+                           NullBytes, PaddingBytes, RawBits, RawBytes, Enum)
 from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal
 from hachoir.parser.common.win32 import PascalStringWin16, GUID
 from hachoir.parser.common.msdos import MSDOSFileAttr16, MSDOSFileAttr32
 from hachoir.core.text_handler import filesizeHandler
+
 
 class TaskTrigger(FieldSet):
     TRIGGER_TYPE = {
@@ -51,12 +52,12 @@ class TaskTrigger(FieldSet):
         yield UInt16(self, "StartHour")
         yield UInt16(self, "StartMinute")
         yield UInt32(self, "MinutesDuration")
-        yield UInt32(self, "MinutesInterval","Time period between repeated trigger firings.")
-        yield Bit(self, "HasEndDate","Can task stop at some point in time?")
-        yield Bit(self, "KillAtDurationEnd","Can task be stopped at the end of the repetition period?")
-        yield Bit(self, "TriggerDisabled","Is this trigger disabled?")
+        yield UInt32(self, "MinutesInterval", "Time period between repeated trigger firings.")
+        yield Bit(self, "HasEndDate", "Can task stop at some point in time?")
+        yield Bit(self, "KillAtDurationEnd", "Can task be stopped at the end of the repetition period?")
+        yield Bit(self, "TriggerDisabled", "Is this trigger disabled?")
         yield RawBits(self, "Unused[]", 29)
-        yield Enum(UInt32(self, "TriggerType"),self.TRIGGER_TYPE)
+        yield Enum(UInt32(self, "TriggerType"), self.TRIGGER_TYPE)
         yield UInt16(self, "TriggerSpecific0")
         yield UInt16(self, "TriggerSpecific1")
         yield UInt16(self, "TriggerSpecific2")
@@ -64,13 +65,17 @@ class TaskTrigger(FieldSet):
         yield UInt16(self, "Reserved[]")
         yield UInt16(self, "Reserved[]")
 
+
 class MSTaskFile(Parser, RootSeekableFieldSet):
     PARSER_TAGS = {
         "id": "mstask",
         "category": "misc",    # "archive", "audio", "container", ...
-        "file_ext": ("job",), # TODO: Example ("bmp",) to parse the file "image.bmp"
-        "min_size": 100,         # TODO: Minimum file size (x bits, or x*8 in bytes)
-        "description": ".job 'at' file parser from ms windows", # TODO: Example: "A bitmap picture",
+        # TODO: Example ("bmp",) to parse the file "image.bmp"
+        "file_ext": ("job",),
+        # TODO: Minimum file size (x bits, or x*8 in bytes)
+        "min_size": 100,
+        # TODO: Example: "A bitmap picture",
+        "description": ".job 'at' file parser from ms windows",
     }
 
     endian = LITTLE_ENDIAN
@@ -156,9 +161,9 @@ class MSTaskFile(Parser, RootSeekableFieldSet):
         yield PascalStringWin16(self, "Comment", strip='\0')
 
         yield UInt16(self, "UserDataSize")
-        #todo: read optional userdata
+        # todo: read optional userdata
         yield UInt16(self, "ReservedDataSize")
-        if self["ReservedDataSize"].value==8:
+        if self["ReservedDataSize"].value == 8:
             yield Enum(UInt32(self, "StartError", "contains the HRESULT error from the most recent attempt to start the task"), self.TASK_STATUS)
             yield UInt32(self, "TaskFlags")
         elif self["ReservedDataSize"].value:

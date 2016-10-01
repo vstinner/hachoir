@@ -133,4 +133,3 @@ LANGUAGE_ID = {
     0x0843: "Uzbek Cyrillic",
     0x042a: "Vietnamese",
 }
-

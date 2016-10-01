@@ -6,15 +6,16 @@
 
 from hachoir.parser import Parser
 from hachoir.field import (Field, FieldSet, createOrphanField,
-    NullBits, Bit, Bits, Enum, Fragment, MissingField, ParserError,
-    UInt8, UInt16, UInt24, UInt32, UInt64,
-    RawBytes, String, PascalString32, NullBytes)
+                           NullBits, Bit, Bits, Enum, Fragment, MissingField, ParserError,
+                           UInt8, UInt16, UInt24, UInt32, UInt64,
+                           RawBytes, String, PascalString32, NullBytes)
 from hachoir.stream import FragmentedStream, InputStreamError
 from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir.core.tools import humanDurationNanosec
 from hachoir.core.text_handler import textHandler, hexadecimal
 
 MAX_FILESIZE = 1000 * 1024 * 1024
+
 
 class XiphInt(Field):
     """
@@ -23,6 +24,7 @@ class XiphInt(Field):
 
     Example: 1000 is stored as (255, 255, 255, 235), total = 255*3+235 = 1000
     """
+
     def __init__(self, parent, name, max_size=None, description=None):
         Field.__init__(self, parent, name, size=0, description=description)
         value = 0
@@ -36,13 +38,16 @@ class XiphInt(Field):
             addr += 8
         self.createValue = lambda: value
 
+
 class Lacing(FieldSet):
+
     def createFields(self):
         size = self.size
         while size:
             field = XiphInt(self, 'size[]', size)
             yield field
             size -= field.size
+
 
 def parseVorbisComment(parent):
     yield PascalString32(parent, 'vendor', charset="UTF-8")
@@ -58,8 +63,10 @@ PIXEL_FORMATS = {
     3: "4:4:4",
 }
 
+
 def formatTimeUnit(field):
     return humanDurationNanosec(field.value * 100)
+
 
 def parseVideoHeader(parent):
     yield NullBytes(parent, "padding[]", 2)
@@ -74,6 +81,7 @@ def parseVideoHeader(parent):
     yield UInt32(parent, "width")
     yield UInt32(parent, "height")
     yield NullBytes(parent, "padding[]", 4)
+
 
 def parseTheoraHeader(parent):
     yield UInt8(parent, "version_major")
@@ -99,6 +107,7 @@ def parseTheoraHeader(parent):
     yield Enum(Bits(parent, "pixel_format", 2), PIXEL_FORMATS)
     yield Bits(parent, "spare_config", 3)
 
+
 def parseVorbisHeader(parent):
     yield UInt32(parent, "vorbis_version")
     yield UInt8(parent, "audio_channels")
@@ -109,6 +118,7 @@ def parseVorbisHeader(parent):
     yield Bits(parent, "blocksize_0", 4)
     yield Bits(parent, "blocksize_1", 4)
     yield UInt8(parent, "framing_flag")
+
 
 class Chunk(FieldSet):
     tag_info = {
@@ -122,11 +132,13 @@ class Chunk(FieldSet):
             1: ("video_hdr", parseVideoHeader),
         },
     }
+
     def __init__(self, *args, **kw):
         FieldSet.__init__(self, *args, **kw)
-        if 7*8 <= self.size:
+        if 7 * 8 <= self.size:
             try:
-                self._name, self.parser = self.tag_info[self["codec"].value][self["type"].value]
+                self._name, self.parser = self.tag_info[
+                    self["codec"].value][self["type"].value]
                 if self._name == "theora_hdr":
                     self.endian = BIG_ENDIAN
             except KeyError:
@@ -135,7 +147,7 @@ class Chunk(FieldSet):
             self.parser = None
 
     def createFields(self):
-        if 7*8 <= self.size:
+        if 7 * 8 <= self.size:
             yield UInt8(self, 'type')
             yield String(self, 'codec', 6)
         if self.parser:
@@ -145,7 +157,9 @@ class Chunk(FieldSet):
             if size:
                 yield RawBytes(self, "raw", size)
 
+
 class Packets:
+
     def __init__(self, first):
         self.first = first
 
@@ -167,18 +181,21 @@ class Packets:
         if size:
             yield size * 8
 
+
 class Segments(Fragment):
+
     def __init__(self, parent, *args, **kw):
         Fragment.__init__(self, parent, *args, **kw)
         if parent['last_page'].value:
             next = None
         else:
             next = self.createNext
-        self.setLinks(parent.parent.streams.setdefault(parent['serial'].value, self), next)
+        self.setLinks(parent.parent.streams.setdefault(
+            parent['serial'].value, self), next)
 
     def _createInputStream(self, **args):
         if self.first is self:
-            return FragmentedStream(self, packets=Packets(self), tags=[("id","ogg_stream")], **args)
+            return FragmentedStream(self, packets=Packets(self), tags=[("id", "ogg_stream")], **args)
         return Fragment._createInputStream(self, **args)
 
     def _getData(self):
@@ -201,9 +218,11 @@ class Segments(Fragment):
     def createFields(self):
         for segment_size in self.parent.segment_size:
             if segment_size:
-                yield Chunk(self, "chunk[]", size=segment_size*8)
+                yield Chunk(self, "chunk[]", size=segment_size * 8)
+
 
 class OggPage(FieldSet):
+
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
         size = 27
@@ -211,14 +230,15 @@ class OggPage(FieldSet):
         if self.lacing_size:
             size += self.lacing_size
             lacing = self['lacing']
-            self.segment_size = [ field.value for field in lacing ]
+            self.segment_size = [field.value for field in lacing]
             size += sum(self.segment_size)
         self._size = size * 8
 
     def createFields(self):
         yield String(self, 'capture_pattern', 4, charset="ASCII")
         if self['capture_pattern'].value != "OggS":
-            self.warning('Invalid signature. An Ogg page must start with "OggS".')
+            self.warning(
+                'Invalid signature. An Ogg page must start with "OggS".')
         yield UInt8(self, 'stream_structure_version')
         yield Bit(self, 'continued_packet')
         yield Bit(self, 'first_page')
@@ -230,8 +250,8 @@ class OggPage(FieldSet):
         yield textHandler(UInt32(self, 'checksum'), hexadecimal)
         yield UInt8(self, 'lacing_size')
         if self.lacing_size:
-            yield Lacing(self, "lacing", size=self.lacing_size*8)
-            yield Segments(self, "segments", size=self._size-self._current_size)
+            yield Lacing(self, "lacing", size=self.lacing_size * 8)
+            yield Segments(self, "segments", size=self._size - self._current_size)
 
     def validate(self):
         if self['capture_pattern'].value != "OggS":
@@ -239,6 +259,7 @@ class OggPage(FieldSet):
         if self['stream_structure_version'].value != 0:
             return "Unknown structure version (%s)" % self['stream_structure_version'].value
         return ""
+
 
 class OggFile(Parser):
     PARSER_TAGS = {
@@ -250,10 +271,10 @@ class OggFile(Parser):
             "audio/ogg", "audio/x-ogg",
             "video/ogg", "video/x-ogg",
             "video/theora", "video/x-theora",
-         ),
+        ),
         "magic": ((b'OggS', 0),),
         "subfile": "skip",
-        "min_size": 28*8,
+        "min_size": 28 * 8,
         "description": "Ogg multimedia container"
     }
     endian = LITTLE_ENDIAN
@@ -332,7 +353,7 @@ class OggStream(Parser):
         "id": "ogg_stream",
         "category": "container",
         "subfile": "skip",
-        "min_size": 7*8,
+        "min_size": 7 * 8,
         "description": "Ogg logical stream"
     }
     endian = LITTLE_ENDIAN
@@ -342,4 +363,4 @@ class OggStream(Parser):
 
     def createFields(self):
         for size in self.stream.packets:
-            yield RawBytes(self, "packet[]", size//8)
+            yield RawBytes(self, "packet[]", size // 8)

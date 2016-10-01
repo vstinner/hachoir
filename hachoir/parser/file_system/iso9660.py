@@ -11,12 +11,14 @@ Creation: 11 july 2006
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, ParserError,
-    UInt8, UInt32, UInt64, Enum,
-    NullBytes, RawBytes, String)
+                           UInt8, UInt32, UInt64, Enum,
+                           NullBytes, RawBytes, String)
 from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 
+
 class PrimaryVolumeDescriptor(FieldSet):
-    static_size = 2041*8
+    static_size = 2041 * 8
+
     def createFields(self):
         yield NullBytes(self, "unused[]", 1)
         yield String(self, "system_id", 32, "System identifier", strip=" ")
@@ -49,17 +51,22 @@ class PrimaryVolumeDescriptor(FieldSet):
         yield String(self, "app_use", 512, "Application use", strip=" \0")
         yield NullBytes(self, "unused[]", 653)
 
+
 class BootRecord(FieldSet):
-    static_size = 2041*8
+    static_size = 2041 * 8
+
     def createFields(self):
         yield String(self, "sys_id", 31, "Boot system identifier", strip="\0")
         yield String(self, "boot_id", 31, "Boot identifier", strip="\0")
         yield RawBytes(self, "system_use", 1979, "Boot system use")
 
+
 class Terminator(FieldSet):
-    static_size = 2041*8
+    static_size = 2041 * 8
+
     def createFields(self):
         yield NullBytes(self, "null", 2041)
+
 
 class Volume(FieldSet):
     endian = BIG_ENDIAN
@@ -88,7 +95,8 @@ class Volume(FieldSet):
         if cls:
             yield cls(self, "content")
         else:
-            yield RawBytes(self, "raw_content", 2048-7)
+            yield RawBytes(self, "raw_content", 2048 - 7)
+
 
 class ISO9660(Parser):
     endian = LITTLE_ENDIAN
@@ -98,12 +106,12 @@ class ISO9660(Parser):
         "id": "iso9660",
         "category": "file_system",
         "description": "ISO 9660 file system",
-        "min_size": (NULL_BYTES + 6)*8,
-        "magic": ((MAGIC, NULL_BYTES*8),),
+        "min_size": (NULL_BYTES + 6) * 8,
+        "magic": ((MAGIC, NULL_BYTES * 8),),
     }
 
     def validate(self):
-        if self.stream.readBytes(self.NULL_BYTES*8, len(self.MAGIC)) != self.MAGIC:
+        if self.stream.readBytes(self.NULL_BYTES * 8, len(self.MAGIC)) != self.MAGIC:
             return "Invalid signature"
         return True
 
@@ -118,4 +126,3 @@ class ISO9660(Parser):
 
         if self.current_size < self._size:
             yield self.seekBit(self._size, "end")
-

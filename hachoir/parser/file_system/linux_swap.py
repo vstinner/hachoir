@@ -11,8 +11,8 @@ Creation date: 25 december 2006 (christmas ;-))
 
 from hachoir.parser import Parser
 from hachoir.field import (ParserError, GenericVector,
-    UInt32, String,
-    Bytes, NullBytes, RawBytes)
+                           UInt32, String,
+                           Bytes, NullBytes, RawBytes)
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.tools import humanFilesize
 from hachoir.core.bits import str2hex
@@ -23,37 +23,43 @@ PAGE_SIZE = 4096
 #  (__swapoffset(magic.magic) - __swapoffset(info.badpages)) / sizeof(int)
 MAX_SWAP_BADPAGES = ((PAGE_SIZE - 10) - 1536) // 4
 
+
 class Page(RawBytes):
-    static_size = PAGE_SIZE*8
+    static_size = PAGE_SIZE * 8
+
     def __init__(self, parent, name):
         RawBytes.__init__(self, parent, name, PAGE_SIZE)
 
+
 class UUID(Bytes):
-    static_size = 16*8
+    static_size = 16 * 8
+
     def __init__(self, parent, name):
         Bytes.__init__(self, parent, name, 16)
+
     def createDisplay(self):
         text = str2hex(self.value, format=r"%02x")
         return "%s-%s-%s-%s-%s" % (
             text[:8], text[8:12], text[12:16], text[16:20], text[20:])
+
 
 class LinuxSwapFile(Parser):
     PARSER_TAGS = {
         "id": "linux_swap",
         "file_ext": ("",),
         "category": "file_system",
-        "min_size": PAGE_SIZE*8,
+        "min_size": PAGE_SIZE * 8,
         "description": "Linux swap file",
         "magic": (
-            (b"SWAP-SPACE", (PAGE_SIZE-10)*8),
-            (b"SWAPSPACE2", (PAGE_SIZE-10)*8),
-            (b"S1SUSPEND\0", (PAGE_SIZE-10)*8),
+            (b"SWAP-SPACE", (PAGE_SIZE - 10) * 8),
+            (b"SWAPSPACE2", (PAGE_SIZE - 10) * 8),
+            (b"S1SUSPEND\0", (PAGE_SIZE - 10) * 8),
         ),
     }
     endian = LITTLE_ENDIAN
 
     def validate(self):
-        magic = self.stream.readBytes((PAGE_SIZE-10)*8, 10)
+        magic = self.stream.readBytes((PAGE_SIZE - 10) * 8, 10)
         if magic not in (b"SWAP-SPACE", b"SWAPSPACE2", b"S1SUSPEND\0"):
             return "Unknown magic string"
         if MAX_SWAP_BADPAGES < self["nb_badpage"].value:
@@ -89,7 +95,7 @@ class LinuxSwapFile(Parser):
         yield UInt32(self, "nb_badpage")
         yield UUID(self, "sws_uuid")
         yield UUID(self, "sws_volume")
-        yield NullBytes(self, "reserved", 117*4)
+        yield NullBytes(self, "reserved", 117 * 4)
 
         # Read bad pages (if any)
         count = self["nb_badpage"].value
@@ -111,4 +117,3 @@ class LinuxSwapFile(Parser):
         padding = self.seekBit(self.size, "end_padding", null=True)
         if padding:
             yield padding
-

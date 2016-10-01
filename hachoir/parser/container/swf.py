@@ -15,8 +15,8 @@ Creation date: 29 october 2006
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, ParserError,
-    Bit, Bits, UInt8, UInt16, Int32, UInt32, Int64, CString, Enum,
-    Bytes, RawBytes, NullBits, String, SubFile)
+                           Bit, Bits, UInt8, UInt16, Int32, UInt32, Int64, CString, Enum,
+                           Bytes, RawBytes, NullBits, String, SubFile)
 from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir.core.text_handler import textHandler, filesizeHandler
 from hachoir.core.tools import paddingSize, humanFrequency
@@ -32,8 +32,10 @@ MAX_FILE_SIZE = 50 * 1024 * 1024
 
 TWIPS = 20
 
+
 class RECT(FieldSet):
     endian = BIG_ENDIAN
+
     def createFields(self):
         yield Bits(self, "nbits", 5)
         nbits = self["nbits"].value
@@ -49,22 +51,27 @@ class RECT(FieldSet):
 
     def getWidth(self):
         return math.ceil(float(self["xmax"].value) / TWIPS)
+
     def getHeight(self):
         return math.ceil(float(self["ymax"].value) / TWIPS)
 
     def createDescription(self):
         return "Rectangle: %ux%u" % (self.getWidth(), self.getHeight())
 
+
 class FixedFloat16(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "float_part")
         yield UInt8(self, "int_part")
 
     def createValue(self):
-        return self["int_part"].value +  float(self["float_part"].value) / 256
+        return self["int_part"].value + float(self["float_part"].value) / 256
+
 
 def parseBackgroundColor(parent, size):
     yield RGB(parent, "color")
+
 
 def bit2hertz(field):
     return humanFrequency(5512.5 * (2 ** field.value))
@@ -78,7 +85,9 @@ SOUND_CODEC = {
     6: "Nellymoser",
 }
 
+
 class SoundEnvelope(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "count")
         for index in range(self["count"].value):
@@ -86,16 +95,18 @@ class SoundEnvelope(FieldSet):
             yield UInt16(self, "level0[]")
             yield UInt16(self, "level1[]")
 
+
 def parseSoundBlock(parent, size):
     # TODO: Be able to get codec... Need to know last sound "def_sound[]" field
-#    if not (...)sound_header:
-#        raise ParserError("Sound block without header")
-    if True: #sound_header == SOUND_CODEC_MP3:
+    #    if not (...)sound_header:
+    #        raise ParserError("Sound block without header")
+    if True:  # sound_header == SOUND_CODEC_MP3:
         yield UInt16(parent, "samples")
         yield UInt16(parent, "left")
     size = (parent.size - parent.current_size) // 8
     if size:
         yield RawBytes(parent, "music_data", size)
+
 
 def parseStartSound(parent, size):
     yield UInt16(parent, "sound_id")
@@ -116,6 +127,7 @@ def parseStartSound(parent, size):
     if parent["has_envelope"].value:
         yield SoundEnvelope(parent, "envelope")
 
+
 def parseDefineSound(parent, size):
     yield UInt16(parent, "sound_id")
 
@@ -133,6 +145,7 @@ def parseDefineSound(parent, size):
     if size:
         yield RawBytes(parent, "music_data", size)
 
+
 def parseSoundHeader(parent, size):
     yield Bit(parent, "playback_is_stereo")
     yield Bit(parent, "playback_is_16bit")
@@ -149,8 +162,10 @@ def parseSoundHeader(parent, size):
     if parent["codec"].value == 2:
         yield UInt16(parent, "latency_seek")
 
+
 class JpegHeader(FieldSet):
     endian = BIG_ENDIAN
+
     def createFields(self):
         count = 1
         while True:
@@ -159,6 +174,7 @@ class JpegHeader(FieldSet):
             if 1 < count and chunk["type"].value in (JpegChunk.TAG_SOI, JpegChunk.TAG_EOI):
                 break
             count += 1
+
 
 def parseJpeg(parent, size):
     yield UInt16(parent, "char_id", "Character identifier")
@@ -190,21 +206,26 @@ def parseJpeg(parent, size):
         size = (parent.size - parent.current_size) // 8
         yield RawBytes(parent, "alpha", size, "Image data")
 
+
 def parseVideoFrame(parent, size):
     yield UInt16(parent, "stream_id")
     yield UInt16(parent, "frame_num")
     if 4 < size:
-        yield RawBytes(parent, "video_data", size-4)
+        yield RawBytes(parent, "video_data", size - 4)
+
 
 class Export(FieldSet):
+
     def createFields(self):
         yield UInt16(self, "object_id")
         yield CString(self, "name")
+
 
 def parseExport(parent, size):
     yield UInt16(parent, "count")
     for index in range(parent["count"].value):
         yield Export(parent, "export[]")
+
 
 def parseProductInfo(parent, size):
     yield Int32(parent, "product_id")
@@ -214,9 +235,11 @@ def parseProductInfo(parent, size):
     yield Int64(parent, "build_number")
     yield Int64(parent, "compilation_date")
 
+
 def parseScriptLimits(parent, size):
     yield UInt16(parent, "max_recursion_limit")
     yield UInt16(parent, "timeout_seconds", "Seconds of processing until the SWF is considered 'stuck'")
+
 
 def parseSymbolClass(parent, size):
     yield UInt16(parent, "count")
@@ -224,11 +247,13 @@ def parseSymbolClass(parent, size):
         yield UInt16(parent, "symbol_id[]")
         yield CString(parent, "symbol_name[]")
 
+
 def parseBinaryData(parent, size):
     yield UInt16(parent, "data_id")
     yield UInt32(parent, "reserved")
     if size > 6:
-        yield RawBytes(parent, "data", size-6)
+        yield RawBytes(parent, "data", size - 6)
+
 
 class Tag(FieldSet):
     TAG_BITS = 6
@@ -237,16 +262,16 @@ class Tag(FieldSet):
     TAG_DO_ABC_DEFINE = 82
     TAG_INFO = {
         # SWF version 1.0
-         0: ("end[]", "End", None),
-         1: ("show_frame[]", "Show frame", None),
-         2: ("def_shape[]", "Define shape", None),
-         3: ("free_char[]", "Free character", None),
-         4: ("place_obj[]", "Place object", None),
-         5: ("remove_obj[]", "Remove object", None),
-         6: ("def_bits[]", "Define bits", parseJpeg),
-         7: ("def_but[]", "Define button", None),
-         8: ("jpg_table", "JPEG tables", None),
-         9: ("bkgd_color[]", "Set background color", parseBackgroundColor),
+        0: ("end[]", "End", None),
+        1: ("show_frame[]", "Show frame", None),
+        2: ("def_shape[]", "Define shape", None),
+        3: ("free_char[]", "Free character", None),
+        4: ("place_obj[]", "Place object", None),
+        5: ("remove_obj[]", "Remove object", None),
+        6: ("def_bits[]", "Define bits", parseJpeg),
+        7: ("def_but[]", "Define button", None),
+        8: ("jpg_table", "JPEG tables", None),
+        9: ("bkgd_color[]", "Set background color", parseBackgroundColor),
         10: ("def_font[]", "Define font", None),
         11: ("def_text[]", "Define text", None),
         12: ("action[]", "Action script", parseActionScript),
@@ -336,9 +361,9 @@ class Tag(FieldSet):
         FieldSet.__init__(self, *args)
         size = self["length"].value
         if self[0].name == "length_ext":
-            self._size = (6+size) * 8
+            self._size = (6 + size) * 8
         else:
-            self._size = (2+size) * 8
+            self._size = (2 + size) * 8
         code = self["code"].value
         if code in self.TAG_INFO:
             self._name, self._description, self.parser = self.TAG_INFO[code]
@@ -363,8 +388,9 @@ class Tag(FieldSet):
     def createDescription(self):
         return "Tag: %s (%s)" % (self["code"].display, self["length"].display)
 
+
 class SwfFile(Parser):
-    VALID_VERSIONS = set(range(1, 10+1))
+    VALID_VERSIONS = set(range(1, 10 + 1))
     PARSER_TAGS = {
         "id": "swf",
         "category": "container",
@@ -407,10 +433,12 @@ class SwfFile(Parser):
             size = (self.size - self.current_size) // 8
             if has_deflate:
                 data = Deflate(Bytes(self, "compressed_data", size), False)
+
                 def createInputStream(cis, source=None, **args):
                     stream = cis(source=source)
-                    header = StringInputStream(b"FWS" + self.stream.readBytes(3*8, 5))
-                    args.setdefault("tags",[]).append(("class", SwfFile))
+                    header = StringInputStream(
+                        b"FWS" + self.stream.readBytes(3 * 8, 5))
+                    args.setdefault("tags", []).append(("class", SwfFile))
                     return ConcatStream((header, stream), source=stream.source, **args)
                 data.setSubIStream(createInputStream)
                 yield data
@@ -429,4 +457,3 @@ class SwfFile(Parser):
         else:
             # TODO: Size of compressed Flash?
             return None
-

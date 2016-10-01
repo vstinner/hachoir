@@ -12,10 +12,10 @@ Sources:
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, ParserError,
-    Bit, Bits, UInt8, UInt16, UInt32,
-    Enum, String, TimestampUnix32, RawBytes, NullBytes)
+                           Bit, Bits, UInt8, UInt16, UInt32,
+                           Enum, String, TimestampUnix32, RawBytes, NullBytes)
 from hachoir.core.tools import (alignValue,
-    humanDuration, humanFilesize)
+                                humanDuration, humanFilesize)
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.text_handler import textHandler
 
@@ -42,7 +42,7 @@ class DirectoryEntry(FieldSet):
         yield UInt8(self, "name_len", "Name length")
         yield Enum(UInt8(self, "file_type", "File type"), self.file_type)
         yield String(self, "name", self["name_len"].value, "File name")
-        size = (self._size - self.current_size)//8
+        size = (self._size - self.current_size) // 8
         if size:
             yield NullBytes(self, "padding", size)
 
@@ -53,9 +53,12 @@ class DirectoryEntry(FieldSet):
         else:
             return "Directory entry (empty)"
 
+
 class InodeFlags(FieldSet):
+
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
+
     def createFields(self):
         yield Bit(self, "SECRM", "Secure deletion")
         yield Bit(self, "UNRM",  "Undelete")
@@ -82,6 +85,7 @@ class InodeFlags(FieldSet):
         yield Bit(self, "NOCOW", "Do not cow file")
         yield Bits(self, "UNSUED2", 7)
         yield Bit(self, "RESERVED", "reserved for ext2 lib")
+
 
 class Inode(FieldSet):
     inode_type_name = {
@@ -110,11 +114,11 @@ class Inode(FieldSet):
         10: "l",
         12: "s",
     }
-    static_size = (68 + 15*4)*8
+    static_size = (68 + 15 * 4) * 8
 
     def __init__(self, parent, name, index):
         FieldSet.__init__(self, parent, name, None)
-        self.uniq_id = 1+index
+        self.uniq_id = 1 + index
 
     def createDescription(self):
         desc = "Inode %s: " % self.uniq_id
@@ -139,7 +143,7 @@ class Inode(FieldSet):
             ("group_read", "group_write", "group_exec"),
             ("other_read", "other_write", "other_exec"))
         letters = "rwx"
-        mode = [ "-"  for index in range(10) ]
+        mode = ["-" for index in range(10)]
         index = 1
         for loop in range(3):
             for name, letter in zip(names[loop], letters):
@@ -203,21 +207,24 @@ class Inode(FieldSet):
         else:
             yield RawBytes(self, "raw", 12, "Reserved")
 
+
 class Bitmap(FieldSet):
+
     def __init__(self, parent, name, start, size, description, **kw):
         description = "%s: %s items" % (description, size)
         FieldSet.__init__(self, parent, name, description, size=size, **kw)
-        self.start = 1+start
+        self.start = 1 + start
 
     def createFields(self):
         for index in range(self._size):
-            yield Bit(self, "item[]", "Item %s" % (self.start+index))
+            yield Bit(self, "item[]", "Item %s" % (self.start + index))
 
 BlockBitmap = Bitmap
 InodeBitmap = Bitmap
 
+
 class GroupDescriptor(FieldSet):
-    static_size = 32*8
+    static_size = 32 * 8
 
     def __init__(self, parent, name, index):
         FieldSet.__init__(self, parent, name)
@@ -239,9 +246,12 @@ class GroupDescriptor(FieldSet):
         yield UInt16(self, "padding", "Padding")
         yield NullBytes(self, "reserved", 12, "Reserved")
 
+
 class FeatureCompat(FieldSet):
+
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
+
     def createFields(self):
         yield Bit(self, "DIR_PREALLOC")
         yield Bit(self, "IMAGIC_INODES")
@@ -251,9 +261,12 @@ class FeatureCompat(FieldSet):
         yield Bit(self, "DIR_INDEX")
         yield Bits(self, "UNSUED", 26)
 
+
 class FeatureIncompat(FieldSet):
+
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
+
     def createFields(self):
         yield Bit(self, "COMPRESSION")
         yield Bit(self, "FILETYPE")
@@ -262,18 +275,24 @@ class FeatureIncompat(FieldSet):
         yield Bit(self, "META_BG")
         yield Bits(self, "UNSUED", 27)
 
+
 class FeatureRocompat(FieldSet):
+
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
+
     def createFields(self):
         yield Bit(self, "SPARSE_SUPER")
         yield Bit(self, "LARGE_FILE")
         yield Bit(self, "BTREE_DIR")
         yield Bits(self, "UNSUED", 29)
 
+
 class DefaultMountOpts(FieldSet):
+
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
+
     def createFields(self):
         yield Bit(self, "DEBUG")
         yield Bit(self, "BSDGROUPS")
@@ -286,8 +305,9 @@ class DefaultMountOpts(FieldSet):
         yield Bit(self, "JMODE_WBACK")
         yield Bits(self, "UNSUED", 32 - 9)
 
+
 class SuperBlock(FieldSet):
-    static_size = 433*8
+    static_size = 433 * 8
 
     OS_LINUX = 0
     OS_HURD = 1
@@ -386,14 +406,17 @@ class SuperBlock(FieldSet):
         if self._group_count is None:
             # Calculate number of groups
             blocks_per_group = self["blocks_per_group"].value
-            self._group_count = (self["blocks_count"].value - self["first_data_block"].value + (blocks_per_group - 1)) // blocks_per_group
+            self._group_count = (self["blocks_count"].value - self[
+                                 "first_data_block"].value + (blocks_per_group - 1)) // blocks_per_group
         return self._group_count
     group_count = property(_getGroupCount)
 
     def postMaxTime(self, chunk):
         return humanDuration(chunk.value * 1000)
 
+
 class GroupDescriptors(FieldSet):
+
     def __init__(self, parent, name, count):
         FieldSet.__init__(self, parent, name)
         self.count = count
@@ -405,7 +428,9 @@ class GroupDescriptors(FieldSet):
         for index in range(0, self.count):
             yield GroupDescriptor(self, "group[]", index)
 
+
 class InodeTable(FieldSet):
+
     def __init__(self, parent, name, start, count):
         FieldSet.__init__(self, parent, name)
         self.start = start
@@ -416,16 +441,18 @@ class InodeTable(FieldSet):
         return "Group descriptors: %s items" % self.count
 
     def createFields(self):
-        for index in range(self.start, self.start+self.count):
+        for index in range(self.start, self.start + self.count):
             yield Inode(self, "inode[]", index)
 
+
 class Group(FieldSet):
+
     def __init__(self, parent, name, index):
         FieldSet.__init__(self, parent, name)
         self.uniq_id = index
 
     def createDescription(self):
-        desc = "Group %s: %s" % (self.uniq_id, humanFilesize(self.size//8))
+        desc = "Group %s: %s" % (self.uniq_id, humanFilesize(self.size // 8))
         if "superblock_copy" in self:
             desc += " (with superblock copy)"
         return desc
@@ -436,7 +463,7 @@ class Group(FieldSet):
         block_size = self["/"].block_size
 
         # Read block bitmap
-        addr = self.absolute_address + 56*8
+        addr = self.absolute_address + 56 * 8
         self.superblock_copy = (self.stream.readBytes(addr, 2) == b"\x53\xEF")
         if self.superblock_copy:
             yield SuperBlock(self, "superblock_copy")
@@ -450,31 +477,36 @@ class Group(FieldSet):
             raise ParserError("Invalid block count")
         if (inode_count % 8) != 0:
             raise ParserError("Invalid inode count")
-        block_count = min(block_count, superblock["blocks_count"].value - block_index)
-        inode_count = min(inode_count, superblock["inodes_count"].value - inode_index)
+        block_count = min(block_count, superblock[
+                          "blocks_count"].value - block_index)
+        inode_count = min(inode_count, superblock[
+                          "inodes_count"].value - inode_index)
 
         # Read block bitmap
-        field = self.seekByte(group["block_bitmap"].value * block_size, relative=False, null=True)
+        field = self.seekByte(
+            group["block_bitmap"].value * block_size, relative=False, null=True)
         if field:
             yield field
         yield BlockBitmap(self, "block_bitmap", block_index, block_count, "Block bitmap")
 
         # Read inode bitmap
-        field = self.seekByte(group["inode_bitmap"].value * block_size, relative=False)
+        field = self.seekByte(
+            group["inode_bitmap"].value * block_size, relative=False)
         if field:
             yield field
         yield InodeBitmap(self, "inode_bitmap", inode_index, inode_count, "Inode bitmap")
 
         # Read inode table
-        field = self.seekByte(alignValue(self.current_size//8, block_size))
+        field = self.seekByte(alignValue(self.current_size // 8, block_size))
         if field:
             yield field
         yield InodeTable(self, "inode_table", inode_index, inode_count)
 
         # Add padding if needed
         addr = min(self.parent.size // 8,
-            (self.uniq_id+1) * superblock["blocks_per_group"].value * block_size)
+                   (self.uniq_id + 1) * superblock["blocks_per_group"].value * block_size)
         yield self.seekByte(addr, "data", relative=False)
+
 
 class EXT2_FS(Parser):
     """
@@ -491,24 +523,24 @@ class EXT2_FS(Parser):
         "id": "ext2",
         "category": "file_system",
         "description": "EXT2/EXT3 file system",
-        "min_size": (1024*2)*8,
+        "min_size": (1024 * 2) * 8,
         "magic": (
             # (magic, state=valid)
-            (b"\x53\xEF\1\0", 1080*8),
+            (b"\x53\xEF\1\0", 1080 * 8),
             # (magic, state=error)
-            (b"\x53\xEF\2\0", 1080*8),
+            (b"\x53\xEF\2\0", 1080 * 8),
             # (magic, state=error)
-            (b"\x53\xEF\4\0", 1080*8),
+            (b"\x53\xEF\4\0", 1080 * 8),
         ),
     }
     endian = LITTLE_ENDIAN
 
     def validate(self):
-        if self.stream.readBytes((1024+56)*8, 2) != b"\x53\xEF":
+        if self.stream.readBytes((1024 + 56) * 8, 2) != b"\x53\xEF":
             return "Invalid magic number"
         if not(0 <= self["superblock/log_block_size"].value <= 2):
             return "Invalid (log) block size"
-        if self["superblock/inode_size"].value != (68 + 15*4):
+        if self["superblock/inode_size"].value != (68 + 15 * 4):
             return "Unsupported inode size"
         return True
 
@@ -521,10 +553,12 @@ class EXT2_FS(Parser):
         yield superblock
         if not(0 <= self["superblock/log_block_size"].value <= 2):
             raise ParserError("EXT2: Invalid (log) block size")
-        self.block_size = 1024 << superblock["log_block_size"].value # in bytes
+        self.block_size = 1024 << superblock[
+            "log_block_size"].value  # in bytes
 
         # Read groups' descriptor
-        field = self.seekByte(((1023 + superblock.size//8) // self.block_size + 1) * self.block_size, null=True)
+        field = self.seekByte(((1023 + superblock.size // 8) //
+                               self.block_size + 1) * self.block_size, null=True)
         if field:
             yield field
         groups = GroupDescriptors(self, "group_desc", superblock.group_count)
@@ -557,5 +591,3 @@ class EXT2_FS(Parser):
         return desc + " file system: total=%s, used=%s, block=%s" % (
             humanFilesize(total), humanFilesize(used),
             humanFilesize(block_size))
-
-

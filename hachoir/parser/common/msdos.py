@@ -27,6 +27,7 @@ _FIELDS = (
     (Bit, "encrypted"),
 )
 
+
 class MSDOSFileAttr16(StaticFieldSet):
     """
     MSDOS 16-bit file attributes
@@ -54,9 +55,9 @@ class MSDOSFileAttr16(StaticFieldSet):
         else:
             return "(none)"
 
+
 class MSDOSFileAttr32(MSDOSFileAttr16):
     """
     MSDOS 32-bit file attributes
     """
     format = _FIELDS + ((NullBits, "reserved[]", 17),)
-

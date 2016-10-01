@@ -10,10 +10,10 @@ Creation date: 2007-01-19
 """
 
 from hachoir.field import (FieldSet, ParserError, Enum,
-    Bit, Bits, SeekableFieldSet,
-    UInt16, UInt32, TimestampUnix32,
-    RawBytes, PaddingBytes, NullBytes, NullBits,
-    CString, String)
+                           Bit, Bits, SeekableFieldSet,
+                           UInt16, UInt32, TimestampUnix32,
+                           RawBytes, PaddingBytes, NullBytes, NullBits,
+                           CString, String)
 from hachoir.core.text_handler import textHandler, filesizeHandler, hexadecimal
 from hachoir.core.tools import createDict, paddingSize, alignValue, makePrintable
 from hachoir.parser.common.win32 import BitmapInfoHeader
@@ -22,11 +22,14 @@ MAX_DEPTH = 5
 MAX_INDEX_PER_HEADER = 300
 MAX_NAME_PER_HEADER = MAX_INDEX_PER_HEADER
 
+
 class Version(FieldSet):
     static_size = 32
+
     def createFields(self):
         yield textHandler(UInt16(self, "minor", "Minor version number"), hexadecimal)
         yield textHandler(UInt16(self, "major", "Major version number"), hexadecimal)
+
     def createValue(self):
         return self["major"].value + float(self["minor"].value) / 10000
 
@@ -58,15 +61,15 @@ FILETYPE_NAME = {
 }
 
 DRIVER_SUBTYPE_NAME = {
-     1: "Printer",
-     2: "Keyboard",
-     3: "Language",
-     4: "Display",
-     5: "Mouse",
-     6: "Network",
-     7: "System",
-     8: "Installable",
-     9: "Sound",
+    1: "Printer",
+    2: "Keyboard",
+    3: "Language",
+    4: "Display",
+    5: "Mouse",
+    6: "Network",
+    7: "System",
+    8: "Installable",
+    9: "Sound",
     10: "Communications",
 }
 
@@ -76,7 +79,9 @@ FONT_SUBTYPE_NAME = {
     3: "TrueType",
 }
 
+
 class VersionInfoBinary(FieldSet):
+
     def createFields(self):
         yield textHandler(UInt32(self, "magic", "File information magic (0xFEEF04BD)"), hexadecimal)
         if self["magic"].value != 0xFEEF04BD:
@@ -108,6 +113,7 @@ class VersionInfoBinary(FieldSet):
         yield TimestampUnix32(self, "date_ms")
         yield TimestampUnix32(self, "date_ls")
 
+
 class VersionInfoNode(FieldSet):
     TYPE_STRING = 1
     TYPE_NAME = {
@@ -126,7 +132,7 @@ class VersionInfoNode(FieldSet):
         yield Enum(UInt16(self, "type"), self.TYPE_NAME)
         yield CString(self, "name", charset="UTF-16-LE")
 
-        size = paddingSize(self.current_size//8, 4)
+        size = paddingSize(self.current_size // 8, 4)
         if size:
             yield NullBytes(self, "padding[]", size)
         size = self["data_size"].value
@@ -136,7 +142,7 @@ class VersionInfoNode(FieldSet):
                     size *= 2
                 yield String(self, "value", size, charset="UTF-16-LE", truncate="\0")
             elif self["name"].value == "VS_VERSION_INFO":
-                yield VersionInfoBinary(self, "value", size=size*8)
+                yield VersionInfoBinary(self, "value", size=size * 8)
                 if self["value/file_flags_mask"].value == 0:
                     self.is_32bit = False
             else:
@@ -147,15 +153,16 @@ class VersionInfoNode(FieldSet):
         if size:
             yield NullBytes(self, "padding[]", size)
 
-
     def createDescription(self):
         text = "Version info node: %s" % self["name"].value
         if self["type"].value == self.TYPE_STRING and "value" in self:
             text += "=%s" % self["value"].value
         return text
 
+
 def parseVersionInfo(parent):
     yield VersionInfoNode(parent, "node[]")
+
 
 def parseIcon(parent):
     yield BitmapInfoHeader(parent, "bmp_header")
@@ -163,7 +170,9 @@ def parseIcon(parent):
     if size:
         yield RawBytes(parent, "raw", size)
 
+
 class WindowsString(FieldSet):
+
     def createFields(self):
         yield UInt16(self, "length", "Number of 16-bit characters")
         size = self["length"].value * 2
@@ -178,6 +187,7 @@ class WindowsString(FieldSet):
 
     def createDisplay(self):
         return makePrintable(self.value, "UTF-8", quote='"')
+
 
 def parseStringTable(parent):
     while not parent.eof:
@@ -200,8 +210,9 @@ RESOURCE_TYPE = {
     16: ("version_info", "Version information", parseVersionInfo),
 }
 
+
 class Entry(FieldSet):
-    static_size = 16*8
+    static_size = 16 * 8
 
     def __init__(self, parent, name, inode=None):
         FieldSet.__init__(self, parent, name)
@@ -217,11 +228,14 @@ class Entry(FieldSet):
         return "Entry #%u: offset=%s size=%s" % (
             self.inode["offset"].value, self["rva"].display, self["size"].display)
 
+
 class NameOffset(FieldSet):
+
     def createFields(self):
         yield UInt32(self, "name")
         yield Bits(self, "offset", 31)
         yield Bit(self, "is_name")
+
 
 class IndexOffset(FieldSet):
     TYPE_DESC = createDict(RESOURCE_TYPE, 1)
@@ -241,9 +255,11 @@ class IndexOffset(FieldSet):
         else:
             return "Index: ID %s at %s" % (self["type"].display, self["offset"].value)
 
+
 class ResourceContent(FieldSet):
+
     def __init__(self, parent, name, entry, size=None):
-        FieldSet.__init__(self, parent, name, size=entry["size"].value*8)
+        FieldSet.__init__(self, parent, name, size=entry["size"].value * 8)
         self.entry = entry
         res_type = self.getResType()
         if res_type in RESOURCE_TYPE:
@@ -261,14 +277,16 @@ class ResourceContent(FieldSet):
         if self._parser:
             yield from self._parser(self)
         else:
-            yield RawBytes(self, "content", self.size//8)
+            yield RawBytes(self, "content", self.size // 8)
 
     def createDescription(self):
         return "Resource #%u content: type=%s" % (
             self.getResID(), self.getResType())
 
+
 class Header(FieldSet):
-    static_size = 16*8
+    static_size = 16 * 8
+
     def createFields(self):
         yield NullBytes(self, "options", 4)
         yield TimestampUnix32(self, "creation_date")
@@ -291,17 +309,22 @@ class Header(FieldSet):
         else:
             return text
 
+
 class Name(FieldSet):
+
     def createFields(self):
         yield UInt16(self, "length")
         size = min(self["length"].value, 255)
         if size:
             yield String(self, "name", size, charset="UTF-16LE")
 
+
 class Directory(FieldSet):
+
     def __init__(self, parent, name, res_type=None):
         FieldSet.__init__(self, parent, name)
-        nb_entries = self["header/nb_name"].value + self["header/nb_index"].value
+        nb_entries = self["header/nb_name"].value + \
+            self["header/nb_index"].value
         self._size = Header.static_size + nb_entries * 64
         self.res_type = res_type
 
@@ -310,10 +333,10 @@ class Directory(FieldSet):
 
         if MAX_NAME_PER_HEADER < self["header/nb_name"].value:
             raise ParserError("EXE resource: invalid number of name (%s)"
-                % self["header/nb_name"].value)
+                              % self["header/nb_name"].value)
         if MAX_INDEX_PER_HEADER < self["header/nb_index"].value:
             raise ParserError("EXE resource: invalid number of index (%s)"
-                % self["header/nb_index"].value)
+                              % self["header/nb_index"].value)
 
         hdr = self["header"]
         for index in range(hdr["nb_name"].value):
@@ -324,7 +347,9 @@ class Directory(FieldSet):
     def createDescription(self):
         return self["header"].description
 
+
 class PE_Resource(SeekableFieldSet):
+
     def __init__(self, parent, name, section, size):
         SeekableFieldSet.__init__(self, parent, name, size=size)
         self.section = section
@@ -354,7 +379,8 @@ class PE_Resource(SeekableFieldSet):
         while subdirs:
             depth += 1
             if MAX_DEPTH < depth:
-                self.error("EXE resource: depth too high (%s), stop parsing directories" % depth)
+                self.error(
+                    "EXE resource: depth too high (%s), stop parsing directories" % depth)
                 break
             newsubdirs = []
             for index, subdir in enumerate(subdirs):
@@ -365,7 +391,8 @@ class PE_Resource(SeekableFieldSet):
                             newsubdirs.append(field)
                         yield field
                 except Exception as err:
-                    self.error("Unable to create directory %s: %s" % (name, err))
+                    self.error("Unable to create directory %s: %s" %
+                               (name, err))
             subdirs = newsubdirs
             alldirs.extend(subdirs)
 
@@ -397,11 +424,13 @@ class PE_Resource(SeekableFieldSet):
                     yield padding
                 yield ResourceContent(self, "content[]", entry)
             except Exception as err:
-                self.warning("Error when parsing entry %s: %s" % (entry.path, err))
+                self.warning("Error when parsing entry %s: %s" %
+                             (entry.path, err))
 
         size = (self.size - self.current_size) // 8
         if size:
             yield PaddingBytes(self, "padding_end", size)
+
 
 class NE_VersionInfoNode(FieldSet):
     TYPE_STRING = 1
@@ -419,13 +448,13 @@ class NE_VersionInfoNode(FieldSet):
         yield UInt16(self, "data_size")
         yield CString(self, "name", charset="ISO-8859-1")
 
-        size = paddingSize(self.current_size//8, 4)
+        size = paddingSize(self.current_size // 8, 4)
         if size:
             yield NullBytes(self, "padding[]", size)
         size = self["data_size"].value
         if size:
             if self["name"].value == "VS_VERSION_INFO":
-                yield VersionInfoBinary(self, "value", size=size*8)
+                yield VersionInfoBinary(self, "value", size=size * 8)
             else:
                 yield String(self, "value", size, charset="ISO-8859-1")
         while 12 <= (self.size - self.current_size) // 8:
@@ -434,10 +463,8 @@ class NE_VersionInfoNode(FieldSet):
         if size:
             yield NullBytes(self, "padding[]", size)
 
-
     def createDescription(self):
         text = "Version info node: %s" % self["name"].value
 #        if self["type"].value == self.TYPE_STRING and "value" in self:
 #            text += "=%s" % self["value"].value
         return text
-

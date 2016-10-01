@@ -11,16 +11,18 @@ References:
 """
 
 from hachoir.field import (FieldSet, SeekableFieldSet, ParserError,
-    UInt8, UInt16, UInt32,
-    Int8, Int16, Int32,
-    Float32, Float64,
-    Enum, String, Bytes, SubFile,
-    NullBits, NullBytes, createPaddingField)
+                           UInt8, UInt16, UInt32,
+                           Int8, Int16, Int32,
+                           Float32, Float64,
+                           Enum, String, Bytes, SubFile,
+                           NullBits, NullBytes, createPaddingField)
 from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN, NETWORK_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal
 from hachoir.core.tools import createDict
 
-MAX_COUNT = 1000 # maximum number of array entries in an IFD entry (excluding string types)
+# maximum number of array entries in an IFD entry (excluding string types)
+MAX_COUNT = 1000
+
 
 def rationalFactory(class_name, size, field_class):
     class Rational(FieldSet):
@@ -39,15 +41,22 @@ def rationalFactory(class_name, size, field_class):
 RationalInt32 = rationalFactory("RationalInt32", 64, Int32)
 RationalUInt32 = rationalFactory("RationalUInt32", 64, UInt32)
 
+
 class ASCIIString(String):
+
     def __init__(self, parent, name, nbytes, description=None, strip=' \0', charset='ISO-8859-1', *args, **kwargs):
-        String.__init__(self, parent, name, nbytes, description, strip, charset, *args, **kwargs)
+        String.__init__(self, parent, name, nbytes, description,
+                        strip, charset, *args, **kwargs)
+
 
 class IFDTag(UInt16):
+
     def getTag(self):
         return self.parent.TAG_INFO.get(self.value, (hex(self.value), ""))
+
     def createDisplay(self):
         return self.getTag()[0]
+
 
 class BasicIFDEntry(FieldSet):
     TYPE_BYTE = 0
@@ -55,15 +64,15 @@ class BasicIFDEntry(FieldSet):
     TYPE_RATIONAL = 5
     TYPE_SIGNED_RATIONAL = 10
     TYPE_INFO = {
-         1: (UInt8, "BYTE (8 bits)"),
-         2: (ASCIIString, "ASCII (8 bits)"),
-         3: (UInt16, "SHORT (16 bits)"),
-         4: (UInt32, "LONG (32 bits)"),
-         5: (RationalUInt32, "RATIONAL (2x LONG, 64 bits)"),
-         6: (Int8, "SBYTE (8 bits)"),
-         7: (Bytes, "UNDEFINED (8 bits)"),
-         8: (Int16, "SSHORT (16 bits)"),
-         9: (Int32, "SLONG (32 bits)"),
+        1: (UInt8, "BYTE (8 bits)"),
+        2: (ASCIIString, "ASCII (8 bits)"),
+        3: (UInt16, "SHORT (16 bits)"),
+        4: (UInt32, "LONG (32 bits)"),
+        5: (RationalUInt32, "RATIONAL (2x LONG, 64 bits)"),
+        6: (Int8, "SBYTE (8 bits)"),
+        7: (Bytes, "UNDEFINED (8 bits)"),
+        8: (Int16, "SSHORT (16 bits)"),
+        9: (Int32, "SLONG (32 bits)"),
         10: (RationalInt32, "SRATIONAL (2x SLONG, 64 bits)"),
         11: (Float32, "FLOAT (32 bits)"),
         12: (Float64, "DOUBLE (64 bits)"),
@@ -83,8 +92,9 @@ class BasicIFDEntry(FieldSet):
         yield UInt32(self, "count", "Count")
 
         if not issubclass(self.value_cls, Bytes) \
-          and self["count"].value > MAX_COUNT:
-            raise ParserError("EXIF: Invalid count value (%s)" % self["count"].value)
+                and self["count"].value > MAX_COUNT:
+            raise ParserError("EXIF: Invalid count value (%s)" %
+                              self["count"].value)
 
         count = self['count'].value
         totalsize = self.value_size * count
@@ -100,7 +110,7 @@ class BasicIFDEntry(FieldSet):
                 for i in range(count):
                     yield self.value_cls(self, name)
             if totalsize < 32:
-                yield NullBits(self, "padding", 32-totalsize)
+                yield NullBits(self, "padding", 32 - totalsize)
         else:
             yield UInt32(self, "offset", "Value offset")
 
@@ -110,7 +120,8 @@ class BasicIFDEntry(FieldSet):
         return None
 
     def createDescription(self):
-        return "Entry: "+self["tag"].getTag()[1]
+        return "Entry: " + self["tag"].getTag()[1]
+
 
 class IFDEntry(BasicIFDEntry):
     EXIF_IFD_POINTER = 0x8769
@@ -203,6 +214,7 @@ class IFDEntry(BasicIFDEntry):
         INTEROP_IFD_POINTER: ("IFDInterop", "Interoperability IFD Pointer"),
     }
 
+
 class ExifIFDEntry(BasicIFDEntry):
     TAG_INFO = {
         # version
@@ -271,6 +283,7 @@ class ExifIFDEntry(BasicIFDEntry):
         0xA420: ("ImageUniqueID", "Unique image ID"),
     }
 
+
 class GPSIFDEntry(BasicIFDEntry):
     TAG_INFO = {
         0x0000: ("GPSVersionID", "GPS tag version"),
@@ -306,13 +319,16 @@ class GPSIFDEntry(BasicIFDEntry):
         0x001E: ("GPSDifferential", "GPS differential correction"),
     }
 
+
 class InteropIFDEntry(BasicIFDEntry):
     TAG_INFO = {
         0x0001: ("InteroperabilityIndex", "Interoperability Identification"),
     }
 
+
 class IFD(SeekableFieldSet):
     EntryClass = IFDEntry
+
     def __init__(self, parent, name, base_addr):
         self.base_addr = base_addr
         SeekableFieldSet.__init__(self, parent, name)
@@ -326,12 +342,13 @@ class IFD(SeekableFieldSet):
             yield self.EntryClass(self, "entry[]")
         yield UInt32(self, "next", "Offset to next IFD")
         for i in range(count):
-            entry = self['entry[%d]'%i]
+            entry = self['entry[%d]' % i]
             if 'offset' not in entry:
                 continue
-            self.seekByte(entry['offset'].value+self.base_addr//8, relative=False)
+            self.seekByte(entry['offset'].value +
+                          self.base_addr // 8, relative=False)
             count = entry['count'].value
-            name = "value[%s]"%i
+            name = "value[%s]" % i
             if issubclass(entry.value_cls, Bytes):
                 yield entry.value_cls(self, name, count)
             else:
@@ -341,9 +358,9 @@ class IFD(SeekableFieldSet):
                     yield entry.value_cls(self, name)
 
     def getEntryValues(self, entry):
-        n = int(entry.name.rsplit('[',1)[1].strip(']'))
+        n = int(entry.name.rsplit('[', 1)[1].strip(']'))
         if 'offset' in entry:
-            field = 'value[%d]'%n
+            field = 'value[%d]' % n
             base = self
         else:
             field = 'value'
@@ -353,11 +370,14 @@ class IFD(SeekableFieldSet):
         else:
             return base.array(field)
 
+
 class ExifIFD(IFD):
     EntryClass = ExifIFDEntry
 
+
 class GPSIFD(IFD):
     EntryClass = GPSIFDEntry
+
 
 class InteropIFD(IFD):
     EntryClass = InteropIFDEntry
@@ -368,33 +388,37 @@ IFD_TAGS = {
     IFDEntry.INTEROP_IFD_POINTER: ('exif_interop', InteropIFD),
 }
 
+
 def TIFF(self):
     iff_start = self.absolute_address + self.current_size
     yield String(self, "endian", 2, "Endian ('II' or 'MM')", charset="ASCII")
     if self["endian"].value not in ("II", "MM"):
         raise ParserError("Invalid endian!")
     if self["endian"].value == "II":
-       self.endian = LITTLE_ENDIAN
+        self.endian = LITTLE_ENDIAN
     else:
-       self.endian = BIG_ENDIAN
+        self.endian = BIG_ENDIAN
 
     yield UInt16(self, "version", "TIFF version number")
     yield UInt32(self, "img_dir_ofs", "Next image directory offset")
     offsets = [(self['img_dir_ofs'].value, 'ifd[]', IFD)]
     while offsets:
         offset, name, klass = offsets.pop(0)
-        self.seekByte(offset+iff_start//8, relative=False)
+        self.seekByte(offset + iff_start // 8, relative=False)
         ifd = klass(self, name, iff_start)
         yield ifd
         for entry in ifd.array('entry'):
             tag = entry['tag'].value
             if tag in IFD_TAGS:
                 name, klass = IFD_TAGS[tag]
-                offsets.append((ifd.getEntryValues(entry)[0].value, name+'[]', klass))
+                offsets.append((ifd.getEntryValues(entry)[
+                               0].value, name + '[]', klass))
         if ifd['next'].value != 0:
             offsets.append((ifd['next'].value, 'ifd[]', IFD))
 
+
 class Exif(SeekableFieldSet):
+
     def createFields(self):
         # Headers
         yield String(self, "header", 6, "Header (Exif\\0\\0)", charset="ASCII")
@@ -412,8 +436,11 @@ class Exif(SeekableFieldSet):
             for i, entry in enumerate(ifd.array('entry')):
                 data[entry['tag'].display] = entry
             if 'JPEGInterchangeFormat' in data and 'JPEGInterchangeFormatLength' in data:
-                offs = ifd.getEntryValues(data['JPEGInterchangeFormat'])[0].value
-                size = ifd.getEntryValues(data['JPEGInterchangeFormatLength'])[0].value
-                if size == 0: continue
-                self.seekByte(offs + iff_start//8, relative=False)
+                offs = ifd.getEntryValues(
+                    data['JPEGInterchangeFormat'])[0].value
+                size = ifd.getEntryValues(
+                    data['JPEGInterchangeFormatLength'])[0].value
+                if size == 0:
+                    continue
+                self.seekByte(offs + iff_start // 8, relative=False)
                 yield SubFile(self, "thumbnail[]", size, "Thumbnail (JPEG file)", mime_type="image/jpeg")

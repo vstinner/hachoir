@@ -10,7 +10,9 @@ from hachoir.field import FieldSet, UInt8, UInt16, Enum, RawBytes
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.parser.image.common import PaletteRGB
 
+
 class Line(FieldSet):
+
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
         self._size = self["/width"].value * self["/bpp"].value
@@ -19,18 +21,22 @@ class Line(FieldSet):
         for x in range(self["/width"].value):
             yield UInt8(self, "pixel[]")
 
+
 class Pixels(FieldSet):
+
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
-        self._size = self["/width"].value * self["/height"].value * self["/bpp"].value
+        self._size = self["/width"].value * \
+            self["/height"].value * self["/bpp"].value
 
     def createFields(self):
         if self["/options"].value == 0:
-            RANGE = range(self["/height"].value-1,-1,-1)
+            RANGE = range(self["/height"].value - 1, -1, -1)
         else:
             RANGE = range(self["/height"].value)
         for y in RANGE:
             yield Line(self, "line[%u]" % y)
+
 
 class TargaFile(Parser):
     PARSER_TAGS = {
@@ -38,13 +44,13 @@ class TargaFile(Parser):
         "category": "image",
         "file_ext": ("tga",),
         "mime": ("image/targa", "image/tga", "image/x-tga"),
-        "min_size": 18*8,
+        "min_size": 18 * 8,
         "description": "Truevision Targa Graphic (TGA)"
     }
     CODEC_NAME = {
-         1: "8-bit uncompressed",
-         2: "24-bit uncompressed",
-         9: "8-bit RLE",
+        1: "8-bit uncompressed",
+        2: "24-bit uncompressed",
+        9: "8-bit RLE",
         10: "24-bit RLE",
     }
     endian = LITTLE_ENDIAN
@@ -81,5 +87,3 @@ class TargaFile(Parser):
             size = (self.size - self.current_size) // 8
             if size:
                 yield RawBytes(self, "raw_pixels", size)
-
-

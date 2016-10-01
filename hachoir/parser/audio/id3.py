@@ -7,118 +7,119 @@ Author: Victor Stinner
 """
 
 from hachoir.field import (FieldSet, MatchError, ParserError,
-    Enum, UInt8, UInt24, UInt32,
-    CString, String, RawBytes,
-    Bit, Bits, NullBytes, NullBits)
+                           Enum, UInt8, UInt24, UInt32,
+                           CString, String, RawBytes,
+                           Bit, Bits, NullBytes, NullBits)
 from hachoir.core.text_handler import textHandler
 from hachoir.core.tools import humanDuration
 from hachoir.core.endian import NETWORK_ENDIAN
 from functools import reduce
 
+
 class ID3v1(FieldSet):
     static_size = 128 * 8
     GENRE_NAME = {
-          0: "Blues",
-          1: "Classic Rock",
-          2: "Country",
-          3: "Dance",
-          4: "Disco",
-          5: "Funk",
-          6: "Grunge",
-          7: "Hip-Hop",
-          8: "Jazz",
-          9: "Metal",
-         10: "New Age",
-         11: "Oldies",
-         12: "Other",
-         13: "Pop",
-         14: "R&B",
-         15: "Rap",
-         16: "Reggae",
-         17: "Rock",
-         18: "Techno",
-         19: "Industrial",
-         20: "Alternative",
-         21: "Ska",
-         22: "Death Metal",
-         23: "Pranks",
-         24: "Soundtrack",
-         25: "Euro-Techno",
-         26: "Ambient",
-         27: "Trip-Hop",
-         28: "Vocal",
-         29: "Jazz+Funk",
-         30: "Fusion",
-         31: "Trance",
-         32: "Classical",
-         33: "Instrumental",
-         34: "Acid",
-         35: "House",
-         36: "Game",
-         37: "Sound Clip",
-         38: "Gospel",
-         39: "Noise",
-         40: "AlternRock",
-         41: "Bass",
-         42: "Soul",
-         43: "Punk",
-         44: "Space",
-         45: "Meditative",
-         46: "Instrumental Pop",
-         47: "Instrumental Rock",
-         48: "Ethnic",
-         49: "Gothic",
-         50: "Darkwave",
-         51: "Techno-Industrial",
-         52: "Electronic",
-         53: "Pop-Folk",
-         54: "Eurodance",
-         55: "Dream",
-         56: "Southern Rock",
-         57: "Comedy",
-         58: "Cult",
-         59: "Gangsta",
-         60: "Top 40",
-         61: "Christian Rap",
-         62: "Pop/Funk",
-         63: "Jungle",
-         64: "Native American",
-         65: "Cabaret",
-         66: "New Wave",
-         67: "Psychadelic",
-         68: "Rave",
-         69: "Showtunes",
-         70: "Trailer",
-         71: "Lo-Fi",
-         72: "Tribal",
-         73: "Acid Punk",
-         74: "Acid Jazz",
-         75: "Polka",
-         76: "Retro",
-         77: "Musical",
-         78: "Rock & Roll",
-         79: "Hard Rock",
-         # Following are winamp extentions
-         80: "Folk",
-         81: "Folk-Rock",
-         82: "National Folk",
-         83: "Swing",
-         84: "Fast Fusion",
-         85: "Bebob",
-         86: "Latin",
-         87: "Revival",
-         88: "Celtic",
-         89: "Bluegrass",
-         90: "Avantgarde",
-         91: "Gothic Rock",
-         92: "Progressive Rock",
-         93: "Psychedelic Rock",
-         94: "Symphonic Rock",
-         95: "Slow Rock",
-         96: "Big Band",
-         97: "Chorus",
-         98: "Easy Listening",
-         99: "Acoustic",
+        0: "Blues",
+        1: "Classic Rock",
+        2: "Country",
+        3: "Dance",
+        4: "Disco",
+        5: "Funk",
+        6: "Grunge",
+        7: "Hip-Hop",
+        8: "Jazz",
+        9: "Metal",
+        10: "New Age",
+        11: "Oldies",
+        12: "Other",
+        13: "Pop",
+        14: "R&B",
+        15: "Rap",
+        16: "Reggae",
+        17: "Rock",
+        18: "Techno",
+        19: "Industrial",
+        20: "Alternative",
+        21: "Ska",
+        22: "Death Metal",
+        23: "Pranks",
+        24: "Soundtrack",
+        25: "Euro-Techno",
+        26: "Ambient",
+        27: "Trip-Hop",
+        28: "Vocal",
+        29: "Jazz+Funk",
+        30: "Fusion",
+        31: "Trance",
+        32: "Classical",
+        33: "Instrumental",
+        34: "Acid",
+        35: "House",
+        36: "Game",
+        37: "Sound Clip",
+        38: "Gospel",
+        39: "Noise",
+        40: "AlternRock",
+        41: "Bass",
+        42: "Soul",
+        43: "Punk",
+        44: "Space",
+        45: "Meditative",
+        46: "Instrumental Pop",
+        47: "Instrumental Rock",
+        48: "Ethnic",
+        49: "Gothic",
+        50: "Darkwave",
+        51: "Techno-Industrial",
+        52: "Electronic",
+        53: "Pop-Folk",
+        54: "Eurodance",
+        55: "Dream",
+        56: "Southern Rock",
+        57: "Comedy",
+        58: "Cult",
+        59: "Gangsta",
+        60: "Top 40",
+        61: "Christian Rap",
+        62: "Pop/Funk",
+        63: "Jungle",
+        64: "Native American",
+        65: "Cabaret",
+        66: "New Wave",
+        67: "Psychadelic",
+        68: "Rave",
+        69: "Showtunes",
+        70: "Trailer",
+        71: "Lo-Fi",
+        72: "Tribal",
+        73: "Acid Punk",
+        74: "Acid Jazz",
+        75: "Polka",
+        76: "Retro",
+        77: "Musical",
+        78: "Rock & Roll",
+        79: "Hard Rock",
+        # Following are winamp extentions
+        80: "Folk",
+        81: "Folk-Rock",
+        82: "National Folk",
+        83: "Swing",
+        84: "Fast Fusion",
+        85: "Bebob",
+        86: "Latin",
+        87: "Revival",
+        88: "Celtic",
+        89: "Bluegrass",
+        90: "Avantgarde",
+        91: "Gothic Rock",
+        92: "Progressive Rock",
+        93: "Psychedelic Rock",
+        94: "Symphonic Rock",
+        95: "Slow Rock",
+        96: "Big Band",
+        97: "Chorus",
+        98: "Easy Listening",
+        99: "Acoustic",
         100: "Humour",
         101: "Speech",
         102: "Chanson",
@@ -172,7 +173,8 @@ class ID3v1(FieldSet):
     def createFields(self):
         yield String(self, "signature", 3, "IDv1 signature (\"TAG\")", charset="ASCII")
         if self["signature"].value != "TAG":
-            raise MatchError("Stream doesn't look like ID3v1 (wrong signature)!")
+            raise MatchError(
+                "Stream doesn't look like ID3v1 (wrong signature)!")
         # TODO: Charset of below strings?
         yield String(self, "song", 30, "Song title", strip=" \0", charset="ISO-8859-1")
         yield String(self, "author", 30, "Author", strip=" \0", charset="ISO-8859-1")
@@ -195,7 +197,7 @@ class ID3v1(FieldSet):
             yield String(self, "comment", 31, "Comment", strip=" \0", charset="ISO-8859-1")
 
     def getVersion(self):
-        addr = self.absolute_address + 126*8
+        addr = self.absolute_address + 126 * 8
         bytes = self.stream.readBytes(addr, 2)
 
         # last byte (127) is not space?
@@ -213,6 +215,7 @@ class ID3v1(FieldSet):
         return "ID3 %s: author=%s, song=%s" % (
             version, self["author"].value, self["song"].value)
 
+
 def getCharset(field):
     try:
         key = field.value
@@ -220,10 +223,13 @@ def getCharset(field):
     except KeyError:
         raise ParserError("ID3v2: Invalid charset (%s)." % key)
 
+
 class ID3_String(FieldSet):
     STRIP = " \0"
+
     def createFields(self):
-        yield String(self, "text", self._size//8, "Text", charset="ISO-8859-1", strip=self.STRIP)
+        yield String(self, "text", self._size // 8, "Text", charset="ISO-8859-1", strip=self.STRIP)
+
 
 class ID3_StringCharset(ID3_String):
     STRIP = " \0"
@@ -239,6 +245,7 @@ class ID3_StringCharset(ID3_String):
         2: "UTF-16-BE",
         3: "UTF-8"
     }
+
     def createFields(self):
         yield Enum(UInt8(self, "charset"), self.charset_desc)
         size = (self.size - self.current_size) // 8
@@ -247,7 +254,9 @@ class ID3_StringCharset(ID3_String):
         charset = getCharset(self["charset"])
         yield String(self, "text", size, "Text", charset=charset, strip=self.STRIP)
 
+
 class ID3_GEOB(ID3_StringCharset):
+
     def createFields(self):
         yield Enum(UInt8(self, "charset"), self.charset_desc)
         charset = getCharset(self["charset"])
@@ -259,7 +268,9 @@ class ID3_GEOB(ID3_StringCharset):
             return
         yield String(self, "text", size, "Text", charset=charset)
 
+
 class ID3_Comment(ID3_StringCharset):
+
     def createFields(self):
         yield Enum(UInt8(self, "charset"), self.charset_desc)
         yield String(self, "lang", 3, "Language", charset="ASCII")
@@ -270,7 +281,9 @@ class ID3_Comment(ID3_StringCharset):
             return
         yield String(self, "text", size, "Text", charset=charset, strip=self.STRIP)
 
+
 class ID3_StringTitle(ID3_StringCharset):
+
     def createFields(self):
         yield Enum(UInt8(self, "charset"), self.charset_desc)
         if self.current_size == self.size:
@@ -282,7 +295,9 @@ class ID3_StringTitle(ID3_StringCharset):
             return
         yield String(self, "text", size, "Text", charset=charset, strip=self.STRIP)
 
+
 class ID3_Private(FieldSet):
+
     def createFields(self):
         size = self._size // 8
         # TODO: Strings charset?
@@ -291,11 +306,13 @@ class ID3_Private(FieldSet):
             size -= 9
         yield String(self, "content", size, "Content")
 
+
 class ID3_TrackLength(FieldSet):
+
     def createFields(self):
         yield NullBytes(self, "zero", 1)
-        yield textHandler(String(self, "length", self._size//8 - 1,
-            "Length in ms", charset="ASCII"), self.computeLength)
+        yield textHandler(String(self, "length", self._size // 8 - 1,
+                                 "Length in ms", charset="ASCII"), self.computeLength)
 
     def computeLength(self, field):
         try:
@@ -303,6 +320,7 @@ class ID3_TrackLength(FieldSet):
             return humanDuration(ms)
         except:
             return field.value
+
 
 class ID3_Picture23(FieldSet):
     pict_type_name = {
@@ -328,6 +346,7 @@ class ID3_Picture23(FieldSet):
         0x13: "Band/artist logotype",
         0x14: "Publisher/Studio logotype"
     }
+
     def createFields(self):
         yield Enum(UInt8(self, "charset"), ID3_StringCharset.charset_desc)
         charset = getCharset(self["charset"])
@@ -338,7 +357,9 @@ class ID3_Picture23(FieldSet):
         if size:
             yield RawBytes(self, "img_data", size)
 
+
 class ID3_Picture24(FieldSet):
+
     def createFields(self):
         yield Enum(UInt8(self, "charset"), ID3_StringCharset.charset_desc)
         charset = getCharset(self["charset"])
@@ -348,6 +369,7 @@ class ID3_Picture24(FieldSet):
         size = (self._size - self._current_size) // 8
         if size:
             yield RawBytes(self, "img_data", size)
+
 
 class ID3_Chunk(FieldSet):
     endian = NETWORK_ENDIAN
@@ -424,7 +446,7 @@ class ID3_Chunk(FieldSet):
             # ID3 v2.2
             yield Enum(String(self, "tag", 3, "Tag", charset="ASCII", strip="\0"), ID3_Chunk.tag22_name)
             yield UInt24(self, "size")
-            size = self["size"].value - self.current_size//8 + 6
+            size = self["size"].value - self.current_size // 8 + 6
             is_compressed = False
 
         if size:
@@ -436,7 +458,7 @@ class ID3_Chunk(FieldSet):
                 elif tag[0] == "T":
                     cls = ID3_StringCharset
             if cls:
-                yield cls(self, "content", "Content", size=size*8)
+                yield cls(self, "content", "Content", size=size * 8)
             else:
                 yield RawBytes(self, "content", size, "Raw data content")
 
@@ -445,6 +467,7 @@ class ID3_Chunk(FieldSet):
             return "ID3 Chunk: %s" % self["tag"].display
         else:
             return "ID3 Chunk: (terminator)"
+
 
 class ID3_Size(Bits):
     static_size = 32
@@ -455,7 +478,8 @@ class ID3_Size(Bits):
     def createValue(self):
         data = self.parent.stream.readBytes(self.absolute_address, 4)
         # TODO: Check that bit #7 of each byte is nul: not(ord(data[i]) & 127)
-        return reduce(lambda x, y: x*128 + y, (item for item in data ))
+        return reduce(lambda x, y: x * 128 + y, (item for item in data))
+
 
 class ID3v2(FieldSet):
     endian = NETWORK_ENDIAN
@@ -480,7 +504,7 @@ class ID3v2(FieldSet):
         if self["header"].value != "ID3":
             raise MatchError("Signature error, should be \"ID3\".")
         if self["ver_major"].value not in self.VALID_MAJOR_VERSIONS \
-        or self["ver_minor"].value != 0:
+                or self["ver_minor"].value != 0:
             raise MatchError(
                 "Unknown ID3 metadata version (2.%u.%u)"
                 % (self["ver_major"].value, self["ver_minor"].value))
@@ -505,4 +529,3 @@ class ID3v2(FieldSet):
         padding = self.seekBit(self._size)
         if padding:
             yield padding
-

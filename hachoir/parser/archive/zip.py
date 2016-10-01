@@ -7,11 +7,11 @@ Authors: Christophe Gisquet and Victor Stinner
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, ParserError,
-    Bit, Bits, Enum,
-    TimeDateMSDOS32, SubFile,
-    UInt8, UInt16, UInt32, UInt64,
-    String, PascalString16,
-    RawBytes)
+                           Bit, Bits, Enum,
+                           TimeDateMSDOS32, SubFile,
+                           UInt8, UInt16, UInt32, UInt64,
+                           String, PascalString16,
+                           RawBytes)
 from hachoir.core.text_handler import textHandler, filesizeHandler, hexadecimal
 from hachoir.core.tools import makeUnicode
 from hachoir.core.endian import LITTLE_ENDIAN
@@ -21,16 +21,16 @@ MAX_FILESIZE = 1000 * 1024 * 1024
 
 COMPRESSION_DEFLATE = 8
 COMPRESSION_METHOD = {
-     0: "no compression",
-     1: "Shrunk",
-     2: "Reduced (factor 1)",
-     3: "Reduced (factor 2)",
-     4: "Reduced (factor 3)",
-     5: "Reduced (factor 4)",
-     6: "Imploded",
-     7: "Tokenizing",
-     8: "Deflate",
-     9: "Deflate64",
+    0: "no compression",
+    1: "Shrunk",
+    2: "Reduced (factor 1)",
+    3: "Reduced (factor 2)",
+    4: "Reduced (factor 3)",
+    5: "Reduced (factor 4)",
+    6: "Imploded",
+    7: "Tokenizing",
+    8: "Deflate",
+    9: "Deflate64",
     10: "PKWARE Imploding",
     11: "Reserved by PKWARE",
     12: "File is compressed using BZIP2 algorithm",
@@ -44,22 +44,24 @@ COMPRESSION_METHOD = {
     98: "PPMd version I, Rev 1",
 }
 
+
 def ZipRevision(field):
     return "%u.%u" % divmod(field.value, 10)
+
 
 class ZipVersion(FieldSet):
     static_size = 16
     HOST_OS = {
-         0: "FAT file system (DOS, OS/2, NT)",
-         1: "Amiga",
-         2: "VMS (VAX or Alpha AXP)",
-         3: "Unix",
-         4: "VM/CMS",
-         5: "Atari",
-         6: "HPFS file system (OS/2, NT 3.x)",
-         7: "Macintosh",
-         8: "Z-System",
-         9: "CP/M",
+        0: "FAT file system (DOS, OS/2, NT)",
+        1: "Amiga",
+        2: "VMS (VAX or Alpha AXP)",
+        3: "Unix",
+        4: "VM/CMS",
+        5: "Atari",
+        6: "HPFS file system (OS/2, NT 3.x)",
+        7: "Macintosh",
+        8: "Z-System",
+        9: "CP/M",
         10: "TOPS-20",
         11: "NTFS file system (NT)",
         12: "SMS/QDOS",
@@ -69,15 +71,20 @@ class ZipVersion(FieldSet):
         16: "BeOS (BeBox or PowerMac)",
         17: "Tandem",
     }
+
     def createFields(self):
         yield textHandler(UInt8(self, "zip_version", "ZIP version"), ZipRevision)
         yield Enum(UInt8(self, "host_os", "ZIP Host OS"), self.HOST_OS)
 
+
 class ZipGeneralFlags(FieldSet):
     static_size = 16
+
     def createFields(self):
-        # Need the compression info from the parent, and that is the byte following
-        method = self.stream.readBits(self.absolute_address+16, 16, LITTLE_ENDIAN)
+        # Need the compression info from the parent, and that is the byte
+        # following
+        method = self.stream.readBits(
+            self.absolute_address + 16, 16, LITTLE_ENDIAN)
 
         yield Bit(self, "is_encrypted", "File is encrypted?")
         if method == 6:
@@ -91,7 +98,7 @@ class ZipGeneralFlags(FieldSet):
                 3: "Super Fast compression"
             }
             yield Enum(Bits(self, "method", 2), NAME)
-        elif method == 14: #LZMA
+        elif method == 14:  # LZMA
             yield Bit(self, "lzma_eos", "LZMA stream is ended with a EndOfStream marker")
             yield Bit(self, "unused[]")
         else:
@@ -107,11 +114,12 @@ class ZipGeneralFlags(FieldSet):
         yield Bit(self, "encrypted_central_dir", "Selected data values in the Local Header are masked")
         yield Bits(self, "unused[]", 2, "Unused")
 
+
 class ExtraField(FieldSet):
     EXTRA_FIELD_ID = {
         0x0007: "AV Info",
         0x0009: "OS/2 extended attributes (also Info-ZIP)",
-        0x000a: "PKWARE Win95/WinNT FileTimes", # undocumented!
+        0x000a: "PKWARE Win95/WinNT FileTimes",  # undocumented!
         0x000c: "PKWARE VAX/VMS (also Info-ZIP)",
         0x000d: "PKWARE Unix",
         0x000f: "Patch Descriptor",
@@ -134,6 +142,7 @@ class ExtraField(FieldSet):
         0x7855: "Info-ZIP Unix (new)",
         0xfb4a: "SMS/QDOS",
     }
+
     def createFields(self):
         yield Enum(UInt16(self, "field_id", "Extra field ID"),
                    self.EXTRA_FIELD_ID)
@@ -142,10 +151,13 @@ class ExtraField(FieldSet):
         if size.value > 0:
             yield RawBytes(self, "field_data", size.value, "Unknown field data")
 
+
 class ExtraFields(FieldSet):
+
     def createFields(self):
         while self.current_size < self.size:
             yield ExtraField(self, "extra[]")
+
 
 def ZipStartCommonFields(self):
     yield ZipVersion(self, "version_needed", "Version needed")
@@ -159,14 +171,17 @@ def ZipStartCommonFields(self):
     yield UInt16(self, "filename_length", "Filename length")
     yield UInt16(self, "extra_length", "Extra fields length")
 
+
 def zipGetCharset(self):
     if self["flags/uses_unicode"].value:
         return "UTF-8"
     else:
         return "ISO-8859-15"
 
+
 class ZipCentralDirectory(FieldSet):
     HEADER = 0x02014b50
+
     def createFields(self):
         yield ZipVersion(self, "version_made_by", "Version made by")
         yield from ZipStartCommonFields(self)
@@ -182,8 +197,8 @@ class ZipCentralDirectory(FieldSet):
         yield String(self, "filename", self["filename_length"].value,
                      "Filename", charset=charset)
         if 0 < self["extra_length"].value:
-            yield ExtraFields(self, "extra", size=self["extra_length"].value*8,
-                           description="Extra fields")
+            yield ExtraFields(self, "extra", size=self["extra_length"].value * 8,
+                              description="Extra fields")
         if 0 < self["comment_length"].value:
             yield String(self, "comment", self["comment_length"].value,
                          "Comment", charset=charset)
@@ -191,8 +206,10 @@ class ZipCentralDirectory(FieldSet):
     def createDescription(self):
         return "Central directory: %s" % self["filename"].display
 
+
 class Zip64EndCentralDirectory(FieldSet):
     HEADER = 0x06064b50
+
     def createFields(self):
         yield UInt64(self, "zip64_end_size",
                      "Size of zip64 end of central directory record")
@@ -211,8 +228,10 @@ class Zip64EndCentralDirectory(FieldSet):
             yield RawBytes(self, "data_sector", self["zip64_end_size"].value,
                            "zip64 extensible data sector")
 
+
 class ZipEndCentralDirectory(FieldSet):
     HEADER = 0x06054b50
+
     def createFields(self):
         yield UInt16(self, "number_disk", "Number of this disk")
         yield UInt16(self, "number_disk2", "Number in the central dir")
@@ -224,17 +243,20 @@ class ZipEndCentralDirectory(FieldSet):
         yield UInt32(self, "offset", "Offset of start of central directory")
         yield PascalString16(self, "comment", "ZIP comment")
 
+
 class ZipDataDescriptor(FieldSet):
     HEADER_STRING = b"\x50\x4B\x07\x08"
     HEADER = 0x08074B50
     static_size = 96
+
     def createFields(self):
         yield textHandler(UInt32(self, "file_crc32",
-            "Checksum (CRC32)"), hexadecimal)
+                                 "Checksum (CRC32)"), hexadecimal)
         yield filesizeHandler(UInt32(self, "file_compressed_size",
-            "Compressed size (bytes)"))
+                                     "Compressed size (bytes)"))
         yield filesizeHandler(UInt32(self, "file_uncompressed_size",
-             "Uncompressed size (bytes)"))
+                                     "Uncompressed size (bytes)"))
+
 
 class FileEntry(FieldSet):
     HEADER = 0x04034B50
@@ -244,7 +266,8 @@ class FileEntry(FieldSet):
         compression = self["compression"].value
         if compression == 0:
             return SubFile(self, "data", size, filename=self.filename)
-        compressed = SubFile(self, "compressed_data", size, filename=self.filename)
+        compressed = SubFile(self, "compressed_data",
+                             size, filename=self.filename)
         if compression == COMPRESSION_DEFLATE:
             return Deflate(compressed)
         else:
@@ -253,19 +276,19 @@ class FileEntry(FieldSet):
     def resync(self):
         # Non-seekable output, search the next data descriptor
         size = self.stream.searchBytesLength(ZipDataDescriptor.HEADER_STRING, False,
-                                            self.absolute_address+self.current_size)
+                                             self.absolute_address + self.current_size)
         if size <= 0:
             raise ParserError("Couldn't resync to %s" %
                               ZipDataDescriptor.HEADER_STRING)
         yield self.data(size)
         yield textHandler(UInt32(self, "header[]", "Header"), hexadecimal)
         data_desc = ZipDataDescriptor(self, "data_desc", "Data descriptor")
-        #self.info("Resynced!")
+        # self.info("Resynced!")
         yield data_desc
         # The above could be checked anytime, but we prefer trying parsing
         # than aborting
         if self["crc32"].value == 0 and \
-            data_desc["file_compressed_size"].value != size:
+                data_desc["file_compressed_size"].value != size:
             raise ParserError("Bad resync: position=>%i but data_desc=>%i" %
                               (size, data_desc["file_compressed_size"].value))
 
@@ -273,15 +296,14 @@ class FileEntry(FieldSet):
         yield from ZipStartCommonFields(self)
         length = self["filename_length"].value
 
-
         if length:
             filename = String(self, "filename", length, "Filename",
                               charset=zipGetCharset(self))
             yield filename
             self.filename = filename.value
         if self["extra_length"].value:
-            yield ExtraFields(self, "extra", size=self["extra_length"].value*8,
-                           description="Extra fields")
+            yield ExtraFields(self, "extra", size=self["extra_length"].value * 8,
+                              description="Extra fields")
         size = self["compressed_size"].value
         if size > 0:
             yield self.data(size)
@@ -299,17 +321,21 @@ class FileEntry(FieldSet):
             return "Unknown compression method (%u)" % self["compression"].value
         return ""
 
+
 class ZipSignature(FieldSet):
     HEADER = 0x05054B50
+
     def createFields(self):
         yield PascalString16(self, "signature", "Signature")
 
+
 class Zip64EndCentralDirectoryLocator(FieldSet):
     HEADER = 0x07064b50
+
     def createFields(self):
-        yield UInt32(self, "disk_number", \
+        yield UInt32(self, "disk_number",
                      "Number of the disk with the start of the zip64 end of central directory")
-        yield UInt64(self, "relative_offset", \
+        yield UInt64(self, "relative_offset",
                      "Relative offset of the zip64 end of central directory record")
         yield UInt32(self, "disk_total_number", "Total number of disks")
 
@@ -363,7 +389,7 @@ class ZipFile(Parser):
         "mime": tuple(MIME_TYPES.keys()),
         "magic": ((b"PK\3\4", 0),),
         "subfile": "skip",
-        "min_size": (4 + 26)*8, # header + file entry
+        "min_size": (4 + 26) * 8,  # header + file entry
         "description": "ZIP archive"
     }
 
@@ -384,7 +410,8 @@ class ZipFile(Parser):
         self.signature = None
         self.central_directory = []
         while not self.eof:
-            header = textHandler(UInt32(self, "header[]", "Header"), hexadecimal)
+            header = textHandler(
+                UInt32(self, "header[]", "Header"), hexadecimal)
             yield header
             header = header.value
             if header == FileEntry.HEADER:
@@ -404,7 +431,8 @@ class ZipFile(Parser):
             elif header == Zip64EndCentralDirectoryLocator.HEADER:
                 yield Zip64EndCentralDirectoryLocator(self, "end_locator", "ZIP64 Enf of central directory locator")
             else:
-                raise ParserError("Error, unknown ZIP header (0x%08X)." % header)
+                raise ParserError(
+                    "Error, unknown ZIP header (0x%08X)." % header)
 
     def createMimeType(self):
         if self["file[0]/filename"].value == "mimetype":
@@ -424,6 +452,5 @@ class ZipFile(Parser):
         end = MAX_FILESIZE * 8
         end = self.stream.searchBytes(b"PK\5\6", start, end)
         if end is not None:
-            return end + 22*8
+            return end + 22 * 8
         return None
-

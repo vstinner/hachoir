@@ -7,9 +7,9 @@ Creation: 27 december 2006
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet,
-    UInt16, UInt32, Float80, TimestampMac32,
-    RawBytes, NullBytes,
-    String, Enum, PascalString32)
+                           UInt16, UInt32, Float80, TimestampMac32,
+                           RawBytes, NullBytes,
+                           String, Enum, PascalString32)
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.core.text_handler import filesizeHandler
 from hachoir.core.tools import alignValue
@@ -24,21 +24,27 @@ CODEC_NAME = {
     'sowt': "Little-endian, no compression",
 }
 
+
 class Comment(FieldSet):
+
     def createFields(self):
         yield TimestampMac32(self, "timestamp")
         yield PascalString32(self, "text")
 
+
 def parseText(self):
     yield String(self, "text", self["size"].value)
 
+
 def parseID3(self):
-    yield ID3v2(self, "id3v2", size=self["size"].value*8)
+    yield ID3v2(self, "id3v2", size=self["size"].value * 8)
+
 
 def parseComment(self):
     yield UInt16(self, "nb_comment")
     for index in range(self["nb_comment"].value):
         yield Comment(self, "comment[]")
+
 
 def parseCommon(self):
     yield UInt16(self, "nb_channel")
@@ -47,8 +53,10 @@ def parseCommon(self):
     yield Float80(self, "sample_rate")
     yield Enum(String(self, "codec", 4, strip="\0", charset="ASCII"), CODEC_NAME)
 
+
 def parseVersion(self):
     yield TimestampMac32(self, "timestamp")
+
 
 def parseSound(self):
     yield UInt32(self, "offset")
@@ -56,6 +64,7 @@ def parseSound(self):
     size = (self.size - self.current_size) // 8
     if size:
         yield RawBytes(self, "data", size)
+
 
 class Chunk(FieldSet):
     TAG_INFO = {
@@ -89,6 +98,7 @@ class Chunk(FieldSet):
             else:
                 yield RawBytes(self, "data", size)
 
+
 class AiffFile(Parser):
     PARSER_TAGS = {
         "id": "aiff",
@@ -96,7 +106,7 @@ class AiffFile(Parser):
         "file_ext": ("aif", "aiff", "aifc"),
         "mime": ("audio/x-aiff",),
         "magic_regex": (("FORM.{4}AIF[CF]", 0),),
-        "min_size": 12*8,
+        "min_size": 12 * 8,
         "description": "Audio Interchange File Format (AIFF)"
     }
     endian = BIG_ENDIAN
@@ -104,7 +114,7 @@ class AiffFile(Parser):
     def validate(self):
         if self.stream.readBytes(0, 4) != b"FORM":
             return "Invalid signature"
-        if self.stream.readBytes(8*8, 4) not in (b"AIFF", b"AIFC"):
+        if self.stream.readBytes(8 * 8, 4) not in (b"AIFF", b"AIFC"):
             return "Invalid type"
         return True
 
@@ -123,4 +133,3 @@ class AiffFile(Parser):
 
     def createContentSize(self):
         return self["filesize"].value * 8
-

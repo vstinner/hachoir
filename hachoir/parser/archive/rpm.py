@@ -6,12 +6,13 @@ Author: Victor Stinner, 1st December 2005.
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, ParserError,
-    UInt8, UInt16, UInt32, UInt64, Enum,
-    NullBytes, Bytes, RawBytes, SubFile,
-    Character, CString, String)
+                           UInt8, UInt16, UInt32, UInt64, Enum,
+                           NullBytes, Bytes, RawBytes, SubFile,
+                           Character, CString, String)
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.parser.archive.gzip_parser import GzipParser
 from hachoir.parser.archive.bzip2_parser import Bzip2Parser
+
 
 class ItemContent(FieldSet):
     format_type = {
@@ -38,11 +39,11 @@ class ItemContent(FieldSet):
 
         cls = self.format_type[type]
         count = item["count"].value
-        if cls is RawBytes: # or type == 8:
+        if cls is RawBytes:  # or type == 8:
             if cls is RawBytes:
                 args = (self, "value", count)
             else:
-                args = (self, "value") # cls is CString
+                args = (self, "value")  # cls is CString
             count = 1
         else:
             if 1 < count:
@@ -51,6 +52,7 @@ class ItemContent(FieldSet):
                 args = (self, "value")
         for index in range(count):
             yield cls(*args)
+
 
 class Item(FieldSet):
     type_name = {
@@ -74,11 +76,11 @@ class Item(FieldSet):
         1005: "GnuPG signature",
         1006: "PGP5 signature",
         1007: "Uncompressed payload size (bytes)",
-        256+8: "Broken SHA1 header digest",
-        256+9: "Broken SHA1 header digest",
-        256+13: "Broken SHA1 header digest",
-        256+11: "DSA header signature",
-        256+12: "RSA header signature"
+        256 + 8: "Broken SHA1 header digest",
+        256 + 9: "Broken SHA1 header digest",
+        256 + 13: "Broken SHA1 header digest",
+        256 + 11: "DSA header signature",
+        256 + 12: "RSA header signature"
     }
 
     def __init__(self, parent, name, description=None, tag_name_dict=None):
@@ -95,6 +97,7 @@ class Item(FieldSet):
 
     def createDescription(self):
         return "Item: %s (%s)" % (self["tag"].display, self["type"].display)
+
 
 class ItemHeader(Item):
     tag_name = {
@@ -171,13 +174,15 @@ class ItemHeader(Item):
         1068: "Trigger flags",
         1069: "Trigger index",
         1079: "Verify script",
-        #TODO: Finish the list (id 1070..1162 using rpm library source code)
+        # TODO: Finish the list (id 1070..1162 using rpm library source code)
     }
 
     def __init__(self, parent, name, description=None):
         Item.__init__(self, parent, name, description, self.tag_name)
 
+
 class PropertySet(FieldSet):
+
     def __init__(self, parent, name, *args):
         FieldSet.__init__(self, parent, name, *args)
         self._size = self["content_item[1]"].address + self["size"].value * 8
@@ -203,16 +208,17 @@ class PropertySet(FieldSet):
         items.sort(key=lambda field: field["offset"].value)
 
         # Read item content
-        start = self.current_size//8
+        start = self.current_size // 8
         for item in items:
             offset = item["offset"].value
-            diff = offset - (self.current_size//8 - start)
+            diff = offset - (self.current_size // 8 - start)
             if 0 < diff:
                 yield NullBytes(self, "padding[]", diff)
             yield ItemContent(self, "content[]", item)
-        size = start + self["size"].value - self.current_size//8
+        size = start + self["size"].value - self.current_size // 8
         if 0 < size:
             yield NullBytes(self, "padding[]", size)
+
 
 class RpmFile(Parser):
     PARSER_TAGS = {
@@ -220,7 +226,8 @@ class RpmFile(Parser):
         "category": "archive",
         "file_ext": ("rpm",),
         "mime": ("application/x-rpm",),
-        "min_size": (96 + 16 + 16)*8, # file header + checksum + content header
+        # file header + checksum + content header
+        "min_size": (96 + 16 + 16) * 8,
         "magic": ((b'\xED\xAB\xEE\xDB', 0),),
         "description": "RPM package"
     }
@@ -252,7 +259,7 @@ class RpmFile(Parser):
         yield PropertySet(self, "checksum", "Checksum (signature)")
         yield PropertySet(self, "header", "Header")
 
-        if self._size is None: # TODO: is it possible to handle piped input?
+        if self._size is None:  # TODO: is it possible to handle piped input?
             raise NotImplementedError
 
         size = (self._size - self.current_size) // 8
@@ -261,4 +268,3 @@ class RpmFile(Parser):
                 yield SubFile(self, "content", size, "bzip2 content", parser=Bzip2Parser)
             else:
                 yield SubFile(self, "content", size, "gzip content", parser=GzipParser)
-

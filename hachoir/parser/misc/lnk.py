@@ -24,11 +24,11 @@ Changes:
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet,
-    CString, String,
-    UInt32, UInt16, UInt8,
-    Bit, Bits, PaddingBits,
-    TimestampWin64, DateTimeMSDOS32,
-    NullBytes, PaddingBytes, RawBytes, Enum)
+                           CString, String,
+                           UInt32, UInt16, UInt8,
+                           Bit, Bits, PaddingBits,
+                           TimestampWin64, DateTimeMSDOS32,
+                           NullBytes, PaddingBytes, RawBytes, Enum)
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal
 from hachoir.parser.common.win32 import GUID
@@ -37,10 +37,12 @@ from hachoir.core.text_handler import filesizeHandler
 
 from hachoir.core.tools import paddingSize
 
+
 class ItemIdList(FieldSet):
+
     def __init__(self, *args, **kw):
         FieldSet.__init__(self, *args, **kw)
-        self._size = (self["size"].value+2) * 8
+        self._size = (self["size"].value + 2) * 8
 
     def createFields(self):
         yield UInt16(self, "size", "Size of item ID list")
@@ -49,6 +51,7 @@ class ItemIdList(FieldSet):
             yield item
             if not item["length"].value:
                 break
+
 
 class ItemId(FieldSet):
     ITEM_TYPE = {
@@ -85,8 +88,8 @@ class ItemId(FieldSet):
         if not self["length"].value:
             return
 
-        yield Enum(UInt8(self, "type"),self.ITEM_TYPE)
-        entrytype=self["type"].value
+        yield Enum(UInt8(self, "type"), self.ITEM_TYPE)
+        entrytype = self["type"].value
         if entrytype in (0x1F, 0x70):
             # GUID
             yield RawBytes(self, "dummy", 1, "should be 0x50")
@@ -104,7 +107,7 @@ class ItemId(FieldSet):
 
         elif entrytype in (0x23, 0x25, 0x29, 0x2F):
             # Drive
-            yield String(self, "drive", self["length"].value-3, strip="\0")
+            yield String(self, "drive", self["length"].value - 3, strip="\0")
 
         elif entrytype in (0x30, 0x31, 0x32, 0x61, 0xb1):
             yield RawBytes(self, "dummy", 1, "should be 0x00")
@@ -114,7 +117,7 @@ class ItemId(FieldSet):
             yield CString(self, "name", "File/folder name")
             if self.root.hasUnicodeNames():
                 # Align to 2-bytes
-                n = paddingSize(self.current_size//8, 2)
+                n = paddingSize(self.current_size // 8, 2)
                 if n:
                     yield PaddingBytes(self, "pad", n)
 
@@ -164,20 +167,22 @@ class ItemId(FieldSet):
                 yield RawBytes(self, "padding[]", 2)
 
         else:
-            yield RawBytes(self, "raw", self["length"].value-3)
+            yield RawBytes(self, "raw", self["length"].value - 3)
 
     def createDescription(self):
         if self["length"].value:
-            return "Item ID Entry: "+self.ITEM_TYPE.get(self["type"].value,"Unknown")
+            return "Item ID Entry: " + self.ITEM_TYPE.get(self["type"].value, "Unknown")
         else:
             return "End of Item ID List"
 
+
 def formatVolumeSerial(field):
     val = field.value
-    return '%04X-%04X'%(val>>16, val&0xFFFF)
+    return '%04X-%04X' % (val >> 16, val & 0xFFFF)
+
 
 class LocalVolumeTable(FieldSet):
-    VOLUME_TYPE={
+    VOLUME_TYPE = {
         1: "No root directory",
         2: "Removable (Floppy, Zip, etc.)",
         3: "Fixed (Hard disk)",
@@ -188,7 +193,7 @@ class LocalVolumeTable(FieldSet):
 
     def createFields(self):
         yield UInt32(self, "length", "Length of this structure")
-        yield Enum(UInt32(self, "volume_type", "Volume Type"),self.VOLUME_TYPE)
+        yield Enum(UInt32(self, "volume_type", "Volume Type"), self.VOLUME_TYPE)
         yield textHandler(UInt32(self, "volume_serial", "Volume Serial Number"), formatVolumeSerial)
 
         yield UInt32(self, "label_offset", "Offset to volume label")
@@ -203,7 +208,9 @@ class LocalVolumeTable(FieldSet):
     def createValue(self):
         return self["drive"].value
 
+
 class NetworkVolumeTable(FieldSet):
+
     def createFields(self):
         yield UInt32(self, "length", "Length of this structure")
         yield UInt32(self, "unknown[]")
@@ -218,7 +225,9 @@ class NetworkVolumeTable(FieldSet):
     def createValue(self):
         return self["share_name"].value
 
+
 class FileLocationInfo(FieldSet):
+
     def createFields(self):
         yield UInt32(self, "length", "Length of this structure")
         if not self["length"].value:
@@ -247,7 +256,8 @@ class FileLocationInfo(FieldSet):
                 yield padding
             yield CString(self, "local_base_pathname", "Local Base Pathname")
             if has_unicode_paths:
-                padding = self.seekByte(self["local_pathname_unicode_offset"].value)
+                padding = self.seekByte(
+                    self["local_pathname_unicode_offset"].value)
                 if padding:
                     yield padding
                 yield CString(self, "local_base_pathname_unicode", "Local Base Pathname in Unicode", charset="UTF-16-LE")
@@ -269,16 +279,18 @@ class FileLocationInfo(FieldSet):
                 yield padding
             yield CString(self, "final_pathname_unicode", "Final component of the pathname in Unicode", charset="UTF-16-LE")
 
-        padding=self.seekByte(self["length"].value)
+        padding = self.seekByte(self["length"].value)
         if padding:
             yield padding
 
+
 class LnkString(FieldSet):
+
     def createFields(self):
         yield UInt16(self, "length", "Length of this string")
         if self["length"].value:
             if self.root.hasUnicodeNames():
-                yield String(self, "data", self["length"].value*2, charset="UTF-16-LE")
+                yield String(self, "data", self["length"].value * 2, charset="UTF-16-LE")
             else:
                 yield String(self, "data", self["length"].value, charset="ASCII")
 
@@ -288,48 +300,56 @@ class LnkString(FieldSet):
         else:
             return ""
 
+
 class ColorRef(FieldSet):
     ''' COLORREF struct, 0x00bbggrr '''
-    static_size=32
+    static_size = 32
+
     def createFields(self):
         yield UInt8(self, "red", "Red")
         yield UInt8(self, "green", "Green")
         yield UInt8(self, "blue", "Blue")
         yield PaddingBytes(self, "pad", 1, "Padding (must be 0)")
+
     def createDescription(self):
         rgb = self["red"].value, self["green"].value, self["blue"].value
         return "RGB Color: #%02X%02X%02X" % rgb
 
+
 class ColorTableIndex(Bits):
+
     def __init__(self, parent, name, size, description=None):
         Bits.__init__(self, parent, name, size, None)
-        self.desc=description
+        self.desc = description
+
     def createDescription(self):
         assert hasattr(self, 'parent') and hasattr(self, 'value')
-        return "%s: %s"%(self.desc,
-                         self.parent["color[%i]"%self.value].description)
+        return "%s: %s" % (self.desc,
+                           self.parent["color[%i]" % self.value].description)
+
 
 class ExtraInfo(FieldSet):
-    INFO_TYPE={
-        0xA0000001: "Link Target Information", # EXP_SZ_LINK_SIG
-        0xA0000002: "Console Window Properties", # NT_CONSOLE_PROPS_SIG
+    INFO_TYPE = {
+        0xA0000001: "Link Target Information",  # EXP_SZ_LINK_SIG
+        0xA0000002: "Console Window Properties",  # NT_CONSOLE_PROPS_SIG
         0xA0000003: "Hostname and Other Stuff",
-        0xA0000004: "Console Codepage Information", # NT_FE_CONSOLE_PROPS_SIG
-        0xA0000005: "Special Folder Info", # EXP_SPECIAL_FOLDER_SIG
-        0xA0000006: "DarwinID (Windows Installer ID) Information", # EXP_DARWIN_ID_SIG
-        0xA0000007: "Custom Icon Details", # EXP_LOGO3_ID_SIG or EXP_SZ_ICON_SIG
+        0xA0000004: "Console Codepage Information",  # NT_FE_CONSOLE_PROPS_SIG
+        0xA0000005: "Special Folder Info",  # EXP_SPECIAL_FOLDER_SIG
+        # EXP_DARWIN_ID_SIG
+        0xA0000006: "DarwinID (Windows Installer ID) Information",
+        0xA0000007: "Custom Icon Details",  # EXP_LOGO3_ID_SIG or EXP_SZ_ICON_SIG
     }
     SPECIAL_FOLDER = {
-         0: "DESKTOP",
-         1: "INTERNET",
-         2: "PROGRAMS",
-         3: "CONTROLS",
-         4: "PRINTERS",
-         5: "PERSONAL",
-         6: "FAVORITES",
-         7: "STARTUP",
-         8: "RECENT",
-         9: "SENDTO",
+        0: "DESKTOP",
+        1: "INTERNET",
+        2: "PROGRAMS",
+        3: "CONTROLS",
+        4: "PRINTERS",
+        5: "PERSONAL",
+        6: "FAVORITES",
+        7: "STARTUP",
+        8: "RECENT",
+        9: "SENDTO",
         10: "BITBUCKET",
         11: "STARTMENU",
         16: "DESKTOPDIRECTORY",
@@ -392,7 +412,7 @@ class ExtraInfo(FieldSet):
         if not self["length"].value:
             return
 
-        yield Enum(textHandler(UInt32(self, "signature", "Signature determining the function of this structure"),hexadecimal),self.INFO_TYPE)
+        yield Enum(textHandler(UInt32(self, "signature", "Signature determining the function of this structure"), hexadecimal), self.INFO_TYPE)
 
         if self["signature"].value == 0xA0000003:
             # Hostname and Other Stuff
@@ -404,22 +424,24 @@ class ExtraInfo(FieldSet):
 
         elif self["signature"].value == 0xA0000005:
             # Special Folder Info
-            yield Enum(UInt32(self, "special_folder_id", "ID of the special folder"),self.SPECIAL_FOLDER)
+            yield Enum(UInt32(self, "special_folder_id", "ID of the special folder"), self.SPECIAL_FOLDER)
             yield UInt32(self, "offset", "Offset to Item ID entry")
 
         elif self["signature"].value in (0xA0000001, 0xA0000006, 0xA0000007):
-            if self["signature"].value == 0xA0000001: # Link Target Information
-                object_name="target"
-            elif self["signature"].value == 0xA0000006: # DarwinID (Windows Installer ID) Information
-                object_name="darwinID"
-            else: # Custom Icon Details
-                object_name="icon_path"
+            if self["signature"].value == 0xA0000001:  # Link Target Information
+                object_name = "target"
+            # DarwinID (Windows Installer ID) Information
+            elif self["signature"].value == 0xA0000006:
+                object_name = "darwinID"
+            else:  # Custom Icon Details
+                object_name = "icon_path"
             yield CString(self, object_name, "Data (ASCII format)", charset="ASCII")
-            remaining = self["length"].value - self.current_size//8 - 260*2 # 260*2 = size of next part
+            # 260*2 = size of next part
+            remaining = self["length"].value - self.current_size // 8 - 260 * 2
             if remaining:
                 yield RawBytes(self, "slack_space[]", remaining, "Data beyond end of string")
-            yield CString(self, object_name+'_unicode', "Data (Unicode format)", charset="UTF-16-LE", truncate="\0")
-            remaining = self["length"].value - self.current_size//8
+            yield CString(self, object_name + '_unicode', "Data (Unicode format)", charset="UTF-16-LE", truncate="\0")
+            remaining = self["length"].value - self.current_size // 8
             if remaining:
                 yield RawBytes(self, "slack_space[]", remaining, "Data beyond end of string")
 
@@ -460,11 +482,11 @@ class ExtraInfo(FieldSet):
             yield UInt32(self, "codepage", "Console's code page")
 
         else:
-            yield RawBytes(self, "raw", self["length"].value-self.current_size//8)
+            yield RawBytes(self, "raw", self["length"].value - self.current_size // 8)
 
     def createDescription(self):
         if self["length"].value:
-            return "Extra Info Entry: "+self["signature"].display
+            return "Extra Info Entry: " + self["signature"].display
         else:
             return "End of Extra Info"
 
@@ -502,20 +524,22 @@ HOT_KEYS = {
     0xde: "'",
 }
 
+
 def text_hot_key(field):
     assert hasattr(field, "value")
-    val=field.value
+    val = field.value
     if 0x30 <= val <= 0x39:
         return chr(val)
     elif 0x41 <= val <= 0x5A:
         return chr(val)
     elif 0x60 <= val <= 0x69:
-        return 'Numpad %c' % chr(val-0x30)
+        return 'Numpad %c' % chr(val - 0x30)
     elif 0x70 <= val <= 0x87:
-        return 'F%i'%(val-0x6F)
+        return 'F%i' % (val - 0x6F)
     elif val in HOT_KEYS:
         return HOT_KEYS[val]
     return str(val)
+
 
 class LnkFile(Parser):
     MAGIC = b"\x4C\0\0\0\x01\x14\x02\x00\x00\x00\x00\x00\xc0\x00\x00\x00\x00\x00\x00\x46"
@@ -525,22 +549,22 @@ class LnkFile(Parser):
         "file_ext": ("lnk",),
         "mime": ("application/x-ms-shortcut",),
         "magic": ((MAGIC, 0),),
-        "min_size": len(MAGIC)*8,   # signature + guid = 20 bytes
+        "min_size": len(MAGIC) * 8,   # signature + guid = 20 bytes
         "description": "Windows Shortcut (.lnk)",
     }
     endian = LITTLE_ENDIAN
 
     SHOW_WINDOW_STATE = {
-         0: "Hide",
-         1: "Show Normal",
-         2: "Show Minimized",
-         3: "Show Maximized",
-         4: "Show Normal, not activated",
-         5: "Show",
-         6: "Minimize",
-         7: "Show Minimized, not activated",
-         8: "Show, not activated",
-         9: "Restore",
+        0: "Hide",
+        1: "Show Normal",
+        2: "Show Minimized",
+        3: "Show Maximized",
+        4: "Show Normal, not activated",
+        5: "Show",
+        6: "Minimize",
+        7: "Show Minimized, not activated",
+        8: "Show, not activated",
+        9: "Restore",
         10: "Show Default",
     }
 
@@ -586,7 +610,7 @@ class LnkFile(Parser):
         yield filesizeHandler(UInt32(self, "target_filesize"))
         yield UInt32(self, "icon_number")
         yield Enum(UInt32(self, "show_window"), self.SHOW_WINDOW_STATE)
-        yield textHandler(UInt8(self, "hot_key", "Hot key used for quick access"),text_hot_key)
+        yield textHandler(UInt8(self, "hot_key", "Hot key used for quick access"), text_hot_key)
         yield Bit(self, "hot_key_shift", "Hot key: is Shift used?")
         yield Bit(self, "hot_key_ctrl", "Hot key: is Ctrl used?")
         yield Bit(self, "hot_key_alt", "Hot key: is Alt used?")
@@ -610,4 +634,3 @@ class LnkFile(Parser):
 
         while not self.eof:
             yield ExtraInfo(self, "extra_info[]")
-

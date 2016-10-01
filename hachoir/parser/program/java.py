@@ -61,15 +61,17 @@ TODO/FIXME:
 
 from hachoir.parser import Parser
 from hachoir.field import (
-        ParserError, FieldSet, StaticFieldSet,
-        Enum, RawBytes, PascalString16, Float32, Float64,
-        Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64,
-        Bit, NullBits )
+    ParserError, FieldSet, StaticFieldSet,
+    Enum, RawBytes, PascalString16, Float32, Float64,
+    Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64,
+    Bit, NullBits)
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal
 from hachoir.core.tools import paddingSize
 
 ###############################################################################
+
+
 def parse_flags(flags, flags_dict, show_unknown_flags=True, separator=" "):
     """
     Parses an integer representing a set of flags.  The known flags are
@@ -100,6 +102,7 @@ code_to_type_name = {
     'V': "void",
 }
 
+
 def eat_descriptor(descr):
     """
     Read head of a field/method descriptor.  Returns a pair of strings, where
@@ -111,8 +114,10 @@ def eat_descriptor(descr):
         array_dim += 1
         descr = descr[1:]
     if (descr[0] == 'L'):
-        try: end = descr.find(';')
-        except: raise ParserError("Not a valid descriptor string: " + descr)
+        try:
+            end = descr.find(';')
+        except:
+            raise ParserError("Not a valid descriptor string: " + descr)
         type = descr[1:end]
         descr = descr[end:]
     else:
@@ -122,6 +127,7 @@ def eat_descriptor(descr):
         except KeyError:
             raise ParserError("Not a valid descriptor string: %s" % descr)
     return (type.replace("/", ".") + array_dim * "[]", descr[1:])
+
 
 def parse_field_descriptor(descr, name=None):
     """
@@ -135,6 +141,7 @@ def parse_field_descriptor(descr, name=None):
         return type + " " + name
     else:
         return type
+
 
 def parse_method_descriptor(descr, name=None):
     """
@@ -155,6 +162,7 @@ def parse_method_descriptor(descr, name=None):
     else:
         return "%s (%s)" % (type, params)
 
+
 def parse_any_descriptor(descr, name=None):
     """
     Parse either a field or method descriptor, and returns it as human-
@@ -174,8 +182,9 @@ class FieldArray(FieldSet):
     type may be variable-length.  Each field will be named "foo[x]" (with x
     starting at 0).
     """
+
     def __init__(self, parent, name, elements_class, length,
-            **elements_extra_args):
+                 **elements_extra_args):
         """Create a FieldArray of <length> fields of class <elements_class>,
         named "<name>[x]".  The **elements_extra_args will be passed to the
         constructor of each field when yielded."""
@@ -187,7 +196,8 @@ class FieldArray(FieldSet):
     def createFields(self):
         for i in range(0, self.array_length):
             yield self.array_elements_class(self, "%s[%d]" % (self.name, i),
-                    **self.array_elements_extra_args)
+                                            **self.array_elements_extra_args)
+
 
 class ConstantPool(FieldSet):
     """
@@ -195,9 +205,11 @@ class ConstantPool(FieldSet):
     - numbering starts at 1 instead of zero
     - some indexes are skipped (after Long or Double entries)
     """
+
     def __init__(self, parent, name, length):
         FieldSet.__init__(self, parent, name)
         self.constant_pool_length = length
+
     def createFields(self):
         i = 1
         while i < self.constant_pool_length:
@@ -213,8 +225,9 @@ class CPIndex(UInt16):
     """
     Holds index of a constant pool entry.
     """
+
     def __init__(self, parent, name, description=None, target_types=None,
-                target_text_handler=(lambda x: x), allow_zero=False):
+                 target_text_handler=(lambda x: x), allow_zero=False):
         """
         Initialize a CPIndex.
         - target_type is the tuple of expected type for the target CPInfo
@@ -245,7 +258,8 @@ class CPIndex(UInt16):
         Returns the target CPInfo field.
         """
         assert self.value < self["/constant_pool_count"].value
-        if self.allow_zero and not self.value: return None
+        if self.allow_zero and not self.value:
+            return None
         cp_entry = self["/constant_pool/constant_pool[%d]" % self.value]
         assert isinstance(cp_entry, CPInfo)
         if self.target_types:
@@ -256,139 +270,186 @@ class CPIndex(UInt16):
 ###############################################################################
 class JavaOpcode(FieldSet):
     OPSIZE = 0
+
     def __init__(self, parent, name, op, desc):
         FieldSet.__init__(self, parent, name)
-        if self.OPSIZE != 0: self._size = self.OPSIZE*8
+        if self.OPSIZE != 0:
+            self._size = self.OPSIZE * 8
         self.op = op
         self.desc = desc
+
     def createDisplay(self):
         return self.op
+
     def createDescription(self):
         return self.desc
+
     def createValue(self):
         return self.createDisplay()
 
+
 class OpcodeNoArgs(JavaOpcode):
     OPSIZE = 1
+
     def createFields(self):
         yield UInt8(self, "opcode")
+
 
 class OpcodeCPIndex(JavaOpcode):
     OPSIZE = 3
+
     def createFields(self):
         yield UInt8(self, "opcode")
         yield CPIndex(self, "index")
+
     def createDisplay(self):
-        return "%s(%i)"%(self.op, self["index"].value)
+        return "%s(%i)" % (self.op, self["index"].value)
+
 
 class OpcodeCPIndexShort(JavaOpcode):
     OPSIZE = 2
+
     def createFields(self):
         yield UInt8(self, "opcode")
         yield UInt8(self, "index")
+
     def createDisplay(self):
-        return "%s(%i)"%(self.op, self["index"].value)
+        return "%s(%i)" % (self.op, self["index"].value)
+
 
 class OpcodeIndex(JavaOpcode):
     OPSIZE = 2
+
     def createFields(self):
         yield UInt8(self, "opcode")
         yield UInt8(self, "index")
+
     def createDisplay(self):
-        return "%s(%i)"%(self.op, self["index"].value)
+        return "%s(%i)" % (self.op, self["index"].value)
+
 
 class OpcodeShortJump(JavaOpcode):
     OPSIZE = 3
+
     def createFields(self):
         yield UInt8(self, "opcode")
         yield Int16(self, "offset")
+
     def createDisplay(self):
-        return "%s(%s)"%(self.op, self["offset"].value)
+        return "%s(%s)" % (self.op, self["offset"].value)
+
 
 class OpcodeLongJump(JavaOpcode):
     OPSIZE = 5
+
     def createFields(self):
         yield UInt8(self, "opcode")
         yield Int32(self, "offset")
+
     def createDisplay(self):
-        return "%s(%s)"%(self.op, self["offset"].value)
+        return "%s(%s)" % (self.op, self["offset"].value)
+
 
 class OpcodeSpecial_bipush(JavaOpcode):
     OPSIZE = 2
+
     def createFields(self):
         yield UInt8(self, "opcode")
         yield Int8(self, "value")
+
     def createDisplay(self):
-        return "%s(%s)"%(self.op, self["value"].value)
+        return "%s(%s)" % (self.op, self["value"].value)
+
 
 class OpcodeSpecial_sipush(JavaOpcode):
     OPSIZE = 3
+
     def createFields(self):
         yield UInt8(self, "opcode")
         yield Int16(self, "value")
+
     def createDisplay(self):
-        return "%s(%s)"%(self.op, self["value"].value)
+        return "%s(%s)" % (self.op, self["value"].value)
+
 
 class OpcodeSpecial_iinc(JavaOpcode):
     OPSIZE = 3
+
     def createFields(self):
         yield UInt8(self, "opcode")
         yield UInt8(self, "index")
         yield Int8(self, "value")
+
     def createDisplay(self):
-        return "%s(%i,%i)"%(self.op, self["index"].value, self["value"].value)
+        return "%s(%i,%i)" % (self.op, self["index"].value, self["value"].value)
+
 
 class OpcodeSpecial_wide(JavaOpcode):
+
     def createFields(self):
         yield UInt8(self, "opcode")
         new_op = UInt8(self, "new_opcode")
         yield new_op
-        op = new_op._description = JavaBytecode.OPCODE_TABLE.get(new_op.value, ["reserved", None, "Reserved"])[0]
+        op = new_op._description = JavaBytecode.OPCODE_TABLE.get(
+            new_op.value, ["reserved", None, "Reserved"])[0]
         yield UInt16(self, "index")
         if op == "iinc":
             yield Int16(self, "value")
-            self.createDisplay = lambda self: "%s(%i,%i)"%(self.op, self["index"].value, self["value"].value)
+            self.createDisplay = lambda self: "%s(%i,%i)" % (
+                self.op, self["index"].value, self["value"].value)
         else:
-            self.createDisplay = lambda self: "%s(%i)"%(self.op, self["index"].value)
+            self.createDisplay = lambda self: "%s(%i)" % (
+                self.op, self["index"].value)
+
 
 class OpcodeSpecial_invokeinterface(JavaOpcode):
     OPSIZE = 5
+
     def createFields(self):
         yield UInt8(self, "opcode")
         yield CPIndex(self, "index")
         yield UInt8(self, "count")
         yield UInt8(self, "zero", "Must be zero.")
+
     def createDisplay(self):
-        return "%s(%i,%i,%i)"%(self.op, self["index"].value, self["count"].value, self["zero"].value)
+        return "%s(%i,%i,%i)" % (self.op, self["index"].value, self["count"].value, self["zero"].value)
+
 
 class OpcodeSpecial_newarray(JavaOpcode):
     OPSIZE = 2
+
     def createFields(self):
         yield UInt8(self, "opcode")
         yield Enum(UInt8(self, "atype"), {4: "boolean",
-                                           5: "char",
-                                           6: "float",
-                                           7: "double",
-                                           8: "byte",
-                                           9: "short",
-                                           10:"int",
-                                           11:"long"})
+                                          5: "char",
+                                          6: "float",
+                                          7: "double",
+                                          8: "byte",
+                                          9: "short",
+                                          10: "int",
+                                          11: "long"})
+
     def createDisplay(self):
-        return "%s(%s)"%(self.op, self["atype"].createDisplay())
+        return "%s(%s)" % (self.op, self["atype"].createDisplay())
+
 
 class OpcodeSpecial_multianewarray(JavaOpcode):
     OPSIZE = 4
+
     def createFields(self):
         yield UInt8(self, "opcode")
         yield CPIndex(self, "index")
         yield UInt8(self, "dimensions")
+
     def createDisplay(self):
-        return "%s(%i,%i)"%(self.op, self["index"].value, self["dimensions"].value)
+        return "%s(%i,%i)" % (self.op, self["index"].value, self["dimensions"].value)
+
 
 class OpcodeSpecial_tableswitch(JavaOpcode):
+
     def createFields(self):
         yield UInt8(self, "opcode")
-        pad = paddingSize(self.address+8, 32)
+        pad = paddingSize(self.address + 8, 32)
         if pad:
             yield NullBits(self, "padding", pad)
         yield Int32(self, "default")
@@ -396,15 +457,18 @@ class OpcodeSpecial_tableswitch(JavaOpcode):
         yield low
         high = Int32(self, "high")
         yield high
-        for i in range(high.value-low.value+1):
+        for i in range(high.value - low.value + 1):
             yield Int32(self, "offset[]")
+
     def createDisplay(self):
-        return "%s(%i,%i,%i,...)"%(self.op, self["default"].value, self["low"].value, self["high"].value)
+        return "%s(%i,%i,%i,...)" % (self.op, self["default"].value, self["low"].value, self["high"].value)
+
 
 class OpcodeSpecial_lookupswitch(JavaOpcode):
+
     def createFields(self):
         yield UInt8(self, "opcode")
-        pad = paddingSize(self.address+8, 32)
+        pad = paddingSize(self.address + 8, 32)
         if pad:
             yield NullBits(self, "padding", pad)
         yield Int32(self, "default")
@@ -413,234 +477,244 @@ class OpcodeSpecial_lookupswitch(JavaOpcode):
         for i in range(n.value):
             yield Int32(self, "match[]")
             yield Int32(self, "offset[]")
+
     def createDisplay(self):
-        return "%s(%i,%i,...)"%(self.op, self["default"].value, self["npairs"].value)
+        return "%s(%i,%i,...)" % (self.op, self["default"].value, self["npairs"].value)
+
 
 class JavaBytecode(FieldSet):
     OPCODE_TABLE = {
-0x00: ("nop", OpcodeNoArgs, "performs no operation. Stack: [No change]"),
-0x01: ("aconst_null", OpcodeNoArgs, "pushes a 'null' reference onto the stack. Stack: -> null"),
-0x02: ("iconst_m1", OpcodeNoArgs, "loads the int value -1 onto the stack. Stack: -> -1"),
-0x03: ("iconst_0", OpcodeNoArgs, "loads the int value 0 onto the stack. Stack: -> 0"),
-0x04: ("iconst_1", OpcodeNoArgs, "loads the int value 1 onto the stack. Stack: -> 1"),
-0x05: ("iconst_2", OpcodeNoArgs, "loads the int value 2 onto the stack. Stack: -> 2"),
-0x06: ("iconst_3", OpcodeNoArgs, "loads the int value 3 onto the stack. Stack: -> 3"),
-0x07: ("iconst_4", OpcodeNoArgs, "loads the int value 4 onto the stack. Stack: -> 4"),
-0x08: ("iconst_5", OpcodeNoArgs, "loads the int value 5 onto the stack. Stack: -> 5"),
-0x09: ("lconst_0", OpcodeNoArgs, "pushes the long 0 onto the stack. Stack: -> 0L"),
-0x0a: ("lconst_1", OpcodeNoArgs, "pushes the long 1 onto the stack. Stack: -> 1L"),
-0x0b: ("fconst_0", OpcodeNoArgs, "pushes '0.0f' onto the stack. Stack: -> 0.0f"),
-0x0c: ("fconst_1", OpcodeNoArgs, "pushes '1.0f' onto the stack. Stack: -> 1.0f"),
-0x0d: ("fconst_2", OpcodeNoArgs, "pushes '2.0f' onto the stack. Stack: -> 2.0f"),
-0x0e: ("dconst_0", OpcodeNoArgs, "pushes the constant '0.0' onto the stack. Stack: -> 0.0"),
-0x0f: ("dconst_1", OpcodeNoArgs, "pushes the constant '1.0' onto the stack. Stack: -> 1.0"),
-0x10: ("bipush", OpcodeSpecial_bipush, "pushes the signed 8-bit integer argument onto the stack. Stack: -> value"),
-0x11: ("sipush", OpcodeSpecial_sipush, "pushes the signed 16-bit integer argument onto the stack. Stack: -> value"),
-0x12: ("ldc", OpcodeCPIndexShort, "pushes a constant from a constant pool (String, int, float or class type) onto the stack. Stack: -> value"),
-0x13: ("ldc_w", OpcodeCPIndex, "pushes a constant from a constant pool (String, int, float or class type) onto the stack. Stack: -> value"),
-0x14: ("ldc2_w", OpcodeCPIndex, "pushes a constant from a constant pool (double or long) onto the stack. Stack: -> value"),
-0x15: ("iload", OpcodeIndex, "loads an int 'value' from a local variable '#index'. Stack: -> value"),
-0x16: ("lload", OpcodeIndex, "loads a long value from a local variable '#index'. Stack: -> value"),
-0x17: ("fload", OpcodeIndex, "loads a float 'value' from a local variable '#index'. Stack: -> value"),
-0x18: ("dload", OpcodeIndex, "loads a double 'value' from a local variable '#index'. Stack: -> value"),
-0x19: ("aload", OpcodeIndex, "loads a reference onto the stack from a local variable '#index'. Stack: -> objectref"),
-0x1a: ("iload_0", OpcodeNoArgs, "loads an int 'value' from variable 0. Stack: -> value"),
-0x1b: ("iload_1", OpcodeNoArgs, "loads an int 'value' from variable 1. Stack: -> value"),
-0x1c: ("iload_2", OpcodeNoArgs, "loads an int 'value' from variable 2. Stack: -> value"),
-0x1d: ("iload_3", OpcodeNoArgs, "loads an int 'value' from variable 3. Stack: -> value"),
-0x1e: ("lload_0", OpcodeNoArgs, "load a long value from a local variable 0. Stack: -> value"),
-0x1f: ("lload_1", OpcodeNoArgs, "load a long value from a local variable 1. Stack: -> value"),
-0x20: ("lload_2", OpcodeNoArgs, "load a long value from a local variable 2. Stack: -> value"),
-0x21: ("lload_3", OpcodeNoArgs, "load a long value from a local variable 3. Stack: -> value"),
-0x22: ("fload_0", OpcodeNoArgs, "loads a float 'value' from local variable 0. Stack: -> value"),
-0x23: ("fload_1", OpcodeNoArgs, "loads a float 'value' from local variable 1. Stack: -> value"),
-0x24: ("fload_2", OpcodeNoArgs, "loads a float 'value' from local variable 2. Stack: -> value"),
-0x25: ("fload_3", OpcodeNoArgs, "loads a float 'value' from local variable 3. Stack: -> value"),
-0x26: ("dload_0", OpcodeNoArgs, "loads a double from local variable 0. Stack: -> value"),
-0x27: ("dload_1", OpcodeNoArgs, "loads a double from local variable 1. Stack: -> value"),
-0x28: ("dload_2", OpcodeNoArgs, "loads a double from local variable 2. Stack: -> value"),
-0x29: ("dload_3", OpcodeNoArgs, "loads a double from local variable 3. Stack: -> value"),
-0x2a: ("aload_0", OpcodeNoArgs, "loads a reference onto the stack from local variable 0. Stack: -> objectref"),
-0x2b: ("aload_1", OpcodeNoArgs, "loads a reference onto the stack from local variable 1. Stack: -> objectref"),
-0x2c: ("aload_2", OpcodeNoArgs, "loads a reference onto the stack from local variable 2. Stack: -> objectref"),
-0x2d: ("aload_3", OpcodeNoArgs, "loads a reference onto the stack from local variable 3. Stack: -> objectref"),
-0x2e: ("iaload", OpcodeNoArgs, "loads an int from an array. Stack: arrayref, index -> value"),
-0x2f: ("laload", OpcodeNoArgs, "load a long from an array. Stack: arrayref, index -> value"),
-0x30: ("faload", OpcodeNoArgs, "loads a float from an array. Stack: arrayref, index -> value"),
-0x31: ("daload", OpcodeNoArgs, "loads a double from an array. Stack: arrayref, index -> value"),
-0x32: ("aaload", OpcodeNoArgs, "loads onto the stack a reference from an array. Stack: arrayref, index -> value"),
-0x33: ("baload", OpcodeNoArgs, "loads a byte or Boolean value from an array. Stack: arrayref, index -> value"),
-0x34: ("caload", OpcodeNoArgs, "loads a char from an array. Stack: arrayref, index -> value"),
-0x35: ("saload", OpcodeNoArgs, "load short from array. Stack: arrayref, index -> value"),
-0x36: ("istore", OpcodeIndex, "store int 'value' into variable '#index'. Stack: value ->"),
-0x37: ("lstore", OpcodeIndex, "store a long 'value' in a local variable '#index'. Stack: value ->"),
-0x38: ("fstore", OpcodeIndex, "stores a float 'value' into a local variable '#index'. Stack: value ->"),
-0x39: ("dstore", OpcodeIndex, "stores a double 'value' into a local variable '#index'. Stack: value ->"),
-0x3a: ("astore", OpcodeIndex, "stores a reference into a local variable '#index'. Stack: objectref ->"),
-0x3b: ("istore_0", OpcodeNoArgs, "store int 'value' into variable 0. Stack: value ->"),
-0x3c: ("istore_1", OpcodeNoArgs, "store int 'value' into variable 1. Stack: value ->"),
-0x3d: ("istore_2", OpcodeNoArgs, "store int 'value' into variable 2. Stack: value ->"),
-0x3e: ("istore_3", OpcodeNoArgs, "store int 'value' into variable 3. Stack: value ->"),
-0x3f: ("lstore_0", OpcodeNoArgs, "store a long 'value' in a local variable 0. Stack: value ->"),
-0x40: ("lstore_1", OpcodeNoArgs, "store a long 'value' in a local variable 1. Stack: value ->"),
-0x41: ("lstore_2", OpcodeNoArgs, "store a long 'value' in a local variable 2. Stack: value ->"),
-0x42: ("lstore_3", OpcodeNoArgs, "store a long 'value' in a local variable 3. Stack: value ->"),
-0x43: ("fstore_0", OpcodeNoArgs, "stores a float 'value' into local variable 0. Stack: value ->"),
-0x44: ("fstore_1", OpcodeNoArgs, "stores a float 'value' into local variable 1. Stack: value ->"),
-0x45: ("fstore_2", OpcodeNoArgs, "stores a float 'value' into local variable 2. Stack: value ->"),
-0x46: ("fstore_3", OpcodeNoArgs, "stores a float 'value' into local variable 3. Stack: value ->"),
-0x47: ("dstore_0", OpcodeNoArgs, "stores a double into local variable 0. Stack: value ->"),
-0x48: ("dstore_1", OpcodeNoArgs, "stores a double into local variable 1. Stack: value ->"),
-0x49: ("dstore_2", OpcodeNoArgs, "stores a double into local variable 2. Stack: value ->"),
-0x4a: ("dstore_3", OpcodeNoArgs, "stores a double into local variable 3. Stack: value ->"),
-0x4b: ("astore_0", OpcodeNoArgs, "stores a reference into local variable 0. Stack: objectref ->"),
-0x4c: ("astore_1", OpcodeNoArgs, "stores a reference into local variable 1. Stack: objectref ->"),
-0x4d: ("astore_2", OpcodeNoArgs, "stores a reference into local variable 2. Stack: objectref ->"),
-0x4e: ("astore_3", OpcodeNoArgs, "stores a reference into local variable 3. Stack: objectref ->"),
-0x4f: ("iastore", OpcodeNoArgs, "stores an int into an array. Stack: arrayref, index, value ->"),
-0x50: ("lastore", OpcodeNoArgs, "store a long to an array. Stack: arrayref, index, value ->"),
-0x51: ("fastore", OpcodeNoArgs, "stores a float in an array. Stack: arreyref, index, value ->"),
-0x52: ("dastore", OpcodeNoArgs, "stores a double into an array. Stack: arrayref, index, value ->"),
-0x53: ("aastore", OpcodeNoArgs, "stores into a reference to an array. Stack: arrayref, index, value ->"),
-0x54: ("bastore", OpcodeNoArgs, "stores a byte or Boolean value into an array. Stack: arrayref, index, value ->"),
-0x55: ("castore", OpcodeNoArgs, "stores a char into an array. Stack: arrayref, index, value ->"),
-0x56: ("sastore", OpcodeNoArgs, "store short to array. Stack: arrayref, index, value ->"),
-0x57: ("pop", OpcodeNoArgs, "discards the top value on the stack. Stack: value ->"),
-0x58: ("pop2", OpcodeNoArgs, "discards the top two values on the stack (or one value, if it is a double or long). Stack: {value2, value1} ->"),
-0x59: ("dup", OpcodeNoArgs, "duplicates the value on top of the stack. Stack: value -> value, value"),
-0x5a: ("dup_x1", OpcodeNoArgs, "inserts a copy of the top value into the stack two values from the top. Stack: value2, value1 -> value1, value2, value1"),
-0x5b: ("dup_x2", OpcodeNoArgs, "inserts a copy of the top value into the stack two (if value2 is double or long it takes up the entry of value3, too) or three values (if value2 is neither double nor long) from the top. Stack: value3, value2, value1 -> value1, value3, value2, value1"),
-0x5c: ("dup2", OpcodeNoArgs, "duplicate top two stack words (two values, if value1 is not double nor long; a single value, if value1 is double or long). Stack: {value2, value1} -> {value2, value1}, {value2, value1}"),
-0x5d: ("dup2_x1", OpcodeNoArgs, "duplicate two words and insert beneath third word. Stack: value3, {value2, value1} -> {value2, value1}, value3, {value2, value1}"),
-0x5e: ("dup2_x2", OpcodeNoArgs, "duplicate two words and insert beneath fourth word. Stack: {value4, value3}, {value2, value1} -> {value2, value1}, {value4, value3}, {value2, value1}"),
-0x5f: ("swap", OpcodeNoArgs, "swaps two top words on the stack (note that value1 and value2 must not be double or long). Stack: value2, value1 -> value1, value2"),
-0x60: ("iadd", OpcodeNoArgs, "adds two ints together. Stack: value1, value2 -> result"),
-0x61: ("ladd", OpcodeNoArgs, "add two longs. Stack: value1, value2 -> result"),
-0x62: ("fadd", OpcodeNoArgs, "adds two floats. Stack: value1, value2 -> result"),
-0x63: ("dadd", OpcodeNoArgs, "adds two doubles. Stack: value1, value2 -> result"),
-0x64: ("isub", OpcodeNoArgs, "int subtract. Stack: value1, value2 -> result"),
-0x65: ("lsub", OpcodeNoArgs, "subtract two longs. Stack: value1, value2 -> result"),
-0x66: ("fsub", OpcodeNoArgs, "subtracts two floats. Stack: value1, value2 -> result"),
-0x67: ("dsub", OpcodeNoArgs, "subtracts a double from another. Stack: value1, value2 -> result"),
-0x68: ("imul", OpcodeNoArgs, "multiply two integers. Stack: value1, value2 -> result"),
-0x69: ("lmul", OpcodeNoArgs, "multiplies two longs. Stack: value1, value2 -> result"),
-0x6a: ("fmul", OpcodeNoArgs, "multiplies two floats. Stack: value1, value2 -> result"),
-0x6b: ("dmul", OpcodeNoArgs, "multiplies two doubles. Stack: value1, value2 -> result"),
-0x6c: ("idiv", OpcodeNoArgs, "divides two integers. Stack: value1, value2 -> result"),
-0x6d: ("ldiv", OpcodeNoArgs, "divide two longs. Stack: value1, value2 -> result"),
-0x6e: ("fdiv", OpcodeNoArgs, "divides two floats. Stack: value1, value2 -> result"),
-0x6f: ("ddiv", OpcodeNoArgs, "divides two doubles. Stack: value1, value2 -> result"),
-0x70: ("irem", OpcodeNoArgs, "logical int remainder. Stack: value1, value2 -> result"),
-0x71: ("lrem", OpcodeNoArgs, "remainder of division of two longs. Stack: value1, value2 -> result"),
-0x72: ("frem", OpcodeNoArgs, "gets the remainder from a division between two floats. Stack: value1, value2 -> result"),
-0x73: ("drem", OpcodeNoArgs, "gets the remainder from a division between two doubles. Stack: value1, value2 -> result"),
-0x74: ("ineg", OpcodeNoArgs, "negate int. Stack: value -> result"),
-0x75: ("lneg", OpcodeNoArgs, "negates a long. Stack: value -> result"),
-0x76: ("fneg", OpcodeNoArgs, "negates a float. Stack: value -> result"),
-0x77: ("dneg", OpcodeNoArgs, "negates a double. Stack: value -> result"),
-0x78: ("ishl", OpcodeNoArgs, "int shift left. Stack: value1, value2 -> result"),
-0x79: ("lshl", OpcodeNoArgs, "bitwise shift left of a long 'value1' by 'value2' positions. Stack: value1, value2 -> result"),
-0x7a: ("ishr", OpcodeNoArgs, "int shift right. Stack: value1, value2 -> result"),
-0x7b: ("lshr", OpcodeNoArgs, "bitwise shift right of a long 'value1' by 'value2' positions. Stack: value1, value2 -> result"),
-0x7c: ("iushr", OpcodeNoArgs, "int shift right. Stack: value1, value2 -> result"),
-0x7d: ("lushr", OpcodeNoArgs, "bitwise shift right of a long 'value1' by 'value2' positions, unsigned. Stack: value1, value2 -> result"),
-0x7e: ("iand", OpcodeNoArgs, "performs a logical and on two integers. Stack: value1, value2 -> result"),
-0x7f: ("land", OpcodeNoArgs, "bitwise and of two longs. Stack: value1, value2 -> result"),
-0x80: ("ior", OpcodeNoArgs, "logical int or. Stack: value1, value2 -> result"),
-0x81: ("lor", OpcodeNoArgs, "bitwise or of two longs. Stack: value1, value2 -> result"),
-0x82: ("ixor", OpcodeNoArgs, "int xor. Stack: value1, value2 -> result"),
-0x83: ("lxor", OpcodeNoArgs, "bitwise exclusive or of two longs. Stack: value1, value2 -> result"),
-0x84: ("iinc", OpcodeSpecial_iinc, "increment local variable '#index' by signed byte 'const'. Stack: [No change]"),
-0x85: ("i2l", OpcodeNoArgs, "converts an int into a long. Stack: value -> result"),
-0x86: ("i2f", OpcodeNoArgs, "converts an int into a float. Stack: value -> result"),
-0x87: ("i2d", OpcodeNoArgs, "converts an int into a double. Stack: value -> result"),
-0x88: ("l2i", OpcodeNoArgs, "converts a long to an int. Stack: value -> result"),
-0x89: ("l2f", OpcodeNoArgs, "converts a long to a float. Stack: value -> result"),
-0x8a: ("l2d", OpcodeNoArgs, "converts a long to a double. Stack: value -> result"),
-0x8b: ("f2i", OpcodeNoArgs, "converts a float to an int. Stack: value -> result"),
-0x8c: ("f2l", OpcodeNoArgs, "converts a float to a long. Stack: value -> result"),
-0x8d: ("f2d", OpcodeNoArgs, "converts a float to a double. Stack: value -> result"),
-0x8e: ("d2i", OpcodeNoArgs, "converts a double to an int. Stack: value -> result"),
-0x8f: ("d2l", OpcodeNoArgs, "converts a double to a long. Stack: value -> result"),
-0x90: ("d2f", OpcodeNoArgs, "converts a double to a float. Stack: value -> result"),
-0x91: ("i2b", OpcodeNoArgs, "converts an int into a byte. Stack: value -> result"),
-0x92: ("i2c", OpcodeNoArgs, "converts an int into a character. Stack: value -> result"),
-0x93: ("i2s", OpcodeNoArgs, "converts an int into a short. Stack: value -> result"),
-0x94: ("lcmp", OpcodeNoArgs, "compares two longs values. Stack: value1, value2 -> result"),
-0x95: ("fcmpl", OpcodeNoArgs, "compares two floats. Stack: value1, value2 -> result"),
-0x96: ("fcmpg", OpcodeNoArgs, "compares two floats. Stack: value1, value2 -> result"),
-0x97: ("dcmpl", OpcodeNoArgs, "compares two doubles. Stack: value1, value2 -> result"),
-0x98: ("dcmpg", OpcodeNoArgs, "compares two doubles. Stack: value1, value2 -> result"),
-0x99: ("ifeq", OpcodeShortJump, "if 'value' is 0, branch to the 16-bit instruction offset argument. Stack: value ->"),
-0x9a: ("ifne", OpcodeShortJump, "if 'value' is not 0, branch to the 16-bit instruction offset argument. Stack: value ->"),
-0x9c: ("ifge", OpcodeShortJump, "if 'value' is greater than or equal to 0, branch to the 16-bit instruction offset argument. Stack: value ->"),
-0x9d: ("ifgt", OpcodeShortJump, "if 'value' is greater than 0, branch to the 16-bit instruction offset argument. Stack: value ->"),
-0x9e: ("ifle", OpcodeShortJump, "if 'value' is less than or equal to 0, branch to the 16-bit instruction offset argument. Stack: value ->"),
-0x9f: ("if_icmpeq", OpcodeShortJump, "if ints are equal, branch to the 16-bit instruction offset argument. Stack: value1, value2 ->"),
-0xa0: ("if_icmpne", OpcodeShortJump, "if ints are not equal, branch to the 16-bit instruction offset argument. Stack: value1, value2 ->"),
-0xa1: ("if_icmplt", OpcodeShortJump, "if 'value1' is less than 'value2', branch to the 16-bit instruction offset argument. Stack: value1, value2 ->"),
-0xa2: ("if_icmpge", OpcodeShortJump, "if 'value1' is greater than or equal to 'value2', branch to the 16-bit instruction offset argument. Stack: value1, value2 ->"),
-0xa3: ("if_icmpgt", OpcodeShortJump, "if 'value1' is greater than 'value2', branch to the 16-bit instruction offset argument. Stack: value1, value2 ->"),
-0xa4: ("if_icmple", OpcodeShortJump, "if 'value1' is less than or equal to 'value2', branch to the 16-bit instruction offset argument. Stack: value1, value2 ->"),
-0xa5: ("if_acmpeq", OpcodeShortJump, "if references are equal, branch to the 16-bit instruction offset argument. Stack: value1, value2 ->"),
-0xa6: ("if_acmpne", OpcodeShortJump, "if references are not equal, branch to the 16-bit instruction offset argument. Stack: value1, value2 ->"),
-0xa7: ("goto", OpcodeShortJump, "goes to the 16-bit instruction offset argument. Stack: [no change]"),
-0xa8: ("jsr", OpcodeShortJump, "jump to subroutine at the 16-bit instruction offset argument and place the return address on the stack. Stack: -> address"),
-0xa9: ("ret", OpcodeIndex, "continue execution from address taken from a local variable '#index'. Stack: [No change]"),
-0xaa: ("tableswitch", OpcodeSpecial_tableswitch, "continue execution from an address in the table at offset 'index'. Stack: index ->"),
-0xab: ("lookupswitch", OpcodeSpecial_lookupswitch, "a target address is looked up from a table using a key and execution continues from the instruction at that address. Stack: key ->"),
-0xac: ("ireturn", OpcodeNoArgs, "returns an integer from a method. Stack: value -> [empty]"),
-0xad: ("lreturn", OpcodeNoArgs, "returns a long value. Stack: value -> [empty]"),
-0xae: ("freturn", OpcodeNoArgs, "returns a float. Stack: value -> [empty]"),
-0xaf: ("dreturn", OpcodeNoArgs, "returns a double from a method. Stack: value -> [empty]"),
-0xb0: ("areturn", OpcodeNoArgs, "returns a reference from a method. Stack: objectref -> [empty]"),
-0xb1: ("return", OpcodeNoArgs, "return void from method. Stack: -> [empty]"),
-0xb2: ("getstatic", OpcodeCPIndex, "gets a static field 'value' of a class, where the field is identified by field reference in the constant pool. Stack: -> value"),
-0xb3: ("putstatic", OpcodeCPIndex, "set static field to 'value' in a class, where the field is identified by a field reference in constant pool. Stack: value ->"),
-0xb4: ("getfield", OpcodeCPIndex, "gets a field 'value' of an object 'objectref', where the field is identified by field reference <argument> in the constant pool. Stack: objectref -> value"),
-0xb5: ("putfield", OpcodeCPIndex, "set field to 'value' in an object 'objectref', where the field is identified by a field reference <argument> in constant pool. Stack: objectref, value ->"),
-0xb6: ("invokevirtual", OpcodeCPIndex, "invoke virtual method on object 'objectref', where the method is identified by method reference <argument> in constant pool. Stack: objectref, [arg1, arg2, ...] ->"),
-0xb7: ("invokespecial", OpcodeCPIndex, "invoke instance method on object 'objectref', where the method is identified by method reference <argument> in constant pool. Stack: objectref, [arg1, arg2, ...] ->"),
-0xb8: ("invokestatic", OpcodeCPIndex, "invoke a static method, where the method is identified by method reference <argument> in the constant pool. Stack: [arg1, arg2, ...] ->"),
-0xb9: ("invokeinterface", OpcodeSpecial_invokeinterface, "invokes an interface method on object 'objectref', where the interface method is identified by method reference <argument> in constant pool. Stack: objectref, [arg1, arg2, ...] ->"),
-0xba: ("xxxunusedxxx", OpcodeNoArgs, "this opcode is reserved for historical reasons. Stack: "),
-0xbb: ("new", OpcodeCPIndex, "creates new object of type identified by class reference <argument> in constant pool. Stack: -> objectref"),
-0xbc: ("newarray", OpcodeSpecial_newarray, "creates new array with 'count' elements of primitive type given in the argument. Stack: count -> arrayref"),
-0xbd: ("anewarray", OpcodeCPIndex, "creates a new array of references of length 'count' and component type identified by the class reference <argument> in the constant pool. Stack: count -> arrayref"),
-0xbe: ("arraylength", OpcodeNoArgs, "gets the length of an array. Stack: arrayref -> length"),
-0xbf: ("athrow", OpcodeNoArgs, "throws an error or exception (notice that the rest of the stack is cleared, leaving only a reference to the Throwable). Stack: objectref -> [empty], objectref"),
-0xc0: ("checkcast", OpcodeCPIndex, "checks whether an 'objectref' is of a certain type, the class reference of which is in the constant pool. Stack: objectref -> objectref"),
-0xc1: ("instanceof", OpcodeCPIndex, "determines if an object 'objectref' is of a given type, identified by class reference <argument> in constant pool. Stack: objectref -> result"),
-0xc2: ("monitorenter", OpcodeNoArgs, "enter monitor for object (\"grab the lock\" - start of synchronized() section). Stack: objectref -> "),
-0xc3: ("monitorexit", OpcodeNoArgs, "exit monitor for object (\"release the lock\" - end of synchronized() section). Stack: objectref -> "),
-0xc4: ("wide", OpcodeSpecial_wide, "execute 'opcode', where 'opcode' is either iload, fload, aload, lload, dload, istore, fstore, astore, lstore, dstore, or ret, but assume the 'index' is 16 bit; or execute iinc, where the 'index' is 16 bits and the constant to increment by is a signed 16 bit short. Stack: [same as for corresponding instructions]"),
-0xc5: ("multianewarray", OpcodeSpecial_multianewarray, "create a new array of 'dimensions' dimensions with elements of type identified by class reference in constant pool; the sizes of each dimension is identified by 'count1', ['count2', etc]. Stack: count1, [count2,...] -> arrayref"),
-0xc6: ("ifnull", OpcodeShortJump, "if 'value' is null, branch to the 16-bit instruction offset argument. Stack: value ->"),
-0xc7: ("ifnonnull", OpcodeShortJump, "if 'value' is not null, branch to the 16-bit instruction offset argument. Stack: value ->"),
-0xc8: ("goto_w", OpcodeLongJump, "goes to another instruction at the 32-bit branch offset argument. Stack: [no change]"),
-0xc9: ("jsr_w", OpcodeLongJump, "jump to subroutine at the 32-bit branch offset argument and place the return address on the stack. Stack: -> address"),
-0xca: ("breakpoint", OpcodeNoArgs, "reserved for breakpoints in Java debuggers; should not appear in any class file."),
-0xfe: ("impdep1", OpcodeNoArgs, "reserved for implementation-dependent operations within debuggers; should not appear in any class file."),
-0xff: ("impdep2", OpcodeNoArgs, "reserved for implementation-dependent operations within debuggers; should not appear in any class file.")}
+        0x00: ("nop", OpcodeNoArgs, "performs no operation. Stack: [No change]"),
+        0x01: ("aconst_null", OpcodeNoArgs, "pushes a 'null' reference onto the stack. Stack: -> null"),
+        0x02: ("iconst_m1", OpcodeNoArgs, "loads the int value -1 onto the stack. Stack: -> -1"),
+        0x03: ("iconst_0", OpcodeNoArgs, "loads the int value 0 onto the stack. Stack: -> 0"),
+        0x04: ("iconst_1", OpcodeNoArgs, "loads the int value 1 onto the stack. Stack: -> 1"),
+        0x05: ("iconst_2", OpcodeNoArgs, "loads the int value 2 onto the stack. Stack: -> 2"),
+        0x06: ("iconst_3", OpcodeNoArgs, "loads the int value 3 onto the stack. Stack: -> 3"),
+        0x07: ("iconst_4", OpcodeNoArgs, "loads the int value 4 onto the stack. Stack: -> 4"),
+        0x08: ("iconst_5", OpcodeNoArgs, "loads the int value 5 onto the stack. Stack: -> 5"),
+        0x09: ("lconst_0", OpcodeNoArgs, "pushes the long 0 onto the stack. Stack: -> 0L"),
+        0x0a: ("lconst_1", OpcodeNoArgs, "pushes the long 1 onto the stack. Stack: -> 1L"),
+        0x0b: ("fconst_0", OpcodeNoArgs, "pushes '0.0f' onto the stack. Stack: -> 0.0f"),
+        0x0c: ("fconst_1", OpcodeNoArgs, "pushes '1.0f' onto the stack. Stack: -> 1.0f"),
+        0x0d: ("fconst_2", OpcodeNoArgs, "pushes '2.0f' onto the stack. Stack: -> 2.0f"),
+        0x0e: ("dconst_0", OpcodeNoArgs, "pushes the constant '0.0' onto the stack. Stack: -> 0.0"),
+        0x0f: ("dconst_1", OpcodeNoArgs, "pushes the constant '1.0' onto the stack. Stack: -> 1.0"),
+        0x10: ("bipush", OpcodeSpecial_bipush, "pushes the signed 8-bit integer argument onto the stack. Stack: -> value"),
+        0x11: ("sipush", OpcodeSpecial_sipush, "pushes the signed 16-bit integer argument onto the stack. Stack: -> value"),
+        0x12: ("ldc", OpcodeCPIndexShort, "pushes a constant from a constant pool (String, int, float or class type) onto the stack. Stack: -> value"),
+        0x13: ("ldc_w", OpcodeCPIndex, "pushes a constant from a constant pool (String, int, float or class type) onto the stack. Stack: -> value"),
+        0x14: ("ldc2_w", OpcodeCPIndex, "pushes a constant from a constant pool (double or long) onto the stack. Stack: -> value"),
+        0x15: ("iload", OpcodeIndex, "loads an int 'value' from a local variable '#index'. Stack: -> value"),
+        0x16: ("lload", OpcodeIndex, "loads a long value from a local variable '#index'. Stack: -> value"),
+        0x17: ("fload", OpcodeIndex, "loads a float 'value' from a local variable '#index'. Stack: -> value"),
+        0x18: ("dload", OpcodeIndex, "loads a double 'value' from a local variable '#index'. Stack: -> value"),
+        0x19: ("aload", OpcodeIndex, "loads a reference onto the stack from a local variable '#index'. Stack: -> objectref"),
+        0x1a: ("iload_0", OpcodeNoArgs, "loads an int 'value' from variable 0. Stack: -> value"),
+        0x1b: ("iload_1", OpcodeNoArgs, "loads an int 'value' from variable 1. Stack: -> value"),
+        0x1c: ("iload_2", OpcodeNoArgs, "loads an int 'value' from variable 2. Stack: -> value"),
+        0x1d: ("iload_3", OpcodeNoArgs, "loads an int 'value' from variable 3. Stack: -> value"),
+        0x1e: ("lload_0", OpcodeNoArgs, "load a long value from a local variable 0. Stack: -> value"),
+        0x1f: ("lload_1", OpcodeNoArgs, "load a long value from a local variable 1. Stack: -> value"),
+        0x20: ("lload_2", OpcodeNoArgs, "load a long value from a local variable 2. Stack: -> value"),
+        0x21: ("lload_3", OpcodeNoArgs, "load a long value from a local variable 3. Stack: -> value"),
+        0x22: ("fload_0", OpcodeNoArgs, "loads a float 'value' from local variable 0. Stack: -> value"),
+        0x23: ("fload_1", OpcodeNoArgs, "loads a float 'value' from local variable 1. Stack: -> value"),
+        0x24: ("fload_2", OpcodeNoArgs, "loads a float 'value' from local variable 2. Stack: -> value"),
+        0x25: ("fload_3", OpcodeNoArgs, "loads a float 'value' from local variable 3. Stack: -> value"),
+        0x26: ("dload_0", OpcodeNoArgs, "loads a double from local variable 0. Stack: -> value"),
+        0x27: ("dload_1", OpcodeNoArgs, "loads a double from local variable 1. Stack: -> value"),
+        0x28: ("dload_2", OpcodeNoArgs, "loads a double from local variable 2. Stack: -> value"),
+        0x29: ("dload_3", OpcodeNoArgs, "loads a double from local variable 3. Stack: -> value"),
+        0x2a: ("aload_0", OpcodeNoArgs, "loads a reference onto the stack from local variable 0. Stack: -> objectref"),
+        0x2b: ("aload_1", OpcodeNoArgs, "loads a reference onto the stack from local variable 1. Stack: -> objectref"),
+        0x2c: ("aload_2", OpcodeNoArgs, "loads a reference onto the stack from local variable 2. Stack: -> objectref"),
+        0x2d: ("aload_3", OpcodeNoArgs, "loads a reference onto the stack from local variable 3. Stack: -> objectref"),
+        0x2e: ("iaload", OpcodeNoArgs, "loads an int from an array. Stack: arrayref, index -> value"),
+        0x2f: ("laload", OpcodeNoArgs, "load a long from an array. Stack: arrayref, index -> value"),
+        0x30: ("faload", OpcodeNoArgs, "loads a float from an array. Stack: arrayref, index -> value"),
+        0x31: ("daload", OpcodeNoArgs, "loads a double from an array. Stack: arrayref, index -> value"),
+        0x32: ("aaload", OpcodeNoArgs, "loads onto the stack a reference from an array. Stack: arrayref, index -> value"),
+        0x33: ("baload", OpcodeNoArgs, "loads a byte or Boolean value from an array. Stack: arrayref, index -> value"),
+        0x34: ("caload", OpcodeNoArgs, "loads a char from an array. Stack: arrayref, index -> value"),
+        0x35: ("saload", OpcodeNoArgs, "load short from array. Stack: arrayref, index -> value"),
+        0x36: ("istore", OpcodeIndex, "store int 'value' into variable '#index'. Stack: value ->"),
+        0x37: ("lstore", OpcodeIndex, "store a long 'value' in a local variable '#index'. Stack: value ->"),
+        0x38: ("fstore", OpcodeIndex, "stores a float 'value' into a local variable '#index'. Stack: value ->"),
+        0x39: ("dstore", OpcodeIndex, "stores a double 'value' into a local variable '#index'. Stack: value ->"),
+        0x3a: ("astore", OpcodeIndex, "stores a reference into a local variable '#index'. Stack: objectref ->"),
+        0x3b: ("istore_0", OpcodeNoArgs, "store int 'value' into variable 0. Stack: value ->"),
+        0x3c: ("istore_1", OpcodeNoArgs, "store int 'value' into variable 1. Stack: value ->"),
+        0x3d: ("istore_2", OpcodeNoArgs, "store int 'value' into variable 2. Stack: value ->"),
+        0x3e: ("istore_3", OpcodeNoArgs, "store int 'value' into variable 3. Stack: value ->"),
+        0x3f: ("lstore_0", OpcodeNoArgs, "store a long 'value' in a local variable 0. Stack: value ->"),
+        0x40: ("lstore_1", OpcodeNoArgs, "store a long 'value' in a local variable 1. Stack: value ->"),
+        0x41: ("lstore_2", OpcodeNoArgs, "store a long 'value' in a local variable 2. Stack: value ->"),
+        0x42: ("lstore_3", OpcodeNoArgs, "store a long 'value' in a local variable 3. Stack: value ->"),
+        0x43: ("fstore_0", OpcodeNoArgs, "stores a float 'value' into local variable 0. Stack: value ->"),
+        0x44: ("fstore_1", OpcodeNoArgs, "stores a float 'value' into local variable 1. Stack: value ->"),
+        0x45: ("fstore_2", OpcodeNoArgs, "stores a float 'value' into local variable 2. Stack: value ->"),
+        0x46: ("fstore_3", OpcodeNoArgs, "stores a float 'value' into local variable 3. Stack: value ->"),
+        0x47: ("dstore_0", OpcodeNoArgs, "stores a double into local variable 0. Stack: value ->"),
+        0x48: ("dstore_1", OpcodeNoArgs, "stores a double into local variable 1. Stack: value ->"),
+        0x49: ("dstore_2", OpcodeNoArgs, "stores a double into local variable 2. Stack: value ->"),
+        0x4a: ("dstore_3", OpcodeNoArgs, "stores a double into local variable 3. Stack: value ->"),
+        0x4b: ("astore_0", OpcodeNoArgs, "stores a reference into local variable 0. Stack: objectref ->"),
+        0x4c: ("astore_1", OpcodeNoArgs, "stores a reference into local variable 1. Stack: objectref ->"),
+        0x4d: ("astore_2", OpcodeNoArgs, "stores a reference into local variable 2. Stack: objectref ->"),
+        0x4e: ("astore_3", OpcodeNoArgs, "stores a reference into local variable 3. Stack: objectref ->"),
+        0x4f: ("iastore", OpcodeNoArgs, "stores an int into an array. Stack: arrayref, index, value ->"),
+        0x50: ("lastore", OpcodeNoArgs, "store a long to an array. Stack: arrayref, index, value ->"),
+        0x51: ("fastore", OpcodeNoArgs, "stores a float in an array. Stack: arreyref, index, value ->"),
+        0x52: ("dastore", OpcodeNoArgs, "stores a double into an array. Stack: arrayref, index, value ->"),
+        0x53: ("aastore", OpcodeNoArgs, "stores into a reference to an array. Stack: arrayref, index, value ->"),
+        0x54: ("bastore", OpcodeNoArgs, "stores a byte or Boolean value into an array. Stack: arrayref, index, value ->"),
+        0x55: ("castore", OpcodeNoArgs, "stores a char into an array. Stack: arrayref, index, value ->"),
+        0x56: ("sastore", OpcodeNoArgs, "store short to array. Stack: arrayref, index, value ->"),
+        0x57: ("pop", OpcodeNoArgs, "discards the top value on the stack. Stack: value ->"),
+        0x58: ("pop2", OpcodeNoArgs, "discards the top two values on the stack (or one value, if it is a double or long). Stack: {value2, value1} ->"),
+        0x59: ("dup", OpcodeNoArgs, "duplicates the value on top of the stack. Stack: value -> value, value"),
+        0x5a: ("dup_x1", OpcodeNoArgs, "inserts a copy of the top value into the stack two values from the top. Stack: value2, value1 -> value1, value2, value1"),
+        0x5b: ("dup_x2", OpcodeNoArgs, "inserts a copy of the top value into the stack two (if value2 is double or long it takes up the entry of value3, too) or three values (if value2 is neither double nor long) from the top. Stack: value3, value2, value1 -> value1, value3, value2, value1"),
+        0x5c: ("dup2", OpcodeNoArgs, "duplicate top two stack words (two values, if value1 is not double nor long; a single value, if value1 is double or long). Stack: {value2, value1} -> {value2, value1}, {value2, value1}"),
+        0x5d: ("dup2_x1", OpcodeNoArgs, "duplicate two words and insert beneath third word. Stack: value3, {value2, value1} -> {value2, value1}, value3, {value2, value1}"),
+        0x5e: ("dup2_x2", OpcodeNoArgs, "duplicate two words and insert beneath fourth word. Stack: {value4, value3}, {value2, value1} -> {value2, value1}, {value4, value3}, {value2, value1}"),
+        0x5f: ("swap", OpcodeNoArgs, "swaps two top words on the stack (note that value1 and value2 must not be double or long). Stack: value2, value1 -> value1, value2"),
+        0x60: ("iadd", OpcodeNoArgs, "adds two ints together. Stack: value1, value2 -> result"),
+        0x61: ("ladd", OpcodeNoArgs, "add two longs. Stack: value1, value2 -> result"),
+        0x62: ("fadd", OpcodeNoArgs, "adds two floats. Stack: value1, value2 -> result"),
+        0x63: ("dadd", OpcodeNoArgs, "adds two doubles. Stack: value1, value2 -> result"),
+        0x64: ("isub", OpcodeNoArgs, "int subtract. Stack: value1, value2 -> result"),
+        0x65: ("lsub", OpcodeNoArgs, "subtract two longs. Stack: value1, value2 -> result"),
+        0x66: ("fsub", OpcodeNoArgs, "subtracts two floats. Stack: value1, value2 -> result"),
+        0x67: ("dsub", OpcodeNoArgs, "subtracts a double from another. Stack: value1, value2 -> result"),
+        0x68: ("imul", OpcodeNoArgs, "multiply two integers. Stack: value1, value2 -> result"),
+        0x69: ("lmul", OpcodeNoArgs, "multiplies two longs. Stack: value1, value2 -> result"),
+        0x6a: ("fmul", OpcodeNoArgs, "multiplies two floats. Stack: value1, value2 -> result"),
+        0x6b: ("dmul", OpcodeNoArgs, "multiplies two doubles. Stack: value1, value2 -> result"),
+        0x6c: ("idiv", OpcodeNoArgs, "divides two integers. Stack: value1, value2 -> result"),
+        0x6d: ("ldiv", OpcodeNoArgs, "divide two longs. Stack: value1, value2 -> result"),
+        0x6e: ("fdiv", OpcodeNoArgs, "divides two floats. Stack: value1, value2 -> result"),
+        0x6f: ("ddiv", OpcodeNoArgs, "divides two doubles. Stack: value1, value2 -> result"),
+        0x70: ("irem", OpcodeNoArgs, "logical int remainder. Stack: value1, value2 -> result"),
+        0x71: ("lrem", OpcodeNoArgs, "remainder of division of two longs. Stack: value1, value2 -> result"),
+        0x72: ("frem", OpcodeNoArgs, "gets the remainder from a division between two floats. Stack: value1, value2 -> result"),
+        0x73: ("drem", OpcodeNoArgs, "gets the remainder from a division between two doubles. Stack: value1, value2 -> result"),
+        0x74: ("ineg", OpcodeNoArgs, "negate int. Stack: value -> result"),
+        0x75: ("lneg", OpcodeNoArgs, "negates a long. Stack: value -> result"),
+        0x76: ("fneg", OpcodeNoArgs, "negates a float. Stack: value -> result"),
+        0x77: ("dneg", OpcodeNoArgs, "negates a double. Stack: value -> result"),
+        0x78: ("ishl", OpcodeNoArgs, "int shift left. Stack: value1, value2 -> result"),
+        0x79: ("lshl", OpcodeNoArgs, "bitwise shift left of a long 'value1' by 'value2' positions. Stack: value1, value2 -> result"),
+        0x7a: ("ishr", OpcodeNoArgs, "int shift right. Stack: value1, value2 -> result"),
+        0x7b: ("lshr", OpcodeNoArgs, "bitwise shift right of a long 'value1' by 'value2' positions. Stack: value1, value2 -> result"),
+        0x7c: ("iushr", OpcodeNoArgs, "int shift right. Stack: value1, value2 -> result"),
+        0x7d: ("lushr", OpcodeNoArgs, "bitwise shift right of a long 'value1' by 'value2' positions, unsigned. Stack: value1, value2 -> result"),
+        0x7e: ("iand", OpcodeNoArgs, "performs a logical and on two integers. Stack: value1, value2 -> result"),
+        0x7f: ("land", OpcodeNoArgs, "bitwise and of two longs. Stack: value1, value2 -> result"),
+        0x80: ("ior", OpcodeNoArgs, "logical int or. Stack: value1, value2 -> result"),
+        0x81: ("lor", OpcodeNoArgs, "bitwise or of two longs. Stack: value1, value2 -> result"),
+        0x82: ("ixor", OpcodeNoArgs, "int xor. Stack: value1, value2 -> result"),
+        0x83: ("lxor", OpcodeNoArgs, "bitwise exclusive or of two longs. Stack: value1, value2 -> result"),
+        0x84: ("iinc", OpcodeSpecial_iinc, "increment local variable '#index' by signed byte 'const'. Stack: [No change]"),
+        0x85: ("i2l", OpcodeNoArgs, "converts an int into a long. Stack: value -> result"),
+        0x86: ("i2f", OpcodeNoArgs, "converts an int into a float. Stack: value -> result"),
+        0x87: ("i2d", OpcodeNoArgs, "converts an int into a double. Stack: value -> result"),
+        0x88: ("l2i", OpcodeNoArgs, "converts a long to an int. Stack: value -> result"),
+        0x89: ("l2f", OpcodeNoArgs, "converts a long to a float. Stack: value -> result"),
+        0x8a: ("l2d", OpcodeNoArgs, "converts a long to a double. Stack: value -> result"),
+        0x8b: ("f2i", OpcodeNoArgs, "converts a float to an int. Stack: value -> result"),
+        0x8c: ("f2l", OpcodeNoArgs, "converts a float to a long. Stack: value -> result"),
+        0x8d: ("f2d", OpcodeNoArgs, "converts a float to a double. Stack: value -> result"),
+        0x8e: ("d2i", OpcodeNoArgs, "converts a double to an int. Stack: value -> result"),
+        0x8f: ("d2l", OpcodeNoArgs, "converts a double to a long. Stack: value -> result"),
+        0x90: ("d2f", OpcodeNoArgs, "converts a double to a float. Stack: value -> result"),
+        0x91: ("i2b", OpcodeNoArgs, "converts an int into a byte. Stack: value -> result"),
+        0x92: ("i2c", OpcodeNoArgs, "converts an int into a character. Stack: value -> result"),
+        0x93: ("i2s", OpcodeNoArgs, "converts an int into a short. Stack: value -> result"),
+        0x94: ("lcmp", OpcodeNoArgs, "compares two longs values. Stack: value1, value2 -> result"),
+        0x95: ("fcmpl", OpcodeNoArgs, "compares two floats. Stack: value1, value2 -> result"),
+        0x96: ("fcmpg", OpcodeNoArgs, "compares two floats. Stack: value1, value2 -> result"),
+        0x97: ("dcmpl", OpcodeNoArgs, "compares two doubles. Stack: value1, value2 -> result"),
+        0x98: ("dcmpg", OpcodeNoArgs, "compares two doubles. Stack: value1, value2 -> result"),
+        0x99: ("ifeq", OpcodeShortJump, "if 'value' is 0, branch to the 16-bit instruction offset argument. Stack: value ->"),
+        0x9a: ("ifne", OpcodeShortJump, "if 'value' is not 0, branch to the 16-bit instruction offset argument. Stack: value ->"),
+        0x9c: ("ifge", OpcodeShortJump, "if 'value' is greater than or equal to 0, branch to the 16-bit instruction offset argument. Stack: value ->"),
+        0x9d: ("ifgt", OpcodeShortJump, "if 'value' is greater than 0, branch to the 16-bit instruction offset argument. Stack: value ->"),
+        0x9e: ("ifle", OpcodeShortJump, "if 'value' is less than or equal to 0, branch to the 16-bit instruction offset argument. Stack: value ->"),
+        0x9f: ("if_icmpeq", OpcodeShortJump, "if ints are equal, branch to the 16-bit instruction offset argument. Stack: value1, value2 ->"),
+        0xa0: ("if_icmpne", OpcodeShortJump, "if ints are not equal, branch to the 16-bit instruction offset argument. Stack: value1, value2 ->"),
+        0xa1: ("if_icmplt", OpcodeShortJump, "if 'value1' is less than 'value2', branch to the 16-bit instruction offset argument. Stack: value1, value2 ->"),
+        0xa2: ("if_icmpge", OpcodeShortJump, "if 'value1' is greater than or equal to 'value2', branch to the 16-bit instruction offset argument. Stack: value1, value2 ->"),
+        0xa3: ("if_icmpgt", OpcodeShortJump, "if 'value1' is greater than 'value2', branch to the 16-bit instruction offset argument. Stack: value1, value2 ->"),
+        0xa4: ("if_icmple", OpcodeShortJump, "if 'value1' is less than or equal to 'value2', branch to the 16-bit instruction offset argument. Stack: value1, value2 ->"),
+        0xa5: ("if_acmpeq", OpcodeShortJump, "if references are equal, branch to the 16-bit instruction offset argument. Stack: value1, value2 ->"),
+        0xa6: ("if_acmpne", OpcodeShortJump, "if references are not equal, branch to the 16-bit instruction offset argument. Stack: value1, value2 ->"),
+        0xa7: ("goto", OpcodeShortJump, "goes to the 16-bit instruction offset argument. Stack: [no change]"),
+        0xa8: ("jsr", OpcodeShortJump, "jump to subroutine at the 16-bit instruction offset argument and place the return address on the stack. Stack: -> address"),
+        0xa9: ("ret", OpcodeIndex, "continue execution from address taken from a local variable '#index'. Stack: [No change]"),
+        0xaa: ("tableswitch", OpcodeSpecial_tableswitch, "continue execution from an address in the table at offset 'index'. Stack: index ->"),
+        0xab: ("lookupswitch", OpcodeSpecial_lookupswitch, "a target address is looked up from a table using a key and execution continues from the instruction at that address. Stack: key ->"),
+        0xac: ("ireturn", OpcodeNoArgs, "returns an integer from a method. Stack: value -> [empty]"),
+        0xad: ("lreturn", OpcodeNoArgs, "returns a long value. Stack: value -> [empty]"),
+        0xae: ("freturn", OpcodeNoArgs, "returns a float. Stack: value -> [empty]"),
+        0xaf: ("dreturn", OpcodeNoArgs, "returns a double from a method. Stack: value -> [empty]"),
+        0xb0: ("areturn", OpcodeNoArgs, "returns a reference from a method. Stack: objectref -> [empty]"),
+        0xb1: ("return", OpcodeNoArgs, "return void from method. Stack: -> [empty]"),
+        0xb2: ("getstatic", OpcodeCPIndex, "gets a static field 'value' of a class, where the field is identified by field reference in the constant pool. Stack: -> value"),
+        0xb3: ("putstatic", OpcodeCPIndex, "set static field to 'value' in a class, where the field is identified by a field reference in constant pool. Stack: value ->"),
+        0xb4: ("getfield", OpcodeCPIndex, "gets a field 'value' of an object 'objectref', where the field is identified by field reference <argument> in the constant pool. Stack: objectref -> value"),
+        0xb5: ("putfield", OpcodeCPIndex, "set field to 'value' in an object 'objectref', where the field is identified by a field reference <argument> in constant pool. Stack: objectref, value ->"),
+        0xb6: ("invokevirtual", OpcodeCPIndex, "invoke virtual method on object 'objectref', where the method is identified by method reference <argument> in constant pool. Stack: objectref, [arg1, arg2, ...] ->"),
+        0xb7: ("invokespecial", OpcodeCPIndex, "invoke instance method on object 'objectref', where the method is identified by method reference <argument> in constant pool. Stack: objectref, [arg1, arg2, ...] ->"),
+        0xb8: ("invokestatic", OpcodeCPIndex, "invoke a static method, where the method is identified by method reference <argument> in the constant pool. Stack: [arg1, arg2, ...] ->"),
+        0xb9: ("invokeinterface", OpcodeSpecial_invokeinterface, "invokes an interface method on object 'objectref', where the interface method is identified by method reference <argument> in constant pool. Stack: objectref, [arg1, arg2, ...] ->"),
+        0xba: ("xxxunusedxxx", OpcodeNoArgs, "this opcode is reserved for historical reasons. Stack: "),
+        0xbb: ("new", OpcodeCPIndex, "creates new object of type identified by class reference <argument> in constant pool. Stack: -> objectref"),
+        0xbc: ("newarray", OpcodeSpecial_newarray, "creates new array with 'count' elements of primitive type given in the argument. Stack: count -> arrayref"),
+        0xbd: ("anewarray", OpcodeCPIndex, "creates a new array of references of length 'count' and component type identified by the class reference <argument> in the constant pool. Stack: count -> arrayref"),
+        0xbe: ("arraylength", OpcodeNoArgs, "gets the length of an array. Stack: arrayref -> length"),
+        0xbf: ("athrow", OpcodeNoArgs, "throws an error or exception (notice that the rest of the stack is cleared, leaving only a reference to the Throwable). Stack: objectref -> [empty], objectref"),
+        0xc0: ("checkcast", OpcodeCPIndex, "checks whether an 'objectref' is of a certain type, the class reference of which is in the constant pool. Stack: objectref -> objectref"),
+        0xc1: ("instanceof", OpcodeCPIndex, "determines if an object 'objectref' is of a given type, identified by class reference <argument> in constant pool. Stack: objectref -> result"),
+        0xc2: ("monitorenter", OpcodeNoArgs, "enter monitor for object (\"grab the lock\" - start of synchronized() section). Stack: objectref -> "),
+        0xc3: ("monitorexit", OpcodeNoArgs, "exit monitor for object (\"release the lock\" - end of synchronized() section). Stack: objectref -> "),
+        0xc4: ("wide", OpcodeSpecial_wide, "execute 'opcode', where 'opcode' is either iload, fload, aload, lload, dload, istore, fstore, astore, lstore, dstore, or ret, but assume the 'index' is 16 bit; or execute iinc, where the 'index' is 16 bits and the constant to increment by is a signed 16 bit short. Stack: [same as for corresponding instructions]"),
+        0xc5: ("multianewarray", OpcodeSpecial_multianewarray, "create a new array of 'dimensions' dimensions with elements of type identified by class reference in constant pool; the sizes of each dimension is identified by 'count1', ['count2', etc]. Stack: count1, [count2,...] -> arrayref"),
+        0xc6: ("ifnull", OpcodeShortJump, "if 'value' is null, branch to the 16-bit instruction offset argument. Stack: value ->"),
+        0xc7: ("ifnonnull", OpcodeShortJump, "if 'value' is not null, branch to the 16-bit instruction offset argument. Stack: value ->"),
+        0xc8: ("goto_w", OpcodeLongJump, "goes to another instruction at the 32-bit branch offset argument. Stack: [no change]"),
+        0xc9: ("jsr_w", OpcodeLongJump, "jump to subroutine at the 32-bit branch offset argument and place the return address on the stack. Stack: -> address"),
+        0xca: ("breakpoint", OpcodeNoArgs, "reserved for breakpoints in Java debuggers; should not appear in any class file."),
+        0xfe: ("impdep1", OpcodeNoArgs, "reserved for implementation-dependent operations within debuggers; should not appear in any class file."),
+        0xff: ("impdep2", OpcodeNoArgs, "reserved for implementation-dependent operations within debuggers; should not appear in any class file.")}
+
     def __init__(self, parent, name, length):
         FieldSet.__init__(self, parent, name)
-        self._size = length*8
+        self._size = length * 8
+
     def createFields(self):
         while self.current_size < self.size:
-            bytecode = ord(self.parent.stream.readBytes(self.absolute_address+self.current_size, 1))
-            op, cls, desc = self.OPCODE_TABLE.get(bytecode,["<reserved_opcode>", OpcodeNoArgs, "Reserved opcode."])
+            bytecode = ord(self.parent.stream.readBytes(
+                self.absolute_address + self.current_size, 1))
+            op, cls, desc = self.OPCODE_TABLE.get(
+                bytecode, ["<reserved_opcode>", OpcodeNoArgs, "Reserved opcode."])
             yield cls(self, "bytecode[]", op, desc)
 
 ###############################################################################
+
+
 class CPInfo(FieldSet):
     """
     Holds a constant pool entry.  Entries all have a type, and various contents
     fields depending on their type.
     """
+
     def createFields(self):
         yield Enum(UInt8(self, "tag"), self.root.CONSTANT_TYPES)
         if self["tag"].value not in self.root.CONSTANT_TYPES:
-            raise ParserError("Java: unknown constant type (%s)" % self["tag"].value)
+            raise ParserError("Java: unknown constant type (%s)" %
+                              self["tag"].value)
         self.constant_type = self.root.CONSTANT_TYPES[self["tag"].value]
         if self.constant_type == "Utf8":
             yield PascalString16(self, "bytes", charset="UTF-8")
@@ -670,7 +744,7 @@ class CPInfo(FieldSet):
             yield CPIndex(self, "descriptor_index", target_types="Utf8")
         else:
             raise ParserError("Not a valid constant pool element type: "
-                    + self["tag"].value)
+                              + self["tag"].value)
 
     def __str__(self):
         """
@@ -684,7 +758,7 @@ class CPInfo(FieldSet):
             return self["bytes"].display
         elif self.constant_type == "Class":
             class_name = str(self["name_index"].get_cp_entry())
-            return class_name.replace("/",".")
+            return class_name.replace("/", ".")
         elif self.constant_type == "String":
             return str(self["string_index"].get_cp_entry())
         elif self.constant_type == "Fieldref":
@@ -692,15 +766,15 @@ class CPInfo(FieldSet):
         elif self.constant_type == "Methodref":
             return "%s (from %s)" % (self["name_and_type_index"], self["class_index"])
         elif self.constant_type == "InterfaceMethodref":
-             return "%s (from %s)" % (self["name_and_type_index"], self["class_index"])
+            return "%s (from %s)" % (self["name_and_type_index"], self["class_index"])
         elif self.constant_type == "NameAndType":
             return parse_any_descriptor(
-                    str(self["descriptor_index"].get_cp_entry()),
-                    name=str(self["name_index"].get_cp_entry()))
+                str(self["descriptor_index"].get_cp_entry()),
+                name=str(self["name_index"].get_cp_entry()))
         else:
             # FIXME: Return "<error>" instead of raising an exception?
             raise ParserError("Not a valid constant pool element type: "
-                    + self["tag"].value)
+                              + self["tag"].value)
 
 
 ###############################################################################
@@ -712,6 +786,7 @@ class CPInfo(FieldSet):
 #        attribute_info attributes[attributes_count];
 # }
 class FieldInfo(FieldSet):
+
     def createFields(self):
         # Access flags (16 bits)
         yield NullBits(self, "reserved[]", 8)
@@ -726,11 +801,11 @@ class FieldInfo(FieldSet):
 
         yield CPIndex(self, "name_index", "Field name", target_types="Utf8")
         yield CPIndex(self, "descriptor_index", "Field descriptor", target_types="Utf8",
-                target_text_handler=parse_field_descriptor)
+                      target_text_handler=parse_field_descriptor)
         yield UInt16(self, "attributes_count", "Number of field attributes")
         if self["attributes_count"].value > 0:
             yield FieldArray(self, "attributes", AttributeInfo,
-                    self["attributes_count"].value)
+                             self["attributes_count"].value)
 
 
 ###############################################################################
@@ -742,6 +817,7 @@ class FieldInfo(FieldSet):
 #        attribute_info attributes[attributes_count];
 # }
 class MethodInfo(FieldSet):
+
     def createFields(self):
         # Access flags (16 bits)
         yield NullBits(self, "reserved[]", 4)
@@ -759,12 +835,12 @@ class MethodInfo(FieldSet):
 
         yield CPIndex(self, "name_index", "Method name", target_types="Utf8")
         yield CPIndex(self, "descriptor_index", "Method descriptor",
-                target_types="Utf8",
-                target_text_handler=parse_method_descriptor)
+                      target_types="Utf8",
+                      target_text_handler=parse_method_descriptor)
         yield UInt16(self, "attributes_count", "Number of method attributes")
         if self["attributes_count"].value > 0:
             yield FieldArray(self, "attributes", AttributeInfo,
-                    self["attributes_count"].value)
+                             self["attributes_count"].value)
 
 
 ###############################################################################
@@ -775,6 +851,7 @@ class MethodInfo(FieldSet):
 # }
 # [...]
 class AttributeInfo(FieldSet):
+
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
         self._size = (self["attribute_length"].value + 6) * 8
@@ -791,10 +868,10 @@ class AttributeInfo(FieldSet):
         # }
         if attr_name == "ConstantValue":
             if self["attribute_length"].value != 2:
-                    raise ParserError("Java: Invalid attribute %s length (%s)" \
-                        % (self.path, self["attribute_length"].value))
+                raise ParserError("Java: Invalid attribute %s length (%s)"
+                                  % (self.path, self["attribute_length"].value))
             yield CPIndex(self, "constantvalue_index",
-                    target_types=("Long","Float","Double","Integer","String"))
+                          target_types=("Long", "Float", "Double", "Integer", "String"))
 
         # Code_attribute {
         #   u2 attribute_name_index;
@@ -821,11 +898,11 @@ class AttributeInfo(FieldSet):
             yield UInt16(self, "exception_table_length")
             if self["exception_table_length"].value > 0:
                 yield FieldArray(self, "exception_table", ExceptionTableEntry,
-                        self["exception_table_length"].value)
+                                 self["exception_table_length"].value)
             yield UInt16(self, "attributes_count")
             if self["attributes_count"].value > 0:
                 yield FieldArray(self, "attributes", AttributeInfo,
-                        self["attributes_count"].value)
+                                 self["attributes_count"].value)
 
         # Exceptions_attribute {
         #   u2 attribute_name_index;
@@ -836,7 +913,7 @@ class AttributeInfo(FieldSet):
         elif (attr_name == "Exceptions"):
             yield UInt16(self, "number_of_exceptions")
             yield FieldArray(self, "exception_index_table", CPIndex,
-                    self["number_of_exceptions"].value, target_types="Class")
+                             self["number_of_exceptions"].value, target_types="Class")
             assert self["attribute_length"].value == \
                 2 + self["number_of_exceptions"].value * 2
 
@@ -854,7 +931,7 @@ class AttributeInfo(FieldSet):
             yield UInt16(self, "number_of_classes")
             if self["number_of_classes"].value > 0:
                 yield FieldArray(self, "classes", InnerClassesEntry,
-                       self["number_of_classes"].value)
+                                 self["number_of_classes"].value)
             assert self["attribute_length"].value == \
                 2 + self["number_of_classes"].value * 8
 
@@ -886,10 +963,10 @@ class AttributeInfo(FieldSet):
             yield UInt16(self, "line_number_table_length")
             if self["line_number_table_length"].value > 0:
                 yield FieldArray(self, "line_number_table",
-                        LineNumberTableEntry,
-                        self["line_number_table_length"].value)
+                                 LineNumberTableEntry,
+                                 self["line_number_table_length"].value)
             assert self["attribute_length"].value == \
-                    2 + self["line_number_table_length"].value * 4
+                2 + self["line_number_table_length"].value * 4
 
         # LocalVariableTable_attribute {
         #   u2 attribute_name_index;
@@ -906,10 +983,10 @@ class AttributeInfo(FieldSet):
             yield UInt16(self, "local_variable_table_length")
             if self["local_variable_table_length"].value > 0:
                 yield FieldArray(self, "local_variable_table",
-                        LocalVariableTableEntry,
-                        self["local_variable_table_length"].value)
+                                 LocalVariableTableEntry,
+                                 self["local_variable_table_length"].value)
             assert self["attribute_length"].value == \
-                    2 + self["local_variable_table_length"].value * 10
+                2 + self["local_variable_table_length"].value * 10
 
         # Deprecated_attribute {
         #   u2 attribute_name_index;
@@ -923,6 +1000,7 @@ class AttributeInfo(FieldSet):
         elif self["attribute_length"].value > 0:
             yield RawBytes(self, "info", self["attribute_length"].value)
 
+
 class ExceptionTableEntry(FieldSet):
     static_size = 48 + CPIndex.static_size
 
@@ -932,14 +1010,15 @@ class ExceptionTableEntry(FieldSet):
         yield textHandler(UInt16(self, "handler_pc"), hexadecimal)
         yield CPIndex(self, "catch_type", target_types="Class")
 
+
 class InnerClassesEntry(StaticFieldSet):
     format = (
         (CPIndex, "inner_class_info_index",
-                {"target_types": "Class", "allow_zero": True}),
+         {"target_types": "Class", "allow_zero": True}),
         (CPIndex, "outer_class_info_index",
-                {"target_types": "Class", "allow_zero": True}),
+         {"target_types": "Class", "allow_zero": True}),
         (CPIndex, "inner_name_index",
-                {"target_types": "Utf8", "allow_zero": True}),
+         {"target_types": "Utf8", "allow_zero": True}),
 
         # Inner class access flags (16 bits)
         (NullBits, "reserved[]", 5),
@@ -954,11 +1033,13 @@ class InnerClassesEntry(StaticFieldSet):
         (Bit, "public"),
     )
 
+
 class LineNumberTableEntry(StaticFieldSet):
     format = (
         (UInt16, "start_pc"),
         (UInt16, "line_number")
     )
+
 
 class LocalVariableTableEntry(StaticFieldSet):
     format = (
@@ -966,7 +1047,7 @@ class LocalVariableTableEntry(StaticFieldSet):
         (UInt16, "length"),
         (CPIndex, "name_index", {"target_types": "Utf8"}),
         (CPIndex, "descriptor_index", {"target_types": "Utf8",
-                "target_text_handler": parse_field_descriptor}),
+                                       "target_text_handler": parse_field_descriptor}),
         (UInt16, "index")
     )
 
@@ -1002,7 +1083,7 @@ class JavaCompiledClassFile(Parser):
         "category": "program",
         "file_ext": ("class",),
         "mime": ("application/java-vm",),
-        "min_size": (32 + 3*16),
+        "min_size": (32 + 3 * 16),
         "description": "Compiled Java class"
     }
 
@@ -1020,14 +1101,14 @@ class JavaCompiledClassFile(Parser):
     # version at some point.  Though, if they happen to be really backward
     # compatible, they may become module globals.
     CONSTANT_TYPES = {
-         1: "Utf8",
-         3: "Integer",
-         4: "Float",
-         5: "Long",
-         6: "Double",
-         7: "Class",
-         8: "String",
-         9: "Fieldref",
+        1: "Utf8",
+        3: "Integer",
+        4: "Float",
+        5: "Long",
+        6: "Double",
+        7: "Class",
+        8: "String",
+        9: "Fieldref",
         10: "Methodref",
         11: "InterfaceMethodref",
         12: "NameAndType"
@@ -1036,13 +1117,15 @@ class JavaCompiledClassFile(Parser):
     def validate(self):
         if self["magic"].value != self.MAGIC:
             return "Wrong magic signature!"
-        version = "%d.%d" % (self["major_version"].value, self["minor_version"].value)
+        version = "%d.%d" % (self["major_version"].value, self[
+                             "minor_version"].value)
         if version not in self.KNOWN_VERSIONS:
             return "Unknown version (%s)" % version
         return True
 
     def createDescription(self):
-        version = "%d.%d" % (self["major_version"].value, self["minor_version"].value)
+        version = "%d.%d" % (self["major_version"].value, self[
+                             "minor_version"].value)
         if version in self.KNOWN_VERSIONS:
             return "Compiled Java class, %s" % self.KNOWN_VERSIONS[version]
         else:
@@ -1050,18 +1133,18 @@ class JavaCompiledClassFile(Parser):
 
     def createFields(self):
         yield textHandler(UInt32(self, "magic", "Java compiled class signature"),
-            hexadecimal)
+                          hexadecimal)
         yield UInt16(self, "minor_version", "Class format minor version")
         yield UInt16(self, "major_version", "Class format major version")
         yield UInt16(self, "constant_pool_count", "Size of the constant pool")
         if self["constant_pool_count"].value > 1:
-            #yield FieldArray(self, "constant_pool", CPInfo,
+            # yield FieldArray(self, "constant_pool", CPInfo,
             #        (self["constant_pool_count"].value - 1), first_index=1)
             # Mmmh... can't use FieldArray actually, because ConstantPool
             # requires some specific hacks (skipping some indexes after Long
             # and Double entries).
             yield ConstantPool(self, "constant_pool",
-                    (self["constant_pool_count"].value))
+                               (self["constant_pool_count"].value))
 
         # Inner class access flags (16 bits)
         yield NullBits(self, "reserved[]", 5)
@@ -1080,18 +1163,18 @@ class JavaCompiledClassFile(Parser):
         yield UInt16(self, "interfaces_count", "Number of implemented interfaces")
         if self["interfaces_count"].value > 0:
             yield FieldArray(self, "interfaces", CPIndex,
-                    self["interfaces_count"].value, target_types="Class")
+                             self["interfaces_count"].value, target_types="Class")
         yield UInt16(self, "fields_count", "Number of fields")
         if self["fields_count"].value > 0:
             yield FieldArray(self, "fields", FieldInfo,
-                    self["fields_count"].value)
+                             self["fields_count"].value)
         yield UInt16(self, "methods_count", "Number of methods")
         if self["methods_count"].value > 0:
             yield FieldArray(self, "methods", MethodInfo,
-                    self["methods_count"].value)
+                             self["methods_count"].value)
         yield UInt16(self, "attributes_count", "Number of attributes")
         if self["attributes_count"].value > 0:
             yield FieldArray(self, "attributes", AttributeInfo,
-                    self["attributes_count"].value)
+                             self["attributes_count"].value)
 
 # vim: set expandtab tabstop=4 shiftwidth=4 autoindent smartindent:

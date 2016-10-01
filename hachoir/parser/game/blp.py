@@ -18,11 +18,15 @@ from hachoir.parser.parser import Parser
 from hachoir.parser.image.common import PaletteRGBA
 from hachoir.core.tools import alignValue
 
+
 class PaletteIndex(UInt8):
+
     def createDescription(self):
         return "Palette index %i (%s)" % (self.value, self["/palette/color[%i]" % self.value].description)
 
+
 class Generic2DArray(FieldSet):
+
     def __init__(self, parent, name, width, height, item_class, row_name="row", item_name="item", *args, **kwargs):
         FieldSet.__init__(self, parent, name, *args, **kwargs)
         self.width = width
@@ -33,7 +37,8 @@ class Generic2DArray(FieldSet):
 
     def createFields(self):
         for i in range(self.height):
-            yield GenericVector(self, self.row_name+"[]", self.width, self.item_class, self.item_name)
+            yield GenericVector(self, self.row_name + "[]", self.width, self.item_class, self.item_name)
+
 
 class BLP1File(Parser):
     MAGIC = b"BLP1"
@@ -41,9 +46,9 @@ class BLP1File(Parser):
         "id": "blp1",
         "category": "game",
         "file_ext": ("blp",),
-        "mime": ("application/x-blp",), # TODO: real mime type???
+        "mime": ("application/x-blp",),  # TODO: real mime type???
         "magic": ((MAGIC, 0),),
-        "min_size": 7*32,   # 7 DWORDs start, incl. magic
+        "min_size": 7 * 32,   # 7 DWORDs start, incl. magic
         "description": "Blizzard Image Format, version 1",
     }
     endian = LITTLE_ENDIAN
@@ -56,15 +61,15 @@ class BLP1File(Parser):
     def createFields(self):
         yield String(self, "magic", 4, "Signature (BLP1)")
         yield Enum(UInt32(self, "compression"), {
-            0:"JPEG Compression",
-            1:"Uncompressed"})
+            0: "JPEG Compression",
+            1: "Uncompressed"})
         yield UInt32(self, "flags")
         yield UInt32(self, "width")
         yield UInt32(self, "height")
         yield Enum(UInt32(self, "type"), {
-            3:"Uncompressed Index List + Alpha List",
-            4:"Uncompressed Index List + Alpha List",
-            5:"Uncompressed Index List"})
+            3: "Uncompressed Index List + Alpha List",
+            4: "Uncompressed Index List + Alpha List",
+            5: "Uncompressed Index List"})
         yield UInt32(self, "subtype")
         for i in range(16):
             yield UInt32(self, "mipmap_offset[]")
@@ -76,7 +81,7 @@ class BLP1File(Parser):
         width = self["width"].value
         height = self["height"].value
 
-        if compression == 0: # JPEG Compression
+        if compression == 0:  # JPEG Compression
             yield UInt32(self, "jpeg_header_len")
             yield RawBytes(self, "jpeg_header", self["jpeg_header_len"].value, "Shared JPEG Header")
         else:
@@ -99,6 +104,7 @@ class BLP1File(Parser):
             width /= 2
             height /= 2
 
+
 def interp_avg(data_low, data_high, n):
     """Interpolated averages. For example,
 
@@ -107,26 +113,30 @@ def interp_avg(data_low, data_high, n):
     """
     if isinstance(data_low, int):
         for i in range(1, n):
-            yield (data_low * (n-i) + data_high * i) / n
-    else: # iterable
+            yield (data_low * (n - i) + data_high * i) / n
+    else:  # iterable
         pairs = list(zip(data_low, data_high))
         pair_iters = [interp_avg(x, y, n) for x, y in pairs]
         for i in range(1, n):
             yield [next(iter) for iter in pair_iters]
 
+
 def color_name(data, bits):
     """Color names in #RRGGBB format, given the number of bits for each component."""
     ret = ["#"]
     for i in range(3):
-        ret.append("%02X" % (data[i] << (8-bits[i])))
+        ret.append("%02X" % (data[i] << (8 - bits[i])))
     return ''.join(ret)
+
 
 class DXT1(FieldSet):
     static_size = 64
+
     def __init__(self, parent, name, dxt2_mode=False, *args, **kwargs):
         """with dxt2_mode on, this field will always use the four color model"""
         FieldSet.__init__(self, parent, name, *args, **kwargs)
         self.dxt2_mode = dxt2_mode
+
     def createFields(self):
         values = [[], []]
         for i in (0, 1):
@@ -140,30 +150,37 @@ class DXT1(FieldSet):
             values += interp_avg(values[0], values[1], 3)
         else:
             values += interp_avg(values[0], values[1], 2)
-            values.append(None) # transparent
+            values.append(None)  # transparent
         for i in range(16):
             pixel = Bits(self, "pixel[%i][%i]" % divmod(i, 4), 2)
             color = values[pixel.value]
             if color is None:
                 pixel._description = "Transparent"
             else:
-                pixel._description = "RGB color: %s" % color_name(color, [5, 6, 5])
+                pixel._description = "RGB color: %s" % color_name(color, [
+                                                                  5, 6, 5])
             yield pixel
+
 
 class DXT3Alpha(FieldSet):
     static_size = 64
+
     def createFields(self):
         for i in range(16):
             yield Bits(self, "alpha[%i][%i]" % divmod(i, 4), 4)
 
+
 class DXT3(FieldSet):
     static_size = 128
+
     def createFields(self):
         yield DXT3Alpha(self, "alpha", "Alpha Channel Data")
         yield DXT1(self, "color", True, "Color Channel Data")
 
+
 class DXT5Alpha(FieldSet):
     static_size = 64
+
     def createFields(self):
         values = []
         yield UInt8(self, "alpha_val[0]", "First alpha value")
@@ -181,11 +198,14 @@ class DXT5Alpha(FieldSet):
             pixel._description = "Alpha value: %i" % alpha
             yield pixel
 
+
 class DXT5(FieldSet):
     static_size = 128
+
     def createFields(self):
         yield DXT5Alpha(self, "alpha", "Alpha Channel Data")
         yield DXT1(self, "color", True, "Color Channel Data")
+
 
 class BLP2File(Parser):
     MAGIC = b"BLP2"
@@ -195,7 +215,7 @@ class BLP2File(Parser):
         "file_ext": ("blp",),
         "mime": ("application/x-blp",),
         "magic": ((MAGIC, 0),),
-        "min_size": 5*32,   # 5 DWORDs start, incl. magic
+        "min_size": 5 * 32,   # 5 DWORDs start, incl. magic
         "description": "Blizzard Image Format, version 2",
     }
     endian = LITTLE_ENDIAN
@@ -208,19 +228,19 @@ class BLP2File(Parser):
     def createFields(self):
         yield String(self, "magic", 4, "Signature (BLP2)")
         yield Enum(UInt32(self, "compression", "Compression type"), {
-            0:"JPEG Compressed",
-            1:"Uncompressed or DXT/S3TC compressed"})
+            0: "JPEG Compressed",
+            1: "Uncompressed or DXT/S3TC compressed"})
         yield Enum(UInt8(self, "encoding", "Encoding type"), {
-            1:"Raw",
-            2:"DXT/S3TC Texture Compression (a.k.a. DirectX)"})
+            1: "Raw",
+            2: "DXT/S3TC Texture Compression (a.k.a. DirectX)"})
         yield UInt8(self, "alpha_depth", "Alpha channel depth, in bits (0 = no alpha)")
         yield Enum(UInt8(self, "alpha_encoding", "Encoding used for alpha channel"), {
-            0:"DXT1 alpha (0 or 1 bit alpha)",
-            1:"DXT3 alpha (4 bit alpha)",
-            7:"DXT5 alpha (8 bit interpolated alpha)"})
+            0: "DXT1 alpha (0 or 1 bit alpha)",
+            1: "DXT3 alpha (4 bit alpha)",
+            7: "DXT5 alpha (8 bit interpolated alpha)"})
         yield Enum(UInt8(self, "has_mips", "Are mip levels present?"), {
-            0:"No mip levels",
-            1:"Mip levels present; number of levels determined by image size"})
+            0: "No mip levels",
+            1: "Mip levels present; number of levels determined by image size"})
         yield UInt32(self, "width", "Base image width")
         yield UInt32(self, "height", "Base image height")
         for i in range(16):
@@ -236,7 +256,7 @@ class BLP2File(Parser):
         width = self["width"].value
         height = self["height"].value
 
-        if compression == 0: # JPEG Compression
+        if compression == 0:  # JPEG Compression
             yield UInt32(self, "jpeg_header_len")
             yield RawBytes(self, "jpeg_header", self["jpeg_header_len"].value, "Shared JPEG Header")
 
