@@ -28,4 +28,3 @@ def getValue(fieldset, key):
 
 def getDisplay(fieldset, key):
     return getFieldAttribute(fieldset, key, "display")
-

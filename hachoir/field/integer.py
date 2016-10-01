@@ -11,9 +11,11 @@ class GenericInteger(Bits):
     """
     Generic integer class used to generate other classes.
     """
+
     def __init__(self, parent, name, signed, size, description=None):
         if not (8 <= size <= 16384):
-            raise FieldError("Invalid integer size (%s): have to be in 8..16384" % size)
+            raise FieldError(
+                "Invalid integer size (%s): have to be in 8..16384" % size)
         Bits.__init__(self, parent, name, size, description)
         self.signed = signed
 
@@ -26,8 +28,10 @@ def integerFactory(name, is_signed, size, doc):
     class Integer(GenericInteger):
         __doc__ = doc
         static_size = size
+
         def __init__(self, parent, name, description=None):
-            GenericInteger.__init__(self, parent, name, is_signed, size, description)
+            GenericInteger.__init__(
+                self, parent, name, is_signed, size, description)
     cls = Integer
     cls.__name__ = name
     return cls
@@ -44,4 +48,3 @@ Int16 = integerFactory("Int16", True, 16, "Signed integer of 16 bits")
 Int24 = integerFactory("Int24", True, 24, "Signed integer of 24 bits")
 Int32 = integerFactory("Int32", True, 32, "Signed integer of 32 bits")
 Int64 = integerFactory("Int64", True, 64, "Signed integer of 64 bits")
-

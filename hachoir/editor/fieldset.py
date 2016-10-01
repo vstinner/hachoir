@@ -1,13 +1,13 @@
 from hachoir.core.dict import UniqKeyError
 from hachoir.field import MissingField, Float32, Float64, FakeArray
 from hachoir.editor import createEditableField, EditorError
-from collections import deque # Python 2.4
-import weakref # Python 2.1
+from collections import deque  # Python 2.4
+import weakref  # Python 2.1
 import struct
 
 
 class EditableFieldSet(object):
-    MAX_SIZE = (1 << 40) # Arbitrary limit to catch errors
+    MAX_SIZE = (1 << 40)  # Arbitrary limit to catch errors
     is_field_set = True
 
     def __init__(self, parent, fieldset):
@@ -16,7 +16,7 @@ class EditableFieldSet(object):
         self._fields = {}      # cache of editable fields
         self._deleted = set()  # Names of deleted fields
         self._inserted = {}    # Inserted field (name => list of field,
-                               # where name is the name after)
+        # where name is the name after)
 
     def array(self, key):
         # FIXME: Use cache?
@@ -46,7 +46,7 @@ class EditableFieldSet(object):
     def __len__(self):
         return len(self.input) \
             - len(self._deleted) \
-            + sum( len(new) for new in self._inserted.values() )
+            + sum(len(new) for new in self._inserted.values())
 
     def __iter__(self):
         for field in self.input:
@@ -84,11 +84,13 @@ class EditableFieldSet(object):
         new_names = list(field.name for field in new_fields)
         names_set = set(new_names)
         if len(names_set) != len(new_fields):
-            duplicates = (name for name in names_set if 1 < new_names.count(name))
-            raise UniqKeyError("Duplicates in inserted fields: %s" % ", ".join(duplicates))
+            duplicates = (name for name in names_set if 1 <
+                          new_names.count(name))
+            raise UniqKeyError(
+                "Duplicates in inserted fields: %s" % ", ".join(duplicates))
 
         # Check that field names are not in input
-        if self.input: # Write special version for NewFieldSet?
+        if self.input:  # Write special version for NewFieldSet?
             for name in new_names:
                 if name in self.input and name not in self._deleted:
                     raise UniqKeyError("Field name '%s' already exists" % name)
@@ -97,14 +99,15 @@ class EditableFieldSet(object):
         for fields in self._inserted.values():
             for field in fields:
                 if field.name in new_names:
-                    raise UniqKeyError("Field name '%s' already exists" % field.name)
+                    raise UniqKeyError(
+                        "Field name '%s' already exists" % field.name)
 
         # Input have already inserted field?
         if key in self._inserted:
             if next:
-                self._inserted[key].extend( reversed(new_fields) )
+                self._inserted[key].extend(reversed(new_fields))
             else:
-                self._inserted[key].extendleft( reversed(new_fields) )
+                self._inserted[key].extendleft(reversed(new_fields))
             return
 
         # Whould like to insert in inserted fields?
@@ -119,7 +122,7 @@ class EditableFieldSet(object):
                     if next:
                         pos += 1
                     fields.rotate(-pos)
-                    fields.extendleft( reversed(new_fields) )
+                    fields.extendleft(reversed(new_fields))
                     fields.rotate(pos)
                     return
 
@@ -136,14 +139,15 @@ class EditableFieldSet(object):
                 raise MissingField(self, key)
 
         # Insert in original input
-        self._inserted[key]= deque(new_fields)
+        self._inserted[key] = deque(new_fields)
 
     def _getDescription(self):
         return self.input.description
     description = property(_getDescription)
 
     def _getStream(self):
-        # FIXME: This property is maybe a bad idea since address may be differents
+        # FIXME: This property is maybe a bad idea since address may be
+        # differents
         return self.input.stream
     stream = property(_getStream)
 
@@ -275,10 +279,10 @@ class EditableFieldSet(object):
             input = self.input
             if input.size % 8:
                 output.copyBitsFrom(input.stream,
-                    input.absolute_address, input.size, input.endian)
+                                    input.absolute_address, input.size, input.endian)
             else:
                 output.copyBytesFrom(input.stream,
-                    input.absolute_address, input.size//8)
+                                     input.absolute_address, input.size // 8)
         else:
             # Altered: call writeInto() method of each field
             realaddr = 0
@@ -288,6 +292,7 @@ class EditableFieldSet(object):
 
     def _getValue(self):
         raise EditorError('Field set "%s" has no value' % self.path)
+
     def _setValue(self, value):
         raise EditorError('Field set "%s" value is read only' % self.path)
     value = property(_getValue, _setValue, "Value of field")
@@ -327,6 +332,7 @@ def createEditableFieldSet(parent, field):
 
 
 class NewFieldSet(EditableFieldSet):
+
     def __init__(self, parent, name):
         EditableFieldSet.__init__(self, parent, None)
         self._name = name
@@ -351,4 +357,3 @@ class NewFieldSet(EditableFieldSet):
 
 def createEditor(fieldset):
     return EditableFieldSet(None, fieldset)
-

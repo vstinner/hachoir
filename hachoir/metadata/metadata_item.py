@@ -13,12 +13,14 @@ QUALITY_BEST = 1.0
 
 
 class DataValue:
+
     def __init__(self, value, text):
         self.value = value
         self.text = text
 
 
 class Data:
+
     def __init__(self, key, priority, description,
                  text_handler=None, type=None, filter=None, conversion=None):
         """
@@ -105,7 +107,7 @@ class Data:
         if isinstance(value, str):
             value = normalizeNewline(value)
             if (config.MAX_STR_LENGTH
-               and config.MAX_STR_LENGTH < len(value)):
+                    and config.MAX_STR_LENGTH < len(value)):
                 value = value[:config.MAX_STR_LENGTH] + "(...)"
 
         # Skip duplicates

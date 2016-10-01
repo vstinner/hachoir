@@ -15,14 +15,16 @@ Samples:
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet,
-    UInt16, UInt32, Bit, RawBits,
-    RawBytes, String, PascalString8, PascalString16)
+                           UInt16, UInt32, Bit, RawBits,
+                           RawBytes, String, PascalString8, PascalString16)
 from hachoir.core.text_handler import textHandler, hexadecimal
 from hachoir.core.endian import BIG_ENDIAN
+
 
 def parseHeader(self):
     yield UInt32(self, "filever", "File version")
     yield UInt32(self, "numheaders", "number of headers")
+
 
 def parseFileProperties(self):
     yield UInt32(self, "max_bit_rate", "Maximum bit rate")
@@ -40,6 +42,7 @@ def parseFileProperties(self):
     yield Bit(self, "is_perfect_play", "Whether PerfectPlay can be used")
     yield Bit(self, "is_saveable", "Whether file can be saved")
 
+
 def parseContentDescription(self):
     yield PascalString16(self, "title", charset="ISO-8859-1", strip=" \0")
     yield PascalString16(self, "author", charset="ISO-8859-1", strip=" \0")
@@ -48,6 +51,7 @@ def parseContentDescription(self):
 
 
 class NameValueProperty(FieldSet):
+
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
         self._size = self["size"].value * 8
@@ -59,7 +63,9 @@ class NameValueProperty(FieldSet):
         yield UInt32(self, "type")
         yield PascalString16(self, "value", charset="ISO-8859-1", strip=" \0")
 
+
 class LogicalFileInfo(FieldSet):
+
     def createFields(self):
         yield UInt32(self, "size")
         yield UInt16(self, "obj_version")
@@ -74,6 +80,7 @@ class LogicalFileInfo(FieldSet):
         yield UInt16(self, "nb_prop")
         for index in range(self["nb_prop"].value):
             yield NameValueProperty(self, "prop[]")
+
 
 def parseMediaPropertiesHeader(self):
     yield UInt16(self, "stream_number", "Stream number")
@@ -90,9 +97,10 @@ def parseMediaPropertiesHeader(self):
     size = self['specific_size'].value
     if size:
         if self["mime_type"].value == "logical-fileinfo":
-            yield LogicalFileInfo(self, "file_info", size=size*8)
+            yield LogicalFileInfo(self, "file_info", size=size * 8)
         else:
             yield RawBytes(self, "specific", size, "Type-specific data")
+
 
 class Chunk(FieldSet):
     tag_info = {
@@ -132,6 +140,7 @@ class Chunk(FieldSet):
     def createDescription(self):
         return "Chunk: %s" % self["tag"].display
 
+
 class RealMediaFile(Parser):
     MAGIC = b'.RMF\0\0\0\x12\0\1'    # (magic, size=18, version=1)
     PARSER_TAGS = {
@@ -144,7 +153,7 @@ class RealMediaFile(Parser):
             "audio/x-pn-realaudio-plugin",
             "audio/x-real-audio",
             "application/vnd.rn-realmedia"),
-        "min_size": len(MAGIC)*8, # just the identifier
+        "min_size": len(MAGIC) * 8,  # just the identifier
         "magic": ((MAGIC, 0),),
         "description": "RealMedia (rm) Container File",
     }
@@ -168,4 +177,3 @@ class RealMediaFile(Parser):
             if prop["mime_type"].value == "video/x-pn-realvideo":
                 return "video/x-pn-realvideo"
         return "audio/x-pn-realaudio"
-

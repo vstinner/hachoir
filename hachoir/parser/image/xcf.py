@@ -11,9 +11,10 @@ Author: Victor Stinner
 
 from hachoir.parser import Parser
 from hachoir.field import (StaticFieldSet, FieldSet, ParserError,
-    UInt8, UInt32, Enum, Float32, String, PascalString32, RawBytes)
+                           UInt8, UInt32, Enum, Float32, String, PascalString32, RawBytes)
 from hachoir.parser.image.common import RGBA
 from hachoir.core.endian import NETWORK_ENDIAN
+
 
 class XcfCompression(FieldSet):
     static_size = 8
@@ -27,14 +28,17 @@ class XcfCompression(FieldSet):
     def createFields(self):
         yield Enum(UInt8(self, "compression",  "Compression method"), self.COMPRESSION_NAME)
 
+
 class XcfResolution(StaticFieldSet):
     format = (
         (Float32, "xres", "X resolution in DPI"),
         (Float32, "yres", "Y resolution in DPI")
     )
 
+
 class XcfTattoo(StaticFieldSet):
     format = ((UInt32, "tattoo", "Tattoo"),)
+
 
 class LayerOffsets(StaticFieldSet):
     format = (
@@ -42,19 +46,20 @@ class LayerOffsets(StaticFieldSet):
         (UInt32, "ofst_y", "Offset Y")
     )
 
+
 class LayerMode(FieldSet):
     static_size = 32
     MODE_NAME = {
-         0: "Normal",
-         1: "Dissolve",
-         2: "Behind",
-         3: "Multiply",
-         4: "Screen",
-         5: "Overlay",
-         6: "Difference",
-         7: "Addition",
-         8: "Subtract",
-         9: "Darken only",
+        0: "Normal",
+        1: "Dissolve",
+        2: "Behind",
+        3: "Multiply",
+        4: "Screen",
+        5: "Overlay",
+        6: "Difference",
+        7: "Addition",
+        8: "Subtract",
+        9: "Darken only",
         10: "Lighten only",
         11: "Hue",
         12: "Saturation",
@@ -73,23 +78,30 @@ class LayerMode(FieldSet):
     def createFields(self):
         yield Enum(UInt32(self, "mode", "Layer mode"), self.MODE_NAME)
 
+
 class GimpBoolean(UInt32):
+
     def __init__(self, parent, name):
         UInt32.__init__(self, parent, name)
 
     def createValue(self):
         return 1 == UInt32.createValue(self)
 
+
 class XcfUnit(StaticFieldSet):
     format = ((UInt32, "unit", "Unit"),)
 
+
 class XcfParasiteEntry(FieldSet):
+
     def createFields(self):
         yield PascalString32(self, "name", "Name", strip="\0", charset="UTF-8")
         yield UInt32(self, "flags", "Flags")
         yield PascalString32(self, "data", "Data", strip=" \0", charset="UTF-8")
 
+
 class XcfLevel(FieldSet):
+
     def createFields(self):
         yield UInt32(self, "width", "Width in pixel")
         yield UInt32(self, "height", "Height in pixel")
@@ -98,13 +110,13 @@ class XcfLevel(FieldSet):
         if offset == 0:
             return
         data_offsets = []
-        while (self.absolute_address + self.current_size)//8 < offset:
+        while (self.absolute_address + self.current_size) // 8 < offset:
             chunk = UInt32(self, "data_offset[]", "Data offset")
             yield chunk
             if chunk.value == 0:
                 break
             data_offsets.append(chunk)
-        if (self.absolute_address + self.current_size)//8 != offset:
+        if (self.absolute_address + self.current_size) // 8 != offset:
             raise ParserError("Problem with level offset.")
         previous = offset
         for chunk in data_offsets:
@@ -113,7 +125,9 @@ class XcfLevel(FieldSet):
             yield RawBytes(self, "data[]", size, "Data content of %s" % chunk.name)
             previous = data_offset
 
+
 class XcfHierarchy(FieldSet):
+
     def createFields(self):
         yield UInt32(self, "width", "Width")
         yield UInt32(self, "height", "Height")
@@ -133,7 +147,9 @@ class XcfHierarchy(FieldSet):
             yield XcfLevel(self, "level[]", "Level")
 #        yield XcfChannel(self, "channel[]", "Channel"))
 
+
 class XcfChannel(FieldSet):
+
     def createFields(self):
         yield UInt32(self, "width", "Channel width")
         yield UInt32(self, "height", "Channel height")
@@ -143,9 +159,11 @@ class XcfChannel(FieldSet):
         yield XcfHierarchy(self, "hierarchy", "Hierarchy")
 
     def createDescription(self):
-         return 'Channel "%s"' % self["name"].value
+        return 'Channel "%s"' % self["name"].value
+
 
 class XcfLayer(FieldSet):
+
     def createFields(self):
         yield UInt32(self, "width", "Layer width in pixels")
         yield UInt32(self, "height", "Layer height in pixels")
@@ -169,27 +187,30 @@ class XcfLayer(FieldSet):
     def createDescription(self):
         return 'Layer "%s"' % self["name"].value
 
+
 class XcfParasites(FieldSet):
+
     def createFields(self):
         size = self["../size"].value * 8
         while self.current_size < size:
             yield XcfParasiteEntry(self, "parasite[]", "Parasite")
+
 
 class XcfProperty(FieldSet):
     PROP_COMPRESSION = 17
     PROP_RESOLUTION = 19
     PROP_PARASITES = 21
     TYPE_NAME = {
-         0: "End",
-         1: "Colormap",
-         2: "Active layer",
-         3: "Active channel",
-         4: "Selection",
-         5: "Floating selection",
-         6: "Opacity",
-         7: "Mode",
-         8: "Visible",
-         9: "Linked",
+        0: "End",
+        1: "Colormap",
+        2: "Active layer",
+        3: "Active channel",
+        4: "Selection",
+        5: "Floating selection",
+        6: "Opacity",
+        7: "Mode",
+        8: "Visible",
+        9: "Linked",
         10: "Lock alpha",
         11: "Apply mask",
         12: "Edit mask",
@@ -210,10 +231,10 @@ class XcfProperty(FieldSet):
     }
 
     handler = {
-         6: RGBA,
-         7: LayerMode,
-         8: GimpBoolean,
-         9: GimpBoolean,
+        6: RGBA,
+        7: LayerMode,
+        8: GimpBoolean,
+        9: GimpBoolean,
         10: GimpBoolean,
         11: GimpBoolean,
         12: GimpBoolean,
@@ -238,12 +259,13 @@ class XcfProperty(FieldSet):
         if 0 < size:
             cls = self.handler.get(self["type"].value, None)
             if cls:
-                yield cls(self, "data", size=size*8)
+                yield cls(self, "data", size=size * 8)
             else:
                 yield RawBytes(self, "data", size, "Data")
 
     def createDescription(self):
         return "Property: %s" % self["type"].display
+
 
 def readProperties(parser):
     while True:
@@ -252,13 +274,15 @@ def readProperties(parser):
         if prop["type"].value == 0:
             return
 
+
 class XcfFile(Parser):
     PARSER_TAGS = {
         "id": "xcf",
         "category": "image",
         "file_ext": ("xcf",),
         "mime": ("image/x-xcf", "application/x-gimp-image"),
-        "min_size": (26 + 8 + 4 + 4)*8, # header+empty property+layer offset+channel offset
+        # header+empty property+layer offset+channel offset
+        "min_size": (26 + 8 + 4 + 4) * 8,
         "magic": (
             (b'gimp xcf file\0', 0),
             (b'gimp xcf v002\0', 0),
@@ -308,8 +332,8 @@ class XcfFile(Parser):
 
         # Read layers
         for index, offset in enumerate(layer_offsets):
-            if index+1 < len(layer_offsets):
-                size = (layer_offsets[index+1] - offset) * 8
+            if index + 1 < len(layer_offsets):
+                size = (layer_offsets[index + 1] - offset) * 8
             else:
                 size = None
             padding = self.seekByte(offset, relative=False)
@@ -319,12 +343,11 @@ class XcfFile(Parser):
 
         # Read channels
         for index, offset in enumerate(channel_offsets):
-            if index+1 < len(channel_offsets):
-                size = (channel_offsets[index+1] - offset) * 8
+            if index + 1 < len(channel_offsets):
+                size = (channel_offsets[index + 1] - offset) * 8
             else:
                 size = None
             padding = self.seekByte(offset, relative=False)
             if padding is not None:
                 yield padding
             yield XcfChannel(self, "channel[]", "Channel", size=size)
-

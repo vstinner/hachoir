@@ -9,65 +9,79 @@ Creation: 10th February 2007
 """
 
 from hachoir.field import (FieldSet,
-    UInt32, UInt16, UInt8, Int8, Float32,
-    RawBytes, String, GenericVector, ParserError)
+                           UInt32, UInt16, UInt8, Int8, Float32,
+                           RawBytes, String, GenericVector, ParserError)
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal
 import collections
 
 MAX_ENVPOINTS = 32
 
+
 def parseComments(parser):
     size = parser["block_size"].value
     if size > 0:
         yield String(parser, "comment", size)
 
+
 class MidiOut(FieldSet):
-    static_size = 9*32*8
+    static_size = 9 * 32 * 8
+
     def createFields(self):
         for name in ("start", "stop", "tick", "noteon", "noteoff",
                      "volume", "pan", "banksel", "program"):
             yield String(self, name, 32, strip='\0')
 
+
 class Command(FieldSet):
-    static_size = 32*8
+    static_size = 32 * 8
+
     def createFields(self):
         start = self.absolute_address
         size = self.stream.searchBytesLength(b"\0", False, start)
         if size > 0:
             self.info("Command: %s" % self.stream.readBytes(start, size))
             yield String(self, "command", size, strip='\0')
-        yield RawBytes(self, "parameter", (self._size//8)-size)
+        yield RawBytes(self, "parameter", (self._size // 8) - size)
+
 
 class MidiSFXExt(FieldSet):
-    static_size = 16*32*8
+    static_size = 16 * 32 * 8
+
     def createFields(self):
         for index in range(16):
             yield Command(self, "command[]")
 
+
 class MidiZXXExt(FieldSet):
-    static_size = 128*32*8
+    static_size = 128 * 32 * 8
+
     def createFields(self):
         for index in range(128):
             yield Command(self, "command[]")
+
 
 def parseMidiConfig(parser):
     yield MidiOut(parser, "midi_out")
     yield MidiSFXExt(parser, "sfx_ext")
     yield MidiZXXExt(parser, "zxx_ext")
 
+
 def parseChannelSettings(parser):
-    size = parser["block_size"].value//4
+    size = parser["block_size"].value // 4
     if size > 0:
         yield GenericVector(parser, "settings", size, UInt32, "mix_plugin")
 
+
 def parseEQBands(parser):
-    size = parser["block_size"].value//4
+    size = parser["block_size"].value // 4
     if size > 0:
         yield GenericVector(parser, "gains", size, UInt32, "band")
 
+
 class SoundMixPluginInfo(FieldSet):
-    static_size = 128*8
+    static_size = 128 * 8
+
     def createFields(self):
         yield textHandler(UInt32(self, "plugin_id1"), hexadecimal)
         yield textHandler(UInt32(self, "plugin_id2"), hexadecimal)
@@ -77,10 +91,12 @@ class SoundMixPluginInfo(FieldSet):
         yield String(self, "name", 32, strip='\0')
         yield String(self, "dll_name", 64, desc="Original DLL name", strip='\0')
 
+
 class ExtraData(FieldSet):
+
     def __init__(self, parent, name, desc=None):
         FieldSet.__init__(self, parent, name, desc)
-        self._size = (4+self["size"].value)*8
+        self._size = (4 + self["size"].value) * 8
 
     def createFields(self):
         yield UInt32(self, "size")
@@ -88,10 +104,12 @@ class ExtraData(FieldSet):
         if size:
             yield RawBytes(self, "data", size)
 
+
 class XPlugData(FieldSet):
+
     def __init__(self, parent, name, desc=None):
         FieldSet.__init__(self, parent, name, desc)
-        self._size = (4+self["size"].value)*8
+        self._size = (4 + self["size"].value) * 8
 
     def createFields(self):
         yield UInt32(self, "size")
@@ -102,16 +120,19 @@ class XPlugData(FieldSet):
             elif self["marker"].value == 'PORG':
                 yield UInt32(self, "default_program")
 
+
 def parsePlugin(parser):
     yield SoundMixPluginInfo(parser, "info")
 
     # Check if VST setchunk present
-    size = parser.stream.readBits(parser.absolute_address+parser.current_size, 32, LITTLE_ENDIAN)
+    size = parser.stream.readBits(
+        parser.absolute_address + parser.current_size, 32, LITTLE_ENDIAN)
     if 0 < size < parser.current_size + parser._size:
         yield ExtraData(parser, "extra_data")
 
     # Check if XPlugData is present
-    size = parser.stream.readBits(parser.absolute_address+parser.current_size, 32, LITTLE_ENDIAN)
+    size = parser.stream.readBits(
+        parser.absolute_address + parser.current_size, 32, LITTLE_ENDIAN)
     if 0 < size < parser.current_size + parser._size:
         yield XPlugData(parser, "xplug_data")
 
@@ -119,80 +140,82 @@ def parsePlugin(parser):
 EXTENSIONS = {
     # WriteInstrumentHeaderStruct@Sndfile.cpp
     "XTPM": {
-         "..Fd": (UInt32, 1, "Flags"),
-         "..OF": (UInt32, 1, "Fade out"),
-         "..VG": (UInt32, 1, "Global Volume"),
-         "...P": (UInt32, 1, "Panning"),
-         "..EV": (UInt32, 1, "Volume Envelope"),
-         "..EP": (UInt32, 1, "Panning Envelope"),
-         ".EiP": (UInt32, 1, "Pitch Envelope"),
-         ".SLV": (UInt8, 1, "Volume Loop Start"),
-         ".ELV": (UInt8, 1, "Volume Loop End"),
-         ".BSV": (UInt8, 1, "Volume Sustain Begin"),
-         ".ESV": (UInt8, 1, "Volume Sustain End"),
-         ".SLP": (UInt8, 1, "Panning Loop Start"),
-         ".ELP": (UInt8, 1, "Panning Loop End"),
-         ".BSP": (UInt8, 1, "Panning Substain Begin"),
-         ".ESP": (UInt8, 1, "Padding Substain End"),
-         "SLiP": (UInt8, 1, "Pitch Loop Start"),
-         "ELiP": (UInt8, 1, "Pitch Loop End"),
-         "BSiP": (UInt8, 1, "Pitch Substain Begin"),
-         "ESiP": (UInt8, 1, "Pitch Substain End"),
-         ".ANN": (UInt8, 1, "NNA"),
-         ".TCD": (UInt8, 1, "DCT"),
-         ".AND": (UInt8, 1, "DNA"),
-         "..SP": (UInt8, 1, "Panning Swing"),
-         "..SV": (UInt8, 1, "Volume Swing"),
-         ".CFI": (UInt8, 1, "IFC"),
-         ".RFI": (UInt8, 1, "IFR"),
-         "..BM": (UInt32, 1, "Midi Bank"),
-         "..PM": (UInt8, 1, "Midi Program"),
-         "..CM": (UInt8, 1, "Midi Channel"),
-         ".KDM": (UInt8, 1, "Midi Drum Key"),
-         ".SPP": (Int8, 1, "PPS"),
-         ".CPP": (UInt8, 1, "PPC"),
-         ".[PV": (UInt32, MAX_ENVPOINTS, "Volume Points"),
-         ".[PP": (UInt32, MAX_ENVPOINTS, "Panning Points"),
-         "[PiP": (UInt32, MAX_ENVPOINTS, "Pitch Points"),
-         ".[EV": (UInt8, MAX_ENVPOINTS, "Volume Enveloppe"),
-         ".[EP": (UInt8, MAX_ENVPOINTS, "Panning Enveloppe"),
-         "[EiP": (UInt8, MAX_ENVPOINTS, "Pitch Enveloppe"),
-         ".[MN": (UInt8, 128, "Note Mapping"),
-         "..[K": (UInt32, 128, "Keyboard"),
-         "..[n": (String, 32, "Name"),
-         ".[nf": (String, 12, "Filename"),
-         ".PiM": (UInt8, 1, "MixPlug"),
-         "..RV": (UInt16, 1, "Volume Ramping"),
-         "...R": (UInt16, 1, "Resampling"),
-         "..SC": (UInt8, 1, "Cut Swing"),
-         "..SR": (UInt8, 1, "Res Swing"),
-         "..MF": (UInt8, 1, "Filter Mode"),
+        "..Fd": (UInt32, 1, "Flags"),
+        "..OF": (UInt32, 1, "Fade out"),
+        "..VG": (UInt32, 1, "Global Volume"),
+        "...P": (UInt32, 1, "Panning"),
+        "..EV": (UInt32, 1, "Volume Envelope"),
+        "..EP": (UInt32, 1, "Panning Envelope"),
+        ".EiP": (UInt32, 1, "Pitch Envelope"),
+        ".SLV": (UInt8, 1, "Volume Loop Start"),
+        ".ELV": (UInt8, 1, "Volume Loop End"),
+        ".BSV": (UInt8, 1, "Volume Sustain Begin"),
+        ".ESV": (UInt8, 1, "Volume Sustain End"),
+        ".SLP": (UInt8, 1, "Panning Loop Start"),
+        ".ELP": (UInt8, 1, "Panning Loop End"),
+        ".BSP": (UInt8, 1, "Panning Substain Begin"),
+        ".ESP": (UInt8, 1, "Padding Substain End"),
+        "SLiP": (UInt8, 1, "Pitch Loop Start"),
+        "ELiP": (UInt8, 1, "Pitch Loop End"),
+        "BSiP": (UInt8, 1, "Pitch Substain Begin"),
+        "ESiP": (UInt8, 1, "Pitch Substain End"),
+        ".ANN": (UInt8, 1, "NNA"),
+        ".TCD": (UInt8, 1, "DCT"),
+        ".AND": (UInt8, 1, "DNA"),
+        "..SP": (UInt8, 1, "Panning Swing"),
+        "..SV": (UInt8, 1, "Volume Swing"),
+        ".CFI": (UInt8, 1, "IFC"),
+        ".RFI": (UInt8, 1, "IFR"),
+        "..BM": (UInt32, 1, "Midi Bank"),
+        "..PM": (UInt8, 1, "Midi Program"),
+        "..CM": (UInt8, 1, "Midi Channel"),
+        ".KDM": (UInt8, 1, "Midi Drum Key"),
+        ".SPP": (Int8, 1, "PPS"),
+        ".CPP": (UInt8, 1, "PPC"),
+        ".[PV": (UInt32, MAX_ENVPOINTS, "Volume Points"),
+        ".[PP": (UInt32, MAX_ENVPOINTS, "Panning Points"),
+        "[PiP": (UInt32, MAX_ENVPOINTS, "Pitch Points"),
+        ".[EV": (UInt8, MAX_ENVPOINTS, "Volume Enveloppe"),
+        ".[EP": (UInt8, MAX_ENVPOINTS, "Panning Enveloppe"),
+        "[EiP": (UInt8, MAX_ENVPOINTS, "Pitch Enveloppe"),
+        ".[MN": (UInt8, 128, "Note Mapping"),
+        "..[K": (UInt32, 128, "Keyboard"),
+        "..[n": (String, 32, "Name"),
+        ".[nf": (String, 12, "Filename"),
+        ".PiM": (UInt8, 1, "MixPlug"),
+        "..RV": (UInt16, 1, "Volume Ramping"),
+        "...R": (UInt16, 1, "Resampling"),
+        "..SC": (UInt8, 1, "Cut Swing"),
+        "..SR": (UInt8, 1, "Res Swing"),
+        "..MF": (UInt8, 1, "Filter Mode"),
     },
 
     # See after "CODE tag dictionary", same place, elements with [EXT]
     "STPM": {
-         "...C": (UInt32, 1, "Channels"),
-         ".VWC": (None, 0, "CreatedWith version"),
-         ".VGD": (None, 0, "Default global volume"),
-         "..TD": (None, 0, "Default tempo"),
-         "HIBE": (None, 0, "Embedded instrument header"),
-         "VWSL": (None, 0, "LastSavedWith version"),
-         ".MMP": (None, 0, "Plugin Mix mode"),
-         ".BPR": (None, 0, "Rows per beat"),
-         ".MPR": (None, 0, "Rows per measure"),
-         "@PES": (None, 0, "Chunk separator"),
-         ".APS": (None, 0, "Song Pre-amplification"),
-         "..MT": (None, 0, "Tempo mode"),
-         "VTSV": (None, 0, "VSTi volume"),
+        "...C": (UInt32, 1, "Channels"),
+        ".VWC": (None, 0, "CreatedWith version"),
+        ".VGD": (None, 0, "Default global volume"),
+        "..TD": (None, 0, "Default tempo"),
+        "HIBE": (None, 0, "Embedded instrument header"),
+        "VWSL": (None, 0, "LastSavedWith version"),
+        ".MMP": (None, 0, "Plugin Mix mode"),
+        ".BPR": (None, 0, "Rows per beat"),
+        ".MPR": (None, 0, "Rows per measure"),
+        "@PES": (None, 0, "Chunk separator"),
+        ".APS": (None, 0, "Song Pre-amplification"),
+        "..MT": (None, 0, "Tempo mode"),
+        "VTSV": (None, 0, "VSTi volume"),
     }
 }
 
+
 class MPField(FieldSet):
+
     def __init__(self, parent, name, ext, desc=None):
         FieldSet.__init__(self, parent, name, desc)
         self.ext = ext
         self.info(self.createDescription())
-        self._size = (6+self["data_size"].value)*8
+        self._size = (6 + self["data_size"].value) * 8
 
     def createFields(self):
         # Identify tag
@@ -223,6 +246,7 @@ class MPField(FieldSet):
         return "Element '%s', size %i" % \
                (self["code"]._description, self["data_size"].value)
 
+
 def parseFields(parser):
     # Determine field names
     ext = EXTENSIONS[parser["block_type"].value]
@@ -238,7 +262,8 @@ def parseFields(parser):
 
     # Abort on unknown codes
     parser.info("End of extension '%s' when finding '%s'" %
-           (parser["block_type"].value, parser.stream.readBytes(addr, 4)))
+                (parser["block_type"].value, parser.stream.readBytes(addr, 4)))
+
 
 class ModplugBlock(FieldSet):
     BLOCK_INFO = {
@@ -248,6 +273,7 @@ class ModplugBlock(FieldSet):
         "XTPM": ("instrument_ext", False, "Instrument extensions", parseFields),
         "STPM": ("song_ext", False, "Song extensions", parseFields),
     }
+
     def __init__(self, parent, name, desc=None):
         FieldSet.__init__(self, parent, name, desc)
         self.parseBlock = parsePlugin
@@ -262,7 +288,7 @@ class ModplugBlock(FieldSet):
                 self.parseBlock = lambda: parseBlock(self)
 
         if self.has_size:
-            self._size = 8*(self["block_size"].value + 8)
+            self._size = 8 * (self["block_size"].value + 8)
 
     def createFields(self):
         yield String(self, "block_type", 4)
@@ -273,9 +299,10 @@ class ModplugBlock(FieldSet):
             yield from self.parseBlock()
 
         if self.has_size:
-            size = self["block_size"].value - (self.current_size//8)
+            size = self["block_size"].value - (self.current_size // 8)
             if size > 0:
                 yield RawBytes(self, "data", size, "Unknown data")
+
 
 def ParseModplugMetadata(parser):
     while not parser.eof:
@@ -285,7 +312,6 @@ def ParseModplugMetadata(parser):
             break
 
     # More undocumented stuff: date ?
-    size = (parser._size - parser.absolute_address - parser.current_size)//8
+    size = (parser._size - parser.absolute_address - parser.current_size) // 8
     if size > 0:
         yield RawBytes(parser, "info", size)
-

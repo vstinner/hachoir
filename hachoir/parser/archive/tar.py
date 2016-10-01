@@ -6,15 +6,16 @@ Author: Victor Stinner
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet,
-    Enum, UInt8, SubFile, String, NullBytes)
+                           Enum, UInt8, SubFile, String, NullBytes)
 from hachoir.core.tools import humanFilesize, paddingSize, timestampUNIX
 from hachoir.core.endian import BIG_ENDIAN
 import re
 
+
 class FileEntry(FieldSet):
     type_name = {
         # 48 is "0", 49 is "1", ...
-         0: "Normal disk file (old format)",
+        0: "Normal disk file (old format)",
         48: "Normal disk file",
         49: "Link to previously dumped file",
         50: "Symbolic link",
@@ -56,7 +57,7 @@ class FileEntry(FieldSet):
         if filesize:
             yield SubFile(self, "content", filesize, filename=self["name"].value)
 
-        size = paddingSize(self.current_size//8, 512)
+        size = paddingSize(self.current_size // 8, 512)
         if size:
             yield NullBytes(self, "padding_end", size, "Padding (512 align)")
 
@@ -82,6 +83,7 @@ class FileEntry(FieldSet):
                 (filename, self["type"].display, filesize)
         return "Tar File " + desc
 
+
 class TarFile(Parser):
     endian = BIG_ENDIAN
     PARSER_TAGS = {
@@ -89,15 +91,15 @@ class TarFile(Parser):
         "category": "archive",
         "file_ext": ("tar",),
         "mime": ("application/x-tar", "application/x-gtar"),
-        "min_size": 512*8,
-        "magic": ((b"ustar  \0", 257*8),),
+        "min_size": 512 * 8,
+        "magic": ((b"ustar  \0", 257 * 8),),
         "subfile": "skip",
         "description": "TAR archive",
     }
     _sign = re.compile(b"ustar *\0|[ \0]*$")
 
     def validate(self):
-        if not self._sign.match(self.stream.readBytes(257*8, 8)):
+        if not self._sign.match(self.stream.readBytes(257 * 8, 8)):
             return "Invalid magic number"
         if self[0].name == "terminator":
             return "Don't contain any file"
@@ -121,4 +123,3 @@ class TarFile(Parser):
 
     def createContentSize(self):
         return self["terminator"].address + self["terminator"].size
-

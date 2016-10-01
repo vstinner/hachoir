@@ -7,9 +7,10 @@ Creation date: 2006-09-15
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, StaticFieldSet,
-    UInt8, UInt16, UInt32,
-    String, PaddingBytes, Bytes, RawBytes)
+                           UInt8, UInt16, UInt32,
+                           String, PaddingBytes, Bytes, RawBytes)
 from hachoir.core.endian import LITTLE_ENDIAN
+
 
 class ZSTHeader(StaticFieldSet):
     format = (
@@ -27,6 +28,7 @@ class ZSTHeader(StaticFieldSet):
         (UInt16, "stackand", "value to and stack to keep it from going to the wrong area"),
         (UInt16, "stackor", "value to or stack to keep it from going to the wrong area"),
     )
+
 
 class ZSTcpu(StaticFieldSet):
     format = (
@@ -48,8 +50,10 @@ class ZSTcpu(StaticFieldSet):
         (UInt32, "cycpblt", "percentage of CPU/SPC to run"),
     )
 
+
 class ZSTppu(FieldSet):
-    static_size = 3019*8
+    static_size = 3019 * 8
+
     def createFields(self):
         yield UInt8(self, "sndrot", "rotates to use A,X or Y for sound skip")
         yield UInt8(self, "sndrot2", "rotates a random value for sound skip")
@@ -207,22 +211,23 @@ class ZSTppu(FieldSet):
 
         yield PaddingBytes(self, "tempdat", 477, "Reserved/Unused")
 
+
 class ZSNESFile(Parser):
     PARSER_TAGS = {
         "id": "zsnes",
         "category": "game",
         "description": "ZSNES Save State File (only version 143)",
-        "min_size": 3091*8,
+        "min_size": 3091 * 8,
         "file_ext": ("zst", "zs1", "zs2", "zs3", "zs4", "zs5", "zs6",
-            "zs7", "zs8", "zs9")
+                     "zs7", "zs8", "zs9")
     }
     endian = LITTLE_ENDIAN
 
     def validate(self):
-        temp = self.stream.readBytes(0,28)
+        temp = self.stream.readBytes(0, 28)
         if temp[0:26] != b"ZSNES Save State File V143":
             return "Wrong header"
-        if ord(temp[27:28]) != 143: # extra...
+        if ord(temp[27:28]) != 143:  # extra...
             return "Wrong save version %d <> 143" % temp[27:1]
         return True
 
@@ -232,12 +237,12 @@ class ZSNESFile(Parser):
             yield padding
 
     def createFields(self):
-        yield ZSTHeader(self, "header", "ZST header") # Offset: 0
-        yield ZSTcpu(self, "cpu", "ZST cpu registers") # 41
-        yield ZSTppu(self, "ppu", "ZST CPU registers") # 72
-        yield RawBytes(self, "wram7E", 65536) # 3091
-        yield RawBytes(self, "wram7F", 65536) # 68627
-        yield RawBytes(self, "vram", 65536) # 134163
+        yield ZSTHeader(self, "header", "ZST header")  # Offset: 0
+        yield ZSTcpu(self, "cpu", "ZST cpu registers")  # 41
+        yield ZSTppu(self, "ppu", "ZST CPU registers")  # 72
+        yield RawBytes(self, "wram7E", 65536)  # 3091
+        yield RawBytes(self, "wram7F", 65536)  # 68627
+        yield RawBytes(self, "vram", 65536)  # 134163
 
         # TODO: Interpret extra on-cart chip data found at/beyond... 199699
 
@@ -247,4 +252,3 @@ class ZSNESFile(Parser):
         if padding is not None:
             yield padding
         yield Bytes(self, "thumbnail", 7168, "Thumbnail of playing game in some sort of raw 64x56x16-bit RGB mode?")
-

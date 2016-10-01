@@ -12,21 +12,24 @@ Documents:
 """
 
 from hachoir.field import (FieldSet, Enum,
-    Bit, Bits,
-    UInt8, Int16, UInt16, UInt32, Int32,
-    NullBytes, Bytes, RawBytes, PascalString8, PascalString16, CString, String,
-    TimestampMac32, TimestampWin64)
+                           Bit, Bits,
+                           UInt8, Int16, UInt16, UInt32, Int32,
+                           NullBytes, Bytes, RawBytes, PascalString8, PascalString16, CString, String,
+                           TimestampMac32, TimestampWin64)
 from hachoir.core.text_handler import displayHandler
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.parser import guessParser
 from hachoir.parser.misc.ole2_util import OLE2FragmentParser
 from hachoir.parser.common.win32_lang_id import LANGUAGE_ID
 
-CREATOR_ID={0x6A62: "Microsoft Word"}
+CREATOR_ID = {0x6A62: "Microsoft Word"}
+
+
 class ShortArray(FieldSet):
+
     def createFields(self):
         yield UInt16(self, "csw", "Count of fields in the array of shorts")
-        self._size = self['csw'].value*16+16
+        self._size = self['csw'].value * 16 + 16
         yield Enum(UInt16(self, "wMagicCreated", "File creator ID"), CREATOR_ID)
         yield Enum(UInt16(self, "wMagicRevised", "File last modifier ID"), CREATOR_ID)
         yield UInt16(self, "wMagicCreatePrivate")
@@ -44,20 +47,25 @@ class ShortArray(FieldSet):
         while self.current_size < self.size:
             yield Int16(self, "unknown[]")
 
+
 def buildDateHandler(v):
-    md,y=divmod(v,100)
-    m,d=divmod(md,100)
-    if y < 60: y=2000+y
-    else: y=1900+y
-    return "%04i-%02i-%02i"%(y,m,d)
+    md, y = divmod(v, 100)
+    m, d = divmod(md, 100)
+    if y < 60:
+        y = 2000 + y
+    else:
+        y = 1900 + y
+    return "%04i-%02i-%02i" % (y, m, d)
+
 
 class LongArray(FieldSet):
+
     def createFields(self):
         yield UInt16(self, "clw", "Count of fields in the array of longs")
-        self._size = self['clw'].value*32+16
+        self._size = self['clw'].value * 32 + 16
         yield Int32(self, "cbMax", "Stream offset of last byte + 1")
-        yield displayHandler(UInt32(self, "lProductCreated", "Date when the creator program was built"),buildDateHandler)
-        yield displayHandler(UInt32(self, "lProductRevised", "Date when the last modifier program was built"),buildDateHandler)
+        yield displayHandler(UInt32(self, "lProductCreated", "Date when the creator program was built"), buildDateHandler)
+        yield displayHandler(UInt32(self, "lProductRevised", "Date when the last modifier program was built"), buildDateHandler)
 
         yield UInt32(self, "ccpText", "Length of main document text stream")
         yield Int32(self, "ccpFtn", "Length of footnote subdocument text stream")
@@ -81,18 +89,23 @@ class LongArray(FieldSet):
         while self.current_size < self.size:
             yield Int32(self, "unknown[]")
 
+
 class FCLCB(FieldSet):
-    static_size=64
+    static_size = 64
+
     def createFields(self):
         yield Int32(self, "fc", "Table Stream Offset")
         yield UInt32(self, "lcb", "Byte Count")
+
     def createValue(self):
-        return (self['fc'].value,self['lcb'].value)
+        return (self['fc'].value, self['lcb'].value)
+
 
 class FCLCBArray(FieldSet):
+
     def createFields(self):
         yield UInt16(self, "cfclcb", "Count of fields in the array of FC/LCB pairs")
-        self._size = self['cfclcb'].value*64+16
+        self._size = self['cfclcb'].value * 64 + 16
 
         yield FCLCB(self, "StshfOrig", "Original STSH allocation")
         yield FCLCB(self, "Stshf", "Current STSH allocation")
@@ -194,7 +207,9 @@ class FCLCBArray(FieldSet):
         while self.current_size < self.size:
             yield FCLCB(self, "unknown[]")
 
+
 class FIB(FieldSet):
+
     def createFields(self):
         yield UInt16(self, "wIdent", "Magic Number")
         yield UInt16(self, "nFib", "File Information Block (FIB) Version")
@@ -218,7 +233,7 @@ class FIB(FieldSet):
 
         yield UInt16(self, "nFibBack", "Document is backwards compatible down to this FIB version")
         yield UInt32(self, "lKey", "File encryption key (only if fEncrypted)")
-        yield Enum(UInt8(self, "envr", "Document creation environment"), {0:'Word for Windows',1:'Macintosh Word'})
+        yield Enum(UInt8(self, "envr", "Document creation environment"), {0: 'Word for Windows', 1: 'Macintosh Word'})
 
         yield Bit(self, "fMac", "Was this file last saved on a Mac?")
         yield Bit(self, "fEmptySpecial")
@@ -226,9 +241,9 @@ class FIB(FieldSet):
         yield Bit(self, "fFutureSavedUndo")
         yield Bit(self, "fWord97Save")
         yield Bits(self, "fSpare0", 3)
-        CHARSET={0:'Windows ANSI',256:'Macintosh'}
-        yield Enum(UInt16(self, "chse", "Character set for document text"),CHARSET)
-        yield Enum(UInt16(self, "chsTables", "Character set for internal table text"),CHARSET)
+        CHARSET = {0: 'Windows ANSI', 256: 'Macintosh'}
+        yield Enum(UInt16(self, "chse", "Character set for document text"), CHARSET)
+        yield Enum(UInt16(self, "chsTables", "Character set for internal table text"), CHARSET)
         yield UInt32(self, "fcMin", "File offset for the first character of text")
         yield UInt32(self, "fcMax", "File offset for the last character of text + 1")
 
@@ -236,19 +251,22 @@ class FIB(FieldSet):
         yield LongArray(self, "array2", "Array of longs")
         yield FCLCBArray(self, "array3", "Array of File Offset/Byte Count (FC/LCB) pairs")
 
+
 def getRootParser(ole2):
     return guessParser(ole2["root[0]"].getSubIStream())
 
+
 def getOLE2Parser(ole2, path):
-    name = path+"[0]"
+    name = path + "[0]"
     if name in ole2:
         fragment = ole2[name]
     else:
         fragment = getRootParser(ole2)[name]
     return guessParser(fragment.getSubIStream())
 
+
 class WordDocumentParser(OLE2FragmentParser):
-    MAGIC = b'\xec\xa5' # 42476
+    MAGIC = b'\xec\xa5'  # 42476
     PARSER_TAGS = {
         "id": "word_document",
         "min_size": 8,
@@ -261,41 +279,45 @@ class WordDocumentParser(OLE2FragmentParser):
         OLE2FragmentParser.__init__(self, stream, **args)
 
     def validate(self):
-        if self.stream.readBytes(0,2) != self.MAGIC:
+        if self.stream.readBytes(0, 2) != self.MAGIC:
             return "Invalid magic."
-        if self['FIB/nFib'].value not in (192,193):
+        if self['FIB/nFib'].value not in (192, 193):
             return "Unknown FIB version."
         return True
 
     def createFields(self):
         yield FIB(self, "FIB", "File Information Block")
-        table = getOLE2Parser(self.ole2, "table"+str(self["FIB/fWhichTblStm"].value))
+        table = getOLE2Parser(self.ole2, "table" +
+                              str(self["FIB/fWhichTblStm"].value))
 
-        padding = (self['FIB/fcMin'].value - self.current_size//8)
+        padding = (self['FIB/fcMin'].value - self.current_size // 8)
         if padding:
             yield NullBytes(self, "padding[]", padding)
 
         # Guess whether the file uses UTF16 encoding.
         is_unicode = False
-        if self['FIB/array2/ccpText'].value*2 == self['FIB/fcMax'].value - self['FIB/fcMin'].value:
+        if self['FIB/array2/ccpText'].value * 2 == self['FIB/fcMax'].value - self['FIB/fcMin'].value:
             is_unicode = True
-        for fieldname, textname in [('Text','text'),('Ftn','text_footnote'),
-        ('Hdr','text_header'),('Mcr','text_macro'),('Atn','text_annotation'),
-        ('Edn','text_endnote'),('Txbx','text_textbox'),('HdrTxbx','text_header_textbox')]:
-            size = self['FIB/array2/ccp'+fieldname].value
+        for fieldname, textname in [('Text', 'text'), ('Ftn', 'text_footnote'),
+                                    ('Hdr', 'text_header'), ('Mcr',
+                                                             'text_macro'), ('Atn', 'text_annotation'),
+                                    ('Edn', 'text_endnote'), ('Txbx', 'text_textbox'), ('HdrTxbx', 'text_header_textbox')]:
+            size = self['FIB/array2/ccp' + fieldname].value
             if size:
                 if is_unicode:
-                    yield String(self, textname, size*2, charset="UTF-16-LE")
+                    yield String(self, textname, size * 2, charset="UTF-16-LE")
                 else:
                     yield Bytes(self, textname, size)
 
-        padding = (self['FIB/fcMax'].value - self.current_size//8)
+        padding = (self['FIB/fcMax'].value - self.current_size // 8)
         if padding:
             yield RawBytes(self, "padding[]", padding)
 
+
 class WidePascalString16(String):
+
     def __init__(self, parent, name, description=None,
-    strip=None, nbytes=None, truncate=None):
+                 strip=None, nbytes=None, truncate=None):
         Bytes.__init__(self, parent, name, 1, description)
 
         self._format = "WidePascalString16"
@@ -305,13 +327,16 @@ class WidePascalString16(String):
         self._charset = "UTF-16-LE"
         self._content_offset = 2
         self._content_size = self._character_size * self._parent.stream.readBits(
-            self.absolute_address, self._content_offset*8, self._parent.endian)
+            self.absolute_address, self._content_offset * 8, self._parent.endian)
         self._size = (self._content_size + self.content_offset) * 8
 
+
 class TableParsers(object):
+
     class Bte(FieldSet):
         'Bin Table Entry'
         static_size = 32
+
         def createFields(self):
             yield Bits(self, "pn", 22, "Referenced page number")
             yield Bits(self, "unused", 10)
@@ -321,6 +346,7 @@ class TableParsers(object):
 
     class Ffn(FieldSet):
         'Font Family Name'
+
         def createFields(self):
             yield UInt8(self, "size", "Total length of this FFN in bytes, minus 1")
             self._size = self["size"].value * 8 + 8
@@ -371,7 +397,8 @@ class TableParsers(object):
             else:
                 self.is_utf16 = False
             yield UInt16(self, "count", "Number of strings in this Sttbf")
-            extra_data_field = UInt16(self, "extra_data_len", "Size of optional extra data after each string")
+            extra_data_field = UInt16(
+                self, "extra_data_len", "Size of optional extra data after each string")
             yield extra_data_field
             extra_data_len = extra_data_field.value
             for i in range(self["count"].value):
@@ -390,6 +417,7 @@ class TableParsers(object):
 
     class Plcf(FieldSet):
         'Plex of CPs/FCs stored in file'
+
         def createFields(self):
             if self.size is None:
                 return
@@ -402,12 +430,14 @@ class TableParsers(object):
             if size is None:
                 size = chunk_parser.static_size // 8
             n = (self.size // 8 - 4) // (4 + size)
-            for i in range(n+1):
+            for i in range(n + 1):
                 yield UInt32(self, "cp_fc[]", "CP or FC value")
             for i in range(n):
                 yield chunk_parser(self, "obj[]")
 
+
 class WordTableParser(OLE2FragmentParser):
+
     def createFields(self):
         word_doc = getOLE2Parser(self.ole2, "word_doc")
         if word_doc["FIB/fWhichTblStm"].value != int(self.ole2name[0]):

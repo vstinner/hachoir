@@ -63,7 +63,8 @@ class TTF_Metadata(RootMetadata):
     def extractHeader(self, header):
         self.creation_date = header["created"].value
         self.last_modification = header["modified"].value
-        self.comment = "Smallest readable size in pixels: %s pixels" % header["lowest"].value
+        self.comment = "Smallest readable size in pixels: %s pixels" % header[
+            "lowest"].value
         self.comment = "Font direction: %s" % header["font_dir"].display
 
     @fault_tolerant
@@ -72,7 +73,7 @@ class TTF_Metadata(RootMetadata):
         for header in names.array("header"):
             key = header["nameID"].value
             foffset = offset + header["offset"].value
-            field = names.getFieldByAddress(foffset*8)
+            field = names.getFieldByAddress(foffset * 8)
             if not field or not isString(field):
                 continue
             value = field.value
@@ -87,26 +88,26 @@ class TTF_Metadata(RootMetadata):
 
 class OLE2_Metadata(RootMetadata):
     SUMMARY_ID_TO_ATTR = {
-         2: "title",     # Title
-         3: "title",     # Subject
-         4: "author",
-         6: "comment",
-         8: "author",    # Last saved by
+        2: "title",     # Title
+        3: "title",     # Subject
+        4: "author",
+        6: "comment",
+        8: "author",    # Last saved by
         12: "creation_date",
         13: "last_modification",
         14: "nb_page",
         18: "producer",
     }
     IGNORE_SUMMARY = set((
-        1, # Code page
+        1,  # Code page
     ))
 
     DOC_SUMMARY_ID_TO_ATTR = {
-         3: "title",     # Subject
+        3: "title",     # Subject
         14: "author",    # Manager
     }
     IGNORE_DOC_SUMMARY = set((
-        1, # Code page
+        1,  # Code page
     ))
 
     def extract(self, ole2):
@@ -165,9 +166,9 @@ class OLE2_Metadata(RootMetadata):
 
     @fault_tolerant
     def useProperty(self, summary, property, is_doc_summary):
-        field = summary.getFieldByAddress(property["offset"].value*8)
+        field = summary.getFieldByAddress(property["offset"].value * 8)
         if not field \
-        or "value" not in field:
+                or "value" not in field:
             return
         field = field["value"]
         if not field.hasValue():
@@ -201,7 +202,7 @@ class OLE2_Metadata(RootMetadata):
         if use_prefix:
             prefix = property["id"].display
             if (prefix in ("TotalEditingTime", "LastPrinted")) \
-            and (not field):
+                    and (not field):
                 # Ignore null time delta
                 return
             value = "%s: %s" % (prefix, value)
@@ -231,13 +232,15 @@ class PcfMetadata(RootMetadata):
         offset0 = last.address + last.size
         for index in properties.array("property"):
             # Search name and value
-            value = properties.getFieldByAddress(offset0+index["value_offset"].value*8)
+            value = properties.getFieldByAddress(
+                offset0 + index["value_offset"].value * 8)
             if not value:
                 continue
             value = value.value
             if not value:
                 continue
-            name = properties.getFieldByAddress(offset0+index["name_offset"].value*8)
+            name = properties.getFieldByAddress(
+                offset0 + index["name_offset"].value * 8)
             if not name:
                 continue
             name = name.value
@@ -249,9 +252,10 @@ class PcfMetadata(RootMetadata):
 
 
 class SwfMetadata(RootMetadata):
+
     def extract(self, swf):
-        self.height = swf["rect/ymax"].value # twips
-        self.width = swf["rect/xmax"].value # twips
+        self.height = swf["rect/ymax"].value  # twips
+        self.width = swf["rect/xmax"].value  # twips
         self.format_version = "flash version %s" % swf["version"].value
         self.frame_rate = swf["frame_rate"].value
         self.comment = "Frame count: %s" % swf["frame_count"].value
@@ -261,4 +265,3 @@ registerExtractor(TrueTypeFontFile, TTF_Metadata)
 registerExtractor(OLE2_File, OLE2_Metadata)
 registerExtractor(PcfFile, PcfMetadata)
 registerExtractor(SwfFile, SwfMetadata)
-

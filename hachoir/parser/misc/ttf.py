@@ -12,10 +12,10 @@ Creation date: 2007-02-08
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, ParserError,
-    UInt16, UInt32, Bit, Bits,
-    PaddingBits, NullBytes,
-    String, RawBytes, Bytes, Enum,
-    TimestampMac32)
+                           UInt16, UInt32, Bit, Bits,
+                           PaddingBits, NullBytes,
+                           String, RawBytes, Bytes, Enum,
+                           TimestampMac32)
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal, filesizeHandler
 
@@ -27,21 +27,21 @@ DIRECTION_NAME = {
     0: "Mixed directional",
     1: "Left to right",
     2: "Left to right + neutrals",
-   -1: "Right to left",
-   -2: "Right to left + neutrals",
+    -1: "Right to left",
+    -2: "Right to left + neutrals",
 }
 
 NAMEID_NAME = {
-     0: "Copyright notice",
-     1: "Font family name",
-     2: "Font subfamily name",
-     3: "Unique font identifier",
-     4: "Full font name",
-     5: "Version string",
-     6: "Postscript name",
-     7: "Trademark",
-     8: "Manufacturer name",
-     9: "Designer",
+    0: "Copyright notice",
+    1: "Font family name",
+    2: "Font subfamily name",
+    3: "Unique font identifier",
+    4: "Full font name",
+    5: "Version string",
+    6: "Postscript name",
+    7: "Trademark",
+    8: "Manufacturer name",
+    9: "Designer",
     10: "Description",
     11: "URL Vendor",
     12: "URL Designer",
@@ -69,7 +69,9 @@ CHARSET_MAP = {
     3: {1: "UTF-16-BE"},
 }
 
+
 class TableHeader(FieldSet):
+
     def createFields(self):
         yield String(self, "tag", 4)
         yield textHandler(UInt32(self, "checksum"), hexadecimal)
@@ -77,9 +79,11 @@ class TableHeader(FieldSet):
         yield filesizeHandler(UInt32(self, "size"))
 
     def createDescription(self):
-         return "Table entry: %s (%s)" % (self["tag"].display, self["size"].display)
+        return "Table entry: %s (%s)" % (self["tag"].display, self["size"].display)
+
 
 class NameHeader(FieldSet):
+
     def createFields(self):
         yield Enum(UInt16(self, "platformID"), PLATFORM_NAME)
         yield UInt16(self, "encodingID")
@@ -101,6 +105,7 @@ class NameHeader(FieldSet):
         platform = self["platformID"].display
         name = self["nameID"].display
         return "Name record: %s (%s)" % (name, platform)
+
 
 def parseFontHeader(self):
     yield UInt16(self, "maj_ver", "Major version")
@@ -156,16 +161,18 @@ def parseFontHeader(self):
     yield Enum(UInt16(self, "ofst_format"), {0: "short offsets", 1: "long"})
     yield UInt16(self, "glyph_format", "(=0)")
 
+
 def parseNames(self):
     # Read header
     yield UInt16(self, "format")
     if self["format"].value != 0:
-        raise ParserError("TTF (names): Invalid format (%u)" % self["format"].value)
+        raise ParserError("TTF (names): Invalid format (%u)" %
+                          self["format"].value)
     yield UInt16(self, "count")
     yield UInt16(self, "offset")
     if MAX_NAME_COUNT < self["count"].value:
         raise ParserError("Invalid number of names (%s)"
-            % self["count"].value)
+                          % self["count"].value)
 
     # Read name index
     entries = []
@@ -189,7 +196,7 @@ def parseNames(self):
 
         # Skip negative offset
         offset = entry["offset"].value + self["offset"].value
-        if offset < self.current_size//8:
+        if offset < self.current_size // 8:
             self.warning("Skip value %s (negative offset)" % entry.name)
             continue
 
@@ -206,6 +213,7 @@ def parseNames(self):
     padding = (self.size - self.current_size) // 8
     if padding:
         yield NullBytes(self, "padding_end", padding)
+
 
 class Table(FieldSet):
     TAG_INFO = {
@@ -226,10 +234,11 @@ class Table(FieldSet):
         if self.parser:
             yield from self.parser(self)
         else:
-            yield RawBytes(self, "content", self.size//8)
+            yield RawBytes(self, "content", self.size // 8)
 
     def createDescription(self):
         return "Table %s (%s)" % (self.table["tag"].value, self.table.path)
+
 
 class TrueTypeFontFile(Parser):
     endian = BIG_ENDIAN
@@ -237,7 +246,7 @@ class TrueTypeFontFile(Parser):
         "id": "ttf",
         "category": "misc",
         "file_ext": ("ttf",),
-        "min_size": 10*8, # FIXME
+        "min_size": 10 * 8,  # FIXME
         "description": "TrueType font",
     }
 
@@ -269,8 +278,7 @@ class TrueTypeFontFile(Parser):
                 yield padding
             size = table["size"].value
             if size:
-                yield Table(self, "table[]", table, size=size*8)
+                yield Table(self, "table[]", table, size=size * 8)
         padding = self.seekBit(self.size, null=True)
         if padding:
             yield padding
-

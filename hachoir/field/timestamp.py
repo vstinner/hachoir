@@ -1,11 +1,12 @@
 from hachoir.core.tools import (humanDatetime, humanDuration,
-    timestampUNIX, timestampMac32, timestampUUID60,
-    timestampWin64, durationWin64)
+                                timestampUNIX, timestampMac32, timestampUUID60,
+                                timestampWin64, durationWin64)
 from hachoir.field import Bits, FieldSet
 from datetime import datetime
 
 
 class GenericTimestamp(Bits):
+
     def __init__(self, parent, name, size, description=None):
         Bits.__init__(self, parent, name, size, description)
 
@@ -22,6 +23,7 @@ class GenericTimestamp(Bits):
 
 def timestampFactory(cls_name, handler, size):
     class Timestamp(GenericTimestamp):
+
         def __init__(self, parent, name, description=None):
             GenericTimestamp.__init__(self, parent, name, size, description)
 
@@ -58,8 +60,8 @@ class TimeDateMSDOS32(FieldSet):
 
     def createValue(self):
         return datetime(
-            1980+self["year"].value, self["month"].value, self["day"].value,
-            self["hour"].value, self["minute"].value, 2*self["second"].value)
+            1980 + self["year"].value, self["month"].value, self["day"].value,
+            self["hour"].value, self["minute"].value, 2 * self["second"].value)
 
     def createDisplay(self):
         return humanDatetime(self.value)
@@ -69,6 +71,7 @@ class DateTimeMSDOS32(TimeDateMSDOS32):
     """
     32-bit MS-DOS timestamp (16-bit date, 16-bit time)
     """
+
     def createFields(self):
         yield Bits(self, "day", 5)
         yield Bits(self, "month", 4)
@@ -79,6 +82,7 @@ class DateTimeMSDOS32(TimeDateMSDOS32):
 
 
 class TimedeltaWin64(GenericTimestamp):
+
     def __init__(self, parent, name, description=None):
         GenericTimestamp.__init__(self, parent, name, 64, description)
 
@@ -88,4 +92,3 @@ class TimedeltaWin64(GenericTimestamp):
     def createValue(self):
         value = Bits.createValue(self)
         return durationWin64(value)
-

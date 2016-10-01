@@ -10,24 +10,25 @@ Author: Victor Stinner
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, Fragment,
-    ParserError, MissingField,
-    UInt8, UInt16, UInt32,
-    String, CString,
-    Bytes, RawBytes,
-    Bit, NullBits,
-    Enum, CompressedField)
+                           ParserError, MissingField,
+                           UInt8, UInt16, UInt32,
+                           String, CString,
+                           Bytes, RawBytes,
+                           Bit, NullBits,
+                           Enum, CompressedField)
 from hachoir.parser.image.common import RGB
 from hachoir.core.text_handler import textHandler, hexadecimal
 from hachoir.core.endian import NETWORK_ENDIAN
 from hachoir.core.tools import humanFilesize
 from datetime import datetime
 
-MAX_FILESIZE = 500 * 1024 * 1024 # 500 MB
+MAX_FILESIZE = 500 * 1024 * 1024  # 500 MB
 
 try:
     from zlib import decompressobj
 
     class Gunzip:
+
         def __init__(self, stream):
             self.gzip = decompressobj()
 
@@ -42,9 +43,10 @@ except ImportError:
 
 UNIT_NAME = {1: "Meter"}
 COMPRESSION_NAME = {
-    0: "deflate" # with 32K sliding window
+    0: "deflate"  # with 32K sliding window
 }
-MAX_CHUNK_SIZE = 5 * 1024 * 1024 # Maximum chunk size (5 MB)
+MAX_CHUNK_SIZE = 5 * 1024 * 1024  # Maximum chunk size (5 MB)
+
 
 def headerParse(parent):
     yield UInt32(parent, "width", "Width (pixels)")
@@ -58,39 +60,52 @@ def headerParse(parent):
     yield UInt8(parent, "filter", "Filter method")
     yield UInt8(parent, "interlace", "Interlace method")
 
+
 def headerDescription(parent):
     return "Header: %ux%u pixels and %u bits/pixel" % \
-        (parent["width"].value, parent["height"].value, getBitsPerPixel(parent))
+        (parent["width"].value, parent[
+         "height"].value, getBitsPerPixel(parent))
+
 
 def paletteParse(parent):
     size = parent["size"].value
     if (size % 3) != 0:
-        raise ParserError("Palette have invalid size (%s), should be 3*n!" % size)
+        raise ParserError(
+            "Palette have invalid size (%s), should be 3*n!" % size)
     nb_colors = size // 3
     for index in range(nb_colors):
         yield RGB(parent, "color[]")
 
+
 def paletteDescription(parent):
     return "Palette: %u colors" % (parent["size"].value // 3)
 
+
 def gammaParse(parent):
     yield UInt32(parent, "gamma", "Gamma (x100,000)")
+
+
 def gammaValue(parent):
     return float(parent["gamma"].value) / 100000
+
+
 def gammaDescription(parent):
     return "Gamma: %.3f" % parent.value
 
+
 def textParse(parent):
     yield CString(parent, "keyword", "Keyword", charset="ISO-8859-1")
-    length = parent["size"].value - parent["keyword"].size//8
+    length = parent["size"].value - parent["keyword"].size // 8
     if length:
         yield String(parent, "text", length, "Text", charset="ISO-8859-1")
+
 
 def textDescription(parent):
     if "text" in parent:
         return 'Text: %s' % parent["text"].display
     else:
         return 'Text'
+
 
 def timestampParse(parent):
     yield UInt16(parent, "year", "Year")
@@ -100,29 +115,34 @@ def timestampParse(parent):
     yield UInt8(parent, "minute", "Minute")
     yield UInt8(parent, "second", "Second")
 
+
 def timestampValue(parent):
     value = datetime(
         parent["year"].value, parent["month"].value, parent["day"].value,
         parent["hour"].value, parent["minute"].value, parent["second"].value)
     return value
 
+
 def physicalParse(parent):
     yield UInt32(parent, "pixel_per_unit_x", "Pixel per unit, X axis")
     yield UInt32(parent, "pixel_per_unit_y", "Pixel per unit, Y axis")
     yield Enum(UInt8(parent, "unit", "Unit type"), UNIT_NAME)
 
+
 def physicalDescription(parent):
     x = parent["pixel_per_unit_x"].value
     y = parent["pixel_per_unit_y"].value
-    desc = "Physical: %ux%u pixels" % (x,y)
+    desc = "Physical: %ux%u pixels" % (x, y)
     if parent["unit"].value == 1:
         desc += " per meter"
     return desc
+
 
 def parseBackgroundColor(parent):
     yield UInt16(parent, "red")
     yield UInt16(parent, "green")
     yield UInt16(parent, "blue")
+
 
 def backgroundColorDesc(parent):
     rgb = parent["red"].value, parent["green"].value, parent["blue"].value
@@ -133,8 +153,9 @@ def backgroundColorDesc(parent):
 
 
 class ImageData(Fragment):
+
     def __init__(self, parent, name="compressed_data"):
-        Fragment.__init__(self, parent, name, None, 8*parent["size"].value)
+        Fragment.__init__(self, parent, name, None, 8 * parent["size"].value)
         data = parent.name.split('[')
         data, next = "../%s[%%u]" % data[0], int(data[1][:-1]) + 1
         first = parent.getField(data % 0)
@@ -151,9 +172,11 @@ class ImageData(Fragment):
             next = None
         self.setLinks(first, next)
 
+
 def parseTransparency(parent):
     for i in range(parent["size"].value):
-        yield UInt8(parent, "alpha_value[]", "Alpha value for palette entry %i"%i)
+        yield UInt8(parent, "alpha_value[]", "Alpha value for palette entry %i" % i)
+
 
 def getBitsPerPixel(header):
     nr_component = 1
@@ -162,6 +185,7 @@ def getBitsPerPixel(header):
     if header["color"].value and not header["has_palette"].value:
         nr_component += 2
     return nr_component * header["bit_depth"].value
+
 
 class Chunk(FieldSet):
     TAG_INFO = {
@@ -185,10 +209,10 @@ class Chunk(FieldSet):
 
     def __init__(self, parent, name, description=None):
         FieldSet.__init__(self, parent, name, description)
-        self._size = (self["size"].value + 3*4) * 8
-        if MAX_CHUNK_SIZE < (self._size//8):
+        self._size = (self["size"].value + 3 * 4) * 8
+        if MAX_CHUNK_SIZE < (self._size // 8):
             raise ParserError("PNG: Chunk is too big (%s)"
-                % humanFilesize(self._size//8))
+                              % humanFilesize(self._size // 8))
         tag = self["tag"].value
         self.desc_func = None
         self.value_func = None
@@ -224,13 +248,14 @@ class Chunk(FieldSet):
         else:
             return "Chunk: %s" % self["tag"].display
 
+
 class PngFile(Parser):
     PARSER_TAGS = {
         "id": "png",
         "category": "image",
         "file_ext": ("png",),
         "mime": ("image/png", "image/x-png"),
-        "min_size": 8*8, # just the identifier
+        "min_size": 8 * 8,  # just the identifier
         "magic": [(b'\x89PNG\r\n\x1A\n', 0)],
         "description": "Portable Network Graphics (PNG) picture"
     }
@@ -260,8 +285,8 @@ class PngFile(Parser):
         field = self["header"]
         start = field.absolute_address + field.size
         end = MAX_FILESIZE * 8
-        pos = self.stream.searchBytes(b"\0\0\0\0IEND\xae\x42\x60\x82", start, end)
+        pos = self.stream.searchBytes(
+            b"\0\0\0\0IEND\xae\x42\x60\x82", start, end)
         if pos is not None:
-            return pos + 12*8
+            return pos + 12 * 8
         return None
-

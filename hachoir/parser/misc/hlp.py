@@ -12,13 +12,15 @@ Creation date: 2007-09-03
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet,
-    Bits, Int32, UInt16, UInt32,
-    NullBytes, RawBytes, PaddingBytes, String)
+                           Bits, Int32, UInt16, UInt32,
+                           NullBytes, RawBytes, PaddingBytes, String)
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.text_handler import (textHandler, hexadecimal,
-    displayHandler, humanFilesize)
+                                       displayHandler, humanFilesize)
+
 
 class FileEntry(FieldSet):
+
     def __init__(self, *args, **kw):
         FieldSet.__init__(self, *args, **kw)
         self._size = self["res_space"].value * 8
@@ -40,9 +42,10 @@ class FileEntry(FieldSet):
         yield UInt16(self, "nb_level", "Number of levels of B+ tree")
         yield UInt16(self, "nb_entry", "Number of entries in B+ tree")
 
-        size = (self.size - self.current_size)//8
+        size = (self.size - self.current_size) // 8
         if size:
             yield PaddingBytes(self, "reserved_space", size)
+
 
 class HlpFile(Parser):
     PARSER_TAGS = {
@@ -57,7 +60,7 @@ class HlpFile(Parser):
     def validate(self):
         if self["magic"].value != 0x00035F3F:
             return "Invalid magic"
-        if self["filesize"].value != self.stream.size//8:
+        if self["filesize"].value != self.stream.size // 8:
             return "Invalid magic"
         return True
 
@@ -70,7 +73,6 @@ class HlpFile(Parser):
         yield self.seekByte(self["dir_start"].value)
         yield FileEntry(self, "file[]")
 
-        size = (self.size - self.current_size)//8
+        size = (self.size - self.current_size) // 8
         if size:
             yield RawBytes(self, "end", size)
-

@@ -12,6 +12,7 @@ class OutputStreamError(StreamError):
 
 
 class OutputStream(object):
+
     def __init__(self, output, filename=None):
         self._output = output
         self._filename = filename
@@ -23,7 +24,8 @@ class OutputStream(object):
     filename = property(_getFilename)
 
     def writeBit(self, state, endian):
-        assert endian in (BIG_ENDIAN, LITTLE_ENDIAN) # middle endian not yet supported
+        # middle endian not yet supported
+        assert endian in (BIG_ENDIAN, LITTLE_ENDIAN)
         if self._bit_pos == 7:
             self._bit_pos = 0
             if state:
@@ -38,11 +40,12 @@ class OutputStream(object):
                 if endian is BIG_ENDIAN:
                     self._byte |= (1 << self._bit_pos)
                 else:
-                    self._byte |= (1 << (7-self._bit_pos))
+                    self._byte |= (1 << (7 - self._bit_pos))
             self._bit_pos += 1
 
     def writeBits(self, count, value, endian):
-        assert endian in (BIG_ENDIAN, LITTLE_ENDIAN) # middle endian not yet supported
+        # middle endian not yet supported
+        assert endian in (BIG_ENDIAN, LITTLE_ENDIAN)
         assert 0 <= value < 2**count
 
         # Feed bits to align to byte address
@@ -54,14 +57,14 @@ class OutputStream(object):
                     self._byte |= (value >> count)
                     value &= ((1 << count) - 1)
                 else:
-                    self._byte |= (value & ((1 << n)-1)) << self._bit_pos
+                    self._byte |= (value & ((1 << n) - 1)) << self._bit_pos
                     value >>= n
                 self._output.write(chr(self._byte))
                 self._bit_pos = 0
                 self._byte = 0
             else:
                 if endian is BIG_ENDIAN:
-                    self._byte |= (value << (8-self._bit_pos-count))
+                    self._byte |= (value << (8 - self._bit_pos - count))
                 else:
                     self._byte |= (value << self._bit_pos)
                 self._bit_pos += count
@@ -84,7 +87,7 @@ class OutputStream(object):
         if 0 < count:
             assert 0 <= value < 2**count
             if endian is BIG_ENDIAN:
-                self._byte = value << (8-count)
+                self._byte = value << (8 - count)
             else:
                 self._byte = value
         else:
@@ -93,13 +96,13 @@ class OutputStream(object):
 
     def writeInteger(self, value, signed, size_byte, endian):
         if signed:
-            value += 1 << (size_byte*8 - 1)
+            value += 1 << (size_byte * 8 - 1)
         raw = long2raw(value, endian, size_byte)
         self.writeBytes(raw)
 
     def copyBitsFrom(self, input, address, nb_bits, endian):
         if (nb_bits % 8) == 0:
-            self.copyBytesFrom(input, address, nb_bits//8)
+            self.copyBytesFrom(input, address, nb_bits // 8)
         else:
             # Arbitrary limit (because we should use a buffer, like copyBytesFrom(),
             # but with endianess problem
@@ -109,7 +112,8 @@ class OutputStream(object):
 
     def copyBytesFrom(self, input, address, nb_bytes):
         if (address % 8):
-            raise OutputStreamError("Unable to copy bytes with address with bit granularity")
+            raise OutputStreamError(
+                "Unable to copy bytes with address with bit granularity")
         buffer_size = 1 << 12   # 8192 (8 KB)
         while 0 < nb_bytes:
             # Compute buffer size
@@ -123,7 +127,7 @@ class OutputStream(object):
             self.writeBytes(data)
 
             # Move address
-            address += buffer_size*8
+            address += buffer_size * 8
             nb_bytes -= buffer_size
 
     def writeBytes(self, bytes):
@@ -152,7 +156,8 @@ class OutputStream(object):
                 return self._output.read(nbytes)
             except IOError as err:
                 if err[0] == EBADF:
-                    raise OutputStreamError("Stream doesn't support read() operation")
+                    raise OutputStreamError(
+                        "Stream doesn't support read() operation")
         finally:
             self._output.seek(oldpos)
 
@@ -176,4 +181,3 @@ def FileOutputStream(filename, real_filename=None):
         real_filename = filename
     output = open(real_filename, 'wb')
     return OutputStream(output, filename=filename)
-

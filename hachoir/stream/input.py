@@ -14,18 +14,22 @@ class InputStreamError(StreamError):
 
 
 class ReadStreamError(InputStreamError):
+
     def __init__(self, size, address, got=None):
         self.size = size
         self.address = address
         self.got = got
         if self.got is not None:
-            msg = "Can't read %u bits at address %u (got %u bits)" % (self.size, self.address, self.got)
+            msg = "Can't read %u bits at address %u (got %u bits)" % (
+                self.size, self.address, self.got)
         else:
-            msg = "Can't read %u bits at address %u" % (self.size, self.address)
+            msg = "Can't read %u bits at address %u" % (
+                self.size, self.address)
         InputStreamError.__init__(self, msg)
 
 
 class NullStreamError(InputStreamError):
+
     def __init__(self, source):
         self.source = source
         msg = "Input size is nul (source='%s')!" % self.source
@@ -93,7 +97,8 @@ class FileFromInputStream:
             if size <= 0:
                 return ''
             data = '', ''
-            self._offset = max(0, self.stream._current_size // 8 + self._offset)
+            self._offset = max(
+                0, self.stream._current_size // 8 + self._offset)
             self._from_end = False
             bs = max(max_size, 1 << 16)
             while True:
@@ -105,10 +110,10 @@ class FileFromInputStream:
                     if not bs:
                         data = data[0] + data[1]
                         d = len(data) - max_size
-                        return data[d:d+size]
+                        return data[d:d + size]
         else:
             # TODO: not tested
-            data = [ ]
+            data = []
             size = 1 << 16
             while True:
                 d = read(self._offset, size)
@@ -160,7 +165,7 @@ class InputStream(Logger):
             not (0 < self._size < size or const or self._feed(size))
 
     def _feed(self, size):
-        return self.read(size-1,1)[2]
+        return self.read(size - 1, 1)[2]
 
     def read(self, address, size):
         """
@@ -175,8 +180,8 @@ class InputStream(Logger):
         if endian is MIDDLE_ENDIAN:
             # read an aligned chunk of words
             wordaddr, remainder = divmod(address, 16)
-            wordnbits = alignValue(remainder+nbits, 16)
-            _, data, missing = self.read(wordaddr*16, wordnbits)
+            wordnbits = alignValue(remainder + nbits, 16)
+            _, data, missing = self.read(wordaddr * 16, wordnbits)
             shift = remainder
         else:
             shift, data, missing = self.read(address, nbits)
@@ -195,7 +200,7 @@ class InputStream(Logger):
 
         # Signe number. Example with nbits=8:
         # if 128 <= value: value -= 256
-        if signed and (1 << (nbits-1)) <= value:
+        if signed and (1 << (nbits - 1)) <= value:
             value -= (1 << nbits)
         return value
 
@@ -208,7 +213,7 @@ class InputStream(Logger):
         return data
 
     def searchBytesLength(self, needle, include_needle,
-    start_address=0, end_address=None):
+                          start_address=0, end_address=None):
         """
         If include_needle is True, add its length to the result.
         Returns None is needle can't be found.
@@ -229,7 +234,8 @@ class InputStream(Logger):
         None else.
         """
         if start_address % 8:
-            raise InputStreamError("Unable to search bytes with address with bit granularity")
+            raise InputStreamError(
+                "Unable to search bytes with address with bit granularity")
         length = len(needle)
         size = max(3 * length, 4096)
         buffer = b''
@@ -311,14 +317,15 @@ class InputPipe(object):
             last = self.buffers[prev]
             next = last[1]
             self.last = self.buffers[next][2] = last[1] = len(self.buffers)
-        self.buffers.append([ data, next, prev ])
+        self.buffers.append([data, next, prev])
 
     def _get(self, index):
         if index >= len(self.buffers):
             return ''
         buf = self.buffers[index]
         if buf is None:
-            raise InputStreamError("Error: Buffers too small. Can't seek backward.")
+            raise InputStreamError(
+                "Error: Buffers too small. Can't seek backward.")
         if self.last != index:
             next = buf[1]
             prev = buf[2]
@@ -362,14 +369,15 @@ class InputPipe(object):
             self._append(data)
         block, offset = divmod(self.address, 1 << self.buffer_size)
         data = b''.join(self._get(index)
-                for index in range(block, (end - 1 >> self.buffer_size) + 1)
-            )[offset:offset+size]
+                        for index in range(block, (end - 1 >> self.buffer_size) + 1)
+                        )[offset:offset + size]
         self._flush()
         self.address += len(data)
         return data
 
 
 class InputIOStream(InputStream):
+
     def __init__(self, input, size=None, **args):
         if not hasattr(input, "seek"):
             if size is None:
@@ -385,7 +393,8 @@ class InputIOStream(InputStream):
                     input = InputPipe(input, self._setSize)
                 else:
                     source = args.get("source", "<inputio:%r>" % input)
-                    raise InputStreamError("Unable to get size of %s: %s" % (source, err))
+                    raise InputStreamError(
+                        "Unable to get size of %s: %s" % (source, err))
         self._input = input
         InputStream.__init__(self, size=size, **args)
 
@@ -421,15 +430,16 @@ class InputIOStream(InputStream):
 
 
 class StringInputStream(InputStream):
+
     def __init__(self, data, source="<string>", **args):
         self.data = data
-        InputStream.__init__(self, source=source, size=8*len(data), **args)
+        InputStream.__init__(self, source=source, size=8 * len(data), **args)
         self._current_size = self._size
 
     def read(self, address, size):
         address, shift = divmod(address, 8)
         size = (size + shift + 7) >> 3
-        data = self.data[address:address+size]
+        data = self.data[address:address + size]
         got = len(data)
         if got != size:
             raise ReadStreamError(8 * size, 8 * address, 8 * got)
@@ -437,6 +447,7 @@ class StringInputStream(InputStream):
 
 
 class InputSubStream(InputStream):
+
     def __init__(self, stream, offset, size=None, source=None, **args):
         if offset is None:
             offset = 0
@@ -447,11 +458,13 @@ class InputSubStream(InputStream):
         self.stream = stream
         self._offset = offset
         if source is None:
-            source = "<substream input=%s offset=%s size=%s>" % (stream.source, offset, size)
+            source = "<substream input=%s offset=%s size=%s>" % (
+                stream.source, offset, size)
         InputStream.__init__(self, source=source, size=size, **args)
         self.stream.askSize(self)
 
-    _current_size = property(lambda self: min(self._size, max(0, self.stream._current_size - self._offset)))
+    _current_size = property(lambda self: min(
+        self._size, max(0, self.stream._current_size - self._offset)))
 
     def read(self, address, size):
         return self.stream.read(self._offset + address, size)
@@ -467,10 +480,11 @@ def InputFieldStream(field, **args):
 
 
 class FragmentedStream(InputStream):
+
     def __init__(self, field, **args):
         self.stream = field.parent.stream
         data = field.getData()
-        self.fragments = [ (0, data.absolute_address, data.size) ]
+        self.fragments = [(0, data.absolute_address, data.size)]
         self.next = field.__next__
         args.setdefault("source", "%s%s" % (self.stream.source, field.path))
         InputStream.__init__(self, **args)
@@ -500,7 +514,7 @@ class FragmentedStream(InputStream):
                     return True
                 fa = f.absolute_address
                 fs = f.size
-                self.fragments += [ (a, fa, fs) ]
+                self.fragments += [(a, fa, fs)]
             self._current_size = a + max(0, self.stream.size - fa)
             self._setSize()
             return True
@@ -515,7 +529,7 @@ class FragmentedStream(InputStream):
                 return 0, '', True
         d = []
         i = lowerBound(self.fragments, lambda x: x[0] <= address)
-        a, fa, fs = self.fragments[i-1]
+        a, fa, fs = self.fragments[i - 1]
         a -= address
         fa -= a
         fs += a
@@ -528,7 +542,7 @@ class FragmentedStream(InputStream):
                 s = u
             else:
                 assert not u
-            d += [ v ]
+            d += [v]
             size -= n
             if not size:
                 return s, ''.join(d), missing
@@ -538,6 +552,7 @@ class FragmentedStream(InputStream):
 
 class ConcatStream(InputStream):
     # TODO: concatene any number of any type of stream
+
     def __init__(self, streams, **args):
         if len(streams) > 2 or not streams[0].checked:
             raise NotImplementedError
@@ -548,7 +563,8 @@ class ConcatStream(InputStream):
         self.__streams = streams
         InputStream.__init__(self, **args)
 
-    _current_size = property(lambda self: self.__size0 + self.__streams[1]._current_size)
+    _current_size = property(
+        lambda self: self.__size0 + self.__streams[1]._current_size)
 
     def read(self, address, size):
         _size = self._size

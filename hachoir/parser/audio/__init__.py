@@ -9,4 +9,3 @@ from hachoir.parser.audio.s3m import S3MModule
 from hachoir.parser.audio.s3m import PTMModule
 from hachoir.parser.audio.mod import AmigaModule
 from hachoir.parser.audio.flac import FlacParser
-

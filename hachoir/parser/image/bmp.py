@@ -8,20 +8,24 @@ Creation: 16 december 2005
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet,
-    UInt8, UInt16, UInt32, Bits,
-    String, RawBytes, Enum,
-    PaddingBytes, NullBytes, createPaddingField)
+                           UInt8, UInt16, UInt32, Bits,
+                           String, RawBytes, Enum,
+                           PaddingBytes, NullBytes, createPaddingField)
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal
 from hachoir.parser.image.common import RGB, PaletteRGBA
 from hachoir.core.tools import alignValue
 
+
 class Pixel4bit(Bits):
     static_size = 4
+
     def __init__(self, parent, name):
         Bits.__init__(self, parent, name, 4)
 
+
 class ImageLine(FieldSet):
+
     def __init__(self, parent, name, width, pixel_class):
         FieldSet.__init__(self, parent, name)
         self._pixel = pixel_class
@@ -35,7 +39,9 @@ class ImageLine(FieldSet):
         if size:
             yield createPaddingField(self, size)
 
+
 class ImagePixels(FieldSet):
+
     def __init__(self, parent, name, width, height, pixel_class, size=None):
         FieldSet.__init__(self, parent, name, size=size)
         self._width = width
@@ -43,17 +49,20 @@ class ImagePixels(FieldSet):
         self._pixel = pixel_class
 
     def createFields(self):
-        for y in range(self._height-1, -1, -1):
+        for y in range(self._height - 1, -1, -1):
             yield ImageLine(self, "line[%u]" % y, self._width, self._pixel)
         size = (self.size - self.current_size) // 8
         if size:
             yield NullBytes(self, "padding", size)
 
+
 class CIEXYZ(FieldSet):
+
     def createFields(self):
         yield UInt32(self, "x")
         yield UInt32(self, "y")
         yield UInt32(self, "z")
+
 
 class BmpHeader(FieldSet):
     color_space_name = {
@@ -76,7 +85,8 @@ class BmpHeader(FieldSet):
         yield UInt32(self, "width", "Width (pixels)")
         yield UInt32(self, "height", "Height (pixels)")
         yield UInt16(self, "nb_plan", "Number of plan (=1)")
-        yield UInt16(self, "bpp", "Bits per pixel") # may be zero for PNG/JPEG picture
+        # may be zero for PNG/JPEG picture
+        yield UInt16(self, "bpp", "Bits per pixel")
 
         # Version 3 (40 bytes)
         if self["header_size"].value < 40:
@@ -103,6 +113,7 @@ class BmpHeader(FieldSet):
         yield UInt32(self, "gamma_green")
         yield UInt32(self, "gamma_blue")
 
+
 def parseImageData(parent, name, size, header):
     if ("compression" not in header) or (header["compression"].value in (0, 3)):
         width = header["width"].value
@@ -119,8 +130,9 @@ def parseImageData(parent, name, size, header):
         else:
             cls = None
         if cls:
-            return ImagePixels(parent, name, width, height, cls, size=size*8)
+            return ImagePixels(parent, name, width, height, cls, size=size * 8)
     return RawBytes(parent, name, size)
+
 
 class BmpFile(Parser):
     PARSER_TAGS = {
@@ -128,12 +140,12 @@ class BmpFile(Parser):
         "category": "image",
         "file_ext": ("bmp",),
         "mime": ("image/x-ms-bmp", "image/x-bmp"),
-        "min_size": 30*8,
-#        "magic": (("BM", 0),),
+        "min_size": 30 * 8,
+        #        "magic": (("BM", 0),),
         "magic_regex": ((
             # "BM", <filesize>, <reserved>, header_size=(12|40|108)
             b"BM.{4}.{8}[\x0C\x28\x6C]\0{3}",
-        0),),
+            0),),
         "description": "Microsoft bitmap (BMP) picture"
     }
     endian = LITTLE_ENDIAN
@@ -184,7 +196,8 @@ class BmpFile(Parser):
             yield field
 
         # Image pixels
-        size = min(self["file_size"].value-self["data_start"].value, (self.size - self.current_size)//8)
+        size = min(self["file_size"].value - self["data_start"].value,
+                   (self.size - self.current_size) // 8)
         yield parseImageData(self, "pixels", size, header)
 
     def createDescription(self):
@@ -192,4 +205,3 @@ class BmpFile(Parser):
 
     def createContentSize(self):
         return self["file_size"].value * 8
-

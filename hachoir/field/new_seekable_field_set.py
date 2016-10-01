@@ -2,7 +2,8 @@ from hachoir.field import BasicFieldSet, GenericFieldSet, ParserError, createRaw
 
 
 # getgaps(int, int, [listof (int, int)]) -> generator of (int, int)
-# Gets all the gaps not covered by a block in `blocks` from `start` for `length` units.
+# Gets all the gaps not covered by a block in `blocks` from `start` for
+# `length` units.
 def getgaps(start, length, blocks):
     '''
     Example:
@@ -11,28 +12,30 @@ def getgaps(start, length, blocks):
     '''
     # done this way to avoid mutating the original
     blocks = sorted(blocks, key=lambda b: b[0])
-    end = start+length
+    end = start + length
     for s, l in blocks:
         if s > start:
-            yield (start, s-start)
+            yield (start, s - start)
             start = s
-        if s+l > start:
-            start = s+l
+        if s + l > start:
+            start = s + l
     if start < end:
-        yield (start, end-start)
+        yield (start, end - start)
 
 
 class NewRootSeekableFieldSet(GenericFieldSet):
+
     def seekBit(self, address, relative=True):
         if not relative:
             address -= self.absolute_address
         if address < 0:
-            raise ParserError("Seek below field set start (%s.%s)" % divmod(address, 8))
+            raise ParserError(
+                "Seek below field set start (%s.%s)" % divmod(address, 8))
         self._current_size = address
         return None
 
     def seekByte(self, address, relative=True):
-        return self.seekBit(address*8, relative)
+        return self.seekBit(address * 8, relative)
 
     def _fixLastField(self):
         """
@@ -47,7 +50,7 @@ class NewRootSeekableFieldSet(GenericFieldSet):
 
         # If last field is too big, delete it
         while self._size < self._current_size:
-            field = self._deleteField(len(self._fields)-1)
+            field = self._deleteField(len(self._fields) - 1)
             message.append("delete field %s" % field.path)
         assert self._current_size <= self._size
 
@@ -59,7 +62,8 @@ class NewRootSeekableFieldSet(GenericFieldSet):
             self.setUniqueFieldName(field)
             self._fields.append(field.name, field)
             fields.append(field)
-            message.append("found unparsed segment: start %s, length %s" % (start, length))
+            message.append(
+                "found unparsed segment: start %s, length %s" % (start, length))
 
         self.seekBit(self._size, relative=False)
         message = ", ".join(message)
@@ -79,6 +83,8 @@ class NewRootSeekableFieldSet(GenericFieldSet):
 
 
 class NewSeekableFieldSet(NewRootSeekableFieldSet):
+
     def __init__(self, parent, name, description=None, size=None):
         assert issubclass(parent.__class__, BasicFieldSet)
-        NewRootSeekableFieldSet.__init__(self, parent, name, parent.stream, description, size)
+        NewRootSeekableFieldSet.__init__(
+            self, parent, name, parent.stream, description, size)

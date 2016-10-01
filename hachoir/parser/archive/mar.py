@@ -12,8 +12,9 @@ from hachoir.field import FieldSet, String, UInt32, SubFile
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.text_handler import textHandler, filesizeHandler, hexadecimal
 
+
 class FileIndex(FieldSet):
-    static_size = 68*8
+    static_size = 68 * 8
 
     def createFields(self):
         yield String(self, "filename", 56, truncate="\0", charset="ASCII")
@@ -25,13 +26,14 @@ class FileIndex(FieldSet):
         return "File %s (%s) at %s" % (
             self["filename"].value, self["filesize"].display, self["offset"].value)
 
+
 class MarFile(Parser):
     MAGIC = b"MARC"
     PARSER_TAGS = {
         "id": "mar",
         "category": "archive",
         "file_ext": ("mar",),
-        "min_size": 80*8,  # At least one file index
+        "min_size": 80 * 8,  # At least one file index
         "magic": ((MAGIC, 0),),
         "description": "Microsoft Archive",
     }
@@ -64,4 +66,3 @@ class MarFile(Parser):
             size = index["filesize"].value
             desc = "File %s" % index["filename"].value
             yield SubFile(self, "data[]", size, desc, filename=index["filename"].value)
-

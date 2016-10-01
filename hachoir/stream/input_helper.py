@@ -18,7 +18,8 @@ def FileInputStream(filename, real_filename=None, **args):
         inputio = open(real_filename, 'rb')
     except IOError as err:
         errmsg = str(err)
-        raise InputStreamError("Unable to open file %s: %s" % (filename, errmsg))
+        raise InputStreamError(
+            "Unable to open file %s: %s" % (filename, errmsg))
     source = "file:" + filename
     offset = args.pop("offset", 0)
     size = args.pop("size", None)
@@ -28,12 +29,11 @@ def FileInputStream(filename, real_filename=None, **args):
         stream = InputIOStream(inputio, source=source, **args)
         return InputSubStream(stream, 8 * offset, size, **args)
     else:
-        args.setdefault("tags",[]).append(("filename", filename))
+        args.setdefault("tags", []).append(("filename", filename))
         return InputIOStream(inputio, source=source, **args)
 
 
 def guessStreamCharset(stream, address, size, default=None):
-    size = min(size, 1024*8)
-    bytes = stream.readBytes(address, size//8)
+    size = min(size, 1024 * 8)
+    bytes = stream.readBytes(address, size // 8)
     return guessBytesCharset(bytes, default)
-

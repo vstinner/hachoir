@@ -25,7 +25,8 @@ class Parser(GenericFieldSet):
             and self.endian in (BIG_ENDIAN, LITTLE_ENDIAN, MIDDLE_ENDIAN)
 
         # Call parent constructor
-        GenericFieldSet.__init__(self, None, "root", stream, description, stream.askSize(self))
+        GenericFieldSet.__init__(
+            self, None, "root", stream, description, stream.askSize(self))
 
     def _logger(self):
         return Logger._logger(self)

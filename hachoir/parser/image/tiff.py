@@ -10,6 +10,7 @@ from hachoir.field import FieldSet, SeekableFieldSet, RootSeekableFieldSet, Byte
 from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir.parser.image.exif import TIFF
 
+
 def getStrips(ifd):
     data = {}
     for i, entry in enumerate(ifd.array('entry')):
@@ -21,7 +22,9 @@ def getStrips(ifd):
         for off, byte in zip(offs, bytes):
             yield off.value, byte.value
 
+
 class ImageFile(SeekableFieldSet):
+
     def __init__(self, parent, name, description, ifd):
         SeekableFieldSet.__init__(self, parent, name, description, None)
         self._ifd = ifd
@@ -31,13 +34,14 @@ class ImageFile(SeekableFieldSet):
             self.seekByte(off, relative=False)
             yield Bytes(self, "strip[]", byte)
 
+
 class TiffFile(RootSeekableFieldSet, Parser):
     PARSER_TAGS = {
         "id": "tiff",
         "category": "image",
         "file_ext": ("tif", "tiff"),
         "mime": ("image/tiff",),
-        "min_size": 8*8,
+        "min_size": 8 * 8,
         "magic": ((b"II\x2A\0", 0), ("MM\0\x2A", 0)),
         "description": "TIFF picture"
     }
@@ -46,7 +50,8 @@ class TiffFile(RootSeekableFieldSet, Parser):
     endian = LITTLE_ENDIAN
 
     def __init__(self, stream, **args):
-        RootSeekableFieldSet.__init__(self, None, "root", stream, None, stream.askSize(self))
+        RootSeekableFieldSet.__init__(
+            self, None, "root", stream, None, stream.askSize(self))
         if self.stream.readBytes(0, 2) == b"MM":
             self.endian = BIG_ENDIAN
         Parser.__init__(self, stream, **args)

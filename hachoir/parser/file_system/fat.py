@@ -1,8 +1,8 @@
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, StaticFieldSet,
-    RawBytes, PaddingBytes, createPaddingField, Link, Fragment,
-    Bit, Bits, UInt8, UInt16, UInt32,
-    String, Bytes, NullBytes)
+                           RawBytes, PaddingBytes, createPaddingField, Link, Fragment,
+                           Bit, Bits, UInt8, UInt16, UInt32,
+                           String, Bytes, NullBytes)
 from hachoir.field.integer import GenericInteger
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal
@@ -15,17 +15,18 @@ strip_index = re.compile(r'\[[^]]+]$')
 
 
 class Boot(FieldSet):
-    static_size = 512*8
+    static_size = 512 * 8
+
     def createFields(self):
         yield Bytes(self, "jmp", 3, "Jump instruction (to skip over header on boot)")
         yield String(self, "oem_name", 8, "OEM Name (padded with spaces)", charset="ASCII")
         yield UInt16(self, "sector_size", "Bytes per sector")
-        yield UInt8 (self, "cluster_size", "Sectors per cluster")
+        yield UInt8(self, "cluster_size", "Sectors per cluster")
         yield UInt16(self, "reserved_sectors", "Reserved sector count (including boot sector)")
-        yield UInt8 (self, "fat_nb", "Number of file allocation tables")
+        yield UInt8(self, "fat_nb", "Number of file allocation tables")
         yield UInt16(self, "max_root", "Maximum number of root directory entries")
         yield UInt16(self, "sectors1", "Total sectors (if zero, use 'sectors2')")
-        yield UInt8 (self, "media_desc", "Media descriptor")
+        yield UInt8(self, "media_desc", "Media descriptor")
         yield UInt16(self, "fat_size", "Sectors per FAT")
         yield UInt16(self, "track_size", "Sectors per track")
         yield UInt16(self, "head_nb", "Number of heads")
@@ -45,7 +46,7 @@ class Boot(FieldSet):
         yield textHandler(UInt32(self, "serial", "ID (serial number)"), hexadecimal)
         yield String(self, "label", 11, "Volume Label", strip=' ', charset="ASCII")
         yield String(self, "fs_type", 8, "FAT file system type", strip=' ', charset="ASCII")
-        yield Bytes(self, "code", 510-self.current_size//8, "Operating system boot code")
+        yield Bytes(self, "code", 510 - self.current_size // 8, "Operating system boot code")
         yield Bytes(self, "trail_sig", 2, "Signature (0x55 0xAA)")
 
 
@@ -62,16 +63,20 @@ class FSInfo(StaticFieldSet):
 
 
 class FAT(FieldSet):
+
     class FAT(FieldSet):
+
         def createFields(self):
             parent = self.parent
             version = parent.parent.version
             text_handler = parent.text_handler
             while self.current_size < self._size:
                 yield textHandler(GenericInteger(self, 'entry[]', False, version), text_handler)
+
     def createFields(self):
         version = self.parent.version
         max_entry = 1 << min(28, version)
+
         def FatEntry(chunk):
             i = chunk.value
             j = (1 - i) % max_entry
@@ -89,10 +94,11 @@ class FAT(FieldSet):
                 return str(i)
         self.text_handler = FatEntry
         while self.current_size < self._size:
-            yield FAT.FAT(self, 'group[]', size=min(1000*version,self._size-self.current_size))
+            yield FAT.FAT(self, 'group[]', size=min(1000 * version, self._size - self.current_size))
 
 
 class Date(FieldSet):
+
     def __init__(self, parent, name):
         FieldSet.__init__(self, parent, name, size={
             "create": 5,
@@ -113,17 +119,18 @@ class Date(FieldSet):
         yield Bits(self, "year", 7, "(0 = 1980, 127 = 2107)")
 
     def createDescription(self):
-        date = [ self["year"].value, self["month"].value, self["day"].value ]
+        date = [self["year"].value, self["month"].value, self["day"].value]
         size = self.size // 8
         if size > 2:
             mkdate = datetime.datetime
             cs = 200 * self["2sec"].value
             if size > 4:
                 cs += self["cs"].value
-            date += [ self["hour"].value, self["min"].value, cs // 100, cs % 100 * 10000 ]
+            date += [self["hour"].value, self["min"].value,
+                     cs // 100, cs % 100 * 10000]
         else:
             mkdate = datetime.date
-        if date == [ 0 for i in date ]:
+        if date == [0 for i in date]:
             date = None
         else:
             date[0] += 1980
@@ -135,6 +142,7 @@ class Date(FieldSet):
 
 
 class InodeLink(Link):
+
     def __init__(self, parent, name, target=None):
         Link.__init__(self, parent, name)
         self.target = target
@@ -143,7 +151,8 @@ class InodeLink(Link):
     def _getTargetPath(self):
         if not self.target:
             parent = self.parent
-            self.target = strip_index.sub(r"\\", parent.parent._name) + parent.getFilename().rstrip("/")
+            self.target = strip_index.sub(
+                r"\\", parent.parent._name) + parent.getFilename().rstrip("/")
         return self.target
 
     def createValue(self):
@@ -157,17 +166,19 @@ class InodeLink(Link):
 
 
 class FileEntry(FieldSet):
-    static_size = 32*8
+    static_size = 32 * 8
     process = False
     LFN = False
 
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
-        self.status = self.stream.readBits(self.absolute_address, 8, LITTLE_ENDIAN)
+        self.status = self.stream.readBits(
+            self.absolute_address, 8, LITTLE_ENDIAN)
         if self.status in (0, 0xE5):
             return
 
-        magic = self.stream.readBits(self.absolute_address+11*8, 8, LITTLE_ENDIAN)
+        magic = self.stream.readBits(
+            self.absolute_address + 11 * 8, 8, LITTLE_ENDIAN)
         if magic & 0x3F == 0x0F:
             self.LFN = True
         elif self.getFilename() not in (".", ".."):
@@ -192,7 +203,7 @@ class FileEntry(FieldSet):
         elif self.status == 0xE5:
             return "Deleted file"
         elif self.LFN:
-            name = "".join( field.value for field in self.array("name") )
+            name = "".join(field.value for field in self.array("name"))
             try:
                 name = name[:name.index('\0')]
             except ValueError:
@@ -211,9 +222,9 @@ class FileEntry(FieldSet):
     def createFields(self):
         if not self.LFN:
             yield String(self, "name", 8, "DOS file name (padded with spaces)",
-                strip=' ', charset="ASCII")
+                         strip=' ', charset="ASCII")
             yield String(self, "ext", 3, "DOS file extension (padded with spaces)",
-                strip=' ', charset="ASCII")
+                         strip=' ', charset="ASCII")
             yield Bit(self, "read_only")
             yield Bit(self, "hidden")
             yield Bit(self, "system")
@@ -247,40 +258,49 @@ class FileEntry(FieldSet):
         else:
             yield UInt8(self, "seq_no", "Sequence Number")
             yield String(self, "name[]", 10, "(5 UTF-16 characters)",
-                charset="UTF-16-LE")
+                         charset="UTF-16-LE")
             yield UInt8(self, "magic", "Magic number (15)")
             yield NullBytes(self, "reserved", 1, "(always 0)")
             yield UInt8(self, "checksum", "Checksum of DOS file name")
             yield String(self, "name[]", 12, "(6 UTF-16 characters)",
-                charset="UTF-16-LE")
+                         charset="UTF-16-LE")
             yield UInt16(self, "first_cluster", "(always 0)")
             yield String(self, "name[]",  4, "(2 UTF-16 characters)",
-                charset="UTF-16-LE")
+                         charset="UTF-16-LE")
+
 
 class Directory(Fragment):
+
     def createFields(self):
         while self.current_size < self._size:
             yield FileEntry(self, "entry[]")
 
+
 class File(Fragment):
+
     def _getData(self):
         return self["data"]
+
     def createFields(self):
-        yield Bytes(self, "data", self.datasize//8)
+        yield Bytes(self, "data", self.datasize // 8)
         padding = self._size - self.current_size
         if padding:
             yield createPaddingField(self, padding)
 
+
 class InodeGen:
+
     def __init__(self, root, entry, path):
         self.root = root
         self.cluster = root.clusters(entry.getCluster)
         self.path = path
         self.filesize = entry.target_size
         self.done = 0
+
         def createInputStream(cis, **args):
             args["size"] = self.filesize
-            args.setdefault("tags",[]).append(("filename", entry.getFilename()))
+            args.setdefault("tags", []).append(
+                ("filename", entry.getFilename()))
             return cis(**args)
         self.createInputStream = createInputStream
 
@@ -293,7 +313,8 @@ class InodeGen:
                 return
             field = File(self.root, name, size=size)
             if prev.first is None:
-                field._description = 'File size: %s' % humanFilesize(self.filesize//8)
+                field._description = 'File size: %s' % humanFilesize(
+                    self.filesize // 8)
                 field.setSubIStream(self.createInputStream)
             field.datasize = min(self.filesize - self.done, size)
             self.done += field.datasize
@@ -316,14 +337,14 @@ class FAT_FS(Parser):
     endian = LITTLE_ENDIAN
     PARSER_TAGS = {
         "category": "file_system",
-        "min_size": 512*8,
+        "min_size": 512 * 8,
         "file_ext": ("",),
     }
 
     def _validate(self, type_offset):
-        if self.stream.readBytes(type_offset*8, 8) != ("FAT%-5u" % self.version).encode('ascii'):
+        if self.stream.readBytes(type_offset * 8, 8) != ("FAT%-5u" % self.version).encode('ascii'):
             return "Invalid FAT%u signature" % self.version
-        if self.stream.readBytes(510*8, 2) != b"\x55\xAA":
+        if self.stream.readBytes(510 * 8, 2) != b"\x55\xAA":
             return "Invalid BIOS signature"
         return True
 
@@ -334,7 +355,7 @@ class FAT_FS(Parser):
             clus_nb = 1
             next = cluster
             while True:
-                next = self.fat[next/1000][next%1000].value
+                next = self.fat[next / 1000][next % 1000].value
                 if not 1 < next < max_entry:
                     break
                 if cluster + clus_nb == next:
@@ -354,14 +375,16 @@ class FAT_FS(Parser):
         if self.version == 32:
             for field in sorted((
                 (boot["inf_sector"].value, lambda: FSInfo(self, "fsinfo")),
-                (boot["boot_copy"].value, lambda: Boot(self, "bkboot", "Copy of the boot sector")),
+                (boot["boot_copy"].value, lambda: Boot(
+                    self, "bkboot", "Copy of the boot sector")),
             )):
                 if field[0]:
                     padding = self.seekByte(field[0] * self.sector_size)
                     if padding:
                         yield padding
                     yield field[1]()
-        padding = self.seekByte(boot["reserved_sectors"].value * self.sector_size)
+        padding = self.seekByte(
+            boot["reserved_sectors"].value * self.sector_size)
         if padding:
             yield padding
 
@@ -390,7 +413,7 @@ class FAT_FS(Parser):
         # Create one big padding field for the end
         size = sectors * self.sector_size
         if self._size:
-            size = min(size, self.size//8)
+            size = min(size, self.size // 8)
         padding = self.seekByte(size)
         if padding:
             yield padding
@@ -400,7 +423,7 @@ class FAT12(FAT_FS):
     PARSER_TAGS = {
         "id": "fat12",
         "description": "FAT12 filesystem",
-        "magic": ((b"FAT12   ", 54*8),),
+        "magic": ((b"FAT12   ", 54 * 8),),
     }
     version = 12
 
@@ -412,7 +435,7 @@ class FAT16(FAT_FS):
     PARSER_TAGS = {
         "id": "fat16",
         "description": "FAT16 filesystem",
-        "magic": ((b"FAT16   ", 54*8),),
+        "magic": ((b"FAT16   ", 54 * 8),),
     }
     version = 16
 
@@ -424,7 +447,7 @@ class FAT32(FAT_FS):
     PARSER_TAGS = {
         "id": "fat32",
         "description": "FAT32 filesystem",
-        "magic": ((b"FAT32   ", 82*8),),
+        "magic": ((b"FAT32   ", 82 * 8),),
     }
     version = 32
 

@@ -12,14 +12,15 @@ Creation date: 2008-04-09
 from hachoir.core.tools import paddingSize
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet,
-    Bit, NullBits, NullBytes,
-    UInt8, UInt32, String, RawBytes, Enum,
-    TimestampUnix64, CompressedField,
-    SubFile)
+                           Bit, NullBits, NullBytes,
+                           UInt8, UInt32, String, RawBytes, Enum,
+                           TimestampUnix64, CompressedField,
+                           SubFile)
 from hachoir.core.endian import BIG_ENDIAN
 
 try:
     import hashlib
+
     def sha256(data):
         hash = hashlib.new('sha256')
         hash.update(data)
@@ -30,7 +31,9 @@ except ImportError:
 
 try:
     from Crypto.Cipher import AES
+
     class DeflateStream:
+
         def __init__(self, stream):
             hash_iterations = 1234
             password = "x" * 8
@@ -50,7 +53,9 @@ except ImportError:
     def Deflate(field):
         return field
 
+
 class KeyringString(FieldSet):
+
     def createFields(self):
         yield UInt32(self, "length")
         length = self["length"].value
@@ -70,7 +75,9 @@ class KeyringString(FieldSet):
         else:
             return "(empty string)"
 
+
 class Attribute(FieldSet):
+
     def createFields(self):
         yield KeyringString(self, "name")
         yield UInt32(self, "type")
@@ -85,7 +92,9 @@ class Attribute(FieldSet):
     def createDescription(self):
         return 'Attribute "%s"' % self["name"].value
 
+
 class ACL(FieldSet):
+
     def createFields(self):
         yield UInt32(self, "types_allowed")
         yield KeyringString(self, "display_name")
@@ -93,7 +102,9 @@ class ACL(FieldSet):
         yield KeyringString(self, "reserved[]")
         yield UInt32(self, "reserved[]")
 
+
 class Item(FieldSet):
+
     def createFields(self):
         yield UInt32(self, "id")
         yield UInt32(self, "type")
@@ -104,13 +115,17 @@ class Item(FieldSet):
     def createDescription(self):
         return "Item #%s: %s attributes" % (self["id"].value, self["attr_count"].value)
 
+
 class Items(FieldSet):
+
     def createFields(self):
         yield UInt32(self, "count")
         for index in range(self["count"].value):
             yield Item(self, "item[]")
 
+
 class EncryptedItem(FieldSet):
+
     def createFields(self):
         yield KeyringString(self, "display_name")
         yield KeyringString(self, "secret")
@@ -129,13 +144,15 @@ class EncryptedItem(FieldSet):
 #        if size:
 #            yield NullBytes(self, "hash_padding", size, "16 bytes alignment")
 
+
 class EncryptedData(Parser):
     PARSER_TAGS = {
         "id": "gnomeencryptedkeyring",
-        "min_size": 16*8,
+        "min_size": 16 * 8,
         "description": "Gnome encrypted keyring",
     }
     endian = BIG_ENDIAN
+
     def validate(self):
         return True
 
@@ -150,13 +167,14 @@ class EncryptedData(Parser):
         if size:
             yield NullBytes(self, "padding_align", size)
 
+
 class GnomeKeyring(Parser):
     MAGIC = b"GnomeKeyring\n\r\0\n"
     PARSER_TAGS = {
         "id": "gnomekeyring",
         "category": "misc",
         "magic": ((MAGIC, 0),),
-        "min_size": 47*8,
+        "min_size": 47 * 8,
         "description": "Gnome keyring",
     }
     CRYPTO_NAMES = {
@@ -192,9 +210,9 @@ class GnomeKeyring(Parser):
         yield UInt32(self, "encrypted_size")
         yield Deflate(SubFile(self, "encrypted", self["encrypted_size"].value, "AES128 CBC", parser_class=EncryptedData))
 
+
 def generate_key(password, salt, hash_iterations):
-    sha = sha256(password+salt)
-    for index in range(hash_iterations-1):
+    sha = sha256(password + salt)
+    for index in range(hash_iterations - 1):
         sha = sha256(sha)
     return sha[:16], sha[16:]
-

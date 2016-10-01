@@ -8,6 +8,7 @@ class Output:
     """
     Store files found by search tool.
     """
+
     def __init__(self, directory):
         self.directory = directory
         self.mkdir = False
@@ -41,8 +42,7 @@ class Output:
 
         # Write output
         try:
-            output.copyBytesFrom(stream, offset, size//8)
+            output.copyBytesFrom(stream, offset, size // 8)
         except StreamError as err:
             error("copyBytesFrom() error: %s" % err)
         return filename
-

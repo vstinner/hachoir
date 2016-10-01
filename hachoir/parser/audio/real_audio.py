@@ -10,19 +10,22 @@ Samples:
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet,
-    UInt8, UInt16, UInt32,
-    Bytes, RawBytes, String,
-    PascalString8)
+                           UInt8, UInt16, UInt32,
+                           Bytes, RawBytes, String,
+                           PascalString8)
 from hachoir.core.tools import humanFrequency
 from hachoir.core.text_handler import displayHandler
 from hachoir.core.endian import BIG_ENDIAN
 
+
 class Metadata(FieldSet):
+
     def createFields(self):
         yield PascalString8(self, "title", charset="ISO-8859-1")
         yield PascalString8(self, "author", charset="ISO-8859-1")
         yield PascalString8(self, "copyright", charset="ISO-8859-1")
         yield PascalString8(self, "comment", charset="ISO-8859-1")
+
 
 class RealAudioFile(Parser):
     MAGIC = b".ra\xFD"
@@ -31,7 +34,7 @@ class RealAudioFile(Parser):
         "category": "audio",
         "file_ext": ["ra"],
         "mime": ("audio/x-realaudio", "audio/x-pn-realaudio"),
-        "min_size": 6*8,
+        "min_size": 6 * 8,
         "magic": ((MAGIC, 0),),
         "description": "Real audio (.ra)",
     }
@@ -55,7 +58,7 @@ class RealAudioFile(Parser):
             yield UInt8(self, "Unknown2")
             yield PascalString8(self, "FourCC")
             audio_size = self["data_size"].value
-        else: # version = 4
+        else:  # version = 4
             yield UInt16(self, "reserved1", "Reserved, should be 0")
             yield String(self, "ra4sig", 4, "'.ra4' signature")
             yield UInt32(self, "filesize", "File size (minus 40 bytes)")
@@ -76,7 +79,8 @@ class RealAudioFile(Parser):
             yield PascalString8(self, "FourCC")
             yield RawBytes(self, "unknown4", 3)
             yield Metadata(self, "metadata")
-            audio_size = (self["filesize"].value + 40) - (self["headersize"].value + 16)
+            audio_size = (self["filesize"].value + 40) - \
+                (self["headersize"].value + 16)
         if 0 < audio_size:
             yield RawBytes(self, "audio_data", audio_size)
 

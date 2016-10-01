@@ -77,12 +77,12 @@ class HachoirParser(object):
                 if isinstance(self._description, str):
                     self._description = makeUnicode(self._description)
             except Exception as err:
-                error("Error getting description of %s: %s" \
-                    % (self.path, str(err)))
+                error("Error getting description of %s: %s"
+                      % (self.path, str(err)))
                 self._description = self.PARSER_TAGS["description"]
         return self._description
     description = property(_getDescription,
-    doc="Description of the parser")
+                           doc="Description of the parser")
 
     def _getMimeType(self):
         if not self._mime_type:
@@ -91,7 +91,7 @@ class HachoirParser(object):
             except Exception as err:
                 self.error("Error when creating MIME type: %s" % str(err))
             if not self._mime_type \
-            and self.createMimeType != Parser.createMimeType:
+                    and self.createMimeType != Parser.createMimeType:
                 self._mime_type = Parser.createMimeType(self)
             if not self._mime_type:
                 self._mime_type = "application/octet-stream"
@@ -100,12 +100,14 @@ class HachoirParser(object):
 
     def createContentSize(self):
         return None
+
     def _getContentSize(self):
         if not hasattr(self, "_content_size"):
             try:
                 self._content_size = self.createContentSize()
             except Exception as err:
-                error("Unable to compute %s content size: %s" % (self.__class__.__name__, err))
+                error("Unable to compute %s content size: %s" %
+                      (self.__class__.__name__, err))
                 self._content_size = None
         return self._content_size
     content_size = property(_getContentSize)
@@ -119,6 +121,7 @@ class HachoirParser(object):
         if isinstance(file_ext, (tuple, list)):
             file_ext = file_ext[0]
         return file_ext and '.' + file_ext
+
     def _getFilenameSuffix(self):
         if not hasattr(self, "_filename_suffix"):
             self._filename_extension = self.createFilenameSuffix()
@@ -149,7 +152,7 @@ class HachoirParser(object):
 
 
 class Parser(HachoirParser, GenericParser):
+
     def __init__(self, stream, **args):
         GenericParser.__init__(self, stream)
         HachoirParser.__init__(self, stream, **args)
-

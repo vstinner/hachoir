@@ -20,14 +20,16 @@ Creation: 2 august 2006
 from hachoir.parser import Parser
 from hachoir.parser.common.win32 import GUID
 from hachoir.field import (ParserError, FieldSet, MissingField,
-    Enum,
-    Bit, NullBits, Bits, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, TimestampMac32,
-    String, PascalString8, PascalString16, CString,
-    RawBytes, NullBytes, PaddingBytes)
+                           Enum,
+                           Bit, NullBits, Bits, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, TimestampMac32,
+                           String, PascalString8, PascalString16, CString,
+                           RawBytes, NullBytes, PaddingBytes)
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal
 
 from hachoir.core.tools import MAC_TIMESTAMP_T0, timedelta
+
+
 def timestampMac64(value):
     if not isinstance(value, (float, int)):
         raise TypeError("an integer or float is required")
@@ -35,30 +37,39 @@ def timestampMac64(value):
 from hachoir.field.timestamp import timestampFactory
 TimestampMac64 = timestampFactory("TimestampMac64", timestampMac64, 64)
 
+
 def fixedFloatFactory(name, int_bits, float_bits, doc):
     size = int_bits + float_bits
+
     class Float(FieldSet):
         static_size = size
         __doc__ = doc
+
         def createFields(self):
             yield Bits(self, "int_part", int_bits)
             yield Bits(self, "float_part", float_bits)
+
         def createValue(self):
-            return self["int_part"].value + float(self["float_part"].value) / (1<<float_bits)
+            return self["int_part"].value + float(self["float_part"].value) / (1 << float_bits)
     klass = Float
     klass.__name__ = name
     return klass
 
 QTFloat16 = fixedFloatFactory("QTFloat32", 8, 8, "8.8 fixed point number")
 QTFloat32 = fixedFloatFactory("QTFloat32", 16, 16, "16.16 fixed point number")
-QTFloat2_30 = fixedFloatFactory("QTFloat2_30", 2, 30, "2.30 fixed point number")
+QTFloat2_30 = fixedFloatFactory(
+    "QTFloat2_30", 2, 30, "2.30 fixed point number")
+
 
 class AtomList(FieldSet):
+
     def createFields(self):
         while not self.eof:
             yield Atom(self, "atom[]")
 
+
 class TrackHeader(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "version", "Version (0 or 1)")
         yield NullBits(self, "flags", 20)
@@ -98,12 +109,16 @@ class TrackHeader(FieldSet):
         yield QTFloat32(self, "frame_size_width")
         yield QTFloat32(self, "frame_size_height")
 
+
 class TrackReferenceType(FieldSet):
+
     def createFields(self):
         while not self.eof:
             yield UInt32(self, "track_id[]", "Referenced track ID")
 
+
 class Handler(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "version", "Version")
         yield NullBits(self, "flags", 24)
@@ -116,6 +131,7 @@ class Handler(FieldSet):
             yield CString(self, "name", charset="UTF-8")
         else:
             yield PascalString8(self, "name")
+
 
 class LanguageCode(FieldSet):
     static_size = 16
@@ -233,6 +249,7 @@ class LanguageCode(FieldSet):
         if field.value == 0:
             return ' '
         return chr(field.value + 0x60)
+
     def createFields(self):
         value = self.stream.readBits(self.absolute_address, 16, self.endian)
         if value < 1024:
@@ -242,12 +259,15 @@ class LanguageCode(FieldSet):
             yield textHandler(Bits(self, "lang[0]", 5), self.fieldHandler)
             yield textHandler(Bits(self, "lang[1]", 5), self.fieldHandler)
             yield textHandler(Bits(self, "lang[2]", 5), self.fieldHandler)
+
     def createValue(self):
         if 'lang' in self:
             return self['lang'].display
         return self['lang[0]'].display + self['lang[1]'].display + self['lang[2]'].display
 
+
 class MediaHeader(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "version", "Version (0 or 1)")
         yield NullBits(self, "flags", 24)
@@ -265,6 +285,7 @@ class MediaHeader(FieldSet):
             yield UInt64(self, "duration", "Length of media, in time-units")
         yield LanguageCode(self, "language")
         yield Int16(self, "quality")
+
 
 class VideoMediaHeader(FieldSet):
     GRAPHICSMODE = {
@@ -293,21 +314,25 @@ class VideoMediaHeader(FieldSet):
         yield UInt8(self, "version", "Version")
         yield Bits(self, "flags", 24, "Flags (=1)")
         graphics = UInt16(self, "graphicsmode")
-        graphics.createDisplay = lambda:self.graphicsDisplay(graphics)
-        graphics.createDescription = lambda:self.graphicsDescription(graphics)
+        graphics.createDisplay = lambda: self.graphicsDisplay(graphics)
+        graphics.createDescription = lambda: self.graphicsDescription(graphics)
         yield graphics
         yield UInt16(self, "op_red", "Red value for graphics mode")
         yield UInt16(self, "op_green", "Green value for graphics mode")
         yield UInt16(self, "op_blue", "Blue value for graphics mode")
 
+
 class SoundMediaHeader(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "version", "Version")
         yield NullBits(self, "flags", 24)
         yield QTFloat16(self, "balance")
         yield UInt16(self, "reserved[]")
 
+
 class HintMediaHeader(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "version", "Version")
         yield NullBits(self, "flags", 24)
@@ -317,7 +342,9 @@ class HintMediaHeader(FieldSet):
         yield UInt32(self, "avg_bit_rate")
         yield UInt32(self, "reserved[]")
 
+
 class DataEntryUrl(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "version", "Version")
         yield NullBits(self, "flags", 23)
@@ -325,7 +352,9 @@ class DataEntryUrl(FieldSet):
         if not self['is_same_file'].value:
             yield CString(self, "location")
 
+
 class DataEntryUrn(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "version", "Version")
         yield NullBits(self, "flags", 23)
@@ -334,7 +363,9 @@ class DataEntryUrn(FieldSet):
             yield CString(self, "name")
             yield CString(self, "location")
 
+
 class DataReference(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "version", "Version")
         yield NullBits(self, "flags", 24)
@@ -342,7 +373,9 @@ class DataReference(FieldSet):
         for i in range(self['count'].value):
             yield Atom(self, "atom[]")
 
+
 class EditList(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "version", "Version (0 or 1)")
         yield NullBits(self, "flags", 24)
@@ -353,20 +386,26 @@ class EditList(FieldSet):
         elif version == 1:
             UInt, Int = UInt64, Int64
         else:
-            raise ParserError("elst version %d not supported"%version)
+            raise ParserError("elst version %d not supported" % version)
         for i in range(self['count'].value):
             yield UInt(self, "duration[]", "Duration of this edit segment")
             yield Int(self, "time[]", "Starting time of this edit segment within the media (-1 = empty edit)")
             yield QTFloat32(self, "play_speed[]", "Playback rate (0 = dwell edit, 1 = normal playback)")
 
+
 class Load(FieldSet):
+
     def createFields(self):
         yield UInt32(self, "start")
         yield UInt32(self, "length")
-        yield UInt32(self, "flags") # PreloadAlways = 1 or TrackEnabledPreload = 2
-        yield UInt32(self, "hints") # KeepInBuffer = 0x00000004; HighQuality = 0x00000100; SingleFieldVideo = 0x00100000
+        # PreloadAlways = 1 or TrackEnabledPreload = 2
+        yield UInt32(self, "flags")
+        # KeepInBuffer = 0x00000004; HighQuality = 0x00000100; SingleFieldVideo = 0x00100000
+        yield UInt32(self, "hints")
+
 
 class MovieHeader(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "version", "Version (0 or 1)")
         yield NullBits(self, "flags", 24)
@@ -402,20 +441,26 @@ class MovieHeader(FieldSet):
         yield UInt32(self, "current_time")
         yield UInt32(self, "next_track_ID", "Value to use as the track ID for the next track added")
 
+
 class FileType(FieldSet):
+
     def createFields(self):
         yield String(self, "brand", 4, "Major brand")
         yield UInt32(self, "version", "Version")
         while not self.eof:
             yield String(self, "compat_brand[]", 4, "Compatible brand")
 
+
 class MovieFragmentHeader(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "version", "Version")
         yield NullBits(self, "flags", 24)
         yield UInt32(self, "sequence_number")
 
+
 class TrackFragmentRandomAccess(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "version", "Version")
         yield NullBits(self, "flags", 24)
@@ -428,43 +473,46 @@ class TrackFragmentRandomAccess(FieldSet):
         for i in range(self['number_of_entry'].value):
             if self['version'].value == 1:
                 yield UInt64(self, "time[%i]" % i)
-                yield UInt64(self, "moof_offset[%i]" %i)
+                yield UInt64(self, "moof_offset[%i]" % i)
             else:
-                yield UInt32(self, "time[%i]" %i)
-                yield UInt32(self, "moof_offset[%i]" %i)
+                yield UInt32(self, "time[%i]" % i)
+                yield UInt32(self, "moof_offset[%i]" % i)
 
             if self['length_size_of_traf_num'].value == 3:
-                yield UInt64(self, "traf_number[%i]" %i)
+                yield UInt64(self, "traf_number[%i]" % i)
             elif self['length_size_of_traf_num'].value == 2:
-                yield UInt32(self, "traf_number[%i]" %i)
+                yield UInt32(self, "traf_number[%i]" % i)
             elif self['length_size_of_traf_num'].value == 1:
-                yield UInt16(self, "traf_number[%i]" %i)
+                yield UInt16(self, "traf_number[%i]" % i)
             else:
-                yield UInt8(self, "traf_number[%i]" %i)
+                yield UInt8(self, "traf_number[%i]" % i)
 
             if self['length_size_of_trun_num'].value == 3:
-                yield UInt64(self, "trun_number[%i]" %i)
+                yield UInt64(self, "trun_number[%i]" % i)
             elif self['length_size_of_trun_num'].value == 2:
-                yield UInt32(self, "trun_number[%i]" %i)
+                yield UInt32(self, "trun_number[%i]" % i)
             elif self['length_size_of_trun_num'].value == 1:
-                yield UInt16(self, "trun_number[%i]" %i)
+                yield UInt16(self, "trun_number[%i]" % i)
             else:
-                yield UInt8(self, "trun_number[%i]" %i)
+                yield UInt8(self, "trun_number[%i]" % i)
 
             if self['length_size_of_sample_num'].value == 3:
-                yield UInt64(self, "sample_number[%i]" %i)
+                yield UInt64(self, "sample_number[%i]" % i)
             elif self['length_size_of_sample_num'].value == 2:
-                yield UInt32(self, "sample_number[%i]" %i)
+                yield UInt32(self, "sample_number[%i]" % i)
             elif self['length_size_of_sample_num'].value == 1:
-                yield UInt16(self, "sample_number[%i]" %i)
+                yield UInt16(self, "sample_number[%i]" % i)
             else:
-                yield UInt8(self, "sample_number[%i]" %i)
+                yield UInt8(self, "sample_number[%i]" % i)
+
 
 class MovieFragmentRandomAccessOffset(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "version", "Version")
         yield NullBits(self, "flags", 24)
         yield UInt32(self, "size")
+
 
 def findHandler(self):
     ''' find the handler corresponding to this fieldset '''
@@ -479,7 +527,9 @@ def findHandler(self):
             return atom['hdlr']
     return None
 
+
 class METATAG(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "unk[]", "0x80 or 0x00")
         yield PascalString16(self, "tag_name", charset='UTF-8')
@@ -487,7 +537,9 @@ class METATAG(FieldSet):
         yield UInt16(self, "unk[]", "0x0000")
         yield PascalString16(self, "tag_value", charset='UTF-8')
 
+
 class META(FieldSet):
+
     def createFields(self):
         # This tag has too many variant forms.
         if '/tags/' in self.path:
@@ -501,13 +553,17 @@ class META(FieldSet):
         else:
             yield AtomList(self, "tags")
 
+
 class Item(FieldSet):
+
     def createFields(self):
         yield UInt32(self, "size")
         yield UInt32(self, "index")
         yield Atom(self, "value")
 
+
 class KeyList(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "version")
         yield NullBits(self, "flags", 24)
@@ -515,7 +571,9 @@ class KeyList(FieldSet):
         for i in range(self['count'].value):
             yield Atom(self, "key[]")
 
+
 class ItemList(FieldSet):
+
     def createFields(self):
         handler = findHandler(self)
         if handler is None:
@@ -527,7 +585,9 @@ class ItemList(FieldSet):
             while not self.eof:
                 yield Item(self, "item[]")
 
+
 class NeroChapters(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "version")
         yield NullBits(self, "flags", 24)
@@ -537,7 +597,9 @@ class NeroChapters(FieldSet):
             yield UInt64(self, "chapter_start[]")
             yield PascalString8(self, "chapter_name[]", charset='UTF-8')
 
+
 class SampleDecodeTimeTable(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "version")
         yield NullBits(self, "flags", 24)
@@ -546,7 +608,9 @@ class SampleDecodeTimeTable(FieldSet):
             yield UInt32(self, "sample_count[]", "Number of consecutive samples with this delta")
             yield UInt32(self, "sample_delta[]", "Decode time delta since last sample, in time-units")
 
+
 class SampleCompositionTimeTable(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "version")
         yield NullBits(self, "flags", 24)
@@ -555,7 +619,9 @@ class SampleCompositionTimeTable(FieldSet):
             yield UInt32(self, "sample_count[]", "Number of consecutive samples with this offset")
             yield UInt32(self, "sample_offset[]", "Difference between decode time and composition time of this sample, in time-units")
 
+
 class ChunkOffsetTable(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "version")
         yield NullBits(self, "flags", 24)
@@ -563,7 +629,9 @@ class ChunkOffsetTable(FieldSet):
         for i in range(self['count'].value):
             yield UInt32(self, "chunk_offset[]")
 
+
 class ChunkOffsetTable64(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "version")
         yield NullBits(self, "flags", 24)
@@ -571,7 +639,9 @@ class ChunkOffsetTable64(FieldSet):
         for i in range(self['count'].value):
             yield UInt64(self, "chunk_offset[]")
 
+
 class SampleEntry(FieldSet):
+
     def createFields(self):
         yield UInt32(self, "size")
         yield RawBytes(self, "format", 4, "Data Format (codec)")
@@ -609,11 +679,13 @@ class SampleEntry(FieldSet):
             # Hint sample entry
             pass
 
-        size = self['size'].value - self.current_size//8
+        size = self['size'].value - self.current_size // 8
         if size > 0:
             yield RawBytes(self, "extra_data", size)
 
+
 class SampleDescription(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "version")
         yield NullBits(self, "flags", 24)
@@ -621,7 +693,9 @@ class SampleDescription(FieldSet):
         for i in range(self['count'].value):
             yield SampleEntry(self, "sample_entry[]")
 
+
 class SyncSampleTable(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "version")
         yield NullBits(self, "flags", 24)
@@ -629,7 +703,9 @@ class SyncSampleTable(FieldSet):
         for i in range(self['count'].value):
             yield UInt32(self, "sample_number[]")
 
+
 class SampleSizeTable(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "version")
         yield NullBits(self, "flags", 24)
@@ -639,7 +715,9 @@ class SampleSizeTable(FieldSet):
             for i in range(self['count'].value):
                 yield UInt32(self, "sample_size[]")
 
+
 class CompactSampleSizeTable(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "version")
         yield NullBits(self, "flags", 24)
@@ -652,7 +730,9 @@ class CompactSampleSizeTable(FieldSet):
         if self.current_size % 8 != 0:
             yield NullBits(self, "padding[]", 8 - (self.current_size % 8))
 
+
 class SampleToChunkTable(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "version")
         yield NullBits(self, "flags", 24)
@@ -662,133 +742,135 @@ class SampleToChunkTable(FieldSet):
             yield UInt32(self, "samples_per_chunk[]")
             yield UInt32(self, "sample_description_index[]")
 
+
 class Atom(FieldSet):
     tag_info = {
         "ftyp": (FileType, "file_type", "File type and compatibility"),
         # pdin: progressive download information
         # pnot: movie preview (old QT spec)
         "moov": (AtomList, "movie", "Container for all metadata"),
-            "mvhd": (MovieHeader, "movie_hdr", "Movie header, overall declarations"),
-            # clip: movie clipping (old QT spec)
-                # crgn: movie clipping region (old QT spec)
-            "trak": (AtomList, "track", "Container for an individual track or stream"),
-                "tkhd": (TrackHeader, "track_hdr", "Track header, overall information about the track"),
-                # matt: track matte (old QT spec)
-                    # kmat: compressed matte (old QT spec)
-                "tref": (AtomList, "tref", "Track reference container"),
-                    "hint": (TrackReferenceType, "hint", "Original media track(s) for this hint track"),
-                    "cdsc": (TrackReferenceType, "cdsc", "Reference to track described by this track"),
-                "edts": (AtomList, "edts", "Edit list container"),
-                    "elst": (EditList, "elst", "Edit list"),
-                "load": (Load, "load", "Track loading settings (old QT spec)"),
-                # imap: Track input map (old QT spec)
-                "mdia": (AtomList, "media", "Container for the media information in a track"),
-                    "mdhd": (MediaHeader, "media_hdr", "Media header, overall information about the media"),
-                    "hdlr": (Handler, "hdlr", "Handler, declares the media or metadata (handler) type"),
-                    "minf": (AtomList, "minf", "Media information container"),
-                        "vmhd": (VideoMediaHeader, "vmhd", "Video media header, overall information (video track only)"),
-                        "smhd": (SoundMediaHeader, "smhd", "Sound media header, overall information (sound track only)"),
-                        "hmhd": (HintMediaHeader, "hmhd", "Hint media header, overall information (hint track only)"),
-                        # nmhd: Null media header, overall information (some tracks only) (unparsed)
-                        "dinf": (AtomList, "dinf", "Data information, container"),
-                            "dref": (DataReference, "dref", "Data reference, declares source(s) of media data in track"),
-                                "url ": (DataEntryUrl, "url", "URL data reference"),
-                                "urn ": (DataEntryUrn, "urn", "URN data reference"),
-                        "stbl": (AtomList, "stbl", "Sample table, container for the time/space map"),
-                            "stsd": (SampleDescription, "stsd", "Sample descriptions (codec types, initialization etc.)"),
-                            "stts": (SampleDecodeTimeTable, "stts", "decoding time-to-sample delta table"),
-                            "ctts": (SampleCompositionTimeTable, "ctts", "composition time-to-sample offset table"),
-                            "stsc": (SampleToChunkTable, "stsc", "sample-to-chunk, partial data-offset information"),
-                            "stsz": (SampleSizeTable, "stsz", "Sample size table (framing)"),
-                            "stz2": (CompactSampleSizeTable, "stz2", "Compact sample size table (framing)"),
-                            "stco": (ChunkOffsetTable, "stco", "Chunk offset, partial data-offset information"),
-                            "co64": (ChunkOffsetTable64, "co64", "64-bit chunk offset"),
-                            "stss": (SyncSampleTable, "stss", "Sync sample table (random access points)"),
-                            # stsh: shadow sync sample table
-                            # padb: sample padding bits
-                            # stdp: sample degradation priority
-                            # sdtp: independent and disposable samples
-                            # sbgp: sample-to-group
-                            # sgpd: sample group description
-                            # subs: sub-sample information
-            # ctab color table (old QT spec)
-            # mvex: movie extends
-                # mehd: movie extends header
-                # trex: track extends defaults
-            # ipmc: IPMP control
+        "mvhd": (MovieHeader, "movie_hdr", "Movie header, overall declarations"),
+        # clip: movie clipping (old QT spec)
+        # crgn: movie clipping region (old QT spec)
+        "trak": (AtomList, "track", "Container for an individual track or stream"),
+        "tkhd": (TrackHeader, "track_hdr", "Track header, overall information about the track"),
+        # matt: track matte (old QT spec)
+        # kmat: compressed matte (old QT spec)
+        "tref": (AtomList, "tref", "Track reference container"),
+        "hint": (TrackReferenceType, "hint", "Original media track(s) for this hint track"),
+        "cdsc": (TrackReferenceType, "cdsc", "Reference to track described by this track"),
+        "edts": (AtomList, "edts", "Edit list container"),
+        "elst": (EditList, "elst", "Edit list"),
+        "load": (Load, "load", "Track loading settings (old QT spec)"),
+        # imap: Track input map (old QT spec)
+        "mdia": (AtomList, "media", "Container for the media information in a track"),
+        "mdhd": (MediaHeader, "media_hdr", "Media header, overall information about the media"),
+        "hdlr": (Handler, "hdlr", "Handler, declares the media or metadata (handler) type"),
+        "minf": (AtomList, "minf", "Media information container"),
+        "vmhd": (VideoMediaHeader, "vmhd", "Video media header, overall information (video track only)"),
+        "smhd": (SoundMediaHeader, "smhd", "Sound media header, overall information (sound track only)"),
+        "hmhd": (HintMediaHeader, "hmhd", "Hint media header, overall information (hint track only)"),
+        # nmhd: Null media header, overall information (some
+        # tracks only) (unparsed)
+        "dinf": (AtomList, "dinf", "Data information, container"),
+        "dref": (DataReference, "dref", "Data reference, declares source(s) of media data in track"),
+        "url ": (DataEntryUrl, "url", "URL data reference"),
+        "urn ": (DataEntryUrn, "urn", "URN data reference"),
+        "stbl": (AtomList, "stbl", "Sample table, container for the time/space map"),
+        "stsd": (SampleDescription, "stsd", "Sample descriptions (codec types, initialization etc.)"),
+        "stts": (SampleDecodeTimeTable, "stts", "decoding time-to-sample delta table"),
+        "ctts": (SampleCompositionTimeTable, "ctts", "composition time-to-sample offset table"),
+        "stsc": (SampleToChunkTable, "stsc", "sample-to-chunk, partial data-offset information"),
+        "stsz": (SampleSizeTable, "stsz", "Sample size table (framing)"),
+        "stz2": (CompactSampleSizeTable, "stz2", "Compact sample size table (framing)"),
+        "stco": (ChunkOffsetTable, "stco", "Chunk offset, partial data-offset information"),
+        "co64": (ChunkOffsetTable64, "co64", "64-bit chunk offset"),
+        "stss": (SyncSampleTable, "stss", "Sync sample table (random access points)"),
+        # stsh: shadow sync sample table
+        # padb: sample padding bits
+        # stdp: sample degradation priority
+        # sdtp: independent and disposable samples
+        # sbgp: sample-to-group
+        # sgpd: sample group description
+        # subs: sub-sample information
+        # ctab color table (old QT spec)
+        # mvex: movie extends
+        # mehd: movie extends header
+        # trex: track extends defaults
+        # ipmc: IPMP control
         "moof": (AtomList, "moof", "movie fragment"),
-            "mfhd": (MovieFragmentHeader, "mfhd", "movie fragment header"),
-            # traf: track fragment
-                # tfhd: track fragment header
-                # trun: track fragment run
-                # sdtp: independent and disposable samples
-                # sbgp: sample-to-group
-                # subs: sub-sample information
+        "mfhd": (MovieFragmentHeader, "mfhd", "movie fragment header"),
+        # traf: track fragment
+        # tfhd: track fragment header
+        # trun: track fragment run
+        # sdtp: independent and disposable samples
+        # sbgp: sample-to-group
+        # subs: sub-sample information
         "mfra": (AtomList, "mfra", "movie fragment random access"),
-            "tfra": (TrackFragmentRandomAccess, "tfra", "track fragment random access"),
-            "mfro": (MovieFragmentRandomAccessOffset, "mfro", "movie fragment random access offset"),
+        "tfra": (TrackFragmentRandomAccess, "tfra", "track fragment random access"),
+        "mfro": (MovieFragmentRandomAccessOffset, "mfro", "movie fragment random access offset"),
         # mdat: media data container
         # free: free space (unparsed)
         # skip: free space (unparsed)
         "udta": (AtomList, "udta", "User data"),
         "meta": (META, "meta", "File metadata"),
-            "keys": (KeyList, "keys", "Metadata keys"),
-            ## hdlr
-            ## dinf
-                ## dref: data reference, declares source(s) of metadata items
-            ## ipmc: IPMP control
-            # iloc: item location
-            # ipro: item protection
-                # sinf: protection scheme information
-                    # frma: original format
-                    # imif: IPMP information
-                    # schm: scheme type
-                    # schi: scheme information
-            # iinf: item information
-            # xml : XML container
-            # bxml: binary XML container
-            # pitm: primary item reference
-        ## other tags
+        "keys": (KeyList, "keys", "Metadata keys"),
+        # hdlr
+        # dinf
+        # dref: data reference, declares source(s) of metadata items
+        # ipmc: IPMP control
+        # iloc: item location
+        # ipro: item protection
+        # sinf: protection scheme information
+        # frma: original format
+        # imif: IPMP information
+        # schm: scheme type
+        # schi: scheme information
+        # iinf: item information
+        # xml : XML container
+        # bxml: binary XML container
+        # pitm: primary item reference
+        # other tags
         "ilst": (ItemList, "ilst", "Item list"),
-            "trkn": (AtomList, "trkn", "Metadata: Track number"),
-            "disk": (AtomList, "disk", "Metadata: Disk number"),
-            "tmpo": (AtomList, "tempo", "Metadata: Tempo"),
-            "cpil": (AtomList, "cpil", "Metadata: Compilation"),
-            "gnre": (AtomList, "gnre", "Metadata: Genre"),
-            "\xa9cpy": (AtomList, "copyright", "Metadata: Copyright statement"),
-            "\xa9day": (AtomList, "date", "Metadata: Date of content creation"),
-            "\xa9dir": (AtomList, "director", "Metadata: Movie director"),
-            "\xa9ed1": (AtomList, "edit1", "Metadata: Edit date and description (1)"),
-            "\xa9ed2": (AtomList, "edit2", "Metadata: Edit date and description (2)"),
-            "\xa9ed3": (AtomList, "edit3", "Metadata: Edit date and description (3)"),
-            "\xa9ed4": (AtomList, "edit4", "Metadata: Edit date and description (4)"),
-            "\xa9ed5": (AtomList, "edit5", "Metadata: Edit date and description (5)"),
-            "\xa9ed6": (AtomList, "edit6", "Metadata: Edit date and description (6)"),
-            "\xa9ed7": (AtomList, "edit7", "Metadata: Edit date and description (7)"),
-            "\xa9ed8": (AtomList, "edit8", "Metadata: Edit date and description (8)"),
-            "\xa9ed9": (AtomList, "edit9", "Metadata: Edit date and description (9)"),
-            "\xa9fmt": (AtomList, "format", "Metadata: Movie format (CGI, digitized, etc.)"),
-            "\xa9inf": (AtomList, "info", "Metadata: Information about the movie"),
-            "\xa9prd": (AtomList, "producer", "Metadata: Movie producer"),
-            "\xa9prf": (AtomList, "performers", "Metadata: Performer names"),
-            "\xa9req": (AtomList, "requirements", "Metadata: Special hardware and software requirements"),
-            "\xa9src": (AtomList, "source", "Metadata: Credits for those who provided movie source content"),
-            "\xa9nam": (AtomList, "name", "Metadata: Name of song or video"),
-            "\xa9des": (AtomList, "description", "Metadata: File description"),
-            "\xa9cmt": (AtomList, "comment", "Metadata: General comment"),
-            "\xa9alb": (AtomList, "album", "Metadata: Album name"),
-            "\xa9gen": (AtomList, "genre", "Metadata: Custom genre"),
-            "\xa9ART": (AtomList, "artist", "Metadata: Artist name"),
-            "\xa9too": (AtomList, "encoder", "Metadata: Encoder"),
-            "\xa9wrt": (AtomList, "writer", "Metadata: Writer"),
-            "covr": (AtomList, "cover", "Metadata: Cover art"),
-            "----": (AtomList, "misc", "Metadata: Miscellaneous"),
+        "trkn": (AtomList, "trkn", "Metadata: Track number"),
+        "disk": (AtomList, "disk", "Metadata: Disk number"),
+        "tmpo": (AtomList, "tempo", "Metadata: Tempo"),
+        "cpil": (AtomList, "cpil", "Metadata: Compilation"),
+        "gnre": (AtomList, "gnre", "Metadata: Genre"),
+        "\xa9cpy": (AtomList, "copyright", "Metadata: Copyright statement"),
+        "\xa9day": (AtomList, "date", "Metadata: Date of content creation"),
+        "\xa9dir": (AtomList, "director", "Metadata: Movie director"),
+        "\xa9ed1": (AtomList, "edit1", "Metadata: Edit date and description (1)"),
+        "\xa9ed2": (AtomList, "edit2", "Metadata: Edit date and description (2)"),
+        "\xa9ed3": (AtomList, "edit3", "Metadata: Edit date and description (3)"),
+        "\xa9ed4": (AtomList, "edit4", "Metadata: Edit date and description (4)"),
+        "\xa9ed5": (AtomList, "edit5", "Metadata: Edit date and description (5)"),
+        "\xa9ed6": (AtomList, "edit6", "Metadata: Edit date and description (6)"),
+        "\xa9ed7": (AtomList, "edit7", "Metadata: Edit date and description (7)"),
+        "\xa9ed8": (AtomList, "edit8", "Metadata: Edit date and description (8)"),
+        "\xa9ed9": (AtomList, "edit9", "Metadata: Edit date and description (9)"),
+        "\xa9fmt": (AtomList, "format", "Metadata: Movie format (CGI, digitized, etc.)"),
+        "\xa9inf": (AtomList, "info", "Metadata: Information about the movie"),
+        "\xa9prd": (AtomList, "producer", "Metadata: Movie producer"),
+        "\xa9prf": (AtomList, "performers", "Metadata: Performer names"),
+        "\xa9req": (AtomList, "requirements", "Metadata: Special hardware and software requirements"),
+        "\xa9src": (AtomList, "source", "Metadata: Credits for those who provided movie source content"),
+        "\xa9nam": (AtomList, "name", "Metadata: Name of song or video"),
+        "\xa9des": (AtomList, "description", "Metadata: File description"),
+        "\xa9cmt": (AtomList, "comment", "Metadata: General comment"),
+        "\xa9alb": (AtomList, "album", "Metadata: Album name"),
+        "\xa9gen": (AtomList, "genre", "Metadata: Custom genre"),
+        "\xa9ART": (AtomList, "artist", "Metadata: Artist name"),
+        "\xa9too": (AtomList, "encoder", "Metadata: Encoder"),
+        "\xa9wrt": (AtomList, "writer", "Metadata: Writer"),
+        "covr": (AtomList, "cover", "Metadata: Cover art"),
+        "----": (AtomList, "misc", "Metadata: Miscellaneous"),
         "tags": (AtomList, "tags", "File tags"),
         "tseg": (AtomList, "tseg", "tseg"),
         "chpl": (NeroChapters, "chpl", "Nero chapter data"),
     }
-    tag_handler = [ item[0] for item in tag_info ]
-    tag_desc = [ item[1] for item in tag_info ]
+    tag_handler = [item[0] for item in tag_info]
+    tag_desc = [item[1] for item in tag_info]
 
     def createFields(self):
         yield UInt32(self, "size")
@@ -815,14 +897,15 @@ class Atom(FieldSet):
         if size > 0:
             if tag in self.tag_info:
                 handler, name, desc = self.tag_info[tag]
-                yield handler(self, name, desc, size=size*8)
+                yield handler(self, name, desc, size=size * 8)
             else:
                 yield RawBytes(self, "data", size)
 
     def createDescription(self):
         if self["tag"].value == "uuid":
-            return "Atom: uuid: "+self["usertag"].value
+            return "Atom: uuid: " + self["usertag"].value
         return "Atom: %s" % self["tag"].value
+
 
 class MovFile(Parser):
     PARSER_TAGS = {
@@ -830,8 +913,8 @@ class MovFile(Parser):
         "category": "video",
         "file_ext": ("mov", "qt", "mp4", "m4v", "m4a", "m4p", "m4b"),
         "mime": ("video/quicktime", 'video/mp4'),
-        "min_size": 8*8,
-        "magic": ((b"moov", 4*8),),
+        "min_size": 8 * 8,
+        "magic": ((b"moov", 4 * 8),),
         "description": "Apple QuickTime movie"
     }
     BRANDS = {
@@ -847,14 +930,14 @@ class MovFile(Parser):
     def __init__(self, *args, **kw):
         Parser.__init__(self, *args, **kw)
 
-    is_mpeg4 = property(lambda self:self.mime_type=='video/mp4')
+    is_mpeg4 = property(lambda self: self.mime_type == 'video/mp4')
 
     def validate(self):
         # TODO: Write better code, erk!
         size = self.stream.readBits(0, 32, self.endian)
         if size < 8:
             return "Invalid first atom size"
-        tag = self.stream.readBytes(4*8, 4)
+        tag = self.stream.readBytes(4 * 8, 4)
         if tag not in (b"ftyp", b"moov", b"free"):
             return "Unknown MOV file type"
         return True
@@ -880,4 +963,3 @@ class MovFile(Parser):
         except MissingField:
             pass
         return 'video/quicktime'
-

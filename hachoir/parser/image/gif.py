@@ -11,10 +11,10 @@ Author: Victor Stinner, Robert Xiao
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, ParserError,
-    Enum, UInt8, UInt16,
-    Bit, Bits, NullBytes,
-    String, PascalString8, Character,
-    NullBits, RawBytes)
+                           Enum, UInt8, UInt16,
+                           Bit, Bits, NullBytes,
+                           String, PascalString8, Character,
+                           NullBits, RawBytes)
 from hachoir.parser.image.common import PaletteRGB
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.stream import StringInputStream
@@ -26,7 +26,9 @@ MAX_WIDTH = 6000
 MAX_HEIGHT = MAX_WIDTH
 MAX_FILE_SIZE = 100 * 1024 * 1024
 
+
 class FragmentGroup:
+
     def __init__(self, parser):
         self.items = []
         self.parser = parser
@@ -39,16 +41,19 @@ class FragmentGroup:
         # FIXME: Use lazy stream creation
         data = []
         for item in self.items:
-            data.append( item["rawdata"].value )
+            data.append(item["rawdata"].value)
         data = "".join(data)
 
         # FIXME: Use smarter code to send arguments
-        self.args["startbits"] = self.items[0].parent["lzw_min_code_size"].value
+        self.args["startbits"] = self.items[
+            0].parent["lzw_min_code_size"].value
         tags = {"class": self.parser, "args": self.args}
         tags = iter(tags.items())
         return StringInputStream(data, "<fragment group>", tags=tags)
 
+
 class CustomFragment(FieldSet):
+
     def __init__(self, parent, name, size, parser, description=None, group=None):
         FieldSet.__init__(self, parent, name, description, size=size)
         if not group:
@@ -63,6 +68,7 @@ class CustomFragment(FieldSet):
     def _createInputStream(self, **args):
         return self.group.createInputStream()
 
+
 def rle_repr(l):
     """Run-length encode a list into an "eval"-able form
 
@@ -75,13 +81,13 @@ def rle_repr(l):
     def add_rle(previous, runlen, result):
         if isinstance(previous, (list, tuple)):
             previous = rle_repr(previous)
-        if runlen>1:
-            result.append('[%s]*%i'%(previous, runlen))
+        if runlen > 1:
+            result.append('[%s]*%i' % (previous, runlen))
         else:
             if result and '*' not in result[-1]:
-                result[-1] = '[%s, %s]'%(result[-1][1:-1], previous)
+                result[-1] = '[%s, %s]' % (result[-1][1:-1], previous)
             else:
-                result.append('[%s]'%previous)
+                result.append('[%s]' % previous)
     iterable = iter(l)
     runlen = 1
     result = []
@@ -100,8 +106,10 @@ def rle_repr(l):
     add_rle(previous, runlen, result)
     return ' + '.join(result)
 
+
 class GifImageBlock(Parser):
     endian = LITTLE_ENDIAN
+
     def createFields(self):
         dictionary = {}
         self.nbits = self.startbits
@@ -115,12 +123,12 @@ class GifImageBlock(Parser):
                 self.nbits += 1
             code = Bits(self, "code[]", self.nbits)
             if code.value == CLEAR_CODE:
-                if compress_code == 2**(self.nbits-1):
+                if compress_code == 2**(self.nbits - 1):
                     # this fixes a bizarre edge case where the reset code could
                     # appear just after the bits incremented. Apparently, the
                     # correct behaviour is to express the reset code with the
                     # old number of bits, not the new...
-                    code = Bits(self, "code[]", self.nbits-1)
+                    code = Bits(self, "code[]", self.nbits - 1)
                 self.nbits = self.startbits + 1
                 dictionary = {}
                 compress_code = CLEAR_CODE + 2
@@ -132,7 +140,7 @@ class GifImageBlock(Parser):
                 code._description = "End of Information Code (LZW code %i)" % code.value
                 yield code
                 break
-            if code.value < CLEAR_CODE: # literal
+            if code.value < CLEAR_CODE:  # literal
                 if obuf:
                     chain = obuf + [code.value]
                     dictionary[compress_code] = chain
@@ -143,21 +151,25 @@ class GifImageBlock(Parser):
             elif code.value >= CLEAR_CODE + 2:
                 if code.value in dictionary:
                     chain = dictionary[code.value]
-                    code._description = "Compression Code %i (found in dictionary as %s)" % (code.value, rle_repr(chain))
+                    code._description = "Compression Code %i (found in dictionary as %s)" % (
+                        code.value, rle_repr(chain))
                 else:
                     chain = obuf + [obuf[0]]
-                    code._description = "Compression Code %i (not found in dictionary; guessed to be %s)" % (code.value, rle_repr(chain))
+                    code._description = "Compression Code %i (not found in dictionary; guessed to be %s)" % (
+                        code.value, rle_repr(chain))
                 dictionary[compress_code] = obuf + [chain[0]]
                 compress_code += 1
                 obuf = chain
                 output += chain
-            code._description += "; Current Decoded Length %i"%len(output)
+            code._description += "; Current Decoded Length %i" % len(output)
             yield code
         padding = paddingSize(self.current_size, 8)
         if padding:
             yield NullBits(self, "padding[]", padding)
 
+
 class Image(FieldSet):
+
     def createFields(self):
         yield UInt16(self, "left", "Left")
         yield UInt16(self, "top", "Top")
@@ -180,7 +192,8 @@ class Image(FieldSet):
             size = UInt8(self, "block_size")
             if size.value == 0:
                 break
-            block = CustomFragment(self, "image_block[]", None, GifImageBlock, "GIF Image Block", group)
+            block = CustomFragment(
+                self, "image_block[]", None, GifImageBlock, "GIF Image Block", group)
             group = block.group
             yield block
         yield NullBytes(self, "terminator", 1, "Terminator (0)")
@@ -201,6 +214,7 @@ NETSCAPE_CODE = {
     1: "Loop count",
 }
 
+
 def parseApplicationExtension(parent):
     yield PascalString8(parent, "app_name", "Application name")
     while True:
@@ -218,6 +232,7 @@ def parseApplicationExtension(parent):
             yield RawBytes(parent, "raw[]", size.value)
     yield NullBytes(parent, "terminator", 1, "Terminator (0)")
 
+
 def parseGraphicControl(parent):
     yield UInt8(parent, "size", "Block size (4)")
 
@@ -232,12 +247,14 @@ def parseGraphicControl(parent):
     yield UInt8(parent, "transp", "Transparent color index")
     yield NullBytes(parent, "terminator", 1, "Terminator (0)")
 
+
 def parseComments(parent):
     while True:
         field = PascalString8(parent, "comment[]", strip=" \0\r\n\t")
         yield field
         if field.length == 0:
             break
+
 
 def parseTextExtension(parent):
     yield UInt8(parent, "block_size", "Block Size")
@@ -255,6 +272,7 @@ def parseTextExtension(parent):
         if field.length == 0:
             break
 
+
 def defaultExtensionParser(parent):
     while True:
         size = UInt8(parent, "size[]", "Size (in bytes)")
@@ -264,6 +282,7 @@ def defaultExtensionParser(parent):
         else:
             break
 
+
 class Extension(FieldSet):
     ext_code = {
         0xf9: ("graphic_ctl[]", parseGraphicControl, "Graphic control"),
@@ -271,6 +290,7 @@ class Extension(FieldSet):
         0xff: ("app_ext[]", parseApplicationExtension, "Application extension"),
         0x01: ("text_ext[]", parseTextExtension, "Plain text extension")
     }
+
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
         code = self["code"].value
@@ -286,7 +306,9 @@ class Extension(FieldSet):
     def createDescription(self):
         return "Extension: function %s" % self["func"].display
 
+
 class ScreenDescriptor(FieldSet):
+
     def createFields(self):
         yield UInt16(self, "width", "Width")
         yield UInt16(self, "height", "Height")
@@ -297,15 +319,17 @@ class ScreenDescriptor(FieldSet):
         yield UInt8(self, "background", "Background color")
         field = UInt8(self, "pixel_aspect_ratio")
         if field.value:
-            field._description = "Pixel aspect ratio: %f (stored as %i)"%((field.value + 15)/64., field.value)
+            field._description = "Pixel aspect ratio: %f (stored as %i)" % (
+                (field.value + 15) / 64., field.value)
         else:
             field._description = "Pixel aspect ratio: not specified"
         yield field
 
     def createDescription(self):
-        colors = 1 << (self["size_global_map"].value+1)
+        colors = 1 << (self["size_global_map"].value + 1)
         return "Screen descriptor: %ux%u pixels %u colors" \
             % (self["width"].value, self["height"].value, colors)
+
 
 class GifFile(Parser):
     endian = LITTLE_ENDIAN
@@ -319,7 +343,8 @@ class GifFile(Parser):
         "category": "image",
         "file_ext": ("gif",),
         "mime": ("image/gif",),
-        "min_size": (6 + 7 + 1 + 9)*8,   # signature + screen + separator + image
+        # signature + screen + separator + image
+        "min_size": (6 + 7 + 1 + 9) * 8,
         "magic": ((b"GIF87a", 0), (b"GIF89a", 0)),
         "description": "GIF picture"
     }
@@ -342,7 +367,7 @@ class GifFile(Parser):
 
         yield ScreenDescriptor(self, "screen")
         if self["screen/global_map"].value:
-            bpp = (self["screen/size_global_map"].value+1)
+            bpp = (self["screen/size_global_map"].value + 1)
             yield PaletteRGB(self, "color_map", 1 << bpp, "Color map")
             self.color_map = self["color_map"]
         else:
@@ -350,7 +375,8 @@ class GifFile(Parser):
 
         self.images = []
         while True:
-            code = Enum(Character(self, "separator[]", "Separator code"), self.separator_name)
+            code = Enum(Character(self, "separator[]",
+                                  "Separator code"), self.separator_name)
             yield code
             code = code.value
             if code == "!":
@@ -361,12 +387,13 @@ class GifFile(Parser):
                 # GIF Terminator
                 break
             else:
-                raise ParserError("Wrong GIF image separator: 0x%02X" % ord(code))
+                raise ParserError(
+                    "Wrong GIF image separator: 0x%02X" % ord(code))
 
     def createContentSize(self):
         field = self["image[0]"]
         start = field.absolute_address + field.size
-        end = start + MAX_FILE_SIZE*8
+        end = start + MAX_FILE_SIZE * 8
         pos = self.stream.searchBytes(b"\0;", start, end)
         if pos:
             return pos + 16

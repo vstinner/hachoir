@@ -12,6 +12,7 @@ class EditableField(FakeField):
     """
 
     _is_altered = False
+
     def __init__(self, parent, name, value=None):
         FakeField.__init__(self, parent, name)
         self._value = value
@@ -25,8 +26,10 @@ class EditableField(FakeField):
 
     def _computeSize(self):
         raise NotImplementedError()
+
     def _getValue(self):
         return self._value
+
     def _setValue(self, value):
         self._value = value
 
@@ -35,6 +38,7 @@ class EditableField(FakeField):
             return self._getValue()
         else:
             return FakeField._getValue(self)
+
     def _propSetValue(self, value):
         self._setValue(value)
         self._is_altered = True
@@ -75,6 +79,7 @@ class EditableFixedField(EditableField):
 
 
 class EditableBits(EditableFixedField):
+
     def __init__(self, parent, name, *args):
         if args:
             if len(args) != 2:
@@ -95,7 +100,7 @@ class EditableBits(EditableFixedField):
     def _setValue(self, value):
         if not(0 <= value < (1 << self._size)):
             raise ValueError("Invalid value, must be in range %s..%s"
-                % (0, (1 << self._size) - 1))
+                             % (0, (1 << self._size) - 1))
         self._value = value
 
     def _write(self, output):
@@ -103,9 +108,11 @@ class EditableBits(EditableFixedField):
 
 
 class EditableBytes(EditableField):
+
     def _setValue(self, value):
-        if not value: raise ValueError(
-            "Unable to set empty string to a EditableBytes field")
+        if not value:
+            raise ValueError(
+                "Unable to set empty string to a EditableBytes field")
         self._value = value
 
     def _computeSize(self):
@@ -117,9 +124,9 @@ class EditableBytes(EditableField):
 
 class EditableString(EditableField):
     MAX_SIZE = {
-        "Pascal8": (1 << 8)-1,
-        "Pascal16": (1 << 16)-1,
-        "Pascal32": (1 << 32)-1,
+        "Pascal8": (1 << 8) - 1,
+        "Pascal16": (1 << 16) - 1,
+        "Pascal32": (1 << 32) - 1,
     }
 
     def __init__(self, parent, name, *args, **kw):
@@ -157,7 +164,7 @@ class EditableString(EditableField):
         self._value = value
 
     def _computeSize(self):
-        return (self._prefix_size + len(self._value) + len(self._suffix_str))*8
+        return (self._prefix_size + len(self._value) + len(self._suffix_str)) * 8
 
     def _write(self, output):
         if self._format in GenericString.SUFFIX_FORMAT:
@@ -168,11 +175,13 @@ class EditableString(EditableField):
         else:
             assert self._format in GenericString.PASCAL_FORMATS
             size = GenericString.PASCAL_FORMATS[self._format]
-            output.writeInteger(len(self._value), False, size, self._parent.endian)
+            output.writeInteger(len(self._value), False,
+                                size, self._parent.endian)
             output.writeBytes(self._value)
 
 
 class EditableCharacter(EditableFixedField):
+
     def __init__(self, parent, name, *args):
         if args:
             if len(args) != 3:
@@ -199,14 +208,14 @@ class EditableCharacter(EditableFixedField):
 
 class EditableInteger(EditableFixedField):
     VALID_VALUE_SIGNED = {
-        8: (-(1 << 8), (1 << 8)-1),
-        16: (-(1 << 15), (1 << 15)-1),
-        32: (-(1 << 31), (1 << 31)-1),
+        8: (-(1 << 8), (1 << 8) - 1),
+        16: (-(1 << 15), (1 << 15) - 1),
+        32: (-(1 << 31), (1 << 31) - 1),
     }
     VALID_VALUE_UNSIGNED = {
-        8: (0, (1 << 8)-1),
-        16: (0, (1 << 16)-1),
-        32: (0, (1 << 32)-1)
+        8: (0, (1 << 8) - 1),
+        16: (0, (1 << 16) - 1),
+        32: (0, (1 << 32) - 1)
     }
 
     def __init__(self, parent, name, *args):
@@ -236,12 +245,12 @@ class EditableInteger(EditableFixedField):
         minval, maxval = valid[self._size]
         if not(minval <= value <= maxval):
             raise ValueError("Invalid value, must be in range %s..%s"
-                % (minval, maxval))
+                             % (minval, maxval))
         self._value = value
 
     def _write(self, output):
         output.writeInteger(
-            self.value, self._signed, self._size//8, self._parent.endian)
+            self.value, self._signed, self._size // 8, self._parent.endian)
 
 
 def createEditableField(fieldset, field):
@@ -258,4 +267,3 @@ def createEditableField(fieldset, field):
     else:
         cls = FakeField
     return cls(fieldset, field.name)
-

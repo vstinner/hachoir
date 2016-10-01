@@ -66,5 +66,4 @@ class FakeField(object):
         if size % 8:
             output.copyBitsFrom(stream, addr, size, input.endian)
         else:
-            output.copyBytesFrom(stream, addr, size//8)
-
+            output.copyBytesFrom(stream, addr, size // 8)

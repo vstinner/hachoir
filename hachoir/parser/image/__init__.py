@@ -9,4 +9,3 @@ from hachoir.parser.image.tga import TargaFile
 from hachoir.parser.image.tiff import TiffFile
 from hachoir.parser.image.wmf import WMF_File
 from hachoir.parser.image.xcf import XcfFile
-

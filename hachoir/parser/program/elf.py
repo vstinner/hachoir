@@ -7,10 +7,11 @@ Creation date: 08 may 2006
 
 from hachoir.parser import HachoirParser
 from hachoir.field import (RootSeekableFieldSet, FieldSet, ParserError, Bit, NullBits, RawBits,
-    UInt8, UInt16, UInt32, UInt64, Enum,
-    String, RawBytes, Bytes)
+                           UInt8, UInt16, UInt32, UInt64, Enum,
+                           String, RawBytes, Bytes)
 from hachoir.core.text_handler import textHandler, hexadecimal
 from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
+
 
 class ElfHeader(FieldSet):
     LITTLE_ENDIAN_ID = 1
@@ -65,11 +66,11 @@ class ElfHeader(FieldSet):
     }
     TYPE_NAME = {
         # e_type, ET_ defines
-             0: "No file type",
-             1: "Relocatable file",
-             2: "Executable file",
-             3: "Shared object file",
-             4: "Core file",
+        0: "No file type",
+        1: "Relocatable file",
+        2: "Executable file",
+        3: "Shared object file",
+        4: "Core file",
         0xFF00: "Processor-specific (0xFF00)",
         0xFFFF: "Processor-specific (0xFFFF)",
     }
@@ -133,7 +134,9 @@ class ElfHeader(FieldSet):
             return "Unknown endian (%s)" % self["endian"].value
         return ""
 
+
 class SectionFlags(FieldSet):
+
     def createFields(self):
         if self.root.endian == BIG_ENDIAN:
             if self.root.is64bit:
@@ -156,15 +159,18 @@ class SectionFlags(FieldSet):
             if self.root.is64bit:
                 yield RawBits(self, "reserved[]", 32)
 
+
 class SymbolStringTableOffset(UInt32):
+
     def createDisplay(self):
         section_index = self['/header/shstrndx'].value
-        section = self['/section['+str(section_index)+']']
+        section = self['/section[' + str(section_index) + ']']
         text = section.value[self.value:]
-        return text.split('\0',1)[0]
+        return text.split('\0', 1)[0]
+
 
 class SectionHeader32(FieldSet):
-    static_size = 40*8
+    static_size = 40 * 8
     TYPE_NAME = {
         # sh_type, SHT_ defines
         0: "Inactive",
@@ -177,8 +183,8 @@ class SectionHeader32(FieldSet):
         7: "Note section",
         8: "Block started by symbol (BSS) or No space section",
         9: "Relocation section without addends",
-        10:"Reserved - purpose unknown",
-        11:"Dynamic symbol table section",
+        10: "Reserved - purpose unknown",
+        11: "Dynamic symbol table section",
     }
 
     def createFields(self):
@@ -197,8 +203,9 @@ class SectionHeader32(FieldSet):
         return "Section header (name: %s, type: %s)" % \
             (self["name"].display, self["type"].display)
 
+
 class SectionHeader64(SectionHeader32):
-    static_size = 64*8
+    static_size = 64 * 8
 
     def createFields(self):
         yield SymbolStringTableOffset(self, "name", "Section name (index into section header string table)")
@@ -212,9 +219,10 @@ class SectionHeader64(SectionHeader32):
         yield UInt64(self, "addr_align", "Address alignment (bytes)")
         yield UInt64(self, "entry_size", "Size of each entry in section")
 
+
 class ProgramFlags(FieldSet):
     static_size = 32
-    FLAGS = (('pf_r','readable'),('pf_w','writable'),('pf_x','executable'))
+    FLAGS = (('pf_r', 'readable'), ('pf_w', 'writable'), ('pf_x', 'executable'))
 
     def createFields(self):
         if self.root.endian == BIG_ENDIAN:
@@ -227,11 +235,12 @@ class ProgramFlags(FieldSet):
             yield NullBits(self, "padding[]", 29)
 
     def createDescription(self):
-        attribs=[]
+        attribs = []
         for fld, desc in self.FLAGS:
             if self[fld].value:
                 attribs.append(desc)
-        return 'Segment is '+', '.join(attribs)
+        return 'Segment is ' + ', '.join(attribs)
+
 
 class ProgramHeader32(FieldSet):
     TYPE_NAME = {
@@ -246,7 +255,7 @@ class ProgramHeader32(FieldSet):
         7: "Thread Local Storage segment",
         0x70000000: "MIPS_REGINFO",
     }
-    static_size = 32*8
+    static_size = 32 * 8
 
     def createFields(self):
         yield Enum(UInt32(self, "type", "Segment type"), ProgramHeader32.TYPE_NAME)
@@ -261,8 +270,9 @@ class ProgramHeader32(FieldSet):
     def createDescription(self):
         return "Program Header (%s)" % self["type"].display
 
+
 class ProgramHeader64(ProgramHeader32):
-    static_size = 56*8
+    static_size = 56 * 8
 
     def createFields(self):
         yield Enum(UInt32(self, "type", "Segment type"), ProgramHeader32.TYPE_NAME)
@@ -274,13 +284,14 @@ class ProgramHeader64(ProgramHeader32):
         yield UInt64(self, "mem_size", "Memory size")
         yield UInt64(self, "align", "Alignment padding")
 
+
 class ElfFile(HachoirParser, RootSeekableFieldSet):
     MAGIC = b"\x7FELF"
     PARSER_TAGS = {
         "id": "elf",
         "category": "program",
         "file_ext": ("so", ""),
-        "min_size": 52*8,  # At least one program header
+        "min_size": 52 * 8,  # At least one program header
         "mime": (
             "application/x-executable",
             "application/x-object",
@@ -293,7 +304,8 @@ class ElfFile(HachoirParser, RootSeekableFieldSet):
     endian = LITTLE_ENDIAN
 
     def __init__(self, stream, **args):
-        RootSeekableFieldSet.__init__(self, None, "root", stream, None, stream.askSize(self))
+        RootSeekableFieldSet.__init__(
+            self, None, "root", stream, None, stream.askSize(self))
         HachoirParser.__init__(self, stream, **args)
 
     def validate(self):
@@ -306,7 +318,7 @@ class ElfFile(HachoirParser, RootSeekableFieldSet):
 
     def createFields(self):
         # Choose the right endian depending on endian specified in header
-        if self.stream.readBits(5*8, 8, BIG_ENDIAN) == ElfHeader.BIG_ENDIAN_ID:
+        if self.stream.readBits(5 * 8, 8, BIG_ENDIAN) == ElfHeader.BIG_ENDIAN_ID:
             self.endian = BIG_ENDIAN
         else:
             self.endian = LITTLE_ENDIAN
@@ -330,12 +342,11 @@ class ElfFile(HachoirParser, RootSeekableFieldSet):
                 yield SectionHeader32(self, "section_header[]")
 
         for index in range(self["header/shnum"].value):
-            field = self["section_header["+str(index)+"]"]
+            field = self["section_header[" + str(index) + "]"]
             if field['size'].value != 0:
                 self.seekByte(field['LMA'].value, relative=False)
-                yield RawBytes(self, "section["+str(index)+"]", field['size'].value)
+                yield RawBytes(self, "section[" + str(index) + "]", field['size'].value)
 
     def createDescription(self):
         return "ELF Unix/BSD program/library: %s" % (
             self["header/class"].display)
-

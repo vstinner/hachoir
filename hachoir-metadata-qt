@@ -3,7 +3,7 @@ from hachoir.metadata.qt.dialog_ui import Ui_Form
 from PyQt4.QtCore import SIGNAL
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import (QApplication, QDialog,
-    QTableWidgetItem, QFileDialog, QMessageBox)
+                         QTableWidgetItem, QFileDialog, QMessageBox)
 from sys import argv, exit
 from os.path import basename, dirname
 from hachoir.core import config
@@ -23,12 +23,16 @@ from fnmatch import fnmatch
 from datetime import datetime
 import codecs
 
+
 class CustomTableWidgetItem(QTableWidgetItem):
-    def __init__(self, parent = None):
+
+    def __init__(self, parent=None):
         super(CustomTableWidgetItem, self).__init__(parent)
-        self.setFlags(Qt.ItemIsSelectable |Qt.ItemIsEnabled)
+        self.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+
 
 class MetadataError(Exception):
+
     def __init__(self, message):
         self.unicode_message = message
         bytes_message = message.encode("ASCII", "replace")
@@ -37,7 +41,9 @@ class MetadataError(Exception):
     def __unicode__(self):
         return self.unicode_message
 
+
 class File:
+
     def __init__(self, filename, realname):
         self.name = filename
         if realname:
@@ -56,9 +62,12 @@ class File:
             raise MetadataError("Metadata extraction error: %s" % str(err))
         if not self.metadata:
             file_type = self.parser.mime_type
-            raise MetadataError("Unable to extract metadata from file of type %s" % file_type)
+            raise MetadataError(
+                "Unable to extract metadata from file of type %s" % file_type)
+
 
 class Metadata(QDialog, Ui_Form):
+
     def __init__(self, application):
         QDialog.__init__(self)
         self.application = application
@@ -79,11 +88,11 @@ class Metadata(QDialog, Ui_Form):
 
     def open(self):
         filename = QFileDialog.getOpenFileName(
-            self, #parent
-            "Choose a file to open", #caption
-            self.current_dir, #dir name
-            "", #filter
-            "Any type" #filter set
+            self,  # parent
+            "Choose a file to open",  # caption
+            self.current_dir,  # dir name
+            "",  # filter
+            "Any type"  # filter set
         )
         if not filename:
             return
@@ -150,6 +159,7 @@ class Metadata(QDialog, Ui_Form):
             index = self.files_combo.count() - 1
             self.files_combo.setCurrentIndex(index)
 
+
 def main():
     app = QApplication(argv)
     metadata = Metadata(app)
@@ -163,4 +173,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

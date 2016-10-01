@@ -1,5 +1,5 @@
 from hachoir.field import (MissingField, BasicFieldSet, Field, ParserError,
-    createRawField, createNullField, createPaddingField, FakeArray)
+                           createRawField, createNullField, createPaddingField, FakeArray)
 from hachoir.core.dict import Dict, UniqKeyError
 from hachoir.core.tools import lowerBound, makeUnicode
 import hachoir.core.config as config
@@ -93,7 +93,8 @@ class GenericFieldSet(BasicFieldSet):
 
     def __str__(self):
         return '<%s path=%s, current_size=%s, current length=%s>' % \
-            (self.__class__.__name__, self.path, self._current_size, len(self._fields))
+            (self.__class__.__name__, self.path,
+             self._current_size, len(self._fields))
 
     def __len__(self):
         """
@@ -112,14 +113,16 @@ class GenericFieldSet(BasicFieldSet):
         if self._size is None:
             self._feedAll()
         return self._size
-    size = property(_getSize, doc="Size in bits, may create all fields to get size")
+    size = property(
+        _getSize, doc="Size in bits, may create all fields to get size")
 
     def _getCurrentSize(self):
         assert not(self.done)
         return self._current_size
     current_size = property(_getCurrentSize)
 
-    eof = property(lambda self: self._checkSize(self._current_size + 1, True) < 0)
+    eof = property(lambda self: self._checkSize(
+        self._current_size + 1, True) < 0)
 
     def _checkSize(self, size, strict):
         field = self
@@ -147,7 +150,7 @@ class GenericFieldSet(BasicFieldSet):
         """
         if not issubclass(field.__class__, Field):
             raise ParserError("Field type (%s) is not a subclass of 'Field'!"
-                % field.__class__.__name__)
+                              % field.__class__.__name__)
         assert isinstance(field._name, str)
         if field._name.endswith("[]"):
             self.setUniqueFieldName(field)
@@ -157,7 +160,7 @@ class GenericFieldSet(BasicFieldSet):
         # required for the msoffice parser
         if field._address != self._current_size:
             self.warning("Fix address of %s to %s (was %s)" %
-                (field.path, self._current_size, field._address))
+                         (field.path, self._current_size, field._address))
             field._address = self._current_size
 
         ask_stop = False
@@ -167,11 +170,13 @@ class GenericFieldSet(BasicFieldSet):
             field_size = field.size
         except Exception as err:
             if field.is_field_set and field.current_length and field.eof:
-                self.warning("Error when getting size of '%s': %s" % (field.name, err))
+                self.warning(
+                    "Error when getting size of '%s': %s" % (field.name, err))
                 field._stopFeeding()
                 ask_stop = True
             else:
-                self.warning("Error when getting size of '%s': delete it" % field.name)
+                self.warning(
+                    "Error when getting size of '%s': delete it" % field.name)
                 self.__is_feeding = False
                 raise
         self.__is_feeding = False
@@ -221,7 +226,7 @@ class GenericFieldSet(BasicFieldSet):
             if key < 0:
                 raise KeyError("Key must be positive!")
             if not const:
-                self.readFirstFields(key+1)
+                self.readFirstFields(key + 1)
             if len(self._fields.values) <= key:
                 raise MissingField(self, key)
             return self._fields.values[key]
@@ -272,7 +277,7 @@ class GenericFieldSet(BasicFieldSet):
 
         # If last field is too big, delete it
         while self._size < self._current_size:
-            field = self._deleteField(len(self._fields)-1)
+            field = self._deleteField(len(self._fields) - 1)
             message.append("delete field %s" % field.path)
         assert self._current_size <= self._size
 
@@ -318,9 +323,9 @@ class GenericFieldSet(BasicFieldSet):
         Return the field if it was found, None else
         """
         if self.__is_feeding \
-        or (self._field_generator and self._field_generator.gi_running):
+                or (self._field_generator and self._field_generator.gi_running):
             self.warning("Unable to get %s (and generator is already running)"
-                % field_name)
+                         % field_name)
             return None
         try:
             while True:
@@ -378,7 +383,7 @@ class GenericFieldSet(BasicFieldSet):
                 if done == len(self._fields):
                     if self._field_generator is None:
                         break
-                    self._addField( next(self._field_generator) )
+                    self._addField(next(self._field_generator))
                 for field in self._fields.values[done:]:
                     yield field
                     done += 1
@@ -407,7 +412,7 @@ class GenericFieldSet(BasicFieldSet):
     # FieldSet_SeekUtility
     #
     def seekBit(self, address, name="padding[]",
-    description=None, relative=True, null=False):
+                description=None, relative=True, null=False):
         """
         Create a field to seek to specified address,
         or None if it's not needed.
@@ -441,14 +446,15 @@ class GenericFieldSet(BasicFieldSet):
         # TODO: Check in self and not self.field
         # Problem is that "generator is already executing"
         if name not in self._fields:
-            raise ParserError("Unable to replace %s: field doesn't exist!" % name)
+            raise ParserError(
+                "Unable to replace %s: field doesn't exist!" % name)
         assert 1 <= len(new_fields)
         old_field = self[name]
-        total_size = sum( (field.size for field in new_fields) )
+        total_size = sum((field.size for field in new_fields))
         if old_field.size != total_size:
             raise ParserError("Unable to replace %s: "
-                "new field(s) hasn't same size (%u bits instead of %u bits)!"
-                % (name, total_size, old_field.size))
+                              "new field(s) hasn't same size (%u bits instead of %u bits)!"
+                              % (name, total_size, old_field.size))
         field = new_fields[0]
         if field._name.endswith("[]"):
             self.setUniqueFieldName(field)
@@ -460,7 +466,7 @@ class GenericFieldSet(BasicFieldSet):
         self._fields.replace(name, field.name, field)
         self.raiseEvent("field-replaced", old_field, field)
         if 1 < len(new_fields):
-            index = self._fields.index(new_fields[0].name)+1
+            index = self._fields.index(new_fields[0].name) + 1
             address = field.address + field.size
             for field in new_fields[1:]:
                 if field._name.endswith("[]"):
@@ -482,7 +488,8 @@ class GenericFieldSet(BasicFieldSet):
         if feed and self._field_generator is not None:
             self._feedAll()
         if address < self._current_size:
-            i = lowerBound(self._fields.values, lambda x: x.address + x.size <= address)
+            i = lowerBound(self._fields.values,
+                           lambda x: x.address + x.size <= address)
             if i is not None:
                 return self._fields.values[i]
         return None
@@ -493,10 +500,10 @@ class GenericFieldSet(BasicFieldSet):
         """
 
         # Check size
-        total_size = sum( field.size for field in new_fields )
+        total_size = sum(field.size for field in new_fields)
         if old_field.size < total_size:
-            raise ParserError( \
-                "Unable to write fields at address %s " \
+            raise ParserError(
+                "Unable to write fields at address %s "
                 "(too big)!" % (address))
 
         # Need padding before?
@@ -529,4 +536,3 @@ class GenericFieldSet(BasicFieldSet):
 
     def getFieldIndex(self, field):
         return self._fields.index(field._name)
-

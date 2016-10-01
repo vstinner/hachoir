@@ -17,16 +17,18 @@ def computeComprRate(meta, compr_size):
     Set "compr_data" with a string like "1.52x".
     """
     if (not meta.has("width")
-       or not meta.has("height")
-       or not meta.has("bits_per_pixel")):
+        or not meta.has("height")
+            or not meta.has("bits_per_pixel")):
         return
     if not compr_size:
         return
-    orig_size = meta.get('width') * meta.get('height') * meta.get('bits_per_pixel')
+    orig_size = meta.get('width') * meta.get('height') * \
+        meta.get('bits_per_pixel')
     meta.compr_rate = float(orig_size) / compr_size
 
 
 class BmpMetadata(RootMetadata):
+
     def extract(self, image):
         if "header" not in image:
             return
@@ -55,9 +57,9 @@ class TiffMetadata(RootMetadata):
         "img_height": "width",
 
         # TODO: Enable that (need link to value)
-#        "description": "comment",
-#        "doc_name": "title",
-#        "orientation": "image_orientation",
+        #        "description": "comment",
+        #        "doc_name": "title",
+        #        "orientation": "image_orientation",
     }
 
     def extract(self, tiff):
@@ -100,7 +102,7 @@ class IcoMetadata(MultipleMetadata):
                 bpp = 8
             image.bits_per_pixel = bpp
             image.setHeader("Icon #%u (%sx%s)"
-                            % (1+index,
+                            % (1 + index,
                                image.get("width", "?"),
                                image.get("height", "?")))
 
@@ -117,6 +119,7 @@ class IcoMetadata(MultipleMetadata):
 
 
 class PcxMetadata(RootMetadata):
+
     @fault_tolerant
     def extract(self, pcx):
         self.width = 1 + pcx["xmax"].value
@@ -233,6 +236,7 @@ class PngMetadata(RootMetadata):
 
 
 class GifMetadata(RootMetadata):
+
     def extract(self, gif):
         self.useScreen(gif["/screen"])
         if self.has("bits_per_pixel"):
@@ -243,7 +247,7 @@ class GifMetadata(RootMetadata):
             for comment in gif.array(comments.name + "/comment"):
                 self.comment = comment.value
         if ("graphic_ctl/has_transp" in gif
-           and gif["graphic_ctl/has_transp"].value):
+                and gif["graphic_ctl/has_transp"].value):
             self.pixel_format = "Color index with transparency"
         else:
             self.pixel_format = "Color index"
@@ -256,6 +260,7 @@ class GifMetadata(RootMetadata):
 
 
 class TargaMetadata(RootMetadata):
+
     def extract(self, tga):
         self.width = tga["width"].value
         self.height = tga["height"].value
@@ -268,6 +273,7 @@ class TargaMetadata(RootMetadata):
 
 
 class WmfMetadata(RootMetadata):
+
     def extract(self, wmf):
         if wmf.isAPM():
             if "amf_header/rect" in wmf:
@@ -293,6 +299,7 @@ class WmfMetadata(RootMetadata):
 
 
 class PsdMetadata(RootMetadata):
+
     @fault_tolerant
     def extract(self, psd):
         self.width = psd["width"].value

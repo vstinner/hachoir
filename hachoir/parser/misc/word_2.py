@@ -6,24 +6,29 @@ Documents:
 """
 
 from hachoir.field import (FieldSet, Enum,
-    Bit, Bits,
-    UInt8, Int16, UInt16, UInt32, Int32,
-    NullBytes, Bytes, RawBytes, PascalString16,
-    DateTimeMSDOS32, TimeDateMSDOS32)
+                           Bit, Bits,
+                           UInt8, Int16, UInt16, UInt32, Int32,
+                           NullBytes, Bytes, RawBytes, PascalString16,
+                           DateTimeMSDOS32, TimeDateMSDOS32)
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.parser.misc.ole2_util import OLE2FragmentParser
 from hachoir.core.tools import paddingSize
 from hachoir.parser.common.win32_lang_id import LANGUAGE_ID
 TIMESTAMP = DateTimeMSDOS32
 
+
 class FC_CB(FieldSet):
+
     def createFields(self):
         yield Int32(self, "fc", "File Offset")
         yield UInt16(self, "cb", "Byte Count")
+
     def createValue(self):
-        return (self['fc'].value,self['cb'].value)
+        return (self['fc'].value, self['cb'].value)
+
 
 class FIB(FieldSet):
+
     def createFields(self):
         yield UInt16(self, "wIdent", "Magic Number")
         yield UInt16(self, "nFib", "File Information Block (FIB) Version")
@@ -100,28 +105,37 @@ class FIB(FieldSet):
         yield UInt16(self, "cpnBteChp", "Count of CHPX FKPs recorded in file")
         yield UInt16(self, "cpnBtePap", "Count of PAPX FKPs recorded in file")
 
+
 class SEPX(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "size")
-        self._size=(self['size'].value+1)*8
+        self._size = (self['size'].value + 1) * 8
         yield RawBytes(self, "raw[]", self['size'].value)
 
+
 class SEPXGroup(FieldSet):
+
     def __init__(self, parent, name, size, description=None):
         FieldSet.__init__(self, parent, name, description=description)
-        self._size=size*8
+        self._size = size * 8
+
     def createFields(self):
         while self.current_size < self.size:
-            next=self.stream.readBytes(self.absolute_address+self.current_size,1)
-            if next=='\x00':
-                padding = paddingSize((self.absolute_address + self.current_size)//8, 512)
+            next = self.stream.readBytes(
+                self.absolute_address + self.current_size, 1)
+            if next == '\x00':
+                padding = paddingSize(
+                    (self.absolute_address + self.current_size) // 8, 512)
                 if padding:
                     yield NullBytes(self, "padding[]", padding)
-                if self.current_size >= self.size: break
+                if self.current_size >= self.size:
+                    break
             yield SEPX(self, "sepx[]")
 
+
 class Word2DocumentParser(OLE2FragmentParser):
-    MAGIC = b'\xdb\xa5' # 42459
+    MAGIC = b'\xdb\xa5'  # 42459
     PARSER_TAGS = {
         "id": "word_v2_document",
         "min_size": 8,
@@ -135,7 +149,7 @@ class Word2DocumentParser(OLE2FragmentParser):
         OLE2FragmentParser.__init__(self, stream, **args)
 
     def validate(self):
-        if self.stream.readBytes(0,2) != self.MAGIC:
+        if self.stream.readBytes(0, 2) != self.MAGIC:
             return "Invalid magic."
         if self['FIB/nFib'].value not in (45,):
             return "Unknown FIB version."
@@ -144,7 +158,7 @@ class Word2DocumentParser(OLE2FragmentParser):
     def createFields(self):
         yield FIB(self, "FIB", "File Information Block")
 
-        padding = (self['FIB/fcMin'].value - self.current_size//8)
+        padding = (self['FIB/fcMin'].value - self.current_size // 8)
         if padding:
             yield NullBytes(self, "padding[]", padding)
         if self['FIB/ccpText'].value:
@@ -158,11 +172,11 @@ class Word2DocumentParser(OLE2FragmentParser):
         if self['FIB/ccpAtn'].value:
             yield Bytes(self, "text_annotation", self['FIB/ccpAtn'].value)
 
-        padding = (self['FIB/fcMax'].value - self.current_size//8)
+        padding = (self['FIB/fcMax'].value - self.current_size // 8)
         if padding:
             yield RawBytes(self, "padding[]", padding)
 
-        sepx_size = (self['FIB/pnChpFirst'].value*512 - self.current_size//8)
+        sepx_size = (self['FIB/pnChpFirst'].value *
+                     512 - self.current_size // 8)
         if sepx_size:
             yield SEPXGroup(self, "sepx", sepx_size)
-

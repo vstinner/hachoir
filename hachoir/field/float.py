@@ -10,6 +10,7 @@ assert struct.unpack(">d", b"\xc0\0\0\0\0\0\0\0")[0] == -2.0
 
 
 class FloatMantissa(Bits):
+
     def createValue(self):
         value = Bits.createValue(self)
         return 1 + float(value) / (2 ** self.size)
@@ -19,9 +20,10 @@ class FloatMantissa(Bits):
 
 
 class FloatExponent(Bits):
+
     def __init__(self, parent, name, size):
         Bits.__init__(self, parent, name, size)
-        self.bias = 2 ** (size-1) - 1
+        self.bias = 2 ** (size - 1) - 1
 
     def createValue(self):
         return Bits.createValue(self) - self.bias
@@ -42,9 +44,9 @@ def floatFactory(name, format, mantissa_bits, exponent_bits, doc):
             FieldSet.__init__(self, parent, name, description, size)
             if format:
                 if self._parent.endian == BIG_ENDIAN:
-                    self.struct_format = ">"+format
+                    self.struct_format = ">" + format
                 else:
-                    self.struct_format = "<"+format
+                    self.struct_format = "<" + format
             else:
                 self.struct_format = None
 
@@ -58,29 +60,30 @@ def floatFactory(name, format, mantissa_bits, exponent_bits, doc):
             """
             if self.struct_format:
                 raw = self._parent.stream.readBytes(
-                    self.absolute_address, self._size//8)
+                    self.absolute_address, self._size // 8)
                 try:
                     return struct.unpack(self.struct_format, raw)[0]
                 except struct.error as err:
                     raise ValueError("[%s] conversion error: %s" %
-                        (self.__class__.__name__, err))
+                                     (self.__class__.__name__, err))
             else:
                 try:
-                    value = self["mantissa"].value * (2.0 ** float(self["exponent"].value))
+                    value = self["mantissa"].value * \
+                        (2.0 ** float(self["exponent"].value))
                     if self["negative"].value:
                         return -(value)
                     else:
                         return value
                 except OverflowError:
                     raise ValueError("[%s] floating point overflow" %
-                        self.__class__.__name__)
+                                     self.__class__.__name__)
 
         def createFields(self):
             yield Bit(self, "negative")
             yield FloatExponent(self, "exponent", exponent_bits)
             if 64 <= mantissa_bits:
                 yield Bit(self, "one")
-                yield FloatMantissa(self, "mantissa", mantissa_bits-1)
+                yield FloatMantissa(self, "mantissa", mantissa_bits - 1)
             else:
                 yield FloatMantissa(self, "mantissa", mantissa_bits)
 
@@ -90,13 +93,12 @@ def floatFactory(name, format, mantissa_bits, exponent_bits, doc):
 
 # 32-bit float (standard: IEEE 754/854)
 Float32 = floatFactory("Float32", "f", 23, 8,
-    "Floating point number: format IEEE 754 int 32 bit")
+                       "Floating point number: format IEEE 754 int 32 bit")
 
 # 64-bit float (standard: IEEE 754/854)
 Float64 = floatFactory("Float64", "d", 52, 11,
-    "Floating point number: format IEEE 754 in 64 bit")
+                       "Floating point number: format IEEE 754 in 64 bit")
 
 # 80-bit float (standard: IEEE 754/854)
 Float80 = floatFactory("Float80", None, 64, 15,
-    "Floating point number: format IEEE 754 in 80 bit")
-
+                       "Floating point number: format IEEE 754 in 80 bit")

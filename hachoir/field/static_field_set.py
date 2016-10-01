@@ -29,7 +29,7 @@ class StaticFieldSet(FieldSet):
         item_class = item[0]
         if item_class.static_size is None:
             raise ParserError("Unable to get static size of field type: %s"
-                % item_class.__name__)
+                              % item_class.__name__)
         if isinstance(item_class.static_size, collections.Callable):
             if isinstance(item[-1], dict):
                 return item_class.static_size(*item[1:-1], **item[-1])
@@ -53,4 +53,3 @@ class StaticFieldSet(FieldSet):
     # Initial value of static_size, it changes when first instance
     # is created (see __new__)
     static_size = _computeStaticSize
-

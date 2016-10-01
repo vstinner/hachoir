@@ -4,4 +4,3 @@ from hachoir.parser.program.python import PythonCompiledFile
 from hachoir.parser.program.java import JavaCompiledClassFile
 from hachoir.parser.program.prc import PRCFile
 from hachoir.parser.program.nds import NdsFile
-

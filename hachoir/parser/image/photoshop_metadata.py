@@ -5,9 +5,9 @@ References:
 """
 
 from hachoir.field import (FieldSet, ParserError,
-    UInt8, UInt16, UInt32, Float32, Enum,
-    SubFile, String, CString, PascalString8,
-    NullBytes, RawBytes)
+                           UInt8, UInt16, UInt32, Float32, Enum,
+                           SubFile, String, CString, PascalString8,
+                           NullBytes, RawBytes)
 from hachoir.core.text_handler import textHandler, hexadecimal
 from hachoir.core.tools import alignValue, createDict
 from hachoir.parser.image.iptc import IPTC
@@ -15,7 +15,9 @@ from hachoir.parser.common.win32 import PascalStringWin32
 
 BOOL = {0: False, 1: True}
 
+
 class Version(FieldSet):
+
     def createFields(self):
         yield UInt32(self, "version")
         yield UInt8(self, "has_realm")
@@ -26,31 +28,39 @@ class Version(FieldSet):
         if size:
             yield NullBytes(self, "padding", size)
 
+
 class FixedFloat32(FieldSet):
+
     def createFields(self):
         yield UInt16(self, "int_part")
         yield UInt16(self, "float_part")
 
     def createValue(self):
-        return self["int_part"].value +  float(self["float_part"].value) / (1<<16)
+        return self["int_part"].value + float(self["float_part"].value) / (1 << 16)
+
 
 class ResolutionInfo(FieldSet):
+
     def createFields(self):
         yield FixedFloat32(self, "horiz_res")
-        yield Enum(UInt16(self, "horiz_res_unit"), {1:'px/in', 2:'px/cm'})
-        yield Enum(UInt16(self, "width_unit"), {1:'inches', 2:'cm', 3:'points', 4:'picas', 5:'columns'})
+        yield Enum(UInt16(self, "horiz_res_unit"), {1: 'px/in', 2: 'px/cm'})
+        yield Enum(UInt16(self, "width_unit"), {1: 'inches', 2: 'cm', 3: 'points', 4: 'picas', 5: 'columns'})
         yield FixedFloat32(self, "vert_res")
-        yield Enum(UInt16(self, "vert_res_unit"), {1:'px/in', 2:'px/cm'})
-        yield Enum(UInt16(self, "height_unit"), {1:'inches', 2:'cm', 3:'points', 4:'picas', 5:'columns'})
+        yield Enum(UInt16(self, "vert_res_unit"), {1: 'px/in', 2: 'px/cm'})
+        yield Enum(UInt16(self, "height_unit"), {1: 'inches', 2: 'cm', 3: 'points', 4: 'picas', 5: 'columns'})
+
 
 class PrintScale(FieldSet):
+
     def createFields(self):
-        yield Enum(UInt16(self, "style"), {0:'centered', 1:'size to fit', 2:'user defined'})
+        yield Enum(UInt16(self, "style"), {0: 'centered', 1: 'size to fit', 2: 'user defined'})
         yield Float32(self, "x_location")
         yield Float32(self, "y_location")
         yield Float32(self, "scale")
 
+
 class PrintFlags(FieldSet):
+
     def createFields(self):
         yield Enum(UInt8(self, "labels"), BOOL)
         yield Enum(UInt8(self, "crop_marks"), BOOL)
@@ -69,7 +79,9 @@ class PrintFlags(FieldSet):
     def createDisplay(self):
         return ', '.join(self.value)
 
+
 class PrintFlags2(FieldSet):
+
     def createFields(self):
         yield UInt16(self, "version")
         yield UInt8(self, "center_crop_marks")
@@ -77,16 +89,20 @@ class PrintFlags2(FieldSet):
         yield UInt32(self, "bleed_width")
         yield UInt16(self, "bleed_width_scale")
 
+
 class GridGuides(FieldSet):
+
     def createFields(self):
         yield UInt32(self, "version")
         yield UInt32(self, "horiz_cycle", "Horizontal grid spacing, in quarter inches")
         yield UInt32(self, "vert_cycle", "Vertical grid spacing, in quarter inches")
         yield UInt32(self, "guide_count", "Number of guide resource blocks (can be 0)")
 
+
 class Thumbnail(FieldSet):
+
     def createFields(self):
-        yield Enum(UInt32(self, "format"), {0:'Raw RGB', 1:'JPEG RGB'})
+        yield Enum(UInt32(self, "format"), {0: 'Raw RGB', 1: 'JPEG RGB'})
         yield UInt32(self, "width", "Width of thumbnail in pixels")
         yield UInt32(self, "height", "Height of thumbnail in pixels")
         yield UInt32(self, "widthbytes", "Padded row bytes = (width * bits per pixel + 31) / 32 * 4")
@@ -95,6 +111,7 @@ class Thumbnail(FieldSet):
         yield UInt16(self, "bits_per_pixel")
         yield UInt16(self, "num_planes")
         yield SubFile(self, "thumbnail", self['compressed_size'].value, "Thumbnail (JPEG file)", mime_type="image/jpeg")
+
 
 class Photoshop8BIM(FieldSet):
     TAG_INFO = {
@@ -130,7 +147,8 @@ class Photoshop8BIM(FieldSet):
     def __init__(self, *args, **kw):
         FieldSet.__init__(self, *args, **kw)
         try:
-            self._name, self.handler, self._description = self.TAG_INFO[self["tag"].value]
+            self._name, self.handler, self._description = self.TAG_INFO[
+                self["tag"].value]
         except KeyError:
             self.handler = None
         size = self["size"]
@@ -139,7 +157,8 @@ class Photoshop8BIM(FieldSet):
     def createFields(self):
         yield String(self, "signature", 4, "8BIM signature", charset="ASCII")
         if self["signature"].value != "8BIM":
-            raise ParserError("Stream doesn't look like 8BIM item (wrong signature)!")
+            raise ParserError(
+                "Stream doesn't look like 8BIM item (wrong signature)!")
         yield textHandler(UInt16(self, "tag"), hexadecimal)
         if self.stream.readBytes(self.absolute_address + self.current_size, 4) != b"\0\0\0\0":
             yield PascalString8(self, "name")
@@ -153,13 +172,15 @@ class Photoshop8BIM(FieldSet):
             return
         if self.handler:
             if issubclass(self.handler, FieldSet):
-                yield self.handler(self, "content", size=size*8)
+                yield self.handler(self, "content", size=size * 8)
             else:
                 yield self.handler(self, "content")
         else:
             yield RawBytes(self, "content", size)
 
+
 class PhotoshopMetadata(FieldSet):
+
     def createFields(self):
         yield CString(self, "signature", "Photoshop version")
         if self["signature"].value == "Photoshop 3.0":
@@ -168,4 +189,3 @@ class PhotoshopMetadata(FieldSet):
         else:
             size = (self._size - self.current_size) // 8
             yield RawBytes(self, "rawdata", size)
-

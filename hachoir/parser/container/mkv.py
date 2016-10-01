@@ -6,11 +6,11 @@
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, Link,
-    MissingField, ParserError,
-    Enum as _Enum, String as _String,
-    Float32, Float64,
-    NullBits, Bits, Bit, RawBytes, Bytes,
-    Int16, GenericInteger)
+                           MissingField, ParserError,
+                           Enum as _Enum, String as _String,
+                           Float32, Float64,
+                           NullBits, Bits, Bit, RawBytes, Bytes,
+                           Int16, GenericInteger)
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.core.iso639 import ISO639_2
 from hachoir.core.tools import humanDatetime
@@ -19,10 +19,12 @@ from hachoir.parser.container.ogg import XiphInt
 from datetime import datetime, timedelta
 import collections
 
+
 class RawInt(GenericInteger):
     """
     Raw integer: have to be used in BIG_ENDIAN!
     """
+
     def __init__(self, parent, name, description=None):
         GenericInteger.__init__(self, parent, name, False, 8, description)
         i = GenericInteger.createValue(self)
@@ -32,12 +34,15 @@ class RawInt(GenericInteger):
             self._size += 8
             i <<= 1
 
+
 class Unsigned(RawInt):
+
     def __init__(self, parent, name, description=None):
         RawInt.__init__(self, parent, name, description)
 
     def hasValue(self):
         return True
+
     def createValue(self):
         header = 1 << self._size // 8 * 7
         value = RawInt.createValue(self) - header
@@ -45,7 +50,9 @@ class Unsigned(RawInt):
             return None
         return value
 
+
 class Signed(Unsigned):
+
     def createValue(self):
         header = 1 << self._size // 8 * 7 - 1
         value = RawInt.createValue(self) - 3 * header + 1
@@ -53,31 +60,41 @@ class Signed(Unsigned):
             return None
         return value
 
+
 def Enum(parent, enum):
-    return _Enum(GenericInteger(parent, 'enum', False, parent['size'].value*8), enum)
+    return _Enum(GenericInteger(parent, 'enum', False, parent['size'].value * 8), enum)
+
 
 def Bool(parent):
-    return textHandler(GenericInteger(parent, 'bool', False, parent['size'].value*8),
-        lambda chunk: str(chunk.value != 0))
+    return textHandler(GenericInteger(parent, 'bool', False, parent['size'].value * 8),
+                       lambda chunk: str(chunk.value != 0))
+
 
 def UInt(parent):
-    return GenericInteger(parent, 'unsigned', False, parent['size'].value*8)
+    return GenericInteger(parent, 'unsigned', False, parent['size'].value * 8)
+
 
 def SInt(parent):
-    return GenericInteger(parent, 'signed', True, parent['size'].value*8)
+    return GenericInteger(parent, 'signed', True, parent['size'].value * 8)
+
 
 def String(parent):
     return _String(parent, 'string', parent['size'].value, charset="ASCII", strip="\0")
 
+
 def EnumString(parent, enum):
     return _Enum(String(parent), enum)
+
 
 def Binary(parent):
     return RawBytes(parent, 'binary', parent['size'].value)
 
+
 class AttachedFile(Bytes):
+
     def __init__(self, parent):
         Bytes.__init__(self, parent, 'file', parent['size'].value, None)
+
     def _getFilename(self):
         if not hasattr(self, "_filename"):
             try:
@@ -85,13 +102,15 @@ class AttachedFile(Bytes):
             except MissingField:
                 self._filename = None
         return self._filename
+
     def createDescription(self):
         filename = self._getFilename()
         if filename:
             return 'File "%s"' % filename
         return "('Filename' entry not found)"
+
     def _createInputStream(self, **args):
-        tags = args.setdefault("tags",[])
+        tags = args.setdefault("tags", [])
         try:
             tags.append(("mime", self["../../FileMimeType/string"].value))
         except MissingField:
@@ -101,8 +120,10 @@ class AttachedFile(Bytes):
             tags.append(("filename", filename))
         return Bytes._createInputStream(self, **args)
 
+
 def UTF8(parent):
-    return _String(parent,'unicode', parent['size'].value, charset='UTF-8')
+    return _String(parent, 'unicode', parent['size'].value, charset='UTF-8')
+
 
 def Float(parent):
     size = parent['size'].value
@@ -115,22 +136,28 @@ def Float(parent):
 
 TIMESTAMP_T0 = datetime(2001, 1, 1)
 
+
 def dateToDatetime(value):
-    return TIMESTAMP_T0 + timedelta(microseconds=value//1000)
+    return TIMESTAMP_T0 + timedelta(microseconds=value // 1000)
+
 
 def dateToString(field):
     return humanDatetime(dateToDatetime(field.value))
 
+
 def Date(parent):
-    return textHandler(GenericInteger(parent, 'date', True, parent['size'].value*8),
-        dateToString)
+    return textHandler(GenericInteger(parent, 'date', True, parent['size'].value * 8),
+                       dateToString)
+
 
 def SeekID(parent):
-    return textHandler(GenericInteger(parent, 'binary', False, parent['size'].value*8),
-        lambda chunk: segment.get(chunk.value, (hexadecimal(chunk),))[0])
+    return textHandler(GenericInteger(parent, 'binary', False, parent['size'].value * 8),
+                       lambda chunk: segment.get(chunk.value, (hexadecimal(chunk),))[0])
+
 
 def CueClusterPosition(parent):
     class Cluster(Link):
+
         def createValue(self):
             parent = self.parent
             segment = parent['.....']
@@ -138,8 +165,10 @@ def CueClusterPosition(parent):
             return segment.getFieldByAddress(pos, feed=False)
     return Cluster(parent, 'cluster')
 
+
 def CueTrackPositions(parent):
     class Block(Link):
+
         def createValue(self):
             parent = self.parent
             time = parent['../CueTime/unsigned'].value
@@ -160,18 +189,21 @@ def CueTrackPositions(parent):
             return self
     return Block(parent, 'block')
 
+
 class Lace(FieldSet):
+
     def __init__(self, parent, lacing, size):
         self.n_frames = parent['n_frames'].value
-        self.createFields = ( self.parseXiph, self.parseFixed, self.parseEBML )[lacing]
+        self.createFields = (
+            self.parseXiph, self.parseFixed, self.parseEBML)[lacing]
         FieldSet.__init__(self, parent, 'Lace', size=size * 8)
 
     def parseXiph(self):
         for i in range(self.n_frames):
             yield XiphInt(self, 'size[]')
         for i in range(self.n_frames):
-            yield RawBytes(self, 'frame[]', self['size['+str(i)+']'].value)
-        yield RawBytes(self,'frame[]', (self._size - self.current_size) // 8)
+            yield RawBytes(self, 'frame[]', self['size[' + str(i) + ']'].value)
+        yield RawBytes(self, 'frame[]', (self._size - self.current_size) // 8)
 
     def parseEBML(self):
         yield Unsigned(self, 'size')
@@ -179,10 +211,10 @@ class Lace(FieldSet):
             yield Signed(self, 'dsize[]')
         size = self['size'].value
         yield RawBytes(self, 'frame[]', size)
-        for i in range(self.n_frames-1):
-            size += self['dsize['+str(i)+']'].value
+        for i in range(self.n_frames - 1):
+            size += self['dsize[' + str(i) + ']'].value
             yield RawBytes(self, 'frame[]', size)
-        yield RawBytes(self,'frame[]', (self._size - self.current_size) // 8)
+        yield RawBytes(self, 'frame[]', (self._size - self.current_size) // 8)
 
     def parseFixed(self):
         n = self.n_frames + 1
@@ -190,13 +222,15 @@ class Lace(FieldSet):
         for i in range(n):
             yield RawBytes(self, 'frame[]', size)
 
+
 class Block(FieldSet):
+
     def __init__(self, parent):
         FieldSet.__init__(self, parent, 'block')
         self._size = 8 * parent['size'].value
 
     def lacing(self):
-        return _Enum(Bits(self, 'lacing', 2), [ 'none', 'Xiph', 'fixed', 'EBML' ])
+        return _Enum(Bits(self, 'lacing', 2), ['none', 'Xiph', 'fixed', 'EBML'])
 
     def createFields(self):
         yield Unsigned(self, 'track')
@@ -221,21 +255,21 @@ class Block(FieldSet):
         lacing = self['lacing'].value
         if lacing:
             yield textHandler(GenericInteger(self, 'n_frames', False, 8),
-                lambda chunk: str(chunk.value+1))
+                              lambda chunk: str(chunk.value + 1))
             yield Lace(self, lacing - 1, size - 1)
         else:
-            yield RawBytes(self,'frame', size)
+            yield RawBytes(self, 'frame', size)
 
 ebml = {
     0x1A45DFA3: ('EBML[]', {
-        0x4286: ('EBMLVersion',UInt),
-        0x42F7: ('EBMLReadVersion',UInt),
-        0x42F2: ('EBMLMaxIDLength',UInt),
-        0x42F3: ('EBMLMaxSizeLength',UInt),
-        0x4282: ('DocType',String),
-        0x4287: ('DocTypeVersion',UInt),
-        0x4285: ('DocTypeReadVersion',UInt)
-        })
+        0x4286: ('EBMLVersion', UInt),
+        0x42F7: ('EBMLReadVersion', UInt),
+        0x42F2: ('EBMLMaxIDLength', UInt),
+        0x42F3: ('EBMLMaxSizeLength', UInt),
+        0x4282: ('DocType', String),
+        0x4287: ('DocTypeVersion', UInt),
+        0x4285: ('DocTypeReadVersion', UInt)
+    })
 }
 
 signature = {
@@ -246,8 +280,8 @@ signature = {
     0x7E5B: ('SignatureElements', {
         0x7E7B: ('SignatureElementList[]', {
             0x6532: ('SignedElement[]', Binary)
-            })
         })
+    })
 }
 
 chapter_atom = {
@@ -261,26 +295,26 @@ chapter_atom = {
     0x63C3: ('ChapterPhysicalEquiv', UInt),
     0x8F:   ('ChapterTrack', {
         0x89:   ('ChapterTrackNumber[]', UInt)
-        }),
+    }),
     0x80:   ('ChapterDisplay[]', {
         0x85:   ('ChapString', UTF8),
         0x437C: ('ChapLanguage[]', String),
         0x437E: ('ChapCountry[]', String)
-        }),
+    }),
     0x6944: ('ChapProcess[]', {
         0x6955: ('ChapProcessCodecID', UInt),
         0x450D: ('ChapProcessPrivate', Binary),
         0x6911: ('ChapProcessCommand[]', {
-        0x6922: ('ChapProcessTime', UInt),
-        0x6933: ('ChapProcessData', Binary)
+            0x6922: ('ChapProcessTime', UInt),
+            0x6933: ('ChapProcessData', Binary)
         })
-        })
+    })
 }
 
 simple_tag = {
     0x45A3: ('TagName', UTF8),
     0x447A: ('TagLanguage', String),
-    0x44B4: ('TagDefault', Bool), # 0x4484
+    0x44B4: ('TagDefault', Bool),  # 0x4484
     0x4487: ('TagString', UTF8),
     0x4485: ('TagBinary', Binary)
 }
@@ -289,7 +323,7 @@ segment_seek = {
     0x4DBB:     ('Seek[]', {
         0x53AB:     ('SeekID', SeekID),
         0x53AC:     ('SeekPosition', UInt)
-        })
+    })
 }
 
 segment_info = {
@@ -304,7 +338,7 @@ segment_info = {
         0x69FC:     ('ChapterTranslateEditionUID[]', UInt),
         0x69BF:     ('ChapterTranslateCodec', UInt),
         0x69A5:     ('ChapterTranslateID', Binary)
-        }),
+    }),
     0x2AD7B1:   ('TimecodeScale', UInt),
     0x4489:     ('Duration', Float),
     0x4461:     ('DateUTC', Date),
@@ -317,7 +351,7 @@ segment_clusters = {
     0xE7:       ('Timecode', UInt),
     0x5854:     ('SilentTracks', {
         0x58D7:     ('SilentTrackNumber[]', UInt)
-        }),
+    }),
     0xA7:       ('Position', UInt),
     0xAB:       ('PrevSize', UInt),
     0xA0:       ('BlockGroup[]', {
@@ -327,8 +361,8 @@ segment_clusters = {
             0xA6:       ('BlockMore[]', {
                 0xEE:       ('BlockAddID', UInt),
                 0xA5:       ('BlockAdditional', Binary)
-                })
-            }),
+            })
+        }),
         0x9B:       ('BlockDuration', UInt),
         0xFA:       ('ReferencePriority', UInt),
         0xFB:       ('ReferenceBlock[]', SInt),
@@ -341,16 +375,16 @@ segment_clusters = {
                 0xCB:       ('BlockAdditionID', UInt),
                 0xCE:       ('Delay', UInt),
                 0xCF:       ('Duration', UInt)
-                })
             })
-        }),
+        })
+    }),
     0xA3:       ('SimpleBlock[]', Block)
 }
 
 tracks_video = {
     0x9A:       ('FlagInterlaced', Bool),
-    0x53B8:     ('StereoMode', lambda parent: Enum(parent, \
-        [ 'mono', 'right eye', 'left eye', 'both eyes' ])),
+    0x53B8:     ('StereoMode', lambda parent: Enum(parent,
+                                                   ['mono', 'right eye', 'left eye', 'both eyes'])),
     0xB0:       ('PixelWidth', UInt),
     0xBA:       ('PixelHeight', UInt),
     0x54AA:     ('PixelCropBottom', UInt),
@@ -359,10 +393,10 @@ tracks_video = {
     0x54DD:     ('PixelCropRight', UInt),
     0x54B0:     ('DisplayWidth', UInt),
     0x54BA:     ('DisplayHeight', UInt),
-    0x54B2:     ('DisplayUnit', lambda parent: Enum(parent, \
-        [ 'pixels', 'centimeters', 'inches' ])),
-    0x54B3:     ('AspectRatioType', lambda parent: Enum(parent, \
-        [ 'free resizing', 'keep aspect ratio', 'fixed' ])),
+    0x54B2:     ('DisplayUnit', lambda parent: Enum(parent,
+                                                    ['pixels', 'centimeters', 'inches'])),
+    0x54B3:     ('AspectRatioType', lambda parent: Enum(parent,
+                                                        ['free resizing', 'keep aspect ratio', 'fixed'])),
     0x2EB524:   ('ColourSpace', Binary),
     0x2FB523:   ('GammaValue', Float)
 }
@@ -383,7 +417,7 @@ tracks_content_encodings = {
         0x5034:     ('ContentCompression', {
             0x4254:     ('ContentCompAlgo', UInt),
             0x4255:     ('ContentCompSettings', Binary)
-            }),
+        }),
         0x5035:     ('ContentEncryption', {
             0x47e1:     ('ContentEncAlgo', UInt),
             0x47e2:     ('ContentEncKeyID', Binary),
@@ -391,8 +425,8 @@ tracks_content_encodings = {
             0x47e4:     ('ContentSigKeyID', Binary),
             0x47e5:     ('ContentSigAlgo', UInt),
             0x47e6:     ('ContentSigHashAlgo', UInt),
-            })
         })
+    })
 }
 
 segment_tracks = {
@@ -407,7 +441,7 @@ segment_tracks = {
             0x11: 'subtitle',
             0x12: 'buttons',
             0x20: 'control'
-            })),
+        })),
         0xB9:       ('FlagEnabled', Bool),
         0x88:       ('FlagDefault', Bool),
         0x55AA:     ('FlagForced[]', Bool),
@@ -433,11 +467,11 @@ segment_tracks = {
             0x66FC:     ('TrackTranslateEditionUID[]', UInt),
             0x66BF:     ('TrackTranslateCodec', UInt),
             0x66A5:     ('TrackTranslateTrackID', Binary)
-            }),
+        }),
         0xE0:       ('Video', tracks_video),
         0xE1:       ('Audio', tracks_audio),
         0x6d80:     ('ContentEncodings', tracks_content_encodings)
-        })
+    })
 }
 
 segment_cues = {
@@ -453,9 +487,9 @@ segment_cues = {
                 0x97:       ('CueRefCluster', UInt),
                 0x535F:     ('CueRefNumber', UInt),
                 0xEB:       ('CueRefCodecState', UInt)
-                })
             })
         })
+    })
 }
 
 segment_attachments = {
@@ -466,7 +500,7 @@ segment_attachments = {
         0x465C:     ('FileData', AttachedFile),
         0x46AE:     ('FileUID', UInt),
         0x4675:     ('FileReferral', Binary)
-        })
+    })
 }
 
 segment_chapters = {
@@ -476,7 +510,7 @@ segment_chapters = {
         0x45DB:     ('EditionFlagDefault', Bool),
         0x45DD:     ('EditionFlagOrdered', Bool),
         0xB6:       ('ChapterAtom[]', chapter_atom)
-        })
+    })
 }
 
 segment_tags = {
@@ -488,9 +522,9 @@ segment_tags = {
             0x63C9:     ('EditionUID[]', UInt),
             0x63C4:     ('ChapterUID[]', UInt),
             0x63C6:     ('AttachmentUID[]', UInt)
-            }),
+        }),
         0x67C8:     ('SimpleTag[]', simple_tag)
-        })
+    })
 }
 
 segment = {
@@ -504,7 +538,9 @@ segment = {
     0x1254C367: ('Tags[]', segment_tags)
 }
 
+
 class EBML(FieldSet):
+
     def __init__(self, parent, ids):
         FieldSet.__init__(self, parent, "?[]")
 
@@ -527,7 +563,8 @@ class EBML(FieldSet):
         if size.value is not None:
             self._size = size.address + size.size + size.value * 8
         elif self._parent._parent:
-            raise ParserError("Unknown length (only allowed for the last Level 0 element)")
+            raise ParserError(
+                "Unknown length (only allowed for the last Level 0 element)")
         elif self._parent._size is not None:
             self._size = self._parent._size - self.address
 
@@ -541,6 +578,7 @@ class EBML(FieldSet):
                 while not self.eof:
                     yield EBML(self, val)
 
+
 class MkvFile(Parser):
     EBML_SIGNATURE = 0x1A45DFA3
     PARSER_TAGS = {
@@ -552,7 +590,7 @@ class MkvFile(Parser):
             "audio/x-matroska",
             "video/webm",
             "audio/webm"),
-        "min_size": 5*8,
+        "min_size": 5 * 8,
         "magic": ((b"\x1A\x45\xDF\xA3", 0),),
         "description": "Matroska multimedia container"
     }
@@ -579,7 +617,7 @@ class MkvFile(Parser):
         yield hdr
 
         while not self.eof:
-            yield EBML(self, { 0x18538067: ('Segment[]', segment) })
+            yield EBML(self, {0x18538067: ('Segment[]', segment)})
 
     def createContentSize(self):
         field = self["Segment[0]/size"]
@@ -596,4 +634,3 @@ class MkvFile(Parser):
             return "video/webm"
         else:
             return "video/x-matroska"
-

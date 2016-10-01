@@ -7,6 +7,7 @@ class BenchmarkError(Exception):
     """
     Error during benchmark, use str(err) to format it as string.
     """
+
     def __init__(self, message):
         Exception.__init__(self, "Benchmark internal error: %s" % message)
 
@@ -24,6 +25,7 @@ class BenchmarkStat:
     - __len__(): get number of elements
     - __nonzero__(): isn't empty?
     """
+
     def __init__(self):
         self._values = []
 
@@ -55,6 +57,7 @@ class BenchmarkStat:
 
 
 class Benchmark:
+
     def __init__(self, max_time=5.0,
                  min_count=5, max_count=None, progress_time=1.0):
         """

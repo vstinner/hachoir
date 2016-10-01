@@ -11,7 +11,9 @@ import codecs
 
 OUTPUT_FILENAME = "metadata.csv"
 
+
 class Extractor:
+
     def __init__(self, directory, fields):
         self.directory = directory
         self.fields = fields
@@ -69,6 +71,7 @@ class Extractor:
             line.append(value)
         return '; '.join(line)
 
+
 def main():
     initLocale()
     if len(argv) != 3:
@@ -82,4 +85,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

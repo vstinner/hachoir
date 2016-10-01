@@ -7,26 +7,28 @@ import hachoir.core
 from sys import exit
 from optparse import OptionGroup, OptionParser
 
+
 def parseOptions():
     parser = OptionParser(usage="%prog [options] filename [output_directory]")
 
-    common = OptionGroup(parser, "hachoir-subfile", "Option of hachoir-subfile")
+    common = OptionGroup(parser, "hachoir-subfile",
+                         "Option of hachoir-subfile")
     common.add_option("--offset", help="Skip first bytes of input file",
-        action="store", type='int', default=0)
+                      action="store", type='int', default=0)
     common.add_option("--size", help="Maximum size of input file",
-        action="store", type='int', default=None)
+                      action="store", type='int', default=None)
     common.add_option("--category", help="Parser category list (separated with a comma)",
-        action="store", type='str', default=None)
+                      action="store", type='str', default=None)
     common.add_option("--parser", help="Parser identifier list (separated with a comma)",
-        action="store", type='str', default=None)
+                      action="store", type='str', default=None)
     common.add_option("--version", help="Display version and exit",
-        action="callback", callback=displayVersion)
+                      action="callback", callback=displayVersion)
     common.add_option("--quiet", help="Be quiet",
-        action="store_true", default=False)
+                      action="store_true", default=False)
     common.add_option("--profiler", help="Run profiler",
-        action="store_true", default=False)
+                      action="store_true", default=False)
     common.add_option("--debug", help="Enable debug mode",
-        action="store_true", default=False)
+                      action="store_true", default=False)
     parser.add_option_group(common)
 
     values, arguments = parser.parse_args()
@@ -39,9 +41,10 @@ def parseOptions():
         exit(1)
     return values, filename, output
 
+
 def displaySearchStat(subfile):
-    stats = [ (parser.tags["id"], stats[0], stats[1])
-        for parser, stats in subfile.stats.items() ]
+    stats = [(parser.tags["id"], stats[0], stats[1])
+             for parser, stats in subfile.stats.items()]
     print()
     print("[ Match statistics ]")
     total_hit = 0
@@ -56,6 +59,7 @@ def displaySearchStat(subfile):
     else:
         print("(no match)")
     print("Total: %u hit/%u valid" % (total_hit, total_valid))
+
 
 def runSearch(subfile, values):
     # Load categories and parsers
@@ -74,6 +78,7 @@ def runSearch(subfile, values):
     if values.debug:
         displaySearchStat(subfile)
     return ok
+
 
 def main():
     # Initialize
@@ -94,4 +99,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

@@ -29,10 +29,10 @@ Thanks to:
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, ParserError,
-    UInt8, UInt16, UInt32, Enum,
-    Bit, NullBits, NullBytes,
-    RawBytes, String, PaddingBytes,
-    SubFile)
+                           UInt8, UInt16, UInt32, Enum,
+                           Bit, NullBits, NullBytes,
+                           RawBytes, String, PaddingBytes,
+                           SubFile)
 from hachoir.core.tools import alignValue, humanDuration
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.text_handler import filesizeHandler, textHandler
@@ -40,13 +40,16 @@ from hachoir.parser.video.fourcc import audio_codec_name, video_fourcc_name
 from hachoir.parser.image.ico import IcoFile
 from datetime import timedelta
 
+
 def parseText(self):
     yield String(self, "text", self["size"].value,
-        strip=" \0", truncate="\0",
-        charset="ISO-8859-1")
+                 strip=" \0", truncate="\0",
+                 charset="ISO-8859-1")
+
 
 def parseRawFormat(self, size):
     yield RawBytes(self, "raw_format", size)
+
 
 def parseVideoFormat(self, size):
     yield UInt32(self, "video_size", "Video format: Size")
@@ -61,6 +64,7 @@ def parseVideoFormat(self, size):
     yield UInt32(self, "clr_used", "Video format: ClrUsed")
     yield UInt32(self, "clr_important", "Video format: ClrImportant")
 
+
 def parseAudioFormat(self, size):
     yield Enum(UInt16(self, "codec", "Audio format: Codec id"), audio_codec_name)
     yield UInt16(self, "channel", "Audio format: Channels")
@@ -71,10 +75,11 @@ def parseAudioFormat(self, size):
         yield UInt16(self, "bits_per_sample", "Audio format: Bits per sample")
     if size >= 18:
         yield UInt16(self, "ext_size", "Audio format: Size of extra information")
-    if size >= 28: # and self["a_channel"].value > 2
+    if size >= 28:  # and self["a_channel"].value > 2
         yield UInt16(self, "reserved", "Audio format: ")
         yield UInt32(self, "channel_mask", "Audio format: channels placement bitmask")
         yield UInt32(self, "subformat", "Audio format: Subformat id")
+
 
 def parseAVIStreamFormat(self):
     size = self["size"].value
@@ -90,11 +95,13 @@ def parseAVIStreamFormat(self):
             handler = info[0]
     yield from handler(self, size)
 
+
 def parseAVIStreamHeader(self):
     if self["size"].value != 56:
         raise ParserError("Invalid stream header size")
     yield String(self, "stream_type", 4, "Stream type four character code", charset="ASCII")
-    field = String(self, "fourcc", 4, "Stream four character code", strip=" \0", charset="ASCII")
+    field = String(self, "fourcc", 4, "Stream four character code",
+                   strip=" \0", charset="ASCII")
     if self["stream_type"].value == "vids":
         yield Enum(field, video_fourcc_name, lambda text: text.upper())
     else:
@@ -115,15 +122,18 @@ def parseAVIStreamHeader(self):
     yield UInt16(self, "right", "Destination rectangle (right)")
     yield UInt16(self, "bottom", "Destination rectangle (bottom)")
 
+
 class RedBook(FieldSet):
     """
     RedBook offset parser, used in CD audio (.cda) file
     """
+
     def createFields(self):
         yield UInt8(self, "frame")
         yield UInt8(self, "second")
         yield UInt8(self, "minute")
         yield PaddingBytes(self, "notused", 1)
+
 
 def formatSerialNumber(field):
     """
@@ -132,6 +142,7 @@ def formatSerialNumber(field):
     """
     sn = field.value
     return "%04X-%04X" % (sn >> 16, sn & 0xFFFF)
+
 
 def parseCDDA(self):
     """
@@ -143,11 +154,12 @@ def parseCDDA(self):
     yield UInt16(self, "cda_version", "CD file version (currently 1)")
     yield UInt16(self, "track_no", "Number of track")
     yield textHandler(UInt32(self, "disc_serial", "Disc serial number"),
-        formatSerialNumber)
+                      formatSerialNumber)
     yield UInt32(self, "hsg_offset", "Track offset (HSG format)")
     yield UInt32(self, "hsg_length", "Track length (HSG format)")
     yield RedBook(self, "rb_offset", "Track offset (Red-book format)")
     yield RedBook(self, "rb_length", "Track length (Red-book format)")
+
 
 def parseWAVFormat(self):
     size = self["size"].value
@@ -160,8 +172,10 @@ def parseWAVFormat(self):
     yield UInt16(self, "block_align", "Block align")
     yield UInt16(self, "bit_per_sample", "Bits per sample")
 
+
 def parseWAVFact(self):
     yield UInt32(self, "nb_sample", "Number of samples in audio stream")
+
 
 def parseAviHeader(self):
     yield UInt32(self, "microsec_per_frame", "Microsecond per frame")
@@ -192,23 +206,28 @@ def parseAviHeader(self):
     yield UInt32(self, "start")
     yield UInt32(self, "length")
 
+
 def parseODML(self):
     yield UInt32(self, "total_frame", "Real number of frame of OpenDML video")
     padding = self["size"].value - 4
     if 0 < padding:
         yield NullBytes(self, "padding[]", padding)
 
+
 class AVIIndexEntry(FieldSet):
-    size = 16*8
+    size = 16 * 8
+
     def createFields(self):
         yield String(self, "tag", 4, "Tag", charset="ASCII")
         yield UInt32(self, "flags")
         yield UInt32(self, "start", "Offset from start of movie data")
         yield UInt32(self, "length")
 
+
 def parseIndex(self):
     while not self.eof:
         yield AVIIndexEntry(self, "index[]")
+
 
 class Chunk(FieldSet):
     TAG_INFO = {
@@ -268,10 +287,10 @@ class Chunk(FieldSet):
         if self["tag"].value == "LIST":
             yield String(self, "subtag", 4, "Sub-tag", charset="ASCII")
             handler = self.tag_info[1]
-            while 8 < (self.size - self.current_size)//8:
+            while 8 < (self.size - self.current_size) // 8:
                 field = self.__class__(self, "field[]")
                 yield field
-                if (field.size//8) % 2 != 0:
+                if (field.size // 8) % 2 != 0:
                     yield UInt8(self, "padding[]", "Padding")
         else:
             handler = self.tag_info[1]
@@ -287,6 +306,7 @@ class Chunk(FieldSet):
         tag = self["tag"].display
         return "Chunk (tag %s)" % tag
 
+
 class ChunkAVI(Chunk):
     TAG_INFO = Chunk.TAG_INFO.copy()
     TAG_INFO.update({
@@ -297,11 +317,13 @@ class ChunkAVI(Chunk):
         "dmlh": ("odml_hdr", parseODML, "ODML header"),
     })
 
+
 class ChunkCDDA(Chunk):
     TAG_INFO = Chunk.TAG_INFO.copy()
     TAG_INFO.update({
         'fmt ': ("cdda", parseCDDA, "CD audio informations"),
     })
+
 
 class ChunkWAVE(Chunk):
     TAG_INFO = Chunk.TAG_INFO.copy()
@@ -311,10 +333,12 @@ class ChunkWAVE(Chunk):
         'data': ("audio_data", None, "Audio stream data"),
     })
 
+
 def parseAnimationHeader(self):
     yield UInt32(self, "hdr_size", "Size of header (36 bytes)")
     if self["hdr_size"].value != 36:
-        self.warning("Animation header with unknown size (%s)" % self["size"].value)
+        self.warning("Animation header with unknown size (%s)" %
+                     self["size"].value)
     yield UInt32(self, "nb_frame", "Number of unique Icons in this cursor")
     yield UInt32(self, "nb_step", "Number of Blits before the animation cycles")
     yield UInt32(self, "cx")
@@ -325,20 +349,25 @@ def parseAnimationHeader(self):
     yield Bit(self, "is_icon")
     yield NullBits(self, "padding", 31)
 
+
 def parseAnimationSequence(self):
     while not self.eof:
         yield UInt32(self, "icon[]")
+
 
 def formatJiffie(field):
     sec = float(field.value) / 60
     return humanDuration(timedelta(seconds=sec))
 
+
 def parseAnimationRate(self):
     while not self.eof:
         yield textHandler(UInt32(self, "rate[]"), formatJiffie)
 
+
 def parseIcon(self):
     yield SubFile(self, "icon_file", self["size"].value, parser_class=IcoFile)
+
 
 class ChunkACON(Chunk):
     TAG_INFO = Chunk.TAG_INFO.copy()
@@ -349,19 +378,20 @@ class ChunkACON(Chunk):
         'icon': ("icon[]", parseIcon, "Icon"),
     })
 
+
 class RiffFile(Parser):
     PARSER_TAGS = {
         "id": "riff",
         "category": "container",
         "file_ext": ("avi", "cda", "wav", "ani"),
-        "min_size": 16*8,
+        "min_size": 16 * 8,
         "mime": ("video/x-msvideo", "audio/x-wav", "audio/x-cda"),
         # FIXME: Use regex "RIFF.{4}(WAVE|CDDA|AVI )"
         "magic": (
-            (b"AVI LIST", 8*8),
-            (b"WAVEfmt ", 8*8),
-            (b"CDDAfmt ", 8*8),
-            (b"ACONanih", 8*8),
+            (b"AVI LIST", 8 * 8),
+            (b"WAVEfmt ", 8 * 8),
+            (b"CDDAfmt ", 8 * 8),
+            (b"ACONanih", 8 * 8),
         ),
         "description": "Microsoft RIFF container"
     }
@@ -392,10 +422,10 @@ class RiffFile(Parser):
             chunk_cls = Chunk
 
         # Parse all chunks up to filesize
-        while self.current_size < self["filesize"].value*8+8:
+        while self.current_size < self["filesize"].value * 8 + 8:
             yield chunk_cls(self, "chunk[]")
         if not self.eof:
-            yield RawBytes(self, "padding[]", (self.size-self.current_size)//8)
+            yield RawBytes(self, "padding[]", (self.size - self.current_size) // 8)
 
     def createMimeType(self):
         try:
@@ -409,12 +439,14 @@ class RiffFile(Parser):
             desc = "Microsoft AVI video"
             if "headers/avi_hdr" in self:
                 header = self["headers/avi_hdr"]
-                desc += ": %ux%u pixels" % (header["width"].value, header["height"].value)
+                desc += ": %ux%u pixels" % (header["width"].value,
+                                            header["height"].value)
                 microsec = header["microsec_per_frame"].value
                 if microsec:
                     desc += ", %.1f fps" % (1000000.0 / microsec)
                     if "total_frame" in header and header["total_frame"].value:
-                        delta = timedelta(seconds=float(header["total_frame"].value) * microsec)
+                        delta = timedelta(seconds=float(
+                            header["total_frame"].value) * microsec)
                         desc += ", " + humanDuration(delta)
             return desc
         else:
@@ -432,4 +464,3 @@ class RiffFile(Parser):
             return self.VALID_TYPES[self["type"].value][3]
         except KeyError:
             return ".riff"
-

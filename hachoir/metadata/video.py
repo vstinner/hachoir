@@ -1,6 +1,6 @@
 from hachoir.field import MissingField
 from hachoir.metadata.metadata import (registerExtractor,
-    Metadata, RootMetadata, MultipleMetadata)
+                                       Metadata, RootMetadata, MultipleMetadata)
 from hachoir.metadata.metadata_item import QUALITY_GOOD
 from hachoir.metadata.safe import fault_tolerant
 from hachoir.parser.video import MovFile, AsfFile, FlvFile
@@ -115,7 +115,7 @@ class MkvMetadata(MultipleMetadata):
 
     def processSimpleTag(self, tag):
         if "TagName/unicode" not in tag \
-        or "TagString/unicode" not in tag:
+                or "TagString/unicode" not in tag:
             return
         name = tag["TagName/unicode"].value
         if name not in self.tag_key:
@@ -129,7 +129,8 @@ class MkvMetadata(MultipleMetadata):
             duration = self.getDouble(info, "Duration")
             if duration is not None:
                 try:
-                    seconds = duration * info["TimecodeScale/unsigned"].value * 1e-9
+                    seconds = duration * \
+                        info["TimecodeScale/unsigned"].value * 1e-9
                     self.duration = timedelta(seconds=seconds)
                 except OverflowError:
                     # Catch OverflowError for timedelta (long int too large
@@ -149,6 +150,7 @@ class MkvMetadata(MultipleMetadata):
 
 
 class FlvMetadata(MultipleMetadata):
+
     def extract(self, flv):
         if "video[0]" in flv:
             meta = Metadata(self)
@@ -214,6 +216,7 @@ class FlvMetadata(MultipleMetadata):
 
 
 class MovMetadata(RootMetadata):
+
     def extract(self, mov):
         for atom in mov:
             if "movie" in atom:
@@ -223,9 +226,11 @@ class MovMetadata(RootMetadata):
     def processMovieHeader(self, hdr):
         self.creation_date = hdr["creation_date"].value
         self.last_modification = hdr["lastmod_date"].value
-        self.duration = timedelta(seconds=float(hdr["duration"].value) / hdr["time_scale"].value)
-        self.comment = "Play speed: %.1f%%" % (hdr["play_speed"].value*100)
-        self.comment = "User volume: %.1f%%" % (float(hdr["volume"].value)*100)
+        self.duration = timedelta(seconds=float(
+            hdr["duration"].value) / hdr["time_scale"].value)
+        self.comment = "Play speed: %.1f%%" % (hdr["play_speed"].value * 100)
+        self.comment = "User volume: %.1f%%" % (
+            float(hdr["volume"].value) * 100)
 
     @fault_tolerant
     def processTrackHeader(self, hdr):
@@ -281,7 +286,8 @@ class AsfMetadata(MultipleMetadata):
 
             # Have ToolName and ToolVersion? If yes, group them to producer key
             if "ToolName" in data and "ToolVersion" in data:
-                self.producer = "%s (version %s)" % (data["ToolName"], data["ToolVersion"])
+                self.producer = "%s (version %s)" % (
+                    data["ToolName"], data["ToolVersion"])
                 del data["ToolName"]
                 del data["ToolVersion"]
 
@@ -318,13 +324,15 @@ class AsfMetadata(MultipleMetadata):
             if "content/audio_header" in stream_prop:
                 meta = Metadata(self)
                 self.streamProperty(header, index, meta)
-                self.streamAudioHeader(stream_prop["content/audio_header"], meta)
+                self.streamAudioHeader(
+                    stream_prop["content/audio_header"], meta)
                 if self.addGroup("audio[%u]" % audio_index, meta, "Audio stream #%u" % audio_index):
                     audio_index += 1
             elif "content/video_header" in stream_prop:
                 meta = Metadata(self)
                 self.streamProperty(header, index, meta)
-                self.streamVideoHeader(stream_prop["content/video_header"], meta)
+                self.streamVideoHeader(
+                    stream_prop["content/video_header"], meta)
                 if self.addGroup("video[%u]" % video_index, meta, "Video stream #%u" % video_index):
                     video_index += 1
 
@@ -412,4 +420,3 @@ registerExtractor(MovFile, MovMetadata)
 registerExtractor(AsfFile, AsfMetadata)
 registerExtractor(FlvFile, FlvMetadata)
 registerExtractor(MkvFile, MkvMetadata)
-

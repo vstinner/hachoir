@@ -23,6 +23,7 @@ def joinPath(path, name):
 
 
 class MissingField(KeyError, FieldError):
+
     def __init__(self, field, key):
         KeyError.__init__(self)
         self.field = field
@@ -78,6 +79,7 @@ class Field(Logger):
 
     def createDescription(self):
         return ""
+
     def _getDescription(self):
         if self._description is None:
             try:
@@ -90,7 +92,7 @@ class Field(Logger):
                 self._description = ""
         return self._description
     description = property(_getDescription,
-    doc="Description of the field (string)")
+                           doc="Description of the field (string)")
 
     def __str__(self):
         return self.display
@@ -101,8 +103,10 @@ class Field(Logger):
 
     def hasValue(self):
         return self._getValue() is not None
+
     def createValue(self):
         raise NotImplementedError()
+
     def _getValue(self):
         try:
             value = self.createValue()
@@ -119,6 +123,7 @@ class Field(Logger):
 
     def createDisplay(self):
         return str(self.value)
+
     def _getDisplay(self):
         if not hasattr(self, "_Field__display"):
             try:
@@ -128,7 +133,7 @@ class Field(Logger):
                 self.__display = ""
         return self.__display
     display = property(lambda self: self._getDisplay(),
-    doc="Short (unicode) string which represents field content")
+                       doc="Short (unicode) string which represents field content")
 
     def createRawDisplay(self):
         value = self.value
@@ -136,6 +141,7 @@ class Field(Logger):
             return makePrintable(value, "ASCII")
         else:
             return str(value)
+
     def _getRawDisplay(self):
         if not hasattr(self, "_Field__raw_display"):
             try:
@@ -145,12 +151,12 @@ class Field(Logger):
                 self.__raw_display = ""
         return self.__raw_display
     raw_display = property(lambda self: self._getRawDisplay(),
-    doc="(Unicode) string which represents raw field content")
+                           doc="(Unicode) string which represents raw field content")
 
     def _getName(self):
         return self._name
     name = property(_getName,
-    doc="Field name (unique in its parent field set list)")
+                    doc="Field name (unique in its parent field set list)")
 
     def _getIndex(self):
         if not self._parent:
@@ -169,12 +175,12 @@ class Field(Logger):
         names[-1] = ''
         return '/'.join(reversed(names))
     path = property(_getPath,
-    doc="Full path of the field starting at root field")
+                    doc="Full path of the field starting at root field")
 
     def _getAddress(self):
         return self._address
     address = property(_getAddress,
-    doc="Relative address in bit to parent address")
+                       doc="Relative address in bit to parent address")
 
     def _getAbsoluteAddress(self):
         address = self._address
@@ -184,7 +190,7 @@ class Field(Logger):
             current = current._parent
         return address
     absolute_address = property(_getAbsoluteAddress,
-    doc="Absolute address (from stream beginning) in bit")
+                                doc="Absolute address (from stream beginning) in bit")
 
     def _getSize(self):
         return self._size
@@ -232,6 +238,7 @@ class Field(Logger):
     def _createInputStream(self, **args):
         assert self._parent
         return InputFieldStream(self, **args)
+
     def getSubIStream(self):
         if hasattr(self, "_sub_istream"):
             stream = self._sub_istream()
@@ -241,6 +248,7 @@ class Field(Logger):
             stream = self._createInputStream()
             self._sub_istream = weakref_ref(stream)
         return stream
+
     def setSubIStream(self, createInputStream):
         cis = self._createInputStream
         self._createInputStream = lambda **args: createInputStream(cis, **args)
@@ -254,4 +262,3 @@ class Field(Logger):
 
     def getFieldType(self):
         return self.__class__.__name__
-

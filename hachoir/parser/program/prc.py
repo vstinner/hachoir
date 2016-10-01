@@ -7,12 +7,13 @@ Creation date: 29 october 2008
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet,
-    UInt16, UInt32, TimestampMac32,
-    String, RawBytes)
+                           UInt16, UInt32, TimestampMac32,
+                           String, RawBytes)
 from hachoir.core.endian import BIG_ENDIAN
 
+
 class PRCHeader(FieldSet):
-    static_size = 78*8
+    static_size = 78 * 8
 
     def createFields(self):
         yield String(self, "name", 32, "Name")
@@ -30,8 +31,9 @@ class PRCHeader(FieldSet):
         yield UInt32(self, "next_record_list", "next_record_list")
         yield UInt16(self, "num_records", "num_records")
 
+
 class ResourceHeader(FieldSet):
-    static_size = 10*8
+    static_size = 10 * 8
 
     def createFields(self):
         yield String(self, "name", 4, "Name of the resource")
@@ -40,6 +42,7 @@ class ResourceHeader(FieldSet):
 
     def createDescription(self):
         return "Resource Header (%s)" % self["name"]
+
 
 class PRCFile(Parser):
     PARSER_TAGS = {
@@ -72,11 +75,10 @@ class PRCFile(Parser):
                 lens.append(r["offset"].value - poff)
             poff = r["offset"].value
             yield r
-        lens.append(self.size//8 - poff)
+        lens.append(self.size // 8 - poff)
         yield UInt16(self, "placeholder", "Place holder bytes")
         for i in range(len(lens)):
-            yield RawBytes(self, "res[]", lens[i], '"'+self["res_header["+str(i)+"]/name"].value+"\" Resource")
+            yield RawBytes(self, "res[]", lens[i], '"' + self["res_header[" + str(i) + "]/name"].value + "\" Resource")
 
     def createDescription(self):
         return "Palm Resource file"
-

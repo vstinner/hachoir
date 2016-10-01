@@ -35,7 +35,7 @@ class GenericString(Bytes):
     """
 
     VALID_FORMATS = ("C", "UnixLine",
-        "fixed", "Pascal8", "Pascal16", "Pascal32")
+                     "fixed", "Pascal8", "Pascal16", "Pascal32")
 
     # 8-bit charsets
     CHARSET_8BIT = set((
@@ -89,12 +89,12 @@ class GenericString(Bytes):
     # Suffix format: value is suffix (string)
     SUFFIX_FORMAT = {
         "C": {
-             8: {LITTLE_ENDIAN: b"\0",       BIG_ENDIAN: b"\0"},
+            8: {LITTLE_ENDIAN: b"\0",       BIG_ENDIAN: b"\0"},
             16: {LITTLE_ENDIAN: b"\0\0",     BIG_ENDIAN: b"\0\0"},
             32: {LITTLE_ENDIAN: b"\0\0\0\0", BIG_ENDIAN: b"\0\0\0\0"},
         },
         "UnixLine": {
-             8: {LITTLE_ENDIAN: b"\n",       BIG_ENDIAN: b"\n"},
+            8: {LITTLE_ENDIAN: b"\n",       BIG_ENDIAN: b"\n"},
             16: {LITTLE_ENDIAN: b"\n\0",     BIG_ENDIAN: b"\0\n"},
             32: {LITTLE_ENDIAN: b"\n\0\0\0", BIG_ENDIAN: b"\0\0\0\n"},
         },
@@ -113,7 +113,7 @@ class GenericString(Bytes):
     _raw_value = None
 
     def __init__(self, parent, name, format, description=None,
-    strip=None, charset=None, nbytes=None, truncate=None):
+                 strip=None, charset=None, nbytes=None, truncate=None):
         Bytes.__init__(self, parent, name, 1, description)
 
         # Is format valid?
@@ -132,7 +132,7 @@ class GenericString(Bytes):
             self._character_size = None
         else:
             raise FieldError("Invalid charset for %s: \"%s\"" %
-                (self.path, charset))
+                             (self.path, charset))
         self._charset = charset
 
         # It is a fixed string?
@@ -141,7 +141,7 @@ class GenericString(Bytes):
             # Arbitrary limits, just to catch some bugs...
             if not (1 <= nbytes <= 0xffff):
                 raise FieldError("Invalid string size for %s: %s" %
-                    (self.path, nbytes))
+                                 (self.path, nbytes))
             self._content_size = nbytes   # content length in bytes
             self._size = nbytes * 8
             self._content_offset = 0
@@ -158,7 +158,7 @@ class GenericString(Bytes):
                     suffix, False, self.absolute_address)
                 if length is None:
                     raise FieldError("Unable to find end of string %s (format %s)!"
-                        % (self.path, self._format))
+                                     % (self.path, self._format))
                 if 1 < len(suffix):
                     # Fix length for little endian bug with UTF-xx charset:
                     #   u"abc" -> "a\0b\0c\0\0\0" (UTF-16-LE)
@@ -166,7 +166,7 @@ class GenericString(Bytes):
                     length = alignValue(length, len(suffix))
 
                 # Compute sizes
-                self._content_size = length # in bytes
+                self._content_size = length  # in bytes
                 self._size = (length + len(suffix)) * 8
 
             # Format with a prefix: Read prefixed length in bytes
@@ -179,31 +179,32 @@ class GenericString(Bytes):
 
                 # Read the prefix and compute sizes
                 value = self._parent.stream.readBits(
-                    self.absolute_address, prefix_size*8, self._parent.endian)
+                    self.absolute_address, prefix_size * 8, self._parent.endian)
                 self._content_size = value   # in bytes
                 self._size = (prefix_size + value) * 8
 
         # For UTF-16 and UTF-32, choose the right charset using BOM
         if self._charset in self.UTF_CHARSET:
             # Charset requires a BOM?
-            bomsize, endian  = self.UTF_CHARSET[self._charset]
+            bomsize, endian = self.UTF_CHARSET[self._charset]
             if endian == "BOM":
                 # Read the BOM value
                 nbytes = bomsize // 8
-                bom = self._parent.stream.readBytes(self.absolute_address, nbytes)
+                bom = self._parent.stream.readBytes(
+                    self.absolute_address, nbytes)
 
                 # Choose right charset using the BOM
                 bom_endian = self.UTF_BOM[bomsize]
                 if bom not in bom_endian:
                     raise FieldError("String %s has invalid BOM (%s)!"
-                        % (self.path, repr(bom)))
+                                     % (self.path, repr(bom)))
                 self._charset = bom_endian[bom]
                 self._content_size -= nbytes
                 self._content_offset += nbytes
 
         # Compute length in character if possible
         if self._character_size:
-            self._length = self._content_size //  self._character_size
+            self._length = self._content_size // self._character_size
         else:
             self._length = None
 
@@ -240,11 +241,12 @@ class GenericString(Bytes):
         # Fix truncated UTF-16 string like 'B\0e' (3 bytes)
         # => Add missing nul byte: 'B\0e\0' (4 bytes)
         if err.reason == "truncated data" \
-        and err.end == len(text) \
-        and self._charset == "UTF-16-LE":
+                and err.end == len(text) \
+                and self._charset == "UTF-16-LE":
             try:
-                text = str(text+"\0", self._charset, "strict")
-                self.warning("Fix truncated %s string: add missing nul byte" % self._charset)
+                text = str(text + "\0", self._charset, "strict")
+                self.warning(
+                    "Fix truncated %s string: add missing nul byte" % self._charset)
                 return text
             except UnicodeDecodeError as err:
                 pass
@@ -346,7 +348,8 @@ class GenericString(Bytes):
         info = self.charset
         if self._strip:
             if isinstance(self._strip, str):
-                info += ",strip=%s" % makePrintable(self._strip, "ASCII", quote="'")
+                info += ",strip=%s" % makePrintable(
+                    self._strip, "ASCII", quote="'")
             else:
                 info += ",strip=True"
         return "%s<%s>" % (Bytes.getFieldType(self), info)
@@ -355,37 +358,38 @@ class GenericString(Bytes):
 def stringFactory(name, format, doc):
     class NewString(GenericString):
         __doc__ = doc
+
         def __init__(self, parent, name, description=None,
-        strip=None, charset=None, truncate=None):
+                     strip=None, charset=None, truncate=None):
             GenericString.__init__(self, parent, name, format, description,
-            strip=strip, charset=charset, truncate=truncate)
+                                   strip=strip, charset=charset, truncate=truncate)
     cls = NewString
     cls.__name__ = name
     return cls
 
 # String which ends with nul byte ("\0")
 CString = stringFactory("CString", "C",
-    r"""C string: string ending with nul byte.
+                        r"""C string: string ending with nul byte.
 See GenericString to get more information.""")
 
 # Unix line of text: string which ends with "\n" (ASCII 0x0A)
 UnixLine = stringFactory("UnixLine", "UnixLine",
-    r"""Unix line: string ending with "\n" (ASCII code 10).
+                         r"""Unix line: string ending with "\n" (ASCII code 10).
 See GenericString to get more information.""")
 
 # String prefixed with length written in a 8-bit integer
 PascalString8 = stringFactory("PascalString8", "Pascal8",
-    r"""Pascal string: string prefixed with 8-bit integer containing its length (endian depends on parent endian).
+                              r"""Pascal string: string prefixed with 8-bit integer containing its length (endian depends on parent endian).
 See GenericString to get more information.""")
 
 # String prefixed with length written in a 16-bit integer (use parent endian)
 PascalString16 = stringFactory("PascalString16", "Pascal16",
-    r"""Pascal string: string prefixed with 16-bit integer containing its length (endian depends on parent endian).
+                               r"""Pascal string: string prefixed with 16-bit integer containing its length (endian depends on parent endian).
 See GenericString to get more information.""")
 
 # String prefixed with length written in a 32-bit integer (use parent endian)
 PascalString32 = stringFactory("PascalString32", "Pascal32",
-    r"""Pascal string: string prefixed with 32-bit integer containing its length (endian depends on parent endian).
+                               r"""Pascal string: string prefixed with 32-bit integer containing its length (endian depends on parent endian).
 See GenericString to get more information.""")
 
 
@@ -394,11 +398,10 @@ class String(GenericString):
     String with fixed size (size in bytes).
     See GenericString to get more information.
     """
-    static_size = staticmethod(lambda *args, **kw: args[1]*8)
+    static_size = staticmethod(lambda *args, **kw: args[1] * 8)
 
     def __init__(self, parent, name, nbytes, description=None,
-    strip=None, charset=None, truncate=None):
+                 strip=None, charset=None, truncate=None):
         GenericString.__init__(self, parent, name, "fixed", description,
-            strip=strip, charset=charset, nbytes=nbytes, truncate=truncate)
+                               strip=strip, charset=charset, nbytes=nbytes, truncate=truncate)
 String.__name__ = "FixedString"
-

@@ -14,8 +14,8 @@ def skipSubfile(parser):
     return (subfile == "skip")
 
 FILE_MAX_SIZE = 100 * 1024 * 1024   # Max. file size in bytes (100 MB)
-SLICE_SIZE = 64*1024                # Slice size in bytes (64 KB)
-MEMORY_LIMIT = 50*1024*1024
+SLICE_SIZE = 64 * 1024                # Slice size in bytes (64 KB)
+MEMORY_LIMIT = 50 * 1024 * 1024
 PROGRESS_UPDATE = 1.5   # Minimum number of second between two progress messages
 
 
@@ -43,14 +43,14 @@ class SearchSubfile:
         # Size
         self.stream = stream
         if size is not None:
-            self.size = min(self.stream.size, (offset+size)*8)
+            self.size = min(self.stream.size, (offset + size) * 8)
         else:
             self.size = self.stream.size
 
         # Offset
-        self.start_offset = offset*8
+        self.start_offset = offset * 8
         self.current_offset = self.start_offset
-        self.slice_size = SLICE_SIZE*8   # 64 KB (in bits)
+        self.slice_size = SLICE_SIZE * 8   # 64 KB (in bits)
 
         # Statistics
         self.datarate = DataRate(self.start_offset)
@@ -70,7 +70,7 @@ class SearchSubfile:
         before = time()
         self.patterns = PatternMatching(categories, parser_ids)
         if self.debug:
-            print("Regex compilation: %.1f ms" % ((time() - before)*1000))
+            print("Regex compilation: %.1f ms" % ((time() - before) * 1000))
             print("Use regex: %s" % self.patterns)
 
     def main(self):
@@ -104,7 +104,7 @@ class SearchSubfile:
         if not self.patterns:
             self.loadParsers()
 
-        bytes = (self.size-self.start_offset)//8
+        bytes = (self.size - self.start_offset) // 8
         print("[+] Start search on %s bytes (%s)" % (
             bytes, humanFilesize(bytes)), file=stderr)
         print(file=stderr)
@@ -115,12 +115,12 @@ class SearchSubfile:
     def mainFooter(self):
         print(file=stderr)
         print("[+] End of search -- offset=%s (%s)" % (
-            self.current_offset//8, humanFilesize(self.current_offset//8)), file=stderr)
+            self.current_offset // 8, humanFilesize(self.current_offset // 8)), file=stderr)
         size = (self.current_offset - self.start_offset) // 8
         duration = time() - self.main_start
         if 0.1 <= duration:
             print("Total time: %s -- global rate: %s/sec" % (
-                humanDuration(duration*1000), humanFilesize(size // duration)), file=stderr)
+                humanDuration(duration * 1000), humanFilesize(size // duration)), file=stderr)
 
     def searchSubfiles(self):
         """
@@ -136,17 +136,19 @@ class SearchSubfile:
                 self.processParser(offset, parser)
             self.current_offset += self.slice_size
             if self.next_offset:
-                self.current_offset = max(self.current_offset, self.next_offset)
+                self.current_offset = max(
+                    self.current_offset, self.next_offset)
             self.current_offset = min(self.current_offset, self.size)
 
     def processParser(self, offset, parser):
         """
         Process a valid parser.
         """
-        text = "[+] File at %s" % (offset//8)
+        text = "[+] File at %s" % (offset // 8)
         if parser.content_size is not None:
-            text += " size=%s (%s)" % (parser.content_size//8, humanFilesize(parser.content_size//8))
-        if not(parser.content_size) or parser.content_size//8 < FILE_MAX_SIZE:
+            text += " size=%s (%s)" % (parser.content_size //
+                                       8, humanFilesize(parser.content_size // 8))
+        if not(parser.content_size) or parser.content_size // 8 < FILE_MAX_SIZE:
             text += ": " + parser.description
         else:
             text += ": " + parser.__class__.__name__
@@ -154,11 +156,12 @@ class SearchSubfile:
         if self.output and parser.content_size:
             if (offset == 0 and parser.content_size == self.size):
                 text += " (don't copy whole file)"
-            elif parser.content_size//8 >= FILE_MAX_SIZE:
+            elif parser.content_size // 8 >= FILE_MAX_SIZE:
                 text += " (don't copy file, too big)"
             elif not self.filter or self.filter(parser):
                 filename = self.output.createFilename(parser.filename_suffix)
-                filename = self.output.writeFile(filename, self.stream, offset, parser.content_size)
+                filename = self.output.writeFile(
+                    filename, self.stream, offset, parser.content_size)
                 text += " => %s" % filename
         print(text)
         self.next_progress = time() + PROGRESS_UPDATE
@@ -175,7 +178,7 @@ class SearchSubfile:
         start = offset
         end = start + self.slice_size
         end = min(end, self.size)
-        data = self.stream.readBytes(start, (end-start)//8)
+        data = self.stream.readBytes(start, (end - start) // 8)
         for parser_cls, offset in self.patterns.search(data):
             offset += start
             # Skip invalid offset
@@ -199,12 +202,12 @@ class SearchSubfile:
 
             if self.debug:
                 print("Found %s at offset %s" % (
-                    parser.__class__.__name__, offset//8), file=stderr)
+                    parser.__class__.__name__, offset // 8), file=stderr)
             yield (offset, parser)
 
             # Set next offset
             if parser.content_size is not None\
-            and skipSubfile(parser):
+                    and skipSubfile(parser):
                 self.next_offset = offset + parser.content_size
                 if end <= self.next_offset:
                     break
@@ -230,7 +233,8 @@ class SearchSubfile:
         self.next_progress = time() + PROGRESS_UPDATE
 
         # Progress offset
-        percent = float(self.current_offset - self.start_offset) * 100 / (self.size - self.start_offset)
+        percent = float(self.current_offset - self.start_offset) * \
+            100 / (self.size - self.start_offset)
         offset = self.current_offset // 8
         message = "Search: %.2f%% -- offset=%u (%s)" % (
             percent, offset, humanFilesize(offset))
@@ -244,4 +248,3 @@ class SearchSubfile:
 
         # Display message
         print(message, file=stderr)
-

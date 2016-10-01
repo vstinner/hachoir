@@ -7,10 +7,10 @@ Author: Victor Stinner
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet,
-    MissingField, ParserError, createOrphanField,
-    Bit, Bits, Enum,
-    PaddingBits, PaddingBytes,
-    RawBytes)
+                           MissingField, ParserError, createOrphanField,
+                           Bit, Bits, Enum,
+                           PaddingBits, PaddingBytes,
+                           RawBytes)
 from hachoir.parser.audio.id3 import ID3v1, ID3v2
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.core.tools import humanFrequency, humanBitSize
@@ -18,15 +18,16 @@ from hachoir.core.bits import long2raw
 from hachoir.stream import InputStreamError
 
 # Max MP3 filesize: 200 MB
-MAX_FILESIZE = 200*1024*1024*8
+MAX_FILESIZE = 200 * 1024 * 1024 * 8
+
 
 class Frame(FieldSet):
-    VERSION_NAME = { 0: "2.5", 2: "2", 3: "1" }
+    VERSION_NAME = {0: "2.5", 2: "2", 3: "1"}
     MPEG_I = 3
     MPEG_II = 2
     MPEG_II_5 = 0
 
-    LAYER_NAME = { 1: "III", 2: "II", 3: "I" }
+    LAYER_NAME = {1: "III", 2: "II", 3: "I"}
     LAYER_I = 3
     LAYER_II = 2
     LAYER_III = 1
@@ -34,16 +35,22 @@ class Frame(FieldSet):
     # Bit rates (bit_rate * 1000 = bits/sec)
     # key 15 is always invalid
     BIT_RATES = {
-        1: ( # MPEG1
-            ( 0, 32,  64,  96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448 ), # layer I
-            ( 0, 32,  48,  56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 384 ), # layer II
-            ( 0, 32,  40,  48,  56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320 ), # layer III
+        1: (  # MPEG1
+            (0, 32,  64,  96, 128, 160, 192, 224, 256,
+             288, 320, 352, 384, 416, 448),  # layer I
+            (0, 32,  48,  56,  64,  80,  96, 112, 128,
+             160, 192, 224, 256, 320, 384),  # layer II
+            (0, 32,  40,  48,  56,  64,  80,  96, 112,
+             128, 160, 192, 224, 256, 320),  # layer III
             # -   1    2    3    4    5    6    7    8    9   10   11   12   13   14 -
         ),
-        2: ( # MPEG2 / MPEG2.5
-            ( 0, 32,  48,  56,  64,  80,  96, 112, 128, 144, 160, 176, 192, 224, 256 ), # layer I
-            ( 0,  8,  16,  24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160 ), # layer II
-            ( 0,  8,  16,  24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160 ), # layer III
+        2: (  # MPEG2 / MPEG2.5
+            (0, 32,  48,  56,  64,  80,  96, 112, 128,
+             144, 160, 176, 192, 224, 256),  # layer I
+            (0,  8,  16,  24,  32,  40,  48,  56,  64,
+             80,  96, 112, 128, 144, 160),  # layer II
+            (0,  8,  16,  24,  32,  40,  48,  56,  64,
+             80,  96, 112, 128, 144, 160),  # layer III
             # -   1    2    3    4    5    6    7    8    9   10   11   12   13   14 -
         )
     }
@@ -101,11 +108,11 @@ class Frame(FieldSet):
 
     def isValid(self):
         return (self["layer"].value != 0
-            and self["sync"].value == 2047
-            and self["version"].value != 1
-            and self["sampling_rate"].value != 3
-            and self["bit_rate"].value not in (0, 15)
-            and self["emphasis"].value != 2)
+                and self["sync"].value == 2047
+                and self["version"].value != 1
+                and self["sampling_rate"].value != 3
+                and self["bit_rate"].value not in (0, 15)
+                and self["emphasis"].value != 2)
 
     def getSampleRate(self):
         """
@@ -127,9 +134,9 @@ class Frame(FieldSet):
         if bit_rate in (0, 15):
             return None
         if self["version"].value == 3:
-            dataset = self.BIT_RATES[1] # MPEG1
+            dataset = self.BIT_RATES[1]  # MPEG1
         else:
-            dataset = self.BIT_RATES[2] # MPEG2 / MPEG2.5
+            dataset = self.BIT_RATES[2]  # MPEG2 / MPEG2.5
         try:
             return dataset[layer][bit_rate] * 1000
         except (KeyError, IndexError):
@@ -151,15 +158,15 @@ class Frame(FieldSet):
             if self["version"].value == self.MPEG_I:
                 return (frame_size * 144) // sample_rate + padding
             else:
-                return (frame_size * 72)  // sample_rate + padding
+                return (frame_size * 72) // sample_rate + padding
         elif self["layer"].value == self.LAYER_II:
             return (frame_size * 144) // sample_rate + padding
-        else: # self.LAYER_I:
+        else:  # self.LAYER_I:
             frame_size = (frame_size * 12) // sample_rate
             return (frame_size + padding) * 4
 
     def getNbChannel(self):
-        return self.NB_CHANNEL[ self["channel_mode"].value ]
+        return self.NB_CHANNEL[self["channel_mode"].value]
 
     def createDescription(self):
         info = ["layer %s" % self["layer"].display]
@@ -170,6 +177,7 @@ class Frame(FieldSet):
         if sampling_rate:
             info.append(humanFrequency(sampling_rate))
         return "MPEG-%s %s" % (self["version"].display, ", ".join(info))
+
 
 def findSynchronizeBits(parser, start, max_size):
     """
@@ -191,7 +199,7 @@ def findSynchronizeBits(parser, start, max_size):
         # Strong validation of frame: create the frame
         # and call method isValid()
         try:
-            frame = createOrphanField(parser, start-address0, Frame, "frame")
+            frame = createOrphanField(parser, start - address0, Frame, "frame")
             valid = frame.isValid()
         except Exception:
             valid = False
@@ -203,6 +211,7 @@ def findSynchronizeBits(parser, start, max_size):
         size += 1
     return None
 
+
 class Frames(FieldSet):
     # Padding bytes allowed before a frame
     MAX_PADDING = 256
@@ -210,10 +219,11 @@ class Frames(FieldSet):
     def synchronize(self):
         addr = self.absolute_address
         start = addr + self.current_size
-        end = min(start + self.MAX_PADDING*8, addr + self.size)
+        end = min(start + self.MAX_PADDING * 8, addr + self.size)
         padding = findSynchronizeBits(self, start, end)
         if padding is None:
-            raise ParserError("MPEG audio: Unable to find synchronization bits")
+            raise ParserError(
+                "MPEG audio: Unable to find synchronization bits")
         if padding:
             return PaddingBytes(self, "padding[]", padding, "Padding before synchronization")
         else:
@@ -261,6 +271,7 @@ class Frames(FieldSet):
             text = "Variable bit rate (VBR)"
         return "Frames: %s" % text
 
+
 def createMpegAudioMagic():
 
     # ID3v1 magic
@@ -268,8 +279,8 @@ def createMpegAudioMagic():
 
     # ID3v2 magics
     for ver_major in ID3v2.VALID_MAJOR_VERSIONS:
-       magic = b"ID3%c\x00" % ver_major
-       magics.append( (magic,0) )
+        magic = b"ID3%c\x00" % ver_major
+        magics.append((magic, 0))
 
     # MPEG frame magic
     # TODO: Use longer magic: 32 bits instead of 16 bits
@@ -277,10 +288,12 @@ def createMpegAudioMagic():
     for version in Frame.VERSION_NAME.keys():
         for layer in Frame.LAYER_NAME.keys():
             for crc16 in (0, 1):
-                magic = (SYNC_BITS << 5) | (version << 3) | (layer << 1) | crc16
+                magic = (SYNC_BITS << 5) | (
+                    version << 3) | (layer << 1) | crc16
                 magic = long2raw(magic, BIG_ENDIAN, 2)
-                magics.append( (magic, 0) )
+                magics.append((magic, 0))
     return magics
+
 
 class MpegAudioFile(Parser):
     PARSER_TAGS = {
@@ -288,8 +301,8 @@ class MpegAudioFile(Parser):
         "category": "audio",
         "file_ext": ("mpa", "mp1", "mp2", "mp3"),
         "mime": ("audio/mpeg",),
-        "min_size": 4*8,
-#        "magic": createMpegAudioMagic(),
+        "min_size": 4 * 8,
+        #        "magic": createMpegAudioMagic(),
         "description": "MPEG audio version 1, 2, 2.5",
         "subfile": "skip",
     }
@@ -299,7 +312,7 @@ class MpegAudioFile(Parser):
         if self[0].name in ("id3v2", "id3v1"):
             return True
 
-        if not self.stream.checked: # TODO: is it possible to handle piped input?
+        if not self.stream.checked:  # TODO: is it possible to handle piped input?
             return False
 
         # Validate first 5 frames
@@ -309,7 +322,7 @@ class MpegAudioFile(Parser):
             except MissingField:
                 # Require a least one valid frame
                 if (1 <= index) \
-                and self["frames"].done:
+                        and self["frames"].done:
                     return True
                 return "Unable to get frame #%u" % index
             except (InputStreamError, ParserError):
@@ -332,16 +345,16 @@ class MpegAudioFile(Parser):
         if self.stream.readBytes(0, 3) == b"ID3":
             yield ID3v2(self, "id3v2")
 
-        if self._size is None: # TODO: is it possible to handle piped input?
+        if self._size is None:  # TODO: is it possible to handle piped input?
             raise NotImplementedError
 
         # Check if file is ending with ID3v1 or not and compute frames size
         frames_size = self.size - self.current_size
-        addr = self.size - 128*8
+        addr = self.size - 128 * 8
         if 0 <= addr:
             has_id3 = (self.stream.readBytes(addr, 3) == b"TAG")
             if has_id3:
-                frames_size -= 128*8
+                frames_size -= 128 * 8
         else:
             has_id3 = False
 
@@ -386,7 +399,8 @@ class MpegAudioFile(Parser):
         while True:
             try:
                 # Parse one MPEG audio frame
-                frame = createOrphanField(frames, size - address0, Frame, "frame")
+                frame = createOrphanField(
+                    frames, size - address0, Frame, "frame")
 
                 # Check frame 32 bits header
                 if not frame.isValid():
@@ -404,4 +418,3 @@ class MpegAudioFile(Parser):
         except InputStreamError:
             pass
         return size
-

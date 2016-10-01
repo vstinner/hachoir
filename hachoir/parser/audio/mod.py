@@ -20,8 +20,8 @@ Creation: 18th February 2007
 from math import log10
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet,
-    Bits, UInt16, UInt8,
-    RawBytes, String, GenericVector)
+                           Bits, UInt16, UInt8,
+                           RawBytes, String, GenericVector)
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.core.text_handler import textHandler
 
@@ -42,15 +42,19 @@ MODULE_TYPE = {
     b"FA08": ("Digital Tracker", 8),
 }
 
+
 def getFineTune(val):
     return ("0", "1", "2", "3", "4", "5", "6", "7", "8",
             "-8", "-7", "-6", "-5", "-4", "-3", "-2", "-1")[val.value]
 
+
 def getVolume(val):
-    return "%.1f dB" % (20.0*log10(val.value/64.0))
+    return "%.1f dB" % (20.0 * log10(val.value / 64.0))
+
 
 class SampleInfo(FieldSet):
-    static_size = 30*8
+    static_size = 30 * 8
+
     def createFields(self):
         yield String(self, "name", 22, strip='\0')
         yield UInt16(self, "sample_count")
@@ -62,8 +66,9 @@ class SampleInfo(FieldSet):
     def createValue(self):
         return self["name"].value
 
+
 class Header(FieldSet):
-    static_size = 1084*8
+    static_size = 1084 * 8
 
     def createFields(self):
         yield String(self, "name", 20, strip='\0')
@@ -76,8 +81,10 @@ class Header(FieldSet):
     def getNumChannels(self):
         return MODULE_TYPE[self["type"].value][1]
 
+
 class Note(FieldSet):
-    static_size = 8*4
+    static_size = 8 * 4
+
     def createFields(self):
         yield Bits(self, 4, "note_hi_nibble")
         yield Bits(self, 12, "period")
@@ -85,42 +92,48 @@ class Note(FieldSet):
         yield Bits(self, 4, "effect")
         yield UInt8(self, "parameter")
 
+
 class Row(FieldSet):
+
     def __init__(self, parent, name, channels, desc=None):
         FieldSet.__init__(self, parent, name, description=desc)
         self.channels = channels
-        self._size = 8*self.channels*4
+        self._size = 8 * self.channels * 4
 
     def createFields(self):
         for index in range(self.channels):
             yield Note(self, "note[]")
 
+
 class Pattern(FieldSet):
+
     def __init__(self, parent, name, channels, desc=None):
         FieldSet.__init__(self, parent, name, description=desc)
         self.channels = channels
-        self._size = 64*8*self.channels*4
+        self._size = 64 * 8 * self.channels * 4
 
     def createFields(self):
         for index in range(64):
             yield Row(self, "row[]", self.channels)
 
+
 class AmigaModule(Parser):
     PARSER_TAGS = {
         "id": "mod",
         "category": "audio",
-        "file_ext": ("mod", "nst", "wow", "oct", "sd0" ),
+        "file_ext": ("mod", "nst", "wow", "oct", "sd0"),
         "mime": ('audio/mod', 'audio/x-mod', 'audio/mod', 'audio/x-mod'),
-        "min_size": 1084*8,
+        "min_size": 1084 * 8,
         "description": "Uncompressed amiga module"
     }
     endian = BIG_ENDIAN
 
     def validate(self):
-        modtype = self.stream.readBytes(1080*8, 4)
+        modtype = self.stream.readBytes(1080 * 8, 4)
         if modtype not in MODULE_TYPE:
             return "Invalid module type %a" % modtype
-        self.createValue = lambda modtype: "%s module, %u channels" % MODULE_TYPE[modtype]
+        self.createValue = lambda modtype: "%s module, %u channels" % MODULE_TYPE[
+            modtype]
         return True
 
     def createFields(self):
@@ -144,6 +157,5 @@ class AmigaModule(Parser):
             count = header["samples/info[%u]/sample_count" % index].value
             if count:
                 self.info("Yielding sample %u: %u samples" % (index, count))
-                yield RawBytes(self, "sample_data[]", 2*count, \
+                yield RawBytes(self, "sample_data[]", 2 * count,
                                "Sample %u" % index)
-

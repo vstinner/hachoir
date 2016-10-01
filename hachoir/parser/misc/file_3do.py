@@ -7,18 +7,20 @@ Creation date: 28 september 2006
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet,
-    UInt32, Int32, String, Float32,
-    RawBytes, PaddingBytes)
+                           UInt32, Int32, String, Float32,
+                           RawBytes, PaddingBytes)
 from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir.parser.misc.common import Vertex, MapUV
 
+
 class Vector(FieldSet):
+
     def __init__(self, parent, name,
-    count, type, ename, edesc=None, description=None):
+                 count, type, ename, edesc=None, description=None):
         FieldSet.__init__(self, parent, name, description)
         self.count = count
         self.type = type
-        self.ename = ename+"[]"
+        self.ename = ename + "[]"
         self.edesc = edesc
         try:
             item_size = self.type.static_size(self.ename, self.edesc)
@@ -31,7 +33,9 @@ class Vector(FieldSet):
         for index in range(self.count):
             yield self.type(self, self.ename, self.edesc)
 
+
 class Face(FieldSet):
+
     def createFields(self):
         yield UInt32(self, "id")
         yield UInt32(self, "type")
@@ -48,17 +52,19 @@ class Face(FieldSet):
         yield Vertex(self, "normal")
         if self["nvertices"].value:
             yield Vector(self, "vertex_indices",
-                self["nvertices"].value, UInt32, "vertex")
+                         self["nvertices"].value, UInt32, "vertex")
         if self["has_texture"].value:
             yield Vector(self, "texture_vertex_indices",
-                self["nvertices"].value, UInt32, "texture_vertex")
+                         self["nvertices"].value, UInt32, "texture_vertex")
         if self["has_material"].value:
             yield UInt32(self, "material_index", "material index")
 
     def createDescription(self):
         return "Face: id=%s" % self["id"].value
 
+
 class Mesh(FieldSet):
+
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
 
@@ -75,20 +81,20 @@ class Mesh(FieldSet):
         nb_vert = self["nmesh_vertices"].value
         if nb_vert:
             yield Vector(self, "vertices",
-                nb_vert, Vertex, "vertex")
+                         nb_vert, Vertex, "vertex")
         if self["ntexture_vertices"].value:
             yield Vector(self, "texture vertices",
-                self["ntexture_vertices"].value, MapUV, "texture_vertex")
+                         self["ntexture_vertices"].value, MapUV, "texture_vertex")
         if nb_vert:
             yield Vector(self, "light vertices",
-                nb_vert, Float32, "extra_light")
+                         nb_vert, Float32, "extra_light")
             yield Vector(self, "unknown[]",
-                nb_vert, Float32, "unknown")
+                         nb_vert, Float32, "unknown")
         if self["nfaces"].value:
             yield Vector(self, "faces", self["nfaces"].value, Face, "face")
         if nb_vert:
             yield Vector(self, "vertex normals",
-                nb_vert, Vertex, "normal")
+                         nb_vert, Vertex, "normal")
 
         yield UInt32(self, "has_shadow")
         yield Float32(self, "unknown[]")
@@ -99,7 +105,9 @@ class Mesh(FieldSet):
     def createDescription(self):
         return 'Mesh "%s" (id %s)' % (self["name"].value, self["id"].value)
 
+
 class Geoset(FieldSet):
+
     def createFields(self):
         yield UInt32(self, "count")
         for index in range(self["count"].value):
@@ -108,10 +116,12 @@ class Geoset(FieldSet):
     def createDescription(self):
         return "Set of %s meshes" % self["count"].value
 
+
 class Node(FieldSet):
+
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
-        size = (188-4)*8
+        size = (188 - 4) * 8
         if self["parent_offset"].value != 0:
             size += 32
         if self["first_child_offset"].value != 0:
@@ -149,7 +159,9 @@ class Node(FieldSet):
     def createDescription(self):
         return 'Node "%s"' % self["name"].value
 
+
 class Nodes(FieldSet):
+
     def createFields(self):
         yield UInt32(self, "count")
         for index in range(self["count"].value):
@@ -158,11 +170,13 @@ class Nodes(FieldSet):
     def createDescription(self):
         return 'Nodes (%s)' % self["count"].value
 
+
 class Materials(FieldSet):
+
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
         count = self["count"]
-        self._size = count.size + count.value * (32*8)
+        self._size = count.size + count.value * (32 * 8)
 
     def createFields(self):
         yield UInt32(self, "count")
@@ -172,13 +186,14 @@ class Materials(FieldSet):
     def createDescription(self):
         return 'Material file names (%s)' % self["count"].value
 
+
 class File3do(Parser):
     PARSER_TAGS = {
         "id": "3do",
         "category": "misc",
         "file_ext": ("3do",),
         "mime": ("image/x-3do",),
-        "min_size": 8*4,
+        "min_size": 8 * 4,
         "description": "renderdroid 3d model."
     }
 
@@ -186,7 +201,7 @@ class File3do(Parser):
 
     def validate(self):
         signature = self.stream.readBytes(0, 4)
-        return signature in (b'LDOM', b'MODL') # lazy endian-safe hack =D
+        return signature in (b'LDOM', b'MODL')  # lazy endian-safe hack =D
 
     def createFields(self):
         # Read file signature, and fix endian if needed
@@ -209,4 +224,3 @@ class File3do(Parser):
         # Read the end of the file
         if self.current_size < self._size:
             yield self.seekBit(self._size, "end")
-

@@ -7,11 +7,13 @@ Author: Victor Stinner
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet,
-    UInt16, UInt32, String, NullBytes, Enum, RawBytes)
+                           UInt16, UInt32, String, NullBytes, Enum, RawBytes)
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.parser.image.photoshop_metadata import Photoshop8BIM
 
+
 class Config(FieldSet):
+
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
         self._size = (4 + self["size"].value) * 8
@@ -21,6 +23,7 @@ class Config(FieldSet):
         while not self.eof:
             yield Photoshop8BIM(self, "item[]")
 
+
 class PsdFile(Parser):
     endian = BIG_ENDIAN
     PARSER_TAGS = {
@@ -28,8 +31,8 @@ class PsdFile(Parser):
         "category": "image",
         "file_ext": ("psd",),
         "mime": ("image/psd", "image/photoshop", "image/x-photoshop"),
-        "min_size": 4*8,
-        "magic": ((b"8BPS\0\1",0),),
+        "min_size": 4 * 8,
+        "magic": ((b"8BPS\0\1", 0),),
         "description": "Photoshop (PSD) picture",
     }
     COLOR_MODE = {
@@ -82,4 +85,3 @@ class PsdFile(Parser):
         size = (self.size - self.current_size) // 8
         if size:
             yield RawBytes(self, "end", size)
-

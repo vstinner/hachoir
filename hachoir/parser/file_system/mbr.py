@@ -14,15 +14,17 @@ Master Boot Record.
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet,
-    Enum, Bits, UInt8, UInt16, UInt32,
-    RawBytes)
+                           Enum, Bits, UInt8, UInt16, UInt32,
+                           RawBytes)
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.tools import humanFilesize
 from hachoir.core.text_handler import textHandler, hexadecimal
 
 BLOCK_SIZE = 512  # bytes
 
+
 class CylinderNumber(Bits):
+
     def __init__(self, parent, name, description=None):
         Bits.__init__(self, parent, name, 10, description)
 
@@ -31,8 +33,9 @@ class CylinderNumber(Bits):
             self.absolute_address, False, self._size, self.parent.endian)
         return i >> 2 | i % 4 << 8
 
+
 class PartitionHeader(FieldSet):
-    static_size = 16*8
+    static_size = 16 * 8
 
     # taken from the source of cfdisk:
     # sed -n 's/.*{\(.*\), N_(\(.*\))}.*/        \1: \2,/p' i386_sys_types.c
@@ -136,7 +139,8 @@ class PartitionHeader(FieldSet):
     def createFields(self):
         yield UInt8(self, "bootable", "Bootable flag (true if equals to 0x80)")
         if self["bootable"].value not in (0x00, 0x80):
-            self.warning("Stream doesn't look like master boot record (partition bootable error)!")
+            self.warning(
+                "Stream doesn't look like master boot record (partition bootable error)!")
         yield UInt8(self, "start_head", "Starting head number of the partition")
         yield Bits(self, "start_sector", 6, "Starting sector number of the partition")
         yield CylinderNumber(self, "start_cylinder", "Starting cylinder number of the partition")
@@ -162,7 +166,7 @@ class PartitionHeader(FieldSet):
 
 
 class MasterBootRecord(FieldSet):
-    static_size = 512*8
+    static_size = 512 * 8
 
     def createFields(self):
         yield RawBytes(self, "program", 446, "Boot program (Intel x86 machine code)")
@@ -173,11 +177,12 @@ class MasterBootRecord(FieldSet):
         yield textHandler(UInt16(self, "signature", "Signature (0xAA55)"), hexadecimal)
 
     def _getPartitions(self):
-        return ( self[index] for index in range(1,5) )
+        return (self[index] for index in range(1, 5))
     headers = property(_getPartitions)
 
 
 class Partition(FieldSet):
+
     def createFields(self):
         mbr = MasterBootRecord(self, "mbr")
         yield mbr
@@ -187,7 +192,7 @@ class Partition(FieldSet):
             return
 
         for start, index, header in sorted((hdr["LBA"].value, index, hdr)
-                for index, hdr in enumerate(mbr.headers) if hdr.isUsed()):
+                                           for index, hdr in enumerate(mbr.headers) if hdr.isUsed()):
             # Seek to the beginning of the partition
             padding = self.seekByte(start * BLOCK_SIZE, "padding[]")
             if padding:
@@ -214,13 +219,13 @@ class MSDos_HardDrive(Parser, Partition):
         "id": "msdos_harddrive",
         "category": "file_system",
         "description": "MS-DOS hard drive with Master Boot Record (MBR)",
-        "min_size": 512*8,
+        "min_size": 512 * 8,
         "file_ext": ("",),
-#        "magic": ((MAGIC, 510*8),),
+        #        "magic": ((MAGIC, 510*8),),
     }
 
     def validate(self):
-        if self.stream.readBytes(510*8, 2) != self.MAGIC:
+        if self.stream.readBytes(510 * 8, 2) != self.MAGIC:
             return "Invalid signature"
         used = False
         for hdr in self["mbr"].headers:

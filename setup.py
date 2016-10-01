@@ -48,6 +48,7 @@ CLASSIFIERS = [
     'Topic :: Utilities',
 ]
 
+
 def main():
     if "--setuptools" in argv:
         argv.remove("--setuptools")
@@ -81,4 +82,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

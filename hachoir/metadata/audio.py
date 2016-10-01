@@ -15,18 +15,20 @@ def computeComprRate(meta, size):
         or not meta.has("sample_rate")
         or not meta.has("bits_per_sample")
         or not meta.has("nb_channel")
-        or not size):
+            or not size):
         return
-    orig_size = timedelta2seconds(meta.get("duration")) * meta.get('sample_rate') * meta.get('bits_per_sample') * meta.get('nb_channel')
+    orig_size = timedelta2seconds(meta.get("duration")) * meta.get(
+        'sample_rate') * meta.get('bits_per_sample') * meta.get('nb_channel')
     meta.compr_rate = float(orig_size) / size
 
 
 def computeBitRate(meta):
     if not meta.has("bits_per_sample") \
-    or not meta.has("nb_channel") \
-    or not meta.has("sample_rate"):
+            or not meta.has("nb_channel") \
+            or not meta.has("sample_rate"):
         return
-    meta.bit_rate = meta.get('bits_per_sample') * meta.get('nb_channel') * meta.get('sample_rate')
+    meta.bit_rate = meta.get('bits_per_sample') * \
+        meta.get('nb_channel') * meta.get('sample_rate')
 
 VORBIS_KEY_TO_ATTR = {
     "ARTIST": "artist",
@@ -64,6 +66,7 @@ def readVorbisComment(metadata, comment):
 
 
 class OggMetadata(MultipleMetadata):
+
     def extract(self, ogg):
         granule_quotient = None
         for index, page in enumerate(ogg.array("page")):
@@ -97,7 +100,8 @@ class OggMetadata(MultipleMetadata):
             page = ogg.createLastPage()
             if page and "abs_granule_pos" in page:
                 try:
-                    self.duration = timedelta(seconds=float(page["abs_granule_pos"].value) / granule_quotient)
+                    self.duration = timedelta(seconds=float(
+                        page["abs_granule_pos"].value) / granule_quotient)
                 except OverflowError:
                     pass
 
@@ -111,16 +115,18 @@ class OggMetadata(MultipleMetadata):
 
     def theoraHeader(self, header, meta):
         meta.compression = "Theora"
-        meta.format_version = "Theora version %u.%u (revision %u)" % (\
+        meta.format_version = "Theora version %u.%u (revision %u)" % (
             header["version_major"].value,
             header["version_minor"].value,
             header["version_revision"].value)
         meta.width = header["frame_width"].value
         meta.height = header["frame_height"].value
         if header["fps_den"].value:
-            meta.frame_rate = float(header["fps_num"].value) / header["fps_den"].value
+            meta.frame_rate = float(
+                header["fps_num"].value) / header["fps_den"].value
         if header["aspect_ratio_den"].value:
-            meta.aspect_ratio = float(header["aspect_ratio_num"].value) / header["aspect_ratio_den"].value
+            meta.aspect_ratio = float(
+                header["aspect_ratio_num"].value) / header["aspect_ratio_den"].value
         meta.pixel_format = header["pixel_format"].display
         meta.comment = "Quality: %s" % header["quality"].value
 
@@ -128,11 +134,13 @@ class OggMetadata(MultipleMetadata):
         meta.compression = "Vorbis"
         meta.sample_rate = header["audio_sample_rate"].value
         meta.nb_channel = header["audio_channels"].value
-        meta.format_version = "Vorbis version %s" % header["vorbis_version"].value
+        meta.format_version = "Vorbis version %s" % header[
+            "vorbis_version"].value
         meta.bit_rate = header["bitrate_nominal"].value
 
 
 class AuMetadata(RootMetadata):
+
     def extract(self, audio):
         self.sample_rate = audio["sample_rate"].value
         self.nb_channel = audio["channels"].value
@@ -143,13 +151,14 @@ class AuMetadata(RootMetadata):
         computeBitRate(self)
         if "audio_data" in audio:
             if self.has("bit_rate"):
-                self.duration = timedelta(seconds=float(audio["audio_data"].size) / self.get('bit_rate'))
+                self.duration = timedelta(seconds=float(
+                    audio["audio_data"].size) / self.get('bit_rate'))
             computeComprRate(self, audio["audio_data"].size)
 
 
 class RealAudioMetadata(RootMetadata):
     FOURCC_TO_BITRATE = {
-        "28_8": 15200, # 28.8 kbit/sec (audio bit rate: 15.2 kbit/s)
+        "28_8": 15200,  # 28.8 kbit/sec (audio bit rate: 15.2 kbit/s)
         "14_4": 8000,  # 14.4 kbit/sec
         "lpcJ": 8000,  # 14.4 kbit/sec
     }
@@ -163,7 +172,8 @@ class RealAudioMetadata(RootMetadata):
         if version == 3:
             size = getValue(real, "data_size")
         elif "filesize" in real and "headersize" in real:
-            size = (real["filesize"].value + 40) - (real["headersize"].value + 16)
+            size = (real["filesize"].value + 40) - \
+                (real["headersize"].value + 16)
         else:
             size = None
         if size:
@@ -247,7 +257,7 @@ class RealMediaMetadata(MultipleMetadata):
             meta.duration = timedelta(milliseconds=stream["duration"].value)
             meta.mime_type = getValue(stream, "mime_type")
         meta.title = getValue(stream, "desc")
-        self.addGroup("stream[%u]" % index, meta, "Stream #%u" % (1+index))
+        self.addGroup("stream[%u]" % index, meta, "Stream #%u" % (1 + index))
 
 
 class MpegAudioMetadata(RootMetadata):
@@ -311,7 +321,8 @@ class MpegAudioMetadata(RootMetadata):
     def extract(self, mp3):
         if "/frames/frame[0]" in mp3:
             frame = mp3["/frames/frame[0]"]
-            self.nb_channel = (frame.getNbChannel(), frame["channel_mode"].display)
+            self.nb_channel = (frame.getNbChannel(), frame[
+                               "channel_mode"].display)
             self.format_version = "MPEG version %s layer %s" % \
                 (frame["version"].display, frame["layer"].display)
             self.sample_rate = frame.getSampleRate()
@@ -336,18 +347,20 @@ class MpegAudioMetadata(RootMetadata):
             computeComprRate(self, mp3["frames"].size)
 
     def computeBitrate(self, frame):
-        bit_rate = frame.getBitRate() # may returns None on error
+        bit_rate = frame.getBitRate()  # may returns None on error
         if not bit_rate:
             return
         self.bit_rate = (bit_rate, "%s (constant)" % humanBitRate(bit_rate))
-        self.duration = timedelta(seconds=float(frame["/frames"].size) / bit_rate)
+        self.duration = timedelta(seconds=float(
+            frame["/frames"].size) / bit_rate)
 
     def computeVariableBitrate(self, mp3):
         if self.quality <= QUALITY_FAST:
             return
         count = 0
         if QUALITY_BEST <= self.quality:
-            self.warning("Process all MPEG audio frames to compute exact duration")
+            self.warning(
+                "Process all MPEG audio frames to compute exact duration")
             max_count = None
         else:
             max_count = 500 * self.quality
@@ -365,12 +378,13 @@ class MpegAudioMetadata(RootMetadata):
             return
         bit_rate = total_bit_rate / count
         self.bit_rate = (bit_rate,
-            "%s (Variable bit rate)" % humanBitRate(bit_rate))
+                         "%s (Variable bit rate)" % humanBitRate(bit_rate))
         duration = timedelta(seconds=float(mp3["frames"].size) / bit_rate)
         self.duration = duration
 
 
 class AiffMetadata(RootMetadata):
+
     def extract(self, aiff):
         if "common" in aiff:
             self.useCommon(aiff["common"])
@@ -391,6 +405,7 @@ class AiffMetadata(RootMetadata):
 
 
 class FlacMetadata(RootMetadata):
+
     def extract(self, flac):
         if "metadata/stream_info/content" in flac:
             self.useStreamInfo(flac["metadata/stream_info/content"])
@@ -414,4 +429,3 @@ registerExtractor(RealMediaFile, RealMediaMetadata)
 registerExtractor(RealAudioFile, RealAudioMetadata)
 registerExtractor(AiffFile, AiffMetadata)
 registerExtractor(FlacParser, FlacMetadata)
-

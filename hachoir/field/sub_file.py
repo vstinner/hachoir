@@ -7,24 +7,27 @@ class SubFile(Bytes):
     """
     File stored in another file
     """
+
     def __init__(self, parent, name, length, description=None,
-    parser=None, filename=None, mime_type=None, parser_class=None):
+                 parser=None, filename=None, mime_type=None, parser_class=None):
         if filename:
             if not isinstance(filename, str):
                 filename = makePrintable(filename, "ISO-8859-1")
             if not description:
-                description = 'File "%s" (%s)' % (filename, humanFilesize(length))
+                description = 'File "%s" (%s)' % (
+                    filename, humanFilesize(length))
         Bytes.__init__(self, parent, name, length, description)
+
         def createInputStream(cis, **args):
-            tags = args.setdefault("tags",[])
+            tags = args.setdefault("tags", [])
             if parser_class:
-                tags.append(( "class", parser_class ))
+                tags.append(("class", parser_class))
             if parser is not None:
-                tags.append(( "id", parser.PARSER_TAGS["id"] ))
+                tags.append(("id", parser.PARSER_TAGS["id"]))
             if mime_type:
-                tags.append(( "mime", mime_type ))
+                tags.append(("mime", mime_type))
             if filename:
-                tags.append(( "filename", filename ))
+                tags.append(("filename", filename))
             return cis(**args)
         self.setSubIStream(createInputStream)
 
@@ -39,7 +42,7 @@ class CompressedStream:
 
     def read(self, size):
         d = self._buffer
-        data = [ d[:size] ]
+        data = [d[:size]]
         size -= len(d)
         if size > 0:
             d = self.decompressor(size)
@@ -56,7 +59,7 @@ class CompressedStream:
                 d = self.decompressor(size, d)
                 data.append(d[:size])
                 size -= len(d)
-        self._buffer = d[size+len(d):]
+        self._buffer = d[size + len(d):]
         return b''.join(data)
 
 
@@ -69,7 +72,8 @@ def CompressedField(field, decompressor):
             stream = field.stream
         input = CompressedStream(stream, decompressor)
         if source is None:
-            source = "Compressed source: '%s' (offset=%s)" % (stream.source, field.absolute_address)
+            source = "Compressed source: '%s' (offset=%s)" % (
+                stream.source, field.absolute_address)
         return InputIOStream(input, source=source, **args)
     field.setSubIStream(createInputStream)
     return field

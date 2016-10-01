@@ -52,12 +52,12 @@ class QueryParser(object):
             self.parsers.clear()
             return []
         elif isinstance(tag, collections.Callable):
-            parsers = [ parser for parser in self.parsers if tag(parser) ]
+            parsers = [parser for parser in self.parsers if tag(parser)]
             for parser in parsers:
                 self.parsers.remove(parser)
         elif tag[0] == "class":
             self.validate = False
-            return [ tag[1] ]
+            return [tag[1]]
         elif tag[0] == "args":
             self.parser_args = tag[1]
             return []
@@ -66,11 +66,11 @@ class QueryParser(object):
             parsers = []
             if tag is not None:
                 key = tag[0]
-                byname = self.db.bytag.get(key,{})
+                byname = self.db.bytag.get(key, {})
                 if tag[1] is None:
                     values = iter(byname.values())
                 else:
-                    values = byname.get(tag[1],()),
+                    values = byname.get(tag[1], ()),
                 if key == "id" and values:
                     self.validate = False
                 for value in values:

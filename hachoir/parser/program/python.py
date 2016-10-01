@@ -13,8 +13,8 @@ DISASSEMBLE = False
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, UInt8,
-    UInt16, Int32, UInt32, Int64, ParserError, Float64, Enum,
-    Character, Bytes, RawBytes, PascalString8, TimestampUnix32)
+                           UInt16, Int32, UInt32, Int64, ParserError, Float64, Enum,
+                           Character, Bytes, RawBytes, PascalString8, TimestampUnix32)
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.bits import long2raw
 from hachoir.core.text_handler import textHandler, hexadecimal
@@ -26,52 +26,67 @@ if DISASSEMBLE:
         dis(bytecode)
 
 # --- String and string reference ---
+
+
 def parseString(parent):
     yield UInt32(parent, "length", "Length")
     length = parent["length"].value
     if parent.name == "lnotab":
-        bytecode_offset=0
-        line_number=parent['../firstlineno'].value
-        for i in range(0,length,2):
-            bc_off_delta=UInt8(parent, 'bytecode_offset_delta[]')
+        bytecode_offset = 0
+        line_number = parent['../firstlineno'].value
+        for i in range(0, length, 2):
+            bc_off_delta = UInt8(parent, 'bytecode_offset_delta[]')
             yield bc_off_delta
-            bytecode_offset+=bc_off_delta.value
-            bc_off_delta._description='Bytecode Offset %i'%bytecode_offset
-            line_number_delta=UInt8(parent, 'line_number_delta[]')
+            bytecode_offset += bc_off_delta.value
+            bc_off_delta._description = 'Bytecode Offset %i' % bytecode_offset
+            line_number_delta = UInt8(parent, 'line_number_delta[]')
             yield line_number_delta
-            line_number+=line_number_delta.value
-            line_number_delta._description='Line Number %i'%line_number
+            line_number += line_number_delta.value
+            line_number_delta._description = 'Line Number %i' % line_number
     elif 0 < length:
         yield RawBytes(parent, "text", length, "Content")
     if DISASSEMBLE and parent.name == "compiled_code":
         disassembleBytecode(parent["text"])
 
+
 def parseStringRef(parent):
     yield textHandler(UInt32(parent, "ref"), hexadecimal)
+
+
 def createStringRefDesc(parent):
     return "String ref: %s" % parent["ref"].display
 
 # --- Integers ---
+
+
 def parseInt32(parent):
     yield Int32(parent, "value")
+
 
 def parseInt64(parent):
     yield Int64(parent, "value")
 
+
 def parseLong(parent):
     yield Int32(parent, "digit_count")
-    for index in range( abs(parent["digit_count"].value) ):
+    for index in range(abs(parent["digit_count"].value)):
         yield UInt16(parent, "digit[]")
 
 
 # --- Float and complex ---
 def parseFloat(parent):
     yield PascalString8(parent, "value")
+
+
 def parseBinaryFloat(parent):
     yield Float64(parent, "value")
+
+
 def parseComplex(parent):
     yield PascalString8(parent, "real")
     yield PascalString8(parent, "complex")
+
+
 def parseBinaryComplex(parent):
     yield Float64(parent, "real")
     yield Float64(parent, "complex")
@@ -85,6 +100,7 @@ def parseTuple(parent):
         raise ParserError("Invalid tuple/list count")
     for index in range(count):
         yield Object(parent, "item[]")
+
 
 def createTupleDesc(parent):
     count = parent["count"].value
@@ -107,10 +123,13 @@ def parseDict(parent):
         yield Object(parent, "value[]")
         parent.count += 1
 
+
 def createDictDesc(parent):
     return "Dict: %s" % ("%s keys" % parent.count)
 
 # --- Code ---
+
+
 def parseCode(parent):
     if 0x3000000 <= parent.root.getVersion():
         yield UInt32(parent, "arg_count", "Argument count")
@@ -142,6 +161,7 @@ def parseCode(parent):
     else:
         yield UInt16(parent, "firstlineno", "First line number")
     yield Object(parent, "lnotab")
+
 
 class Object(FieldSet):
     bytecode_info = {
@@ -195,11 +215,11 @@ class Object(FieldSet):
             self.createValue = self.createValueString
             self.createDisplay = self.createDisplayString
             if code == 't':
-                if not hasattr(self.root,'string_table'):
-                    self.root.string_table=[]
+                if not hasattr(self.root, 'string_table'):
+                    self.root.string_table = []
                 self.root.string_table.append(self)
         elif code == 'R':
-            if hasattr(self.root,'string_table'):
+            if hasattr(self.root, 'string_table'):
                 self.createValue = self.createValueStringRef
 
     def createValueString(self):
@@ -218,7 +238,7 @@ class Object(FieldSet):
         is_negative = self["digit_count"].value < 0
         count = abs(self["digit_count"].value)
         total = 0
-        for index in range(count-1, -1, -1):
+        for index in range(count - 1, -1, -1):
             total <<= 15
             total += self["digit[%u]" % index].value
         if is_negative:
@@ -249,12 +269,13 @@ class Object(FieldSet):
         else:
             return self.code_info[2]
 
+
 class PythonCompiledFile(Parser):
     PARSER_TAGS = {
         "id": "python",
         "category": "program",
         "file_ext": ("pyc", "pyo"),
-        "min_size": 9*8,
+        "min_size": 9 * 8,
         "description": "Compiled Python script (.pyc/.pyo files)"
     }
     endian = LITTLE_ENDIAN
@@ -319,17 +340,18 @@ class PythonCompiledFile(Parser):
 
     # Dictionnary which associate the pyc signature (4-byte long string)
     # to a Python version string (eg. "m\xf2\r\n" => "2.4b1")
-    STR_MAGIC = dict( \
-        (long2raw(magic | (ord('\r')<<16) | (ord('\n')<<24), LITTLE_ENDIAN), value[0]) \
+    STR_MAGIC = dict(
+        (long2raw(magic | (ord('\r') << 16) |
+                  (ord('\n') << 24), LITTLE_ENDIAN), value[0])
         for magic, value in MAGIC.items())
 
     def validate(self):
         signature = self.stream.readBits(0, 16, self.endian)
         if signature not in self.MAGIC:
             return "Unknown version (%s)" % signature
-        if self.stream.readBytes(2*8, 2) != b"\r\n":
+        if self.stream.readBytes(2 * 8, 2) != b"\r\n":
             return r"Wrong signature (\r\n)"
-        if self.stream.readBytes(8*8, 1) != b'c':
+        if self.stream.readBytes(8 * 8, 1) != b'c':
             return "First object bytecode is not code"
         return True
 
@@ -343,4 +365,3 @@ class PythonCompiledFile(Parser):
         yield Enum(Bytes(self, "signature", 4, "Python file signature and version"), self.STR_MAGIC)
         yield TimestampUnix32(self, "timestamp", "Timestamp")
         yield Object(self, "content")
-

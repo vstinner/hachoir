@@ -4,6 +4,7 @@ import collections
 
 
 class Link(Field):
+
     def __init__(self, parent, name, *args, **kw):
         Field.__init__(self, parent, name, 0, *args, **kw)
 
@@ -26,6 +27,7 @@ class Link(Field):
 
 
 class Fragments:
+
     def __init__(self, first):
         self.first = first
 
@@ -72,7 +74,7 @@ class Fragment(FieldSet):
         if isinstance(next, collections.Callable):
             self._next = next = next()
         return next
-    next  = property(_getNext)
+    next = property(_getNext)
 
     def _createInputStream(self, **args):
         first = self.first
@@ -106,5 +108,4 @@ class Fragment(FieldSet):
     def createFields(self):
         if self._size is None:
             self._size = self._getSize()
-        yield Bytes(self, "data", self._size//8)
-
+        yield Bytes(self, "data", self._size // 8)

@@ -29,6 +29,7 @@ STRIP_INDEX = 0x04      # Index in video
 
 
 class BasicStripper:
+
     def __init__(self, editor, level, verbose=False):
         self.editor = editor
         self.level = level
@@ -67,6 +68,7 @@ class BasicStripper:
 
 
 class CheckStripper(BasicStripper):
+
     def checkField(self, field):
         """
         Check if a field of the root have to be removed or not.
@@ -80,6 +82,7 @@ class CheckStripper(BasicStripper):
 
 
 class PngStripper(CheckStripper):
+
     def checkField(self, field):
         if self.level & STRIP_METADATA:
             name = field.name
@@ -91,6 +94,7 @@ class PngStripper(CheckStripper):
 
 
 class JpegStripper(CheckStripper):
+
     def checkField(self, field):
         if self.level & STRIP_METADATA:
             if field.name.startswith("comment"):
@@ -100,6 +104,7 @@ class JpegStripper(CheckStripper):
 
 
 class MpegAudioStripper(CheckStripper):
+
     def checkField(self, field):
         if self.level & STRIP_METADATA:
             return field.name in ("id3v1", "id3v2")
@@ -107,6 +112,7 @@ class MpegAudioStripper(CheckStripper):
 
 
 class AuStripper(BasicStripper):
+
     def strip(self):
         if self.level & STRIP_METADATA and "info" in self.editor:
             size = self.editor["info"].size
@@ -117,6 +123,7 @@ class AuStripper(BasicStripper):
 
 
 class RiffStripper(BasicStripper):
+
     def stripSub(self, editor, names):
         remove = []
         total = 0
@@ -163,6 +170,7 @@ def usage():
 
 
 class TarStripper(BasicStripper):
+
     def strip(self):
         for file in self.editor.array("file"):
             self.stripFile(file)

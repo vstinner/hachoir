@@ -18,8 +18,8 @@ MAX_FILESIZE = 50 * 1024 * 1024
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, StaticFieldSet, Enum,
-    MissingField, ParserError,
-    UInt32, Int32, UInt16, Int16, UInt8, NullBytes, RawBytes, String)
+                           MissingField, ParserError,
+                           UInt32, Int32, UInt16, Int16, UInt8, NullBytes, RawBytes, String)
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal
 from hachoir.core.tools import createDict
@@ -62,15 +62,15 @@ PEN_STYLE = {
 
 # Binary raster operations
 ROP2_DESC = {
-     1: "Black (0)",
-     2: "Not merge pen (DPon)",
-     3: "Mask not pen (DPna)",
-     4: "Not copy pen (PN)",
-     5: "Mask pen not (PDna)",
-     6: "Not (Dn)",
-     7: "Xor pen (DPx)",
-     8: "Not mask pen (DPan)",
-     9: "Mask pen (DPa)",
+    1: "Black (0)",
+    2: "Not merge pen (DPon)",
+    3: "Mask not pen (DPna)",
+    4: "Not copy pen (PN)",
+    5: "Mask pen not (PDna)",
+    6: "Not (Dn)",
+    7: "Xor pen (DPx)",
+    8: "Not mask pen (DPan)",
+    9: "Mask pen (DPa)",
     10: "Not xor pen (DPxn)",
     11: "No operation (D)",
     12: "Merge not pen (DPno)",
@@ -80,14 +80,17 @@ ROP2_DESC = {
     16: "White (1)",
 }
 
+
 def parseXY(parser):
     yield Int16(parser, "x")
     yield Int16(parser, "y")
+
 
 def parseCreateBrushIndirect(parser):
     yield Enum(UInt16(parser, "brush_style"), BRUSH_STYLE)
     yield RGBA(parser, "color")
     yield Enum(UInt16(parser, "brush_hatch"), HATCH_STYLE)
+
 
 def parsePenIndirect(parser):
     yield Enum(UInt16(parser, "pen_style"), PEN_STYLE)
@@ -95,22 +98,29 @@ def parsePenIndirect(parser):
     yield UInt16(parser, "pen_height")
     yield RGBA(parser, "color")
 
+
 def parsePolyFillMode(parser):
     yield Enum(UInt16(parser, "operation"), POLYFILL_MODE)
+
 
 def parseROP2(parser):
     yield Enum(UInt16(parser, "operation"), ROP2_DESC)
 
+
 def parseObjectID(parser):
     yield UInt16(parser, "object_id")
 
+
 class Point(FieldSet):
     static_size = 32
+
     def createFields(self):
         yield Int16(self, "x")
         yield Int16(self, "y")
+
     def createDescription(self):
         return "Point (%s, %s)" % (self["x"].value, self["y"].value)
+
 
 def parsePolygon(parser):
     yield UInt16(parser, "count")
@@ -203,15 +213,19 @@ EMF_MAPPING_MODE = {
 #----------------------------------------------------------------------------
 # EMF parser
 
+
 def parseEmfMappingMode(parser):
     yield Enum(Int32(parser, "mapping_mode"), EMF_MAPPING_MODE)
+
 
 def parseXY32(parser):
     yield Int32(parser, "x")
     yield Int32(parser, "y")
 
+
 def parseObjectID32(parser):
     yield textHandler(UInt32(parser, "object_id"), hexadecimal)
+
 
 def parseBrushIndirect(parser):
     yield UInt32(parser, "ihBrush")
@@ -219,13 +233,17 @@ def parseBrushIndirect(parser):
     yield RGBA(parser, "color")
     yield Int32(parser, "hatch")
 
+
 class Point16(FieldSet):
     static_size = 32
+
     def createFields(self):
         yield Int16(self, "x")
         yield Int16(self, "y")
+
     def createDescription(self):
         return "Point16: (%i,%i)" % (self["x"].value, self["y"].value)
+
 
 def parsePoint16array(parser):
     yield RECT32(parser, "bounds")
@@ -233,14 +251,17 @@ def parsePoint16array(parser):
     for index in range(parser["count"].value):
         yield Point16(parser, "point[]")
 
+
 def parseGDIComment(parser):
     yield UInt32(parser, "data_size")
     size = parser["data_size"].value
     if size:
         yield RawBytes(parser, "data", size)
 
+
 def parseICMMode(parser):
     yield UInt32(parser, "icm_mode")
+
 
 def parseExtCreatePen(parser):
     yield UInt32(parser, "ihPen")
@@ -365,7 +386,9 @@ EMF_META = {
 EMF_META_NAME = createDict(EMF_META, 0)
 EMF_META_DESC = createDict(EMF_META, 1)
 
+
 class Function(FieldSet):
+
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
         if self.root.isEMF():
@@ -407,6 +430,7 @@ class Function(FieldSet):
         except KeyError:
             return "Function %s" % self["function"].display
 
+
 class RECT16(StaticFieldSet):
     format = (
         (Int16, "left"),
@@ -414,13 +438,15 @@ class RECT16(StaticFieldSet):
         (Int16, "right"),
         (Int16, "bottom"),
     )
+
     def createDescription(self):
         return "%s: %ux%u at (%u,%u)" % (
             self.__class__.__name__,
-            self["right"].value-self["left"].value,
-            self["bottom"].value-self["top"].value,
+            self["right"].value - self["left"].value,
+            self["bottom"].value - self["top"].value,
             self["left"].value,
             self["top"].value)
+
 
 class RECT32(RECT16):
     format = (
@@ -429,6 +455,7 @@ class RECT32(RECT16):
         (Int32, "right"),
         (Int32, "bottom"),
     )
+
 
 class PlaceableHeader(FieldSet):
     """
@@ -445,8 +472,10 @@ class PlaceableHeader(FieldSet):
         yield NullBytes(self, "reserved", 4)
         yield textHandler(UInt16(self, "checksum"), hexadecimal)
 
+
 class EMF_Header(FieldSet):
     MAGIC = b"\x20\x45\x4D\x46\0\0"   # (magic, min_ver=0x0000)
+
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
         self._size = self["size"].value * 8
@@ -480,9 +509,10 @@ class EMF_Header(FieldSet):
             yield String(self, "description", size, charset="UTF-16-LE", strip="\0 ")
 
         # Read padding (if any)
-        size = self["size"].value - self.current_size//8
+        size = self["size"].value - self.current_size // 8
         if size:
             yield RawBytes(self, "padding", size)
+
 
 class WMF_File(Parser):
     PARSER_TAGS = {
@@ -495,13 +525,13 @@ class WMF_File(Parser):
             "image/x-emf"),
         "magic": (
             (PlaceableHeader.MAGIC, 0),
-            (EMF_Header.MAGIC, 40*8),
+            (EMF_Header.MAGIC, 40 * 8),
             # WMF: file_type=memory, header size=9, version=3.0
             (b"\0\0\x09\0\0\3", 0),
             # WMF: file_type=disk, header size=9, version=3.0
             (b"\1\0\x09\0\0\3", 0),
         ),
-        "min_size": 40*8,
+        "min_size": 40 * 8,
         "description": "Microsoft Windows Metafile (WMF)",
     }
     endian = LITTLE_ENDIAN
@@ -572,10 +602,10 @@ class WMF_File(Parser):
         """File is in EMF format?"""
         if 1 <= self.current_length:
             return self[0].name == "emf_header"
-        if self.size < 44*8:
+        if self.size < 44 * 8:
             return False
         magic = EMF_Header.MAGIC
-        return self.stream.readBytes(40*8, len(magic)) == magic
+        return self.stream.readBytes(40 * 8, len(magic)) == magic
 
     def isAPM(self):
         """File is in Aldus Placeable Metafiles format?"""
@@ -605,6 +635,5 @@ class WMF_File(Parser):
         start = self["func[0]"].absolute_address
         end = self.stream.searchBytes(b"\3\0\0\0\0\0", start, MAX_FILESIZE * 8)
         if end is not None:
-            return end + 6*8
+            return end + 6 * 8
         return None
-

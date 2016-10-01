@@ -69,7 +69,7 @@ def bin2long(text, endian):
     3
     """
     assert endian in (LITTLE_ENDIAN, BIG_ENDIAN)
-    bits = [(ord(character)-ord("0"))
+    bits = [(ord(character) - ord("0"))
             for character in text if character in "01"]
     if endian is not BIG_ENDIAN:
         bits = bits[::-1]
@@ -150,7 +150,7 @@ def byte2bin(number, classic_mode=True):
     text = ""
     for i in range(0, 8):
         if classic_mode:
-            mask = 1 << (7-i)
+            mask = 1 << (7 - i)
         else:
             mask = 1 << i
         if (number & mask) == mask:

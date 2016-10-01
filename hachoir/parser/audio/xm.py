@@ -15,16 +15,17 @@ Creation: 8th February 2007
 
 from hachoir.parser import Parser
 from hachoir.field import (StaticFieldSet, FieldSet,
-    Bit, RawBits, Bits,
-    UInt32, UInt16, UInt8, Int8, Enum,
-    RawBytes, String, GenericVector)
+                           Bit, RawBits, Bits,
+                           UInt32, UInt16, UInt8, Int8, Enum,
+                           RawBytes, String, GenericVector)
 from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir.core.text_handler import textHandler, filesizeHandler, hexadecimal
 from hachoir.parser.audio.modplug import ParseModplugMetadata
 from hachoir.parser.common.tracker import NOTE_NAME
 
+
 def parseSigned(val):
-    return "%i" % (val.value-128)
+    return "%i" % (val.value - 128)
 
 # From dumb
 SEMITONE_BASE = 1.059463094359295309843105314939748495817
@@ -32,16 +33,20 @@ PITCH_BASE = 1.000225659305069791926712241547647863626
 
 SAMPLE_LOOP_MODE = ("No loop", "Forward loop", "Ping-pong loop", "Undef")
 
+
 class SampleType(FieldSet):
     static_size = 8
+
     def createFields(self):
         yield Bits(self, "unused[]", 4)
         yield Bit(self, "16bits")
         yield Bits(self, "unused[]", 1)
         yield Enum(Bits(self, "loop_mode", 2), SAMPLE_LOOP_MODE)
 
+
 class SampleHeader(FieldSet):
-    static_size = 40*8
+    static_size = 40 * 8
+
     def createFields(self):
         yield UInt32(self, "length")
         yield UInt32(self, "loop_start")
@@ -55,11 +60,13 @@ class SampleHeader(FieldSet):
         yield String(self, "name", 22, charset="ASCII", strip=' \0')
 
     def createValue(self):
-        bytes = 1+self["type/16bits"].value
-        C5_speed = int(16726.0*pow(SEMITONE_BASE, self["relative_note"].value)
-                       *pow(PITCH_BASE, self["fine_tune"].value*2))
+        bytes = 1 + self["type/16bits"].value
+        C5_speed = int(16726.0 * pow(SEMITONE_BASE, self["relative_note"].value)
+                       * pow(PITCH_BASE, self["fine_tune"].value * 2))
         return "%s, %ubits, %u samples, %uHz" % \
-               (self["name"].display, 8*bytes, self["length"].value/bytes, C5_speed)
+               (self["name"].display, 8 * bytes,
+                self["length"].value / bytes, C5_speed)
+
 
 class StuffType(StaticFieldSet):
     format = (
@@ -69,8 +76,10 @@ class StuffType(StaticFieldSet):
         (Bit, "on")
     )
 
+
 class InstrumentSecondHeader(FieldSet):
-    static_size = 234*8
+    static_size = 234 * 8
+
     def createFields(self):
         yield UInt32(self, "sample_header_size")
         yield GenericVector(self, "notes", 96, UInt8, "sample")
@@ -93,11 +102,12 @@ class InstrumentSecondHeader(FieldSet):
         yield UInt16(self, "volume_fadeout")
         yield GenericVector(self, "reserved", 11, UInt16, "word")
 
+
 def createInstrumentContentSize(s, addr):
     start = addr
-    samples = s.stream.readBits(addr+27*8, 16, LITTLE_ENDIAN)
+    samples = s.stream.readBits(addr + 27 * 8, 16, LITTLE_ENDIAN)
     # Seek to end of header (1st + 2nd part)
-    addr += 8*s.stream.readBits(addr, 32, LITTLE_ENDIAN)
+    addr += 8 * s.stream.readBits(addr, 32, LITTLE_ENDIAN)
 
     sample_size = 0
     if samples:
@@ -107,9 +117,11 @@ def createInstrumentContentSize(s, addr):
             # Seek to next sample header
             addr += SampleHeader.static_size
 
-    return addr - start + 8*sample_size
+    return addr - start + 8 * sample_size
+
 
 class Instrument(FieldSet):
+
     def __init__(self, parent, name):
         FieldSet.__init__(self, parent, name)
         self._size = createInstrumentContentSize(self, self.absolute_address)
@@ -117,7 +129,7 @@ class Instrument(FieldSet):
 
     # Seems to fix things...
     def fixInstrumentHeader(self):
-        size = self["size"].value - self.current_size//8
+        size = self["size"].value - self.current_size // 8
         if size:
             yield RawBytes(self, "unknown_data", size)
 
@@ -137,7 +149,7 @@ class Instrument(FieldSet):
             yield from self.fixInstrumentHeader()
 
             # This part probably wrong
-            sample_size = [ ]
+            sample_size = []
             for index in range(num):
                 sample = SampleHeader(self, "sample_header[]")
                 yield sample
@@ -159,12 +171,14 @@ VOLUME_NAME = (
     "Set panning", "Panning slide left", "Panning slide right",
     "Tone porta", "Unhandled")
 
+
 def parseVolume(val):
     val = val.value
-    if 0x10<=val<=0x50:
-        return "Volume %i" % val-16
+    if 0x10 <= val <= 0x50:
+        return "Volume %i" % val - 16
     else:
-        return VOLUME_NAME[val/16 - 6]
+        return VOLUME_NAME[val / 16 - 6]
+
 
 class RealBit(RawBits):
     static_size = 1
@@ -174,6 +188,7 @@ class RealBit(RawBits):
 
     def createValue(self):
         return self._parent.stream.readBits(self.absolute_address, 1, BIG_ENDIAN)
+
 
 class NoteInfo(StaticFieldSet):
     format = (
@@ -202,35 +217,47 @@ EFFECT_E_NAME = (
     "Fine volume slide up", "Fine volume slide down", "Note cut",
     "Note delay", "Pattern delay")
 
+
 class Effect(RawBits):
+
     def __init__(self, parent, name):
         RawBits.__init__(self, parent, name, 8)
 
     def createValue(self):
-        t = self.parent.stream.readBits(self.absolute_address, 8, LITTLE_ENDIAN)
-        param = self.parent.stream.readBits(self.absolute_address+8, 8, LITTLE_ENDIAN)
+        t = self.parent.stream.readBits(
+            self.absolute_address, 8, LITTLE_ENDIAN)
+        param = self.parent.stream.readBits(
+            self.absolute_address + 8, 8, LITTLE_ENDIAN)
         if t == 0x0E:
-            return EFFECT_E_NAME[param>>4] + " %i" % (param&0x07)
+            return EFFECT_E_NAME[param >> 4] + " %i" % (param & 0x07)
         elif t == 0x21:
-            return ("Extra fine porta up", "Extra fine porta down")[param>>4]
+            return ("Extra fine porta up", "Extra fine porta down")[param >> 4]
         else:
             return EFFECT_NAME[t]
 
+
 class Note(FieldSet):
+
     def __init__(self, parent, name, desc=None):
         FieldSet.__init__(self, parent, name, desc)
-        self.flags = self.stream.readBits(self.absolute_address, 8, LITTLE_ENDIAN)
-        if self.flags&0x80:
+        self.flags = self.stream.readBits(
+            self.absolute_address, 8, LITTLE_ENDIAN)
+        if self.flags & 0x80:
             # TODO: optimize bitcounting with a table:
             # http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetTable
             self._size = 8
-            if self.flags&0x01: self._size += 8
-            if self.flags&0x02: self._size += 8
-            if self.flags&0x04: self._size += 8
-            if self.flags&0x08: self._size += 8
-            if self.flags&0x10: self._size += 8
+            if self.flags & 0x01:
+                self._size += 8
+            if self.flags & 0x02:
+                self._size += 8
+            if self.flags & 0x04:
+                self._size += 8
+            if self.flags & 0x08:
+                self._size += 8
+            if self.flags & 0x10:
+                self._size += 8
         else:
-            self._size = 5*8
+            self._size = 5 * 8
 
     def createFields(self):
         # This stupid shit gets the LSB, not the MSB...
@@ -273,23 +300,29 @@ class Note(FieldSet):
                 desc.append("parameter %i" % self["effect_parameter"].value)
         else:
             desc = (self["note"].display, "instrument %i" % self["instrument"].value,
-                self["has_volume"].display, "effect %s" % self["effect_type"].value,
-                "parameter %i" % self["effect_parameter"].value)
+                    self["has_volume"].display, "effect %s" % self[
+                        "effect_type"].value,
+                    "parameter %i" % self["effect_parameter"].value)
         if desc:
             return "Note %s" % ", ".join(desc)
         else:
             return "Note"
 
+
 class Row(FieldSet):
+
     def createFields(self):
         for index in range(self["/header/channels"].value):
             yield Note(self, "note[]")
 
+
 def createPatternContentSize(s, addr):
-    return 8*(s.stream.readBits(addr, 32, LITTLE_ENDIAN) +
-              s.stream.readBits(addr+7*8, 16, LITTLE_ENDIAN))
+    return 8 * (s.stream.readBits(addr, 32, LITTLE_ENDIAN) +
+                s.stream.readBits(addr + 7 * 8, 16, LITTLE_ENDIAN))
+
 
 class Pattern(FieldSet):
+
     def __init__(self, parent, name, desc=None):
         FieldSet.__init__(self, parent, name, desc)
         self._size = createPatternContentSize(self, self.absolute_address)
@@ -307,9 +340,10 @@ class Pattern(FieldSet):
     def createDescription(self):
         return "Pattern with %i rows" % self["rows"].value
 
+
 class Header(FieldSet):
     MAGIC = b"Extended Module: "
-    static_size = 336*8
+    static_size = 336 * 8
 
     def createFields(self):
         yield String(self, "signature", 17, "XM signature", charset="ASCII")
@@ -335,6 +369,7 @@ class Header(FieldSet):
         return "'%s' by '%s'" % (
             self["title"].value, self["tracker_name"].value)
 
+
 class XMModule(Parser):
     PARSER_TAGS = {
         "id": "fasttracker2",
@@ -344,7 +379,7 @@ class XMModule(Parser):
             'audio/xm', 'audio/x-xm',
             'audio/module-xm', 'audio/mod', 'audio/x-mod'),
         "magic": ((Header.MAGIC, 0),),
-        "min_size": Header.static_size +29*8, # Header + 1 empty instrument
+        "min_size": Header.static_size + 29 * 8,  # Header + 1 empty instrument
         "description": "FastTracker2 module"
     }
     endian = LITTLE_ENDIAN
@@ -384,4 +419,3 @@ class XMModule(Parser):
 
     def createDescription(self):
         return self["header"].description
-

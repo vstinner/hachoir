@@ -139,6 +139,7 @@ log = Log()
 
 
 class Logger(object):
+
     def _logger(self):
         return "<%s>" % self.__class__.__name__
 

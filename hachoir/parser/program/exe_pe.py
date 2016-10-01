@@ -1,11 +1,13 @@
 from hachoir.field import (FieldSet, ParserError,
-    Bit, UInt8, UInt16, UInt32, TimestampUnix32,
-    Bytes, String, Enum,
-    PaddingBytes, PaddingBits, NullBytes, NullBits)
+                           Bit, UInt8, UInt16, UInt32, TimestampUnix32,
+                           Bytes, String, Enum,
+                           PaddingBytes, PaddingBits, NullBytes, NullBits)
 from hachoir.core.text_handler import textHandler, hexadecimal, filesizeHandler
+
 
 class SectionHeader(FieldSet):
     static_size = 40 * 8
+
     def createFields(self):
         yield String(self, "name", 8, charset="ASCII", strip="\0 ")
         yield filesizeHandler(UInt32(self, "mem_size", "Size in memory"))
@@ -53,7 +55,7 @@ class SectionHeader(FieldSet):
         rva = self["rva"].value
         size = self["mem_size"].value
         info = [
-            "rva=0x%08x..0x%08x" % (rva, rva+size),
+            "rva=0x%08x..0x%08x" % (rva, rva + size),
             "size=%s" % self["mem_size"].display,
         ]
         if self["is_executable"].value:
@@ -73,7 +75,9 @@ class SectionHeader(FieldSet):
             self.warning(str(err))
         return "section[]"
 
+
 class DataDirectory(FieldSet):
+
     def createFields(self):
         yield textHandler(UInt32(self, "rva", "Virtual address"), hexadecimal)
         yield filesizeHandler(UInt32(self, "size"))
@@ -85,8 +89,9 @@ class DataDirectory(FieldSet):
         else:
             return "(empty directory)"
 
+
 class PE_Header(FieldSet):
-    static_size = 24*8
+    static_size = 24 * 8
     cpu_name = {
         0x0184: "Alpha AXP",
         0x01c0: "ARM",
@@ -141,15 +146,16 @@ class PE_Header(FieldSet):
         yield Bit(self, "up", "File should be run only on a UP machine")
         yield Bit(self, "reverse_hi", "Big endian: MSB precedes LSB in memory")
 
+
 class PE_OptHeader(FieldSet):
     SUBSYSTEM_NAME = {
-         1: "Native",
-         2: "Windows GUI",
-         3: "Windows CUI",
-         5: "OS/2 CUI",
-         7: "POSIX CUI",
-         8: "Native Windows",
-         9: "Windows CE GUI",
+        1: "Native",
+        2: "Windows GUI",
+        3: "Windows CUI",
+        5: "OS/2 CUI",
+        7: "POSIX CUI",
+        8: "Native Windows",
+        9: "Windows CE GUI",
         10: "EFI application",
         11: "EFI boot service driver",
         12: "EFI runtime driver",
@@ -158,20 +164,21 @@ class PE_OptHeader(FieldSet):
         16: "Windows boot application",
     }
     DIRECTORY_NAME = {
-         0: "export",
-         1: "import",
-         2: "resource",
-         3: "exception",
-         4: "certificate",
-         5: "relocation",
-         6: "debug",
-         7: "description",
-         8: "global_ptr",
-         9: "tls",   # Thread local storage
+        0: "export",
+        1: "import",
+        2: "resource",
+        3: "exception",
+        4: "certificate",
+        5: "relocation",
+        6: "debug",
+        7: "description",
+        8: "global_ptr",
+        9: "tls",   # Thread local storage
         10: "load_config",
         11: "bound_import",
         12: "import_address",
     }
+
     def createFields(self):
         yield UInt16(self, "signature", "PE optional header signature (0x010b)")
         # TODO: Support PE32+ (signature=0x020b)
@@ -217,4 +224,3 @@ class PE_OptHeader(FieldSet):
         return "PE optional header: %s, entry point %s" % (
             self["subsystem"].display,
             self["entry_point"].display)
-

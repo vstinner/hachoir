@@ -20,7 +20,7 @@ def computeCompressionRate(meta):
     Compute compression rate, sizes have to be in byte.
     """
     if (not meta.has("file_size")
-        or not meta.get("compr_size", 0)):
+            or not meta.get("compr_size", 0)):
         return
     file_size = meta.get("file_size")
     if not file_size:
@@ -29,12 +29,14 @@ def computeCompressionRate(meta):
 
 
 class Bzip2Metadata(RootMetadata):
+
     def extract(self, zip):
         if "file" in zip:
-            self.compr_size = zip["file"].size//8
+            self.compr_size = zip["file"].size // 8
 
 
 class GzipMetadata(RootMetadata):
+
     def extract(self, gzip):
         self.useHeader(gzip)
         computeCompressionRate(self)
@@ -49,11 +51,12 @@ class GzipMetadata(RootMetadata):
             self.filename = getValue(gzip, "filename")
         if gzip["has_comment"].value:
             self.comment = getValue(gzip, "comment")
-        self.compr_size = gzip["file"].size//8
+        self.compr_size = gzip["file"].size // 8
         self.file_size = gzip["size"].value
 
 
 class ZipMetadata(MultipleMetadata):
+
     def extract(self, zip):
         max_nb = maxNbFile(self)
         for index, field in enumerate(zip.array("file")):
@@ -83,6 +86,7 @@ class ZipMetadata(MultipleMetadata):
 
 
 class TarMetadata(MultipleMetadata):
+
     def extract(self, tar):
         max_nb = maxNbFile(self)
         for index, field in enumerate(tar.array("file")):
@@ -116,6 +120,7 @@ class TarMetadata(MultipleMetadata):
 
 
 class CabMetadata(MultipleMetadata):
+
     def extract(self, cab):
         if "folder[0]" in cab:
             self.useFolder(cab["folder[0]"])
@@ -157,6 +162,7 @@ class CabMetadata(MultipleMetadata):
 
 
 class MarMetadata(MultipleMetadata):
+
     def extract(self, mar):
         self.comment = "Contains %s files" % mar["nb_file"].value
         self.format_version = ("Microsoft Archive version %s"

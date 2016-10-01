@@ -4,6 +4,7 @@ try:
     from zlib import decompressobj, MAX_WBITS
 
     class DeflateStream:
+
         def __init__(self, stream, wbits=None):
             if wbits:
                 self.gzip = decompressobj(-MAX_WBITS)
@@ -13,9 +14,10 @@ try:
         def __call__(self, size, data=None):
             if data is None:
                 data = b''
-            return self.gzip.decompress(self.gzip.unconsumed_tail+data, size)
+            return self.gzip.decompress(self.gzip.unconsumed_tail + data, size)
 
     class DeflateStreamWbits(DeflateStream):
+
         def __init__(self, stream):
             DeflateStream.__init__(self, stream, True)
 
@@ -30,4 +32,3 @@ except ImportError:
     def Deflate(field, wbits=True):
         return field
     has_deflate = False
-

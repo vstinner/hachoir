@@ -20,8 +20,9 @@ class TimezoneUTC(tzinfo):
 
 class Timezone(TimezoneUTC):
     """Fixed offset in hour from UTC."""
+
     def __init__(self, offset):
-        self._offset = timedelta(minutes=offset*60)
+        self._offset = timedelta(minutes=offset * 60)
         self._name = "%+03u00" % offset
 
     def utcoffset(self, dt):
@@ -42,4 +43,3 @@ def createTimezone(offset):
         return Timezone(offset)
     else:
         return UTC
-

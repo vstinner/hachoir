@@ -15,7 +15,7 @@ Creation date: YYYY-mm-DD
 # TODO: Just keep what you need
 from hachoir.parser import Parser
 from hachoir.field import (ParserError,
-    UInt8, UInt16, UInt32, String, RawBytes)
+                           UInt8, UInt16, UInt32, String, RawBytes)
 from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 
 
@@ -23,10 +23,12 @@ class TODOFile(Parser):
     PARSER_TAGS = {
         "id": "TODO",
         "category": "TODO",    # "archive", "audio", "container", ...
-        "file_ext": ("TODO",), # TODO: Example ("bmp",) to parse the file "image.bmp"
+        # TODO: Example ("bmp",) to parse the file "image.bmp"
+        "file_ext": ("TODO",),
         "mime": ("TODO",),    # TODO: Example: "image/png"
-        "min_size": 0,         # TODO: Minimum file size (x bits, or x*8 in bytes)
-        "description": "TODO", # TODO: Example: "A bitmap picture"
+        # TODO: Minimum file size (x bits, or x*8 in bytes)
+        "min_size": 0,
+        "description": "TODO",  # TODO: Example: "A bitmap picture"
     }
 
 #    TODO: Choose between little or big endian
@@ -52,4 +54,3 @@ class TODOFile(Parser):
         # TODO: You may remove this code
         if self.current_size < self._size:
             yield self.seekBit(self._size, "end")
-

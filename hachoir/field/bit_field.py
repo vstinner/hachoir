@@ -63,8 +63,7 @@ class Bit(RawBits):
 
     def createValue(self):
         return 1 == self._parent.stream.readBits(
-                self.absolute_address, 1, self._parent.endian)
+            self.absolute_address, 1, self._parent.endian)
 
     def createRawDisplay(self):
         return str(int(self.value))
-

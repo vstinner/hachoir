@@ -15,13 +15,14 @@ SECTOR_SIZE = 512
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, Enum,
-    UInt8, UInt16, UInt32, UInt64, TimestampWin64,
-    String, Bytes, Bit,
-    NullBits, NullBytes, PaddingBytes, RawBytes)
+                           UInt8, UInt16, UInt32, UInt64, TimestampWin64,
+                           String, Bytes, Bit,
+                           NullBits, NullBytes, PaddingBytes, RawBytes)
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal, filesizeHandler
 from hachoir.core.tools import humanFilesize, createDict
 from hachoir.parser.common.msdos import MSDOSFileAttr32
+
 
 class BiosParameterBlock(FieldSet):
     """
@@ -53,8 +54,10 @@ class BiosParameterBlock(FieldSet):
                 self["sectors_per_cluster"].value
         return ""
 
+
 class MasterBootRecord(FieldSet):
-    static_size = 512*8
+    static_size = 512 * 8
+
     def createFields(self):
         yield Bytes(self, "jump", 3, "Intel x86 jump instruction")
         yield String(self, "name", 8)
@@ -81,15 +84,19 @@ class MasterBootRecord(FieldSet):
         size = self["nb_sectors"].value * self["bios/bytes_per_sector"].value
         return "NTFS Master Boot Record (%s)" % humanFilesize(size)
 
+
 class MFT_Flags(FieldSet):
     static_size = 16
+
     def createFields(self):
         yield Bit(self, "in_use")
         yield Bit(self, "is_directory")
         yield NullBits(self, "padding", 14)
 
+
 class Attribute(FieldSet):
     # --- Common code ---
+
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
         self._size = self["size"].value * 8
@@ -172,29 +179,31 @@ class Attribute(FieldSet):
 
     # --- Type information ---
     ATTR_INFO = {
-         0x10: ('standard_info', 'STANDARD_INFORMATION ', parseStandardInfo),
-         0x20: ('attr_list', 'ATTRIBUTE_LIST ', None),
-         0x30: ('filename', 'FILE_NAME ', parseFilename),
-         0x40: ('vol_ver', 'VOLUME_VERSION', None),
-         0x40: ('obj_id', 'OBJECT_ID ', None),
-         0x50: ('security', 'SECURITY_DESCRIPTOR ', None),
-         0x60: ('vol_name', 'VOLUME_NAME ', None),
-         0x70: ('vol_info', 'VOLUME_INFORMATION ', None),
-         0x80: ('data', 'DATA ', parseData),
-         0x90: ('index_root', 'INDEX_ROOT ', None),
-         0xA0: ('index_alloc', 'INDEX_ALLOCATION ', None),
-         0xB0: ('bitmap', 'BITMAP ', parseBitmap),
-         0xC0: ('sym_link', 'SYMBOLIC_LINK', None),
-         0xC0: ('reparse', 'REPARSE_POINT ', None),
-         0xD0: ('ea_info', 'EA_INFORMATION ', None),
-         0xE0: ('ea', 'EA ', None),
-         0xF0: ('prop_set', 'PROPERTY_SET', None),
+        0x10: ('standard_info', 'STANDARD_INFORMATION ', parseStandardInfo),
+        0x20: ('attr_list', 'ATTRIBUTE_LIST ', None),
+        0x30: ('filename', 'FILE_NAME ', parseFilename),
+        0x40: ('vol_ver', 'VOLUME_VERSION', None),
+        0x40: ('obj_id', 'OBJECT_ID ', None),
+        0x50: ('security', 'SECURITY_DESCRIPTOR ', None),
+        0x60: ('vol_name', 'VOLUME_NAME ', None),
+        0x70: ('vol_info', 'VOLUME_INFORMATION ', None),
+        0x80: ('data', 'DATA ', parseData),
+        0x90: ('index_root', 'INDEX_ROOT ', None),
+        0xA0: ('index_alloc', 'INDEX_ALLOCATION ', None),
+        0xB0: ('bitmap', 'BITMAP ', parseBitmap),
+        0xC0: ('sym_link', 'SYMBOLIC_LINK', None),
+        0xC0: ('reparse', 'REPARSE_POINT ', None),
+        0xD0: ('ea_info', 'EA_INFORMATION ', None),
+        0xE0: ('ea', 'EA ', None),
+        0xF0: ('prop_set', 'PROPERTY_SET', None),
         0x100: ('log_util', 'LOGGED_UTILITY_STREAM', None),
     }
     ATTR_NAME = createDict(ATTR_INFO, 1)
 
+
 class File(FieldSet):
-#    static_size = 48*8
+    #    static_size = 48*8
+
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
         self._size = self["bytes_allocated"].value * 8
@@ -228,7 +237,7 @@ class File(FieldSet):
                 break
             yield Attribute(self, "attr[]")
 
-        size = self["bytes_in_use"].value - self.current_size//8
+        size = self["bytes_in_use"].value - self.current_size // 8
         if size:
             yield RawBytes(self, "end_rawdata", size)
 
@@ -246,13 +255,14 @@ class File(FieldSet):
             text += ', %s' % self["standard_info/file_attr"].display
         return text
 
+
 class NTFS(Parser):
     MAGIC = b"\xEB\x52\x90NTFS    "
     PARSER_TAGS = {
         "id": "ntfs",
         "category": "file_system",
         "description": "NTFS file system",
-        "min_size": 1024*8,
+        "min_size": 1024 * 8,
         "magic": ((MAGIC, 0),),
     }
     endian = LITTLE_ENDIAN
@@ -270,7 +280,8 @@ class NTFS(Parser):
         yield MasterBootRecord(self, "mbr")
 
         bios = self["mbr/bios"]
-        cluster_size = bios["sectors_per_cluster"].value * bios["bytes_per_sector"].value
+        cluster_size = bios["sectors_per_cluster"].value * \
+            bios["bytes_per_sector"].value
         offset = self["mbr/mft_cluster"].value * cluster_size
         padding = self.seekByte(offset, relative=False)
         if padding:
@@ -281,4 +292,3 @@ class NTFS(Parser):
         size = (self.size - self.current_size) // 8
         if size:
             yield RawBytes(self, "end", size)
-

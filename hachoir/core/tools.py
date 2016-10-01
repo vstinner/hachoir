@@ -88,7 +88,7 @@ def timedelta2seconds(delta):
     60.25
     """
     return delta.microseconds / 1000000.0 \
-        + delta.seconds + delta.days * 60*60*24
+        + delta.seconds + delta.days * 60 * 60 * 24
 
 
 def humanDurationNanosec(nsec):
@@ -107,12 +107,12 @@ def humanDurationNanosec(nsec):
     # Micro seconds
     usec, nsec = divmod(nsec, 1000)
     if usec < 1000:
-        return "%.2f usec" % (usec+float(nsec)/1000)
+        return "%.2f usec" % (usec + float(nsec) / 1000)
 
     # Milli seconds
     msec, usec = divmod(usec, 1000)
     if msec < 1000:
-        return "%.2f ms" % (msec + float(usec)/1000)
+        return "%.2f ms" % (msec + float(usec) / 1000)
     return humanDuration(msec)
 
 
@@ -131,12 +131,12 @@ def humanDuration(delta):
     '1 hours 46 min 42 sec'
     """
     if not isinstance(delta, timedelta):
-        delta = timedelta(microseconds=delta*1000)
+        delta = timedelta(microseconds=delta * 1000)
 
     # Milliseconds
     text = []
     if 1000 <= delta.microseconds:
-        text.append("%u ms" % (delta.microseconds//1000))
+        text.append("%u ms" % (delta.microseconds // 1000))
 
     # Seconds
     minutes, seconds = divmod(delta.seconds, 60)
@@ -248,14 +248,14 @@ def humanFrequency(hertz):
 
 regex_control_code = re.compile(r"([\x00-\x1f\x7f])")
 controlchars = tuple({
-        # Don't use "\0", because "\0"+"0"+"1" = "\001" = "\1" (1 character)
-        # Same rease to not use octal syntax ("\1")
-        ord("\n"): r"\n",
-        ord("\r"): r"\r",
-        ord("\t"): r"\t",
-        ord("\a"): r"\a",
-        ord("\b"): r"\b",
-    }.get(code, '\\x%02x' % code)
+    # Don't use "\0", because "\0"+"0"+"1" = "\001" = "\1" (1 character)
+    # Same rease to not use octal syntax ("\1")
+    ord("\n"): r"\n",
+    ord("\r"): r"\r",
+    ord("\t"): r"\t",
+    ord("\a"): r"\a",
+    ord("\b"): r"\b",
+}.get(code, '\\x%02x' % code)
     for code in range(128)
 )
 
@@ -528,7 +528,7 @@ def durationWin64(value):
         raise TypeError("an integer or float is required")
     if value < 0:
         raise ValueError("value have to be a positive or nul integer")
-    return timedelta(microseconds=value/10)
+    return timedelta(microseconds=value / 10)
 
 # Start of 64-bit Windows timestamp: 1st January 1600 at 00:00
 WIN64_TIMESTAMP_T0 = datetime(1601, 1, 1, 0, 0, 0)
@@ -572,7 +572,7 @@ def timestampUUID60(value):
     if value < 0:
         raise ValueError("value have to be a positive or nul integer")
     try:
-        return UUID60_TIMESTAMP_T0 + timedelta(microseconds=value/10)
+        return UUID60_TIMESTAMP_T0 + timedelta(microseconds=value / 10)
     except OverflowError:
         raise ValueError("timestampUUID60() overflow (value=%s)" % value)
 

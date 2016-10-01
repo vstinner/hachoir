@@ -12,11 +12,12 @@ Creation date: 2007-03-20
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, Enum,
-    UInt8, UInt32, Bytes, RawBytes, NullBytes,
-    Bit, Bits, PaddingBits, CString)
+                           UInt8, UInt32, Bytes, RawBytes, NullBytes,
+                           Bit, Bits, PaddingBits, CString)
 from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal, filesizeHandler
 from hachoir.core.tools import paddingSize
+
 
 class TOC(FieldSet):
     TYPE_NAME = {
@@ -35,7 +36,7 @@ class TOC(FieldSet):
         0x00000000: "Default",
         0x00000200: "Ink bounds",
         0x00000100: "Accelerator W ink bounds",
-#        0x00000200: "Compressed metrics",
+        #        0x00000200: "Compressed metrics",
     }
 
     def createFields(self):
@@ -48,9 +49,11 @@ class TOC(FieldSet):
         return "%s at %s (%s)" % (
             self["type"].display, self["offset"].value, self["size"].display)
 
+
 class PropertiesFormat(FieldSet):
     static_size = 32
     endian = LITTLE_ENDIAN
+
     def createFields(self):
         yield Bits(self, "reserved[]", 2)
         yield Bit(self, "byte_big_endian")
@@ -58,7 +61,9 @@ class PropertiesFormat(FieldSet):
         yield Bits(self, "scan_unit", 2)
         yield textHandler(PaddingBits(self, "reserved[]", 26), hexadecimal)
 
+
 class Property(FieldSet):
+
     def createFields(self):
         yield UInt32(self, "name_offset")
         yield UInt8(self, "is_string")
@@ -66,10 +71,12 @@ class Property(FieldSet):
 
     def createDescription(self):
         # FIXME: Use link or any better way to read name value
-        name = self["../name[%s]" % (self.index-2)].value
+        name = self["../name[%s]" % (self.index - 2)].value
         return "Property %s" % name
 
+
 class GlyphNames(FieldSet):
+
     def __init__(self, parent, name, toc, description, size=None):
         FieldSet.__init__(self, parent, name, description, size=size)
         self.toc = toc
@@ -90,7 +97,7 @@ class GlyphNames(FieldSet):
         offsets.sort()
         offset0 = self.current_size // 8
         for offset in offsets:
-            padding = self.seekByte(offset0+offset)
+            padding = self.seekByte(offset0 + offset)
             if padding:
                 yield padding
             yield CString(self, "name[]")
@@ -98,7 +105,9 @@ class GlyphNames(FieldSet):
         if padding:
             yield NullBytes(self, "end_padding", padding)
 
+
 class Properties(GlyphNames):
+
     def createFields(self):
         yield PropertiesFormat(self, "format")
         yield UInt32(self, "nb_prop")
@@ -107,14 +116,14 @@ class Properties(GlyphNames):
             property = Property(self, "property[]")
             yield property
             properties.append(property)
-        padding = paddingSize(self.current_size//8, 4)
+        padding = paddingSize(self.current_size // 8, 4)
         if padding:
             yield NullBytes(self, "padding", padding)
         yield UInt32(self, "total_str_length")
         properties.sort(key=lambda entry: entry["name_offset"].value)
         offset0 = self.current_size // 8
         for property in properties:
-            padding = self.seekByte(offset0+property["name_offset"].value)
+            padding = self.seekByte(offset0 + property["name_offset"].value)
             if padding:
                 yield padding
             yield CString(self, "name[]", "Name of %s" % property.name)
@@ -124,6 +133,7 @@ class Properties(GlyphNames):
         if padding:
             yield NullBytes(self, "end_padding", padding)
 
+
 class PcfFile(Parser):
     MAGIC = b"\1fcp"
     PARSER_TAGS = {
@@ -131,7 +141,7 @@ class PcfFile(Parser):
         "category": "misc",
         "file_ext": ("pcf",),
         "magic": ((MAGIC, 0),),
-        "min_size": 32, # FIXME
+        "min_size": 32,  # FIXME
         "description": "X11 Portable Compiled Font (pcf)",
     }
     endian = LITTLE_ENDIAN
@@ -155,16 +165,16 @@ class PcfFile(Parser):
             padding = self.seekByte(entry["offset"].value)
             if padding:
                 yield padding
-            maxsize = (self.size-self.current_size)//8
+            maxsize = (self.size - self.current_size) // 8
             if maxsize < size:
-                self.warning("Truncate content of %s to %s bytes (was %s)" % (entry.path, maxsize, size))
+                self.warning("Truncate content of %s to %s bytes (was %s)" % (
+                    entry.path, maxsize, size))
                 size = maxsize
             if not size:
                 continue
             if entry["type"].value == 1:
-                yield Properties(self, "properties", entry, "Properties", size=size*8)
+                yield Properties(self, "properties", entry, "Properties", size=size * 8)
             elif entry["type"].value == 128:
-                yield GlyphNames(self, "glyph_names", entry, "Glyph names", size=size*8)
+                yield GlyphNames(self, "glyph_names", entry, "Glyph names", size=size * 8)
             else:
                 yield RawBytes(self, "data[]", size, "Content of %s" % entry.path)
-

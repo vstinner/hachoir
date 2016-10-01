@@ -6,6 +6,7 @@ class Pattern:
     """
     Abstract class used to define a pattern used in pattern matching
     """
+
     def __init__(self, user):
         self.user = user
 
@@ -14,6 +15,7 @@ class StringPattern(Pattern):
     """
     Static string pattern
     """
+
     def __init__(self, text, user=None):
         Pattern.__init__(self, user)
         self.text = text
@@ -29,6 +31,7 @@ class RegexPattern(Pattern):
     """
     Regular expression pattern
     """
+
     def __init__(self, regex, user=None):
         Pattern.__init__(self, user)
         self.regex = parse(regex)
@@ -70,6 +73,7 @@ class PatternMatching:
     (2, 3, <StringPattern 'b'>)
     (4, 6, <RegexPattern '[cd]e'>)
     """
+
     def __init__(self):
         self.string_patterns = []
         self.string_dict = {}
@@ -120,7 +124,8 @@ class PatternMatching:
     def addRegex(self, regex, user=None):
         item = RegexPattern(regex, user)
         if item.regex.maxLength() is None:
-            raise ValueError("Regular expression with no maximum size has forbidden")
+            raise ValueError(
+                "Regular expression with no maximum size has forbidden")
         self.regex_patterns.append(item)
         self._need_commit = True
 
@@ -173,8 +178,8 @@ class PatternMatching:
     max_length = property(_getMaxLength)
 
 if __name__ == "__main__":
-    import doctest, sys
+    import doctest
+    import sys
     failure, nb_test = doctest.testmod()
     if failure:
         sys.exit(1)
-

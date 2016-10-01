@@ -14,13 +14,15 @@ Creation date: 26 April 2008
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, ParserError,
-    Bit, Bits, UInt8, UInt32, Int16, UInt16, Float32, Float64, CString, Enum,
-    Bytes, RawBytes, NullBits, String, SubFile, Field)
+                           Bit, Bits, UInt8, UInt32, Int16, UInt16, Float32, Float64, CString, Enum,
+                           Bytes, RawBytes, NullBits, String, SubFile, Field)
 from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir.field.float import FloatExponent
 from struct import unpack
 
+
 class FlashPackedInteger(Bits):
+
     def __init__(self, parent, name, signed=False, nbits=30, description=None):
         Bits.__init__(self, parent, name, 8, description)
         stream = self._parent.stream
@@ -29,30 +31,41 @@ class FlashPackedInteger(Bits):
         value = 0
         mult = 1
         while True:
-            byte = stream.readBits(addr+size, 8, LITTLE_ENDIAN)
+            byte = stream.readBits(addr + size, 8, LITTLE_ENDIAN)
             value += mult * (byte & 0x7f)
             size += 8
             mult <<= 7
             if byte < 128:
                 break
         self._size = size
-        if signed and (1 << (nbits-1)) <= value:
+        if signed and (1 << (nbits - 1)) <= value:
             value -= (1 << nbits)
         self.createValue = lambda: value
 
+
 class FlashU30(FlashPackedInteger):
+
     def __init__(self, parent, name, description=None):
-        FlashPackedInteger.__init__(self, parent, name, signed=False, nbits=30, description=description)
+        FlashPackedInteger.__init__(
+            self, parent, name, signed=False, nbits=30, description=description)
+
 
 class FlashS32(FlashPackedInteger):
+
     def __init__(self, parent, name, description=None):
-        FlashPackedInteger.__init__(self, parent, name, signed=True, nbits=32, description=description)
+        FlashPackedInteger.__init__(
+            self, parent, name, signed=True, nbits=32, description=description)
+
 
 class FlashU32(FlashPackedInteger):
+
     def __init__(self, parent, name, description=None):
-        FlashPackedInteger.__init__(self, parent, name, signed=False, nbits=32, description=description)
+        FlashPackedInteger.__init__(
+            self, parent, name, signed=False, nbits=32, description=description)
+
 
 class FlashFloat64(FieldSet):
+
     def createFields(self):
         yield Bits(self, "mantissa_high", 20)
         yield FloatExponent(self, "exponent", 11)
@@ -65,7 +78,7 @@ class FlashFloat64(FieldSet):
         # float = 2^exponent + (1 + mantissa / 2^52)
         # (and float is negative if negative=True)
         bytes = self.parent.stream.readBytes(
-            self.absolute_address, self.size//8)
+            self.absolute_address, self.size // 8)
         # Mix bytes: xxxxyyyy <=> yyyyxxxx
         bytes = bytes[4:8] + bytes[0:4]
         return unpack('<d', bytes)[0]
@@ -83,8 +96,10 @@ TYPE_INFO = {
     0x09: (UInt16, "Large_Dictionary_Lookup_Index[]"),
 }
 
+
 def parseBranch(parent, size):
     yield Int16(parent, "offset")
+
 
 def parseDeclareFunction(parent, size):
     yield CString(parent, "name")
@@ -93,6 +108,7 @@ def parseDeclareFunction(parent, size):
     for i in range(argCount.value):
         yield CString(parent, "arg[]")
     yield UInt16(parent, "function_length")
+
 
 def parseDeclareFunctionV7(parent, size):
     yield CString(parent, "name")
@@ -114,6 +130,7 @@ def parseDeclareFunctionV7(parent, size):
         yield CString(parent, "arg[]")
     yield UInt16(parent, "function_length")
 
+
 def parseTry(parent, size):
     yield Bits(parent, "reserved", 5)
     catchInReg = Bit(parent, "catch_in_register")
@@ -128,6 +145,7 @@ def parseTry(parent, size):
     else:
         yield UInt8(parent, "register")
 
+
 def parsePushData(parent, size):
     while not parent.eof:
         codeobj = UInt8(parent, "data_type[]")
@@ -141,34 +159,44 @@ def parsePushData(parent, size):
 #        else:
 #            yield Field(parent, name, 0)
 
+
 def parseSetTarget(parent, size):
     yield CString(parent, "target")
 
+
 def parseWith(parent, size):
     yield UInt16(parent, "size")
+
 
 def parseGetURL(parent, size):
     yield CString(parent, "url")
     yield CString(parent, "target")
 
+
 def parseGetURL2(parent, size):
     yield UInt8(parent, "method")
+
 
 def parseGotoExpression(parent, size):
     yield UInt8(parent, "play")
 
+
 def parseGotoFrame(parent, size):
     yield UInt16(parent, "frame_no")
 
+
 def parseGotoLabel(parent, size):
     yield CString(parent, "label")
+
 
 def parseWaitForFrame(parent, size):
     yield UInt16(parent, "frame")
     yield UInt8(parent, "skip")
 
+
 def parseWaitForFrameDyn(parent, size):
     yield UInt8(parent, "skip")
+
 
 def parseDeclareDictionary(parent, size):
     count = UInt16(parent, "count")
@@ -176,11 +204,14 @@ def parseDeclareDictionary(parent, size):
     for i in range(count.value):
         yield CString(parent, "dictionnary[]")
 
+
 def parseStoreRegister(parent, size):
     yield UInt8(parent, "register")
 
+
 def parseStrictMode(parent, size):
     yield UInt8(parent, "strict")
+
 
 class Instruction(FieldSet):
     ACTION_INFO = {
@@ -330,11 +361,15 @@ class Instruction(FieldSet):
     def __str__(self):
         r = str(self._description)
         for f in self:
-            if f.name not in ("action_id", "action_length", "count") and not f.name.startswith("data_type") :
-                r = r + "\n   " + str((self.address+f.address)//8) + " " + str(f.name) + "=" + str(f.value)
+            if f.name not in ("action_id", "action_length", "count") and not f.name.startswith("data_type"):
+                r = r + "\n   " + \
+                    str((self.address + f.address) // 8) + \
+                    " " + str(f.name) + "=" + str(f.value)
         return r
 
+
 class ActionScript(FieldSet):
+
     def createFields(self):
         while not self.eof:
             yield Instruction(self, "instr[]")
@@ -342,11 +377,13 @@ class ActionScript(FieldSet):
     def __str__(self):
         r = ""
         for f in self:
-            r = r + str(f.address//8) + " " + str(f) + "\n"
+            r = r + str(f.address // 8) + " " + str(f) + "\n"
         return r
 
+
 def parseActionScript(parent, size):
-    yield ActionScript(parent, "action", size=size*8)
+    yield ActionScript(parent, "action", size=size * 8)
+
 
 def FindABC(field):
     while not getattr(field, "isABC", False):
@@ -355,10 +392,12 @@ def FindABC(field):
             return None
     return field
 
+
 def GetConstant(field, pool, index):
     if index == 0:
         return None
-    return FindABC(field)["constant_%s_pool/constant[%i]"%(pool, index)]
+    return FindABC(field)["constant_%s_pool/constant[%i]" % (pool, index)]
+
 
 def GetMultiname(field, index):
     fld = GetConstant(field, "multiname", index)
@@ -371,55 +410,72 @@ def GetMultiname(field, index):
         return "*"
     return fld2.value
 
+
 class ABCStringIndex(FlashU30):
+
     def createDisplay(self):
         fld = GetConstant(self, "string", self.value)
         if fld is None:
             return "*"
         return fld.value
 
+
 class ABCNSIndex(FlashU30):
+
     def createDisplay(self):
         fld = GetConstant(self, "namespace", self.value)
         if fld is None:
             return "*"
         return fld.display
 
+
 class ABCMethodIndex(FlashU30):
+
     def createDisplay(self):
-        fld = FindABC(self)["method_array/method[%i]"%self.value]
+        fld = FindABC(self)["method_array/method[%i]" % self.value]
         if fld is None:
             return "*"
         return fld.description
 
+
 class ABCMultinameIndex(FlashU30):
+
     def createDisplay(self):
         return GetMultiname(self, self.value)
 
+
 class ABCConstantPool(FieldSet):
+
     def __init__(self, parent, name, klass):
-        FieldSet.__init__(self, parent, 'constant_%s_pool'%name)
+        FieldSet.__init__(self, parent, 'constant_%s_pool' % name)
         self.klass = klass
+
     def createFields(self):
         ctr = FlashU30(self, "count")
         yield ctr
-        for i in range(ctr.value-1):
-            yield self.klass(self, "constant[%i]"%(i+1))
+        for i in range(ctr.value - 1):
+            yield self.klass(self, "constant[%i]" % (i + 1))
+
 
 class ABCObjectArray(FieldSet):
+
     def __init__(self, parent, name, klass):
         self.arrname = name
-        FieldSet.__init__(self, parent, name+'_array')
+        FieldSet.__init__(self, parent, name + '_array')
         self.klass = klass
+
     def createFields(self):
         ctr = FlashU30(self, "count")
         yield ctr
         for i in range(ctr.value):
-            yield self.klass(self, self.arrname+"[]")
+            yield self.klass(self, self.arrname + "[]")
+
 
 class ABCClassArray(FieldSet):
+
     def __init__(self, parent, name):
-        FieldSet.__init__(self, parent, name+'_array')
+        FieldSet.__init__(self, parent, name + '_array')
+
     def createFields(self):
         ctr = FlashU30(self, "count")
         yield ctr
@@ -428,7 +484,9 @@ class ABCClassArray(FieldSet):
         for i in range(ctr.value):
             yield ABCClassInfo(self, "class[]")
 
+
 class ABCConstantString(FieldSet):
+
     def createFields(self):
         yield FlashU30(self, "length")
         size = self["length"].value
@@ -447,6 +505,7 @@ class ABCConstantString(FieldSet):
         else:
             return ""
 
+
 class ABCConstantNamespace(FieldSet):
     NAMESPACE_KIND = {8: "Namespace",
                       5: "PrivateNamespace",
@@ -455,17 +514,20 @@ class ABCConstantNamespace(FieldSet):
                       24: "ProtectedNamespace",
                       25: "ExplicitNamespace",
                       26: "MultinameL"}
+
     def createFields(self):
         yield Enum(UInt8(self, "kind"), self.NAMESPACE_KIND)
         yield ABCStringIndex(self, "name_index")
 
     def createDisplay(self):
-        return "%s %s"%(self["kind"].display, self["name_index"].display)
+        return "%s %s" % (self["kind"].display, self["name_index"].display)
 
     def createValue(self):
         return self["name_index"].value
 
+
 class ABCConstantNamespaceSet(FieldSet):
+
     def createFields(self):
         ctr = FlashU30(self, "namespace_count")
         yield ctr
@@ -475,6 +537,7 @@ class ABCConstantNamespaceSet(FieldSet):
     def createDescription(self):
         ret = [fld.display for fld in self.array("namespace_index")]
         return ', '.join(ret)
+
 
 class ABCConstantMultiname(FieldSet):
     MULTINAME_KIND = {7: "Qname",
@@ -486,20 +549,21 @@ class ABCConstantMultiname(FieldSet):
                       27: "MultinameL",
                       17: "RTQnameL",
                       18: "RTQnameLA"}
+
     def createFields(self):
         yield Enum(UInt8(self, "kind"), self.MULTINAME_KIND)
         kind = self["kind"].value
-        if kind in (7,13): # Qname
+        if kind in (7, 13):  # Qname
             yield FlashU30(self, "namespace_index")
             yield ABCStringIndex(self, "name_index")
-        elif kind in (9,14): # Multiname
+        elif kind in (9, 14):  # Multiname
             yield ABCStringIndex(self, "name_index")
             yield FlashU30(self, "namespace_set_index")
-        elif kind in (15,16): # RTQname
+        elif kind in (15, 16):  # RTQname
             yield ABCStringIndex(self, "name_index")
-        elif kind == 27: # MultinameL
+        elif kind == 27:  # MultinameL
             yield FlashU30(self, "namespace_set_index")
-        elif kind in (17,18): # RTQnameL
+        elif kind in (17, 18):  # RTQnameL
             pass
 
     def createDisplay(self):
@@ -511,6 +575,7 @@ class ABCConstantMultiname(FieldSet):
     def createValue(self):
         return self["kind"].value
 
+
 class ABCTrait(FieldSet):
     TRAIT_KIND = {0: "slot",
                   1: "method",
@@ -518,40 +583,45 @@ class ABCTrait(FieldSet):
                   3: "setter",
                   4: "class",
                   5: "function",
-                  6: "const",}
+                  6: "const", }
+
     def createFields(self):
         yield ABCMultinameIndex(self, "name_index")
         yield Enum(Bits(self, "kind", 4), self.TRAIT_KIND)
-        yield Enum(Bit(self, "is_final"), {True:'final',False:'virtual'})
-        yield Enum(Bit(self, "is_override"), {True:'override',False:'new'})
+        yield Enum(Bit(self, "is_final"), {True: 'final', False: 'virtual'})
+        yield Enum(Bit(self, "is_override"), {True: 'override', False: 'new'})
         yield Bit(self, "has_metadata")
         yield Bits(self, "unused", 1)
         kind = self["kind"].value
-        if kind in (0,6): # slot, const
+        if kind in (0, 6):  # slot, const
             yield FlashU30(self, "slot_id")
             yield ABCMultinameIndex(self, "type_index")
-            ### TODO reference appropriate constant pool using value_kind
+            # TODO reference appropriate constant pool using value_kind
             yield FlashU30(self, "value_index")
             if self['value_index'].value != 0:
                 yield UInt8(self, "value_kind")
-        elif kind in (1,2,3): # method, getter, setter
+        elif kind in (1, 2, 3):  # method, getter, setter
             yield FlashU30(self, "disp_id")
             yield ABCMethodIndex(self, "method_info")
-        elif kind == 4: # class
+        elif kind == 4:  # class
             yield FlashU30(self, "disp_id")
             yield FlashU30(self, "class_info")
-        elif kind == 5: # function
+        elif kind == 5:  # function
             yield FlashU30(self, "disp_id")
             yield ABCMethodIndex(self, "method_info")
         if self['has_metadata'].value:
             yield ABCObjectArray(self, "metadata", FlashU30)
 
+
 class ABCValueKind(FieldSet):
+
     def createFields(self):
         yield FlashU30(self, "value_index")
         yield UInt8(self, "value_kind")
 
+
 class ABCMethodInfo(FieldSet):
+
     def createFields(self):
         yield FlashU30(self, "param_count")
         yield ABCMultinameIndex(self, "ret_type")
@@ -575,10 +645,13 @@ class ABCMethodInfo(FieldSet):
     def createDescription(self):
         ret = GetMultiname(self, self["ret_type"].value)
         ret += " " + self["name_index"].display
-        ret += "(" + ", ".join(GetMultiname(self, fld.value) for fld in self.array("param_type")) + ")"
+        ret += "(" + ", ".join(GetMultiname(self, fld.value)
+                               for fld in self.array("param_type")) + ")"
         return ret
 
+
 class ABCMetadataInfo(FieldSet):
+
     def createFields(self):
         yield ABCStringIndex(self, "name_index")
         yield FlashU30(self, "values_count")
@@ -588,7 +661,9 @@ class ABCMetadataInfo(FieldSet):
         for i in range(count):
             yield FlashU30(self, "value[]")
 
+
 class ABCInstanceInfo(FieldSet):
+
     def createFields(self):
         yield ABCMultinameIndex(self, "name_index")
         yield ABCMultinameIndex(self, "super_index")
@@ -605,17 +680,23 @@ class ABCInstanceInfo(FieldSet):
         yield ABCMethodIndex(self, "iinit_index")
         yield ABCObjectArray(self, "trait", ABCTrait)
 
+
 class ABCClassInfo(FieldSet):
+
     def createFields(self):
         yield ABCMethodIndex(self, "cinit_index")
         yield ABCObjectArray(self, "trait", ABCTrait)
 
+
 class ABCScriptInfo(FieldSet):
+
     def createFields(self):
         yield ABCMethodIndex(self, "init_index")
         yield ABCObjectArray(self, "trait", ABCTrait)
 
+
 class ABCException(FieldSet):
+
     def createFields(self):
         yield FlashU30(self, "start")
         yield FlashU30(self, "end")
@@ -623,7 +704,9 @@ class ABCException(FieldSet):
         yield FlashU30(self, "type_index")
         yield FlashU30(self, "name_index")
 
+
 class ABCMethodBody(FieldSet):
+
     def createFields(self):
         yield ABCMethodIndex(self, "method_info")
         yield FlashU30(self, "max_stack")
@@ -634,6 +717,7 @@ class ABCMethodBody(FieldSet):
         yield RawBytes(self, "code", self['code_length'].value)
         yield ABCObjectArray(self, "exception", ABCException)
         yield ABCObjectArray(self, "trait", ABCTrait)
+
 
 def parseABC(parent, size):
     code = parent["code"].value
@@ -657,4 +741,3 @@ def parseABC(parent, size):
     yield ABCClassArray(parent, "class")
     yield ABCObjectArray(parent, "script", ABCScriptInfo)
     yield ABCObjectArray(parent, "body", ABCMethodBody)
-

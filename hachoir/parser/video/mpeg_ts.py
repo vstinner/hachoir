@@ -11,17 +11,19 @@ Creation date: 13 january 2007
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, ParserError, MissingField,
-    UInt8, Enum, Bit, Bits, RawBytes)
+                           UInt8, Enum, Bit, Bits, RawBytes)
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal
 
+
 class Packet(FieldSet):
+
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
         if self["has_error"].value:
-            self._size = 204*8
+            self._size = 204 * 8
         else:
-            self._size = 188*8
+            self._size = 188 * 8
 
     PID = {
         0x0000: "Program Association Table (PAT)",
@@ -29,8 +31,8 @@ class Packet(FieldSet):
         # 0x0002..0x000f: reserved
         # 0x0010..0x1FFE: network PID, program map PID, elementary PID, etc.
         # TODO: Check above values
-        #0x0044: "video",
-        #0x0045: "audio",
+        # 0x0044: "video",
+        # 0x0045: "audio",
         0x1FFF: "Null packet",
     }
 
@@ -64,18 +66,19 @@ class Packet(FieldSet):
             return "Invalid program identifier (%s)" % self["pid"].display
         return ""
 
+
 class MPEG_TS(Parser):
     PARSER_TAGS = {
         "id": "mpeg_ts",
         "category": "video",
         "file_ext": ("ts",),
-        "min_size": 188*8,
+        "min_size": 188 * 8,
         "description": "MPEG-2 Transport Stream"
     }
     endian = BIG_ENDIAN
 
     def validate(self):
-        sync = self.stream.searchBytes(b"\x47", 0, 204*8)
+        sync = self.stream.searchBytes(b"\x47", 0, 204 * 8)
         if sync is None:
             return "Unable to find synchronization byte"
         for index in range(5):
@@ -93,10 +96,10 @@ class MPEG_TS(Parser):
 
     def createFields(self):
         while not self.eof:
-            sync = self.stream.searchBytes(b"\x47", self.current_size, self.current_size+204*8)
+            sync = self.stream.searchBytes(
+                b"\x47", self.current_size, self.current_size + 204 * 8)
             if sync is None:
                 raise ParserError("Unable to find synchronization byte")
             elif sync:
-                yield RawBytes(self, "incomplete_packet[]", (sync-self.current_size)//8)
+                yield RawBytes(self, "incomplete_packet[]", (sync - self.current_size) // 8)
             yield Packet(self, "packet[]")
-

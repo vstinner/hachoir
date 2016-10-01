@@ -15,7 +15,8 @@ class ExeMetadata(RootMetadata):
         "FileDescription": "title",
         "ProductVersion": "version",
     }
-    SKIP_KEY = set(("InternalName", "OriginalFilename", "FileVersion", "BuildVersion"))
+    SKIP_KEY = set(("InternalName", "OriginalFilename",
+                    "FileVersion", "BuildVersion"))
 
     def extract(self, exe):
         if exe.isPE():
@@ -47,7 +48,7 @@ class ExeMetadata(RootMetadata):
         if resource and "version_info/node[0]" in resource:
             for node in resource.array("version_info/node[0]/node"):
                 if getValue(node, "name") == "StringFileInfo" \
-                and "node[0]" in node:
+                        and "node[0]" in node:
                     self.readVersionInfo(node["node[0]"])
 
     @fault_tolerant
@@ -98,4 +99,3 @@ class ExeMetadata(RootMetadata):
                 self.comment = "%s=%s" % (key, value)
 
 registerExtractor(ExeFile, ExeMetadata)
-

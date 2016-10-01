@@ -8,8 +8,8 @@ TODO:
 """
 
 from hachoir.regex import (RegexString, RegexEmpty, RegexRepeat,
-    RegexDot, RegexWord, RegexStart, RegexEnd,
-    RegexRange, RegexRangeItem, RegexRangeCharacter)
+                           RegexDot, RegexWord, RegexStart, RegexEnd,
+                           RegexRange, RegexRangeItem, RegexRangeCharacter)
 import re
 
 REGEX_COMMAND_CHARACTERS = '.^$[](){}|+?*\\'
@@ -40,17 +40,18 @@ def parseRange(text, start):
         char_range.append(RegexRangeCharacter(']'))
         index += 1
     while index < len(text) and text[index] != ']':
-        if index+1 < len(text) \
-        and text[index] == '\\':
-            char_range.append(RegexRangeCharacter(text[index+1]))
+        if index + 1 < len(text) \
+                and text[index] == '\\':
+            char_range.append(RegexRangeCharacter(text[index + 1]))
             index += 2
-        elif index+1 < len(text) \
-        and text[index] == '-' and text[index+1] == ']':
+        elif index + 1 < len(text) \
+                and text[index] == '-' and text[index + 1] == ']':
             break
-        elif index+3 < len(text) \
-        and text[index+1] == '-' \
-        and text[index+2] != ']':
-            char_range.append(RegexRangeItem(ord(text[index]), ord(text[index+2])))
+        elif index + 3 < len(text) \
+                and text[index + 1] == '-' \
+                and text[index + 2] != ']':
+            char_range.append(RegexRangeItem(
+                ord(text[index]), ord(text[index + 2])))
             index += 3
         else:
             char_range.append(RegexRangeCharacter(text[index]))
@@ -59,8 +60,8 @@ def parseRange(text, start):
         char_range.append(RegexRangeCharacter('-'))
         index += 1
     if index == len(text) or text[index] != ']':
-        raise SyntaxError('Invalid range: %s' % text[start-1:index])
-    return RegexRange(char_range, exclude), index+1
+        raise SyntaxError('Invalid range: %s' % text[start - 1:index])
+    return RegexRange(char_range, exclude), index + 1
 
 
 def parseOr(text, start):
@@ -74,7 +75,7 @@ def parseOr(text, start):
     """
     index = start
     # (?:...): Skip Python prefix '?:'
-    if text[index:index+2] == '?:':
+    if text[index:index + 2] == '?:':
         index += 2
     if text[index] == '?':
         raise NotImplementedError("Doesn't support Python extension (?...)")
@@ -107,7 +108,7 @@ def parseRepeat(text, start):
     """
     match = REPEAT_REGEX.match(text, start)
     if not match:
-        raise SyntaxError('Unable to parse repetition '+text[start:])
+        raise SyntaxError('Unable to parse repetition ' + text[start:])
     rmin = int(match.group(1))
     if match.group(2):
         text = match.group(2)[1:]
@@ -138,35 +139,39 @@ def _parse(text, start=0, until=None):
             break
         if char in REGEX_COMMAND_CHARACTERS:
             if char in CHAR_TO_FUNC:
-                new_regex, index = CHAR_TO_FUNC[char] (text, index+1)
+                new_regex, index = CHAR_TO_FUNC[char](text, index + 1)
             elif char in CHAR_TO_CLASS:
                 new_regex = CHAR_TO_CLASS[char]()
                 index += 1
             elif char == '{':
-                rmin, rmax, index = parseRepeat(text, index+1)
+                rmin, rmax, index = parseRepeat(text, index + 1)
                 new_regex = RegexRepeat(last, rmin, rmax)
                 last = None
             elif char in CHAR_TO_REPEAT:
                 rmin, rmax = CHAR_TO_REPEAT[char]
                 if last is None:
-                    raise SyntaxError('Repetition character (%s) without previous expression' % text[index])
+                    raise SyntaxError(
+                        'Repetition character (%s) without previous expression' % text[index])
                 new_regex = RegexRepeat(last, rmin, rmax)
                 last = None
                 index += 1
             elif char == "\\":
                 index += 1
                 if index == len(text):
-                    raise SyntaxError("Antislash (\\) without escaped character")
+                    raise SyntaxError(
+                        "Antislash (\\) without escaped character")
                 char = text[index]
                 if char == 'b':
                     new_regex = RegexWord()
                 else:
                     if not(char in REGEX_COMMAND_CHARACTERS or char in " '"):
-                        raise SyntaxError("Operator '\\%s' is not supported" % char)
+                        raise SyntaxError(
+                            "Operator '\\%s' is not supported" % char)
                     new_regex = RegexString(char)
                 index += 1
             else:
-                raise NotImplementedError("Operator '%s' is not supported" % char)
+                raise NotImplementedError(
+                    "Operator '%s' is not supported" % char)
             if last:
                 regex = regex + last
             last = new_regex
@@ -201,4 +206,3 @@ def parse(text):
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
-

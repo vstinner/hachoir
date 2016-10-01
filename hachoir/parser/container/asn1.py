@@ -41,15 +41,16 @@ Creation date: 24 september 2006
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet,
-    FieldError, ParserError,
-    Bit, Bits, Bytes, UInt8, GenericInteger, String,
-    Field, Enum, RawBytes)
+                           FieldError, ParserError,
+                           Bit, Bits, Bytes, UInt8, GenericInteger, String,
+                           Field, Enum, RawBytes)
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.core.tools import createDict, humanDatetime
 from hachoir.stream import InputStreamError
 from hachoir.core.text_handler import textHandler
 
 # --- Field parser ---
+
 
 class ASNInteger(Field):
     """
@@ -58,6 +59,7 @@ class ASNInteger(Field):
     - first byte in 128..255: byte & 127 is the number of bytes,
       next bytes are the value
     """
+
     def __init__(self, parent, name, description=None):
         Field.__init__(self, parent, name, 8, description)
         stream = self._parent.stream
@@ -71,10 +73,12 @@ class ASNInteger(Field):
                 # Arbitrary limit to catch errors
                 raise ParserError("ASN.1: ASN integer is limited to 64 bits")
             self._size = 8 + nbits
-            value = stream.readBits(addr+8, nbits, BIG_ENDIAN)
+            value = stream.readBits(addr + 8, nbits, BIG_ENDIAN)
         self.createValue = lambda: value
 
+
 class OID_Integer(Bits):
+
     def __init__(self, parent, name, description=None):
         Bits.__init__(self, parent, name, 8, description)
         stream = self._parent.stream
@@ -88,64 +92,80 @@ class OID_Integer(Bits):
             size += 8
             if 64 < size:
                 # Arbitrary limit to catch errors
-                raise ParserError("ASN.1: Object identifier is limited 64 bits")
+                raise ParserError(
+                    "ASN.1: Object identifier is limited 64 bits")
             byte = stream.readBits(addr, 8, BIG_ENDIAN)
             value = (value << 7) + (byte & 127)
         self._size = size
         self.createValue = lambda: value
 
+
 def readSequence(self, content_size):
     while self.current_size < self.size:
         yield Object(self, "item[]")
 
+
 def readSet(self, content_size):
-    yield Object(self, "value", size=content_size*8)
+    yield Object(self, "value", size=content_size * 8)
+
 
 def readASCIIString(self, content_size):
     yield String(self, "value", content_size, charset="ASCII")
 
+
 def readUTF8String(self, content_size):
     yield String(self, "value", content_size, charset="UTF-8")
+
 
 def readBMPString(self, content_size):
     yield String(self, "value", content_size, charset="UTF-16")
 
+
 def readBitString(self, content_size):
     yield UInt8(self, "padding_size", description="Number of unused bits")
     if content_size > 1:
-        yield Bytes(self, "value", content_size-1)
+        yield Bytes(self, "value", content_size - 1)
+
 
 def readOctetString(self, content_size):
     yield Bytes(self, "value", content_size)
 
+
 def formatObjectID(fieldset):
-    text = [ fieldset["first"].display ]
+    text = [fieldset["first"].display]
     items = [field for field in fieldset if field.name.startswith("item[")]
     text.extend(str(field.value) for field in items)
     return ".".join(text)
+
 
 def readObjectID(self, content_size):
     yield textHandler(UInt8(self, "first"), formatFirstObjectID)
     while self.current_size < self.size:
         yield OID_Integer(self, "item[]")
 
+
 def readBoolean(self, content_size):
     if content_size != 1:
-        raise ParserError("Overlong boolean: got %s bytes, expected 1 byte"%content_size)
-    yield textHandler(UInt8(self, "value"), lambda field:str(bool(field.value)))
+        raise ParserError(
+            "Overlong boolean: got %s bytes, expected 1 byte" % content_size)
+    yield textHandler(UInt8(self, "value"), lambda field: str(bool(field.value)))
+
 
 def readInteger(self, content_size):
     # Always signed?
-    yield GenericInteger(self, "value", True, content_size*8)
+    yield GenericInteger(self, "value", True, content_size * 8)
 
 # --- Format ---
+
 
 def formatFirstObjectID(field):
     value = field.value
     return "%u.%u" % (value // 40, value % 40)
 
+
 def formatValue(fieldset):
     return fieldset["value"].display
+
 
 def formatUTCTime(fieldset):
     import datetime
@@ -169,24 +189,28 @@ def formatUTCTime(fieldset):
 
 # --- Object parser ---
 
+
 class Object(FieldSet):
     TYPE_INFO = {
-        0: ("end[]", None, "End (reserved for BER, None)", None), # TODO: Write parser
+        # TODO: Write parser
+        0: ("end[]", None, "End (reserved for BER, None)", None),
         1: ("boolean[]", readBoolean, "Boolean", None),
         2: ("integer[]", readInteger, "Integer", None),
         3: ("bit_str[]", readBitString, "Bit string", None),
         4: ("octet_str[]", readOctetString, "Octet string", None),
         5: ("null[]", None, "NULL (empty, None)", None),
         6: ("obj_id[]", readObjectID, "Object identifier", formatObjectID),
-        7: ("obj_desc[]", None, "Object descriptor", None), # TODO: Write parser
-        8: ("external[]", None, "External, instance of", None), # TODO: Write parser # External?
-        9: ("real[]", readASCIIString, "Real number", None), # TODO: Write parser
+        7: ("obj_desc[]", None, "Object descriptor", None),  # TODO: Write parser
+        # TODO: Write parser # External?
+        8: ("external[]", None, "External, instance of", None),
+        9: ("real[]", readASCIIString, "Real number", None),  # TODO: Write parser
         10: ("enum[]", readInteger, "Enumerated", None),
-        11: ("embedded[]", None, "Embedded PDV", None), # TODO: Write parser
+        11: ("embedded[]", None, "Embedded PDV", None),  # TODO: Write parser
         12: ("utf8_str[]", readUTF8String, "Printable string", None),
-        13: ("rel_obj_id[]", None, "Relative object identifier", None), # TODO: Write parser
-        14: ("time[]", None, "Time", None), # TODO: Write parser
-      # 15: invalid??? sequence of???
+        # TODO: Write parser
+        13: ("rel_obj_id[]", None, "Relative object identifier", None),
+        14: ("time[]", None, "Time", None),  # TODO: Write parser
+        # 15: invalid??? sequence of???
         16: ("seq[]", readSequence, "Sequence", None),
         17: ("set[]", readSet, "Set", None),
         18: ("num_str[]", readASCIIString, "Numeric string", None),
@@ -202,13 +226,13 @@ class Object(FieldSet):
         28: ("universal_str[]", readASCIIString, "Universal string", None),
         29: ("unrestricted_str[]", readASCIIString, "Unrestricted string", None),
         30: ("bmp_str[]", readBMPString, "BMP string", None),
-      # 31: multiple octet tag number, TODO: not supported
+        # 31: multiple octet tag number, TODO: not supported
 
-      # Extended tag values:
-      #   31: Date
-      #   32: Time of day
-      #   33: Date-time
-      #   34: Duration
+        # Extended tag values:
+        #   31: Date
+        #   32: Time of day
+        #   33: Date-time
+        #   34: Duration
     }
     TYPE_DESC = createDict(TYPE_INFO, 2)
 
@@ -221,12 +245,15 @@ class Object(FieldSet):
         if self['class'].value == 0:
             # universal object
             if key in self.TYPE_INFO:
-                self._name, self._handler, self._description, create_desc = self.TYPE_INFO[key]
+                self._name, self._handler, self._description, create_desc = self.TYPE_INFO[
+                    key]
                 if create_desc:
-                    self.createDescription = lambda: "%s: %s" % (self.TYPE_INFO[key][2], create_desc(self))
+                    self.createDescription = lambda: "%s: %s" % (
+                        self.TYPE_INFO[key][2], create_desc(self))
                     self._description = None
             elif key == 31:
-                raise ParserError("ASN.1 Object: tag bigger than 30 are not supported")
+                raise ParserError(
+                    "ASN.1 Object: tag bigger than 30 are not supported")
             else:
                 self._handler = None
         elif self['form'].value:
@@ -238,9 +265,10 @@ class Object(FieldSet):
             # primitive, context/private
             self._name = 'raw[]'
             self._handler = readASCIIString
-            self._description = '%s object type %i' % (self['class'].display, key)
+            self._description = '%s object type %i' % (
+                self['class'].display, key)
         field = self["size"]
-        self._size = field.address + field.size + field.value*8
+        self._size = field.address + field.size + field.value * 8
 
     def createFields(self):
         yield Enum(Bits(self, "class", 2), self.CLASS_DESC)
@@ -256,6 +284,7 @@ class Object(FieldSet):
                 yield from self._handler(self, size)
             else:
                 yield RawBytes(self, "raw", size)
+
 
 class ASN1File(Parser):
     PARSER_TAGS = {
@@ -278,4 +307,3 @@ class ASN1File(Parser):
 
     def createFields(self):
         yield Object(self, "root")
-

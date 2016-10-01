@@ -34,7 +34,8 @@ class PaddingBits(Bits):
         else:
             value = self.value
         if value != 0:
-            self.warning("padding contents doesn't look normal (invalid pattern)")
+            self.warning(
+                "padding contents doesn't look normal (invalid pattern)")
             return False
         if self.MAX_SIZE < self._size:
             self.info("only check first %u bits" % self.MAX_SIZE)
@@ -59,11 +60,11 @@ class PaddingBytes(Bytes):
      * pattern (str): Content pattern, eg. b"\0" for nul bytes
     """
 
-    static_size = staticmethod(lambda *args, **kw: args[1]*8)
+    static_size = staticmethod(lambda *args, **kw: args[1] * 8)
     MAX_SIZE = 4096
 
     def __init__(self, parent, name, nbytes,
-    description="Padding", pattern=None):
+                 description="Padding", pattern=None):
         """ pattern is None or repeated string """
         assert (pattern is None) or (isinstance(pattern, bytes))
         Bytes.__init__(self, parent, name, nbytes, description)
@@ -76,8 +77,9 @@ class PaddingBytes(Bytes):
         if self.pattern is None:
             return False
 
-        if self.MAX_SIZE < self._size//8:
-            self.info("only check first %s of padding" % humanFilesize(self.MAX_SIZE))
+        if self.MAX_SIZE < self._size // 8:
+            self.info("only check first %s of padding" %
+                      humanFilesize(self.MAX_SIZE))
             content = self._parent.stream.readBytes(
                 self.absolute_address, self.MAX_SIZE)
         else:
@@ -85,7 +87,7 @@ class PaddingBytes(Bytes):
         index = 0
         pattern_len = len(self.pattern)
         while index < len(content):
-            if content[index:index+pattern_len] != self.pattern:
+            if content[index:index + pattern_len] != self.pattern:
                 self.warning(
                     "padding contents doesn't look normal"
                     " (invalid pattern at byte %u)!"
@@ -131,12 +133,13 @@ class NullBytes(PaddingBytes):
     Arguments:
      * nbytes: Size of the field in bytes
     """
+
     def __init__(self, parent, name, nbytes, description=None):
-        PaddingBytes.__init__(self, parent, name, nbytes, description, pattern=b"\0")
+        PaddingBytes.__init__(self, parent, name, nbytes,
+                              description, pattern=b"\0")
 
     def createDisplay(self):
         if self._display_pattern:
             return "<null>"
         else:
             return Bytes.createDisplay(self)
-

@@ -26,8 +26,10 @@ try:
     from urwid import ListWalker
 except ImportError:
     class ListWalker(object):
+
         def _modified(self):
             pass
+
 
 def browse_completion(text):
     path = os.path.dirname(text)
@@ -39,16 +41,20 @@ def browse_completion(text):
 
 
 class NewTab_Stream(Exception):
+
     def __init__(self, field):
         self.field = field
 
+
 class NeedInput(Exception):
+
     def __init__(self, *args):
         self.args = args
 
 
 class TextField(AttrWrap):
     start = 0
+
     def __init__(self, text):
         AttrWrap.__init__(self, Text(text, wrap='clip'), None, 'focus')
 
@@ -60,6 +66,7 @@ class TextField(AttrWrap):
 
 
 class Node:
+
     def __init__(self, field, parent=None):
         self.parent = parent
         self.childs = []
@@ -94,8 +101,8 @@ class Node:
     def hidden(self):
         parent = self.parent
         return (parent and parent.childs[-1] == self
-            and (len(parent.childs) < parent.field.current_length
-              or not parent.field.done))
+                and (len(parent.childs) < parent.field.current_length
+                     or not parent.field.done))
 
     def sync(self):
         start, end = len(self.childs), self.field.current_length
@@ -108,7 +115,7 @@ class Node:
         if self.childs:
             for index, child in enumerate(self.childs):
                 if (index >= self.field.current_length
-                   or child.field != self.field[index]):
+                        or child.field != self.field[index]):
                     del self.childs[index:]
                     break
                 child.refresh()
@@ -130,13 +137,20 @@ class Walker(ListWalker):
 
     def __init__(self, charset, root, preload_fields, focus, options):
         self.charset = charset
-        if options.get("display_value",      True):  self.flags |= self.display_value
-        if options.get("description",      True):  self.flags |= self.display_description
-        if options.get("display_type",     False): self.flags |= self.display_type
-        if options.get("display_size",     True):  self.flags |= self.display_size
-        if options.get("human-size",       True):  self.flags |= self.human_size
-        if options.get("absolute-address", False): self.flags |= self.use_absolute_address
-        if options.get("hex-address",      False): self.flags |= self.hex_address
+        if options.get("display_value",      True):
+            self.flags |= self.display_value
+        if options.get("description",      True):
+            self.flags |= self.display_description
+        if options.get("display_type",     False):
+            self.flags |= self.display_type
+        if options.get("display_size",     True):
+            self.flags |= self.display_size
+        if options.get("human-size",       True):
+            self.flags |= self.human_size
+        if options.get("absolute-address", False):
+            self.flags |= self.use_absolute_address
+        if options.get("hex-address",      False):
+            self.flags |= self.hex_address
         assert preload_fields > 0
         self.preload_fields = preload_fields
         self.focus = root
@@ -193,13 +207,20 @@ class Walker(ListWalker):
             if not self.start:
                 return
             self.start -= 1
-        elif key == 'a': self.flags ^= self.use_absolute_address
-        elif key == 'b': self.flags ^= self.hex_address
-        elif key == 'h': self.flags ^= self.human_size
-        elif key == 's': self.flags ^= self.display_size
-        elif key == 't': self.flags ^= self.display_type
-        elif key == 'v': self.flags ^= self.display_value
-        elif key == 'd': self.flags ^= self.display_description
+        elif key == 'a':
+            self.flags ^= self.use_absolute_address
+        elif key == 'b':
+            self.flags ^= self.hex_address
+        elif key == 'h':
+            self.flags ^= self.human_size
+        elif key == 's':
+            self.flags ^= self.display_size
+        elif key == 't':
+            self.flags ^= self.display_type
+        elif key == 'v':
+            self.flags ^= self.display_value
+        elif key == 'd':
+            self.flags ^= self.display_description
         elif key in ('ctrl e', 'ctrl x'):
             if self.focus.field.size != 0:
                 raise NeedInput(lambda path: self.save_field(path, key == 'ctrl e'),
@@ -254,14 +275,14 @@ class Walker(ListWalker):
 
             if self.flags & self.hex_address:
                 if display_bits:
-                    text += "%04x.%x" % (address//8, address%8)
+                    text += "%04x.%x" % (address // 8, address % 8)
                 else:
-                    text += "%04x" % (address//8)
+                    text += "%04x" % (address // 8)
             else:
                 if display_bits:
-                    text += "%u.%u" % (address//8, address%8)
+                    text += "%u.%u" % (address // 8, address % 8)
                 else:
-                    text += "%u" % (address//8)
+                    text += "%u" % (address // 8)
             text += ") " + name
         else:
             text += "-> " + name
@@ -291,7 +312,7 @@ class Walker(ListWalker):
                     if not self.flags & self.human_size:
                         tmp_text.append("%u bytes" % size)
                     else:
-                        tmp_text.append( humanFilesize(size) )
+                        tmp_text.append(humanFilesize(size))
             text += " (%s)" % ", ".join(tmp_text)
         text = makePrintable(text, self.charset, smart=smart_display)
         node.setText(text, self.flags)
@@ -320,7 +341,7 @@ class Walker(ListWalker):
 
     def get_prev(self, pos):
         if pos.index:
-            pos = pos.parent.childs[pos.index-1]
+            pos = pos.parent.childs[pos.index - 1]
             while pos.childs:
                 pos = pos.childs[-1]
         else:
@@ -370,8 +391,10 @@ class Walker(ListWalker):
 
 
 class TreeBox(ListBox):
+
     def __init__(self, charset, root, preload_fields, focus, options={}):
-        ListBox.__init__(self, Walker(charset, root, preload_fields, focus, options))
+        ListBox.__init__(self, Walker(
+            charset, root, preload_fields, focus, options))
 
     def keypress(self, size, key):
         key = self.body.keypress(size, key)
@@ -444,6 +467,7 @@ class Tabbed(WidgetPlaceholder):
 
 
 class Separator(Text):
+
     def __init__(self, format):
         Text.__init__(self, '')
         self.format = format
@@ -496,7 +520,7 @@ class Input(Edit):
         self._tab = tab
         self.set_caption(caption)
         self.set_edit_text(text)
-        self._end = True # TODO: find a better way to move the cursor the end.
+        self._end = True  # TODO: find a better way to move the cursor the end.
         self._top[0](AttrWrap(self, 'input'))
 
     def move_cursor_to_coords(self, size, x, y):
@@ -531,32 +555,34 @@ class Input(Edit):
 
 def getHelpMessage():
     actions = ("Application:",
-        ("q",      "exit"),
-        ("F1",     "help"),
-        ("< / >",  "prev/next tab"),
-        ("+ / -",  "move separator vertically"),
-        ("esc/^W", "close current tab"),
-    ), ("Parser window:",
-        ("a", "absolute address"),
-        ("b", "address in hexadecimal"),
-        ("h", "human display"),
-        ("d", "description"),
-        ("s", "field set size"),
-        ("t", "field type"),
-        ("v", "field value"),
-        ("^E", "save field to a file"),
-        ("^X", "create a stream from the selected field and save it to a file"),
-        ("enter", "collapse/expand"),
-        ("(page) up/down", "move (1 page) up/down"),
-        ("home", "move to parent field"),
-        ("end", "move to last (parent) field"),
-        ("<-/->", "scroll horizontally"),
-        ("space", "parse the selected field"),
-    )
-    length = 4 + max(max(len(action[0]) for action in group[1:]) for group in actions)
+               ("q",      "exit"),
+               ("F1",     "help"),
+               ("< / >",  "prev/next tab"),
+               ("+ / -",  "move separator vertically"),
+               ("esc/^W", "close current tab"),
+               ), ("Parser window:",
+                   ("a", "absolute address"),
+                   ("b", "address in hexadecimal"),
+                   ("h", "human display"),
+                   ("d", "description"),
+                   ("s", "field set size"),
+                   ("t", "field type"),
+                   ("v", "field value"),
+                   ("^E", "save field to a file"),
+                   ("^X", "create a stream from the selected field and save it to a file"),
+                   ("enter", "collapse/expand"),
+                   ("(page) up/down", "move (1 page) up/down"),
+                   ("home", "move to parent field"),
+                   ("end", "move to last (parent) field"),
+                   ("<-/->", "scroll horizontally"),
+                   ("space", "parse the selected field"),
+                   )
+    length = 4 + max(max(len(action[0])
+                         for action in group[1:]) for group in actions)
     return "\n".join("\n    %s\n%s" % (group[0],
-        "\n".join("%*s   %s" % (length, action[0], action[1])
-            for action in group[1:])) for group in actions)
+                                       "\n".join("%*s   %s" % (length, action[0], action[1])
+                                                 for action in group[1:])) for group in actions)
+
 
 def exploreFieldSet(field_set, args, options={}):
     charset = getTerminalCharset()
@@ -568,18 +594,19 @@ def exploreFieldSet(field_set, args, options={}):
         ('input', 'black', 'light gray'),
     ))
 
-    msgs = [[],[],0]
+    msgs = [[], [], 0]
     hachoir_log.use_print = False
+
     def logger(level, prefix, text, ctxt):
         if ctxt is not None:
             c = []
             if hasattr(ctxt, "_logger"):
-                c[:0] = [ ctxt._logger() ]
+                c[:0] = [ctxt._logger()]
             if issubclass(ctxt.__class__, Field):
                 ctxt = ctxt["/"]
             name = logger.objects.get(ctxt)
             if name:
-                c[:0] = [ name ]
+                c[:0] = [name]
             if c:
                 text = "[%s] %s" % ('|'.join(c), text)
         if not isinstance(text, str):
@@ -590,22 +617,26 @@ def exploreFieldSet(field_set, args, options={}):
 
     preload_fields = 1 + max(0, args.preload)
 
-    log_count = [ 0, 0, 0 ]
+    log_count = [0, 0, 0]
     sep = Separator("log: %%u/%%u/%%u  |  %s  " % "F1: help")
     sep.set_info(*tuple(log_count))
     body = Tabbed(sep)
-    help = ('help', ListBox([ Text(getHelpMessage()) ]))
-    logger.objects[field_set] = logger.objects[field_set.stream] = name = 'root'
-    body.append((name, TreeBox(charset, Node(field_set, None), preload_fields, args.path, options)))
+    help = ('help', ListBox([Text(getHelpMessage())]))
+    logger.objects[field_set] = logger.objects[
+        field_set.stream] = name = 'root'
+    body.append((name, TreeBox(charset, Node(field_set, None),
+                               preload_fields, args.path, options)))
 
     log = BoxAdapter(ListBox(msgs[1]), 0)
     log.selectable = lambda: False
     wrapped_sep = AttrWrap(sep, 'sep')
-    footer = Pile([ ('flow', wrapped_sep), log ])
+    footer = Pile([('flow', wrapped_sep), log])
 
     # awful way to allow the user to hide the log widget
-    log.render = lambda size, focus=False: BoxAdapter.render(log, size[:1], focus)
-    footer.render = lambda arg, focus=False: Pile.render(footer, (arg[0], sep.rows(arg)+log.height), focus)
+    log.render = lambda size, focus=False: BoxAdapter.render(log, size[
+                                                             :1], focus)
+    footer.render = lambda arg, focus=False: Pile.render(
+        footer, (arg[0], sep.rows(arg) + log.height), focus)
 
     top = Frame(body, None, footer)
 
@@ -613,6 +644,7 @@ def exploreFieldSet(field_set, args, options={}):
         footer.widget_list[0] = w
         footer.set_focus(0)
         top.set_focus('footer')
+
     def input_leave():
         footer.widget_list[0] = wrapped_sep
         footer.set_focus(0)
@@ -621,7 +653,7 @@ def exploreFieldSet(field_set, args, options={}):
 
     def run():
         msg = _resize = retry = 0
-        events = ( "window resize", )
+        events = ("window resize", )
         profile_display = args.profile_display
         while True:
             for e in events:
@@ -655,13 +687,16 @@ def exploreFieldSet(field_set, args, options={}):
                 #     hachoir_log.error(getBacktrace())
                 except NewTab_Stream as e:
                     stream = e.field.getSubIStream()
-                    logger.objects[stream] = e = "%u/%s" % (body.active, e.field.absolute_address)
+                    logger.objects[
+                        stream] = e = "%u/%s" % (body.active, e.field.absolute_address)
                     parser = guessParser(stream)
                     if not parser:
-                        hachoir_log.error("No parser found for %s" % stream.source)
+                        hachoir_log.error(
+                            "No parser found for %s" % stream.source)
                     else:
                         logger.objects[parser] = e
-                        body.append((e, TreeBox(charset, Node(parser, None), preload_fields, None, options)))
+                        body.append(
+                            (e, TreeBox(charset, Node(parser, None), preload_fields, None, options)))
                         resize = log.height
                 except NeedInput as e:
                     input.do(*e.args)
@@ -678,7 +713,7 @@ def exploreFieldSet(field_set, args, options={}):
                         _resize += txt.rows(size[:1])
                     if log.height < _resize and (resize is None or resize < _resize):
                         resize = _resize
-                    log.set_focus(len(msgs[1])-1)
+                    log.set_focus(len(msgs[1]) - 1)
                     sep.set_info(*tuple(log_count))
                     msgs[0] = []
                 if resize is not None:
@@ -700,13 +735,15 @@ def exploreFieldSet(field_set, args, options={}):
                 continue
             while True:
                 events = ui.get_input()
-                if events: break
+                if events:
+                    break
 
     try:
         ui.run_wrapper(run)
     except Exception:
         pending = [ msg.get_text()[0] for msg in msgs[1][msgs[2]:] ] + \
-                  [ "[*]%s %s" % (prefix, text) for level, prefix, text in msgs[0] ]
+                  ["[*]%s %s" % (prefix, text)
+                   for level, prefix, text in msgs[0]]
         if pending:
             print("\nPending messages:\n" + '\n'.join(pending))
         raise
@@ -716,32 +753,33 @@ def displayParserList(*args):
     HachoirParserList().print_()
     sys.exit(0)
 
+
 def parseOptions():
     parser = OptionParser(usage="%prog [options] filename")
 
     common = OptionGroup(parser, "Urwid", "Option of urwid explorer")
     common.add_option("--preload", help="Number of fields to preload at each read",
-        type="int", action="store", default=15)
+                      type="int", action="store", default=15)
     common.add_option("--path", help="Initial path to focus on",
-        type="str", action="store", default=None)
+                      type="str", action="store", default=None)
     common.add_option("--parser", help="Use the specified parser (use its identifier)",
-        type="str", action="store", default=None)
+                      type="str", action="store", default=None)
     common.add_option("--offset", help="Skip first bytes of input file",
-        type="long", action="store", default=0)
-    common.add_option("--parser-list",help="List all parsers then exit",
-        action="callback", callback=displayParserList)
+                      type="long", action="store", default=0)
+    common.add_option("--parser-list", help="List all parsers then exit",
+                      action="callback", callback=displayParserList)
     common.add_option("--profiler", help="Run profiler",
-        action="store_true", default=False)
+                      action="store_true", default=False)
     common.add_option("--profile-display", help="Force update of the screen beetween each event",
-        action="store_true", default=False)
+                      action="store_true", default=False)
     common.add_option("--size", help="Maximum size of bytes of input file",
-        type="long", action="store", default=None)
+                      type="long", action="store", default=None)
     common.add_option("--hide-value", dest="display_value", help="Don't display value",
-        action="store_false", default=True)
+                      action="store_false", default=True)
     common.add_option("--hide-size", dest="display_size", help="Don't display size",
-        action="store_false", default=True)
+                      action="store_false", default=True)
     common.add_option("--version", help="Display version and exit",
-        action="callback", callback=displayVersion)
+                      action="callback", callback=displayVersion)
     parser.add_option_group(common)
 
     hachoir = getHachoirOptions(parser)
@@ -753,14 +791,16 @@ def parseOptions():
         sys.exit(1)
     return values, arguments[0]
 
+
 def profile(func, *args):
     from hachoir.core.profiler import runProfiler
     runProfiler(func, args)
 
+
 def openParser(parser_id, filename, offset, size):
     tags = []
     if parser_id:
-        tags += [ ("id", parser_id), None ]
+        tags += [("id", parser_id), None]
     try:
         stream = FileInputStream(filename,
                                  offset=offset, size=size, tags=tags)
@@ -771,13 +811,15 @@ def openParser(parser_id, filename, offset, size):
         return None, "Unable to parse file: %s" % filename
     return parser, None
 
+
 def main():
     # Parser options and initialize Hachoir
     values, filename = parseOptions()
     configureHachoir(values)
 
     # Open file and create parser
-    parser, err = openParser(values.parser, filename, values.offset, values.size)
+    parser, err = openParser(values.parser, filename,
+                             values.offset, values.size)
     if err:
         print(err)
         sys.exit(1)

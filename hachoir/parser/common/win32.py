@@ -1,5 +1,5 @@
 from hachoir.field import (FieldSet,
-    UInt16, UInt32, Enum, String, Bytes, Bits, TimestampUUID60)
+                           UInt16, UInt32, Enum, String, Bytes, Bits, TimestampUUID60)
 from hachoir.parser.video.fourcc import video_fourcc_name
 from hachoir.core.bits import str2hex
 from hachoir.core.text_handler import textHandler, hexadecimal
@@ -7,24 +7,26 @@ from hachoir.parser.network.common import MAC48_Address
 
 # Dictionary: Windows codepage => Python charset name
 CODEPAGE_CHARSET = {
-      874: "CP874",
-#     932: Japanese Shift-JIS
-#     936: Simplified Chinese GBK
-#     949: Korean
-#     950: Traditional Chinese Big5
-     1250: "WINDOWS-1250",
-     1251: "WINDOWS-1251",
-     1252: "WINDOWS-1252",
-     1253: "WINDOWS-1253",
-     1254: "WINDOWS-1254",
-     1255: "WINDOWS-1255",
-     1256: "WINDOWS-1256",
-     1257: "WINDOWS-1257",
-     1258: "WINDOWS-1258",
+    874: "CP874",
+    #     932: Japanese Shift-JIS
+    #     936: Simplified Chinese GBK
+    #     949: Korean
+    #     950: Traditional Chinese Big5
+    1250: "WINDOWS-1250",
+    1251: "WINDOWS-1251",
+    1252: "WINDOWS-1252",
+    1253: "WINDOWS-1253",
+    1254: "WINDOWS-1254",
+    1255: "WINDOWS-1255",
+    1256: "WINDOWS-1256",
+    1257: "WINDOWS-1257",
+    1258: "WINDOWS-1258",
     65001: "UTF-8",
 }
 
+
 class PascalStringWin16(FieldSet):
+
     def __init__(self, parent, name, description=None, strip=None, charset="UTF-16-LE"):
         FieldSet.__init__(self, parent, name, description)
         length = self["length"].value
@@ -36,7 +38,7 @@ class PascalStringWin16(FieldSet):
         yield UInt16(self, "length", "Length in widechar characters")
         size = self["length"].value
         if size:
-            yield String(self, "text", size*2, charset=self.charset, strip=self.strip)
+            yield String(self, "text", size * 2, charset=self.charset, strip=self.strip)
 
     def createValue(self):
         if "text" in self:
@@ -44,7 +46,9 @@ class PascalStringWin16(FieldSet):
         else:
             return None
 
+
 class PascalStringWin32(FieldSet):
+
     def __init__(self, parent, name, description=None, strip=None, charset="UTF-16-LE"):
         FieldSet.__init__(self, parent, name, description)
         length = self["length"].value
@@ -56,13 +60,14 @@ class PascalStringWin32(FieldSet):
         yield UInt32(self, "length", "Length in widechar characters")
         size = self["length"].value
         if size:
-            yield String(self, "text", size*2, charset=self.charset, strip=self.strip)
+            yield String(self, "text", size * 2, charset=self.charset, strip=self.strip)
 
     def createValue(self):
         if "text" in self:
             return self["text"].value
         else:
             return None
+
 
 class GUID(FieldSet):
     """
@@ -87,13 +92,15 @@ class GUID(FieldSet):
     VARIANT_NAME = {
         0: "NCS",
         2: "Leach-Salz",
-       # 5: Microsoft Corporation?
+        # 5: Microsoft Corporation?
         6: "Microsoft Corporation",
         7: "Reserved Future",
     }
+
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
-        self.version = self.stream.readBits(self.absolute_address + 32 + 16 + 12, 4, self.endian)
+        self.version = self.stream.readBits(
+            self.absolute_address + 32 + 16 + 12, 4, self.endian)
 
     def createFields(self):
         if self.version == 1:
@@ -116,9 +123,9 @@ class GUID(FieldSet):
 
     def createValue(self):
         addr = self.absolute_address
-        a = self.stream.readBits (addr,      32, self.endian)
-        b = self.stream.readBits (addr + 32, 16, self.endian)
-        c = self.stream.readBits (addr + 48, 16, self.endian)
+        a = self.stream.readBits(addr,      32, self.endian)
+        b = self.stream.readBits(addr + 32, 16, self.endian)
+        c = self.stream.readBits(addr + 48, 16, self.endian)
         d = self.stream.readBytes(addr + 64, 2)
         e = self.stream.readBytes(addr + 80, 6)
         return "%08X-%04X-%04X-%s-%s" % (a, b, c, str2hex(d), str2hex(e))
@@ -135,9 +142,10 @@ class GUID(FieldSet):
         value = self.stream.readBytes(self.absolute_address, 16)
         return str2hex(value, format=r"\x%02x")
 
+
 class BitmapInfoHeader(FieldSet):
     """ Win32 BITMAPINFOHEADER structure from GDI """
-    static_size = 40*8
+    static_size = 40 * 8
 
     COMPRESSION_NAME = {
         0: "Uncompressed (RGB)",
@@ -171,4 +179,3 @@ class BitmapInfoHeader(FieldSet):
     def createDescription(self):
         return "Bitmap info header: %ux%u pixels, %u bits/pixel" % \
             (self["width"].value, self["height"].value, self["bpp"].value)
-

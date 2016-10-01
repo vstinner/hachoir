@@ -13,6 +13,7 @@ from hachoir.core.text_handler import textHandler, hexadecimal, filesizeHandler
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.parser.common.deflate import Deflate
 
+
 class GzipParser(Parser):
     endian = LITTLE_ENDIAN
     PARSER_TAGS = {
@@ -20,7 +21,7 @@ class GzipParser(Parser):
         "category": "archive",
         "file_ext": ("gz",),
         "mime": ("application/x-gzip",),
-        "min_size": 18*8,
+        "min_size": 18 * 8,
         #"magic": ((b'\x1F\x8B\x08', 0),),
         "magic_regex": (
             # (magic, compression=deflate, <flags>, <mtime>, )
@@ -29,16 +30,16 @@ class GzipParser(Parser):
         "description": "gzip archive",
     }
     os_name = {
-         0: "FAT filesystem",
-         1: "Amiga",
-         2: "VMS (or OpenVMS)",
-         3: "Unix",
-         4: "VM/CMS",
-         5: "Atari TOS",
-         6: "HPFS filesystem (OS/2, NT)",
-         7: "Macintosh",
-         8: "Z-System",
-         9: "CP/M",
+        0: "FAT filesystem",
+        1: "Amiga",
+        2: "VMS (or OpenVMS)",
+        3: "Unix",
+        4: "VM/CMS",
+        5: "Atari TOS",
+        6: "HPFS filesystem (OS/2, NT)",
+        7: "Macintosh",
+        8: "Z-System",
+        9: "CP/M",
         10: "TOPS-20",
         11: "NTFS filesystem (NT)",
         12: "QDOS",
@@ -92,9 +93,9 @@ class GzipParser(Parser):
             yield CString(self, "comment", "Comment")
         if self["has_crc16"].value:
             yield textHandler(UInt16(self, "hdr_crc16", "CRC16 of the header"),
-                hexadecimal)
+                              hexadecimal)
 
-        if self._size is None: # TODO: is it possible to handle piped input?
+        if self._size is None:  # TODO: is it possible to handle piped input?
             raise NotImplementedError()
 
         # Read file
@@ -113,7 +114,7 @@ class GzipParser(Parser):
 
         # Footer
         yield textHandler(UInt32(self, "crc32",
-            "Uncompressed data content CRC32"), hexadecimal)
+                                 "Uncompressed data content CRC32"), hexadecimal)
         yield filesizeHandler(UInt32(self, "size", "Uncompressed size"))
 
     def createDescription(self):
@@ -126,4 +127,3 @@ class GzipParser(Parser):
         if self["mtime"].value:
             info.append(self["mtime"].display)
         return "%s: %s" % (desc, ", ".join(info))
-

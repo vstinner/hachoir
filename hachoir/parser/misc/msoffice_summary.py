@@ -7,14 +7,14 @@ Documents
  - Apache POI (HPSF Internals):
    http://poi.apache.org/hpsf/internals.html
 """
-from hachoir.core.endian import BIG_ENDIAN,LITTLE_ENDIAN
+from hachoir.core.endian import BIG_ENDIAN, LITTLE_ENDIAN
 from hachoir.parser import HachoirParser
 from hachoir.field import (FieldSet, ParserError,
-    SeekableFieldSet,
-    Bit, Bits, NullBits,
-    UInt8, UInt16, UInt32, TimestampWin64, TimedeltaWin64, Enum,
-    Bytes, RawBytes, NullBytes, PaddingBits, String,
-    Int8, Int32, Float32, Float64, PascalString32)
+                           SeekableFieldSet,
+                           Bit, Bits, NullBits,
+                           UInt8, UInt16, UInt32, TimestampWin64, TimedeltaWin64, Enum,
+                           Bytes, RawBytes, NullBytes, PaddingBits, String,
+                           Int8, Int32, Float32, Float64, PascalString32)
 from hachoir.core.text_handler import textHandler, hexadecimal, filesizeHandler
 from hachoir.core.tools import createDict, paddingSize
 from hachoir.parser.common.win32 import GUID, PascalStringWin32, CODEPAGE_CHARSET
@@ -30,7 +30,9 @@ OS_NAME = {
     2: "Windows 32-bit",
 }
 
+
 class OSConfig:
+
     def __init__(self, big_endian):
         if big_endian:
             self.charset = "MacRoman"
@@ -40,6 +42,7 @@ class OSConfig:
             #self.charset = "ISO-8859-1"
             self.charset = None
             self.utf16 = "UTF-16-LE"
+
 
 class PropertyIndex(FieldSet):
     TAG_CODEPAGE = 1
@@ -52,14 +55,14 @@ class PropertyIndex(FieldSet):
     }
 
     DOCUMENT_PROPERTY = {
-         2: "Category",
-         3: "PresentationFormat",
-         4: "NumBytes",
-         5: "NumLines",
-         6: "NumParagraphs",
-         7: "NumSlides",
-         8: "NumNotes",
-         9: "NumHiddenSlides",
+        2: "Category",
+        3: "PresentationFormat",
+        4: "NumBytes",
+        5: "NumLines",
+        6: "NumParagraphs",
+        7: "NumSlides",
+        8: "NumNotes",
+        9: "NumHiddenSlides",
         10: "NumMMClips",
         11: "Scale",
         12: "HeadingPairs",
@@ -78,14 +81,14 @@ class PropertyIndex(FieldSet):
     DOCUMENT_PROPERTY.update(COMMON_PROPERTY)
 
     COMPONENT_PROPERTY = {
-         2: "Title",
-         3: "Subject",
-         4: "Author",
-         5: "Keywords",
-         6: "Comments",
-         7: "Template",
-         8: "LastSavedBy",
-         9: "RevisionNumber",
+        2: "Title",
+        3: "Subject",
+        4: "Author",
+        5: "Keywords",
+        6: "Comments",
+        7: "Template",
+        8: "LastSavedBy",
+        9: "RevisionNumber",
         10: "TotalEditingTime",
         11: "LastPrinted",
         12: "CreateTime",
@@ -110,10 +113,13 @@ class PropertyIndex(FieldSet):
     def createDescription(self):
         return "Property: %s" % self["id"].display
 
+
 class Bool(Int8):
+
     def createValue(self):
         value = Int8.createValue(self)
         return (value == -1)
+
 
 class Thumbnail(FieldSet):
     """
@@ -133,10 +139,10 @@ class Thumbnail(FieldSet):
         -1: "Windows clipboard",
         -2: "Macintosh clipboard",
         -3: "GUID that contains format identifier",
-         0: "No data",
-         2: "Bitmap",
-         3: "Windows metafile format",
-         8: "Device Independent Bitmap (DIB)",
+        0: "No data",
+        2: "Bitmap",
+        3: "Windows metafile format",
+        8: "Device Independent Bitmap (DIB)",
         14: "Enhanced Windows metafile",
     }
 
@@ -145,8 +151,9 @@ class Thumbnail(FieldSet):
         2: "Bitmap Obsolete (old BMP)",
         3: "Windows metafile format (WMF)",
         8: "Device Independent Bitmap (BMP)",
-       14: "Enhanced Windows metafile (EMF)",
+        14: "Enhanced Windows metafile (EMF)",
     }
+
     def __init__(self, *args):
         FieldSet.__init__(self, *args)
         self._size = self["size"].value * 8
@@ -165,34 +172,46 @@ class Thumbnail(FieldSet):
         if size:
             yield RawBytes(self, "data", size)
 
+
 class PropertyContent(FieldSet):
+
     class NullHandler(FieldSet):
+
         def createFields(self):
             yield UInt32(self, "unknown[]")
             yield PascalString32(self, "data")
+
         def createValue(self):
             return self["data"].value
+
     class BlobHandler(FieldSet):
+
         def createFields(self):
             self.osconfig = self.parent.osconfig
             yield UInt32(self, "size")
             yield UInt32(self, "count")
             for i in range(self["count"].value):
                 yield PropertyContent(self, "item[]")
-                n=paddingSize(self.current_size,32)
-                if n: yield PaddingBits(self, "padding[]", n)
+                n = paddingSize(self.current_size, 32)
+                if n:
+                    yield PaddingBits(self, "padding[]", n)
+
     class WidePascalString32(FieldSet):
         ''' uses number of characters instead of number of bytes '''
-        def __init__(self,parent,name,charset='ASCII'):
-            FieldSet.__init__(self,parent,name)
-            self.charset=charset
+
+        def __init__(self, parent, name, charset='ASCII'):
+            FieldSet.__init__(self, parent, name)
+            self.charset = charset
+
         def createFields(self):
             yield UInt32(self, "length", "Length of this string")
-            yield String(self, "data", self["length"].value*2, charset=self.charset)
+            yield String(self, "data", self["length"].value * 2, charset=self.charset)
+
         def createValue(self):
             return self["data"].value
+
         def createDisplay(self):
-            return 'u'+self["data"].display
+            return 'u' + self["data"].display
     TYPE_LPSTR = 30
     TYPE_INFO = {
         0: ("EMPTY", None),
@@ -244,17 +263,17 @@ class PropertyContent(FieldSet):
         if True:
             yield Enum(Bits(self, "type", 12), self.TYPE_NAME)
             yield Bit(self, "is_vector")
-            yield NullBits(self, "padding", 32-12-1)
+            yield NullBits(self, "padding", 32 - 12 - 1)
         else:
             yield Enum(Bits(self, "type", 32), self.TYPE_NAME)
-        tag =  self["type"].value
+        tag = self["type"].value
         kw = {}
         try:
             handler = self.TYPE_INFO[tag][1]
-            if handler in (self.WidePascalString32,PascalString32):
+            if handler in (self.WidePascalString32, PascalString32):
                 cur = self
-                while not hasattr(cur,'osconfig'):
-                    cur=cur.parent
+                while not hasattr(cur, 'osconfig'):
+                    cur = cur.parent
                     if cur is None:
                         raise LookupError('Cannot find osconfig')
                 osconfig = cur.osconfig
@@ -268,8 +287,8 @@ class PropertyContent(FieldSet):
         except LookupError:
             handler = None
         if not handler:
-            self.warning("OLE2: Unable to parse property of type %s" \
-                % self["type"].display)
+            self.warning("OLE2: Unable to parse property of type %s"
+                         % self["type"].display)
             # raise ParserError(
         elif self["is_vector"].value:
             yield UInt32(self, "count")
@@ -280,7 +299,9 @@ class PropertyContent(FieldSet):
             self.createValue = lambda: self["value"].value
 PropertyContent.TYPE_INFO[12] = ("VARIANT", PropertyContent)
 
+
 class SummarySection(SeekableFieldSet):
+
     def __init__(self, *args):
         SeekableFieldSet.__init__(self, *args)
         self._size = self["size"].value * 8
@@ -297,21 +318,24 @@ class SummarySection(SeekableFieldSet):
             field = PropertyContent(self, "property[]", findex["id"].display)
             yield field
             if not self.osconfig.charset \
-            and findex['id'].value == PropertyIndex.TAG_CODEPAGE:
+                    and findex['id'].value == PropertyIndex.TAG_CODEPAGE:
                 codepage = field['value'].value
                 if codepage in CODEPAGE_CHARSET:
                     self.osconfig.charset = CODEPAGE_CHARSET[codepage]
                 else:
                     self.warning("Unknown codepage: %r" % codepage)
 
+
 class SummaryIndex(FieldSet):
-    static_size = 20*8
+    static_size = 20 * 8
+
     def createFields(self):
         yield String(self, "name", 16)
         yield UInt32(self, "offset")
 
+
 class Summary(OLE2FragmentParser):
-    ENDIAN_CHECK=True
+    ENDIAN_CHECK = True
 
     def __init__(self, stream, **args):
         OLE2FragmentParser.__init__(self, stream, **args)
@@ -327,7 +351,8 @@ class Summary(OLE2FragmentParser):
         yield GUID(self, "format_id")
         yield UInt32(self, "section_count")
         if MAX_SECTION_COUNT < self["section_count"].value:
-            raise ParserError("OLE2: Too much sections (%s)" % self["section_count"].value)
+            raise ParserError("OLE2: Too much sections (%s)" %
+                              self["section_count"].value)
 
         section_indexes = []
         for index in range(self["section_count"].value):
@@ -343,8 +368,9 @@ class Summary(OLE2FragmentParser):
         if 0 < size:
             yield NullBytes(self, "end_padding", size)
 
+
 class CompObj(OLE2FragmentParser):
-    ENDIAN_CHECK=True
+    ENDIAN_CHECK = True
 
     def __init__(self, stream, **args):
         OLE2FragmentParser.__init__(self, stream, **args)
@@ -386,8 +412,10 @@ class CompObj(OLE2FragmentParser):
             yield PascalStringWin32(self, "clipboard_format_unicode", strip="\0")
             yield PascalStringWin32(self, "prog_id_unicode", strip="\0")
 
-        size = self.datasize - (self._current_size // 8) # _current_size because current_size returns _current_max_size
+        # _current_size because current_size returns _current_max_size
+        size = self.datasize - (self._current_size // 8)
         if size:
             yield NullBytes(self, "end_padding", size)
 
-        if self.datasize<self.size//8: yield RawBytes(self,"slack_space",(self.size//8)-self.datasize)
+        if self.datasize < self.size // 8:
+            yield RawBytes(self, "slack_space", (self.size // 8) - self.datasize)

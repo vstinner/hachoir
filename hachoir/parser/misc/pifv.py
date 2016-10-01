@@ -7,8 +7,8 @@ Creation date: 08 jul 2007
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet,
-    UInt8, UInt16, UInt24, UInt32, UInt64, Enum,
-    CString, String, PaddingBytes, RawBytes, NullBytes)
+                           UInt8, UInt16, UInt24, UInt32, UInt64, Enum,
+                           CString, String, PaddingBytes, RawBytes, NullBytes)
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.tools import paddingSize, humanFilesize
 from hachoir.parser.common.win32 import GUID
@@ -28,10 +28,10 @@ EFI_SECTION_RAW = 0x19
 EFI_SECTION_PEI_DEPEX = 0x1b
 
 EFI_SECTION_TYPE = {
-    EFI_SECTION_COMPRESSION: "Encapsulation section where other sections" \
-        + " are compressed",
-    EFI_SECTION_GUID_DEFINED: "Encapsulation section where other sections" \
-        + " have format defined by a GUID",
+    EFI_SECTION_COMPRESSION: "Encapsulation section where other sections"
+    + " are compressed",
+    EFI_SECTION_GUID_DEFINED: "Encapsulation section where other sections"
+    + " have format defined by a GUID",
     EFI_SECTION_PE32: "PE32+ Executable image",
     EFI_SECTION_PIC: "Position-Independent Code",
     EFI_SECTION_TE: "Terse Executable image",
@@ -40,8 +40,8 @@ EFI_SECTION_TYPE = {
     EFI_SECTION_USER_INTERFACE: "User-Friendly name of the driver",
     EFI_SECTION_COMPATIBILITY16: "DOS-style 16-bit EXE",
     EFI_SECTION_FIRMWARE_VOLUME_IMAGE: "PI Firmware Volume image",
-    EFI_SECTION_FREEFORM_SUBTYPE_GUID: "Raw data with GUID in header to" \
-        + " define format",
+    EFI_SECTION_FREEFORM_SUBTYPE_GUID: "Raw data with GUID in header to"
+    + " define format",
     EFI_SECTION_RAW: "Raw data",
     EFI_SECTION_PEI_DEPEX: "PEI Dependency Expression",
 }
@@ -61,8 +61,8 @@ EFI_FV_FILETYPE_FFS_PAD = 0xf0
 EFI_FV_FILETYPE = {
     EFI_FV_FILETYPE_RAW: "Binary data",
     EFI_FV_FILETYPE_FREEFORM: "Sectioned data",
-    EFI_FV_FILETYPE_SECURITY_CORE: "Platform core code used during the SEC" \
-        + " phase",
+    EFI_FV_FILETYPE_SECURITY_CORE: "Platform core code used during the SEC"
+    + " phase",
     EFI_FV_FILETYPE_PEI_CORE: "PEI Foundation",
     EFI_FV_FILETYPE_DXE_CORE: "DXE Foundation",
     EFI_FV_FILETYPE_PEIM: "PEI module (PEIM)",
@@ -81,7 +81,8 @@ for x in range(0xf1, 0x100):
 
 
 class BlockMap(FieldSet):
-    static_size = 8*8
+    static_size = 8 * 8
+
     def createFields(self):
         yield UInt32(self, "num_blocks")
         yield UInt32(self, "len")
@@ -106,7 +107,7 @@ class FileSection(FieldSet):
             # claims! It's so nice to have so detailled specs and not follow
             # them ...
             if self.stream.readBytes(self.absolute_address +
-                self._size, 1) == b'\0':
+                                     self._size, 1) == b'\0':
                 self._size = self._size + 16
 
     def createFields(self):
@@ -147,15 +148,16 @@ class FileSection(FieldSet):
             yield FirmwareVolume(self, "firmware_volume")
         else:
             yield RawBytes(self, "content", content_size,
-                EFI_SECTION_TYPE.get(self["type"].value,
-                "Unknown Section Type"))
+                           EFI_SECTION_TYPE.get(self["type"].value,
+                                                "Unknown Section Type"))
 
     def createDescription(self):
         return EFI_SECTION_TYPE.get(self["type"].value,
-            "Unknown Section Type")
+                                    "Unknown Section Type")
 
 
 class File(FieldSet):
+
     def __init__(self, *args, **kw):
         FieldSet.__init__(self, *args, **kw)
         self._size = self["size"].value * 8
@@ -181,6 +183,7 @@ class File(FieldSet):
 
 
 class FirmwareVolume(FieldSet):
+
     def __init__(self, *args, **kw):
         FieldSet.__init__(self, *args, **kw)
         if not self._size:
@@ -223,19 +226,18 @@ class PIFVFile(Parser):
         "id": "pifv",
         "category": "program",
         "file_ext": ("bin", ""),
-        "min_size": 64*8, # smallest possible header
+        "min_size": 64 * 8,  # smallest possible header
         "magic_regex": ((b"\0{16}.{24}" + MAGIC, 0), ),
         "description": "EFI Platform Initialization Firmware Volume",
     }
 
     def validate(self):
-        if self.stream.readBytes(40*8, 4) != self.MAGIC:
+        if self.stream.readBytes(40 * 8, 4) != self.MAGIC:
             return "Invalid magic number"
-        if self.stream.readBytes(0, 16) != b"\0"*16:
+        if self.stream.readBytes(0, 16) != b"\0" * 16:
             return "Invalid zero vector"
         return True
 
     def createFields(self):
         while not self.eof:
             yield FirmwareVolume(self, "firmware_volume[]")
-

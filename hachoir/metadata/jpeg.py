@@ -36,8 +36,8 @@ class JpegMetadata(RootMetadata):
     }
 
     IPTC_KEY = {
-         80: "author",
-         90: "city",
+        80: "author",
+        90: "city",
         101: "country",
         116: "copyright",
         120: "title",
@@ -59,13 +59,15 @@ class JpegMetadata(RootMetadata):
         if "start_frame/content" in jpeg:
             self.startOfFrame(jpeg["start_frame/content"])
         elif "start_scan/content/nr_components" in jpeg:
-            self.bits_per_pixel = 8 * jpeg["start_scan/content/nr_components"].value
+            self.bits_per_pixel = 8 * \
+                jpeg["start_scan/content/nr_components"].value
         if "app0/content" in jpeg:
             self.extractAPP0(jpeg["app0/content"])
 
         if "exif/content" in jpeg:
             for ifd in jpeg['exif/content']:
-                if not isinstance(ifd, IFD): continue
+                if not isinstance(ifd, IFD):
+                    continue
                 for entry in ifd.array("entry"):
                     self.processIfdEntry(ifd, entry)
                 self.readGPS(ifd)
@@ -120,15 +122,17 @@ class JpegMetadata(RootMetadata):
         # Compute sum of all coefficients
         sumcoeff = 0
         for qt in qtlist:
-           coeff = qt.array("coeff")
-           for index in range(64):
+            coeff = qt.array("coeff")
+            for index in range(64):
                 sumcoeff += coeff[index].value
 
         # Choose the right quality table and compute hash value
         try:
-            hashval= qtlist[0]["coeff[2]"].value +  qtlist[0]["coeff[53]"].value
+            hashval = qtlist[0]["coeff[2]"].value + \
+                qtlist[0]["coeff[53]"].value
             if 2 <= len(qtlist):
-                hashval += qtlist[1]["coeff[0]"].value + qtlist[1]["coeff[63]"].value
+                hashval += qtlist[1]["coeff[0]"].value + \
+                    qtlist[1]["coeff[63]"].value
                 hashtable = QUALITY_HASH_COLOR
                 sumtable = QUALITY_SUM_COLOR
             else:
@@ -177,7 +181,7 @@ class JpegMetadata(RootMetadata):
             if not value:
                 return
             if isinstance(value, float):
-                value = (value, "1/%g" % (1/value))
+                value = (value, "1/%g" % (1 / value))
         elif entry["type"].value in (BasicIFDEntry.TYPE_RATIONAL, BasicIFDEntry.TYPE_SIGNED_RATIONAL):
             value = (value, "%.3g" % value)
 
@@ -283,4 +287,3 @@ class JpegMetadata(RootMetadata):
                 pass
 
 registerExtractor(JpegFile, JpegMetadata)
-

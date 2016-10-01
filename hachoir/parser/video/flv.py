@@ -14,15 +14,15 @@ Creation date: 4 november 2006
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet,
-    UInt8, UInt24, UInt32, NullBits, NullBytes,
-    Bit, Bits, String, RawBytes, Enum)
+                           UInt8, UInt24, UInt32, NullBits, NullBytes,
+                           Bit, Bits, String, RawBytes, Enum)
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.parser.audio.mpeg_audio import Frame
 from hachoir.parser.video.amf import AMFObject
 from hachoir.core.tools import createDict
 
 SAMPLING_RATE = {
-    0: ( 5512, "5.5 kHz"),
+    0: (5512, "5.5 kHz"),
     1: (11025, "11 kHz"),
     2: (22050, "22.1 kHz"),
     3: (44100, "44.1 kHz"),
@@ -51,7 +51,9 @@ FRAME_TYPE = {
     3: "disposable inter frame",
 }
 
+
 class Header(FieldSet):
+
     def createFields(self):
         yield String(self, "signature", 3, "FLV format signature", charset="ASCII")
         yield UInt8(self, "version")
@@ -63,6 +65,7 @@ class Header(FieldSet):
 
         yield UInt32(self, "data_offset")
 
+
 def parseAudio(parent, size):
     yield Enum(Bits(parent, "codec", 4, "Audio codec"), AUDIO_CODEC_NAME)
     yield Enum(Bits(parent, "sampling_rate", 2, "Sampling rate"), SAMPLING_RATE_TEXT)
@@ -71,25 +74,28 @@ def parseAudio(parent, size):
 
     size -= 1
     if 0 < size:
-        if parent["codec"].value == AUDIO_CODEC_MP3 :
-            yield Frame(parent, "music_data", size=size*8)
+        if parent["codec"].value == AUDIO_CODEC_MP3:
+            yield Frame(parent, "music_data", size=size * 8)
         else:
             yield RawBytes(parent, "music_data", size)
+
 
 def parseVideo(parent, size):
     yield Enum(Bits(parent, "frame_type", 4, "Frame type"), FRAME_TYPE)
     yield Enum(Bits(parent, "codec", 4, "Video codec"), VIDEO_CODEC_NAME)
     if 1 < size:
-        yield RawBytes(parent, "data", size-1)
+        yield RawBytes(parent, "data", size - 1)
+
 
 def parseAMF(parent, size):
     while parent.current_size < parent.size:
         yield AMFObject(parent, "entry[]")
 
+
 class Chunk(FieldSet):
     tag_info = {
-         8: ("audio[]", parseAudio, ""),
-         9: ("video[]", parseVideo, ""),
+        8: ("audio[]", parseAudio, ""),
+        9: ("video[]", parseVideo, ""),
         18: ("metadata", parseAMF, ""),
     }
 
@@ -120,13 +126,14 @@ class Chunk(FieldSet):
         except LookupError:
             return None
 
+
 class FlvFile(Parser):
     PARSER_TAGS = {
         "id": "flv",
         "category": "video",
         "file_ext": ("flv",),
         "mime": ("video/x-flv",),
-        "min_size": 9*4,
+        "min_size": 9 * 4,
         "magic": (
             # Signature, version=1, flags=5 (video+audio), header size=9
             (b"FLV\1\x05\0\0\0\x09", 0),
@@ -153,4 +160,3 @@ class FlvFile(Parser):
 
     def createDescription(self):
         return "Macromedia Flash video version %s" % self["header/version"].value
-

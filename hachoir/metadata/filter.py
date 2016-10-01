@@ -7,6 +7,7 @@ MAX_YEAR = 2030
 
 
 class Filter:
+
     def __init__(self, valid_types, min=None, max=None):
         self.types = valid_types
         self.min = min
@@ -23,11 +24,13 @@ class Filter:
 
 
 class NumberFilter(Filter):
+
     def __init__(self, min=None, max=None):
         Filter.__init__(self, (int, int, float), min, max)
 
 
 class DatetimeFilter(Filter):
+
     def __init__(self, min=None, max=None):
         Filter.__init__(self, (date, datetime),
                         datetime(MIN_YEAR, 1, 1),
@@ -52,4 +55,3 @@ class DatetimeFilter(Filter):
             return (self.min_date <= value <= self.max_date)
 
 DATETIME_FILTER = DatetimeFilter()
-

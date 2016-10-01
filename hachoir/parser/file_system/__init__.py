@@ -5,4 +5,3 @@ from hachoir.parser.file_system.ntfs import NTFS
 from hachoir.parser.file_system.iso9660 import ISO9660
 from hachoir.parser.file_system.reiser_fs import REISER_FS
 from hachoir.parser.file_system.linux_swap import LinuxSwapFile
-
