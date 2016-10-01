@@ -17,6 +17,7 @@ class Dict(object):
     __iter__() which allow to iterate into the dictionnary _values_ (and not
     keys like Python's dict does).
     """
+
     def __init__(self, values=None):
         self._index = {}        # key => index
         self._key_list = []     # index => key

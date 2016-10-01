@@ -1,8 +1,8 @@
 from hachoir.field import (FieldError,
-    RawBits, RawBytes,
-    PaddingBits, PaddingBytes,
-    NullBits, NullBytes,
-    GenericString, GenericInteger)
+                           RawBits, RawBytes,
+                           PaddingBits, PaddingBytes,
+                           NullBits, NullBytes,
+                           GenericString, GenericInteger)
 from hachoir.stream import FileOutputStream
 
 
@@ -61,4 +61,3 @@ def createOrphanField(fieldset, address, field_cls, *args, **kw):
     finally:
         fieldset._current_size = save_size
     return field
-

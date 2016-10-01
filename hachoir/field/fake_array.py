@@ -14,6 +14,7 @@ class FakeArray:
 
     And to get array size using len(fieldset.array("item")).
     """
+
     def __init__(self, fieldset, name):
         pos = name.rfind("/")
         if pos != -1:
@@ -79,4 +80,3 @@ class FakeArray:
                 yield self[index]
             except MissingField:
                 raise StopIteration()
-

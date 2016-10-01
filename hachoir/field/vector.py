@@ -2,6 +2,7 @@ from hachoir.field import Field, FieldSet, ParserError
 
 
 class GenericVector(FieldSet):
+
     def __init__(self, parent, name, nb_items, item_class, item_name="item", description=None):
         # Sanity checks
         assert issubclass(item_class, Field)
@@ -36,5 +37,5 @@ class UserVector(GenericVector):
     item_name = "item"
 
     def __init__(self, parent, name, nb_items, description=None):
-        GenericVector.__init__(self, parent, name, nb_items, self.item_class, self.item_name, description)
-
+        GenericVector.__init__(self, parent, name, nb_items,
+                               self.item_class, self.item_name, description)

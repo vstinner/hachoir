@@ -55,5 +55,5 @@ available_types = (Bit, Bits, RawBits,
                    NullBits, NullBytes,
                    TimestampUnix32, TimestampMac32, TimestampWin64,
                    DateTimeMSDOS32, TimeDateMSDOS32,
-#                   GenericInteger, GenericString,
+                   #                   GenericInteger, GenericString,
                    )

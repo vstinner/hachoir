@@ -9,7 +9,7 @@ import sys
 
 class ParserList(object):
     VALID_CATEGORY = ("archive", "audio", "container", "file_system",
-        "game", "image", "misc", "program", "video")
+                      "game", "image", "misc", "program", "video")
     ID_REGEX = re.compile("^[a-z0-9][a-z0-9_]{2,}$")
 
     def __init__(self):
@@ -141,25 +141,29 @@ class ParserList(object):
         bycategory = self.bytag["category"]
         for category in sorted(bycategory.keys()):
             if format == "one_line":
-                parser_list = [parser.PARSER_TAGS["id"] for parser in bycategory[category]]
+                parser_list = [parser.PARSER_TAGS["id"]
+                               for parser in bycategory[category]]
                 parser_list.sort()
-                print("- %s: %s" % (category.title(), ", ".join(parser_list)), file=out)
+                print("- %s: %s" %
+                      (category.title(), ", ".join(parser_list)), file=out)
             else:
                 if format == "rest":
                     print(category.replace("_", " ").title(), file=out)
                     print("-" * len(category), file=out)
                     print(file=out)
                 elif format == "trac":
-                    print("=== %s ===" % category.replace("_", " ").title(), file=out)
+                    print("=== %s ===" % category.replace(
+                        "_", " ").title(), file=out)
                     print(file=out)
                 else:
                     print("[%s]" % category, file=out)
                 parser_list = sorted(bycategory[category],
-                    key=lambda parser: parser.PARSER_TAGS["id"])
+                                     key=lambda parser: parser.PARSER_TAGS["id"])
                 if format == "rest":
                     for parser in parser_list:
                         tags = parser.getParserTags()
-                        print("* %s: %s" % (tags["id"], tags["description"]), file=out)
+                        print("* %s: %s" %
+                              (tags["id"], tags["description"]), file=out)
                 elif format == "trac":
                     for parser in parser_list:
                         tags = parser.getParserTags()
@@ -208,9 +212,8 @@ class HachoirParserList(ParserList):
             for name in dir(module):
                 attr = getattr(module, name)
                 if isinstance(attr, type) \
-                and issubclass(attr, HachoirParser) \
-                and attr not in (Parser, HachoirParser):
+                        and issubclass(attr, HachoirParser) \
+                        and attr not in (Parser, HachoirParser):
                     self.add(attr)
         assert 1 <= len(self.parser_list)
         return self.parser_list
-

@@ -58,7 +58,7 @@ if not IMPLEMENTATION:
 
 if not IMPLEMENTATION:
     try:
-        from signal import signal, SIGXCPU
+        from signal import signal, SIGXCPU  # noqa
         from resource import getrlimit, setrlimit, RLIMIT_CPU
 
         # resource.setrlimit(RLIMIT_CPU) implementation

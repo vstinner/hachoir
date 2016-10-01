@@ -14,9 +14,9 @@ Creation date: YYYY-mm-DD
 
 # TODO: Just keep what you need
 from hachoir.parser import Parser
-from hachoir.field import (ParserError,
-                           UInt8, UInt16, UInt32, String, RawBytes)
-from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
+# from hachoir.field import (ParserError,
+#                            UInt8, UInt16, UInt32, String, RawBytes)
+# from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 
 
 class TODOFile(Parser):
