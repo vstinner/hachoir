@@ -1,20 +1,17 @@
+include benchmark.sh
 include AUTHORS
 include COPYING
 include ChangeLog
 include INSTALL
 include MANIFEST.in
-include README
-include README.header
-include README.py
-include doc/*.rst
-include gnome/README
-include gnome/hachoir
-include hachoir_metadata/qt/dialog.ui
-include kde/README
-include kde/hachoir-metadata-kde
-include kde/hachoir.desktop
-include metadata_csv.py
-include metadata_csv.py
-include run_testcase.py
-include tests/*.py
+include README.rst
+include TODO
+include tox.ini
+include .travis.yml
 include runtests.py
+include hachoir-metadata-csv
+include run_testcase.py
+
+include doc/*.rst doc/conf.py doc/make.bat doc/Makefile
+
+include tests/*.py tests/*.rst tests/files/*
