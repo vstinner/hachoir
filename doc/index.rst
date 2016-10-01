@@ -9,11 +9,11 @@ strings, bits, padding types, floats, etc. Hachoir is the French word for a
 meat grinder (meat mincer), which is used by butchers to divide meat into long
 tubes; Hachoir is used by computer butchers to divide binary files into fields.
 
-* `Hachoir3 website <http://hachoir3.readthedocs.org/>`_ (this site)
+* `Hachoir3 website <http://hachoir3.readthedocs.io/>`_ (this site)
 * `Hachoir3 at GitHub <https://github.com/haypo/hachoir3>`_
 
-See also `Hachoir at Bitbucket <http://hachoir3.readthedocs.org/>`_: original
-Hachoir for Python 2.
+See also `Hachoir at Bitbucket <https://bitbucket.org/haypo/hachoir/>`_:
+original Hachoir for Python 2.
 
 
 Table Of Contents

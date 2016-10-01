@@ -16,7 +16,7 @@ etc. Hachoir is the French word for a meat grinder (meat mincer), which is used
 by butchers to divide meat into long tubes; Hachoir is used by computer
 butchers to divide binary files into fields.
 
-* Hachoir3 website: http://hachoir3.readthedocs.org/
+* Hachoir3 website: http://hachoir3.readthedocs.io/
 * Source code, bug tracker: https://github.com/haypo/hachoir3
 * License: GNU GPL v2
 
