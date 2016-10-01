@@ -41,14 +41,15 @@ class TestGrepCommandLine(unittest.TestCase):
                                 stderr=subprocess.STDOUT)
         stdout, _ = proc.communicate()
         stdout = stdout.decode('ascii', 'replace')
-        self.assertEqual(stdout, """0.0:/magic:MSCF
-60.0:/file[0]/filename:fontinst.inf
-89.0:/file[1]/filename:Georgiaz.TTF
-118.0:/file[2]/filename:Georgiab.TTF
-147.0:/file[3]/filename:Georgiai.TTF
-176.0:/file[4]/filename:Georgia.TTF
-204.0:/file[5]/filename:fontinst.exe
-""")
+        self.assertEqual(stdout, """
+0:/magic:MSCF
+60:/file[0]/filename:fontinst.inf
+89:/file[1]/filename:Georgiaz.TTF
+118:/file[2]/filename:Georgiab.TTF
+147:/file[3]/filename:Georgiai.TTF
+176:/file[4]/filename:Georgia.TTF
+204:/file[5]/filename:fontinst.exe
+""".lstrip())
 
 
 if __name__ == "__main__":
