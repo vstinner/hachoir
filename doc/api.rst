@@ -311,33 +311,29 @@ Hachoir Metadata Example
 
 :ref:`hachoir-metadata <metadata>` example::
 
-    from hachoir_core.cmd_line import unicodeFilename
-    from hachoir_parser import createParser
-    from hachoir_core.tools import makePrintable
-    from hachoir_metadata import extractMetadata
-    from hachoir_core.i18n import getTerminalCharset
+    from hachoir.parser import createParser
+    from hachoir.core.tools import makePrintable
+    from hachoir.metadata import extractMetadata
+    from hachoir.core.i18n import getTerminalCharset
     from sys import argv, stderr, exit
 
     if len(argv) != 2:
-        print >>stderr, "usage: %s filename" % argv[0]
+        print("usage: %s filename" % argv[0], file=stderr)
         exit(1)
     filename = argv[1]
-    filename, realname = unicodeFilename(filename), filename
-    parser = createParser(filename, realname)
+    parser = createParser(filename)
     if not parser:
-        print >>stderr, "Unable to parse file"
+        print("Unable to parse file", file=stderr)
         exit(1)
+
     try:
         metadata = extractMetadata(parser)
     except Exception as err:
-        print "Metadata extraction error: %s" % unicode(err)
+        print("Metadata extraction error: %s" % err)
         metadata = None
     if not metadata:
-        print "Unable to extract metadata"
+        print("Unable to extract metadata")
         exit(1)
 
-    text = metadata.exportPlaintext()
-    charset = getTerminalCharset()
-    for line in text:
-        print makePrintable(line, charset)
-
+    for line in metadata.exportPlaintext():
+        print(line)
