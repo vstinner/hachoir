@@ -9,7 +9,7 @@ by butchers to divide meat into long tubes; Hachoir is used by computer
 butchers to divide binary files into fields.
 
 * Hachoir3 website: http://hachoir3.readthedocs.org/
-* Source code, bug tracker: https://bitbucket.org/haypo/hachoir3
+* Source code, bug tracker: https://github.com/haypo/hachoir3
 
 Hachoir3 is written for Python 3.3+, it uses the new ``yield from`` syntax.
 For Python 2, see the Hachoir project: https://bitbucket.org/haypo/hachoir

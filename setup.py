@@ -60,7 +60,7 @@ def main():
 
     hachoir = load_source("version", path.join("hachoir", "version.py"))
 
-    readme = open('README')
+    readme = open('README.rst')
     long_description = readme.read()
     readme.close()
 
