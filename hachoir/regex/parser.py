@@ -131,11 +131,9 @@ def _parse(text, start=0, until=None):
     index = start
     regex = RegexEmpty()
     last = None
-    done = False
     while index < len(text):
         char = text[index]
         if until and char in until:
-            done = True
             break
         if char in REGEX_COMMAND_CHARACTERS:
             if char in CHAR_TO_FUNC:

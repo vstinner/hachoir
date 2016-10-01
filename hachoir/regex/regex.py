@@ -33,7 +33,6 @@ See also CPAN Regexp::Assemble (Perl module):
 """
 
 import re
-import itertools
 import operator
 
 from hachoir.core.tools import makePrintable
@@ -58,7 +57,7 @@ def matchSingleValue(regex):
     if cls in (RegexEmpty, RegexString, RegexStart, RegexEnd):
         return True
     if cls == RegexAnd:
-        return all( matchSingleValue(item) for item in regex )
+        return all(matchSingleValue(item) for item in regex)
     if cls == RegexRange:
         return len(regex.ranges) == 1 and len(regex.ranges[0]) == 1
     return False
@@ -105,7 +104,7 @@ def createRange(*text, **kw):
     >>> createRange("-", "9", "4", "3", "0")
     <RegexRange '[0349-]'>
     """
-    ranges = ( RegexRangeCharacter(item) for item in text )
+    ranges = (RegexRangeCharacter(item) for item in text)
     return RegexRange(ranges, kw.get('exclude', False))
 
 
@@ -113,6 +112,7 @@ class Regex:
     """
     Abstract class defining a regular expression atom
     """
+
     def minLength(self):
         """
         Maximum length in characters of the regex.
@@ -186,7 +186,7 @@ class Regex:
         if new_regex:
             return new_regex
         else:
-            return RegexAnd( (self, regex) )
+            return RegexAnd((self, regex))
 
     def __add__(self, regex):
         return self.__and__(regex)
@@ -242,7 +242,7 @@ class Regex:
             return new_regex
 
         # Else use (a|b)
-        return RegexOr( (self, other) )
+        return RegexOr((self, other))
 
     def __eq__(self, regex):
         if self.__class__ != regex.__class__:
@@ -253,7 +253,8 @@ class Regex:
         """
         Check if two objects of the same class are equals
         """
-        raise NotImplementedError("Class %s has no method _eq()" % self.__class__.__name__)
+        raise NotImplementedError(
+            "Class %s has no method _eq()" % self.__class__.__name__)
 
     def compile(self, **kw):
         return re.compile(self.__str__(**kw))
@@ -272,6 +273,7 @@ class Regex:
 
 
 class RegexEmpty(Regex):
+
     def minLength(self):
         return 0
 
@@ -286,6 +288,7 @@ class RegexEmpty(Regex):
 
 
 class RegexWord(RegexEmpty):
+
     def _and(self, other):
         if other.__class__ == RegexWord:
             return self
@@ -296,6 +299,7 @@ class RegexWord(RegexEmpty):
 
 
 class RegexStart(RegexEmpty):
+
     def _and(self, other):
         if other.__class__ == RegexStart:
             return self
@@ -306,6 +310,7 @@ class RegexStart(RegexEmpty):
 
 
 class RegexEnd(RegexStart):
+
     def _and(self, other):
         if other.__class__ == RegexEnd:
             return self
@@ -316,6 +321,7 @@ class RegexEnd(RegexStart):
 
 
 class RegexDot(Regex):
+
     def minLength(self):
         return 1
 
@@ -334,6 +340,7 @@ class RegexDot(Regex):
 
 
 class RegexString(Regex):
+
     def __init__(self, text=""):
         assert isinstance(text, str)
         self.text = text
@@ -370,11 +377,11 @@ class RegexString(Regex):
 
         # '(a|b)' => '[ab]'
         if len(texta) == len(textb) == 1:
-            return (createRange(texta, textb),  RegexEmpty(), RegexEmpty())
+            return (createRange(texta, textb), RegexEmpty(), RegexEmpty())
 
         # '(text abc|text def)' => 'text (abc|def)'
         common = None
-        for length in range(1, min(len(texta), len(textb))+1):
+        for length in range(1, min(len(texta), len(textb)) + 1):
             if textb.startswith(texta[:length]):
                 common = length
             else:
@@ -417,6 +424,7 @@ class RegexString(Regex):
 
 
 class RegexRangeItem:
+
     def __init__(self, cmin, cmax=None):
         try:
             self.cmin = cmin
@@ -425,10 +433,11 @@ class RegexRangeItem:
             else:
                 self.cmax = cmin
         except TypeError:
-            raise TypeError("RegexRangeItem: two characters expected (%s, %s) found" % (type(cmin), type(cmax)))
+            raise TypeError("RegexRangeItem: two characters expected (%s, %s) found" % (
+                type(cmin), type(cmax)))
         if self.cmax < self.cmin:
             raise TypeError("RegexRangeItem: minimum (%u) is bigger than maximum (%u)" %
-                (self.cmin, self.cmax))
+                            (self.cmin, self.cmax))
 
     def __len__(self):
         return (self.cmax - self.cmin + 1)
@@ -441,7 +450,7 @@ class RegexRangeItem:
         cmin = chr(self.cmin)
         if self.cmin != self.cmax:
             cmax = chr(self.cmax)
-            if (self.cmin+1) == self.cmax:
+            if (self.cmin + 1) == self.cmax:
                 return "%s%s" % (cmin, cmax)
             else:
                 return "%s-%s" % (cmin, cmax)
@@ -453,11 +462,13 @@ class RegexRangeItem:
 
 
 class RegexRangeCharacter(RegexRangeItem):
+
     def __init__(self, char):
         RegexRangeItem.__init__(self, ord(char), ord(char))
 
 
 class RegexRange(Regex):
+
     def __init__(self, ranges, exclude=False, optimize=True):
         if optimize:
             self.ranges = []
@@ -483,11 +494,11 @@ class RegexRange(Regex):
             elif itemb in itema:
                 # [a-c] + [b] => [a-c]
                 return
-            elif (itemb.cmax+1) == itema.cmin:
+            elif (itemb.cmax + 1) == itema.cmin:
                 # [d-f] + [a-c] => [a-f]
                 new = RegexRangeItem(itemb.cmin, itema.cmax)
                 break
-            elif (itema.cmax+1) == itemb.cmin:
+            elif (itema.cmax + 1) == itemb.cmin:
                 # [a-c] + [d-f] => [a-f]
                 new = RegexRangeItem(itema.cmin, itemb.cmax)
                 break
@@ -515,7 +526,7 @@ class RegexRange(Regex):
         else:
             return None
         for itemb in branges:
-            if not any( itemb in itema for itema in self.ranges ):
+            if not any(itemb in itema for itema in self.ranges):
                 return False
         return True
 
@@ -562,6 +573,7 @@ class RegexRange(Regex):
 
 
 class RegexAnd(Regex):
+
     def __init__(self, items):
         self.content = list(items)
         assert 2 <= len(self.content)
@@ -580,7 +592,7 @@ class RegexAnd(Regex):
         >>> regex.minLength()
         2
         """
-        return self._minmaxLength( regex.minLength() for regex in self.content )
+        return self._minmaxLength(regex.minLength() for regex in self.content)
 
     def maxLength(self):
         """
@@ -588,7 +600,7 @@ class RegexAnd(Regex):
         >>> RegexAnd((regex, RegexString('z'))).maxLength()
         4
         """
-        return self._minmaxLength( regex.maxLength() for regex in self.content )
+        return self._minmaxLength(regex.maxLength() for regex in self.content)
 
     def _or_(self, other, reverse):
         if other.__class__ == RegexString:
@@ -609,14 +621,15 @@ class RegexAnd(Regex):
         while index < last_index and contenta[index] == contentb[index]:
             index += 1
         if index:
-            regex = RegexAnd.join(contenta[index:]) | RegexAnd.join(contentb[index:])
+            regex = RegexAnd.join(
+                contenta[index:]) | RegexAnd.join(contentb[index:])
             return RegexAnd.join(contenta[:index]) + regex
 
         # Find common prefix: (abc|aef) => a(bc|ef)
         common = contenta[0].findPrefix(contentb[0])
         if common:
-            regexa = common[1] & RegexAnd.join( contenta[1:] )
-            regexb = common[2] & RegexAnd.join( contentb[1:] )
+            regexa = common[1] & RegexAnd.join(contenta[1:])
+            regexb = common[2] & RegexAnd.join(contentb[1:])
             regex = (regexa | regexb)
             if matchSingleValue(common[0]) or matchSingleValue(regex):
                 return common[0] + regex
@@ -639,10 +652,10 @@ class RegexAnd(Regex):
         if new_item:
             self.content[-1] = new_item
             return self
-        return RegexAnd( self.content + [regex] )
+        return RegexAnd(self.content + [regex])
 
     def _str(self, **kw):
-        return ''.join( item.__str__(**kw) for item in self.content )
+        return ''.join(item.__str__(**kw) for item in self.content)
 
     @classmethod
     def join(cls, regex):
@@ -658,10 +671,11 @@ class RegexAnd(Regex):
     def _eq(self, other):
         if len(self.content) != len(other.content):
             return False
-        return all( item[0] == item[1] for item in zip(self.content, other.content) )
+        return all(item[0] == item[1] for item in zip(self.content, other.content))
 
 
 class RegexOr(Regex):
+
     def __init__(self, items, optimize=True):
         if optimize:
             self.content = []
@@ -695,7 +709,7 @@ class RegexOr(Regex):
             new_item = item.or_(other)
             if new_item:
                 content = list(self.content)
-                content = content[:index] + [new_item] + content[index+1:]
+                content = content[:index] + [new_item] + content[index + 1:]
                 return RegexOr(content, optimize=False)
         if not reverse:
             content = list(self.content) + [other]
@@ -704,7 +718,7 @@ class RegexOr(Regex):
         return RegexOr(content, optimize=False)
 
     def _str(self, **kw):
-        content = '|'.join( item.__str__(**kw) for item in self.content )
+        content = '|'.join(item.__str__(**kw) for item in self.content)
         if kw.get('python', False):
             return "(?:%s)" % content
         else:
@@ -722,11 +736,11 @@ class RegexOr(Regex):
         return value
 
     def minLength(self):
-        lengths = ( regex.minLength() for regex in self.content )
+        lengths = (regex.minLength() for regex in self.content)
         return self._minmaxLength(lengths, min)
 
     def maxLength(self):
-        lengths = ( regex.maxLength() for regex in self.content )
+        lengths = (regex.maxLength() for regex in self.content)
         return self._minmaxLength(lengths, max)
 
     @classmethod
@@ -743,7 +757,7 @@ class RegexOr(Regex):
     def _eq(self, other):
         if len(self.content) != len(other.content):
             return False
-        return all( item[0] == item[1] for item in zip(self.content, other.content) )
+        return all(item[0] == item[1] for item in zip(self.content, other.content))
 
 
 def optimizeRepeatOr(rmin, rmax, regex):
@@ -768,20 +782,22 @@ def optimizeRepeatOr(rmin, rmax, regex):
         if cls == RegexRepeat:
             if item.min == 0:
                 if rmin in (0, 1):
-                    if rmax == item.max == None:
+                    if rmax is item.max is None:
                         # (a*|b){x,} => (a|b){x,}
                         item = item.regex
                     else:
                         # (a{0,p}|b){x,} => (a{1,p}|b){x,}
-                        item = RegexRepeat(item.regex, 1, item.max, optimize=False)
+                        item = RegexRepeat(
+                            item.regex, 1, item.max, optimize=False)
             elif item.min == 1:
-                if rmax == item.max == None:
+                if rmax is item.max is None:
                     # (a+|b){x,} => (a|b){x,}
                     item = item.regex
             else:
-                if rmax == item.max == None:
+                if rmax is item.max is None:
                     # (a{n,}|b){x,} => (a{n}|b){x,}
-                    item = RegexRepeat(item.regex, item.min, item.min, optimize=False)
+                    item = RegexRepeat(item.regex, item.min,
+                                       item.min, optimize=False)
         content.append(item)
     regex = RegexOr.join(content)
     return (rmin, rmax, regex)
@@ -827,10 +843,12 @@ class RegexRepeat(Regex):
         assert 0 <= rmin
         if self.max is not None:
             if self.max < self.min:
-                raise ValueError("RegexRepeat: minimum (%s) is bigger than maximum (%s)!" % (self.min, self.max))
+                raise ValueError(
+                    "RegexRepeat: minimum (%s) is bigger than maximum (%s)!" % (self.min, self.max))
             if (self.max == 0) \
-            or (self.min == self.max == 1):
-                raise ValueError("RegexRepeat: invalid values (min=%s, max=%s)!" % (self.min, self.max))
+                    or (self.min == self.max == 1):
+                raise ValueError(
+                    "RegexRepeat: invalid values (min=%s, max=%s)!" % (self.min, self.max))
 
     def minLength(self):
         """
@@ -855,7 +873,7 @@ class RegexRepeat(Regex):
     def _str(self, **kw):
         text = str(self.regex)
         if self.regex.__class__ == RegexAnd \
-        or (self.regex.__class__ == RegexString and 1 < len(self.regex.text)):
+                or (self.regex.__class__ == RegexString and 1 < len(self.regex.text)):
             text = "(%s)" % text
         if self.min == 0 and self.max == 1:
             return "%s?" % text
@@ -880,4 +898,3 @@ class RegexRepeat(Regex):
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
-

@@ -1,5 +1,5 @@
 from hachoir.core.tools import makePrintable
-from hachoir.regex import RegexEmpty, RegexOr, parse, createString
+from hachoir.regex import RegexEmpty, parse, createString
 
 
 class Pattern:
