@@ -273,4 +273,3 @@ def extractMetadata(parser, quality=QUALITY_NORMAL):
         metadata.mime_type = parser.mime_type
         metadata.endian = endian_name[parser.endian]
     return metadata
-

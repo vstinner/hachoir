@@ -36,4 +36,3 @@ class DataRate:
         self.datarates = self.datarates[-self.size:]
         if self.min_size <= len(self.datarates):
             self.average = sum(self.datarates) / len(self.datarates)
-
