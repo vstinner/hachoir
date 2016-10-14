@@ -139,24 +139,24 @@ class ElfHeader(FieldSet):
 class SectionFlags(FieldSet):
 
     def createFields(self):
+        field_thunks = (
+            lambda: Bit(self, "is_writable", "Section contains writable data?"),
+            lambda: Bit(self, "is_alloc", "Section occupies memory?"),
+            lambda: Bit(self, "is_exec", "Section contains executable instructions?"),
+            lambda: NullBits(self, "reserved[]", 7),
+            lambda: Bit(self, "is_tls", "Section contains TLS data?"),
+            lambda: NullBits(self, "reserved[]", 17)
+            lambda: RawBits(self, "processor_specific", 4, "Processor specific flags")
+        )
+
         if self.root.endian == BIG_ENDIAN:
             if self.root.is64bit:
                 yield RawBits(self, "reserved[]", 32)
-            yield RawBits(self, "processor_specific", 4, "Processor specific flags")
-            yield NullBits(self, "reserved[]", 17)
-            yield Bit(self, "is_tls", "Section contains TLS data?")
-            yield NullBits(self, "reserved[]", 7)
-            yield Bit(self, "is_exec", "Section contains executable instructions?")
-            yield Bit(self, "is_alloc", "Section occupies memory?")
-            yield Bit(self, "is_writable", "Section contains writable data?")
+            for t in reversed (field_thunks):
+                yield t()
         else:
-            yield Bit(self, "is_writable", "Section contains writable data?")
-            yield Bit(self, "is_alloc", "Section occupies memory?")
-            yield Bit(self, "is_exec", "Section contains executable instructions?")
-            yield NullBits(self, "reserved[]", 7)
-            yield Bit(self, "is_tls", "Section contains TLS data?")
-            yield NullBits(self, "reserved[]", 17)
-            yield RawBits(self, "processor_specific", 4, "Processor specific flags")
+            for t in field_thunks:
+                yield t()
             if self.root.is64bit:
                 yield RawBits(self, "reserved[]", 32)
 
