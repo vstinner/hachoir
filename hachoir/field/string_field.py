@@ -367,6 +367,7 @@ def stringFactory(name, format, doc):
     cls.__name__ = name
     return cls
 
+
 # String which ends with nul byte ("\0")
 CString = stringFactory("CString", "C",
                         r"""C string: string ending with nul byte.
@@ -404,4 +405,6 @@ class String(GenericString):
                  strip=None, charset=None, truncate=None):
         GenericString.__init__(self, parent, name, "fixed", description,
                                strip=strip, charset=charset, nbytes=nbytes, truncate=truncate)
+
+
 String.__name__ = "FixedString"

@@ -34,6 +34,7 @@ def timestampFactory(cls_name, handler, size):
     cls.__name__ = cls_name
     return cls
 
+
 TimestampUnix32 = timestampFactory("TimestampUnix32", timestampUNIX, 32)
 TimestampUnix64 = timestampFactory("TimestampUnix64", timestampUNIX, 64)
 TimestampMac32 = timestampFactory("TimestampUnix32", timestampMac32, 32)

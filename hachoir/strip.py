@@ -194,6 +194,7 @@ class TarStripper(BasicStripper):
         self.fixChecksum(file)
         self._is_dirty = True
 
+
 strippers = {
     AuFile: AuStripper,
     RiffFile: RiffStripper,

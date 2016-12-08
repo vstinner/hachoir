@@ -91,6 +91,7 @@ def floatFactory(name, format, mantissa_bits, exponent_bits, doc):
     cls.__name__ = name
     return cls
 
+
 # 32-bit float (standard: IEEE 754/854)
 Float32 = floatFactory("Float32", "f", 23, 8,
                        "Floating point number: format IEEE 754 int 32 bit")

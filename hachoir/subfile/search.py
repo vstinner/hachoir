@@ -12,6 +12,7 @@ def skipSubfile(parser):
     subfile = parser.getParserTags().get("subfile", "")
     return (subfile == "skip")
 
+
 FILE_MAX_SIZE = 100 * 1024 * 1024   # Max. file size in bytes (100 MB)
 SLICE_SIZE = 64 * 1024                # Slice size in bytes (64 KB)
 MEMORY_LIMIT = 50 * 1024 * 1024
