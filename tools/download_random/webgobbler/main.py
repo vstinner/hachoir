@@ -30,5 +30,3 @@ finally:
     print("Stopping image pool (please wait).")
     pool.shutdown()
     pool.join()
-
-

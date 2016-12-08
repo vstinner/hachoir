@@ -5,7 +5,7 @@ Original data file:
 http://standards.ieee.org/regauth/oui/oui.txt
 """
 
-REGISTERED_OUID = { # noqa
+REGISTERED_OUID = {  # noqa
    0x000000: u'XEROX CORPORATION',
    0x000001: u'XEROX CORPORATION',
    0x000002: u'XEROX CORPORATION',

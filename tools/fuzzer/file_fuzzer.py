@@ -29,7 +29,9 @@ MAX_NB_EXTRACT = 40
 # 1 times on 20 tries
 TRUNCATE_RATE = 20
 
+
 class UndoMangle:
+
     def __init__(self, fuzz):
         self.data = fuzz.data.tostring()
         self.orig = fuzz.is_original
@@ -38,7 +40,9 @@ class UndoMangle:
         fuzz.data = array('B', self.data)
         fuzz.is_original = self.orig
 
+
 class UndoTruncate:
+
     def __init__(self, fuzz):
         self.data = fuzz.data
         self.orig = fuzz.is_original
@@ -47,7 +51,9 @@ class UndoTruncate:
         fuzz.data = self.data
         fuzz.is_original = self.orig
 
+
 class FileFuzzer:
+
     def __init__(self, fuzzer, filename):
         self.fuzzer = fuzzer
         self.verbose = fuzzer.verbose
@@ -86,7 +92,8 @@ class FileFuzzer:
                 self.nb_truncate, percent, self.size))
 
     def warning(self, message):
-        print("    %s (%s): %s" % (basename(self.filename), self.nb_extract, message))
+        print("    %s (%s): %s" %
+              (basename(self.filename), self.nb_extract, message))
 
     def info(self, message):
         if self.verbose:
@@ -112,7 +119,7 @@ class FileFuzzer:
 
         # Truncate
         self.nb_truncate += 1
-        new_size = randint(MIN_SIZE, len(self.data)-1)
+        new_size = randint(MIN_SIZE, len(self.data) - 1)
         self.warning("Truncate #%s (%s bytes)" % (self.nb_truncate, new_size))
         self.data = self.data[:new_size]
         self.is_original = False
@@ -130,10 +137,12 @@ class FileFuzzer:
         self.undo = None
 
         # Update mangle percent
-        percent = max(self.mangle_percent - MANGLE_PERCENT_INCR, MIN_MANGLE_PERCENT)
+        percent = max(self.mangle_percent -
+                      MANGLE_PERCENT_INCR, MIN_MANGLE_PERCENT)
         if self.mangle_percent != percent:
             self.mangle_percent = percent
-            self.info("Set mangle percent to: %u%%" % int(self.mangle_percent*100))
+            self.info("Set mangle percent to: %u%%" %
+                      int(self.mangle_percent * 100))
         return True
 
     def extract(self):
@@ -178,10 +187,9 @@ class FileFuzzer:
     def keepFile(self, prefix):
         data = self.data.tostring()
         uniq_id = generateUniqueID(data)
-        filename="%s-%s" % (uniq_id, basename(self.filename))
+        filename = "%s-%s" % (uniq_id, basename(self.filename))
         if prefix:
             filename = "%s-%s" % (prefix, filename)
         filename = path.join(self.fuzzer.error_dir, filename)
         open(filename, "wb").write(data)
         print("=> Store file %s" % filename)
-

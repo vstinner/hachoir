@@ -3,7 +3,9 @@ from hachoir.parser import createParser, guessParser
 from hachoir.parser.container.swf import SOUND_CODEC_MP3
 from sys import stderr, exit, argv
 
+
 class JpegExtractor:
+
     def __init__(self):
         self.jpg_index = 1
         self.snd_index = 1
@@ -28,7 +30,8 @@ class JpegExtractor:
             if 32 < header.size:
                 if self.verbose:
                     print("Use JPEG table: %s" % header.path)
-                header = field.root.stream.readBytes(header.absolute_address, (header.size-16)//8)
+                header = field.root.stream.readBytes(
+                    header.absolute_address, (header.size - 16) // 8)
             else:
                 header = ""
         else:
@@ -51,7 +54,7 @@ class JpegExtractor:
                 assert data[:1] == b'\xFF'
                 output.write(data)
             elif field.name.startswith("sound_blk") \
-            and "music_data" in field:
+                    and "music_data" in field:
                 data = field["music_data"].value
                 if data:
                     assert data[0] == '\xFF'
@@ -85,7 +88,7 @@ class JpegExtractor:
             self.extractFormat2(field)
 
         # Extract sound
-        #self.extractSound(parser)
+        # self.extractSound(parser)
         self.extractSound2(parser)
 
         # Does it extract anything?
@@ -95,4 +98,3 @@ class JpegExtractor:
             print("No sound found.")
 
 JpegExtractor().main()
-

@@ -9,6 +9,7 @@ class DataRate:
     Store self.size data rates to compute good average speed.
     Don't compute average before self.min_size values are computed.
     """
+
     def __init__(self, offset, size=20, min_size=3):
         self.last_offset = offset
         self.last_time = time()

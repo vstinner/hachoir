@@ -2,7 +2,7 @@ from sys import platform
 
 if platform == 'win32':
     from win32process import (GetCurrentProcess, SetPriorityClass,
-        BELOW_NORMAL_PRIORITY_CLASS)
+                              BELOW_NORMAL_PRIORITY_CLASS)
 
     def beNice():
         process = GetCurrentProcess()
@@ -21,6 +21,7 @@ else:
 
 try:
     import sha
+
     def generateUniqueID(data):
         return sha.new(data).hexdigest()
 except ImportError:
@@ -29,9 +30,9 @@ except ImportError:
         return generateUniqueID.sequence
     generateUniqueID.sequence = 0
 
+
 def getFilesize(file):
     file.seek(0, 2)
     size = file.tell()
     file.seek(0, 0)
     return size
-

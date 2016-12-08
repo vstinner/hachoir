@@ -71,7 +71,8 @@ class TiffMetadata(RootMetadata):
         for entry in ifd.array("entry"):
             self.processIfdEntry(ifd, entry, attr)
         if 'BitsPerSample' in attr and 'SamplesPerPixel' in attr:
-            self.bits_per_pixel = attr['BitsPerSample'] * attr['SamplesPerPixel']
+            self.bits_per_pixel = attr[
+                'BitsPerSample'] * attr['SamplesPerPixel']
 
     @fault_tolerant
     def processIfdEntry(self, ifd, entry, attr):

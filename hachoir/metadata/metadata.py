@@ -39,7 +39,8 @@ class Metadata(Logger):
         """
         # Invalid key?
         if key not in self.__data:
-            raise KeyError("%s has no metadata '%s'" % (self.__class__.__name__, key))
+            raise KeyError("%s has no metadata '%s'" %
+                           (self.__class__.__name__, key))
 
         # Skip duplicates
         self.__data[key].add(value)
@@ -77,7 +78,8 @@ class Metadata(Logger):
         item = self.getItem(key, index)
         if item is None:
             if default is None:
-                raise ValueError("Metadata has no value '%s' (index %s)" % (key, index))
+                raise ValueError(
+                    "Metadata has no value '%s' (index %s)" % (key, index))
             else:
                 return default
         return item.value
@@ -182,6 +184,7 @@ class Metadata(Logger):
 
 
 class RootMetadata(Metadata):
+
     def __init__(self, quality=QUALITY_NORMAL):
         Metadata.__init__(self, None, quality)
 
@@ -240,7 +243,8 @@ class MultipleMetadata(RootMetadata):
                 title = key
             else:
                 title = None
-            value = metadata.exportPlaintext(priority, human, line_prefix, title=title)
+            value = metadata.exportPlaintext(
+                priority, human, line_prefix, title=title)
             if value:
                 text.extend(value)
         if len(text):

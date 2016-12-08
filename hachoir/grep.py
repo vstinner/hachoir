@@ -69,6 +69,7 @@ def parseOptions():
 
 
 class Grep:
+
     def __init__(self):
         self.pattern = None
         self.case_sensitive = True
@@ -96,6 +97,7 @@ class Grep:
 
 
 class ConsoleGrep(Grep):
+
     def __init__(self):
         Grep.__init__(self)
         self.term_charset = getTerminalCharset()

@@ -62,15 +62,18 @@ class RiffMetadata(MultipleMetadata):
 
         self.compression = format["codec"].display
         if ("nb_sample/nb_sample" in wav
-           and 0 < format["sample_per_sec"].value):
-            self.duration = timedelta(seconds=float(wav["nb_sample/nb_sample"].value) / format["sample_per_sec"].value)
+                and 0 < format["sample_per_sec"].value):
+            self.duration = timedelta(seconds=float(
+                wav["nb_sample/nb_sample"].value) / format["sample_per_sec"].value)
         if format["codec"].value in UNCOMPRESSED_AUDIO:
             # Codec with fixed bit rate
-            self.bit_rate = format["nb_channel"].value * format["bit_per_sample"].value * format["sample_per_sec"].value
+            self.bit_rate = format[
+                "nb_channel"].value * format["bit_per_sample"].value * format["sample_per_sec"].value
             if (not self.has("duration")
-               and "audio_data/size" in wav
-               and self.has("bit_rate")):
-                duration = float(wav["audio_data/size"].value) * 8 / self.get('bit_rate')
+                and "audio_data/size" in wav
+                    and self.has("bit_rate")):
+                duration = float(wav["audio_data/size"].value) * \
+                    8 / self.get('bit_rate')
                 self.duration = timedelta(seconds=duration)
 
     def extractInfo(self, fieldset):
@@ -91,7 +94,8 @@ class RiffMetadata(MultipleMetadata):
             fps = float(header["rate"].value) / header["scale"].value
             meta.frame_rate = fps
             if 0 < fps:
-                self.duration = meta.duration = timedelta(seconds=float(header["length"].value) / fps)
+                self.duration = meta.duration = timedelta(
+                    seconds=float(header["length"].value) / fps)
 
         if "../stream_fmt/width" in header:
             format = header["../stream_fmt"]
@@ -112,8 +116,10 @@ class RiffMetadata(MultipleMetadata):
         if "../stream_hdr" in format:
             header = format["../stream_hdr"]
             if header["rate"].value and header["scale"].value:
-                frame_rate = float(header["rate"].value) / header["scale"].value
-                meta.duration = timedelta(seconds=float(header["length"].value) / frame_rate)
+                frame_rate = float(
+                    header["rate"].value) / header["scale"].value
+                meta.duration = timedelta(seconds=float(
+                    header["length"].value) / frame_rate)
             if header["fourcc"].value != "":
                 meta.compression = "%s (fourcc:\"%s\")" \
                     % (format["codec"].display, header["fourcc"].value)
@@ -127,7 +133,8 @@ class RiffMetadata(MultipleMetadata):
         uncompr = meta.get('bit_rate', 0)
         if not uncompr:
             return
-        compr = meta.get('nb_channel') * meta.get('sample_rate') * meta.get('bits_per_sample', default=16)
+        compr = meta.get('nb_channel') * meta.get('sample_rate') * \
+            meta.get('bits_per_sample', default=16)
         if not compr:
             return
         meta.compr_rate = float(compr) / uncompr
@@ -166,7 +173,8 @@ class RiffMetadata(MultipleMetadata):
 
         # Compute global bit rate
         if self.has("duration") and "/movie/size" in headers:
-            self.bit_rate = float(headers["/movie/size"].value) * 8 / timedelta2seconds(self.get('duration'))
+            self.bit_rate = float(
+                headers["/movie/size"].value) * 8 / timedelta2seconds(self.get('duration'))
 
         # Video has index?
         if "/index" in headers:

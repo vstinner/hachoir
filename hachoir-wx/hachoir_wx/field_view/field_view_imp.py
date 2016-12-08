@@ -3,7 +3,9 @@ from hachoir.core.i18n import _
 
 MAXITEMS = 1000
 
+
 class field_view_imp_t:
+
     def __init__(self):
         self.addr_func = lambda field: field._getAbsoluteAddress()
         self.format_addr = lambda field: format_addr_hex(self.addr_func(field))
@@ -25,7 +27,7 @@ class field_view_imp_t:
         assert view is not None
 
         # register callbacks before activating the field view
-        view.register_callback(cbGetItemText = self.OnGetItemTextImp)
+        view.register_callback(cbGetItemText=self.OnGetItemTextImp)
 
         self.view = view
         self.fill_view()
@@ -92,7 +94,8 @@ class field_view_imp_t:
             width = 0
             func = self.col_str_table[col]
             # when fields has more than 20 rows, they are probably similar.
-            # Therefore this routine only checks the first 10 rows and last 10 rows.
+            # Therefore this routine only checks the first 10 rows and last 10
+            # rows.
 
             if field_count <= 20:
                 field_range = [(0, field_count)]
@@ -118,12 +121,12 @@ class field_view_imp_t:
         else:
             parent_count = 0
         try:
-            self.fields[item+MAXITEMS]
-            if item+MAXITEMS+parent_count > self.view.GetItemCount():
-                self.view.SetItemCount(item+MAXITEMS+parent_count)
+            self.fields[item + MAXITEMS]
+            if item + MAXITEMS + parent_count > self.view.GetItemCount():
+                self.view.SetItemCount(item + MAXITEMS + parent_count)
         except:
             if len(self.fields) + parent_count != self.view.GetItemCount():
-                self.view.SetItemCount(len(self.fields)+parent_count)
+                self.view.SetItemCount(len(self.fields) + parent_count)
         field = self.fields[item]
         return self.col_str_table[col](field)
 

@@ -5,6 +5,7 @@ from datetime import datetime
 
 
 class ISO9660_Metadata(RootMetadata):
+
     def extract(self, iso):
         desc = iso['volume[0]/content']
         self.title = desc['volume_id'].value

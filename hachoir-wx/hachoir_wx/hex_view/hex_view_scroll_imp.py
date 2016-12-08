@@ -1,7 +1,9 @@
 from math import ceil
 from .stubs import byte_addr, get_file_size, get_page_num
 
+
 class hex_view_scroll_imp_t:
+
     def on_file_ready(self, dispatcher, file):
         assert file is not None
         self.file = file
@@ -22,7 +24,8 @@ class hex_view_scroll_imp_t:
         cur_height = self.offset_to_thumb(pos)
         total_height = int(ceil(get_file_size(self.file) / float(page_width)))
 
-        self.view.SetScrollbar(cur_height, page_height, total_height, page_height)
+        self.view.SetScrollbar(cur_height, page_height,
+                               total_height, page_height)
 
     def on_field_selected(self, dispatcher, field):
         offset = byte_addr(field._getAbsoluteAddress())
@@ -35,8 +38,8 @@ class hex_view_scroll_imp_t:
 
     def set_mappers(self, page_width):
         self.thumb_to_offset = lambda thumb_pos: thumb_pos * page_width
-        self.offset_to_thumb = lambda offset: get_page_num(offset = offset,
-                                                           page_width = page_width)
+        self.offset_to_thumb = lambda offset: get_page_num(offset=offset,
+                                                           page_width=page_width)
 
     def on_scrolled(self):
         offset = self.thumb_to_offset(self.view.GetThumbPosition())

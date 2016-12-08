@@ -3,7 +3,9 @@ from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
 from sys import maxsize
 from hachoir.core.i18n import _
 
+
 class field_view_t(ListCtrl, ListCtrlAutoWidthMixin):
+
     def __init__(self):
         self.cols = {}
 
@@ -14,7 +16,8 @@ class field_view_t(ListCtrl, ListCtrlAutoWidthMixin):
     def post_init(self):
         ListCtrlAutoWidthMixin.__init__(self)
 
-        columns = [_('address'), _('name'), _('type'), _('size'), _('data'), _('description')]
+        columns = [_('address'), _('name'), _('type'),
+                   _('size'), _('data'), _('description')]
         for name in columns:
             self.append_column(name)
         self.col_min_width = [len(s) for s in columns]
@@ -30,7 +33,7 @@ class field_view_t(ListCtrl, ListCtrlAutoWidthMixin):
     def append_column(self, name):
         index = self.GetColumnCount()
         self.cols[name] = index
-        self.InsertColumn(col = index, heading = name)
+        self.InsertColumn(col=index, heading=name)
 
     def get_selected(self, name):
         return self.GetItem(self.GetFocusedItem(), self.cols[_('name')]).GetText()
@@ -45,10 +48,10 @@ class field_view_t(ListCtrl, ListCtrlAutoWidthMixin):
         return self.OnGetItemText_imp(item, col)
 
     def get_col_index(self, name):
-       return self.cols[name]
+        return self.cols[name]
 
     def get_col_count(self):
-       return len(self.cols)
+        return len(self.cols)
 
     def resize_column(self, col_index, width):
         width = max(self.col_min_width[col_index], width) + 1

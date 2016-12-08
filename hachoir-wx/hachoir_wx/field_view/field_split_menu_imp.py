@@ -2,7 +2,9 @@ from hachoir_wx.field_view.mutator import split_field
 from hachoir.field import RawBytes, RawBits
 from hachoir.core.i18n import _
 
+
 class field_split_menu_imp_t:
+
     def on_field_split_menu_ready(self, dispatcher, view):
         assert view is not None
         self.view = view
@@ -21,6 +23,7 @@ class field_split_menu_imp_t:
     def split_field(self, caption, field, split_type, size_func):
         offset = self.view.ask_split(caption, 1, size_func(field) - 1)
         if offset is not None:
-            new_fields = split_field(field, offset, field._getName(), split_type, size_func)
+            new_fields = split_field(
+                field, offset, field._getName(), split_type, size_func)
 
         return offset

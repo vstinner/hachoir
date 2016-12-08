@@ -1,7 +1,9 @@
 from hachoir_wx.field_view.stubs import save_substream_to_disk
 from hachoir.core.i18n import _
 
+
 class field_menu_imp_t:
+
     def on_field_set_ready(self, dispatcher, fields):
         assert fields is not None
         self.fields = fields
@@ -45,7 +47,7 @@ class field_menu_imp_t:
         self.dispatcher.trigger('field_open_window_here', self.selected)
 
     def on_dump_to_disk(self, event):
-        dump_path = self.view.ask_for_dump_file(_('Dump "' + self.selected._getPath() + '" To Disk...'))
+        dump_path = self.view.ask_for_dump_file(
+            _('Dump "' + self.selected._getPath() + '" To Disk...'))
         if dump_path is not None:
             save_substream_to_disk(self.selected, dump_path)
-

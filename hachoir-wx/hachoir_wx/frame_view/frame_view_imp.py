@@ -1,4 +1,5 @@
 class frame_view_imp_t:
+
     def on_frame_view_ready(self, dispatcher, frame_view):
         assert frame_view is not None
         self.view = frame_view
@@ -12,7 +13,7 @@ class frame_view_imp_t:
 
     def format_title(self, field):
         field_path = field._getPath()
-        return self.filename+'/'+field_path[1:]
+        return self.filename + '/' + field_path[1:]
 
     def on_field_activated(self, dispatcher, field):
         self.view.SetTitle(self.format_title(field))

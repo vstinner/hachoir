@@ -28,13 +28,16 @@ for i in True, False:
             raise
 
 if not hasattr(fuse, '__version__'):
-    raise RuntimeError("your fuse-py doesn't know of fuse.__version__, probably it's too old.")
+    raise RuntimeError(
+        "your fuse-py doesn't know of fuse.__version__, probably it's too old.")
 
 # This setting is optional, but it ensures that this class will keep
 # working after a future API revision
 fuse.fuse_python_api = (0, 2)
 
+
 class MyStat(fuse.Stat):
+
     def __init__(self):
         self.st_mode = 0
         self.st_ino = 0
@@ -47,7 +50,9 @@ class MyStat(fuse.Stat):
         self.st_mtime = 0
         self.st_ctime = 0
 
+
 class HelloFS(Fuse):
+
     def __init__(self, input_filename, **kw):
         Fuse.__init__(self, **kw)
         log.setFilename("/home/haypo/fuse_log")
@@ -78,7 +83,7 @@ class HelloFS(Fuse):
             raise
 
     def fieldValue(self, field):
-        return makePrintable(field.display, "ISO-8859-1")+"\n"
+        return makePrintable(field.display, "ISO-8859-1") + "\n"
 
     def getattr(self, path):
         st = MyStat()
@@ -154,11 +159,11 @@ class HelloFS(Fuse):
         count = len(fieldset)
         if count % 10:
             count += 10 - (count % 10)
-        format = "%%0%ud-%%s" % (count//10)
+        format = "%%0%ud-%%s" % (count // 10)
 
         # Create entries
         for index, field in enumerate(fieldset):
-            name = format % (1+index, field.name)
+            name = format % (1 + index, field.name)
             entry = fuse.Direntry(name)
             if field.is_field_set:
                 entry.type = stat.S_IFDIR
@@ -208,7 +213,7 @@ class HelloFS(Fuse):
             return ''
         if offset + size > slen:
             size = slen - offset
-        data = data[offset:offset+size]
+        data = data[offset:offset + size]
         log.info("=> %s" % repr(data))
         return data
 
@@ -218,8 +223,9 @@ class HelloFS(Fuse):
     def truncate(self, *args):
         log.info("truncate(): TODO!")
 
+
 def main():
-    usage="""
+    usage = """
 Userspace hello example
 
 """ + Fuse.fusage
