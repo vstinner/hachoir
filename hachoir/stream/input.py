@@ -419,6 +419,8 @@ class InputIOStream(InputStream):
     _current_size = property(__current_size)
 
     def read(self, address, size):
+        if not size:
+            return (0, b'', False)
         assert size > 0
         _size = self._size
         address, shift = divmod(address, 8)
