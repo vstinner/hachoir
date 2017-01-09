@@ -79,4 +79,4 @@ class FakeArray:
             try:
                 yield self[index]
             except MissingField:
-                raise StopIteration()
+                break

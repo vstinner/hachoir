@@ -56,7 +56,9 @@ def parseDate(parent):
 
 
 def parseNothing(parent):
-    raise StopIteration()
+    # Python hack to make sure that the function is a generator
+    if 0:
+        yield
 
 
 class AMFObject(FieldSet):
