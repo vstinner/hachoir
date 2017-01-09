@@ -18,7 +18,6 @@ TODO
 * test hachoir-gtk
 * test hachoir-http
 * convert remaining wiki pages
-* runtests.py: unclosed files ; reference cycle somewhere
 
 
 subfile
