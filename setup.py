@@ -12,7 +12,7 @@
 #
 # Release a new version:
 #
-#  - run: git tag hachoir-XXX
+#  - run: git tag x.y.z
 #  - run: git push --tags
 #  - rm -rf dist/
 #  - run: python3 setup.py sdist bdist_wheel
