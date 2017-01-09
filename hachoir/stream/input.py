@@ -82,7 +82,7 @@ class FileFromInputStream:
             # We don't want self.tell() to read anything
             # and the size must be known if we read until the end.
             pos = self.tell()
-            if size is None or None < self._size < pos + size:
+            if size is None or (self._size is not None and self._size < pos + size):
                 size = self._size - pos
             if size <= 0:
                 return ''
@@ -423,7 +423,7 @@ class InputIOStream(InputStream):
         if hasattr(self._input, "fileno"):
             from os import dup, fdopen
             new_fd = dup(self._input.fileno())
-            new_file = fdopen(new_fd, "r")
+            new_file = fdopen(new_fd, "rb")
             new_file.seek(0)
             return new_file
         return InputStream.file(self)
