@@ -7,6 +7,8 @@
 #  - set the release date: edit doc/changelog.rst
 #  - run: git commit -a
 #  - run: git push
+#  - check Travis CI status:
+#    https://travis-ci.org/haypo/hachoir3
 #
 # Release a new version:
 #
@@ -27,14 +29,12 @@ from imp import load_source
 from os import path
 from setuptools import find_packages
 
-SCRIPTS = [
-    "hachoir-grep",
-    "hachoir-metadata",
-    "hachoir-strip",
-#   FIXME: hachoir-subfile is currently broken
-#    "hachoir-subfile",
-    "hachoir-urwid",
-]
+SCRIPTS = ["hachoir-grep",
+           "hachoir-metadata",
+           "hachoir-strip",
+#          FIXME: hachoir-subfile is currently broken
+#          "hachoir-subfile",
+           "hachoir-urwid"]
 
 CLASSIFIERS = [
     'Development Status :: 5 - Production/Stable',
