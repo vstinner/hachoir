@@ -23,8 +23,9 @@ class TestGrepClass(unittest.TestCase):
                 fields.append(field)
 
         parser = createParser(GEORGIA_CAB)
-        grep = TestGrep()
-        grep.grep(parser)
+        with parser:
+            grep = TestGrep()
+            grep.grep(parser)
         fields = [(field.absolute_address, field.path, field.value)
                   for field in fields]
         self.assertEqual(fields,
