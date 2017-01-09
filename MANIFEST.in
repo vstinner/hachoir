@@ -13,6 +13,7 @@ include hachoir-metadata-csv
 include run_testcase.py
 
 include doc/*.rst doc/conf.py doc/make.bat doc/Makefile doc/gen_parser_list.py
+include doc/examples/*.py
 
 include tests/*.py tests/*.rst tests/files/*
 

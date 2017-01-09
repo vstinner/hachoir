@@ -309,31 +309,6 @@ Lazy methods:
 Hachoir Metadata Example
 ========================
 
-:ref:`hachoir-metadata <metadata>` example::
+:ref:`hachoir-metadata <metadata>` example:
 
-    from hachoir.parser import createParser
-    from hachoir.core.tools import makePrintable
-    from hachoir.metadata import extractMetadata
-    from hachoir.core.i18n import getTerminalCharset
-    from sys import argv, stderr, exit
-
-    if len(argv) != 2:
-        print("usage: %s filename" % argv[0], file=stderr)
-        exit(1)
-    filename = argv[1]
-    parser = createParser(filename)
-    if not parser:
-        print("Unable to parse file", file=stderr)
-        exit(1)
-
-    try:
-        metadata = extractMetadata(parser)
-    except Exception as err:
-        print("Metadata extraction error: %s" % err)
-        metadata = None
-    if not metadata:
-        print("Unable to extract metadata")
-        exit(1)
-
-    for line in metadata.exportPlaintext():
-        print(line)
+.. literalinclude:: examples/metadata.py

@@ -13,48 +13,14 @@ information to make a file smaller).
 Example: gzip, remove filename
 ==============================
 
-::
-
-    from hachoir_parser import createParser
-    from hachoir_editor import createEditor
-    from hachoir_core.field import writeIntoFile
-
-    parser = createParser(u"file.gz")
-    editor = createEditor(parser)
-    del editor["filename"]
-    editor["has_filename"].value = False
-    writeIntoFile(editor, u"noname.gz")
+.. literalinclude:: examples/editor_gzip.py
 
 Example: gzip, add extra
 ========================
 
-::
-
-    from hachoir_parser import createParser
-    from hachoir_editor import createEditor
-    from hachoir_core.field import writeIntoFile
-    from hachoir_core.editor import EditableInteger, EditableBytes
-
-    parser = createParser(u"file.gz")
-    editor = createEditor(parser)
-    extra = "abcd"
-    editor["has_extra"].value = True
-    editor.insertAfter("os",
-        EditableInteger(editor, "extra_length", False, 16, len(extra)),
-        EditableBytes(editor, "extra", extra))
-    writeIntoFile(editor, u"file_extra.gz")
+.. literalinclude:: examples/editor_add_extra.py
 
 Example: zip, set comment
 =========================
 
-::
-
-    from hachoir_parser import createParser
-    from hachoir_editor import createEditor
-    from hachoir_core.field import writeIntoFile
-
-    parser = createParser(u"file.gz")
-    editor = createEditor(parser)
-    editor["end_central_directory/comment"].value = "new comment"
-    writeIntoFile(editor, u"file_comment.zip")
-
+.. literalinclude:: examples/editor_zip.py
