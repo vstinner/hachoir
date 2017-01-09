@@ -31,7 +31,8 @@ SCRIPTS = [
     "hachoir-grep",
     "hachoir-metadata",
     "hachoir-strip",
-    "hachoir-subfile",
+#   FIXME: hachoir-subfile is currently broken
+#    "hachoir-subfile",
     "hachoir-urwid",
 ]
 
