@@ -1,20 +1,25 @@
 #!/usr/bin/env python3
 #
-# Procedure to release Hachoir:
-#
-# FIXME: update this procedure which was written for hachoir using Python 2
-# FIXME: and using Mercurial.
+# Prepare a release:
 #
 #  - check version: hachoir/version.py and doc/conf.py
-#  - run: ./runtests.py
-#  - edit doc/changelog.rst (set release date)
-#  - run: hg commit
-#  - run: hg tag hachoir-XXX
-#  - run: hg push
-#  - run: ./README.py
-#  - run: ./setup.py --setuptools register sdist upload
-#  - run: rm README
+#  - run tests: tox
+#  - set the release date: edit doc/changelog.rst
+#  - run: git commit -a
+#  - run: git push
+#
+# Release a new version:
+#
+#  - run: git tag hachoir-XXX
+#  - run: git push --tags
+#  - rm -rf dist/
+#  - run: python3 setup.py sdist bdist_wheel
+#  - FIXME: register? twine register dist/hachoir-x.y.z.tar.gz
+#  - twine upload dist/*
 #  - check http://pypi.python.org/pypi/hachoir3
+#
+# After the release:
+#
 #  - update doc/install.rst
 #  - set version to N+1: hachoir/version.py and doc/conf.py
 
@@ -40,7 +45,7 @@ CLASSIFIERS = [
     'License :: OSI Approved :: GNU General Public License (GPL)',
     'Natural Language :: English',
     'Operating System :: OS Independent',
-    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
     'Topic :: Multimedia',
     'Topic :: Scientific/Engineering :: Information Analysis',
     'Topic :: Software Development :: Disassemblers',
@@ -53,13 +58,7 @@ CLASSIFIERS = [
 
 
 def main():
-    if "--setuptools" in argv:
-        argv.remove("--setuptools")
-        from setuptools import setup
-        use_setuptools = True
-    else:
-        from distutils.core import setup
-        use_setuptools = False
+    from setuptools import setup
 
     hachoir = load_source("version", path.join("hachoir", "version.py"))
 
@@ -78,9 +77,8 @@ def main():
         "license": hachoir.LICENSE,
         "packages": find_packages(),
         "scripts": SCRIPTS,
+        "zip_safe": True,
     }
-    if use_setuptools:
-        install_options["zip_safe"] = True
     setup(**install_options)
 
 if __name__ == "__main__":
