@@ -19,6 +19,15 @@ class OutputStream(object):
         self._bit_pos = 0
         self._byte = 0
 
+    def close(self):
+        self._output.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.close()
+
     def _getFilename(self):
         return self._filename
     filename = property(_getFilename)

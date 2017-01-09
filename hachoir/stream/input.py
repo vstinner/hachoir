@@ -137,6 +137,15 @@ class InputStream(Logger):
         self.tags = tuple(args.get("tags", tuple()))
         self.packets = packets
 
+    def close(self):
+        raise NotImplementedError
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.close()
+
     def askSize(self, client):
         if self._size != self._current_size:
             if self._set_size is None:
@@ -398,6 +407,9 @@ class InputIOStream(InputStream):
         self._input = input
         InputStream.__init__(self, size=size, **args)
 
+    def close(self):
+        self._input.close()
+
     def __current_size(self):
         if self._size:
             return self._size
@@ -436,6 +448,9 @@ class StringInputStream(InputStream):
         InputStream.__init__(self, source=source, size=8 * len(data), **args)
         self._current_size = self._size
 
+    def close(self):
+        pass
+
     def read(self, address, size):
         address, shift = divmod(address, 8)
         size = (size + shift + 7) >> 3
@@ -466,6 +481,9 @@ class InputSubStream(InputStream):
     _current_size = property(lambda self: min(
         self._size, max(0, self.stream._current_size - self._offset)))
 
+    def close(self):
+        self.stream = None
+
     def read(self, address, size):
         return self.stream.read(self._offset + address, size)
 
@@ -491,6 +509,9 @@ class FragmentedStream(InputStream):
         if not self.__next__:
             self._current_size = data.size
             self._setSize()
+
+    def close(self):
+        self.stream = None
 
     def _feed(self, end):
         if self._current_size < end:
@@ -565,6 +586,9 @@ class ConcatStream(InputStream):
 
     _current_size = property(
         lambda self: self.__size0 + self.__streams[1]._current_size)
+
+    def close(self):
+        self.__streams = None
 
     def read(self, address, size):
         _size = self._size

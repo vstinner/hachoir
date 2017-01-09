@@ -823,10 +823,11 @@ def main():
         sys.exit(1)
 
     # Explore file
-    if values.profiler:
-        profile(exploreFieldSet, parser, values)
-    else:
-        exploreFieldSet(parser, values, {
-            "display_size": values.display_size,
-            "display_value": values.display_value,
-        })
+    with parser:
+        if values.profiler:
+            profile(exploreFieldSet, parser, values)
+        else:
+            exploreFieldSet(parser, values, {
+                "display_size": values.display_size,
+                "display_value": values.display_value,
+            })

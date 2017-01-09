@@ -28,6 +28,18 @@ class Parser(GenericFieldSet):
         GenericFieldSet.__init__(
             self, None, "root", stream, description, stream.askSize(self))
 
+    def close(self):
+        self.stream.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.close()
+
+    def __del__(self):
+        self.close()
+
     def _logger(self):
         return Logger._logger(self)
 

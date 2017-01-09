@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from hachoir.core.stream import FileInputStream
+from hachoir.stream import FileInputStream
 from hachoir.core import config
 from hachoir.subfile.search import SearchSubfile
 from hachoir.core.cmd_line import displayVersion
@@ -84,16 +84,17 @@ def main():
     values, filename, output = parseOptions()
     config.quiet = True
     stream = FileInputStream(filename)
-    subfile = SearchSubfile(stream, values.offset, values.size)
-    subfile.verbose = not(values.quiet)
-    subfile.debug = values.debug
-    if output:
-        subfile.setOutput(output)
-    if values.profiler:
-        from hachoir.core.profiler import runProfiler
-        ok = runProfiler(runSearch, (subfile, values))
-    else:
-        ok = runSearch(subfile, values)
+    with stream:
+        subfile = SearchSubfile(stream, values.offset, values.size)
+        subfile.verbose = not(values.quiet)
+        subfile.debug = values.debug
+        if output:
+            subfile.setOutput(output)
+        if values.profiler:
+            from hachoir.core.profiler import runProfiler
+            ok = runProfiler(runSearch, (subfile, values))
+        else:
+            ok = runSearch(subfile, values)
     exit(int(not ok))
 
 

@@ -85,18 +85,19 @@ def processFile(values, filename,
         error("Unable to parse file: %s" % filename)
         return False
 
-    # Extract metadata
-    extract_metadata = not(values.mime or values.type)
-    if extract_metadata:
-        try:
-            metadata = extractMetadata(parser, values.quality)
-        except Exception as err:
-            error(str(err))
-            metadata = None
-        if not metadata:
-            parser.error("Hachoir can't extract metadata, but is able to parse: %s"
-                         % filename)
-            return False
+    with parser:
+        # Extract metadata
+        extract_metadata = not(values.mime or values.type)
+        if extract_metadata:
+            try:
+                metadata = extractMetadata(parser, values.quality)
+            except Exception as err:
+                error(str(err))
+                metadata = None
+            if not metadata:
+                parser.error("Hachoir can't extract metadata, but is able to parse: %s"
+                             % filename)
+                return False
 
     if display:
         # Display metadatas on stdout

@@ -216,7 +216,9 @@ def stripEditor(editor, filename, level, verbose):
 
     if stripper():
         output = FileOutputStream(filename)
-        editor.writeInto(output)
+        with output:
+            editor.writeInto(output)
+
         size = stripper.stripped_bytes
         if size:
             percent = "%.1f%%" % (float(size) * 100 / editor.input.size)

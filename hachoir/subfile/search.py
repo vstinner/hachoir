@@ -94,6 +94,7 @@ class SearchSubfile:
             main_error = True
             print("[!] Memory error!", file=stderr)
         self.mainFooter()
+        self.stream.close()
         return not(main_error)
 
     def mainHeader(self):

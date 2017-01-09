@@ -141,6 +141,11 @@ class ConsoleGrep(Grep):
 
     def searchFile(self, filename, pattern, case_sensitive=True):
         self.filename = filename
+        self.case_sensitive = case_sensitive
+        if pattern and not self.case_sensitive:
+            pattern = pattern.lower()
+        self.pattern = pattern
+
         try:
             self.parser = createParser(self.filename)
         except InputStreamError as err:
@@ -149,18 +154,16 @@ class ConsoleGrep(Grep):
         if not self.parser:
             error("Unable to parse file: %s" % self.filename)
             sys.exit(1)
-        self.case_sensitive = case_sensitive
-        if pattern and not self.case_sensitive:
-            pattern = pattern.lower()
-        self.pattern = pattern
-        try:
-            self.grep(self.parser)
-        except IOError as err:
-            if err[0] == errno.EPIPE:
-                # Ignore broken PIPE error
-                return
-            else:
-                raise
+
+        with self.parser:
+            try:
+                self.grep(self.parser)
+            except IOError as err:
+                if err[0] == errno.EPIPE:
+                    # Ignore broken PIPE error
+                    return
+                else:
+                    raise
 
 
 def runGrep(values, pattern, filenames):

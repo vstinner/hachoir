@@ -2,6 +2,13 @@
 Changelog
 +++++++++
 
+hachoir 3.0a2
+=============
+
+* Fix ResourceWarning warnings on files. Add a close() method and support for
+  the context manager protocol ("with obj: ...") to parsers, input and output
+  streams.
+
 hachoir 3.0a1 (2017-01-09)
 ==========================
 
