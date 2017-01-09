@@ -2,6 +2,10 @@
 Hachoir
 *******
 
+.. image:: https://img.shields.io/pypi/v/hachoir3.svg
+   :alt: Latest release on the Python Cheeseshop (PyPI)
+   :target: https://pypi.python.org/pypi/hachoir3
+
 .. image:: https://travis-ci.org/haypo/hachoir3.svg?branch=master
    :alt: Build status of hachoir3 on Travis CI
    :target: https://travis-ci.org/haypo/hachoir3
