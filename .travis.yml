@@ -5,3 +5,6 @@ env:
   - TOXENV=pep8
 install: pip install -U tox
 script: tox
+notifications:
+  email:
+    - victor.stinner@gmail.com
