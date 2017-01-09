@@ -5,13 +5,26 @@ include ChangeLog
 include INSTALL
 include MANIFEST.in
 include README.rst
-include TODO
+include TODO.rst
 include tox.ini
 include .travis.yml
 include runtests.py
 include hachoir-metadata-csv
 include run_testcase.py
 
-include doc/*.rst doc/conf.py doc/make.bat doc/Makefile
+include doc/*.rst doc/conf.py doc/make.bat doc/Makefile doc/gen_parser_list.py
 
 include tests/*.py tests/*.rst tests/files/*
+
+# IGNORED files:
+#
+# hachoir-core/
+# hachoir-gtk/
+# hachoir-http/
+# hachoir-metadata-gtk
+# hachoir-metadata-qt
+# hachoir-wx/
+# hachoir/metadata/qt/dialog.ui
+# old-hachoir-metadata/
+# tools/download_random/
+# tools/*.py

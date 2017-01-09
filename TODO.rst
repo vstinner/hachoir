@@ -6,6 +6,7 @@ TODO
 ====
 
 * Fix hachoir-subfile: hachoir.regex only supports Unicode?
+* Remove old files? See MANIFEST.in for the list of "IGNORED files"
 * Write more tests:
 
   - use coverage to check which parsers are never tested
@@ -18,6 +19,7 @@ TODO
 * test hachoir-http
 * convert remaining wiki pages
 * runtests.py: unclosed files ; reference cycle somewhere
+
 
 subfile
 =======
