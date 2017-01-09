@@ -26,4 +26,5 @@ class ISO9660_Metadata(RootMetadata):
             int(value[8:10]), int(value[10:12]), int(value[12:14]))
         setattr(self, key, value)
 
+
 registerExtractor(ISO9660, ISO9660_Metadata)

@@ -136,6 +136,7 @@ def parsePlugin(parser):
     if 0 < size < parser.current_size + parser._size:
         yield XPlugData(parser, "xplug_data")
 
+
 # Format: "XXXX": (type, count, name)
 EXTENSIONS = {
     # WriteInstrumentHeaderStruct@Sndfile.cpp

@@ -296,6 +296,8 @@ class PropertyContent(FieldSet):
         else:
             yield handler(self, "value", **kw)
             self.createValue = lambda: self["value"].value
+
+
 PropertyContent.TYPE_INFO[12] = ("VARIANT", PropertyContent)
 
 

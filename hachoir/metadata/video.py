@@ -416,6 +416,7 @@ class AsfMetadata(MultipleMetadata):
 #                else:
 #                    meta.compression = text
 
+
 registerExtractor(MovFile, MovMetadata)
 registerExtractor(AsfFile, AsfMetadata)
 registerExtractor(FlvFile, FlvMetadata)

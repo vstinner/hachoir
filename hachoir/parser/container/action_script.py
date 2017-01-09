@@ -82,6 +82,7 @@ class FlashFloat64(FieldSet):
         bytes = bytes[4:8] + bytes[0:4]
         return unpack('<d', bytes)[0]
 
+
 TYPE_INFO = {
     0x00: (CString, "Cstring[]"),
     0x01: (Float32, "Float[]"),

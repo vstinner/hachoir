@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 from math import log
 
+
 class Entropy:
+
     def __init__(self):
         self.frequence = dict((index, 0) for index in range(0, 256))
         self.count = 0
@@ -24,7 +26,9 @@ class Entropy:
 from time import time
 from sys import stderr
 
+
 class EntropyFile(Entropy):
+
     def __init__(self):
         Entropy.__init__(self)
         self.progress_time = 1.0
@@ -42,7 +46,7 @@ class EntropyFile(Entropy):
             raise ValueError("Empty stream")
 
         # Read stream content
-        stream.seek(0,0)
+        stream.seek(0, 0)
         next_msg = time() + self.progress_time
         while True:
             if next_msg <= time():
@@ -59,6 +63,7 @@ class EntropyFile(Entropy):
         self.readStream(stream)
         return self
 
+
 def main():
     from sys import argv, exit
     if len(argv) != 2:
@@ -71,4 +76,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

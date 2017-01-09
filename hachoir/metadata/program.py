@@ -98,4 +98,5 @@ class ExeMetadata(RootMetadata):
             elif key not in self.SKIP_KEY:
                 self.comment = "%s=%s" % (key, value)
 
+
 registerExtractor(ExeFile, ExeMetadata)

@@ -54,4 +54,5 @@ class DatetimeFilter(Filter):
         else:
             return (self.min_date <= value <= self.max_date)
 
+
 DATETIME_FILTER = DatetimeFilter()

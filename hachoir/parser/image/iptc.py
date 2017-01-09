@@ -21,6 +21,7 @@ def IPTC_String(parent, name, desc=None):
     return String(parent, name, parent["size"].value, desc,
                   strip=" ")
 
+
 dataset1 = {
 }
 dataset2 = {

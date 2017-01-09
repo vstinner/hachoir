@@ -1,6 +1,5 @@
 from wx import ListCtrl, PreListCtrl, EVT_WINDOW_CREATE, CallAfter
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
-from sys import maxsize
 from hachoir.core.i18n import _
 
 

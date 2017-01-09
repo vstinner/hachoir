@@ -35,6 +35,8 @@ def timestampMac64(value):
     if not isinstance(value, (float, int)):
         raise TypeError("an integer or float is required")
     return MAC_TIMESTAMP_T0 + timedelta(seconds=value)
+
+
 TimestampMac64 = timestampFactory("TimestampMac64", timestampMac64, 64)
 
 
@@ -54,6 +56,7 @@ def fixedFloatFactory(name, int_bits, float_bits, doc):
     klass = Float
     klass.__name__ = name
     return klass
+
 
 QTFloat16 = fixedFloatFactory("QTFloat32", 8, 8, "8.8 fixed point number")
 QTFloat32 = fixedFloatFactory("QTFloat32", 16, 16, "16.16 fixed point number")
@@ -165,9 +168,7 @@ class LanguageCode(FieldSet):
         26: 'Hungarian',
         27: 'Estonian',
         28: 'Latvian',
-        28: 'Lettish',
         29: 'Lappish',
-        29: 'Saamisk',
         30: 'Faeroese',
         31: 'Farsi',
         32: 'Russian',

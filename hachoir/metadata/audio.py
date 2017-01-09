@@ -30,6 +30,7 @@ def computeBitRate(meta):
     meta.bit_rate = meta.get('bits_per_sample') * \
         meta.get('nb_channel') * meta.get('sample_rate')
 
+
 VORBIS_KEY_TO_ATTR = {
     "ARTIST": "artist",
     "ALBUM": "album",
@@ -421,6 +422,7 @@ class FlacMetadata(RootMetadata):
         if sec:
             sec = float(sec) / info["sample_hertz"].value
             self.duration = timedelta(seconds=sec)
+
 
 registerExtractor(AuFile, AuMetadata)
 registerExtractor(MpegAudioFile, MpegAudioMetadata)

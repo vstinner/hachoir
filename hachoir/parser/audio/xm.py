@@ -27,6 +27,7 @@ from hachoir.parser.common.tracker import NOTE_NAME
 def parseSigned(val):
     return "%i" % (val.value - 128)
 
+
 # From dumb
 SEMITONE_BASE = 1.059463094359295309843105314939748495817
 PITCH_BASE = 1.000225659305069791926712241547647863626
@@ -165,6 +166,7 @@ class Instrument(FieldSet):
         return "Instrument '%s': %i samples, header %i bytes" % \
                (self["name"].value, self["samples"].value, self["size"].value)
 
+
 VOLUME_NAME = (
     "Volume slide down", "Volume slide up", "Fine volume slide down",
     "Fine volume slide up", "Set vibrato speed", "Vibrato",
@@ -199,6 +201,7 @@ class NoteInfo(StaticFieldSet):
         (RealBit, "has_instrument"),
         (RealBit, "has_note")
     )
+
 
 EFFECT_NAME = (
     "Arppegio", "Porta up", "Porta down", "Tone porta", "Vibrato",

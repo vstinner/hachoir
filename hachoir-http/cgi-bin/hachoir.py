@@ -6,17 +6,19 @@ Creation date: June 28 2007
 
 """
 
-import sys # for stdout, stderr, argv
-import os # for environ, listdir, stat, unlink
-import time # for time
-import hashlib # for md5
-import random # for random
+import sys  # for stdout, stderr, argv
+import os  # for environ, listdir, stat, unlink
+import time  # for time
+import hashlib  # for md5
+import random  # for random
 import cPickle
 from cStringIO import StringIO
 
 from Cookie import SimpleCookie
 import cgi
-import cgitb; cgitb.enable()
+import cgitb
+
+cgitb.enable()
 
 from hachoir.core.tools import alignValue
 from hachoir.field import Field, SubFile
@@ -25,7 +27,8 @@ from hachoir.stream.input import FileFromInputStream, InputSubStream
 from hachoir.parser.guess import guessParser
 
 # from http://code.activestate.com/recipes/273844/
-try: # Windows needs stdio set for binary mode.
+try:
+    # Windows needs stdio set for binary mode.
     import msvcrt
     msvcrt.setmode (0, os.O_BINARY) # stdin  = 0
     msvcrt.setmode (1, os.O_BINARY) # stdout = 1

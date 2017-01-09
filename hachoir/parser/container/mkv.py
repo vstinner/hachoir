@@ -134,6 +134,7 @@ def Float(parent):
     else:
         return RawBytes(parent, 'INVALID_FLOAT', size)
 
+
 TIMESTAMP_T0 = datetime(2001, 1, 1)
 
 
@@ -259,6 +260,7 @@ class Block(FieldSet):
             yield Lace(self, lacing - 1, size - 1)
         else:
             yield RawBytes(self, 'frame', size)
+
 
 ebml = {
     0x1A45DFA3: ('EBML[]', {

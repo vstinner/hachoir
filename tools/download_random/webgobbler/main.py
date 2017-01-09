@@ -3,8 +3,10 @@
 total = 100
 directory = "imagepool"
 
+
 from webgobbler import imagePool, applicationConfig
 from time import sleep
+
 
 config = applicationConfig()
 config["pool.keepimages"] = True

@@ -606,7 +606,7 @@ class ExcelWorkbook(OLE2FragmentParser):
                   0x0d7: "DBCELL",
                   0x0d8: "SXNUMGROUP",  # from OO : numerical grouping in pivot cache field
                   0x0da: "BOOKBOOL",
-                  0x0dc: "PARAMQRY",  # DUPLICATE dc
+                  # 0x0dc: "PARAMQRY",  # DUPLICATE dc
                   0x0dc: "SXEXT",  # DUPLICATE dc
                   0x0dd: "SCENPROTECT",
                   0x0de: "OLESIZE",
@@ -787,6 +787,7 @@ class ThumbsCatalog(OLE2FragmentParser):
         yield UInt32(self, "unknown[]")
         for i in range(self['count'].value):
             yield ThumbsCatalog.ThumbsEntry(self, "entry[]")
+
 
 PROPERTY_NAME = {
     "Root Entry": ("root", RootEntry),

@@ -25,7 +25,6 @@
 
 from imp import load_source
 from os import path
-from sys import argv
 from setuptools import find_packages
 
 SCRIPTS = [
@@ -80,6 +79,7 @@ def main():
         "zip_safe": True,
     }
     setup(**install_options)
+
 
 if __name__ == "__main__":
     main()

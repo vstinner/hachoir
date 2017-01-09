@@ -96,6 +96,7 @@ def parseOr(text, start):
         regex = RegexEmpty()
     return regex, index
 
+
 REPEAT_REGEX = re.compile("([0-9]+)(,[0-9]*)?}")
 
 
@@ -119,6 +120,7 @@ def parseRepeat(text, start):
     else:
         rmax = rmin
     return (rmin, rmax, match.end(0))
+
 
 CHAR_TO_FUNC = {'[': parseRange, '(': parseOr}
 CHAR_TO_CLASS = {'.': RegexDot, '^': RegexStart, '$': RegexEnd}
@@ -200,6 +202,7 @@ def parse(text):
     regex, index = _parse(text)
     assert index == len(text)
     return regex
+
 
 if __name__ == "__main__":
     import doctest

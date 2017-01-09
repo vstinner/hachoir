@@ -978,14 +978,16 @@ in HKEY_CURRENT_USER\Software\sebsauvage.net\webGobbler)
 
 # Disable the warning generated when importing psyco:
 import warnings
-warnings.filterwarnings(action = 'ignore',message='.*?no locals\(\) in functions bound by Psyco')
+warnings.filterwarnings(
+    action='ignore', message='.*?no locals\(\) in functions bound by Psyco')
 
 # Psyco will speed up the program by a factor of x2 to x100 without touching the rest of the code.
-# If you have random lockups on heavy load, comment the whole try/except block below:
+# If you have random lockups on heavy load, comment the whole try/except
+# block below:
 try:
     import psyco
     psyco.full()
-    #print 'Program accelerated by Psyco.'
+    # print 'Program accelerated by Psyco.'
 except:
     pass
 
@@ -1003,17 +1005,23 @@ import sys
 
 # We trap this and create dummy stdin/stdout/stderr so that all print and log statements
 # in this programm will work anyway.
-# This is needed when bundling webGobbler with cx_Freeze with the console-less stub.
+# This is needed when bundling webGobbler with cx_Freeze with the
+# console-less stub.
 try:
     sys.stdout.write("\r")
     sys.stdout.flush()
 except IOError:
     class dummyStream:
         ''' dummyStream behaves like a stream but does nothing. '''
+
         def __init__(self): pass
-        def write(self,data): pass
-        def read(self,data): pass
+
+        def write(self, data): pass
+
+        def read(self, data): pass
+
         def flush(self): pass
+
         def close(self): pass
     # and now redirect all default streams to this dummyStream:
     sys.stdout = dummyStream()
@@ -1054,51 +1062,52 @@ import logging
 socket.setdefaulttimeout(15)
 
 try:
-  import Image
-  # Note: For cx_freeze or py2exe, we need to import each image plugin individually:
-  import ArgImagePlugin
-  import BmpImagePlugin
-  import CurImagePlugin
-  import DcxImagePlugin
-  import EpsImagePlugin
-  import FliImagePlugin
-  import FpxImagePlugin
-  import GbrImagePlugin
-  import GifImagePlugin
-  import IcoImagePlugin
-  import ImImagePlugin
-  import ImtImagePlugin
-  import IptcImagePlugin
-  import JpegImagePlugin
-  import McIdasImagePlugin
-  import MicImagePlugin
-  import MpegImagePlugin
-  import MspImagePlugin
-  import PalmImagePlugin
-  import PcdImagePlugin
-  import PcxImagePlugin
-  import PdfImagePlugin
-  import PixarImagePlugin
-  import PngImagePlugin
-  import PpmImagePlugin
-  import PsdImagePlugin
-  import SgiImagePlugin
-  import SunImagePlugin
-  import TgaImagePlugin
-  import TiffImagePlugin
-  import WmfImagePlugin
-  import XbmImagePlugin
-  import XpmImagePlugin
-  import XVThumbImagePlugin
+    import Image
+    # Note: For cx_freeze or py2exe, we need to import each image plugin
+    # individually:
+    import ArgImagePlugin
+    import BmpImagePlugin
+    import CurImagePlugin
+    import DcxImagePlugin
+    import EpsImagePlugin
+    import FliImagePlugin
+    import FpxImagePlugin
+    import GbrImagePlugin
+    import GifImagePlugin
+    import IcoImagePlugin
+    import ImImagePlugin
+    import ImtImagePlugin
+    import IptcImagePlugin
+    import JpegImagePlugin
+    import McIdasImagePlugin
+    import MicImagePlugin
+    import MpegImagePlugin
+    import MspImagePlugin
+    import PalmImagePlugin
+    import PcdImagePlugin
+    import PcxImagePlugin
+    import PdfImagePlugin
+    import PixarImagePlugin
+    import PngImagePlugin
+    import PpmImagePlugin
+    import PsdImagePlugin
+    import SgiImagePlugin
+    import SunImagePlugin
+    import TgaImagePlugin
+    import TiffImagePlugin
+    import WmfImagePlugin
+    import XbmImagePlugin
+    import XpmImagePlugin
+    import XVThumbImagePlugin
 
-  import ImageFile
-  import ImageOps
-  import ImageEnhance
-  import ImageFilter
-  import ImageChops
-  import ImageDraw
+    import ImageFile
+    import ImageOps
+    import ImageEnhance
+    import ImageFilter
+    import ImageChops
+    import ImageDraw
 except ImportError, exc:
-  raise ImportError, "The PIL (Python Imaging Library) is required to run this program. See http://www.pythonware.com/products/pil/\nCould not import module because: %s" % exc
+    raise ImportError, "The PIL (Python Imaging Library) is required to run this program. See http://www.pythonware.com/products/pil/\nCould not import module because: %s" % exc
 
 
 CTYPES_AVAILABLE = True
@@ -1112,21 +1121,22 @@ except ImportError:
 # when webGobbler is still running.
 # (This mutex is not re-used in any other part of webGobbler).
 WEBGOBBLER_MUTEX = None
-if CTYPES_AVAILABLE and sys.platform=="win32":
+if CTYPES_AVAILABLE and sys.platform == "win32":
     try:
-        WEBGOBBLER_MUTEX = ctypes.windll.kernel32.CreateMutexA(None, False, "sebsauvage_net_webGobbler_running")
+        WEBGOBBLER_MUTEX = ctypes.windll.kernel32.CreateMutexA(
+            None, False, "sebsauvage_net_webGobbler_running")
     except:
-        pass  # If any error occured, nevermind the mutex: it's not critical for webGobbler.
-              # (It's only an installer issue.)
-
-
+        # If any error occured, nevermind the mutex: it's not critical for
+        # webGobbler.
+        pass
+        # (It's only an installer issue.)
 
 
 # FIXME: Code some unit-testing !
 # FIXME: Pychecker the code often !
 # FIXME: Profile the code with the profile module, then optimize.
 
-# === Globals ==================================================================
+# === Globals ============================================================
 
 # webGobbler logo
 # FIXME: How can I automatically paste GIF/PNG with its transparency ?
@@ -1237,7 +1247,8 @@ EbbOMbbskLbHAbb2Mba9UbZmG7fTMQ7VoQujYCRIoiRM4iRGIAVl0AeWAAvFYA3hcA7BsR+0gbZp
 4RfNcB3ZsR3d8R1l0AZ5gAicAAvEQA3ggA7woRahUbqqe7yvm7zKS7zHa7qm0brLG72XcRZbUb3W
 e70t0RN98ReBMRjFUz+UUuAJZ3MMwHsOXYu96Ju+6ru+7Nu+7vu+CeETQCEURKGkSbEUvmAMz5AN
 hbsOoQu/ABzAAjzABFzA8GsRGKERHGEvIbEwJoES/2vAEjzBFNwQAQEAOw==""")))
-WEBGOBBLER_LOGO_TRANSPARENCY = WEBGOBBLER_LOGO_TRANSPARENCY.convert("L") # Force greyscale
+WEBGOBBLER_LOGO_TRANSPARENCY = WEBGOBBLER_LOGO_TRANSPARENCY.convert(
+    "L")  # Force greyscale
 
 
 PLEASE_WAIT_IMAGE = Image.open(StringIO.StringIO(base64.decodestring("""
@@ -1257,7 +1268,7 @@ HIUWXohhhhpuyGGHHn4IogIFAAA7""")))
 VERSION = "webGobbler 1.2.6"
 
 # License text will be used in the GUI.
-LICENSE='''This program is distributed under the OSI-certified zlib/libpng license.
+LICENSE = '''This program is distributed under the OSI-certified zlib/libpng license.
 http://www.opensource.org/licenses/zlib-license.php
 
 This software is provided 'as-is', without any express or implied warranty.
@@ -1279,7 +1290,7 @@ subject to the following restrictions:
     3. This notice may not be removed or altered from any source distribution.'''
 
 # Disclaimer text will be used in the GUI.
-DISCLAIMER='''IMPORTANT - READ
+DISCLAIMER = '''IMPORTANT - READ
 
 This program downloads random images from the internet, which may include
 pornography or any morally objectionable or illegal material.
@@ -1302,15 +1313,15 @@ from the original image rights owners for each image composing the whole image.
 last_used_images.html file in the image pool directory.)'''
 
 
-
 # Default list of blacklisted images (based on their content)
 # These images will be discarded, whatever the name of the file or the
 # website address.
 # (You can do a sha1sum on the image you want to blacklist and put the SHA1 here)
 # (This list may be overwritten by saved configuration (.INI file or registry.))
-BLACKLIST_IMAGESHA1 = { 'f521b7763f6dc35a8f6d8fdda35c7176eb2ed21c' : 0,  # deviantArt.com "Poetry and prose" logo
-                        'd6ee67a52d8fbef935225de1363847d30a86b5de' : 0,  # FortuneCity hosting/domaine names logo
-                      }
+BLACKLIST_IMAGESHA1 = {'f521b7763f6dc35a8f6d8fdda35c7176eb2ed21c': 0,  # deviantArt.com "Poetry and prose" logo
+                       # FortuneCity hosting/domaine names logo
+                       'd6ee67a52d8fbef935225de1363847d30a86b5de': 0,
+                       }
 
 
 # Default list of blacklisted URLs
@@ -1318,22 +1329,24 @@ BLACKLIST_IMAGESHA1 = { 'f521b7763f6dc35a8f6d8fdda35c7176eb2ed21c' : 0,  # devia
 # You can use * in URLs.   An implicit * will be added at end (?a AdBlock)
 # Examples: BLACKLIST_URL = [ 'http://*.doubleclick.net/', 'http://ads.*.*/', 'http://*.*.*/adserver/','*/banners/' ]
 # (This list may be overwritten by saved configuration (.INI file or registry.))
-BLACKLIST_URL = [ 'http://www.flickr.com/images/photo_unavailable.gif' ]
+BLACKLIST_URL = ['http://www.flickr.com/images/photo_unavailable.gif']
 
 
 # Accepted MIME type.
 # Only these types will be considered images and downloaded.
 # key=MIME type (Content-Type),  value=file extension (which will be used to save
 # the file in the imagepool directory)
-ACCEPTED_MIME_TYPES = { 'image/jpeg': '.jpg',
-                        'image/gif' : '.gif',
-                        'image/png' : '.png',
-                        'image/bmp' : '.bmp',   # Microsoft Windows space-hog file format
-                        'image/pcx' : '.pcx',   # old ZSoft/Microsoft PCX format (used in Paintbrush)
-                        'image/tiff': '.tiff'
-                      }
+ACCEPTED_MIME_TYPES = {'image/jpeg': '.jpg',
+                       'image/gif': '.gif',
+                       'image/png': '.png',
+                       'image/bmp': '.bmp',   # Microsoft Windows space-hog file format
+                       # old ZSoft/Microsoft PCX format (used in Paintbrush)
+                       'image/pcx': '.pcx',
+                       'image/tiff': '.tiff'
+                       }
 
 # ---------------------------------------------------------------------------------------
+
 
 class applicationConfig(dict):
     ''' An object capable of storing program configuration (in the form of a dictionary).
@@ -1367,60 +1380,100 @@ class applicationConfig(dict):
     # (key=parameter name, value=value of this parameter)
     # Here are the default values:
     DEFAULTCONFIG = {
-            "network.http.proxy.enabled" : False,           # (boolean) If true, will use a proxy (--proxy)
-            "network.http.proxy.address" : "proxy.free.fr", # (string)  Address of proxy (example)
-            "network.http.proxy.port"    : 3128,            # (integer) Port of proxy (example)
-            "network.http.proxy.auth.enabled" : False,      # (boolean) Proxy requires authentication (--proxyauth)
-            "network.http.proxy.auth.login"   : "",         # (string)  Login for proxy.
-            "network.http.proxy.auth.password": "",         # (string)  Password for proxy.
-            "network.http.useragent"     : "webGobbler/1.2.6",# (string) User-agent passed in HTTP requests.
-            "collector.maximumimagesize" : 2000000,         # (integer) Maximum image file size in bytes. If a picture is bigger than this, it will not be downloaded.
-            "collector.acceptedmimetypes": ACCEPTED_MIME_TYPES, # (dictionary)  List of image types which will be downloaded.
-            "collector.localonly"        : False,           # (boolean) If true, will collect images from local disk instead of internet (--localonly)
-            "collector.localonly.startdir" : "/",           # (string) When using local disk only, the directory to scan for images (default="/"=Whole disk.)
-            "collector.keywords.enabled" : False,           # (boolean) Use keywords for image search. If False, random generated words will be used.
-            "collector.keywords.keywords": "cats",          # (string) Keyword(s) for keyword search. Can be a single word or several words separated with a space (eg."cats dogs")
-            "pool.imagepooldirectory"    : "imagepool",     # (string)  Directory where to store image pool (--pooldirectory)
-            "pool.nbimages"              : 50,              # (integer) Minimum number of images to maintain in pool (--poolnbimages)
-            "pool.sourcemark"            : "--- Picture taken from ", # (string) String used to store image source in image files.
-                                                   # If you change this string, you will have to delete all images from your pool.
-            "pool.keepimages"            : False,           # (boolean) Do not delete images from the pool after use (--keepimage)
-            "assembler.sizex"            : 1024,            # (integer) Width of image to generate (--resolution). Ignored for wallpaper changer and screensaver.
-            "assembler.sizey"            :  768,            # (integer) Height of image to generate (--resolution). Ignored for wallpaper changer and screensaver.
-            "assembler.mirror"           : False,           # (boolean) Horizontal mirror of image (to render text unreadable) (--mirror)
-            "assembler.invert"           : False,           # (boolean) Invert (negative) final picture before saving (--invert)
-            "assembler.emboss"           : False,           # (boolean) Emboss the final picture before saving (--emboss)
-            "assembler.resuperpose"      : False,           # (boolean) Rotates and re-superposes the final image on itself.
-            "assembler.superpose.nbimages": 10,             # (integer) Number of images to superpose on each new image (--nbimages)
-            "assembler.superpose.randomrotation": True,     # (boolean) Rotate images randomly (--norotation to disable)
-            "assembler.superpose.variante": 0,              # (integer) Variantes of the superpose assembler (this give different results) (--variante).
-                                                            # 0=Equalize (default, recommended), 1=Darkening+autoConstrast.
-            "assembler.superpose.bordersmooth": 30,         # (integer) Size of border smooth (0 to disable border smooth.)
-            "assembler.superpose.scale": float(1.0),        # (float) Scale images before superposing them (--scale)
-            "persistencedirectory"       : ".",             # (string) Directory where classes save their data between program runs
-            "program.every"              : 60,              # (integer) Generate a new image every n seconds (--every)
-            "debug"                      : False,           # (boolean) debug mode (True will display various activity on screen and log into the file webGobbler.log) (--debug)
-            "blacklist.imagesha1"        : BLACKLIST_IMAGESHA1, # (dictionary: key=hex SHA1 (string), value=0) List of images to blacklist (based on their content)
-            "blacklist.url"              : BLACKLIST_URL,   # (list of strings) List of blacklisted URLs.
-            "blacklist.url_re"           : []               # (list of regular expression objets) Same as blacklist.url, but compiled as regular expressions.
-                                                            # (blacklist.url_re is automatically compiled from blacklist.url)
-            }
+        # (boolean) If true, will use a proxy (--proxy)
+        "network.http.proxy.enabled": False,
+        # (string)  Address of proxy (example)
+        "network.http.proxy.address": "proxy.free.fr",
+        # (integer) Port of proxy (example)
+        "network.http.proxy.port": 3128,
+        # (boolean) Proxy requires authentication (--proxyauth)
+        "network.http.proxy.auth.enabled": False,
+        # (string)  Login for proxy.
+        "network.http.proxy.auth.login": "",
+        # (string)  Password for proxy.
+        "network.http.proxy.auth.password": "",
+        # (string) User-agent passed in HTTP requests.
+        "network.http.useragent": "webGobbler/1.2.6",
+        # (integer) Maximum image file size in bytes. If a picture is bigger than this, it will not be downloaded.
+        "collector.maximumimagesize": 2000000,
+        # (dictionary)  List of image types which will be downloaded.
+        "collector.acceptedmimetypes": ACCEPTED_MIME_TYPES,
+        # (boolean) If true, will collect images from local disk instead of internet (--localonly)
+        "collector.localonly": False,
+        # (string) When using local disk only, the directory to scan for images (default="/"=Whole disk.)
+        "collector.localonly.startdir": "/",
+        # (boolean) Use keywords for image search. If False, random generated words will be used.
+        "collector.keywords.enabled": False,
+        # (string) Keyword(s) for keyword search. Can be a single word or several words separated with a space (eg."cats dogs")
+        "collector.keywords.keywords": "cats",
+        # (string)  Directory where to store image pool (--pooldirectory)
+        "pool.imagepooldirectory": "imagepool",
+        # (integer) Minimum number of images to maintain in pool (--poolnbimages)
+        "pool.nbimages": 50,
+        # (string) String used to store image source in image files.
+        "pool.sourcemark": "--- Picture taken from ",
+        # If you change this string, you will have to delete all images from
+        # your pool.
+        # (boolean) Do not delete images from the pool after use (--keepimage)
+        "pool.keepimages": False,
+        # (integer) Width of image to generate (--resolution). Ignored for wallpaper changer and screensaver.
+        "assembler.sizex": 1024,
+        # (integer) Height of image to generate (--resolution). Ignored for wallpaper changer and screensaver.
+        "assembler.sizey":  768,
+        # (boolean) Horizontal mirror of image (to render text unreadable) (--mirror)
+        "assembler.mirror": False,
+        # (boolean) Invert (negative) final picture before saving (--invert)
+        "assembler.invert": False,
+        # (boolean) Emboss the final picture before saving (--emboss)
+        "assembler.emboss": False,
+        # (boolean) Rotates and re-superposes the final image on itself.
+        "assembler.resuperpose": False,
+        # (integer) Number of images to superpose on each new image (--nbimages)
+        "assembler.superpose.nbimages": 10,
+        # (boolean) Rotate images randomly (--norotation to disable)
+        "assembler.superpose.randomrotation": True,
+        # (integer) Variantes of the superpose assembler (this give different results) (--variante).
+        "assembler.superpose.variante": 0,
+        # 0=Equalize
+        # (default,
+        # recommended),
+        # 1=Darkening+autoConstrast.
+        # (integer) Size of border smooth (0 to disable border smooth.)
+        "assembler.superpose.bordersmooth": 30,
+        # (float) Scale images before superposing them (--scale)
+        "assembler.superpose.scale": float(1.0),
+        # (string) Directory where classes save their data between program runs
+        "persistencedirectory": ".",
+        # (integer) Generate a new image every n seconds (--every)
+        "program.every": 60,
+        # (boolean) debug mode (True will display various activity on screen and log into the file webGobbler.log) (--debug)
+        "debug": False,
+        # (dictionary: key=hex SHA1 (string), value=0) List of images to blacklist (based on their content)
+        "blacklist.imagesha1": BLACKLIST_IMAGESHA1,
+        # (list of strings) List of blacklisted URLs.
+        "blacklist.url": BLACKLIST_URL,
+        # (list of regular expression objets) Same as blacklist.url, but compiled as regular expressions.
+        "blacklist.url_re": []
+        # (blacklist.url_re is automatically compiled from blacklist.url)
+    }
 
-    # FIXME: Add explanations on each parameter ? (in another dictionary with the same keys ? CONFIG_HELP ?))
+    # FIXME: Add explanations on each parameter ? (in another dictionary with
+    # the same keys ? CONFIG_HELP ?))
 
     # The following parameters will not be exported to INI or registry, nor imported.
     # (Mostly because they are code dependant.)
     NONEXPORTABLE_PARAMETERS = {
-        "collector.acceptedmimetypes":0,
-        "collector.maximumimagesize":0,
+        "collector.acceptedmimetypes": 0,
+        "collector.maximumimagesize": 0,
         "blacklist.url_re": 0,
-        "pool.sourcemark":0,
-        "network.http.useragent":0
-        }
+        "pool.sourcemark": 0,
+        "network.http.useragent": 0
+    }
 
-    CONFIG_FILENAME =".webGobblerConf"  # Name of configuration file.
+    CONFIG_FILENAME = ".webGobblerConf"  # Name of configuration file.
     CONFIG_SECTIONNAME = "webGobbler"  # Name of section in .INI files.
-    CONFIG_REGPATH = "Software\\sebsauvage.net\\webGobbler"  # Registry key containing configuration
+    # Registry key containing configuration
+    CONFIG_REGPATH = "Software\\sebsauvage.net\\webGobbler"
 
     # Maybe I could do a better job on configuration with this:
     # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/303347
@@ -1428,10 +1481,11 @@ class applicationConfig(dict):
     def __init__(self):
         dict.__init__(self)
         self.data = {}
-        self.update( applicationConfig.DEFAULTCONFIG ) # Start with default configuration:
+        # Start with default configuration:
+        self.update(applicationConfig.DEFAULTCONFIG)
 
-    def __setitem(self,key,value):
-        if not isinstance(key,basestring):
+    def __setitem(self, key, value):
+        if not isinstance(key, basestring):
             raise TypeError, "applicationConfig only accepts strings as keys."
 
         self.data[key] = value   # Store the value
@@ -1443,10 +1497,13 @@ class applicationConfig(dict):
             for s in value:
                 # We escape all characters in s, except * which we replace with .+?
                 # We also add an implicit .+? at end.
-                # Example: 'http://*.xiti.com/'  -->  'http\:\/\/.+?\.xiti\.com\/.+?'
-                if not s.endswith('*'):     s += '*'
+                # Example: 'http://*.xiti.com/'  -->
+                # 'http\:\/\/.+?\.xiti\.com\/.+?'
+                if not s.endswith('*'):
+                    s += '*'
                 s = '.+?'.join([re.escape(ss) for ss in s.split('*')])
-                self.data['blacklist.url_re'].append( re.compile(s,re.IGNORECASE) )
+                self.data['blacklist.url_re'].append(
+                    re.compile(s, re.IGNORECASE))
 
     def toINI(self):
         ''' Outputs the configuration as a .INI file.
@@ -1459,16 +1516,22 @@ class applicationConfig(dict):
             if key not in applicationConfig.NONEXPORTABLE_PARAMETERS:
                 # Serialize some special parameters:
                 if key == 'network.http.proxy.auth.password':
-                    cp.set(applicationConfig.CONFIG_SECTIONNAME,key,self._garble(self[key])) # Garble the password.
+                    # Garble the password.
+                    cp.set(applicationConfig.CONFIG_SECTIONNAME,
+                           key, self._garble(self[key]))
                 elif key == 'blacklist.imagesha1':  # Serialize the list of blacklisted images
-                    cp.set(applicationConfig.CONFIG_SECTIONNAME,key,'|'.join(self[key].keys()))
+                    cp.set(applicationConfig.CONFIG_SECTIONNAME,
+                           key, '|'.join(self[key].keys()))
                 elif key == 'blacklist.url':  # Serialize the list of blacklisted URLs
-                    cp.set(applicationConfig.CONFIG_SECTIONNAME,key,'|'.join([url.replace('%','%%') for url in self[key]]))
+                    cp.set(applicationConfig.CONFIG_SECTIONNAME, key, '|'.join(
+                        [url.replace('%', '%%') for url in self[key]]))
                     # (For ConfigParser, % must be escaped to %%)
                 else:  # else, simply store the parameter as is.
-                    cp.set(applicationConfig.CONFIG_SECTIONNAME,key,str(self[key]))
+                    cp.set(applicationConfig.CONFIG_SECTIONNAME,
+                           key, str(self[key]))
 
-        # ConfigParser can only write to a file --> create a pseudo-file (inifile)
+        # ConfigParser can only write to a file --> create a pseudo-file
+        # (inifile)
         inifile = StringIO.StringIO()
         cp.write(inifile)
         data = inifile.getvalue()
@@ -1478,9 +1541,10 @@ class applicationConfig(dict):
         lines = data.split('\n')
         sectionname = [lines[0]]   # The [webGobbler] section delimiter
         parameters = lines[1:]     # The parameters below
-        parameters = [p for p in parameters if len(p.strip())>0]  # remove empty lines generated by configparser
+        # remove empty lines generated by configparser
+        parameters = [p for p in parameters if len(p.strip()) > 0]
         parameters.sort()
-        data = '\n'.join(sectionname+parameters)
+        data = '\n'.join(sectionname + parameters)
         return data
 
     def fromINI(self, inidata):
@@ -1494,33 +1558,44 @@ class applicationConfig(dict):
 
             doCoerceType = True
             if name == 'blacklist.imagesha1':
-                # Deserialize the list of sha1  (  'xxxx,yyy,zzz' --> ['xxx','yyy','zzz'])
-                value = dict([ (v,0) for v in value.split('|')])
-                doCoerceType = False  # We already manually coerced the type of this parameter.
+                # Deserialize the list of sha1  (  'xxxx,yyy,zzz' -->
+                # ['xxx','yyy','zzz'])
+                value = dict([(v, 0) for v in value.split('|')])
+                # We already manually coerced the type of this parameter.
+                doCoerceType = False
             elif name == 'blacklist.url':
                 # Deserialize the list of URLs
                 value = value.split('|')
-                doCoerceType = False  # We already manually coerced the type of this parameter.
+                # We already manually coerced the type of this parameter.
+                doCoerceType = False
 
             if name in applicationConfig.DEFAULTCONFIG and doCoerceType:
                 # If parameter exists in default parameters, coerce its type.
                 defaultvalue = applicationConfig.DEFAULTCONFIG[name]
                 obj = None
                 try:
-                    if isinstance(defaultvalue,basestring): obj = str(value).strip()
-                    elif isinstance(defaultvalue,bool):
-                        if str(value).lower()=='true': obj = True
-                        else: obj = False
-                    elif isinstance(defaultvalue,int):  obj = int(value)
-                    elif isinstance(defaultvalue,float):  obj = float(value)
-                    elif isinstance(value,dict): raise NotImplementedError,"applicationConfig.fromINI() : serialization of dictionary objects is not implemented."
-                    elif isinstance(value,list): raise NotImplementedError,"applicationConfig.fromINI() : serialization of list objects is not implemented."
-                    else:  raise ValueError, "Could not convert parameter %s. Oops. Looks like an error in the program." % name
+                    if isinstance(defaultvalue, basestring):
+                        obj = str(value).strip()
+                    elif isinstance(defaultvalue, bool):
+                        if str(value).lower() == 'true':
+                            obj = True
+                        else:
+                            obj = False
+                    elif isinstance(defaultvalue, int):
+                        obj = int(value)
+                    elif isinstance(defaultvalue, float):
+                        obj = float(value)
+                    elif isinstance(value, dict):
+                        raise NotImplementedError, "applicationConfig.fromINI() : serialization of dictionary objects is not implemented."
+                    elif isinstance(value, list):
+                        raise NotImplementedError, "applicationConfig.fromINI() : serialization of list objects is not implemented."
+                    else:
+                        raise ValueError, "Could not convert parameter %s. Oops. Looks like an error in the program." % name
                 except ValueError:
-                    raise ValueError, "Error in configuration: Parameter %s should be of type %s." % (name,type(defaultvalue) )
+                    raise ValueError, "Error in configuration: Parameter %s should be of type %s." % (name, type(defaultvalue))
 
                 if name == 'network.http.proxy.auth.password':
-                    obj =  self._ungarble(obj)  # Ungarbles the password.
+                    obj = self._ungarble(obj)  # Ungarbles the password.
 
                 if obj != None:
                     self[name] = obj
@@ -1537,12 +1612,15 @@ class applicationConfig(dict):
         except ImportError, exc:
             raise ImportError, "applicationConfig.loadFromRegistryCurrentUser() can only be used under Windows (requires the _winreg module).\nCould not import module because: %s" % exc
         try:
-            key = _winreg.OpenKey( _winreg.HKEY_CURRENT_USER, applicationConfig.CONFIG_REGPATH,0, _winreg.KEY_READ)
+            key = _winreg.OpenKey(
+                _winreg.HKEY_CURRENT_USER, applicationConfig.CONFIG_REGPATH, 0, _winreg.KEY_READ)
             # Now get all values in this key:
             i = 0
             try:
                 while True:
-                    valueobj = _winreg.EnumValue(key,i) # mmm..strange, Should unpack to 3 values, but seems to unpack to more.  Bug of EnumValue() ?
+                    # mmm..strange, Should unpack to 3 values, but seems to
+                    # unpack to more.  Bug of EnumValue() ?
+                    valueobj = _winreg.EnumValue(key, i)
                     valuename = str(valueobj[0]).strip()
                     valuedata = str(valueobj[1]).strip()
                     valuetype = valueobj[2]
@@ -1550,11 +1628,15 @@ class applicationConfig(dict):
                         raise TypeError, "The registry value %s does not have the correct type (REG_SZ). Please delete it." % valuename
                     else:
                         if valuename not in applicationConfig.NONEXPORTABLE_PARAMETERS:
-                            inilines += [ '%s=%s' % (valuename,str(valuedata)) ]  # Build the .INI file.
+                            # Build the .INI file.
+                            inilines += ['%s=%s' % (valuename, str(valuedata))]
                     i += 1
             except EnvironmentError:
-                pass  # EnvironmentError means: "No more values to read". We simply exit the 'While True' loop.
-            self.fromINI('\n'.join(inilines))   # Then parse the generated .INI file.
+                # EnvironmentError means: "No more values to read". We simply
+                # exit the 'While True' loop.
+                pass
+            # Then parse the generated .INI file.
+            self.fromINI('\n'.join(inilines))
         except EnvironmentError:
             raise WindowsError, "Could not read configuration from registry !"
         _winreg.CloseKey(key)
@@ -1572,35 +1654,42 @@ class applicationConfig(dict):
         except ImportError, exc:
             raise ImportError, "applicationConfig.saveToRegistryCurrentUser() can only be used under Windows (requires the _winreg module).\nCould not import module because: %s" % exc
         try:
-            key = _winreg.CreateKey(_winreg.HKEY_CURRENT_USER, applicationConfig.CONFIG_REGPATH)  # Create or open existing key
+            # Create or open existing key
+            key = _winreg.CreateKey(
+                _winreg.HKEY_CURRENT_USER, applicationConfig.CONFIG_REGPATH)
             for line in self.toINI().split('\n')[1:]:
-                pname = line.split('=')[0]                # pname    : everything before the first =
-                strvalue = '='.join(line.split('=')[1:])  # strvalue : everything after the first =
-                _winreg.SetValueEx(key, pname.strip(),0, _winreg.REG_SZ, strvalue.strip())
+                # pname    : everything before the first =
+                pname = line.split('=')[0]
+                # strvalue : everything after the first =
+                strvalue = '='.join(line.split('=')[1:])
+                _winreg.SetValueEx(key, pname.strip(), 0,
+                                   _winreg.REG_SZ, strvalue.strip())
         except EnvironmentError:
             raise WindowsError, "Could not write configuration to registry !"
         _winreg.CloseKey(key)
 
     def saveToFileInUserHomedir(self):
         ''' Save the configuration in .webGobblerConf in user's home dir. '''
-        # Mainly for Unix/Linux. Windows users will probably prefer saveToRegistryCurrentUser()
+        # Mainly for Unix/Linux. Windows users will probably prefer
+        # saveToRegistryCurrentUser()
         inidata = self.toINI()
         userhomedir = os.path.expanduser('~')  # Get user home directory.
-        filepath = os.path.join(userhomedir,applicationConfig.CONFIG_FILENAME)
-        file = open(filepath,"w+b")
+        filepath = os.path.join(userhomedir, applicationConfig.CONFIG_FILENAME)
+        file = open(filepath, "w+b")
         file.write(inidata)
         file.close()
 
     def configFilename(self):
         ''' Returns the absolute path where the .ini file is supposed to be read/saved. '''
-        return os.path.join(os.path.expanduser('~'),applicationConfig.CONFIG_FILENAME)
+        return os.path.join(os.path.expanduser('~'), applicationConfig.CONFIG_FILENAME)
 
     def loadFromFileInUserHomedir(self):
         ''' Loads the configuration from .webGobblerConf in user's home dir. '''
-        # Mainly for Unix/Linux. Windows users will probably prefer loadFromRegistryCurrentUser()
+        # Mainly for Unix/Linux. Windows users will probably prefer
+        # loadFromRegistryCurrentUser()
         userhomedir = os.path.expanduser('~')  # Get user home directory.
-        filepath = os.path.join(userhomedir,applicationConfig.CONFIG_FILENAME)
-        file = open(filepath,"rb")
+        filepath = os.path.join(userhomedir, applicationConfig.CONFIG_FILENAME)
+        file = open(filepath, "rb")
         inidata = file.read(50000)
         file.close()
         self.fromINI(inidata)
@@ -1609,28 +1698,39 @@ class applicationConfig(dict):
         ''' Returns a garbled version of a string. '''
         # This is no replacement for a good cipher !
         # text IS NOT ENCRYPTED. Is it only self-garbled.
-        h=sha.new(text).digest()
-        hk=h*int(len(text)/20+1)
-        et=''.join([chr(ord(text[i])^ord(hk[i])) for i in range(len(text))])
-        return binascii.hexlify(h+et)
+        h = sha.new(text).digest()
+        hk = h * int(len(text) / 20 + 1)
+        et = ''.join([chr(ord(text[i]) ^ ord(hk[i]))
+                      for i in range(len(text))])
+        return binascii.hexlify(h + et)
 
     def _ungarble(self, text):
         ''' Un-garbles the text garbled with _garble(). '''
-        d=binascii.unhexlify(text)
-        (h,t)=(d[0:20],d[20:])
-        hk=h*int(len(t)/20+1)
-        return ''.join([chr(ord(t[i])^ord(hk[i])) for i in range(len(t))])
+        d = binascii.unhexlify(text)
+        (h, t) = (d[0:20], d[20:])
+        hk = h * int(len(t) / 20 + 1)
+        return ''.join([chr(ord(t[i]) ^ ord(hk[i])) for i in range(len(t))])
 
-# == Classes ===================================================================
+# == Classes =============================================================
+
 
 class commandToken:
     ''' Command tokens used to send commands to threads. '''
-    def __init__(self, shutdown=None, stopcollecting=None, collect=None, collectnonstop=None,superpose=None):
-        self.shutdown = shutdown                # Collector and pool: Order to shutdown. The thread should stop working and quit (exit the run() method.)
-        self.collect = collect                  # Collector: Collect n images and stop. (value = the number of images to collect)
+
+    def __init__(self, shutdown=None, stopcollecting=None, collect=None, collectnonstop=None, superpose=None):
+        # Collector and pool: Order to shutdown. The thread should stop working
+        # and quit (exit the run() method.)
+        self.shutdown = shutdown
+        # Collector: Collect n images and stop. (value = the number of images
+        # to collect)
+        self.collect = collect
         self.collectnonstop = collectnonstop    # Collector: Collect images continuously
-        self.stopcollecting = stopcollecting    # Collector: The treads should stop collecting images, but not shutdown.
-        self.superpose = superpose              # Assembler_superpose: Superpose images now.
+        # Collector: The treads should stop collecting images, but not
+        # shutdown.
+        self.stopcollecting = stopcollecting
+        # Assembler_superpose: Superpose images now.
+        self.superpose = superpose
+
 
 class internetImage:
     ''' An image from the internet.
@@ -1644,50 +1744,60 @@ class internetImage:
                    i.saveToDisk("c:\\my pictures")  # Save the image to disk.
                    i.getImage()    # Get the PIL Image object.
     '''
-    def __init__(self,imageurl,config):
+
+    def __init__(self, imageurl, config):
         ''' imageurl (string): url of the image to download.
             config (applicationConfig object) : the program configuration
         '''
         self.imageurl = imageurl  # URL of this image on the internet
-        self.imagedata = None     # Raw binary image data (as downloaded from the internet)
-        self.filename = None      # Image filename (computed from self.imagedata)
+        # Raw binary image data (as downloaded from the internet)
+        self.imagedata = None
+        # Image filename (computed from self.imagedata)
+        self.filename = None
         self.isNotAnImage = True  # True if this URL is not an image.
         self.discardReason = ""   # Reason why
-        self.CONFIG=config
+        self.CONFIG = config
 
-        # If the URL of the image matches any of the blacklisted URLs, we discard the image.
+        # If the URL of the image matches any of the blacklisted URLs, we
+        # discard the image.
         for regexp in self.CONFIG["blacklist.url_re"]:
-            if regexp.match(imageurl):  # FIXME : protect against maximum recursion limited exceeded exception ?
+            # FIXME : protect against maximum recursion limited exceeded
+            # exception ?
+            if regexp.match(imageurl):
                 self.discardReason = "URL is blacklisted"
                 return  # Discard the image.
 
-        #FIXME: Handle passwords required on some pages (Have to use fancy_url opener or urllib2 ?)
+        # FIXME: Handle passwords required on some pages (Have to use fancy_url opener or urllib2 ?)
         #       (Those URLs have to be skipped)
 
         # Build and send the HTTP request:
-        request_headers = { 'User-Agent': self.CONFIG["network.http.useragent"] }
-        request = urllib2.Request(imageurl, None, request_headers)  # Build the HTTP request
+        request_headers = {'User-Agent': self.CONFIG["network.http.useragent"]}
+        # Build the HTTP request
+        request = urllib2.Request(imageurl, None, request_headers)
         try:
             urlfile = urllib2.urlopen(request)
         except urllib2.HTTPError, exc:
             if exc.code == 404:
-                self.discardReason = "not found"  # Display a simplified message for HTTP Error 404.
+                # Display a simplified message for HTTP Error 404.
+                self.discardReason = "not found"
             else:
-                self.discardReason = "HTTP request failed with error %d (%s)" % (exc.code, exc.msg)
+                self.discardReason = "HTTP request failed with error %d (%s)" % (
+                    exc.code, exc.msg)
             return    # Discard this image.
-            # FIXME: display simplified error message for some other HTTP error codes ?
+            # FIXME: display simplified error message for some other HTTP error
+            # codes ?
         except urllib2.URLError, exc:
             self.discardReason = exc.reason
             return    # Discard this image.
         except Exception, exc:
             self.discardReason = exc
             return    # Discard this image.
-        #FIXME: catch HTTPError to catch Authentication requests ? (see urllib2 manual)
+        # FIXME: catch HTTPError to catch Authentication requests ? (see urllib2 manual)
         # (URLs requesting authentication should be discarded.)
 
         # If the returned Content-Type is not recognized, ignore the file.
         # ("image/jpeg", "image/gif", etc.)
-        MIME_Type = urlfile.info().getheader("Content-Type","")
+        MIME_Type = urlfile.info().getheader("Content-Type", "")
         if not self.CONFIG["collector.acceptedmimetypes"].has_key(MIME_Type):
             urlfile.close()
             self.discardReason = "not an image (%s)" % MIME_Type
@@ -1701,8 +1811,8 @@ class internetImage:
         # (so that we can abort the download right now if the file is too big.)
         file_size = 0
         try:
-            file_size = int( urlfile.info().getheader("Content-Length","0") )
-        except ValueError: # Content-Length does not contains an integer
+            file_size = int(urlfile.info().getheader("Content-Length", "0"))
+        except ValueError:  # Content-Length does not contains an integer
             urlfile.close()
             self.discardReason = "bogus data in Content-Length HTTP headers"
             return  # Discard this image.
@@ -1714,33 +1824,39 @@ class internetImage:
 
         # Then download the image:
         try:
-            self.imagedata = urlfile.read(self.CONFIG["collector.maximumimagesize"]) # Max image size: 2 Mb
+            self.imagedata = urlfile.read(
+                self.CONFIG["collector.maximumimagesize"])  # Max image size: 2 Mb
         except:
             self.discardReason = "error while downloading image"
             urlfile.close()
             pass  # Discard image if there was a problem downloading it.
         urlfile.close()
 
-        # Check image size (can be necessary if Content-Length was not returned in HTTP headers.)
+        # Check image size (can be necessary if Content-Length was not returned
+        # in HTTP headers.)
         try:
-            if len(self.imagedata) >= self.CONFIG["collector.maximumimagesize"]:  # Too big, probably not an image.
+            # Too big, probably not an image.
+            if len(self.imagedata) >= self.CONFIG["collector.maximumimagesize"]:
                 self.discardReason = "too big"
                 return    # Discard the image.
-        except TypeError:  # Happens sometimes on len(self.imagedata):  "TypeError: len() of unsized object"
+        # Happens sometimes on len(self.imagedata):  "TypeError: len() of
+        # unsized object"
+        except TypeError:
             self.imagedata = "no data"
             return    # Discard the image.
 
         # Compute filename from file SHA1
         imagesha1 = sha.new(self.imagedata).hexdigest()
-        if self.CONFIG["blacklist.imagesha1"].has_key(imagesha1):  # discard blacklisted images
+        # discard blacklisted images
+        if self.CONFIG["blacklist.imagesha1"].has_key(imagesha1):
             self.discardReason = "blacklisted"
             return
-        self.filename = 'WG'+imagesha1+file_extension  # SHA1 in hex + image extension
-        self.imagedata += self.CONFIG["pool.sourcemark"] + self.imageurl   # Add original URL in image file
+        self.filename = 'WG' + imagesha1 + file_extension  # SHA1 in hex + image extension
+        # Add original URL in image file
+        self.imagedata += self.CONFIG["pool.sourcemark"] + self.imageurl
 
         self.discardReason = ""
         self.isNotAnImage = False  # The image is ok.
-
 
     def getImage(self):
         ''' Returns the image as a PIL Image object.
@@ -1769,9 +1885,11 @@ class internetImage:
         if self.isNotAnImage:
             raise RuntimeError, "This is not an image. Cannot save."
             # Shame shame, the caller should have discarded this image already !
-        # FIXME: Should I implement try/except on the following file write operation ?
+        # FIXME: Should I implement try/except on the following file write
+        # operation ?
         try:
-            file = open(os.path.join(destinationDirectory,self.filename),'w+b')
+            file = open(os.path.join(
+                destinationDirectory, self.filename), 'w+b')
             file.write(self.imagedata)
             file.close()
         except IOError:
@@ -1789,45 +1907,57 @@ class collector(threading.Thread):
             (ideally get only one picture)
         Used by: imagePool
     '''
-    def __init__(self,config,dictionaryFile=None):
+
+    def __init__(self, config, dictionaryFile=None):
         ''' Download random images
               config (an applicationConfig object) : the program configuration
               dictionaryFile (string): A filename+path to an optional word dictionary.
         '''
         threading.Thread.__init__(self)
-        self.inputCommandQueue = Queue.Queue()   # Input commands (commandToken objects)
-        self.numberOfImagesToGet = 0     # By default, do not start to collect images.
+        # Input commands (commandToken objects)
+        self.inputCommandQueue = Queue.Queue()
+        # By default, do not start to collect images.
+        self.numberOfImagesToGet = 0
         self.continuousCollect = False
         self.dictionaryFile = dictionaryFile  # Optional word dictionary
-        self.name="collector"
-        self.CONFIG=config
-        self.statusLock = threading.RLock()  # A lock to access collector status.
-        self.status = ('Stopped','')    # Status of this collector
+        self.name = "collector"
+        self.CONFIG = config
+        # A lock to access collector status.
+        self.statusLock = threading.RLock()
+        self.status = ('Stopped', '')    # Status of this collector
 
-    def _logDebug    (self,message): logging.getLogger(self.name).debug    (message)
-    def _logInfo     (self,message): logging.getLogger(self.name).info     (message)
-    def _logWarning  (self,message): logging.getLogger(self.name).warning  (message)
-    def _logError    (self,message): logging.getLogger(self.name).error    (message)
-    def _logCritical (self,message): logging.getLogger(self.name).critical (message)
-    def _logException(self,message): logging.getLogger(self.name).exception(message)
+    def _logDebug(self, message): logging.getLogger(self.name).debug(message)
+
+    def _logInfo(self, message): logging.getLogger(self.name).info(message)
+
+    def _logWarning(self, message): logging.getLogger(
+        self.name).warning(message)
+
+    def _logError(self, message): logging.getLogger(self.name).error(message)
+
+    def _logCritical(self, message): logging.getLogger(
+        self.name).critical(message)
+
+    def _logException(self, message): logging.getLogger(
+        self.name).exception(message)
 
     # Thread activity methods:
-    def collectAndStop(self,n):
+    def collectAndStop(self, n):
         ''' Ask this collector to collect n images and stop. '''
-        self.inputCommandQueue.put(commandToken(collect=n),True)
+        self.inputCommandQueue.put(commandToken(collect=n), True)
 
     def collectNonStop(self):
         ''' Ask this collector to collect images and never stop. '''
-        self.inputCommandQueue.put(commandToken(collectnonstop=1),True)
+        self.inputCommandQueue.put(commandToken(collectnonstop=1), True)
 
     def stopcollecting(self):
         ''' Ask the thread to stop collecting images ASAP (this may not be right now). '''
-        self.inputCommandQueue.put(commandToken(stopcollecting=1),True)
+        self.inputCommandQueue.put(commandToken(stopcollecting=1), True)
 
     # Thread life methods:
     def shutdown(self):
         ''' Ask this thread to die. '''
-        self.inputCommandQueue.put(commandToken(shutdown=1),True)
+        self.inputCommandQueue.put(commandToken(shutdown=1), True)
 
     def run(self):
         ''' Main thread loop. '''
@@ -1837,30 +1967,33 @@ class collector(threading.Thread):
                 # Handle commands put in the command queue:
                 if commandToken.shutdown:
                     self._logDebug("Shutting down.")
-                    self._setCurrentStatus('Shutting down','')
-                    return # Exit the tread.
+                    self._setCurrentStatus('Shutting down', '')
+                    return  # Exit the tread.
                 elif commandToken.collect:  # Order to collect n images
-                    if self.numberOfImagesToGet==0:
-                        self._logDebug("Starting to collect %d images..."%commandToken.collect)
+                    if self.numberOfImagesToGet == 0:
+                        self._logDebug(
+                            "Starting to collect %d images..." % commandToken.collect)
                     self.numberOfImagesToGet = commandToken.collect
                     self.continuousCollect = False
                 elif commandToken.collectnonstop:  # Order to collect continuously
                     if not self.continuousCollect:
-                        self._logDebug("Starting to collect images non-stop...")
+                        self._logDebug(
+                            "Starting to collect images non-stop...")
                     self.continuousCollect = True
                     self.numberOfImagesToGet = 0
                 elif commandToken.stopcollecting:  # Stop collecting images
-                    if (self.numberOfImagesToGet>1) or self.continuousCollect:
+                    if (self.numberOfImagesToGet > 1) or self.continuousCollect:
                         self._logDebug("Stopped")
-                        self._setCurrentStatus('Stopped','')
+                        self._setCurrentStatus('Stopped', '')
                     self.numberOfImagesToGet = 0
                     self.continuousCollect = False
                 else:
                     self._logError("Unknown command token")
                     pass  # Unknown command, ignore.
-            except Queue.Empty: # Else (if no command is available), do some stuff.
+            # Else (if no command is available), do some stuff.
+            except Queue.Empty:
                 try:
-                    if self.continuousCollect: # collect continuously
+                    if self.continuousCollect:  # collect continuously
                         self.numberOfImagesToGet = 1
                         self._getRandomImage()  # This call must decrement self.numberOfImagesToGet
                         time.sleep(0.25)
@@ -1872,11 +2005,11 @@ class collector(threading.Thread):
                 except Exception, exc:
                     self._logException(exc)  # Log any unexpected exception
 
-    def _setCurrentStatus(self,status,information):
+    def _setCurrentStatus(self, status, information):
         ''' Sets the current status so that it can be read by others. '''
         #
         self.statusLock.acquire()
-        self.status = (status,information)
+        self.status = (status, information)
         self.statusLock.release()
 
     def getCurrentStatus(self):
@@ -1888,9 +2021,9 @@ class collector(threading.Thread):
             information (string): 'abc','http://...','60 seconds' (information complementary to status.)
         '''
         self.statusLock.acquire()
-        status,information = self.status
+        status, information = self.status
         self.statusLock.release()
-        return (status,information)
+        return (status, information)
 
     def _getRandomImage(self):
         ''' Each derived class must implement this method.
@@ -1905,7 +2038,7 @@ class collector(threading.Thread):
             continuously (except when the pool decides there are enough images.)
         '''
         self._logError("collector._getRandomImage() is not implemented.")
-        raise NotImplementedError,"collector._getRandomImage()"
+        raise NotImplementedError, "collector._getRandomImage()"
 
     def _generateRandomWord(self):
         ''' Generates a random word.
@@ -1919,24 +2052,28 @@ class collector(threading.Thread):
             Example: word = self._generateRandomWord()
         '''
         # FIXME: To implement
-        #if self.dictionaryFile:
+        # if self.dictionaryFile:
         #     ...get word from dictionary...
-        #else:
+        # else:
         #     ...the old standalone method below...
         word = '1'
-        if random.randint(0,100)<30: # Sometimes use only digits
-            if random.randint(0,100)<30:
-                word = str(random.randint(1,999))
+        if random.randint(0, 100) < 30:  # Sometimes use only digits
+            if random.randint(0, 100) < 30:
+                word = str(random.randint(1, 999))
             else:
-                word = str(random.randint(1,999999))
+                word = str(random.randint(1, 999999))
         else:  # Generate a word containing letters
             word = ''
-            charset = 'abcdefghijklmnopqrstuvwxyz' # Search for random word containing letter only.
-            if random.randint(0,100)<60: # Sometimes include digits with letters
-                charset = 'abcdefghijklmnopqrstuvwxyz'*2 + '0123456789'  # *2 to have more letters than digits
-            for i in range(random.randint(2,5)): # Only generate short words (2 to 5 characters)
-              word += random.choice(charset)
+            # Search for random word containing letter only.
+            charset = 'abcdefghijklmnopqrstuvwxyz'
+            if random.randint(0, 100) < 60:  # Sometimes include digits with letters
+                charset = 'abcdefghijklmnopqrstuvwxyz' * 2 + \
+                    '0123456789'  # *2 to have more letters than digits
+            # Only generate short words (2 to 5 characters)
+            for i in range(random.randint(2, 5)):
+                word += random.choice(charset)
         return word
+
 
 class collector_local(collector):
     ''' This collector does not use the internet and only searches local harddisks
@@ -1944,75 +2081,90 @@ class collector_local(collector):
         Used by: imagePool.
     '''
 
-    def __init__(self,**keywords):
+    def __init__(self, **keywords):
         '''
          Parameters:
             config (applicationConfig object) : the program configuration
         '''
-        collector.__init__(self,**keywords)   # Call the mother class constructor.
+        collector.__init__(self, **
+                           keywords)   # Call the mother class constructor.
         self.directoryToScan = self.CONFIG["collector.localonly.startdir"]
-        self.name="collector_local"
-        self.remainingDirectories = [self.directoryToScan]  # Directories to scan
+        self.name = "collector_local"
+        self.remainingDirectories = [
+            self.directoryToScan]  # Directories to scan
         self.filepaths = {}  # Paths to images
 
     def _getRandomImage(self):
-        if len(self.filepaths) < 2000:  # Stop scanning directories if we have more than 2000 images filenames
-            for i in range(5): # Read 5 directories
-                if len(self.remainingDirectories)>0:
-                    directory = random.choice(self.remainingDirectories) # Get a directory to scan
+        # Stop scanning directories if we have more than 2000 images filenames
+        if len(self.filepaths) < 2000:
+            for i in range(5):  # Read 5 directories
+                if len(self.remainingDirectories) > 0:
+                    # Get a directory to scan
+                    directory = random.choice(self.remainingDirectories)
                     self.remainingDirectories.remove(directory)
                     self._logDebug("Reading directory %s" % directory)
-                    self._setCurrentStatus('Reading directory',directory)
+                    self._setCurrentStatus('Reading directory', directory)
                     # Scan the directory:
                     files = []
                     try:
                         files = os.listdir(directory)
                     except:
-                        pass   # I probably do not have access rights to this directory. Skip it silentely.
+                        # I probably do not have access rights to this
+                        # directory. Skip it silentely.
+                        pass
                     for filename in files:
-                        filepath = os.path.join(directory,filename)
+                        filepath = os.path.join(directory, filename)
                         # FIXME: I should try/except isdir() and isfile() in case the directory/file
                         # was removed (or I do not have access rights)
                         if os.path.isdir(filepath):
                             # Avoid /mnt /proc and /dev
-                            pathsToAvoid = ('/mnt/','/proc/','/dev/') # Paths to avoid under *nixes systems.
+                            # Paths to avoid under *nixes systems.
+                            pathsToAvoid = ('/mnt/', '/proc/', '/dev/')
                             if not (filepath.startswith('/mnt/') or filepath.startswith('/proc/') or filepath.startswith('/dev/')):
-                               self.remainingDirectories += [filepath] # This is a new directory to scan
+                                # This is a new directory to scan
+                                self.remainingDirectories += [filepath]
                         elif os.path.isfile(filepath):
-                            (name,extension) = os.path.splitext(filename)
-                            if extension.lower() in ('.jpg','.jpeg','.jpe','.png','.gif','.bmp','.tif','.tiff','.pcx','.ppm','tga'):
+                            (name, extension) = os.path.splitext(filename)
+                            if extension.lower() in ('.jpg', '.jpeg', '.jpe', '.png', '.gif', '.bmp', '.tif', '.tiff', '.pcx', '.ppm', 'tga'):
                                 self.filepaths[filepath] = 0  # Keep file path
             # If there are no more directories to scan, restart all over:
             if len(self.remainingDirectories) == 0:
                 self.remainingDirectories = [self.directoryToScan]
 
-
-        # Now choose a random image from scanned directories and copy it to the pool directory
+        # Now choose a random image from scanned directories and copy it to the
+        # pool directory
         if len(self.filepaths) > 0:
-            filepath = random.choice(self.filepaths.keys()) # Choose a random file path
+            # Choose a random file path
+            filepath = random.choice(self.filepaths.keys())
             del self.filepaths[filepath]  # Remove it from the list
             self._logDebug("Getting %s" % filepath)
-            self._setCurrentStatus('Copying file',filepath)
-            try:   #... and copy the image to the pool directory
-                file = open(filepath,'rb')
-                imagedata = file.read(2000000) # Max 2 Mb for local images
+            self._setCurrentStatus('Copying file', filepath)
+            try:  # ... and copy the image to the pool directory
+                file = open(filepath, 'rb')
+                imagedata = file.read(2000000)  # Max 2 Mb for local images
                 file.close()
             except:
-                imagedata = ''  # Discard image if there was a problem reading the file.
+                # Discard image if there was a problem reading the file.
+                imagedata = ''
 
-            if (len(imagedata)>0) and (len(imagedata) < 2000000):
+            if (len(imagedata) > 0) and (len(imagedata) < 2000000):
                 # Compute filename from file SHA1
                 imagesha1 = sha.new(imagedata).hexdigest()
                 if not self.CONFIG["blacklist.imagesha1"].has_key(imagesha1):
-                    extension = filepath[filepath.rfind("."):].lower()  # Get file extension
-                    outputfilename = 'WG'+imagesha1+extension   # SHA1 in hex + original image extension
-                    imagedata += self.CONFIG["pool.sourcemark"] + filepath   # Add original URL in image file
+                    extension = filepath[filepath.rfind(
+                        "."):].lower()  # Get file extension
+                    # SHA1 in hex + original image extension
+                    outputfilename = 'WG' + imagesha1 + extension
+                    # Add original URL in image file
+                    imagedata += self.CONFIG["pool.sourcemark"] + filepath
                     # and save the image to disk.
                     # FIXME: try/except file creation:
-                    file = open(os.path.join(self.CONFIG["pool.imagepooldirectory"],outputfilename),"w+b")
+                    file = open(os.path.join(
+                        self.CONFIG["pool.imagepooldirectory"], outputfilename), "w+b")
                     file.write(imagedata)
                     file.close()
-                    time.sleep(0.25) #Be gentle with other threads
+                    time.sleep(0.25)  # Be gentle with other threads
+
 
 class collector_deviantart(collector):
     ''' This collector gets random images from http://deviantART.com, an excellent
@@ -2023,89 +2175,117 @@ class collector_deviantart(collector):
     '''
     # Regular expression used to extract the image URL from a random deviant Art page.
     # (URL is buried in javascript)
-    # Example: "fullview":{"width":"1050","height":"715","src":"http:\/\/ic3.deviantart.com\/fs11\/i\/2006\/220\/2\/e\/Thessaloniki_at_Night_IV_by_Vovin84.jpg"}
-    RE_IMAGEURL = re.compile('"fullview":{.+?,"src":"(.+?)"}'  ,re.DOTALL|re.IGNORECASE)
+    # Example:
+    # "fullview":{"width":"1050","height":"715","src":"http:\/\/ic3.deviantart.com\/fs11\/i\/2006\/220\/2\/e\/Thessaloniki_at_Night_IV_by_Vovin84.jpg"}
+    RE_IMAGEURL = re.compile(
+        '"fullview":{.+?,"src":"(.+?)"}', re.DOTALL | re.IGNORECASE)
 
     # Regular expression to extract the maximum deviantionID from homepage
-    RE_ALLDEVIATIONID = re.compile('<a href="http://www.deviantart.com/deviation/(\d+)/"',re.DOTALL|re.IGNORECASE)
+    RE_ALLDEVIATIONID = re.compile(
+        '<a href="http://www.deviantart.com/deviation/(\d+)/"', re.DOTALL | re.IGNORECASE)
 
-    def __init__(self,**keywords):
-        collector.__init__(self,**keywords)   # Call the mother class constructor.
-        self.name="collector_deviantart"
+    def __init__(self, **keywords):
+        # Call the mother class constructor.
+        collector.__init__(self, **keywords)
+        self.name = "collector_deviantart"
         self.max_deviationid = -1  # We do not know yet what if the maximum deviationID
-        self.deviationIDs = []     # List of deviantionIDs (DeviantArt picture identifier). Used only for keyword search.
+        # List of deviantionIDs (DeviantArt picture identifier). Used only for
+        # keyword search.
+        self.deviationIDs = []
         self.imageurltoget = ""    # URL of image to get.
         self.waituntil = 0         # Wait until this date.
 
     def _getRandomImage(self):
-        if time.time()<self.waituntil:
+        if time.time() < self.waituntil:
             return
-        if self.max_deviationid < 0: # If we do not know the maximum deviationid:
+        if self.max_deviationid < 0:  # If we do not know the maximum deviationid:
             # Get the maximum deviationID from the Homepage:
             self._logDebug("Getting maximum deviationID from homepage.")
-            self._setCurrentStatus('Querying','Maximum deviationID from homepage')
+            self._setCurrentStatus(
+                'Querying', 'Maximum deviationID from homepage')
             try:
                 request_url = "http://browse.deviantart.com/?order=5"
-                request_headers = {'User-Agent': self.CONFIG["network.http.useragent"]}
-                request = urllib2.Request(request_url, None, request_headers)  # Build the HTTP request
+                request_headers = {
+                    'User-Agent': self.CONFIG["network.http.useragent"]}
+                # Build the HTTP request
+                request = urllib2.Request(request_url, None, request_headers)
                 htmlpage = urllib2.urlopen(request).read(500000)
             except:
-                self._logInfo("Unable to contact DeviantART.com. Waiting 60 seconds.") # Nevermind temporary failures
-                self._setCurrentStatus('Error','Unable to contact DeviantART.com. Waiting 60 seconds.')
-                self.waituntil = time.time()+60
+                # Nevermind temporary failures
+                self._logInfo(
+                    "Unable to contact DeviantART.com. Waiting 60 seconds.")
+                self._setCurrentStatus(
+                    'Error', 'Unable to contact DeviantART.com. Waiting 60 seconds.')
+                self.waituntil = time.time() + 60
                 return
             results = collector_deviantart.RE_ALLDEVIATIONID.findall(htmlpage)
-            # If no deviationID was found in homepage, display an error message and stop collecting.
-            if len(results)==0:
-                self._logWarning("Could not find any deviationID from homepage. Website changed ?")
-                self._setCurrentStatus('Error','Could not find any deviationID from homepage. Website changed ?')
+            # If no deviationID was found in homepage, display an error message
+            # and stop collecting.
+            if len(results) == 0:
+                self._logWarning(
+                    "Could not find any deviationID from homepage. Website changed ?")
+                self._setCurrentStatus(
+                    'Error', 'Could not find any deviationID from homepage. Website changed ?')
                 if self.CONFIG["debug"]:
-                    filename = "debug_deviantart_%s.html"%sha.new(htmlpage).hexdigest()
-                    self._logDebug("(See corresponding HTML page saved in %s)" % filename)
-                    open(filename,"w+b").write(htmlpage) # Write bogus html page to debug
+                    filename = "debug_deviantart_%s.html" % sha.new(
+                        htmlpage).hexdigest()
+                    self._logDebug(
+                        "(See corresponding HTML page saved in %s)" % filename)
+                    # Write bogus html page to debug
+                    open(filename, "w+b").write(htmlpage)
                 self.stopcollecting()
                 return
             # Get the maximum deviationID:
             for result in results:
                 try:
                     deviationid = int(result)
-                    if deviationid>self.max_deviationid:
+                    if deviationid > self.max_deviationid:
                         self.max_deviationid = deviationid
                 except ValueError:  # could not convert to int
                     pass  # ignore value
             if self.max_deviationid > 0:
-                self._logDebug("Max deviationid = %d"%self.max_deviationid)
+                self._logDebug("Max deviationid = %d" % self.max_deviationid)
             return
 
-        if len(self.imageurltoget)==0: # If we do not have the URL of an image, get a random DeviantArt page.
+        # If we do not have the URL of an image, get a random DeviantArt page.
+        if len(self.imageurltoget) == 0:
             deviationid = 0
             if self.CONFIG['collector.keywords.enabled']:
                 # If we do not have enough deviations corresponding to the search word,
                 # let's run a search on deviantArt search engine:
-                if len(self.deviationIDs)<40:
+                if len(self.deviationIDs) < 40:
                     # If keyword search is enabled, we use the search engine of DeviantArt
                     # to get a list of deviationID (images).
                     wordToSearch = self.CONFIG['collector.keywords.keywords']
                     self._logDebug("Querying %s" % wordToSearch)
-                    self._setCurrentStatus('Querying',wordToSearch)
+                    self._setCurrentStatus('Querying', wordToSearch)
                     # Get the search result page:
                     htmlpage = ''
-                    try: # Get the page corresponding to this deviation:
-                        request_url = "http://search.deviantart.com/searchcraft/?section=browse&search=%s&offset=%d" % (urllib.quote_plus(wordToSearch),random.randint(0,300)*24)
-                        request_headers = {'User-Agent': self.CONFIG["network.http.useragent"]}
-                        request = urllib2.Request(request_url, None, request_headers)  # Build the HTTP request
+                    try:  # Get the page corresponding to this deviation:
+                        request_url = "http://search.deviantart.com/searchcraft/?section=browse&search=%s&offset=%d" % (
+                            urllib.quote_plus(wordToSearch), random.randint(0, 300) * 24)
+                        request_headers = {
+                            'User-Agent': self.CONFIG["network.http.useragent"]}
+                        # Build the HTTP request
+                        request = urllib2.Request(
+                            request_url, None, request_headers)
                         htmlpage = urllib2.urlopen(request).read(500000)
                     except:
-                        self._logInfo("Unable to contact DeviantART.com. Waiting 60 seconds.") # Nevermind temporary failures
-                        self._setCurrentStatus('Error','Unable to contact DeviantART.com. Waiting 60 seconds.')
-                        self.waituntil = time.time()+60
+                        # Nevermind temporary failures
+                        self._logInfo(
+                            "Unable to contact DeviantART.com. Waiting 60 seconds.")
+                        self._setCurrentStatus(
+                            'Error', 'Unable to contact DeviantART.com. Waiting 60 seconds.')
+                        self.waituntil = time.time() + 60
                         return
                     # Search for devationIDs in the result page.
-                    results = collector_deviantart.RE_ALLDEVIATIONID.findall(htmlpage)
+                    results = collector_deviantart.RE_ALLDEVIATIONID.findall(
+                        htmlpage)
                     for result in results:
                         try:
                             deviationid = int(result)
-                            if random.randint(0,2)<2:  # We keep some of these images.
+                            # We keep some of these images.
+                            if random.randint(0, 2) < 2:
                                 self.deviationIDs.append(deviationid)
                         except ValueError:  # could not convert to int
                             pass  # ignore value
@@ -2115,41 +2295,59 @@ class collector_deviantart(collector):
                 self.deviationIDs.remove(deviationid)
             else:
                 # Get a random deviation page:
-                deviationid = random.randint(1,self.max_deviationid)   # choose a random deviation
+                # choose a random deviation
+                deviationid = random.randint(1, self.max_deviationid)
             self._logDebug("Getting deviation page %d" % deviationid)
-            self._setCurrentStatus('Querying','Deviation page %s' % deviationid)
+            self._setCurrentStatus(
+                'Querying', 'Deviation page %s' % deviationid)
             htmlpage = ''
-            try: # Get the page corresponding to this deviation:
+            try:  # Get the page corresponding to this deviation:
                 request_url = "http://www.deviantart.com/deviation/%d/" % deviationid
-                request_headers = {'User-Agent': self.CONFIG["network.http.useragent"]}
-                request = urllib2.Request(request_url, None, request_headers)  # Build the HTTP request
+                request_headers = {
+                    'User-Agent': self.CONFIG["network.http.useragent"]}
+                # Build the HTTP request
+                request = urllib2.Request(request_url, None, request_headers)
                 htmlpage = urllib2.urlopen(request).read(500000)
             except:
-                self._logInfo("Unable to contact DeviantART.com. Waiting 60 seconds.") # Nevermind temporary failures
-                self._setCurrentStatus('Error','Unable to contact DeviantART.com. Waiting 60 seconds.')
-                self.waituntil = time.time()+60
+                # Nevermind temporary failures
+                self._logInfo(
+                    "Unable to contact DeviantART.com. Waiting 60 seconds.")
+                self._setCurrentStatus(
+                    'Error', 'Unable to contact DeviantART.com. Waiting 60 seconds.')
+                self.waituntil = time.time() + 60
                 return
-            results = collector_deviantart.RE_IMAGEURL.findall(htmlpage) # The page should contain a link to an image.
-            if len(results)>0:
-                self.imageurltoget = results[0].replace('\\/','/')  # Replace \/ with /  (We unescape javascript)
+            # The page should contain a link to an image.
+            results = collector_deviantart.RE_IMAGEURL.findall(htmlpage)
+            if len(results) > 0:
+                # Replace \/ with /  (We unescape javascript)
+                self.imageurltoget = results[0].replace('\\/', '/')
             else:
-                if "<b>Fatal error</b>:" in htmlpage:  # Temporary deviantart problem.
-                    self._logInfo("Temporary error on site. Waiting 60 seconds.")
-                    self._setCurrentStatus('Error','Temporary error on site. Waiting 60 seconds.')
-                    self.waituntil = time.time()+60
+                # Temporary deviantart problem.
+                if "<b>Fatal error</b>:" in htmlpage:
+                    self._logInfo(
+                        "Temporary error on site. Waiting 60 seconds.")
+                    self._setCurrentStatus(
+                        'Error', 'Temporary error on site. Waiting 60 seconds.')
+                    self.waituntil = time.time() + 60
                 else:
-                    self._logWarning("Found no image URL in this page. Website changed ?")
-                    self._setCurrentStatus('Error','Found no image URL in this page. Website changed ?')
+                    self._logWarning(
+                        "Found no image URL in this page. Website changed ?")
+                    self._setCurrentStatus(
+                        'Error', 'Found no image URL in this page. Website changed ?')
                 if self.CONFIG["debug"]:
-                    filename = "debug_deviantart_%s.html"%sha.new(htmlpage).hexdigest()
-                    self._logDebug("(See corresponding HTML page saved in %s)" % filename)
-                    open(filename,"w+b").write(htmlpage) # Write bogus html page to debug
+                    filename = "debug_deviantart_%s.html" % sha.new(
+                        htmlpage).hexdigest()
+                    self._logDebug(
+                        "(See corresponding HTML page saved in %s)" % filename)
+                    # Write bogus html page to debug
+                    open(filename, "w+b").write(htmlpage)
                     self.stopcollecting()
             return
-        else: # Download an image.
+        else:  # Download an image.
             self._logDebug(self.imageurltoget)
-            self._setCurrentStatus('Downloading',self.imageurltoget)
-            i = internetImage(self.imageurltoget,self.CONFIG)  # Download the image
+            self._setCurrentStatus('Downloading', self.imageurltoget)
+            # Download the image
+            i = internetImage(self.imageurltoget, self.CONFIG)
             if i.isNotAnImage:
                 self._logDebug("Image discarded because %s." % i.discardReason)
             else:  # We do not make other checks on the image. We always consider the image is OK.
@@ -2163,45 +2361,56 @@ class collector_randomimagesus(collector):
     ''' Downloads random images from http://randomimages.us
         Used by: imagePool.
     '''
-    RE_IMAGEURL = re.compile('<img src="(http://www.randomimage.us/files/.+?)"',re.DOTALL|re.IGNORECASE)
-    def __init__(self,**keywords):
-        collector.__init__(self,**keywords)
-        self.name="collector_randomimagesus"
+    RE_IMAGEURL = re.compile(
+        '<img src="(http://www.randomimage.us/files/.+?)"', re.DOTALL | re.IGNORECASE)
+
+    def __init__(self, **keywords):
+        collector.__init__(self, **keywords)
+        self.name = "collector_randomimagesus"
         self.waituntil = 0         # Wait until this date.
 
     def _getRandomImage(self):
-        if time.time()<self.waituntil:
+        if time.time() < self.waituntil:
             return
         self._logDebug("Getting random image from http://randomimage.us")
-        self._setCurrentStatus('Querying','randomimages.us homepage')
+        self._setCurrentStatus('Querying', 'randomimages.us homepage')
         try:
             request_url = "http://randomimage.us/"
-            request_headers = {'User-Agent': self.CONFIG["network.http.useragent"]}
-            request = urllib2.Request(request_url, None, request_headers)  # Build the HTTP request
+            request_headers = {
+                'User-Agent': self.CONFIG["network.http.useragent"]}
+            # Build the HTTP request
+            request = urllib2.Request(request_url, None, request_headers)
             htmlpage = urllib2.urlopen(request).read(500000)
         except:
-            self._logWarning("Unable to contact randomimage.us. Waiting 60 seconds.")
-            self.waituntil = time.time()+60
+            self._logWarning(
+                "Unable to contact randomimage.us. Waiting 60 seconds.")
+            self.waituntil = time.time() + 60
             return
         results = collector_randomimagesus.RE_IMAGEURL.findall(htmlpage)
         if len(results) > 0:
             imageurl = results[0]  # There should be only one image URL
             self._logDebug(imageurl)
-            self._setCurrentStatus('Downloading',imageurl)
-            i = internetImage(imageurl,self.CONFIG)   # Download the image
+            self._setCurrentStatus('Downloading', imageurl)
+            i = internetImage(imageurl, self.CONFIG)   # Download the image
             if i.isNotAnImage:
                 self._logDebug("Image discarded because %s." % i.discardReason)
             else:  # We do not make other checks on the image. We always consider the image is OK.
                 i.saveToDisk(self.CONFIG["pool.imagepooldirectory"])
                 self.numberOfImagesToGet -= 1   # One less !
         else:
-            filename = "debug_randomimagesus_%s.html"%sha.new(htmlpage).hexdigest()
-            self._logWarning("Found no image URL in this page. Website changed ?")
-            self._setCurrentStatus('Error','Found no image URL in this page. Website changed ?')
+            filename = "debug_randomimagesus_%s.html" % sha.new(
+                htmlpage).hexdigest()
+            self._logWarning(
+                "Found no image URL in this page. Website changed ?")
+            self._setCurrentStatus(
+                'Error', 'Found no image URL in this page. Website changed ?')
             if self.CONFIG["debug"]:
-                filename = "debug_randomimagesus_%s.html"%sha.new(htmlpage).hexdigest()
-                self._logDebug("(See corresponding HTML page saved in %s)" % filename)
-                open(filename,"w+b").write(htmlpage) # Write bogus html page to debug
+                filename = "debug_randomimagesus_%s.html" % sha.new(
+                    htmlpage).hexdigest()
+                self._logDebug(
+                    "(See corresponding HTML page saved in %s)" % filename)
+                # Write bogus html page to debug
+                open(filename, "w+b").write(htmlpage)
             self.stopcollecting()
 
 
@@ -2213,88 +2422,118 @@ class collector_askjeevesimages(collector):
     '''
     #RE_IMAGEURL = re.compile('imagesrc=(http%3A%2F%2F.+?)&',re.DOTALL|re.IGNORECASE)
     #RE_IMAGEURL = re.compile('imagesrc%3D(http%3A%2F%2F.+?)%26',re.DOTALL|re.IGNORECASE)
-    RE_IMAGEURL = re.compile('imagesrc%3D(http%253A%252F%252F.+?)%26',re.DOTALL|re.IGNORECASE)
-    def __init__(self,**keywords):
-        collector.__init__(self,**keywords)
-        self.name="collector_askjeevesimages"
+    RE_IMAGEURL = re.compile(
+        'imagesrc%3D(http%253A%252F%252F.+?)%26', re.DOTALL | re.IGNORECASE)
+
+    def __init__(self, **keywords):
+        collector.__init__(self, **keywords)
+        self.name = "collector_askjeevesimages"
         self.imageurls = {}   # image URLs extracted from html result pages.
         self.waituntil = 0         # Wait until this date.
-        self.collectURL = True     # Used to alternate between collecting URL and downloading images
+        # Used to alternate between collecting URL and downloading images
+        self.collectURL = True
 
     def _getRandomImage(self):
-        if time.time()<self.waituntil:
+        if time.time() < self.waituntil:
             return
         if self.collectURL:
             self.collectURL = not self.collectURL
-            # First, let's see how many URL remain in our list of urls (self.imageurls)
-            if len(self.imageurls)<500:  # If we have less than 500 urls, make another query on Jeeves.
+            # First, let's see how many URL remain in our list of urls
+            # (self.imageurls)
+            # If we have less than 500 urls, make another query on Jeeves.
+            if len(self.imageurls) < 500:
                 wordToSearch = ""
                 if self.CONFIG['collector.keywords.enabled']:
                     wordToSearch = self.CONFIG['collector.keywords.keywords']
                 else:
                     wordToSearch = self._generateRandomWord()
-                self._logDebug("Querying '%s'"%wordToSearch)
-                self._setCurrentStatus('Querying',wordToSearch)
+                self._logDebug("Querying '%s'" % wordToSearch)
+                self._setCurrentStatus('Querying', wordToSearch)
                 # We also get a random result page (between 0-50)
                 htmlpage = ''
                 try:
-                    request_url = "http://pictures.ask.com/pictures?q=%s&page=%d" % (urllib.quote_plus(wordToSearch),random.randint(0,50))
-                    request_headers = { 'User-Agent': self.CONFIG["network.http.useragent"] }
-                    request = urllib2.Request(request_url, None, request_headers)  # Build the HTTP request
+                    request_url = "http://pictures.ask.com/pictures?q=%s&page=%d" % (
+                        urllib.quote_plus(wordToSearch), random.randint(0, 50))
+                    request_headers = {
+                        'User-Agent': self.CONFIG["network.http.useragent"]}
+                    # Build the HTTP request
+                    request = urllib2.Request(
+                        request_url, None, request_headers)
                     htmlpage = urllib2.urlopen(request).read(500000)
                 except:
-                    self._logWarning("Unable to contact ask.com. Waiting 60 seconds.")
-                    self._setCurrentStatus('Error','Unable to contact ask.com. Waiting 60 seconds.')
-                    self.waituntil = time.time()+60
+                    self._logWarning(
+                        "Unable to contact ask.com. Waiting 60 seconds.")
+                    self._setCurrentStatus(
+                        'Error', 'Unable to contact ask.com. Waiting 60 seconds.')
+                    self.waituntil = time.time() + 60
                     return
-                results = collector_askjeevesimages.RE_IMAGEURL.findall(htmlpage)
+                results = collector_askjeevesimages.RE_IMAGEURL.findall(
+                    htmlpage)
                 if len(results) > 0:
                     for imageurl in results:
                         # Keep some of those URLs in memory.
                         # (and put the URLs in a dictionary to remove duplicates)
-                        if random.randint(0,1)==1:
-                            imageurl = urllib.unquote_plus(urllib.unquote_plus(imageurl))
+                        if random.randint(0, 1) == 1:
+                            imageurl = urllib.unquote_plus(
+                                urllib.unquote_plus(imageurl))
                             if not imageurl.startswith("http://"):
-                                imageurl = "http://"+imageurl
-                            self.imageurls[imageurl] = 0  # Put in the dictionary to remove duplicates
+                                imageurl = "http://" + imageurl
+                            # Put in the dictionary to remove duplicates
+                            self.imageurls[imageurl] = 0
                 else:
                     if ("did not match with any Picture results." in htmlpage) or ("did not match with any Image results." in htmlpage):
-                        self._logDebug("No results for this word.") # Our search was unsuccessfull.  Nevermind... we'll try another one later.
-                        self._setCurrentStatus('No result','No results for this word.')
+                        # Our search was unsuccessfull.  Nevermind... we'll try
+                        # another one later.
+                        self._logDebug("No results for this word.")
+                        self._setCurrentStatus(
+                            'No result', 'No results for this word.')
                     elif "We are currently experiencing an unusually large amount of Picture searches" in htmlpage:
-                        self._logWarning("Search engine overloaded ; Waiting 60 seconds.")
-                        self._setCurrentStatus('Waiting','Search engine overloaded ; Waiting 60 seconds.')
-                        self.waituntil = time.time()+60
+                        self._logWarning(
+                            "Search engine overloaded ; Waiting 60 seconds.")
+                        self._setCurrentStatus(
+                            'Waiting', 'Search engine overloaded ; Waiting 60 seconds.')
+                        self.waituntil = time.time() + 60
                         return
                     elif "Your search is likely to return adult content" in htmlpage:
-                        self._logDebug("Jeeves thinks this may be pr0n. Skipping.")
-                        self._setCurrentStatus('Bad result','Jeeves thinks this may be pr0n. Skipping.')
+                        self._logDebug(
+                            "Jeeves thinks this may be pr0n. Skipping.")
+                        self._setCurrentStatus(
+                            'Bad result', 'Jeeves thinks this may be pr0n. Skipping.')
                     else:
-                        filename = "debug_askjeevesimages_%s.html"%sha.new(htmlpage).hexdigest()
-                        self._logWarning("Found no image URL in this page. Website changed ?")
-                        self._setCurrentStatus('Error','Found no image URL in this page. Website changed ?')
+                        filename = "debug_askjeevesimages_%s.html" % sha.new(
+                            htmlpage).hexdigest()
+                        self._logWarning(
+                            "Found no image URL in this page. Website changed ?")
+                        self._setCurrentStatus(
+                            'Error', 'Found no image URL in this page. Website changed ?')
                         if self.CONFIG["debug"]:
-                            filename = "debug_askjeevesimages_%s.html"%sha.new(htmlpage).hexdigest()
-                            self._logDebug("(See corresponding HTML page saved in %s)" % filename)
-                            open(filename,"w+b").write(htmlpage) # Write bogus html page to debug
+                            filename = "debug_askjeevesimages_%s.html" % sha.new(
+                                htmlpage).hexdigest()
+                            self._logDebug(
+                                "(See corresponding HTML page saved in %s)" % filename)
+                            # Write bogus html page to debug
+                            open(filename, "w+b").write(htmlpage)
                         self.stopcollecting()
                 return
 
         # Then choose a random image to download.
         if not self.collectURL:
             self.collectURL = not self.collectURL
-            if len(self.imageurls)>0:
-                imageurl = random.choice(self.imageurls.keys())  # Choose a random image URL.
+            if len(self.imageurls) > 0:
+                # Choose a random image URL.
+                imageurl = random.choice(self.imageurls.keys())
                 del self.imageurls[imageurl]  # Remove it from list
                 self._logDebug(imageurl)
-                self._setCurrentStatus('Downloading',imageurl)
-                i = internetImage(imageurl,self.CONFIG)   # Download the image
+                self._setCurrentStatus('Downloading', imageurl)
+                i = internetImage(imageurl, self.CONFIG)   # Download the image
                 if i.isNotAnImage:
-                    self._logDebug("Image discarded because %s." % i.discardReason)
+                    self._logDebug("Image discarded because %s." %
+                                   i.discardReason)
                 else:  # We do not make other checks on the image. We always consider the image is OK.
                     i.saveToDisk(self.CONFIG["pool.imagepooldirectory"])
                     self.numberOfImagesToGet -= 1   # One less !
                 return
+
 
 class collector_yahooimagesearch(collector):
     ''' Get images from random queries on Yahoo Image search engine.
@@ -2303,162 +2542,210 @@ class collector_yahooimagesearch(collector):
         Used by: imagePool
     '''
     #RE_IMAGEURL = re.compile('&imgcurl=(.+?)&',re.DOTALL|re.IGNORECASE)
-    RE_IMAGEURL = re.compile('&imgurl=(.+?)&',re.DOTALL|re.IGNORECASE)
-    def __init__(self,**keywords):
-        collector.__init__(self,**keywords)
-        self.name="collector_yahooimagesearch"
+    RE_IMAGEURL = re.compile('&imgurl=(.+?)&', re.DOTALL | re.IGNORECASE)
+
+    def __init__(self, **keywords):
+        collector.__init__(self, **keywords)
+        self.name = "collector_yahooimagesearch"
         self.imageurls = {}  # image URLs extracted from html result pages.
         self.waituntil = 0         # Wait until this date.
-        self.collectURL = True     # Used to alternate between collecting URL and downloading images
+        # Used to alternate between collecting URL and downloading images
+        self.collectURL = True
 
     def _getRandomImage(self):
-        if time.time()<self.waituntil:
+        if time.time() < self.waituntil:
             return
         if self.collectURL:
             self.collectURL = not self.collectURL
-            # First, let's see how many URL remain in our list of urls (self.imageurls)
-            if len(self.imageurls)<500:  # If we have less than 500 urls, make another query on Yahoo.
+            # First, let's see how many URL remain in our list of urls
+            # (self.imageurls)
+            # If we have less than 500 urls, make another query on Yahoo.
+            if len(self.imageurls) < 500:
                 wordToSearch = ""
                 if self.CONFIG['collector.keywords.enabled']:
                     wordToSearch = self.CONFIG['collector.keywords.keywords']
                 else:
                     wordToSearch = self._generateRandomWord()
-                self._logDebug("Querying '%s'"%wordToSearch)
-                self._setCurrentStatus('Querying',wordToSearch)
+                self._logDebug("Querying '%s'" % wordToSearch)
+                self._setCurrentStatus('Querying', wordToSearch)
                 # We also get a random result page (between 0-50)
                 try:
-                    request_url = "http://images.search.yahoo.com/search/images?p=%s&b=%s" % (urllib.quote_plus(wordToSearch), random.randint(0,50)*20+1)
-                    request_headers = { 'User-Agent': self.CONFIG["network.http.useragent"] }
-                    request = urllib2.Request(request_url, None, request_headers)  # Build the HTTP request
+                    request_url = "http://images.search.yahoo.com/search/images?p=%s&b=%s" % (
+                        urllib.quote_plus(wordToSearch), random.randint(0, 50) * 20 + 1)
+                    request_headers = {
+                        'User-Agent': self.CONFIG["network.http.useragent"]}
+                    # Build the HTTP request
+                    request = urllib2.Request(
+                        request_url, None, request_headers)
                     htmlpage = urllib2.urlopen(request).read(500000)
                 except:
-                    self._logWarning("Unable to contact images.search.yahoo.com. Waiting 60 seconds.")
-                    self._setCurrentStatus('Error','Unable to contact images.search.yahoo.com. Waiting 60 seconds.')
-                    self.waituntil = time.time()+60
+                    self._logWarning(
+                        "Unable to contact images.search.yahoo.com. Waiting 60 seconds.")
+                    self._setCurrentStatus(
+                        'Error', 'Unable to contact images.search.yahoo.com. Waiting 60 seconds.')
+                    self.waituntil = time.time() + 60
                     return
-                results = collector_yahooimagesearch.RE_IMAGEURL.findall(htmlpage)
+                results = collector_yahooimagesearch.RE_IMAGEURL.findall(
+                    htmlpage)
                 if len(results) > 0:
                     for imageurl in results:
                         # Keep some of those URLs in memory.
                         # (and put the URLs in a dictionary to remove duplicates)
-                        if random.randint(0,1)==1:
+                        if random.randint(0, 1) == 1:
                             imageurl = urllib.unquote_plus(imageurl)
                             if not imageurl.startswith("http://"):
-                                imageurl = "http://"+imageurl
+                                imageurl = "http://" + imageurl
                             self.imageurls[imageurl] = 0
                 else:
-                    htmlpage = htmlpage.replace("&nbsp;"," ")
+                    htmlpage = htmlpage.replace("&nbsp;", " ")
                     if "We did not find results for" in htmlpage:
-                        self._logDebug("No results for this word.") # Our search was unsuccessfull.  Nevermind... we'll try another one later.
-                        self._setCurrentStatus('Result','No results for this word.')
+                        # Our search was unsuccessfull.  Nevermind... we'll try
+                        # another one later.
+                        self._logDebug("No results for this word.")
+                        self._setCurrentStatus(
+                            'Result', 'No results for this word.')
                     elif "Unfortunately, we are unable to process your request" in htmlpage:
-                        self._logWarning("Search engine overloaded ; Waiting 60 seconds.")
-                        self._setCurrentStatus('Waiting','Search engine overloaded ; Waiting 60 seconds.')
-                        self.waituntil = time.time()+60
+                        self._logWarning(
+                            "Search engine overloaded ; Waiting 60 seconds.")
+                        self._setCurrentStatus(
+                            'Waiting', 'Search engine overloaded ; Waiting 60 seconds.')
+                        self.waituntil = time.time() + 60
                     elif "may contain adult-oriented content" in htmlpage:
-                        self._logDebug("Yahoo thinks this may be pr0n. Skipping.")
-                        self._setCurrentStatus('Bad result','Yahoo thinks this may be pr0n. Skipping.')
+                        self._logDebug(
+                            "Yahoo thinks this may be pr0n. Skipping.")
+                        self._setCurrentStatus(
+                            'Bad result', 'Yahoo thinks this may be pr0n. Skipping.')
                     else:
-                        self._logWarning("Found no image URL in this page. Website changed ?")
-                        self._setCurrentStatus('Error','Found no image URL in this page. Website changed ?')
+                        self._logWarning(
+                            "Found no image URL in this page. Website changed ?")
+                        self._setCurrentStatus(
+                            'Error', 'Found no image URL in this page. Website changed ?')
                         if self.CONFIG["debug"]:
-                            filename = "debug_yahooimagesearch_%s.html"%sha.new(htmlpage).hexdigest()
-                            self._logDebug("(See corresponding HTML page saved in %s)" % filename)
-                            open(filename,"w+b").write(htmlpage) # Write bogus html page to debug
+                            filename = "debug_yahooimagesearch_%s.html" % sha.new(
+                                htmlpage).hexdigest()
+                            self._logDebug(
+                                "(See corresponding HTML page saved in %s)" % filename)
+                            # Write bogus html page to debug
+                            open(filename, "w+b").write(htmlpage)
                         self.stopcollecting()
             return
 
         # Then choose a random image to download.
         if not self.collectURL:
             self.collectURL = not self.collectURL
-            if len(self.imageurls)>0:
-                imageurl = random.choice(self.imageurls.keys())  # Choose a random image URL.
+            if len(self.imageurls) > 0:
+                # Choose a random image URL.
+                imageurl = random.choice(self.imageurls.keys())
                 del self.imageurls[imageurl]  # Remove it from list
-                self._setCurrentStatus('Downloading',imageurl)
+                self._setCurrentStatus('Downloading', imageurl)
                 self._logDebug(imageurl)
-                i = internetImage(imageurl,self.CONFIG)   # Download the image
+                i = internetImage(imageurl, self.CONFIG)   # Download the image
                 if i.isNotAnImage:
-                    self._logDebug("Image discarded because %s." % i.discardReason)
+                    self._logDebug("Image discarded because %s." %
+                                   i.discardReason)
                 else:  # We do not make other checks on the image. We always consider the image is OK.
                     i.saveToDisk(self.CONFIG["pool.imagepooldirectory"])
                     self.numberOfImagesToGet -= 1   # One less !
             return
+
 
 class collector_googleimages(collector):
     ''' Get images from random queries on Google Image search.
         http://images.google.com/
         Used by: imagePool
     '''
-    RE_IMAGEURL = re.compile('imgurl=(http://.+?)&',re.DOTALL|re.IGNORECASE)
-    def __init__(self,**keywords):
-        collector.__init__(self,**keywords)
-        self.name="collector_googleimages"
+    RE_IMAGEURL = re.compile('imgurl=(http://.+?)&', re.DOTALL | re.IGNORECASE)
+
+    def __init__(self, **keywords):
+        collector.__init__(self, **keywords)
+        self.name = "collector_googleimages"
         self.imageurls = {}  # image URLs extracted from html result pages.
         self.waituntil = 0         # Wait until this date.
-        self.collectURL = True     # Used to alternate between collecting URL and downloading images
+        # Used to alternate between collecting URL and downloading images
+        self.collectURL = True
 
     def _getRandomImage(self):
-        if time.time()<self.waituntil:
+        if time.time() < self.waituntil:
             return
         if self.collectURL:
             self.collectURL = not self.collectURL
-            # First, let's see how many URL remain in our list of urls (self.imageurls)
-            if len(self.imageurls)<500:  # If we have less than 500 urls, make another query on Jeeves.
+            # First, let's see how many URL remain in our list of urls
+            # (self.imageurls)
+            # If we have less than 500 urls, make another query on Jeeves.
+            if len(self.imageurls) < 500:
                 wordToSearch = ""
                 if self.CONFIG['collector.keywords.enabled']:
                     wordToSearch = self.CONFIG['collector.keywords.keywords']
                 else:
                     wordToSearch = self._generateRandomWord()
-                self._logDebug("Querying '%s'"%wordToSearch)
-                self._setCurrentStatus('Querying',wordToSearch)
+                self._logDebug("Querying '%s'" % wordToSearch)
+                self._setCurrentStatus('Querying', wordToSearch)
                 # We also get a random result page (between 0-50)
                 htmlpage = ''
                 try:
-                    request_url = "http://images.google.com/images?q=%s&hl=en&start=%d" % (urllib.quote_plus(wordToSearch),random.randint(0,50)*10)
-                    request_headers = { 'User-Agent': self.CONFIG["network.http.useragent"] }
-                    request = urllib2.Request(request_url, None, request_headers)  # Build the HTTP request
-                    htmlpage = urllib2.urlopen(request).read(500000)  # Send the request to Google.
+                    request_url = "http://images.google.com/images?q=%s&hl=en&start=%d" % (
+                        urllib.quote_plus(wordToSearch), random.randint(0, 50) * 10)
+                    request_headers = {
+                        'User-Agent': self.CONFIG["network.http.useragent"]}
+                    # Build the HTTP request
+                    request = urllib2.Request(
+                        request_url, None, request_headers)
+                    # Send the request to Google.
+                    htmlpage = urllib2.urlopen(request).read(500000)
                 except Exception, exc:
                     print exc
-                    self._logWarning("Unable to contact google.com. Waiting 60 seconds.")
-                    self._setCurrentStatus('Error','Unable to contact google.com. Waiting 60 seconds.')
-                    self.waituntil = time.time()+60
+                    self._logWarning(
+                        "Unable to contact google.com. Waiting 60 seconds.")
+                    self._setCurrentStatus(
+                        'Error', 'Unable to contact google.com. Waiting 60 seconds.')
+                    self.waituntil = time.time() + 60
                     return
                 results = collector_googleimages.RE_IMAGEURL.findall(htmlpage)
                 if len(results) > 0:
                     for imageurl in results:
                         # Keep some of those URLs in memory.
                         # (and put the URLs in a dictionary to remove duplicates)
-                        if random.randint(0,1)==1:
+                        if random.randint(0, 1) == 1:
                             imageurl = urllib.unquote_plus(imageurl)
                             if not imageurl.startswith("http://"):
-                                imageurl = "http://"+imageurl
-                            self.imageurls[imageurl] = 0  # Put in the dictionary to remove duplicates
+                                imageurl = "http://" + imageurl
+                            # Put in the dictionary to remove duplicates
+                            self.imageurls[imageurl] = 0
                 else:
                     if "did not match any documents" in htmlpage:
-                        self._logDebug("No results for this word.") # Our search was unsuccessfull.  Nevermind... we'll try another one later.
-                        self._setCurrentStatus('Result','No results for this word.')
+                        # Our search was unsuccessfull.  Nevermind... we'll try
+                        # another one later.
+                        self._logDebug("No results for this word.")
+                        self._setCurrentStatus(
+                            'Result', 'No results for this word.')
                     else:
-                        self._logWarning("Found no image URL in this page. Website changed ?")
-                        self._setCurrentStatus('Error','Found no image URL in this page. Website changed ?')
+                        self._logWarning(
+                            "Found no image URL in this page. Website changed ?")
+                        self._setCurrentStatus(
+                            'Error', 'Found no image URL in this page. Website changed ?')
                         if self.CONFIG["debug"]:
-                            filename = "debug_googleimages_%s.html"%sha.new(htmlpage).hexdigest()
-                            self._logDebug("(See corresponding HTML page saved in %s)" % filename)
-                            open(filename,"w+b").write(htmlpage) # Write bogus html page to debug
+                            filename = "debug_googleimages_%s.html" % sha.new(
+                                htmlpage).hexdigest()
+                            self._logDebug(
+                                "(See corresponding HTML page saved in %s)" % filename)
+                            # Write bogus html page to debug
+                            open(filename, "w+b").write(htmlpage)
                         self.stopcollecting()
             return
 
         # Then choose a random image to download.
         if not self.collectURL:
             self.collectURL = not self.collectURL
-            if len(self.imageurls)>0:
-                imageurl = random.choice(self.imageurls.keys())  # Choose a random image URL.
+            if len(self.imageurls) > 0:
+                # Choose a random image URL.
+                imageurl = random.choice(self.imageurls.keys())
                 del self.imageurls[imageurl]  # Remove it from list
                 self._logDebug(imageurl)
-                self._setCurrentStatus('Downloading',imageurl)
-                i = internetImage(imageurl,self.CONFIG)   # Download the image
+                self._setCurrentStatus('Downloading', imageurl)
+                i = internetImage(imageurl, self.CONFIG)   # Download the image
                 if i.isNotAnImage:
-                    self._logDebug("Image discarded because %s." % i.discardReason)
+                    self._logDebug("Image discarded because %s." %
+                                   i.discardReason)
                 else:  # We do not make other checks on the image. We always consider the image is OK.
                     i.saveToDisk(self.CONFIG["pool.imagepooldirectory"])
                     self.numberOfImagesToGet -= 1   # One less !
@@ -2471,90 +2758,125 @@ class collector_flickr(collector):
         Used by: imagePool
     '''
 
-    # Regexp to get all images (eg. "http://static.flickr.com/36/94902996_d58bec5e04_t.jpg") from http://flickr.com/photos/?start=x
-    RE_IMAGEURL = re.compile('src="(http://static.flickr.com/\d+/[0-9_a-z]+\_[tm].jpg)"',re.DOTALL|re.IGNORECASE)
+    # Regexp to get all images (eg.
+    # "http://static.flickr.com/36/94902996_d58bec5e04_t.jpg") from
+    # http://flickr.com/photos/?start=x
+    RE_IMAGEURL = re.compile(
+        'src="(http://static.flickr.com/\d+/[0-9_a-z]+\_[tm].jpg)"', re.DOTALL | re.IGNORECASE)
 
-    def __init__(self,**keywords):
-        collector.__init__(self,**keywords)
-        self.name="collector_flickr"
-        self.imageurls = {}  # URLs of images (eg."http://static.flickr.com/36/94902996_d58bec5e04_o.jpg")
+    def __init__(self, **keywords):
+        collector.__init__(self, **keywords)
+        self.name = "collector_flickr"
+        # URLs of images
+        # (eg."http://static.flickr.com/36/94902996_d58bec5e04_o.jpg")
+        self.imageurls = {}
         self.waituntil = 0         # Wait until this date.
-        self.collectURL = True     # Used to alternate between collecting URL and downloading images
+        # Used to alternate between collecting URL and downloading images
+        self.collectURL = True
 
     def _getRandomImage(self):
-        if time.time()<self.waituntil:
+        if time.time() < self.waituntil:
             return
         if self.collectURL:
             self.collectURL = not self.collectURL
 
-            # First, let's see how many URL remain in our list of urls (self.imageurls)
-            if len(self.imageurls)<100:  # If we have less than 500 urls, let's get more images URLs.
-                if self.CONFIG['collector.keywords.enabled']: # Search by keyword
+            # First, let's see how many URL remain in our list of urls
+            # (self.imageurls)
+            # If we have less than 500 urls, let's get more images URLs.
+            if len(self.imageurls) < 100:
+                if self.CONFIG['collector.keywords.enabled']:  # Search by keyword
                     wordToSearch = self.CONFIG['collector.keywords.keywords']
                     self._logDebug("Querying '%s'" % wordToSearch)
-                    self._setCurrentStatus('Querying',wordToSearch)
+                    self._setCurrentStatus('Querying', wordToSearch)
                     htmlpage = ''
                     try:
-                        request_url = "http://flickr.com/photos/search/text:%s/?s=1&page=%d" % (urllib.quote_plus(wordToSearch),random.randint(0,200))
-                        request_headers = { 'User-Agent': self.CONFIG["network.http.useragent"] }
-                        request = urllib2.Request(request_url, None, request_headers)  # Build the HTTP request
-                        htmlpage = urllib2.urlopen(request).read(500000)  # Send the request
+                        request_url = "http://flickr.com/photos/search/text:%s/?s=1&page=%d" % (
+                            urllib.quote_plus(wordToSearch), random.randint(0, 200))
+                        request_headers = {
+                            'User-Agent': self.CONFIG["network.http.useragent"]}
+                        # Build the HTTP request
+                        request = urllib2.Request(
+                            request_url, None, request_headers)
+                        htmlpage = urllib2.urlopen(request).read(
+                            500000)  # Send the request
                     except Exception:
-                        self._logWarning("Unable to contact flickr.com. Waiting 60 seconds.")
-                        self._setCurrentStatus('Error','Unable to contact flickr.com. Waiting 60 seconds.')
-                        self.waituntil = time.time()+60
+                        self._logWarning(
+                            "Unable to contact flickr.com. Waiting 60 seconds.")
+                        self._setCurrentStatus(
+                            'Error', 'Unable to contact flickr.com. Waiting 60 seconds.')
+                        self.waituntil = time.time() + 60
                         return
                     if "Your search didn't match any photos." in htmlpage:
-                        # No results, let's try again (we probably used a page number too high)
+                        # No results, let's try again (we probably used a page
+                        # number too high)
                         self.collectURL = True
                         return
-                else: # Pick images by taking a random page of flickr in "Most recent" photos.
-                    pageNumber = random.randint(1,999999999)
-                    self._logDebug("Getting 'Most recent photos' page %d" % pageNumber)
-                    self._setCurrentStatus('Querying',"Getting 'Most recent photos' page %d" % pageNumber)
+                else:  # Pick images by taking a random page of flickr in "Most recent" photos.
+                    pageNumber = random.randint(1, 999999999)
+                    self._logDebug(
+                        "Getting 'Most recent photos' page %d" % pageNumber)
+                    self._setCurrentStatus(
+                        'Querying', "Getting 'Most recent photos' page %d" % pageNumber)
                     htmlpage = ''
                     try:
                         request_url = "http://flickr.com/photos/?start=%d" % pageNumber
-                        request_headers = { 'User-Agent': self.CONFIG["network.http.useragent"] }
-                        request = urllib2.Request(request_url, None, request_headers)  # Build the HTTP request
-                        htmlpage = urllib2.urlopen(request).read(500000)  # Send the request
+                        request_headers = {
+                            'User-Agent': self.CONFIG["network.http.useragent"]}
+                        # Build the HTTP request
+                        request = urllib2.Request(
+                            request_url, None, request_headers)
+                        htmlpage = urllib2.urlopen(request).read(
+                            500000)  # Send the request
                     except Exception:
-                        self._logWarning("Unable to contact flickr.com. Waiting 60 seconds.")
-                        self._setCurrentStatus('Error','Unable to contact flickr.com. Waiting 60 seconds.')
-                        self.waituntil = time.time()+60
+                        self._logWarning(
+                            "Unable to contact flickr.com. Waiting 60 seconds.")
+                        self._setCurrentStatus(
+                            'Error', 'Unable to contact flickr.com. Waiting 60 seconds.')
+                        self.waituntil = time.time() + 60
                         return
                 # Then parse the result page in search for image URLs.
                 results = collector_flickr.RE_IMAGEURL.findall(htmlpage)
                 if len(results) > 0:
                     for imageurl in results:
-                        # Keep some of those URLs in memory (and put the URLs in a dictionary to remove duplicates)
-                        if random.randint(0,3)==1:
+                        # Keep some of those URLs in memory (and put the URLs
+                        # in a dictionary to remove duplicates)
+                        if random.randint(0, 3) == 1:
                             if not imageurl.startswith("http://"):
-                                imageurl = "http://"+imageurl
-                            imageurl = imageurl.replace("_t.jpg","_o.jpg").replace("_m.jpg","_o.jpg")
-                            # _t is for "Thumbnail", "_m" is for "medium size", "_o" is for "original size".
-                            self.imageurls[imageurl] = 0  # Put in the dictionary to remove duplicates
+                                imageurl = "http://" + imageurl
+                            imageurl = imageurl.replace(
+                                "_t.jpg", "_o.jpg").replace("_m.jpg", "_o.jpg")
+                            # _t is for "Thumbnail", "_m" is for "medium size",
+                            # "_o" is for "original size".
+                            # Put in the dictionary to remove duplicates
+                            self.imageurls[imageurl] = 0
                 else:
-                    self._logWarning("Found no image URL in this page. Website changed ?")
-                    self._setCurrentStatus('Error','Found no image URL in this page. Website changed ?')
+                    self._logWarning(
+                        "Found no image URL in this page. Website changed ?")
+                    self._setCurrentStatus(
+                        'Error', 'Found no image URL in this page. Website changed ?')
                     if self.CONFIG["debug"]:
-                        filename = "debug_flickr_%s.html"%sha.new(htmlpage).hexdigest()
-                        self._logDebug("(See corresponding HTML page saved in %s)" % filename)
-                        open(filename,"w+b").write(htmlpage) # Write bogus html page to debug
+                        filename = "debug_flickr_%s.html" % sha.new(
+                            htmlpage).hexdigest()
+                        self._logDebug(
+                            "(See corresponding HTML page saved in %s)" % filename)
+                        # Write bogus html page to debug
+                        open(filename, "w+b").write(htmlpage)
                     self.stopcollecting()
             return
 
         # Then choose a random image to download.
         if not self.collectURL:
             self.collectURL = not self.collectURL
-            if len(self.imageurls)>0:
-                imageurl = random.choice(self.imageurls.keys())  # Choose a random image URL.
+            if len(self.imageurls) > 0:
+                # Choose a random image URL.
+                imageurl = random.choice(self.imageurls.keys())
                 del self.imageurls[imageurl]  # Remove it from list
                 self._logDebug(imageurl)
-                self._setCurrentStatus('Downloading',imageurl)
-                i = internetImage(imageurl,self.CONFIG)   # Download the image
+                self._setCurrentStatus('Downloading', imageurl)
+                i = internetImage(imageurl, self.CONFIG)   # Download the image
                 if i.isNotAnImage:
-                    self._logDebug("Image discarded because %s." % i.discardReason)
+                    self._logDebug("Image discarded because %s." %
+                                   i.discardReason)
                 else:  # We do not make other checks on the image. We always consider the image is OK.
                     i.saveToDisk(self.CONFIG["pool.imagepooldirectory"])
                     self.numberOfImagesToGet -= 1   # One less !
@@ -2566,33 +2888,45 @@ class imagePool(threading.Thread):
         If the pool is going low, it will ask the collectors do to download some more random images.
         Used by: assemblers and other programs.
     '''
-    def __init__(self,config):
+
+    def __init__(self, config):
         ''' config (applicationConfig object) : the program configuration '''
         threading.Thread.__init__(self)
-        self.inputCommandQueue = Queue.Queue()       # Input commands (commandToken objects)
-        self.outputImages = Queue.Queue()            # Output images taken from the pool (PIL.Image objects)
-        self.collectors = []                         # List of collector objects which download images from the internet (collector object descendants)
-        self.delayBetweenChecks = 5                  # Seconds between image pool directory content check
-        self.availableFiles = []                     # List of currently available images in the directory
-        self.lastCheckTime = 0                       # Datetime of last directory check.
+        # Input commands (commandToken objects)
+        self.inputCommandQueue = Queue.Queue()
+        # Output images taken from the pool (PIL.Image objects)
+        self.outputImages = Queue.Queue()
+        # List of collector objects which download images from the internet
+        # (collector object descendants)
+        self.collectors = []
+        # Seconds between image pool directory content check
+        self.delayBetweenChecks = 5
+        # List of currently available images in the directory
+        self.availableFiles = []
+        # Datetime of last directory check.
+        self.lastCheckTime = 0
         self.CONFIG = config
         self._log = logging.getLogger('imagepool')
         # If directory does not exist, create it.
         if not os.path.isdir(self.CONFIG["pool.imagepooldirectory"]):
             os.makedirs(self.CONFIG["pool.imagepooldirectory"])
         if not os.path.isdir(self.CONFIG["pool.imagepooldirectory"]):
-            self._log.error("Could not create directory "+ os.path.abspath(self.CONFIG["pool.imagepooldirectory"]))
-            raise IOError, "Could not create directory "+ os.path.abspath(self.CONFIG["pool.imagepooldirectory"])
-        self._log.debug("Using images in %s" % os.path.abspath(self.CONFIG["pool.imagepooldirectory"]))
+            self._log.error("Could not create directory " +
+                            os.path.abspath(self.CONFIG["pool.imagepooldirectory"]))
+            raise IOError, "Could not create directory " + os.path.abspath(self.CONFIG["pool.imagepooldirectory"])
+        self._log.debug("Using images in %s" % os.path.abspath(
+            self.CONFIG["pool.imagepooldirectory"]))
         # Instanciate all collectors
         if self.CONFIG["collector.localonly"]:
-            self.collectors.append( collector_local(config=self.CONFIG) )
+            self.collectors.append(collector_local(config=self.CONFIG))
         else:
-            self.collectors.append( collector_googleimages    (config=self.CONFIG) )
-            self.collectors.append( collector_yahooimagesearch(config=self.CONFIG) )
-            self.collectors.append( collector_askjeevesimages (config=self.CONFIG) )
-            self.collectors.append( collector_flickr          (config=self.CONFIG) )
-            self.collectors.append( collector_deviantart      (config=self.CONFIG) )
+            self.collectors.append(collector_googleimages(config=self.CONFIG))
+            self.collectors.append(
+                collector_yahooimagesearch(config=self.CONFIG))
+            self.collectors.append(
+                collector_askjeevesimages(config=self.CONFIG))
+            self.collectors.append(collector_flickr(config=self.CONFIG))
+            self.collectors.append(collector_deviantart(config=self.CONFIG))
             #self.collectors.append( collector_randomimagesus  (config=self.CONFIG) )
 
     def run(self):
@@ -2609,18 +2943,21 @@ class imagePool(threading.Thread):
                         collector.shutdown()
                     for collector in self.collectors:  # and wait for them to stop.
                         collector.join()
-                    return # Exit the tread.
+                    return  # Exit the tread.
                 else:
                     self._log.error("Unknown command token")
                     pass  # Unknown command, ignore.
             except Queue.Empty:
                 # Ensure there are always enough images in the directory.
-                # and start/stop the collector is there are not enough/enough pictures in the directory.
-                elapsed = time.time()-self.lastCheckTime  # Count time since last check.
-                if (elapsed > self.delayBetweenChecks) or (elapsed<0):
+                # and start/stop the collector is there are not enough/enough
+                # pictures in the directory.
+                # Count time since last check.
+                elapsed = time.time() - self.lastCheckTime
+                if (elapsed > self.delayBetweenChecks) or (elapsed < 0):
                     # Check the directory
                     self.availableFiles = self._getFileList()
-                    if len(self.availableFiles) < self.CONFIG["pool.nbimages"]:  # We do not have enough images
+                    # We do not have enough images
+                    if len(self.availableFiles) < self.CONFIG["pool.nbimages"]:
                         for collector in self.collectors:
                             collector.collectNonStop()
                     else:  # we have enough images: stop collecting.
@@ -2630,59 +2967,73 @@ class imagePool(threading.Thread):
                     time.sleep(0.25)
                 # Then ensure there is always one image in the output queue
                 # available to assemblers.
-                if (self.outputImages.qsize()<1) and (len(self.availableFiles)>0):
+                if (self.outputImages.qsize() < 1) and (len(self.availableFiles) > 0):
                     # Get a random filename from the list of available images.
-                    filename = random.choice(self.availableFiles) # Choose a random file in the list
+                    # Choose a random file in the list
+                    filename = random.choice(self.availableFiles)
                     #(we do not need to remove the file from the self.availableFiles list, because the file will be
-                    # deleted and will diseappear from the list at the next refresh of self.availableFiles)
+                    # deleted and will diseappear from the list at the next
+                    # refresh of self.availableFiles)
                     imagedata = None
-                    try: # Read image file.
-                        file = open(filename,'rb')
-                        imagedata = file.read(self.CONFIG["collector.maximumimagesize"])
+                    try:  # Read image file.
+                        file = open(filename, 'rb')
+                        imagedata = file.read(
+                            self.CONFIG["collector.maximumimagesize"])
                         file.close()
                     except IOError:
                         pass
                     if imagedata != None:
                         if not self.CONFIG["pool.keepimages"]:
                             try:
-                                os.remove(filename)  # Delete the file we've just successfully read.
+                                # Delete the file we've just successfully read.
+                                os.remove(filename)
                             except OSError:
                                 pass
                         imageparser = ImageFile.Parser()
                         image = None
                         try:  # Try to decode file content.
                             imageparser.feed(imagedata)
-                            image = imageparser.close()   # Get the Image object.
-                        except: # PIL cannot understand file content.
-                            pass # self._log.info("Bad image. Dropping file.")  # Oops !  Bad image. Ignore it.
+                            # Get the Image object.
+                            image = imageparser.close()
+                        except:  # PIL cannot understand file content.
+                            # self._log.info("Bad image. Dropping file.")  #
+                            # Oops !  Bad image. Ignore it.
+                            pass
                         imageurl = "<url unknown>"
-                        try: # Extract image URL from file (written at end)
-                            partial_data = imagedata[-1024:]  # Get the 1024 last bytes of file
-                            commentoffset = partial_data.rfind(self.CONFIG["pool.sourcemark"])
+                        try:  # Extract image URL from file (written at end)
+                            # Get the 1024 last bytes of file
+                            partial_data = imagedata[-1024:]
+                            commentoffset = partial_data.rfind(
+                                self.CONFIG["pool.sourcemark"])
                             if commentoffset < 0:
                                 imageurl = '<url unknown>'
                             else:
-                                imageurl = partial_data[commentoffset+len(self.CONFIG["pool.sourcemark"]):]
+                                imageurl = partial_data[
+                                    commentoffset + len(self.CONFIG["pool.sourcemark"]):]
                         except:
                             imageurl = "<url unknown>"
                         # Now, log in HTML format.
                         localfilename = os.path.split(filename)[1]
-                        self._logImageUrl('<code>%s:&nbsp;<a href="%s">%s</a></code><br>' % (localfilename,imageurl,imageurl))
-                        self.outputImages.put(image,True)  # Put the image in the output queue
+                        self._logImageUrl(
+                            '<code>%s:&nbsp;<a href="%s">%s</a></code><br>' % (localfilename, imageurl, imageurl))
+                        # Put the image in the output queue
+                        self.outputImages.put(image, True)
                 time.sleep(0.25)
 
     def _getFileList(self):
         ''' Returns the list of image files present in the imagepool directory.
         '''
         filelist = []
-        for extension in ('jpg','jpeg','jpe','png','gif','bmp','tif','tiff','pcx','ppm','tga'):
-            filelist += glob.glob(os.path.join(self.CONFIG["pool.imagepooldirectory"],"*."+extension))
-        #FIXME: Maybe I could do a better job here by using a single listdir() and use fnmatch()
+        for extension in ('jpg', 'jpeg', 'jpe', 'png', 'gif', 'bmp', 'tif', 'tiff', 'pcx', 'ppm', 'tga'):
+            filelist += glob.glob(os.path.join(
+                self.CONFIG["pool.imagepooldirectory"], "*." + extension))
+        # FIXME: Maybe I could do a better job here by using a single listdir()
+        # and use fnmatch()
         return filelist
 
     def shutdown(self):
         ''' Ask this thread to die. '''
-        self.inputCommandQueue.put(commandToken(shutdown=1),True)
+        self.inputCommandQueue.put(commandToken(shutdown=1), True)
 
     def getImage(self):
         ''' Returns an image from the pool.
@@ -2704,7 +3055,7 @@ class imagePool(threading.Thread):
             (The duration may be several seconds.)
         '''
         image = None
-        while (image==None):
+        while (image == None):
             try:
                 image = self.outputImages.get_nowait()
             except Queue.Empty:
@@ -2725,46 +3076,61 @@ class imagePool(threading.Thread):
             Note that ideally, 'text' should contain only HTML, and a single line of text (no CR/LF)
         '''
         # FIXME: try/except all IO operations here ?
-        filename = os.path.join(self.CONFIG["pool.imagepooldirectory"],"last_used_images.html")
-        file = open(filename,"a+")
-        file.write(text+"\n")
+        filename = os.path.join(
+            self.CONFIG["pool.imagepooldirectory"], "last_used_images.html")
+        file = open(filename, "a+")
+        file.write(text + "\n")
         file.close()
-        if os.stat(filename)[stat.ST_SIZE] > 1000000: # If file is bigger than 1 Mb, truncate to 800 kb
+        # If file is bigger than 1 Mb, truncate to 800 kb
+        if os.stat(filename)[stat.ST_SIZE] > 1000000:
             self._log.info("Truncating log file to 800 kb.")
-            file = open(filename,"rb")
+            file = open(filename, "rb")
             data = file.read()
             file.close()
-            data = data[-800000:] # Keep the last 800 kilobytes
-            data = "\n".join(data.split("\n")[2:])  # Remove the first lines (which is probably cut)
-            file = open(filename,"w+b")
+            data = data[-800000:]  # Keep the last 800 kilobytes
+            # Remove the first lines (which is probably cut)
+            data = "\n".join(data.split("\n")[2:])
+            file = open(filename, "w+b")
             file.write(data)
             file.close()
+
 
 class assembler(threading.Thread):
     ''' Generic assembler class. Derived classes will assemble several pictures from
         the pool into a single picture.
         Derived classes must implement .saveImageTo()
     '''
-    def __init__(self, pool,config):
+
+    def __init__(self, pool, config):
         ''' pool (imagePool object): the pool where to get images from.
             config (an applicationConfig object) : the program configuration
             Derived classes may have additional parameters.
         '''
         threading.Thread.__init__(self)
-        self.inputCommandQueue = Queue.Queue()      # Input commands (commandToken objects)
-        self.outImageQueue = Queue.Queue()          # Queue where created images are put
+        # Input commands (commandToken objects)
+        self.inputCommandQueue = Queue.Queue()
+        # Queue where created images are put
+        self.outImageQueue = Queue.Queue()
         self.pool = pool                            # Image pool
         self.name = 'assembler'
         self.CONFIG = config
         self.pool.start()
         self.closing = False  # Indicates if the threads was asked to close.
 
-    def _logDebug    (self,message): logging.getLogger(self.name).debug    (message)
-    def _logInfo     (self,message): logging.getLogger(self.name).info     (message)
-    def _logWarning  (self,message): logging.getLogger(self.name).warning  (message)
-    def _logError    (self,message): logging.getLogger(self.name).error    (message)
-    def _logCritical (self,message): logging.getLogger(self.name).critical (message)
-    def _logException(self,message): logging.getLogger(self.name).exception(message)
+    def _logDebug(self, message): logging.getLogger(self.name).debug(message)
+
+    def _logInfo(self, message): logging.getLogger(self.name).info(message)
+
+    def _logWarning(self, message): logging.getLogger(
+        self.name).warning(message)
+
+    def _logError(self, message): logging.getLogger(self.name).error(message)
+
+    def _logCritical(self, message): logging.getLogger(
+        self.name).critical(message)
+
+    def _logException(self, message): logging.getLogger(
+        self.name).exception(message)
 
     def run(self):
         while True:
@@ -2775,7 +3141,7 @@ class assembler(threading.Thread):
                     self.closing = True
                     self.pool.shutdown()
                     self.pool.join()
-                    return # Exit the tread.
+                    return  # Exit the tread.
                 else:
                     self._logError("Unknown command token")
                     pass  # Unknown command, ignore.
@@ -2785,16 +3151,17 @@ class assembler(threading.Thread):
 
     def shutdown(self):
         ''' Ask this thread to die. '''
-        self.inputCommandQueue.put(commandToken(shutdown=1),True)
+        self.inputCommandQueue.put(commandToken(shutdown=1), True)
 
-    def saveImageTo(self,destinationFilename):
+    def saveImageTo(self, destinationFilename):
         ''' Save the image to the destination filename and path.
             All assemblers must implement this class.
             This call is blocking.
             This call must succeed (caller does not expect image not to be saved.)
         '''
         self._logError("assembler.saveImageTo() is not implemented.")
-        raise NotImplementedError,"assembler.saveImageTo()"
+        raise NotImplementedError, "assembler.saveImageTo()"
+
 
 class assembler_simple(assembler):
     ''' Outputs a single random image at the desired resolution (with filtering)
@@ -2803,35 +3170,41 @@ class assembler_simple(assembler):
             a.start()
             a.saveImageTo('singleimage.bmp')
     '''
-    def __init__(self,**keywords):
-        assembler.__init__(self,**keywords)
-        self.name="assembler_simple"
 
-    def saveImageTo(self,destinationFilename):
+    def __init__(self, **keywords):
+        assembler.__init__(self, **keywords)
+        self.name = "assembler_simple"
+
+    def saveImageTo(self, destinationFilename):
         ''' Generates an image and save to the destination filename.
             destinationFilename (string): file path and name for destination file.
             Supported file formats: png jpg bmp (and those supported by the PIL module)
             This call is blocking.
         '''
-        self._logInfo("Generating image and saving to %s" % destinationFilename )
+        self._logInfo("Generating image and saving to %s" %
+                      destinationFilename)
         image = self.pool.getImageB()
         if image.mode != 'RGB':
             image = image.convert('RGB')
         (imagex, imagey) = image.size
         if (imagex != self.CONFIG["assembler.sizex"] or imagey != self.CONFIG["assembler.sizey"]):
-            image.thumbnail((self.CONFIG["assembler.sizex"],self.CONFIG["assembler.sizey"]),Image.ANTIALIAS)
+            image.thumbnail((self.CONFIG["assembler.sizex"], self.CONFIG[
+                            "assembler.sizey"]), Image.ANTIALIAS)
         if self.CONFIG["assembler.mirror"]:
             image = ImageOps.mirror(image)
         if self.CONFIG["assembler.emboss"]:
-            finalimage_embossed = image.filter(ImageFilter.EMBOSS).filter(ImageFilter.SMOOTH)  # Emboss image
-            image = ImageOps.equalize( ImageChops.multiply(image, finalimage_embossed) )  # Compose images
-            image = Image.blend(image,finalimage_embossed,0.1)
+            finalimage_embossed = image.filter(ImageFilter.EMBOSS).filter(
+                ImageFilter.SMOOTH)  # Emboss image
+            image = ImageOps.equalize(ImageChops.multiply(
+                image, finalimage_embossed))  # Compose images
+            image = Image.blend(image, finalimage_embossed, 0.1)
         if self.CONFIG["assembler.invert"]:
             image = ImageOps.invert(image)
         image.save(destinationFilename)
         self._logInfo("Done.")
 
-    #FIXME: Also create an asynchronous, threaded image creation method ?
+    # FIXME: Also create an asynchronous, threaded image creation method ?
+
 
 class assembler_mosaic(assembler):
     ''' Outputs a mosaic of images at the desired resolution (with filtering)
@@ -2841,19 +3214,24 @@ class assembler_mosaic(assembler):
             a.start()
             a.saveImageTo('mosaic.bmp')
     '''
-    def __init__(self,**keywords):
+
+    def __init__(self, **keywords):
         ''' Additional parameters:
             nbX (integer): number of images to stack horizontally.
             nbY (integer): number of images to stack vertically.
         '''
-        if 'nbX' in keywords: self.nbX = keywords.pop('nbX')
-        else:                 self.nbX = 5
-        if 'nbY' in keywords: self.nbY = keywords.pop('nbY')
-        else:                 self.nbY = 5
-        assembler.__init__(self,**keywords)
-        self.name="assembler_mosaic"
+        if 'nbX' in keywords:
+            self.nbX = keywords.pop('nbX')
+        else:
+            self.nbX = 5
+        if 'nbY' in keywords:
+            self.nbY = keywords.pop('nbY')
+        else:
+            self.nbY = 5
+        assembler.__init__(self, **keywords)
+        self.name = "assembler_mosaic"
 
-    def saveImageTo(self,destinationFilename, resizeMethod=2):
+    def saveImageTo(self, destinationFilename, resizeMethod=2):
         ''' Generates an image and save to the destination filename.
             destinationFilename (string): file path and name for destination file.
             Supported file formats: png jpg bmp (and those supported by the PIL module)
@@ -2865,8 +3243,10 @@ class assembler_mosaic(assembler):
                                   1 = fit smaller edge and crop largest, keep ratio
                                   2 = fit, do not keep ratio
         '''
-        self._logInfo("Generating image and saving to %s" % destinationFilename )
-        finalImage = Image.new('RGB',(self.CONFIG["assembler.sizex"],self.CONFIG["assembler.sizey"]))
+        self._logInfo("Generating image and saving to %s" %
+                      destinationFilename)
+        finalImage = Image.new(
+            'RGB', (self.CONFIG["assembler.sizex"], self.CONFIG["assembler.sizey"]))
         imageSizeX = self.CONFIG["assembler.sizex"] // self.nbX
         imageSizeY = self.CONFIG["assembler.sizex"] // self.nbY
         for y in range(self.nbY):
@@ -2874,22 +3254,27 @@ class assembler_mosaic(assembler):
                 image = self.pool.getImageB()
                 if image.mode != 'RGB':
                     image = image.convert('RGB')
-                if resizeMethod==1:
-                    image = ImageOps.fit(image,size=(imageSizeX,imageSizeY),method=Image.ANTIALIAS,bleed=0,centering=(0.5,0.5))
-                if resizeMethod==2:
-                    image = image.resize((imageSizeX,imageSizeY),Image.ANTIALIAS)
+                if resizeMethod == 1:
+                    image = ImageOps.fit(image, size=(
+                        imageSizeX, imageSizeY), method=Image.ANTIALIAS, bleed=0, centering=(0.5, 0.5))
+                if resizeMethod == 2:
+                    image = image.resize(
+                        (imageSizeX, imageSizeY), Image.ANTIALIAS)
                 else:
-                    image.thumbnail((imageSizeX,imageSizeY),Image.ANTIALIAS)
-                finalImage.paste(image,(x*imageSizeX,y*imageSizeY))
+                    image.thumbnail((imageSizeX, imageSizeY), Image.ANTIALIAS)
+                finalImage.paste(image, (x * imageSizeX, y * imageSizeY))
         if self.CONFIG["assembler.mirror"]:
             finalImage = ImageOps.mirror(finalImage)
         if self.CONFIG["assembler.emboss"]:
-            finalimage_embossed = finalImage.filter(ImageFilter.EMBOSS).filter(ImageFilter.SMOOTH)  # Emboss image
-            finalImage = ImageOps.equalize( ImageChops.multiply(finalImage, finalimage_embossed) )  # Compose images
+            finalimage_embossed = finalImage.filter(
+                ImageFilter.EMBOSS).filter(ImageFilter.SMOOTH)  # Emboss image
+            finalImage = ImageOps.equalize(ImageChops.multiply(
+                finalImage, finalimage_embossed))  # Compose images
         if self.CONFIG["assembler.invert"]:
             finalImage = ImageOps.invert(finalImage)
         finalImage.save(destinationFilename)
         self._logInfo("Done.")
+
 
 class BadImage(Exception):
     ''' This exception is raised when an image seems broken and can't be processed.
@@ -2897,8 +3282,10 @@ class BadImage(Exception):
     '''
     pass
 
+
 class assembler_superpose(threading.Thread):
-    def __init__(self,pool,config,ignorePreviousImage=False):
+
+    def __init__(self, pool, config, ignorePreviousImage=False):
         ''' Outputs a superposed mesh of images.
             You should call .superpose() method to make the image evolve,
             then call .saveImageTo() or .getImage() to get the resulting picture.
@@ -2933,30 +3320,49 @@ class assembler_superpose(threading.Thread):
         threading.Thread.__init__(self)
         self.CONFIG = config
         self.pool = pool                        # The image pool.
-        self.pool.start()                       # Start the image pool right now.
+        # Start the image pool right now.
+        self.pool.start()
         self.name = 'assembler_superpose'
         self.inputCommandQueue = Queue.Queue()  # Input commands (commandToken objects)
-        self.superposeCompleted = Queue.Queue() # An object in this Queue means ._superpose() has completed its work.
-        self.nbImagesToSuperpose = 0            # Number of images to superpose.
-        self.currentImage = None                # Image currently beeing generated.
-        self.blankImage = False                 # Should the superpose() blank image before starting ?
-        self.finalImage = None                  # Final image (self.currentImage after post-processing.)
-        self.finalImageCompletionDate = None    # Date/time when last image was generated.
-        self.finalImageLock = threading.RLock() # Lock for concurrent access to self.finalImage
-        self._loadPreviousImage(ignorePreviousImage) # Get image from previous run.
-        self.state = "Waiting"                  # State of the assemble (textual)
+        # An object in this Queue means ._superpose() has completed its work.
+        self.superposeCompleted = Queue.Queue()
+        # Number of images to superpose.
+        self.nbImagesToSuperpose = 0
+        # Image currently beeing generated.
+        self.currentImage = None
+        # Should the superpose() blank image before starting ?
+        self.blankImage = False
+        # Final image (self.currentImage after post-processing.)
+        self.finalImage = None
+        # Date/time when last image was generated.
+        self.finalImageCompletionDate = None
+        # Lock for concurrent access to self.finalImage
+        self.finalImageLock = threading.RLock()
+        # Get image from previous run.
+        self._loadPreviousImage(ignorePreviousImage)
+        # State of the assemble (textual)
+        self.state = "Waiting"
 
     # Loggin methods:
-    def _logDebug    (self,message): logging.getLogger(self.name).debug    (message)
-    def _logInfo     (self,message): logging.getLogger(self.name).info     (message)
-    def _logWarning  (self,message): logging.getLogger(self.name).warning  (message)
-    def _logError    (self,message): logging.getLogger(self.name).error    (message)
-    def _logCritical (self,message): logging.getLogger(self.name).critical (message)
-    def _logException(self,message): logging.getLogger(self.name).exception(message)
+    def _logDebug(self, message): logging.getLogger(self.name).debug(message)
+
+    def _logInfo(self, message): logging.getLogger(self.name).info(message)
+
+    def _logWarning(self, message): logging.getLogger(
+        self.name).warning(message)
+
+    def _logError(self, message): logging.getLogger(self.name).error(message)
+
+    def _logCritical(self, message): logging.getLogger(
+        self.name).critical(message)
+
+    def _logException(self, message): logging.getLogger(
+        self.name).exception(message)
 
     def run(self):
         ''' The main thread dispatch method. '''
-        time.sleep(0.5)  # Give time to other threads (usefull to let the GUI start to display)
+        time.sleep(
+            0.5)  # Give time to other threads (usefull to let the GUI start to display)
         while True:
             try:
                 commandToken = self.inputCommandQueue.get_nowait()  # Get orders
@@ -2967,12 +3373,17 @@ class assembler_superpose(threading.Thread):
                     self.pool.join()      # Wait for the thread to die.
                     return                # Exit our tread.
                 elif commandToken.superpose:  # We are asked to assemble n images.
-                    if self.nbImagesToSuperpose == 0:  # Ignore the command if we are already assembling images (!=0)
-                        self._logInfo("Superposing %d images in current image" % commandToken.superpose)
-                        self.nbImagesToSuperpose = commandToken.superpose  # Get the number of images to superpose
+                    # Ignore the command if we are already assembling images
+                    # (!=0)
+                    if self.nbImagesToSuperpose == 0:
+                        self._logInfo(
+                            "Superposing %d images in current image" % commandToken.superpose)
+                        # Get the number of images to superpose
+                        self.nbImagesToSuperpose = commandToken.superpose
                         # Blank the image if needed:
                         if self.blankImage:
-                            self.currentImage = Image.new('RGB',(self.CONFIG["assembler.sizex"],self.CONFIG["assembler.sizey"]))
+                            self.currentImage = Image.new(
+                                'RGB', (self.CONFIG["assembler.sizex"], self.CONFIG["assembler.sizey"]))
                             self.blankImage = False
                 else:
                     self._logError("Unknown command token")
@@ -2982,7 +3393,8 @@ class assembler_superpose(threading.Thread):
                     self._superpose()  # Let's superpose one image. (This method will decrement self.nbImagesToSuperpose if successfull)
                     if self.nbImagesToSuperpose == 0:  # Are we done assembling images ?
                         # Let's save the current image.
-                        self._logInfo("Saving session image and post-processing...")
+                        self._logInfo(
+                            "Saving session image and post-processing...")
                         self._saveCurrentImage()
 
                         # Then post-process the image and give it away.
@@ -2992,7 +3404,7 @@ class assembler_superpose(threading.Thread):
                         self.finalImageCompletionDate = time.time()
                         self.finalImageLock.release()
                         self._logInfo("Done.")
-                        self.superposeCompleted.put("completed",True)
+                        self.superposeCompleted.put("completed", True)
                         self.state = "Waiting"
                 else:
                     #self._logInfo("Nothing in queue")
@@ -3002,7 +3414,7 @@ class assembler_superpose(threading.Thread):
         ''' Superpose an image.
             This method must only be called by the assembler_superpose thread !
         '''
-        (imagex, imagey) = (0,0)
+        (imagex, imagey) = (0, 0)
         # Try to get an image from the pool.
         imageToSuperpose = self.pool.getImage()
         if imageToSuperpose == None:  # no image availabe.
@@ -3011,16 +3423,18 @@ class assembler_superpose(threading.Thread):
             return  # It's ok, we'll try next time.
 
         # If the image is too small, get another image.
-        (imagex,imagey) = imageToSuperpose.size
+        (imagex, imagey) = imageToSuperpose.size
         if (imagex < 32) or (imagey < 32):
             return    # Image is too small. We'll take another one.
 
         self._logInfo("Superposing image %d" % self.nbImagesToSuperpose)
-        self.state = "Superposing image %d of %d" % (self.CONFIG["assembler.superpose.nbimages"]-self.nbImagesToSuperpose+1, self.CONFIG["assembler.superpose.nbimages"])
+        self.state = "Superposing image %d of %d" % (self.CONFIG[
+                                                     "assembler.superpose.nbimages"] - self.nbImagesToSuperpose + 1, self.CONFIG["assembler.superpose.nbimages"])
 
         # Superpose the image in current image.
         try:
-            self.currentImage = self._superposeOneImage(self.currentImage,imageToSuperpose)
+            self.currentImage = self._superposeOneImage(
+                self.currentImage, imageToSuperpose)
             self.nbImagesToSuperpose = self.nbImagesToSuperpose - 1
         except BadImage:
             self._logInfo("Broken image ; Ignoring.")
@@ -3037,7 +3451,8 @@ class assembler_superpose(threading.Thread):
         '''
         # Darken slightly the current image:
         if self.CONFIG["assembler.superpose.variante"] == 1:
-          currentImage = ImageEnhance.Brightness(currentImage).enhance(0.99)  # Old value (in beta 3): 0.985
+            currentImage = ImageEnhance.Brightness(currentImage).enhance(
+                0.99)  # Old value (in beta 3): 0.985
 
         # Force the image to RGB mode:
         if imageToSuperpose.mode != 'RGB':
@@ -3050,22 +3465,24 @@ class assembler_superpose(threading.Thread):
 
         # If the image is bigger than current image, scale it down to 1/2 of final picture dimensions
         # (while keeping its ratio)
-        (imagex,imagey) = imageToSuperpose.size
+        (imagex, imagey) = imageToSuperpose.size
         if (imagex > self.CONFIG["assembler.sizex"]) or (imagey > self.CONFIG["assembler.sizey"]):
             try:
-                imageToSuperpose.thumbnail((self.CONFIG["assembler.sizex"]/2,self.CONFIG["assembler.sizey"]/2),Image.ANTIALIAS)
-            except TypeError:  #TypeError: unsubscriptable object  ; Spurious exception in PIL.  :-(
+                imageToSuperpose.thumbnail((self.CONFIG[
+                                           "assembler.sizex"] / 2, self.CONFIG["assembler.sizey"] / 2), Image.ANTIALIAS)
+            except TypeError:  # TypeError: unsubscriptable object  ; Spurious exception in PIL.  :-(
                 raise BadImage
-            (imagex,imagey) = imageToSuperpose.size
+            (imagex, imagey) = imageToSuperpose.size
 
         # Scale down/up image if required.
         scaleValue = self.CONFIG["assembler.superpose.scale"]
         if str(scaleValue) != "1.0":
             try:
-                imageToSuperpose.thumbnail((int(float(imagex)*scaleValue),int(float(imagey)*scaleValue)),Image.ANTIALIAS)
-            except TypeError:  #TypeError: unsubscriptable object  ; Spurious exception in PIL.  :-(
+                imageToSuperpose.thumbnail(
+                    (int(float(imagex) * scaleValue), int(float(imagey) * scaleValue)), Image.ANTIALIAS)
+            except TypeError:  # TypeError: unsubscriptable object  ; Spurious exception in PIL.  :-(
                 raise BadImage
-            (imagex,imagey) = imageToSuperpose.size
+            (imagex, imagey) = imageToSuperpose.size
 
         # Compensate for poorly-contrasted images on the web
         try:
@@ -3082,44 +3499,52 @@ class assembler_superpose(threading.Thread):
         pixelcount = 1  # 1 to prevent divide by zero error.
         valuecount = 0
         try:
-            for x in range(0,imagex,20):
-                (r,g,b) = imageToSuperpose.getpixel((x,5))
-                valuecount += r+g+b
-                (r,g,b) = imageToSuperpose.getpixel((x,imagey-5))
-                valuecount += r+g+b
+            for x in range(0, imagex, 20):
+                (r, g, b) = imageToSuperpose.getpixel((x, 5))
+                valuecount += r + g + b
+                (r, g, b) = imageToSuperpose.getpixel((x, imagey - 5))
+                valuecount += r + g + b
                 pixelcount += 2
-            for y in range(0,imagey,20):
-                (r,g,b) = imageToSuperpose.getpixel((5,y))
-                valuecount += r+g+b
-                (r,g,b) = imageToSuperpose.getpixel((imagex-5,y))
-                valuecount += r+g+b
+            for y in range(0, imagey, 20):
+                (r, g, b) = imageToSuperpose.getpixel((5, y))
+                valuecount += r + g + b
+                (r, g, b) = imageToSuperpose.getpixel((imagex - 5, y))
+                valuecount += r + g + b
                 pixelcount += 2
-        except TypeError:  #unsubscriptable object  Arrggghh... not again !
+        except TypeError:  # unsubscriptable object  Arrggghh... not again !
             raise BadImage   # Aggrrreeeuuuu...
 
         # If the average r+g+b of the border pixels exceed this value,
         # we consider the image is too white, and we invert it.
-        if (100*(valuecount/(255*3))/pixelcount)>60:  # Cut at 60%.  (100% is RGB=(255,255,255))
+        # Cut at 60%.  (100% is RGB=(255,255,255))
+        if (100 * (valuecount / (255 * 3)) / pixelcount) > 60:
             imageToSuperpose = ImageOps.invert(imageToSuperpose)
 
-        paste_coords = (random.randint(-imagex,self.CONFIG["assembler.sizex"]),random.randint(-imagey,self.CONFIG["assembler.sizey"]) )
+        paste_coords = (random.randint(-imagex, self.CONFIG[
+                        "assembler.sizex"]), random.randint(-imagey, self.CONFIG["assembler.sizey"]))
 
         # Darken image borders
-        imageToSuperpose = self._darkenImageBorder(imageToSuperpose,borderSize=self.CONFIG["assembler.superpose.bordersmooth"])
+        imageToSuperpose = self._darkenImageBorder(
+            imageToSuperpose, borderSize=self.CONFIG["assembler.superpose.bordersmooth"])
 
         if self.CONFIG["assembler.superpose.randomrotation"]:
-            imageToSuperpose = imageToSuperpose.rotate(random.randint(0,359), Image.BICUBIC)
+            imageToSuperpose = imageToSuperpose.rotate(
+                random.randint(0, 359), Image.BICUBIC)
             # Darken the borders of the rotated image:
-            imageToSuperpose = self._darkenImageBorder(imageToSuperpose,borderSize=self.CONFIG["assembler.superpose.bordersmooth"])
+            imageToSuperpose = self._darkenImageBorder(
+                imageToSuperpose, borderSize=self.CONFIG["assembler.superpose.bordersmooth"])
 
         mask_image = ImageOps.autocontrast(imageToSuperpose.convert('L'))
 
-        if (self.CONFIG["assembler.superpose.variante"]==1) and (random.randint(0,100)<5):  # Invert the transparency of 5% of the images (Except if we are in variante 1 mode)
+        # Invert the transparency of 5% of the images (Except if we are in
+        # variante 1 mode)
+        if (self.CONFIG["assembler.superpose.variante"] == 1) and (random.randint(0, 100) < 5):
             mask_image = ImageOps.invert(mask_image)
         try:
-            currentImage.paste(imageToSuperpose,paste_coords,mask_image)
+            currentImage.paste(imageToSuperpose, paste_coords, mask_image)
         except IOError:
-            # Sometimes, we get a IOError: "image file is truncated (0 bytes not processed)"
+            # Sometimes, we get a IOError: "image file is truncated (0 bytes
+            # not processed)"
             raise BadImage
         if self.CONFIG["assembler.superpose.variante"] == 0:
             currentImage = ImageOps.equalize(currentImage)
@@ -3128,7 +3553,7 @@ class assembler_superpose(threading.Thread):
 
         return currentImage
 
-    def _postProcessImage(self,image):
+    def _postProcessImage(self, image):
         ''' Post-process the image before outputing it.
             This method must only be called by the thread !
             Input: a PIL Image object.
@@ -3140,10 +3565,13 @@ class assembler_superpose(threading.Thread):
             # then paste is with luminance as mask.
             # This lights up only dark areas while leaving other areas almost untouched.
             # This way, we get rid of most dark areas.
-            im_color = ImageOps.mirror(ImageOps.flip(finalimage))  # Flip image vertically and horizontally
-            im_mask = ImageOps.invert(finalimage.convert('L'))   # Use the image luminance as mask
-            #im_mask = ImageEnhance.Brightness(im_mask).enhance(0.7)  # Darken the mask
-            finalimage.paste(im_color,(0,0),im_mask)
+            # Flip image vertically and horizontally
+            im_color = ImageOps.mirror(ImageOps.flip(finalimage))
+            # Use the image luminance as mask
+            im_mask = ImageOps.invert(finalimage.convert('L'))
+            # im_mask = ImageEnhance.Brightness(im_mask).enhance(0.7)  # Darken
+            # the mask
+            finalimage.paste(im_color, (0, 0), im_mask)
             finalimage = ImageOps.equalize(finalimage)
 
         #  TEST for a new variante. (Less dark areas)
@@ -3158,18 +3586,20 @@ class assembler_superpose(threading.Thread):
         if self.CONFIG["assembler.mirror"]:
             finalimage = ImageOps.mirror(finalimage)
         if self.CONFIG["assembler.emboss"]:
-            finalimage_embossed = finalimage.filter(ImageFilter.EMBOSS).filter(ImageFilter.SMOOTH)  # Emboss image
-            finalimage = ImageOps.equalize( ImageChops.multiply(finalimage, finalimage_embossed) )  # Compose images
+            finalimage_embossed = finalimage.filter(
+                ImageFilter.EMBOSS).filter(ImageFilter.SMOOTH)  # Emboss image
+            finalimage = ImageOps.equalize(ImageChops.multiply(
+                finalimage, finalimage_embossed))  # Compose images
             #finalimage = Image.blend(finalimage,finalimage_embossed,0.5)
         if self.CONFIG["assembler.invert"]:
             finalimage = ImageOps.invert(finalimage)
 
-
-        (imagex,imagey) = finalimage.size
+        (imagex, imagey) = finalimage.size
         # Superpose the webGobbler "logo" in the lower right corner
-        (logox,logoy) = WEBGOBBLER_LOGO.size
-        #finalimage.paste(WEBGOBBLER_LOGO,(imagex-logox-4,imagey-logoy-2),WEBGOBBLER_LOGO_TRANSPARENCY)
-        finalimage.paste(WEBGOBBLER_LOGO,(imagex-logox-4,imagey-logoy-2+6),WEBGOBBLER_LOGO_TRANSPARENCY)  # Adjustment for the new logo
+        (logox, logoy) = WEBGOBBLER_LOGO.size
+        # finalimage.paste(WEBGOBBLER_LOGO,(imagex-logox-4,imagey-logoy-2),WEBGOBBLER_LOGO_TRANSPARENCY)
+        finalimage.paste(WEBGOBBLER_LOGO, (imagex - logox - 4, imagey - logoy - 2 + 6),
+                         WEBGOBBLER_LOGO_TRANSPARENCY)  # Adjustment for the new logo
         return finalimage
 
     def _saveCurrentImage(self):
@@ -3177,13 +3607,14 @@ class assembler_superpose(threading.Thread):
             This method must only be called by the thread !
         '''
         if self.currentImage != None:
-            savepath = os.path.join(self.CONFIG["persistencedirectory"],"assembler_superpose_current.bmp")
+            savepath = os.path.join(
+                self.CONFIG["persistencedirectory"], "assembler_superpose_current.bmp")
             try:
-              self.currentImage.save(savepath)
+                self.currentImage.save(savepath)
             except IOError, exc:
-              raise IOError, "Could not save current image to %s because: %s" % (savepath,exc)
+                raise IOError, "Could not save current image to %s because: %s" % (savepath, exc)
 
-    def _loadPreviousImage(self,ignorePreviousImage=False):
+    def _loadPreviousImage(self, ignorePreviousImage=False):
         ''' Try to get persisted image (image from previous run of program)
             (file to self.currentImage)
 
@@ -3193,22 +3624,25 @@ class assembler_superpose(threading.Thread):
         try:
             if ignorePreviousImage:
                 raise IOError  # Force to create a new image.
-            self.currentImage = Image.open(os.path.join(self.CONFIG["persistencedirectory"],"assembler_superpose_current.bmp"))
+            self.currentImage = Image.open(os.path.join(
+                self.CONFIG["persistencedirectory"], "assembler_superpose_current.bmp"))
             # If the image does not have the same size, resize it.
-            (imagex,imagey) = self.currentImage.size
-            if (imagex!=self.CONFIG["assembler.sizex"]) or (imagey!=self.CONFIG["assembler.sizey"]):
+            (imagex, imagey) = self.currentImage.size
+            if (imagex != self.CONFIG["assembler.sizex"]) or (imagey != self.CONFIG["assembler.sizey"]):
                 if self.currentImage.mode != 'RGB':
                     self.currentImage = self.currentImage.convert('RGB')
-                self.currentImage = self.currentImage.resize((self.CONFIG["assembler.sizex"],self.CONFIG["assembler.sizey"]),Image.ANTIALIAS)
+                self.currentImage = self.currentImage.resize(
+                    (self.CONFIG["assembler.sizex"], self.CONFIG["assembler.sizey"]), Image.ANTIALIAS)
                 self._logDebug("Starting from previous image resized.")
             else:
                 self._logDebug("Starting from previous image.")
         except IOError:
             # Could not read image, create a new one.
-            self.currentImage = Image.new('RGB',(self.CONFIG["assembler.sizex"],self.CONFIG["assembler.sizey"]))
+            self.currentImage = Image.new(
+                'RGB', (self.CONFIG["assembler.sizex"], self.CONFIG["assembler.sizey"]))
             # Before the first images are superposed, we display "Please wait while the first images are downloaded..."
-            #self.currentImage.paste(PLEASE_WAIT_IMAGE,(self.CONFIG["assembler.sizex"]/2-PLEASE_WAIT_IMAGE.size[0]/2,self.CONFIG["assembler.sizey"]/2-PLEASE_WAIT_IMAGE.size[1]/2+20))
-            self.currentImage.paste(PLEASE_WAIT_IMAGE,(30,30))
+            # self.currentImage.paste(PLEASE_WAIT_IMAGE,(self.CONFIG["assembler.sizex"]/2-PLEASE_WAIT_IMAGE.size[0]/2,self.CONFIG["assembler.sizey"]/2-PLEASE_WAIT_IMAGE.size[1]/2+20))
+            self.currentImage.paste(PLEASE_WAIT_IMAGE, (30, 30))
             self._logDebug("Starting a new image.")
             # Tell the superpose method to blank image when starting to superpose
             # (in order to remove the "Please wait while.." message.)
@@ -3227,21 +3661,26 @@ class assembler_superpose(threading.Thread):
         ''' Order the thread to superpose n images. This call is non-blocking.
             After this call, you can call getImage() but you are not guaranteed to get an image.
             (You may get None is the superpose option has not completed.) '''
-        self.inputCommandQueue.put(commandToken(superpose=self.CONFIG["assembler.superpose.nbimages"]),True)
+        self.inputCommandQueue.put(commandToken(superpose=self.CONFIG[
+                                   "assembler.superpose.nbimages"]), True)
 
     def superposeB(self):
         ''' Order the thread to superpose n images, and wait for completion. This call is blocking.
             After the end of this call, you can call getImage() and you will always get an image..'''
-        if not self.isAlive(): return
+        if not self.isAlive():
+            return
         # Ask the thread to superpose images.
-        self.inputCommandQueue.put(commandToken(superpose=self.CONFIG["assembler.superpose.nbimages"]),True)
+        self.inputCommandQueue.put(commandToken(superpose=self.CONFIG[
+                                   "assembler.superpose.nbimages"]), True)
         # Then wait for completion:
-        while True:  # We loop until .get(block=True) does not raise Queue.Empty exception.
+        # We loop until .get(block=True) does not raise Queue.Empty exception.
+        while True:
             try:
-                self.superposeCompleted.get(block=True,timeout=1)
+                self.superposeCompleted.get(block=True, timeout=1)
                 return
             except Queue.Empty:
-                if not self.isAlive(): return  # Do not wait for an answer if thread is dead !
+                if not self.isAlive():
+                    return  # Do not wait for an answer if thread is dead !
                 time.sleep(0.25)
 
     def getImage(self):
@@ -3260,17 +3699,19 @@ class assembler_superpose(threading.Thread):
 
     def shutdown(self):
         ''' Order the thread to shutdown and die. '''
-        self.inputCommandQueue.put(commandToken(shutdown=1),True)
+        self.inputCommandQueue.put(commandToken(shutdown=1), True)
 
-    def saveImageTo(self,destinationFilename):
+    def saveImageTo(self, destinationFilename):
         ''' Save last generated image to a file. '''
-        if not self.isAlive(): return
-        self._logInfo("Saving image to %s" % destinationFilename )
+        if not self.isAlive():
+            return
+        self._logInfo("Saving image to %s" % destinationFilename)
         # Saving image to persistence directory
-        self.getImage().save(destinationFilename)  # Save generated image to disk.
+        # Save generated image to disk.
+        self.getImage().save(destinationFilename)
         self._logInfo("Done.")
 
-    def _darkenImageBorder(self,image,borderSize=30):
+    def _darkenImageBorder(self, image, borderSize=30):
         '''
         Uses a gradient to darken the 4 borders of an image.
 
@@ -3286,48 +3727,58 @@ class assembler_superpose(threading.Thread):
             return image
 
         # Step 1 : create an image and a mask of the right width
-        horImage = Image.new('RGB', (image.size[0],borderSize))
-        horMask = Image.new('L',horImage.size)
-        verImage = Image.new('RGB', (borderSize,image.size[1]))
-        verMask = Image.new('L',verImage.size)
+        horImage = Image.new('RGB', (image.size[0], borderSize))
+        horMask = Image.new('L', horImage.size)
+        verImage = Image.new('RGB', (borderSize, image.size[1]))
+        verMask = Image.new('L', verImage.size)
 
         # Step 2 : Draw a gray gradient in the mask:
         drawH = ImageDraw.Draw(horMask)
         drawV = ImageDraw.Draw(verMask)
         for i in range(borderSize):
-            drawH.line( (0, i, horMask.size[0], i) ,fill=256-(256*i/borderSize))
-            drawV.line( (i,0, i, verMask.size[1]) ,fill=256-(256*i/borderSize))
+            drawH.line((0, i, horMask.size[0], i),
+                       fill=256 - (256 * i / borderSize))
+            drawV.line((i, 0, i, verMask.size[1]),
+                       fill=256 - (256 * i / borderSize))
         del drawH
         del drawV
 
-        # Step 3 : Paste the black image with the gradient mask on the original image:
-        image.paste(horImage,(0,0),horMask)  # Paste at image top.
-        image.paste(horImage,(0,image.size[1]-borderSize),ImageOps.flip(horMask))  # Paste at image bottom
-        image.paste(verImage,(0,0),verMask)  # Paste at image top.
-        image.paste(verImage,(image.size[0]-borderSize,0),ImageOps.mirror(verMask))  # Paste at image bottom
+        # Step 3 : Paste the black image with the gradient mask on the original
+        # image:
+        image.paste(horImage, (0, 0), horMask)  # Paste at image top.
+        # Paste at image bottom
+        image.paste(horImage, (0, image.size[
+                    1] - borderSize), ImageOps.flip(horMask))
+        image.paste(verImage, (0, 0), verMask)  # Paste at image top.
+        # Paste at image bottom
+        image.paste(
+            verImage, (image.size[0] - borderSize, 0), ImageOps.mirror(verMask))
 
         return image
+
 
 def get_unix_lib(lib_name):
     '''Find an Unix / Linux shared library path to use it with ctypes'''
 
-    lib_path=['/lib/','/usr/lib/'] # Standard libs path
-    personal_lib_path=os.environ.get("LD_LIBRARY_PATH") # Personal libs path
+    lib_path = ['/lib/', '/usr/lib/']  # Standard libs path
+    personal_lib_path = os.environ.get("LD_LIBRARY_PATH")  # Personal libs path
 
     if personal_lib_path:
         lib_path += personal_lib_path.split(':')
 
-    if os.path.isfile("/etc/ld.so.conf"): # Other global libs path
+    if os.path.isfile("/etc/ld.so.conf"):  # Other global libs path
         lib_path += open("/etc/ld.so.conf").read().strip().split('\n')
 
     for path in lib_path:
         if not os.path.isdir(path):
             continue
         for element in os.listdir(path):
-            if element[:len(lib_name)] == lib_name: # The letters in the beginning of this lib are the same as our lib_name. I guess this is one of its versions
+            # The letters in the beginning of this lib are the same as our
+            # lib_name. I guess this is one of its versions
+            if element[:len(lib_name)] == lib_name:
                 return os.path.join(path, element)
 
-    return None # Can't find it
+    return None  # Can't find it
 
 
 def gnomeWallpaperChanger(config, wallpaperPath='.'):
@@ -3341,51 +3792,60 @@ def gnomeWallpaperChanger(config, wallpaperPath='.'):
         raise ImportError, "The ctypes module is required to run the Gnome wallpaper changer. See http://starship.python.net/crew/theller/ctypes/\nCould not import module because: %s" % exc
 
     # Search the libgconf-2.so and load it
-    gconf2_path=get_unix_lib("libgconf-2.so")
+    gconf2_path = get_unix_lib("libgconf-2.so")
     if not gconf2_path:
         raise OSError, "Is Gconf 2.x installed on your system? Older versions are currently unsupported. If you suspect a bug, please send me an email on frederic.weisbecker@wanadoo.fr"
-    gconf=ctypes.CDLL(gconf2_path)
+    gconf = ctypes.CDLL(gconf2_path)
     # Get Gconf Api necessary functions
-    g_type_init=gconf.g_type_init
-    gconf_client_get_default=gconf.gconf_client_get_default
-    gconf_client_set_string=gconf.gconf_client_set_string
+    g_type_init = gconf.g_type_init
+    gconf_client_get_default = gconf.gconf_client_get_default
+    gconf_client_set_string = gconf.gconf_client_set_string
 
     # Wallpaper entry on Gnome configuration
-    wallpaper_config="/desktop/gnome/background/picture_filename"
+    wallpaper_config = "/desktop/gnome/background/picture_filename"
 
     # Save the image
-    wallpaperfilename = os.path.join(os.path.abspath(wallpaperPath),'webgobbler.bmp')
-    a = assembler_superpose(pool=imagePool(config=config),config=config)
+    wallpaperfilename = os.path.join(
+        os.path.abspath(wallpaperPath), 'webgobbler.bmp')
+    a = assembler_superpose(pool=imagePool(config=config), config=config)
     a.start()
     a.saveImageTo(wallpaperfilename)
 
     # Change the "Desktop Wallpaper" value in Gnome configuration
-    # Thanks to http://freshmeat.net/projects/wp_tray/ (where I found the way to change the wallpaper under Gnome)
+    # Thanks to http://freshmeat.net/projects/wp_tray/ (where I found the way
+    # to change the wallpaper under Gnome)
     g_type_init()
-    GConfClient=gconf_client_get_default()
-    gconf_client_set_string(GConfClient, wallpaper_config, wallpaperfilename, 0)
+    GConfClient = gconf_client_get_default()
+    gconf_client_set_string(
+        GConfClient, wallpaper_config, wallpaperfilename, 0)
 
     # Under gnome, if you change the "Desktop Wallpaper" path with the same path than before (even if the image changed)
     # gnome will not change the wallpaper, considering that nothing changed.
-    # So we have to manage the wallpaper with two files: /path/image.ext (real path) and /path/~image.ext (symbolic link to the real path)
-    wallpaperlinkname= os.path.join(os.path.abspath(wallpaperPath),'~webgobbler.bmp')
+    # So we have to manage the wallpaper with two files: /path/image.ext (real
+    # path) and /path/~image.ext (symbolic link to the real path)
+    wallpaperlinkname = os.path.join(
+        os.path.abspath(wallpaperPath), '~webgobbler.bmp')
     if os.path.islink(wallpaperlinkname):
         os.remove(wallpaperlinkname)
     os.symlink(wallpaperfilename, wallpaperlinkname)
-    link_tour=1
+    link_tour = 1
 
     try:
         while True:
-            log.info("Generating a new wallpaper now with %d new images" % config["assembler.superpose.nbimages"])
+            log.info("Generating a new wallpaper now with %d new images" %
+                     config["assembler.superpose.nbimages"])
             a.superposeB()
             a.saveImageTo(wallpaperfilename)
-            if link_tour: # It's the wallpaper's link tour
-                gconf_client_set_string(GConfClient, wallpaper_config, wallpaperlinkname, 0)
-            else: # Normal filename tour
-                gconf_client_set_string(GConfClient, wallpaper_config, wallpaperfilename, 0)
+            if link_tour:  # It's the wallpaper's link tour
+                gconf_client_set_string(
+                    GConfClient, wallpaper_config, wallpaperlinkname, 0)
+            else:  # Normal filename tour
+                gconf_client_set_string(
+                    GConfClient, wallpaper_config, wallpaperfilename, 0)
 
-            link_tour^=1
-            log.info("Done. Next wallpaper in %d seconds." % config["program.every"])
+            link_tour ^= 1
+            log.info("Done. Next wallpaper in %d seconds." %
+                     config["program.every"])
             time.sleep(config["program.every"])
     finally:
         a.shutdown()
@@ -3395,7 +3855,7 @@ def gnomeWallpaperChanger(config, wallpaperPath='.'):
 def kdeWallpaperChanger(config, wallpaperPath="."):
     '''Like windowsWallpaperChanger (), This will automatically change the Wallpaper, but under Kde 3.x Desktop (and perhaps older versions)'''
 
-    log=logging.getLogger('kdeWallpaperChanger')
+    log = logging.getLogger('kdeWallpaperChanger')
 
     try:
         import pcop
@@ -3403,38 +3863,48 @@ def kdeWallpaperChanger(config, wallpaperPath="."):
         raise ImportError, "The python-dcop module is required to run The Kde wallpaper. Python-dcop is included into kdebindings (a part of kde). Your distribution probably have this package.\nCould not import module because: %s" % exc
 
     # Does setWallpaper() 's kdesktop method exists?
-    wallpaper_methods=pcop.method_list("kdesktop","KBackgroundIface")
+    wallpaper_methods = pcop.method_list("kdesktop", "KBackgroundIface")
     try:
-        wallpaper_methods.index('void setWallpaper(QString wallpaper,int mode)')
+        wallpaper_methods.index(
+            'void setWallpaper(QString wallpaper,int mode)')
     except ValueError:
         raise ValueError, "Webgobbler needs to use kde resources with dcop service to manage kde wallpaper. I'm unable to access kdesktop 's setWallpaper() method. Perhaps kde is not started or you are running a too old kde version."
 
-    wallpaperfilename = os.path.join(os.path.abspath(wallpaperPath),'webgobbler.bmp')
-    a = assembler_superpose(pool=imagePool(config=config),config=config)
+    wallpaperfilename = os.path.join(
+        os.path.abspath(wallpaperPath), 'webgobbler.bmp')
+    a = assembler_superpose(pool=imagePool(config=config), config=config)
     a.start()
     a.saveImageTo(wallpaperfilename)
 
     # Set wallpaper
     # Thanks to http://linuxfr.org/tips/213.html where I found the way to change wallpaper under Kde,
-    # http://lea-linux.org/cached/index/Dev-dcop.html and thanks to many other urls....
-    pcop.dcop_call("kdesktop", "KBackgroundIface", "setWallpaper", (wallpaperfilename,1))
-    # Create a link to the wallpaper to alternate two names for the wallpaper for the same reason explained in changeGnomeWallpaper
-    wallpaperlinkname= os.path.join(os.path.abspath(wallpaperPath),'~webgobbler.bmp')
+    # http://lea-linux.org/cached/index/Dev-dcop.html and thanks to many other
+    # urls....
+    pcop.dcop_call("kdesktop", "KBackgroundIface",
+                   "setWallpaper", (wallpaperfilename, 1))
+    # Create a link to the wallpaper to alternate two names for the wallpaper
+    # for the same reason explained in changeGnomeWallpaper
+    wallpaperlinkname = os.path.join(
+        os.path.abspath(wallpaperPath), '~webgobbler.bmp')
     os.symlink(wallpaperfilename, wallpaperlinkname)
-    link_tour=1
+    link_tour = 1
 
     try:
         while True:
-            log.info("Generating a new wallpaper now with %d new images" % config["assembler.superpose.nbimages"])
+            log.info("Generating a new wallpaper now with %d new images" %
+                     config["assembler.superpose.nbimages"])
             a.superposeB()
             a.saveImageTo(wallpaperfilename)
-            if link_tour: # Tell kdesktop to use the picture's link path
-                pcop.dcop_call("kdesktop", "KBackgroundIface", "setWallpaper", (wallpaperlinkname,1))
-            else: # Tell kdesktop to use the normal picture's path
-                pcop.dcop_call("kdesktop", "KBackgroundIface", "setWallpaper", (wallpaperfilename,1))
+            if link_tour:  # Tell kdesktop to use the picture's link path
+                pcop.dcop_call("kdesktop", "KBackgroundIface",
+                               "setWallpaper", (wallpaperlinkname, 1))
+            else:  # Tell kdesktop to use the normal picture's path
+                pcop.dcop_call("kdesktop", "KBackgroundIface",
+                               "setWallpaper", (wallpaperfilename, 1))
 
-            link_tour^=1
-            log.info("Done. Next wallpaper in %d seconds." % config["program.every"])
+            link_tour ^= 1
+            log.info("Done. Next wallpaper in %d seconds." %
+                     config["program.every"])
             time.sleep(config["program.every"])
     finally:
         a.shutdown()
@@ -3459,32 +3929,43 @@ def windowsWallpaperChanger(config, wallpaperPath='.'):
     SM_CXSCREEN = 0
     SM_CYSCREEN = 1
 
-    # Get Windows screen resolution and use it (we ignore resolution specified in command-line)
-    screen_resolution = ( ctypes.windll.user32.GetSystemMetrics(SM_CXSCREEN), ctypes.windll.user32.GetSystemMetrics(SM_CYSCREEN) )
-    log.info("Using screen resolution %dx%d"%(screen_resolution[0],screen_resolution[1]))
-    (config["assembler.sizex"],config["assembler.sizey"]) = screen_resolution
+    # Get Windows screen resolution and use it (we ignore resolution specified
+    # in command-line)
+    screen_resolution = (ctypes.windll.user32.GetSystemMetrics(
+        SM_CXSCREEN), ctypes.windll.user32.GetSystemMetrics(SM_CYSCREEN))
+    log.info("Using screen resolution %dx%d" %
+             (screen_resolution[0], screen_resolution[1]))
+    (config["assembler.sizex"], config["assembler.sizey"]) = screen_resolution
 
-    SPI_SETDESKWALLPAPER = 20 # According to http://support.microsoft.com/default.aspx?scid=97142
-    wallpaperfilename = os.path.join(os.path.abspath(wallpaperPath),'webgobbler.bmp')
-    a = assembler_superpose(pool=imagePool(config=config),config=config)
+    # According to http://support.microsoft.com/default.aspx?scid=97142
+    SPI_SETDESKWALLPAPER = 20
+    wallpaperfilename = os.path.join(
+        os.path.abspath(wallpaperPath), 'webgobbler.bmp')
+    a = assembler_superpose(pool=imagePool(config=config), config=config)
     a.start()
     # Display immediately an image:
     a.saveImageTo(wallpaperfilename)
-    ctypes.windll.user32.SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, wallpaperfilename , 0)
+    ctypes.windll.user32.SystemParametersInfoA(
+        SPI_SETDESKWALLPAPER, 0, wallpaperfilename, 0)
     try:
         while True:
-            log.info("Generating a new wallpaper now with %d new images" % config["assembler.superpose.nbimages"])
-            a.superposeB() # Evolve current image
+            log.info("Generating a new wallpaper now with %d new images" %
+                     config["assembler.superpose.nbimages"])
+            a.superposeB()  # Evolve current image
             a.saveImageTo(wallpaperfilename)
             # Force Windows to use our wallpaper:
-            ctypes.windll.user32.SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, wallpaperfilename , 0)
-            log.info("Done. Next wallpaper in %d seconds." % config["program.every"])
+            ctypes.windll.user32.SystemParametersInfoA(
+                SPI_SETDESKWALLPAPER, 0, wallpaperfilename, 0)
+            log.info("Done. Next wallpaper in %d seconds." %
+                     config["program.every"])
             time.sleep(config["program.every"])
     finally:
         a.shutdown()
-        a.join()   # Make sure assemble is shutdown before shutting down the image pool.
+        # Make sure assemble is shutdown before shutting down the image pool.
+        a.join()
 
-def image_saver(config, imageName='webgobbler.bmp',generateSingleImage=False):
+
+def image_saver(config, imageName='webgobbler.bmp', generateSingleImage=False):
     ''' Continuously generate new images (using the assembler_superpose) and save them
         into a file.
         config (an applicationConfig object) : the program configuration
@@ -3492,22 +3973,24 @@ def image_saver(config, imageName='webgobbler.bmp',generateSingleImage=False):
         generateSingleImage (bool): If True, will generate a single image.
     '''
     log = logging.getLogger('image_saver')
-    a = assembler_superpose(pool=imagePool(config=config),config=config)
+    a = assembler_superpose(pool=imagePool(config=config), config=config)
     a.start()
     try:
         while True:
             log.info("Generating a new image to %s" % imageName)
             a.superposeB()  # Evolve current image
             a.saveImageTo(imageName)
-            if generateSingleImage: break;
-            log.info("Will generate a new image in %d seconds." % config["program.every"])
+            if generateSingleImage:
+                break
+            log.info("Will generate a new image in %d seconds." %
+                     config["program.every"])
             time.sleep(config["program.every"])
     finally:
         a.shutdown()
         a.join()
 
 
-def windowsScreensaver(startmode,config):
+def windowsScreensaver(startmode, config):
     ''' Start as Windows Screensaver
         startmode (string): Start option
              s = start screensaver
@@ -3535,39 +4018,46 @@ def windowsScreensaver(startmode,config):
         raise ImportError, "wgwin32screensaver module is required to run the Windows screensaver.\nCould not import module because: %s" % exc
 
     # Check parameters passed.
-    if not (startmode in ('s','c','p','a')):
+    if not (startmode in ('s', 'c', 'p', 'a')):
         raise RuntimeError, "Parameter startmode=%s not supported by windowsScreensaver." % str(startmode)
 
-    if startmode=='s':
+    if startmode == 's':
         # Get current screen resolution:
         screen_resolution = wgwin32screensaver.getScreenResolution()
         # screen_resolution is a tuple (x,y) where x and y are integers.
 
-        # Ignore resolution specified in command-line and use screen resolution.
-        log.info("Using screen resolution %dx%d"%(screen_resolution[0],screen_resolution[1]))
-        (config["assembler.sizex"],config["assembler.sizey"]) = screen_resolution
+        # Ignore resolution specified in command-line and use screen
+        # resolution.
+        log.info("Using screen resolution %dx%d" %
+                 (screen_resolution[0], screen_resolution[1]))
+        (config["assembler.sizex"], config[
+         "assembler.sizey"]) = screen_resolution
 
-        a = assembler_superpose(pool=imagePool(config=config),config=config)
+        a = assembler_superpose(pool=imagePool(config=config), config=config)
         a.start()         # Start the assembler (non-blocking)
 
         # Ask the wgwin32screensaver module to create the screensaver Window
         # and handle the low-level stuff (Windows message handling, etc.)
         # messageLoop() will use the assembler we created.
         try:
-            wgwin32screensaver.messageLoop(assembler_sup=a,config=config);  # this call is a blocking call.
+            # this call is a blocking call.
+            wgwin32screensaver.messageLoop(assembler_sup=a, config=config)
         finally:
             # At this point, the screensaver has stopped and the screensaver window
             # has disappeared, but some threads are still alive (collectors, pool, etc.)
             # We ask all threads to shutdown, but this may take a while...
-            a.shutdown()  # When we shutdown the assembler, the assembler will take care of shutting all threads it manages.
+            # When we shutdown the assembler, the assembler will take care of
+            # shutting all threads it manages.
+            a.shutdown()
             a.join()
         return
 
-    if startmode=='p':
+    if startmode == 'p':
         return  # Ignore.  FIXME: Implement the preview mode.
 
     # else, display error:
     raise NotImplementedError, "/%s option not implemented yet" % startmode
+
 
 def x11Screensaver(config):
     ''' Start as XWindow Screensaver (XFree86) in a Linux/Unix os type.
@@ -3586,21 +4076,23 @@ def x11Screensaver(config):
         raise ImportError, "wgx11screensaver module is required to run the XWindow screensaver.\nCould not import module because: %s" % exc
 
     # Define our unix_lib finder on wgx11screensaver module
-    wgx11screensaver.get_unix_lib=get_unix_lib
+    wgx11screensaver.get_unix_lib = get_unix_lib
     # Get current screen resolution:
     screen_resolution = wgx11screensaver.getScreenResolution()
     # screen_resolution is a tuple (x,y) where x and y are integers.
 
     # Ignore resolution specified in command-line and use screen resolution.
-    log.info("Using screen resolution %dx%d"%(screen_resolution[0],screen_resolution[1]))
-    (config["assembler.sizex"],config["assembler.sizey"]) = screen_resolution
+    log.info("Using screen resolution %dx%d" %
+             (screen_resolution[0], screen_resolution[1]))
+    (config["assembler.sizex"], config["assembler.sizey"]) = screen_resolution
 
-    a = assembler_superpose(pool=imagePool(config=config),config=config)
+    a = assembler_superpose(pool=imagePool(config=config), config=config)
     a.start()         # Start the assembler (non-blocking)
 
     # Launch the Xwindow Screensaver
     try:
-        wgx11screensaver.Loop(assembler_sup=a,config=config)  # this call is a blocking call.
+        # this call is a blocking call.
+        wgx11screensaver.Loop(assembler_sup=a, config=config)
     finally:
         # At this point, the screensaver has stopped and the screensaver window
         # has disappeard, but some threads are still alive.
@@ -3610,8 +4102,7 @@ def x11Screensaver(config):
         return
 
 
-
-def htmlPageGenerator(htmlFilename,config):
+def htmlPageGenerator(htmlFilename, config):
     ''' Generates a HTML page and a JPEG image.
         The HTML page contains refresh META tags so that the page is
         automatically reloaded in the browser.
@@ -3622,11 +4113,12 @@ def htmlPageGenerator(htmlFilename,config):
         (progressive JPEG file).
     '''
     log = logging.getLogger('htmlPageGenerator')
-    a = assembler_superpose(pool=imagePool(config=config),config=config)
+    a = assembler_superpose(pool=imagePool(config=config), config=config)
     a.start()
     # Get the path of the htmlFile and write the image in the same directory:
-    (path,htmlfilename) = os.path.split(htmlFilename)
-    if path == None: path = "."
+    (path, htmlfilename) = os.path.split(htmlFilename)
+    if path == None:
+        path = "."
     path = os.path.abspath(path)  # Convert to absolute path.
 
     try:
@@ -3634,12 +4126,14 @@ def htmlPageGenerator(htmlFilename,config):
             log.info("Generating an image and HTML page in %s..." % path)
             a.superposeB()  # Evolve current image
             i = a.getImage()
-            if len(path.strip())>0:
-                imagepath = os.path.join(path,'webgobbler.jpg')
+            if len(path.strip()) > 0:
+                imagepath = os.path.join(path, 'webgobbler.jpg')
             else:
                 imagepath = 'webgobbler.jpg'
-            i.save(imagepath,option={'progression':True,'quality':70,'optimize':True})
-            file = open(htmlFilename,'w+b')  # Overwrite any existing html page with this name.
+            i.save(imagepath, option={
+                   'progression': True, 'quality': 70, 'optimize': True})
+            # Overwrite any existing html page with this name.
+            file = open(htmlFilename, 'w+b')
             file.write('''<html>
   <head>
     <meta http-equiv="refresh" content="%d; url=%s">
@@ -3650,22 +4144,22 @@ def htmlPageGenerator(htmlFilename,config):
     <img src="webgobbler.jpg" width="%d" height="%d" alt="webGobbler generated image">
   </body>
 </html>
-''' % (config["program.every"],htmlfilename,time.asctime(time.localtime()),i.size[0],i.size[1]))
+''' % (config["program.every"], htmlfilename, time.asctime(time.localtime()), i.size[0], i.size[1]))
             file.close()
-            log.info("Will generate a new image and HTML page in %d seconds." % config["program.every"])
+            log.info("Will generate a new image and HTML page in %d seconds." % config[
+                     "program.every"])
             time.sleep(config["program.every"])
     finally:
         a.shutdown()
         a.join()
 
 
-
-# ### Program help ###############################################################
+# ### Program help #######################################################
 
 def usage(programname):
     '''Displays program help and command-line options.'''
     if programname.endswith('.py'):
-        programname = 'python '+programname
+        programname = 'python ' + programname
     # FIXME: code the following parameters for the windows screensaver.
     '''
   /p  : Preview Windows screensaver
@@ -3855,7 +4349,7 @@ Examples:
   %s --loadconfreg --towindowswallpaper
      Run the wallpaper changer with the options saved in registry
      by --saveconfreg.
-'''%((programname,)*8)
+''' % ((programname,) * 8)
 
     sys.stdout.write(t)
 
@@ -3876,35 +4370,37 @@ def setUrllibProxy(log, CONFIG):
     # FIXME: Handle HTTP error if proxy login/password is wrong ?
     if CONFIG["network.http.proxy.enabled"]:
         if log != None:
-            log.info('  Using proxy %s:%d' % (CONFIG["network.http.proxy.address"],CONFIG["network.http.proxy.port"]))
+            log.info('  Using proxy %s:%d' % (
+                CONFIG["network.http.proxy.address"], CONFIG["network.http.proxy.port"]))
         if CONFIG["network.http.proxy.auth.enabled"]:  # For proxy with Basic authentication
-            #if p_action =='--saveconffile':
+            # if p_action =='--saveconffile':
             #    log.warning("*** WARNING: The proxy password will be saved in a file in your home directory.")
-            #if p_action =='--saveconfreg':
+            # if p_action =='--saveconfreg':
             #    log.warning("*** WARNING: The proxy password will be saved in the Windows registry.")
-            if len(CONFIG["network.http.proxy.auth.password"])==0:
-                CONFIG["network.http.proxy.auth.password"] = getpass.getpass("  Please enter password for %s at %s:%d:" % (CONFIG["network.http.proxy.auth.login"],CONFIG["network.http.proxy.address"],CONFIG["network.http.proxy.port"]))
+            if len(CONFIG["network.http.proxy.auth.password"]) == 0:
+                CONFIG["network.http.proxy.auth.password"] = getpass.getpass("  Please enter password for %s at %s:%d:" % (
+                    CONFIG["network.http.proxy.auth.login"], CONFIG["network.http.proxy.address"], CONFIG["network.http.proxy.port"]))
             if log != None:
                 log.info("  Using authentication on proxy.")
             # Code shamelessly copy-pasted from:
             # http://groups.google.com/groups?selm=mailman.983901970.11969.python-list%40python.org
-            proxy_info = { 'host' : CONFIG["network.http.proxy.address"],
-                           'port' : CONFIG["network.http.proxy.port"],
-                           'user' : CONFIG["network.http.proxy.auth.login"],
-                           'pass' : CONFIG["network.http.proxy.auth.password"]
-                         }
+            proxy_info = {'host': CONFIG["network.http.proxy.address"],
+                          'port': CONFIG["network.http.proxy.port"],
+                          'user': CONFIG["network.http.proxy.auth.login"],
+                          'pass': CONFIG["network.http.proxy.auth.password"]
+                          }
             # build a new opener that uses a proxy requiring authorization
-            proxy_support = urllib2.ProxyHandler({"http" :
-                            "http://%(user)s:%(pass)s@%(host)s:%(port)d" % proxy_info})
+            proxy_support = urllib2.ProxyHandler({"http":
+                                                  "http://%(user)s:%(pass)s@%(host)s:%(port)d" % proxy_info})
             opener = urllib2.build_opener(proxy_support)
             urllib2.install_opener(opener)  # install it as the default opener
         else:  # Use proxy with no password
-            proxy_info = { 'host' : CONFIG["network.http.proxy.address"],
-                           'port' : CONFIG["network.http.proxy.port"]
-                         }
+            proxy_info = {'host': CONFIG["network.http.proxy.address"],
+                          'port': CONFIG["network.http.proxy.port"]
+                          }
             # build a new opener that uses a proxy
-            proxy_support = urllib2.ProxyHandler({"http" :
-                            "http://%(host)s:%(port)d" % proxy_info})
+            proxy_support = urllib2.ProxyHandler({"http":
+                                                  "http://%(host)s:%(port)d" % proxy_info})
             opener = urllib2.build_opener(proxy_support)
             urllib2.install_opener(opener)  # install it as the default opener
     else:
@@ -3913,12 +4409,10 @@ def setUrllibProxy(log, CONFIG):
         opener = urllib2.build_opener()  # Get the default handler.
         urllib2.install_opener(opener)  # install it as the default opener
 
-
     return CONFIG
 
 
-
-# == Main ======================================================================
+# == Main ================================================================
 
 def main():
     '''Parses the command-line options and rects accordingly (launches the GUI, etc.). '''
@@ -3926,75 +4420,83 @@ def main():
     CONFIG = applicationConfig()
 
     # Set up the default log:
-    logging.getLogger().setLevel(logging.INFO)  # By default, only display informative messages and fatal errors.
+    # By default, only display informative messages and fatal errors.
+    logging.getLogger().setLevel(logging.INFO)
     # Attach a handler to this log:
     handler_stdout = logging.StreamHandler()
     handler_stdout.setFormatter(logging.Formatter('%(message)s'))
-    #handler_stdout.setFormatter(logging.Formatter('%(name)s: %(message)s'))  # Change format of messages.
+    # handler_stdout.setFormatter(logging.Formatter('%(name)s: %(message)s'))
+    # # Change format of messages.
 
     logging.getLogger().addHandler(handler_stdout)
 
     log = logging.getLogger('main')    # The log for the main()
 
-
     # Default value for command-line parameters:
-    p_action = None            # Action to perform (screensaver, wallpaper changer...)
+    # Action to perform (screensaver, wallpaper changer...)
+    p_action = None
     p_action_parameter = None  # Optional parameters for action
 
     # Parse command-line options:
     # In case we are called directly by Windows as a screensaver, the command-line may contain /s /c /p or /a
     # We first parse the command-line ourselves.
     if len(sys.argv) > 1:
-        line_option = sys.argv[1].lower() # Get the first command-line option.
-        if len(line_option)>1 and line_option[0] in ('/','-') and line_option[1] in ('s','c','p','a'):
+        line_option = sys.argv[1].lower()  # Get the first command-line option.
+        if len(line_option) > 1 and line_option[0] in ('/', '-') and line_option[1] in ('s', 'c', 'p', 'a'):
             p_action = "--windowsscreensaver"
             p_action_parameter = line_option[1]
-            del sys.argv[1]  # Then remove this option (because getopt does not like slashes)
-            if p_action_parameter=='c':
+            # Then remove this option (because getopt does not like slashes)
+            del sys.argv[1]
+            if p_action_parameter == 'c':
                 import webgobbler_config
                 webgobbler_config.main()  # Call the configuration GUI
-                return # Then exit.
+                return  # Then exit.
 
     # Then we let the command-line be parsed by getopt:
     # FIXME: Use the new optparse module ?
     try:
-        opts, args = getopt.getopt(sys.argv[1:],'',['tofile=','resolution=','debug','variante=','emboss',
-                                                    'keepimages','nbimages=','every=','pooldirectory=',
-                                                    'invert','mirror','poolnbimages=','localonly','help',
-                                                    'proxy=','proxyauth=','singleimage=','tohtml=',
-                                                    'bordersmooth=', 'tognomewallpaper','tokdewallpaper',
-                                                    'towindowswallpaper','norotation','resuperpose','guiconfig',
-                                                    'saveconfreg','loadconfreg','saveconffile','loadconffile',
-                                                    'xscreensaver','scale=','keywords='])
+        opts, args = getopt.getopt(sys.argv[1:], '', ['tofile=', 'resolution=', 'debug', 'variante=', 'emboss',
+                                                      'keepimages', 'nbimages=', 'every=', 'pooldirectory=',
+                                                      'invert', 'mirror', 'poolnbimages=', 'localonly', 'help',
+                                                      'proxy=', 'proxyauth=', 'singleimage=', 'tohtml=',
+                                                      'bordersmooth=', 'tognomewallpaper', 'tokdewallpaper',
+                                                      'towindowswallpaper', 'norotation', 'resuperpose', 'guiconfig',
+                                                      'saveconfreg', 'loadconfreg', 'saveconffile', 'loadconffile',
+                                                      'xscreensaver', 'scale=', 'keywords='])
     except getopt.GetoptError, ex:
         print "Error in command-line: %s" % ex
-        #usage(sys.argv[0])  # print help information and exit:
+        # usage(sys.argv[0])  # print help information and exit:
         logging.shutdown()
         return
 
     for opt, arg in opts:
         if opt == '--resolution':  # Example: --resolution 1024x768
-            (x,y) = arg.split('x')  # FIXME: try/except split+assignment
-            CONFIG["assembler.sizex"] = int(x)      # FIXME: try/except conversion to int
+            (x, y) = arg.split('x')  # FIXME: try/except split+assignment
+            # FIXME: try/except conversion to int
+            CONFIG["assembler.sizex"] = int(x)
             CONFIG["assembler.sizey"] = int(y)
         elif opt == '--help':
             usage(sys.argv[0])  # print help information and exit:
             return  # Exit program.
         elif opt == '--every':
-            CONFIG["program.every"] = int(arg) # FIXME: try/except conversion to int
+            # FIXME: try/except conversion to int
+            CONFIG["program.every"] = int(arg)
         elif opt == '--keepimages':
             CONFIG["pool.keepimages"] = True
         elif opt == '--pooldirectory':
             CONFIG["pool.imagepooldirectory"] = str(arg)
         elif opt == '--poolnbimages':
-            CONFIG["pool.nbimages"] = int(arg)        # FIXME: try/except conversion to int
+            # FIXME: try/except conversion to int
+            CONFIG["pool.nbimages"] = int(arg)
         elif opt == '--nbimages':
-            CONFIG["assembler.superpose.nbimages"] = int(arg)   # FIXME: try/except conversion to int
+            CONFIG["assembler.superpose.nbimages"] = int(
+                arg)   # FIXME: try/except conversion to int
         elif opt == '--keywords':
             CONFIG["collector.keywords.enabled"] = True
             CONFIG["collector.keywords.keywords"] = str(arg)
         elif opt == '--bordersmooth':
-            CONFIG["assembler.superpose.bordersmooth"] = int(arg)   # FIXME: try/except conversion to int
+            CONFIG["assembler.superpose.bordersmooth"] = int(
+                arg)   # FIXME: try/except conversion to int
         elif opt == '--invert':
             CONFIG["assembler.invert"] = True
         elif opt == '--mirror':
@@ -4008,25 +4510,28 @@ def main():
         elif opt == '--debug':
             CONFIG["debug"] = True
         elif opt == "--variante":
-            CONFIG["assembler.superpose.variante"] = int(arg)   # FIXME: try/except conversion to int
+            CONFIG["assembler.superpose.variante"] = int(
+                arg)   # FIXME: try/except conversion to int
         elif opt == "--scale":
-            CONFIG["assembler.superpose.scale"] = float(arg)    # FIXME: try/except conversion to float
+            CONFIG["assembler.superpose.scale"] = float(
+                arg)    # FIXME: try/except conversion to float
         elif opt == '--norotation':
             CONFIG["assembler.superpose.randomrotation"] = False
         elif opt == '--proxy':
             proxyaddress, proxyport = str(arg).split(":")
             CONFIG["network.http.proxy.address"] = proxyaddress
-            CONFIG["network.http.proxy.port"] = int(proxyport)   # FIXME: try/except conversion to int
+            # FIXME: try/except conversion to int
+            CONFIG["network.http.proxy.port"] = int(proxyport)
             CONFIG["network.http.proxy.enabled"] = True
             # FIXME: Test proxy connexion here ?
             # FIXME: handle authentication errors.
         elif opt == '--proxyauth':
             CONFIG["network.http.proxy.auth.enabled"] = True
             if arg.find(":") > 0:
-              proxylogin, proxypasswd = arg.split(":")
+                proxylogin, proxypasswd = arg.split(":")
             else:
-              proxylogin = arg
-              proxypasswd = ""
+                proxylogin = arg
+                proxypasswd = ""
             CONFIG["network.http.proxy.auth.login"] = proxylogin
             CONFIG["network.http.proxy.auth.password"] = proxypasswd
         elif opt in ('--tofile'):  # Save to file
@@ -4038,7 +4543,8 @@ def main():
             p_action = opt
         elif opt in ('--tokdewallpaper'):  # Set wallpaper under Kde
             p_action = opt
-        elif opt in ('--xscreensaver'): # Set image on a xwindow Screensaver (Linux or Unix with XFree86)
+        # Set image on a xwindow Screensaver (Linux or Unix with XFree86)
+        elif opt in ('--xscreensaver'):
             p_action = opt
         elif opt in ('--singleimage'):  # Generate a single image and exit.
             p_action = opt
@@ -4074,18 +4580,21 @@ def main():
         webgobbler_config.main()  # Call the GUI configuration
         return  # Then exit.
 
-    # When running in GUI application mode, get the config from registry or .ini by default.
-    if p_action==None:
+    # When running in GUI application mode, get the config from registry or
+    # .ini by default.
+    if p_action == None:
         CONFIG = getConfig()
-
 
     if CONFIG["debug"]:  # If we are running in debug mode:
         # Change the display of the main log (to screen)
-        handler_stdout.setFormatter(logging.Formatter('%(name)s: %(message)s'))  # Change format of messages.
-        logging.getLogger().setLevel(logging.DEBUG)  # And switch to DEBUG view (=view all messages)
+        # Change format of messages.
+        handler_stdout.setFormatter(logging.Formatter('%(name)s: %(message)s'))
+        # And switch to DEBUG view (=view all messages)
+        logging.getLogger().setLevel(logging.DEBUG)
         # And also log everything to a file:
-        handler = logging.FileHandler('webGobbler.log') # Log to a file.
-        handler.setFormatter(logging.Formatter('[%(thread)d] %(name)s: %(message)s'))
+        handler = logging.FileHandler('webGobbler.log')  # Log to a file.
+        handler.setFormatter(logging.Formatter(
+            '[%(thread)d] %(name)s: %(message)s'))
         logging.getLogger().addHandler(handler)
 
     # Display parameters:
@@ -4094,23 +4603,32 @@ def main():
     # Configure proxy (if provided in command-line):
     CONFIG = setUrllibProxy(log, CONFIG)
 
-    log.info('  Resolution: %dx%d' % (CONFIG["assembler.sizex"],CONFIG["assembler.sizey"]))
+    log.info('  Resolution: %dx%d' %
+             (CONFIG["assembler.sizex"], CONFIG["assembler.sizey"]))
     log.info('  Generate new image every %d seconds' % CONFIG["program.every"])
-    if CONFIG["assembler.invert"]: log.info('  Images will be inverted (negative)')
-    if CONFIG["assembler.mirror"]: log.info('  Images will be mirror (left-right)')
-    if CONFIG["assembler.emboss"]: log.info('  Images will be embossed')
-    if CONFIG["assembler.resuperpose"]: log.info('  Images will be re-superposed')
-    if not CONFIG["assembler.superpose.randomrotation"]: log.info('  Rotation is disabled.')
-    log.info('  Use %d images at each image generation' % CONFIG["assembler.superpose.nbimages"])
-    log.info('  Image pool storage directory: %s' % CONFIG["pool.imagepooldirectory"])
-    log.info('  Will try to maintain %d images in this directory.' % CONFIG["pool.nbimages"])
+    if CONFIG["assembler.invert"]:
+        log.info('  Images will be inverted (negative)')
+    if CONFIG["assembler.mirror"]:
+        log.info('  Images will be mirror (left-right)')
+    if CONFIG["assembler.emboss"]:
+        log.info('  Images will be embossed')
+    if CONFIG["assembler.resuperpose"]:
+        log.info('  Images will be re-superposed')
+    if not CONFIG["assembler.superpose.randomrotation"]:
+        log.info('  Rotation is disabled.')
+    log.info('  Use %d images at each image generation' %
+             CONFIG["assembler.superpose.nbimages"])
+    log.info('  Image pool storage directory: %s' %
+             CONFIG["pool.imagepooldirectory"])
+    log.info('  Will try to maintain %d images in this directory.' %
+             CONFIG["pool.nbimages"])
     if CONFIG["pool.keepimages"]:
         log.info('  Will keep images after use.')
     if CONFIG["collector.localonly"]:
         log.info('  Will collect image from local system instead of internet')
     if CONFIG["collector.keywords.enabled"]:
-        log.info("  Will search the internet for the words '%s'" % CONFIG["collector.keywords.keywords"])
-
+        log.info("  Will search the internet for the words '%s'" %
+                 CONFIG["collector.keywords.keywords"])
 
     if CONFIG["debug"]:
         log.info('  Running in debug mode.')
@@ -4118,13 +4636,14 @@ def main():
     # Otherwise, execute the desired action:
     if p_action == '--tofile':
         log.info('Starting image generator...')
-        image_saver(imageName=p_action_parameter,config=CONFIG)
+        image_saver(imageName=p_action_parameter, config=CONFIG)
     if p_action == '--singleimage':
         log.info('Generating a single image...')
-        image_saver(imageName=p_action_parameter,generateSingleImage=True,config=CONFIG)
+        image_saver(imageName=p_action_parameter,
+                    generateSingleImage=True, config=CONFIG)
     elif p_action == "--tohtml":
         log.info("Starting HTML page generator...")
-        htmlPageGenerator(p_action_parameter,config=CONFIG)
+        htmlPageGenerator(p_action_parameter, config=CONFIG)
     elif p_action == '--towindowswallpaper':
         log.info('Starting wallpaper changer...')
         windowsWallpaperChanger(config=CONFIG)
@@ -4136,7 +4655,7 @@ def main():
         kdeWallpaperChanger(config=CONFIG)
     elif p_action == "--windowsscreensaver":
         log.info("Starting Windows screensaver...")
-        windowsScreensaver(p_action_parameter,config=CONFIG)
+        windowsScreensaver(p_action_parameter, config=CONFIG)
     elif p_action == "--xscreensaver":
         log.info("Starting X11 Window Screensaver...")
         x11Screensaver(config=CONFIG)
@@ -4146,10 +4665,10 @@ def main():
     elif p_action == "--saveconffile":
         CONFIG.saveToFileInUserHomedir()
         log.info("Configuration saved in user's home directory.")
-    else: # If no action is provided, display command-line parameters.
+    else:  # If no action is provided, display command-line parameters.
         webgobbler_application(CONFIG)
         #log.error('No running mode provided ; Displaying help:')
-        #usage(sys.argv[0])  # print help information and exit:
+        # usage(sys.argv[0])  # print help information and exit:
         logging.shutdown()
         return
 
@@ -4197,7 +4716,7 @@ def webgobbler_application(config):
     # just below the main executable.
     if os.path.isdir('libtcltk84'):
         os.environ['TCL_LIBRARY'] = 'libtcltk84\\tcl8.4'
-        os.environ['TK_LIBRARY'] =  'libtcltk84\\tk8.4'
+        os.environ['TK_LIBRARY'] = 'libtcltk84\\tk8.4'
 
     import Tkinter  # FIXME: try/catch import ?
     try:
@@ -4213,12 +4732,12 @@ def webgobbler_application(config):
     root.title(VERSION)         # Set window title.
 
     # Display the application window:
-    wgapp = webgobbler_app.wg_application(root,config)  # Build the GUI, and pass the program configuration.
+    # Build the GUI, and pass the program configuration.
+    wgapp = webgobbler_app.wg_application(root, config)
     root.mainloop()                  # Display it and let is operate...
     return
 
 
 if __name__ == "__main__":
-    sys.stdout.write(VERSION+" -- http://sebsauvage.net/python/webgobbler\n")
+    sys.stdout.write(VERSION + " -- http://sebsauvage.net/python/webgobbler\n")
     main()
-

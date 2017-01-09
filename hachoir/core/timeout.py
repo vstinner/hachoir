@@ -37,6 +37,7 @@ def fixTimeout(second):
     assert isinstance(second, int)
     return max(second, 1)
 
+
 if not IMPLEMENTATION:
     try:
         from signal import signal, alarm, SIGALRM

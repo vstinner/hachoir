@@ -33,6 +33,7 @@ class Version(FieldSet):
     def createValue(self):
         return self["major"].value + float(self["minor"].value) / 10000
 
+
 MAJOR_OS_NAME = {
     1: "DOS",
     2: "OS/2 16-bit",
@@ -192,6 +193,7 @@ class WindowsString(FieldSet):
 def parseStringTable(parent):
     while not parent.eof:
         yield WindowsString(parent, "string[]")
+
 
 RESOURCE_TYPE = {
     1: ("cursor[]", "Cursor", None),

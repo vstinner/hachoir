@@ -1,7 +1,9 @@
 from wx import EVT_MENU
 from wx.xrc import XRCID
 
+
 class field_menu_fwd_t:
+
     def __init__(self, imp):
         self.imp = imp
 
@@ -22,4 +24,3 @@ class field_menu_fwd_t:
                   id=XRCID('field_menu_parse_substream'))
         view.Bind(EVT_MENU, self.imp.on_open_window_here,
                   id=XRCID('field_menu_open_window_here'))
-

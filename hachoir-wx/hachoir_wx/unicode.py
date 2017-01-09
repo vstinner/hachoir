@@ -1,6 +1,6 @@
-import wx
 import locale
 import sys
+
 
 def get_charset():
     try:
@@ -12,6 +12,7 @@ def get_charset():
         charset = sys.getdefaultencoding()
 
     return charset
+
 
 def force_unicode(name):
     if not isinstance(name, str):

@@ -3,7 +3,6 @@ from hachoir.core.stream import FileInputStream
 from hachoir.core import config
 from hachoir.subfile.search import SearchSubfile
 from hachoir.core.cmd_line import displayVersion
-import hachoir.core
 from sys import exit
 from optparse import OptionGroup, OptionParser
 
@@ -96,6 +95,7 @@ def main():
     else:
         ok = runSearch(subfile, values)
     exit(int(not ok))
+
 
 if __name__ == "__main__":
     main()

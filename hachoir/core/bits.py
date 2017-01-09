@@ -265,6 +265,8 @@ def _createStructFormat():
         except struct_error:
             pass
     return format
+
+
 _struct_format = _createStructFormat()
 
 

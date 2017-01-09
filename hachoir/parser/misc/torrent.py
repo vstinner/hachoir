@@ -139,6 +139,7 @@ class DictionaryItem(FieldSet):
     def createTimestampValue(self):
         return timestampUNIX(self["value"].value)
 
+
 # Map first chunk byte => type
 TAGS = {b'd': Dictionary, b'i': Integer, b'l': List}
 for index in range(0, 9 + 1):

@@ -490,6 +490,7 @@ class ExtraInfo(FieldSet):
         else:
             return "End of Extra Info"
 
+
 HOT_KEYS = {
     0x00: 'None',
     0x13: 'Pause',

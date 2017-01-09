@@ -2,7 +2,6 @@
 # some stubs that could be in hachoir-core.
 #
 
-from hachoir.core.tools import alignValue
 from hachoir.stream.input import FileFromInputStream
 
 

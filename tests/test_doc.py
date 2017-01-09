@@ -67,6 +67,7 @@ class TestDoc(unittest.TestCase):
         self.check_module("hachoir.regex.regex")
         self.check_module("hachoir.regex.pattern")
 
+
 if __name__ == "__main__":
     setup_tests()
     unittest.main()

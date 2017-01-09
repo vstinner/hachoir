@@ -177,6 +177,7 @@ class PatternMatching:
         return self._getAttribute("_max_length")
     max_length = property(_getMaxLength)
 
+
 if __name__ == "__main__":
     import doctest
     import sys

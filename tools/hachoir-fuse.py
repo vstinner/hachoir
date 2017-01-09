@@ -4,7 +4,7 @@ Proof of concept of Hachoir user interface using FUSE
 """
 
 import errno
-import os
+# import os
 import stat
 from hachoir.log import log
 from hachoir.field import MissingField
@@ -21,7 +21,7 @@ for i in True, False:
     except ImportError:
         if i:
             try:
-                import _find_fuse_parts
+                import _find_fuse_parts   # noqa
             except ImportError:
                 pass
         else:
@@ -237,6 +237,7 @@ Userspace hello example
     server.parse(errex=1)
     server.main()
     server.stop()
+
 
 if __name__ == '__main__':
     main()

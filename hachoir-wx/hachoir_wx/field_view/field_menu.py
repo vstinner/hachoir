@@ -1,7 +1,9 @@
 from hachoir_wx.dialogs import file_save_dialog
 import wx
 
+
 class field_menu_t:
+
     def __init__(self, parent, menu):
         self.parent = parent
         self.menu = menu
@@ -17,4 +19,3 @@ class field_menu_t:
         dump_dlog = file_save_dialog(title)
         if wx.ID_OK == dump_dlog.ShowModal():
             return dump_dlog.GetPath()
-

@@ -286,4 +286,5 @@ class JpegMetadata(RootMetadata):
             except ValueError:
                 pass
 
+
 registerExtractor(JpegFile, JpegMetadata)

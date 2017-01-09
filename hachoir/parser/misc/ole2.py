@@ -151,6 +151,7 @@ class Header(FieldSet):
         yield SECT(self, "db_start", "First block of DIFAT")
         yield UInt32(self, "db_count", "Number of SECTs in DIFAT")
 
+
 # Header (ole_id, header, difat) size in bytes
 HEADER_SIZE = 64 + Header.static_size + NB_DIFAT * SECT.static_size
 

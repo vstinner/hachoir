@@ -1,6 +1,8 @@
 from wx import EVT_SIZE
 
+
 class hex_view_fwd_t:
+
     def __init__(self, imp):
         self.imp = imp
 

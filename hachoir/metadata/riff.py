@@ -196,4 +196,5 @@ class RiffMetadata(MultipleMetadata):
         if not self.has("frame_rate") and "anim_hdr/jiffie_rate" in riff:
             self.frame_rate = 60.0 / riff["anim_hdr/jiffie_rate"].value
 
+
 registerExtractor(RiffFile, RiffMetadata)

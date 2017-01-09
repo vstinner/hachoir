@@ -322,6 +322,7 @@ class PsdMetadata(RootMetadata):
         self.pixel_format = psd["color_mode"].display
         self.compression = psd["compression"].display
 
+
 registerExtractor(IcoFile, IcoMetadata)
 registerExtractor(GifFile, GifMetadata)
 registerExtractor(XcfFile, XcfMetadata)

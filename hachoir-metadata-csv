@@ -83,5 +83,6 @@ def main():
     fields = [field.strip() for field in argv[2].split(",")]
     Extractor(directory, fields).main()
 
+
 if __name__ == "__main__":
     main()

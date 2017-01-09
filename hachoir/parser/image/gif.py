@@ -203,6 +203,7 @@ class Image(FieldSet):
             self["width"].value, self["height"].value,
             self["left"].value, self["top"].value)
 
+
 DISPOSAL_METHOD = {
     0: "No disposal specified",
     1: "Do not dispose",

@@ -25,6 +25,7 @@ CLASSIFIERS = [
 
 MODULES = ("field_view", "frame_view", "hex_view", "resource")
 
+
 def main():
     hachoir_wx = load_source("version", path.join("hachoir_wx", "version.py"))
 
@@ -63,6 +64,6 @@ def main():
         install_options["include_package_data"] = True
     setup(**install_options)
 
+
 if __name__ == "__main__":
     main()
-

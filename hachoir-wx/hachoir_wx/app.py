@@ -9,8 +9,10 @@ from hachoir_wx.dialogs import file_open_dialog
 from hachoir_wx.str import force_unicode
 from hachoir_wx import __version__ as VERSION
 
+
 class app_t(App):
-    def __init__(self, filename = None):
+
+    def __init__(self, filename=None):
         print("[+] Run hachoir-wx version %s" % VERSION)
         self.filename = filename
         App.__init__(self, False)
@@ -37,7 +39,7 @@ class app_t(App):
             return
         filename = open_dialog.GetPath()
         open_dialog.Destroy()
-        load_file(self, open_dialog.GetPath())
+        load_file(self, filename)
 
     def on_field_parse_substream(self, dispatcher, field):
         stream = field.getSubIStream()
@@ -59,11 +61,13 @@ class app_t(App):
         assert top_window is not None
         top_window.Close()
 
+
 def load_file(app, filename):
-    parser = createParser(force_unicode(filename), real_filename = filename)
+    parser = createParser(force_unicode(filename), real_filename=filename)
     if not parser:
         return
     new_window(app, open(filename, 'rb'), parser, filename)
+
 
 def new_window(app, file, parser, filename):
     print('[+] Opening new GUI')
@@ -79,7 +83,7 @@ def new_window(app, file, parser, filename):
 
     dispatcher.trigger('file_ready', file)
     dispatcher.trigger('field_set_ready', parser)
-    dispatcher.trigger('filename_update', filename.replace('\\','/'))
+    dispatcher.trigger('filename_update', filename.replace('\\', '/'))
     frame.ready()
     hex_view_widget.ready()
 

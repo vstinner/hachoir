@@ -135,6 +135,7 @@ class Log:
         """
         self.newMessage(Log.LOG_ERROR, text)
 
+
 log = Log()
 
 

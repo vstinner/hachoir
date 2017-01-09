@@ -93,29 +93,24 @@ class DataDirectory(FieldSet):
 class PE_Header(FieldSet):
     static_size = 24 * 8
     cpu_name = {
-        0x0184: "Alpha AXP",
-        0x01c0: "ARM",
         0x014C: "Intel 80386",
         0x014D: "Intel 80486",
         0x014E: "Intel Pentium",
-        0x0200: "Intel IA64",
-        0x0268: "Motorola 68000",
-        0x0266: "MIPS",
-        0x0284: "Alpha AXP 64 bits",
-        0x0366: "MIPS with FPU",
-        0x0466: "MIPS16 with FPU",
-        0x01f0: "PowerPC little endian",
-        0x0162: "R3000",
-        0x0166: "MIPS little endian (R4000)",
-        0x0168: "R10000",
-        0x01a2: "Hitachi SH3",
-        0x01a6: "Hitachi SH4",
         0x0160: "R3000 (MIPS), big endian",
         0x0162: "R3000 (MIPS), little endian",
         0x0166: "R4000 (MIPS), little endian",
         0x0168: "R10000 (MIPS), little endian",
         0x0184: "DEC Alpha AXP",
+        0x01a2: "Hitachi SH3",
+        0x01a6: "Hitachi SH4",
+        0x01c0: "ARM",
         0x01F0: "IBM Power PC, little endian",
+        0x0200: "Intel IA64",
+        0x0266: "MIPS",
+        0x0268: "Motorola 68000",
+        0x0284: "Alpha AXP 64 bits",
+        0x0366: "MIPS with FPU",
+        0x0466: "MIPS16 with FPU",
     }
 
     def createFields(self):

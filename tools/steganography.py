@@ -118,7 +118,7 @@ class MpegAudioInjecter(Injecter):
             padding = data[index:index + self.packet_size]
             name = "frame[%u]" % field_index
             print("Insert %s before %s" % (len(padding), name))
-            output.insertAfter(name,  EditableString(
+            output.insertAfter(name, EditableString(
                 output, "padding[]", "fixed", padding))
             index += self.packet_size
             field_index += 2
@@ -127,6 +127,7 @@ class MpegAudioInjecter(Injecter):
 def createEditor(filename):
     parser = createParser(filename)
     return hachoirCreateEditor(parser)
+
 
 injecter_cls = {
     PngFile: PngInjecter,
@@ -163,6 +164,7 @@ def main():
 
         print("Write ouput into: %s" % out_filename)
         injecter.saveInto(out_filename)
+
 
 if __name__ == "__main__":
     main()

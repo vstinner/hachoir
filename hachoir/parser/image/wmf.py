@@ -127,6 +127,7 @@ def parsePolygon(parser):
     for index in range(parser["count"].value):
         yield Point(parser, "point[]")
 
+
 META = {
     0x0000: ("EOF", "End of file", None),
     0x001E: ("SAVEDC", "Save device context", None),
@@ -277,6 +278,7 @@ def parseExtCreatePen(parser):
     yield UInt32(parser, "nb_style")
     for index in range(parser["nb_style"].value):
         yield UInt32(parser, "style")
+
 
 EMF_META = {
     1: ("HEADER", "Header", None),

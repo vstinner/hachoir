@@ -76,6 +76,7 @@ def parseBackgroundColor(parent, size):
 def bit2hertz(field):
     return humanFrequency(5512.5 * (2 ** field.value))
 
+
 SOUND_CODEC_MP3 = 2
 SOUND_CODEC = {
     0: "RAW",

@@ -219,6 +219,7 @@ class Bitmap(FieldSet):
         for index in range(self._size):
             yield Bit(self, "item[]", "Item %s" % (self.start + index))
 
+
 BlockBitmap = Bitmap
 InodeBitmap = Bitmap
 

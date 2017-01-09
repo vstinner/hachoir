@@ -5,6 +5,7 @@ from time import time
 
 MIN_SIZE = 2
 
+
 def canDeflate(compressed_data):
     try:
         data = decompress(compressed_data)
@@ -12,23 +13,26 @@ def canDeflate(compressed_data):
     except zlib_error:
         return False
 
+
 def findDeflateBlocks(data):
     next_msg = time() + 1.0
-    max_index = len(data)-MIN_SIZE-1
-    for index in range(max_index+1):
+    max_index = len(data) - MIN_SIZE - 1
+    for index in range(max_index + 1):
         if next_msg < time():
             next_msg = time() + 1.0
             print("Progress: %.1f%% (offset %s/%s)" % (
-                index*100.0/max_index, index, max_index))
+                index * 100.0 / max_index, index, max_index))
         if canDeflate(data[index:]):
             yield index
 
+
 def guessDeflateSize(data, offset):
-    size = len(data)-offset
+    size = len(data) - offset
     while size:
-        if canDeflate(data[offset:offset+size]):
+        if canDeflate(data[offset:offset + size]):
             yield size
         size -= 1
+
 
 def main():
     if len(argv) != 2:
@@ -51,4 +55,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

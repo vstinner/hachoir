@@ -246,6 +246,7 @@ def humanFrequency(hertz):
             return "%.1f %s" % (hertz, unit)
     return "%s %s" % (hertz, unit)
 
+
 regex_control_code = re.compile(r"([\x00-\x1f\x7f])")
 controlchars = tuple({
     # Don't use "\0", because "\0"+"0"+"1" = "\001" = "\1" (1 character)
@@ -466,6 +467,7 @@ def createDict(data, index):
     """
     return dict((key, values[index]) for key, values in data.items())
 
+
 # Start of UNIX timestamp (Epoch): 1st January 1970 at 00:00
 UNIX_TIMESTAMP_T0 = datetime(1970, 1, 1)
 
@@ -492,6 +494,7 @@ def timestampUNIX(value):
     if not(0 <= value <= 2147483647):
         raise ValueError("timestampUNIX(): value have to be in 0..2147483647")
     return UNIX_TIMESTAMP_T0 + timedelta(seconds=value)
+
 
 # Start of Macintosh timestamp: 1st January 1904 at 00:00
 MAC_TIMESTAMP_T0 = datetime(1904, 1, 1)
@@ -530,6 +533,7 @@ def durationWin64(value):
         raise ValueError("value have to be a positive or nul integer")
     return timedelta(microseconds=value / 10)
 
+
 # Start of 64-bit Windows timestamp: 1st January 1600 at 00:00
 WIN64_TIMESTAMP_T0 = datetime(1601, 1, 1, 0, 0, 0)
 
@@ -551,6 +555,7 @@ def timestampWin64(value):
     except OverflowError:
         raise ValueError("date newer than year %s (value=%s)"
                          % (MAXYEAR, value))
+
 
 # Start of 60-bit UUID timestamp: 15 October 1582 at 00:00
 UUID60_TIMESTAMP_T0 = datetime(1582, 10, 15, 0, 0, 0)
@@ -593,6 +598,7 @@ def humanDatetime(value, strip_microsecond=True):
     if strip_microsecond and "." in text:
         text = text.split(".")[0]
     return text
+
 
 NEWLINES_REGEX = re.compile("\n+")
 

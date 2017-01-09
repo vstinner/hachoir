@@ -260,6 +260,7 @@ class SwfMetadata(RootMetadata):
         self.frame_rate = swf["frame_rate"].value
         self.comment = "Frame count: %s" % swf["frame_count"].value
 
+
 registerExtractor(TorrentFile, TorrentMetadata)
 registerExtractor(TrueTypeFontFile, TTF_Metadata)
 registerExtractor(OLE2_File, OLE2_Metadata)

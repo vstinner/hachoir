@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from hachoir.parser import createParser, guessParser
-from hachoir.parser.container.swf import SOUND_CODEC_MP3
 from sys import stderr, exit, argv
 
 
@@ -96,5 +95,6 @@ class JpegExtractor:
             print("No JPEG picture found.")
         if self.snd_index == 1:
             print("No sound found.")
+
 
 JpegExtractor().main()

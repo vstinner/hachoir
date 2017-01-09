@@ -14,7 +14,9 @@ import re
 SLEEP_SEC = 0
 MEMORY_LIMIT = 5 * 1024 * 1024
 
+
 class Fuzzer:
+
     def __init__(self, filedb_dirs, error_dir):
         self.filedb_dirs = filedb_dirs
         self.filedb = []
@@ -43,14 +45,15 @@ class Fuzzer:
             if why.startswith("date newer than year "):
                 return True
             if why in (
-            "day is out of range for month",
-            "year is out of range",
-            "[Float80] floating point overflow"):
+                "day is out of range for month",
+                "year is out of range",
+                    "[Float80] floating point overflow"):
                 return True
             if re.match("^(second|minute|hour|month) must be in ", why):
                 return True
         if re.match("days=[0-9]+; must have magnitude ", text):
-            # Error during metadata extraction: days=1143586582; must have magnitude <= 999999999
+            # Error during metadata extraction: days=1143586582; must have
+            # magnitude <= 999999999
             return True
         if "floating point overflow" in text:
             return True
@@ -77,8 +80,8 @@ class Fuzzer:
 
     def newLog(self, level, prefix, text, context):
         if level < Log.LOG_ERROR or self.filterError(text):
-#            if self.verbose:
-#                print "   ignore %s %s" % (prefix, text)
+            #            if self.verbose:
+            #                print "   ignore %s %s" % (prefix, text)
             return
         self.log_error += 1
         print("METADATA ERROR: %s %s" % (prefix, text))
@@ -96,7 +99,8 @@ class Fuzzer:
                 prefix = fuzz.prefix
             except KeyboardInterrupt:
                 try:
-                    failure = (input("Keep current file (y/n)?").strip() == "y")
+                    failure = (
+                        input("Keep current file (y/n)?").strip() == "y")
                 except (KeyboardInterrupt, EOFError):
                     print()
                     failure = False
@@ -116,7 +120,8 @@ class Fuzzer:
                 if fuzz.tryUndo():
                     failure = False
                 elif fuzz.is_original:
-                    print("    Warning: Unsupported file format: remove %s from test suite" % fuzz.filename)
+                    print(
+                        "    Warning: Unsupported file format: remove %s from test suite" % fuzz.filename)
                     self.filedb.remove(fuzz.filename)
                     return True
             if failure is None:
@@ -124,7 +129,7 @@ class Fuzzer:
             if failure:
                 break
             if fuzz.acceptTruncate():
-                if randint(0,TRUNCATE_RATE-1) == 0:
+                if randint(0, TRUNCATE_RATE - 1) == 0:
                     fuzz.truncate()
                 else:
                     fuzz.mangle()
@@ -140,7 +145,7 @@ class Fuzzer:
 
     def init(self):
         # Setup log
-        self.nb_error=0
+        self.nb_error = 0
         hachoir_logger.use_print = False
         hachoir_logger.on_new_message = self.newLog
 
@@ -165,7 +170,8 @@ class Fuzzer:
         try:
             while True:
                 test_file = random_choice(self.filedb)
-                print("[+] %s error -- test file: %s" % (self.nb_error, test_file))
+                print("[+] %s error -- test file: %s" %
+                      (self.nb_error, test_file))
                 fuzz = FileFuzzer(self, test_file)
                 ok = self.fuzzFile(fuzz)
                 if not ok:
@@ -173,12 +179,13 @@ class Fuzzer:
         except KeyboardInterrupt:
             print("Stop")
 
+
 def main():
     # Read command line argument
     if len(argv) < 2:
         print("usage: %s directory [directory2 ...]" % argv[0], file=stderr)
         exit(1)
-    test_dirs = [ path.normpath(path.expanduser(item)) for item in argv[1:] ]
+    test_dirs = [path.normpath(path.expanduser(item)) for item in argv[1:]]
 
     # Directory is current directory?
     err_dir = path.join(getcwd(), "error")
@@ -189,6 +196,6 @@ def main():
     fuzzer = Fuzzer(test_dirs, err_dir)
     fuzzer.run()
 
+
 if __name__ == "__main__":
     main()
-

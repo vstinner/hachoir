@@ -72,6 +72,8 @@ def initLocale():
         locale.setlocale(locale.LC_ALL, "")
     except (locale.Error, IOError):
         pass
+
+
 initLocale.is_done = False
 
 UTF_BOMS = (

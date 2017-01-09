@@ -57,6 +57,7 @@ def parseVorbisComment(parent):
     if parent.current_size != parent.size:
         yield UInt8(parent, "framing_flag")
 
+
 PIXEL_FORMATS = {
     0: "4:2:0",
     2: "4:2:2",

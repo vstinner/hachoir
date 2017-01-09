@@ -3,13 +3,15 @@ from .stubs import clamp_range, byte_addr, safe_seek, calc_field_mark, get_page_
 
 MAX_SIZE = 10 * 1024
 
+
 class hex_view_imp_t:
+
     def on_file_ready(self, dispatcher, file):
         assert file is not None
         self.input = file
         self.field = None
         self.pos = 0
-        self.format_addr = lambda addr: '%08x'%addr
+        self.format_addr = lambda addr: '%08x' % addr
 
     def on_hex_view_ready(self, dispatcher, view):
         assert view is not None
@@ -40,17 +42,18 @@ class hex_view_imp_t:
         self.update_set_mark(field)
 
     def on_address_decimal(self, dispatcher):
-        self.format_addr = lambda addr: '%08d'%addr
+        self.format_addr = lambda addr: '%08d' % addr
         self.update_addr_view()
 
     def on_address_hexadecimal(self, dispatcher):
-        self.format_addr = lambda addr: '%08x'%addr
+        self.format_addr = lambda addr: '%08x' % addr
         self.update_addr_view()
 
     def update_addr_view(self):
         addr_text_list = []
         for i in range(self.view.get_height_chars()):
-            addr_text_list.append( self.format_addr(self.pos+i*self.view.get_width_chars())+'\n')
+            addr_text_list.append(self.format_addr(
+                self.pos + i * self.view.get_width_chars()) + '\n')
         self.view.addr_view.SetValue(''.join(addr_text_list))
 
     def update_set_mark(self, field):

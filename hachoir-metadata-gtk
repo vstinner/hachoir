@@ -6,7 +6,6 @@ from gi.repository import Gtk
 
 from hachoir.parser import createParser
 from hachoir.metadata import extractMetadata
-from hachoir.metadata.metadata import MultipleMetadata
 
 
 class Gui:
@@ -99,6 +98,7 @@ class Gui:
         if has_file:
             self.file_combo.set_active(0)
         Gtk.main()
+
 
 if __name__ == "__main__":
     Gui().main()

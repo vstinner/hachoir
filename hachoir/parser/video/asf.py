@@ -326,6 +326,7 @@ class Object(FieldSet):
             else:
                 yield RawBytes(self, "content", size)
 
+
 tag_info_list = Object.TAG_INFO
 Object.TAG_INFO = dict((parser[1].guid, parser) for parser in tag_info_list)
 

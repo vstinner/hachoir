@@ -22,6 +22,7 @@ def getBacktrace(empty="Empty backtrace."):
         return "Error while trying to get backtrace"
     return empty
 
+
 info = log.info
 warning = log.warning
 error = log.error

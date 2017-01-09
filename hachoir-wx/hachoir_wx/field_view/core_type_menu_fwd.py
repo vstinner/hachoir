@@ -1,6 +1,8 @@
 import wx
 
+
 class core_type_menu_fwd_t:
+
     def __init__(self, imp):
         self.imp = imp
 

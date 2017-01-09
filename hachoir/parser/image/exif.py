@@ -37,6 +37,7 @@ def rationalFactory(class_name, size, field_class):
     cls.__name__ = class_name
     return cls
 
+
 RationalInt32 = rationalFactory("RationalInt32", 64, Int32)
 RationalUInt32 = rationalFactory("RationalUInt32", 64, UInt32)
 
@@ -380,6 +381,7 @@ class GPSIFD(IFD):
 
 class InteropIFD(IFD):
     EntryClass = InteropIFDEntry
+
 
 IFD_TAGS = {
     IFDEntry.EXIF_IFD_POINTER: ('exif', ExifIFD),

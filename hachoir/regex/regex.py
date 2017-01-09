@@ -895,6 +895,7 @@ class RegexRepeat(Regex):
             return False
         return (self.regex == other.regex)
 
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()

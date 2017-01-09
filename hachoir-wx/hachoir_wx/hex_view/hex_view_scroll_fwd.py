@@ -1,6 +1,8 @@
 import wx
 
+
 class hex_view_scroll_fwd_t:
+
     def __init__(self, imp):
         self.imp = imp
 

@@ -1,1 +1,1 @@
-from hachoir_wx.resource.resource import *
+from hachoir_wx.resource.resource import *   # noqa

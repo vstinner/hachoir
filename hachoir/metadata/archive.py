@@ -181,6 +181,7 @@ class MarMetadata(MultipleMetadata):
             self.addGroup(field.name, meta,
                           "File \"%s\"" % meta.getText('filename'))
 
+
 registerExtractor(CabFile, CabMetadata)
 registerExtractor(GzipParser, GzipMetadata)
 registerExtractor(Bzip2Parser, Bzip2Metadata)
