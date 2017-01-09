@@ -30,6 +30,7 @@ class TestParsers(unittest.TestCase):
         parser = createParser(fullname)
         if not parser:
             self.fail("unable to create parser")
+        self.addCleanup(parser.close)
 
         if self.verbose:
             sys.stdout.write("ok\n")

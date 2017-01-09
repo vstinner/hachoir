@@ -25,6 +25,15 @@ def getgaps(start, length, blocks):
 
 class RootSeekableFieldSet(GenericFieldSet):
 
+    def close(self):
+        self.stream.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.close()
+
     def seekBit(self, address, relative=True):
         if not relative:
             address -= self.absolute_address

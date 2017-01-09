@@ -195,6 +195,15 @@ class OLE2_File(HachoirParser, RootSeekableFieldSet):
             self, None, "root", stream, None, stream.askSize(self))
         HachoirParser.__init__(self, stream, **args)
 
+    def close(self):
+        self.stream.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.close()
+
     def validate(self):
         if self["ole_id"].value != b"\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1":
             return "Invalid magic"

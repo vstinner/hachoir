@@ -32,14 +32,15 @@ class TestMetadata(unittest.TestCase):
         if not parser:
             self.fail("unable to create parser\n")
 
-        if self.verbose:
-            sys.stdout.write("ok\n")
-            sys.stdout.write("  - Create metadata: ")
-            sys.stdout.flush()
+        with parser:
+            if self.verbose:
+                sys.stdout.write("ok\n")
+                sys.stdout.write("  - Create metadata: ")
+                sys.stdout.flush()
 
-        metadata = extractMetadata(parser, 1.0)
-        if not metadata:
-            self.fail("unable to create parser\n")
+            metadata = extractMetadata(parser, 1.0)
+            if not metadata:
+                self.fail("unable to create parser\n")
 
         if self.verbose:
             sys.stdout.write("ok\n")

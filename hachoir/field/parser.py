@@ -37,9 +37,6 @@ class Parser(GenericFieldSet):
     def __exit__(self, type, value, traceback):
         self.close()
 
-    def __del__(self):
-        self.close()
-
     def _logger(self):
         return Logger._logger(self)
 
