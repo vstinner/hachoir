@@ -68,7 +68,8 @@ class OutputStream(object):
                 else:
                     self._byte |= (value & ((1 << n) - 1)) << self._bit_pos
                     value >>= n
-                self._output.write(chr(self._byte))
+                byte = bytes((self._byte,))
+                self._output.write(byte)
                 self._bit_pos = 0
                 self._byte = 0
             else:
