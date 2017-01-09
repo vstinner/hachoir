@@ -177,7 +177,8 @@ class EditableString(EditableField):
             size = GenericString.PASCAL_FORMATS[self._format]
             output.writeInteger(len(self._value), False,
                                 size, self._parent.endian)
-            output.writeBytes(self._value)
+            value = self._value.encode(self._charset)
+            output.writeBytes(value)
 
 
 class EditableCharacter(EditableFixedField):
