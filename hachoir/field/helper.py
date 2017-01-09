@@ -43,7 +43,8 @@ def isInteger(field):
 
 def writeIntoFile(fieldset, filename):
     output = FileOutputStream(filename)
-    fieldset.writeInto(output)
+    with output:
+        fieldset.writeInto(output)
 
 
 def createOrphanField(fieldset, address, field_cls, *args, **kw):
