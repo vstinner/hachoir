@@ -32,9 +32,9 @@ from setuptools import find_packages
 SCRIPTS = ["hachoir-grep",
            "hachoir-metadata",
            "hachoir-strip",
-#          FIXME: hachoir-subfile is currently broken
-#          "hachoir-subfile",
            "hachoir-urwid"]
+# FIXME: hachoir-subfile is currently broken
+# "hachoir-subfile",
 
 CLASSIFIERS = [
     'Development Status :: 5 - Production/Stable',
