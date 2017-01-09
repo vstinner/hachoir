@@ -67,6 +67,14 @@ class ZipMetadata(MultipleMetadata):
                 break
             self.processFile(field)
 
+        self.extract_end_central_directory(zip)
+
+    @fault_tolerant
+    def extract_end_central_directory(self, parser):
+        comment = parser['end_central_directory/comment'].value
+        if comment:
+            self.comment = comment
+
     @fault_tolerant
     def processFile(self, field):
         meta = Metadata(self)
