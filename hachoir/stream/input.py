@@ -170,8 +170,12 @@ class InputStream(Logger):
     checked = property(lambda self: self._size == self._current_size)
 
     def sizeGe(self, size, const=False):
-        return self._current_size >= size or \
-            not (0 < self._size < size or const or self._feed(size))
+        if self._current_size >= size:
+            return True
+        elif self._size is not None and 0 < self._size < size:
+            return False
+        else:
+            return not const and not self._feed(size)
 
     def _feed(self, size):
         return self.read(size - 1, 1)[2]
