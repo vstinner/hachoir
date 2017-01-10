@@ -103,6 +103,8 @@ class hex_view_t(wx.ScrolledWindow):
         # OnCreate required to avoid crashing wx in xrc creation
         self.Bind(wx.EVT_WINDOW_CREATE, self.OnCreate)
 
+        # Disable physical scrolling - refresh entire display on each scroll event.
+        self.EnableScrolling(False, False)
         # This line enables double-buffered painting for reduced flicker.
         self.SetBackgroundStyle(wx.BG_STYLE_PAINT)
 
@@ -201,8 +203,13 @@ class hex_view_t(wx.ScrolledWindow):
 
         self.Refresh()
 
-    def OnScrolled(self, event):
+    def set_prev_scroll(self):
         self.prev_scroll = ('scroll', self.get_scroll_addr())
+
+    def OnScrolled(self, event):
+        wx.CallAfter(self.set_prev_scroll)
+        # ensure that the scroll event is normally handled
+        event.Skip()
 
     def scroll_to(self, start, end):
         ''' Scroll view so that [start,end) is in view.
