@@ -32,7 +32,8 @@ from setuptools import find_packages
 SCRIPTS = ["hachoir-grep",
            "hachoir-metadata",
            "hachoir-strip",
-           "hachoir-urwid"]
+           "hachoir-urwid",
+           "hachoir-wx"]
 # FIXME: hachoir-subfile is currently broken
 # "hachoir-subfile",
 
