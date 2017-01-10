@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
-
 from hachoir.field import available_types
 from hachoir.wx.field_view.mutator import convert_field
 from hachoir.wx.field_view.stubs import can_convert
+
 
 class core_type_menu_imp_t:
     def __init__(self):
@@ -18,7 +17,7 @@ class core_type_menu_imp_t:
 
     def on_field_selected(self, dispatcher, field):
         self.cur_field = field
-        
+
         self.view.clear()
         for type in available_types:
             if can_convert(field, type) and field.__class__ is not type:

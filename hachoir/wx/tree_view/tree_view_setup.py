@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-
 from hachoir.wx.resource import get_child_control
+
 
 def setup_tree_view(parent, dispatcher):
     print("[+] Setup tree view")

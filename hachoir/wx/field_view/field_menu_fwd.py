@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
-
 from wx import EVT_MENU
 from wx.xrc import XRCID
+
 
 class field_menu_fwd_t:
     def __init__(self, imp):

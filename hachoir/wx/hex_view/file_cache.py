@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+
 class FileCache(object):
     CHUNKSIZE = 4096
 
@@ -47,6 +48,7 @@ class FileCache(object):
             out[0] = out[0][soff:]
         return b''.join(out)
 
+
 def test():
     from io import BytesIO
 
@@ -65,6 +67,7 @@ def test():
             got = fc.get(s, e)
             expected = instr[s:e]
             assert got == expected, "Failed to get %d, %d: got %r, expected %r" % (s, e, got, expected)
+
 
 if __name__ == '__main__':
     test()

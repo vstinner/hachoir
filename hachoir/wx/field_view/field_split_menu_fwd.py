@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-
 import wx
+
 
 class field_split_menu_fwd_t:
     def __init__(self, imp):

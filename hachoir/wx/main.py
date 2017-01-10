@@ -6,6 +6,7 @@ from hachoir.core.cmd_line import getHachoirOptions, configureHachoir
 from optparse import OptionParser
 import sys
 
+
 def parseOptions():
     parser = OptionParser(usage="%prog [options] [filename]")
     hachoir = getHachoirOptions(parser)
@@ -15,11 +16,12 @@ def parseOptions():
     if len(arguments) == 1:
         filename = arguments[0]
     elif not arguments:
-        filename =  None
+        filename = None
     else:
         parser.print_help()
         sys.exit(1)
     return values, filename
+
 
 def main():
     print("%s version %s" % (PACKAGE, VERSION))
@@ -29,6 +31,7 @@ def main():
     configureHachoir(values)
     app = app_t(filename)
     app.MainLoop()
+
 
 if __name__ == '__main__':
     main()

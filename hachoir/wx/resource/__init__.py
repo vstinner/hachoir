@@ -1,3 +1,1 @@
-# -*- coding: utf-8 -*-
-
-from hachoir.wx.resource.resource import *
+from hachoir.wx.resource.resource import *   # noqa

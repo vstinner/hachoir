@@ -1,13 +1,12 @@
-# -*- coding: utf-8 -*-
-
 import wx
-from hachoir.field import FieldSet
+
 
 class FieldNodeData(object):
     def __init__(self, field):
         self.field = field
         self.enumerated = False
         self.child_map = {}
+
 
 class tree_view_t(wx.TreeCtrl):
     def __init__(self):
@@ -30,7 +29,6 @@ class tree_view_t(wx.TreeCtrl):
     def OnCreate(self, event):
         self.Unbind(wx.EVT_WINDOW_CREATE)
         wx.CallAfter(self.post_init)
-
 
     def setup_new_node(self, node, field):
         self.AppendItem(node, "loading...")

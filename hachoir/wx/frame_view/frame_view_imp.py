@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 class frame_view_imp_t:
     def on_frame_view_ready(self, dispatcher, frame_view):
         assert frame_view is not None

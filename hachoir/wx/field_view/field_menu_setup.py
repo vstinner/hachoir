@@ -16,6 +16,7 @@ import wx
 
 from hachoir.wx.resource import get_menu
 
+
 def setup_field_menu(parent, dispatcher):
     menu = get_menu('field_menu')
     field_menu = field_menu_t(parent, menu)
@@ -33,6 +34,7 @@ def setup_field_menu(parent, dispatcher):
 
     return field_menu
 
+
 def setup_core_type_menu(parent, dispatcher):
     menu = parent.FindItemById(wx.xrc.XRCID('field_menu_convert_to_core_type')).GetSubMenu()
     core_type_menu = core_type_menu_t(menu)
@@ -44,6 +46,7 @@ def setup_core_type_menu(parent, dispatcher):
     dispatcher.add_receiver(fwd)
 
     dispatcher.trigger('core_type_menu_ready', core_type_menu)
+
 
 def setup_field_split_menu(parent, parent_menu, dispatcher):
     menu = parent_menu.FindItemById(wx.xrc.XRCID('field_menu_split')).GetSubMenu()

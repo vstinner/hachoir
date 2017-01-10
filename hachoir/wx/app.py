@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from wx import App, EVT_MENU, ID_OK
 from wx.xrc import XRCID
 
@@ -11,8 +9,9 @@ from hachoir.wx.dialogs import file_open_dialog
 from hachoir.wx.unicode import force_unicode
 from hachoir.version import VERSION
 
+
 class app_t(App):
-    def __init__(self, filename = None):
+    def __init__(self, filename=None):
         print("[+] Run hachoir-wx version %s" % VERSION)
         self.filename = filename
         App.__init__(self, False)
@@ -32,7 +31,7 @@ class app_t(App):
                   id=XRCID('file_menu_open_file'))
         self.Bind(EVT_MENU, self.on_file_menu_close_window,
                   id=XRCID('file_menu_close_window'))
-    
+
     def on_file_menu_open_file(self, event):
         open_dialog = file_open_dialog()
         if ID_OK != open_dialog.ShowModal():
@@ -62,12 +61,14 @@ class app_t(App):
         assert top_window is not None
         top_window.Close()
 
+
 def load_file(app, filename):
     parser = createParser(force_unicode(filename), real_filename=filename)
     if not parser:
         return
     print('[+] Using parser: %s.%s' % (parser.__module__, type(parser).__name__))
     new_window(app, open(filename, 'rb'), parser, filename)
+
 
 def new_window(app, file, parser, filename):
     print('[+] Opening new GUI')

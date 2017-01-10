@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
-
 import wx
 import os
+
 
 def file_open_dialog():
     dialog_style = wx.FD_OPEN | wx.FD_FILE_MUST_EXIST
@@ -10,8 +9,9 @@ def file_open_dialog():
         None, message='Open',
         defaultDir=os.getcwd(),
         defaultFile='', style=dialog_style)
-    
+
     return dialog
+
 
 def file_save_dialog(title):
     dialog_style = wx.FD_SAVE

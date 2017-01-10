@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-
 import wx
+
 
 class field_view_fwd_t:
     def __init__(self, imp):

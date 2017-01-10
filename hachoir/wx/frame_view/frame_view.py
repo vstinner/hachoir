@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-
 import wx
+
 
 class frame_view_t(wx.Frame):
     def __init__(self):

@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
-
 import wx
 from .file_cache import FileCache
 
+
 textchars = set('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ ')
 text_view_transtable = bytes([c if chr(c) in textchars else ord('.') for c in range(256)])
+
 
 class HexViewLayout(object):
     ''' Encapsulates information about the layout of the address, hex and text panes. '''
@@ -13,8 +13,8 @@ class HexViewLayout(object):
         self.charsize = (10, 10)
         self.addrchars = 2
 
-        self.hborder = 2 # spacing between panes
-        self.hpad = 4 # inner padding between pane edge and text
+        self.hborder = 2   # spacing between panes
+        self.hpad = 4   # inner padding between pane edge and text
 
         self.dispatcher = None
         self.update()
@@ -47,11 +47,12 @@ class HexViewLayout(object):
     def update(self):
         w, h = self.winsize
         cw, ch = self.charsize
-        mw = (self.hpad + self.hborder) * 2 # total margin width
+        mw = (self.hpad + self.hborder) * 2   # total margin width
 
         # calculate width of address pane
         addrpane_width = int((cw * self.addrchars) + mw)
-        overhead = addrpane_width + mw*2 + 2 # +2 is a slight fudge to prevent tight layouts
+        # +2 is a slight fudge to prevent tight layouts
+        overhead = addrpane_width + mw * 2 + 2
 
         # figure out how many characters we can fit in the views
         # add one extra char to account for one less space in hexview
@@ -62,8 +63,8 @@ class HexViewLayout(object):
         hexpane_width = int(cw * (tc * 3 - 1) + mw)
         textpane_width = int(cw * tc + mw)
         slack = w - addrpane_width - hexpane_width - textpane_width
-        hexpane_width += slack//2
-        textpane_width += slack - slack//2
+        hexpane_width += slack // 2
+        textpane_width += slack - slack // 2
 
         self.addrpane_width = addrpane_width
         self.hexpane_width = hexpane_width
@@ -92,6 +93,7 @@ class HexViewLayout(object):
     def textstart(self, name):
         ''' Get the starting x position of the text within the given pane '''
         return getattr(self, name + 'pane_start') + self.hpad + self.hborder
+
 
 class hex_view_t(wx.ScrolledWindow):
     def __init__(self):
@@ -184,8 +186,8 @@ class hex_view_t(wx.ScrolledWindow):
         cury = -offset
         for i in range(0, size, lo.textcols):
             dc.DrawText(self.format_address(start + i), lo.textstart('addr'), cury)
-            dc.DrawText(" ".join("%02x" % c for c in text[i:i+lo.textcols]), lo.textstart('hex'), cury)
-            dc.DrawText(text[i:i+lo.textcols].translate(text_view_transtable), lo.textstart('text'), cury)
+            dc.DrawText(" ".join("%02x" % c for c in text[i:i + lo.textcols]), lo.textstart('hex'), cury)
+            dc.DrawText(text[i:i + lo.textcols].translate(text_view_transtable), lo.textstart('text'), cury)
             cury += ch
 
     def OnResized(self, event):
@@ -213,7 +215,7 @@ class hex_view_t(wx.ScrolledWindow):
 
     def scroll_to(self, start, end):
         ''' Scroll view so that [start,end) is in view.
-        
+
         If the entire range can't be shown at once, it will scroll
         to show as much of the start of the range as possible.
 
@@ -262,7 +264,7 @@ class hex_view_t(wx.ScrolledWindow):
         else:
             return ('%d' % addr).rjust(self.layout.addrchars)
 
-    #---------- dispatcher events ----------
+    # ---------- dispatcher events ----------
 
     def on_file_ready(self, dispatcher, file):
         assert file is not None

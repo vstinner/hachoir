@@ -5,6 +5,7 @@ from .frame_view_fwd import frame_view_fwd_t
 
 from hachoir.wx.resource import get_frame
 
+
 def setup_frame_view(dispatcher):
     print('[+] Setup frame view')
     frame = get_frame('frame_view')

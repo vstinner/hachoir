@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-
 from wx import ListCtrl, EVT_WINDOW_CREATE, CallAfter
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
-from sys import maxsize
+
 
 class field_view_t(ListCtrl, ListCtrlAutoWidthMixin):
     def __init__(self):
@@ -44,10 +42,10 @@ class field_view_t(ListCtrl, ListCtrlAutoWidthMixin):
         return self.OnGetItemText_imp(item, col)
 
     def get_col_index(self, name):
-       return self.cols[name]
+        return self.cols[name]
 
     def get_col_count(self):
-       return len(self.cols)
+        return len(self.cols)
 
     def resize_column(self, col_index, width):
         width = max(self.col_min_width[col_index], width) + 1

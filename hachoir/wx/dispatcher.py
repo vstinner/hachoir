@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 class dispatcher_t:
     def __init__(self):
         self.receivers = []
