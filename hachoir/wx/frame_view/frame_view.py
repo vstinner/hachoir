@@ -1,12 +1,12 @@
-from wx import Frame, EVT_WINDOW_CREATE
+# -*- coding: utf-8 -*-
 
+import wx
 
-class frame_view_t(Frame):
-
+class frame_view_t(wx.Frame):
     def __init__(self):
-        Frame.__init__(self)
+        wx.Frame.__init__(self)
         # OnCreate required to avoid crashing wx
-        self.Bind(EVT_WINDOW_CREATE, self.OnCreate)
+        self.Bind(wx.EVT_WINDOW_CREATE, self.OnCreate)
 
     def OnCreate(self, evt):
         pass

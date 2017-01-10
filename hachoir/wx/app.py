@@ -1,18 +1,18 @@
+# -*- coding: utf-8 -*-
+
 from wx import App, EVT_MENU, ID_OK
 from wx.xrc import XRCID
 
 from hachoir.parser.guess import createParser, guessParser
 from hachoir.stream.input import FileFromInputStream
 from hachoir.wx.dispatcher import dispatcher_t
-from hachoir.wx import frame_view, field_view, hex_view
+from hachoir.wx import frame_view, field_view, hex_view, tree_view
 from hachoir.wx.dialogs import file_open_dialog
 from hachoir.wx.unicode import force_unicode
-from hachoir.wx import __version__ as VERSION
-
+from hachoir.version import VERSION
 
 class app_t(App):
-
-    def __init__(self, filename=None):
+    def __init__(self, filename = None):
         print("[+] Run hachoir-wx version %s" % VERSION)
         self.filename = filename
         App.__init__(self, False)
@@ -32,7 +32,7 @@ class app_t(App):
                   id=XRCID('file_menu_open_file'))
         self.Bind(EVT_MENU, self.on_file_menu_close_window,
                   id=XRCID('file_menu_close_window'))
-
+    
     def on_file_menu_open_file(self, event):
         open_dialog = file_open_dialog()
         if ID_OK != open_dialog.ShowModal():
@@ -46,6 +46,7 @@ class app_t(App):
         parser = guessParser(stream)
         if not parser:
             return
+        print('[+] Substream parser: %s.%s' % (parser.__module__, type(parser).__name__))
         subfile = FileFromInputStream(stream)
         subfile.name = field.path
         new_window(self, subfile, parser, subfile.name)
@@ -61,13 +62,12 @@ class app_t(App):
         assert top_window is not None
         top_window.Close()
 
-
 def load_file(app, filename):
     parser = createParser(force_unicode(filename), real_filename=filename)
     if not parser:
         return
+    print('[+] Using parser: %s.%s' % (parser.__module__, type(parser).__name__))
     new_window(app, open(filename, 'rb'), parser, filename)
-
 
 def new_window(app, file, parser, filename):
     print('[+] Opening new GUI')
@@ -80,6 +80,7 @@ def new_window(app, file, parser, filename):
     frame = frame_view.setup_frame_view(dispatcher)
     field_view.setup_field_view(frame, dispatcher)
     hex_view_widget = hex_view.setup_hex_view(frame, dispatcher)
+    tree_view.setup_tree_view(frame, dispatcher)
 
     dispatcher.trigger('file_ready', file)
     dispatcher.trigger('field_set_ready', parser)

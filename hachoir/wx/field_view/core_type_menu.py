@@ -1,13 +1,13 @@
+# -*- coding: utf-8 -*-
+
 import wx
 
-
 class core_type_menu_t:
-
     def __init__(self, menu):
         self.menu = menu
         self.id_to_type = {}
 
-        self.Bind = self.menu.Bind  # see note in field_menu.py
+        self.Bind = self.menu.Bind # see note in field_menu.py
 
     def add_type(self, type_name):
         type_id = wx.NewId()
@@ -20,5 +20,4 @@ class core_type_menu_t:
     def clear(self):
         items = self.menu.GetMenuItems()
         for item in items:
-            # TODO: what's the difference between Remove and Delete?
             self.menu.Delete(item)

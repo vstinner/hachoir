@@ -1,8 +1,8 @@
+# -*- coding: utf-8 -*-
+
 import wx
 
-
 class frame_view_fwd_t:
-
     def __init__(self, imp):
         self.imp = imp
 

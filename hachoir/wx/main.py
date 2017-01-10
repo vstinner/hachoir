@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from hachoir.wx.app import app_t
-from hachoir.wx.version import PACKAGE, VERSION, WEBSITE
+from hachoir.version import PACKAGE, VERSION, WEBSITE
 from hachoir.core.cmd_line import getHachoirOptions, configureHachoir
 from optparse import OptionParser
 import sys

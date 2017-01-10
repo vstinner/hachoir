@@ -1,14 +1,14 @@
+# -*- coding: utf-8 -*-
+
 from hachoir.wx.field_view.format import format_addr_hex, format_addr_dec, format_size, format_data, format_name, format_desc
 
 MAXITEMS = 1000
 
-
 class field_view_imp_t:
-
     def __init__(self):
         self.addr_func = lambda field: field._getAbsoluteAddress()
         self.format_addr = lambda field: format_addr_hex(self.addr_func(field))
-
+        
         self.col_str_table = [
             lambda f: self.format_addr(f),          # address
             format_name,                            # name
@@ -41,10 +41,13 @@ class field_view_imp_t:
     def on_item_activated(self):
         field = self.fields[self.view.get_selected('name')]
         if field.is_field_set:
+            self.dispatcher.trigger('field_activated', field)
+
+    def on_field_activated(self, dispatcher, field):
+        if field.is_field_set:
             self.fields = field
             self.refill_view()
-        self.dispatcher.trigger('field_activated', field)
-
+        
     def on_field_modified(self, dispatcher, field):
         self.refill_view()
 
@@ -93,8 +96,7 @@ class field_view_imp_t:
             width = 0
             func = self.col_str_table[col]
             # when fields has more than 20 rows, they are probably similar.
-            # Therefore this routine only checks the first 10 rows and last 10
-            # rows.
+            # Therefore this routine only checks the first 10 rows and last 10 rows.
 
             if field_count <= 20:
                 field_range = [(0, field_count)]

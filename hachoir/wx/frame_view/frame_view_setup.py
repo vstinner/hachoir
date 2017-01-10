@@ -1,8 +1,9 @@
+# -*- coding: utf-8 -*-
+
 from .frame_view_imp import frame_view_imp_t
 from .frame_view_fwd import frame_view_fwd_t
 
 from hachoir.wx.resource import get_frame
-
 
 def setup_frame_view(dispatcher):
     print('[+] Setup frame view')
