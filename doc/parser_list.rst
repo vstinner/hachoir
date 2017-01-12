@@ -11,6 +11,7 @@ Archive
 * gzip: gzip archive
 * mar: Microsoft Archive
 * mozilla_ar: Mozilla Archive
+* prs_pak: Parallel Realities Starfighter .pak archive
 * rar: Roshal archive (RAR)
 * rpm: RPM package
 * tar: TAR archive
@@ -121,4 +122,4 @@ Video
 * mpeg_ts: MPEG-2 Transport Stream
 * mpeg_video: MPEG video, version 1 or 2
 
-Total: 86 parsers
+Total: 87 parsers
