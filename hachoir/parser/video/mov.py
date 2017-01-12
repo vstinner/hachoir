@@ -750,126 +750,125 @@ class Atom(FieldSet):
         # pdin: progressive download information
         # pnot: movie preview (old QT spec)
         "moov": (AtomList, "movie", "Container for all metadata"),
-        "mvhd": (MovieHeader, "movie_hdr", "Movie header, overall declarations"),
-        # clip: movie clipping (old QT spec)
-        # crgn: movie clipping region (old QT spec)
-        "trak": (AtomList, "track", "Container for an individual track or stream"),
-        "tkhd": (TrackHeader, "track_hdr", "Track header, overall information about the track"),
-        # matt: track matte (old QT spec)
-        # kmat: compressed matte (old QT spec)
-        "tref": (AtomList, "tref", "Track reference container"),
-        "hint": (TrackReferenceType, "hint", "Original media track(s) for this hint track"),
-        "cdsc": (TrackReferenceType, "cdsc", "Reference to track described by this track"),
-        "edts": (AtomList, "edts", "Edit list container"),
-        "elst": (EditList, "elst", "Edit list"),
-        "load": (Load, "load", "Track loading settings (old QT spec)"),
-        # imap: Track input map (old QT spec)
-        "mdia": (AtomList, "media", "Container for the media information in a track"),
-        "mdhd": (MediaHeader, "media_hdr", "Media header, overall information about the media"),
-        "hdlr": (Handler, "hdlr", "Handler, declares the media or metadata (handler) type"),
-        "minf": (AtomList, "minf", "Media information container"),
-        "vmhd": (VideoMediaHeader, "vmhd", "Video media header, overall information (video track only)"),
-        "smhd": (SoundMediaHeader, "smhd", "Sound media header, overall information (sound track only)"),
-        "hmhd": (HintMediaHeader, "hmhd", "Hint media header, overall information (hint track only)"),
-        # nmhd: Null media header, overall information (some
-        # tracks only) (unparsed)
-        "dinf": (AtomList, "dinf", "Data information, container"),
-        "dref": (DataReference, "dref", "Data reference, declares source(s) of media data in track"),
-        "url ": (DataEntryUrl, "url", "URL data reference"),
-        "urn ": (DataEntryUrn, "urn", "URN data reference"),
-        "stbl": (AtomList, "stbl", "Sample table, container for the time/space map"),
-        "stsd": (SampleDescription, "stsd", "Sample descriptions (codec types, initialization etc.)"),
-        "stts": (SampleDecodeTimeTable, "stts", "decoding time-to-sample delta table"),
-        "ctts": (SampleCompositionTimeTable, "ctts", "composition time-to-sample offset table"),
-        "stsc": (SampleToChunkTable, "stsc", "sample-to-chunk, partial data-offset information"),
-        "stsz": (SampleSizeTable, "stsz", "Sample size table (framing)"),
-        "stz2": (CompactSampleSizeTable, "stz2", "Compact sample size table (framing)"),
-        "stco": (ChunkOffsetTable, "stco", "Chunk offset, partial data-offset information"),
-        "co64": (ChunkOffsetTable64, "co64", "64-bit chunk offset"),
-        "stss": (SyncSampleTable, "stss", "Sync sample table (random access points)"),
-        # stsh: shadow sync sample table
-        # padb: sample padding bits
-        # stdp: sample degradation priority
-        # sdtp: independent and disposable samples
-        # sbgp: sample-to-group
-        # sgpd: sample group description
-        # subs: sub-sample information
-        # ctab color table (old QT spec)
-        # mvex: movie extends
-        # mehd: movie extends header
-        # trex: track extends defaults
-        # ipmc: IPMP control
+            "mvhd": (MovieHeader, "movie_hdr", "Movie header, overall declarations"),
+            # clip: movie clipping (old QT spec)
+                # crgn: movie clipping region (old QT spec)
+            "trak": (AtomList, "track", "Container for an individual track or stream"),
+                "tkhd": (TrackHeader, "track_hdr", "Track header, overall information about the track"),
+                # matt: track matte (old QT spec)
+                    # kmat: compressed matte (old QT spec)
+                "tref": (AtomList, "tref", "Track reference container"),
+                    "hint": (TrackReferenceType, "hint", "Original media track(s) for this hint track"),
+                    "cdsc": (TrackReferenceType, "cdsc", "Reference to track described by this track"),
+                "edts": (AtomList, "edts", "Edit list container"),
+                    "elst": (EditList, "elst", "Edit list"),
+                "load": (Load, "load", "Track loading settings (old QT spec)"),
+                # imap: Track input map (old QT spec)
+                "mdia": (AtomList, "media", "Container for the media information in a track"),
+                    "mdhd": (MediaHeader, "media_hdr", "Media header, overall information about the media"),
+                    "hdlr": (Handler, "hdlr", "Handler, declares the media or metadata (handler) type"),
+                    "minf": (AtomList, "minf", "Media information container"),
+                        "vmhd": (VideoMediaHeader, "vmhd", "Video media header, overall information (video track only)"),
+                        "smhd": (SoundMediaHeader, "smhd", "Sound media header, overall information (sound track only)"),
+                        "hmhd": (HintMediaHeader, "hmhd", "Hint media header, overall information (hint track only)"),
+                        # nmhd: Null media header, overall information (some tracks only) (unparsed)
+                        "dinf": (AtomList, "dinf", "Data information, container"),
+                            "dref": (DataReference, "dref", "Data reference, declares source(s) of media data in track"),
+                                "url ": (DataEntryUrl, "url", "URL data reference"),
+                                "urn ": (DataEntryUrn, "urn", "URN data reference"),
+                        "stbl": (AtomList, "stbl", "Sample table, container for the time/space map"),
+                            "stsd": (SampleDescription, "stsd", "Sample descriptions (codec types, initialization etc.)"),
+                            "stts": (SampleDecodeTimeTable, "stts", "decoding time-to-sample delta table"),
+                            "ctts": (SampleCompositionTimeTable, "ctts", "composition time-to-sample offset table"),
+                            "stsc": (SampleToChunkTable, "stsc", "sample-to-chunk, partial data-offset information"),
+                            "stsz": (SampleSizeTable, "stsz", "Sample size table (framing)"),
+                            "stz2": (CompactSampleSizeTable, "stz2", "Compact sample size table (framing)"),
+                            "stco": (ChunkOffsetTable, "stco", "Chunk offset, partial data-offset information"),
+                            "co64": (ChunkOffsetTable64, "co64", "64-bit chunk offset"),
+                            "stss": (SyncSampleTable, "stss", "Sync sample table (random access points)"),
+                            # stsh: shadow sync sample table
+                            # padb: sample padding bits
+                            # stdp: sample degradation priority
+                            # sdtp: independent and disposable samples
+                            # sbgp: sample-to-group
+                            # sgpd: sample group description
+                            # subs: sub-sample information
+            # ctab color table (old QT spec)
+            # mvex: movie extends
+                # mehd: movie extends header
+                # trex: track extends defaults
+            # ipmc: IPMP control
         "moof": (AtomList, "moof", "movie fragment"),
-        "mfhd": (MovieFragmentHeader, "mfhd", "movie fragment header"),
-        # traf: track fragment
-        # tfhd: track fragment header
-        # trun: track fragment run
-        # sdtp: independent and disposable samples
-        # sbgp: sample-to-group
-        # subs: sub-sample information
+            "mfhd": (MovieFragmentHeader, "mfhd", "movie fragment header"),
+            # traf: track fragment
+                # tfhd: track fragment header
+                # trun: track fragment run
+                # sdtp: independent and disposable samples
+                # sbgp: sample-to-group
+                # subs: sub-sample information
         "mfra": (AtomList, "mfra", "movie fragment random access"),
-        "tfra": (TrackFragmentRandomAccess, "tfra", "track fragment random access"),
-        "mfro": (MovieFragmentRandomAccessOffset, "mfro", "movie fragment random access offset"),
+            "tfra": (TrackFragmentRandomAccess, "tfra", "track fragment random access"),
+            "mfro": (MovieFragmentRandomAccessOffset, "mfro", "movie fragment random access offset"),
         # mdat: media data container
         # free: free space (unparsed)
         # skip: free space (unparsed)
         "udta": (AtomList, "udta", "User data"),
         "meta": (META, "meta", "File metadata"),
-        "keys": (KeyList, "keys", "Metadata keys"),
-        # hdlr
-        # dinf
-        # dref: data reference, declares source(s) of metadata items
-        # ipmc: IPMP control
-        # iloc: item location
-        # ipro: item protection
-        # sinf: protection scheme information
-        # frma: original format
-        # imif: IPMP information
-        # schm: scheme type
-        # schi: scheme information
-        # iinf: item information
-        # xml : XML container
-        # bxml: binary XML container
-        # pitm: primary item reference
+            "keys": (KeyList, "keys", "Metadata keys"),
+            # hdlr
+            # dinf
+                # dref: data reference, declares source(s) of metadata items
+            # ipmc: IPMP control
+            # iloc: item location
+            # ipro: item protection
+                # sinf: protection scheme information
+                    # frma: original format
+                    # imif: IPMP information
+                    # schm: scheme type
+                    # schi: scheme information
+            # iinf: item information
+            # xml : XML container
+            # bxml: binary XML container
+            # pitm: primary item reference
         # other tags
         "ilst": (ItemList, "ilst", "Item list"),
-        "trkn": (AtomList, "trkn", "Metadata: Track number"),
-        "disk": (AtomList, "disk", "Metadata: Disk number"),
-        "tmpo": (AtomList, "tempo", "Metadata: Tempo"),
-        "cpil": (AtomList, "cpil", "Metadata: Compilation"),
-        "gnre": (AtomList, "gnre", "Metadata: Genre"),
-        "\xa9cpy": (AtomList, "copyright", "Metadata: Copyright statement"),
-        "\xa9day": (AtomList, "date", "Metadata: Date of content creation"),
-        "\xa9dir": (AtomList, "director", "Metadata: Movie director"),
-        "\xa9ed1": (AtomList, "edit1", "Metadata: Edit date and description (1)"),
-        "\xa9ed2": (AtomList, "edit2", "Metadata: Edit date and description (2)"),
-        "\xa9ed3": (AtomList, "edit3", "Metadata: Edit date and description (3)"),
-        "\xa9ed4": (AtomList, "edit4", "Metadata: Edit date and description (4)"),
-        "\xa9ed5": (AtomList, "edit5", "Metadata: Edit date and description (5)"),
-        "\xa9ed6": (AtomList, "edit6", "Metadata: Edit date and description (6)"),
-        "\xa9ed7": (AtomList, "edit7", "Metadata: Edit date and description (7)"),
-        "\xa9ed8": (AtomList, "edit8", "Metadata: Edit date and description (8)"),
-        "\xa9ed9": (AtomList, "edit9", "Metadata: Edit date and description (9)"),
-        "\xa9fmt": (AtomList, "format", "Metadata: Movie format (CGI, digitized, etc.)"),
-        "\xa9inf": (AtomList, "info", "Metadata: Information about the movie"),
-        "\xa9prd": (AtomList, "producer", "Metadata: Movie producer"),
-        "\xa9prf": (AtomList, "performers", "Metadata: Performer names"),
-        "\xa9req": (AtomList, "requirements", "Metadata: Special hardware and software requirements"),
-        "\xa9src": (AtomList, "source", "Metadata: Credits for those who provided movie source content"),
-        "\xa9nam": (AtomList, "name", "Metadata: Name of song or video"),
-        "\xa9des": (AtomList, "description", "Metadata: File description"),
-        "\xa9cmt": (AtomList, "comment", "Metadata: General comment"),
-        "\xa9alb": (AtomList, "album", "Metadata: Album name"),
-        "\xa9gen": (AtomList, "genre", "Metadata: Custom genre"),
-        "\xa9ART": (AtomList, "artist", "Metadata: Artist name"),
-        "\xa9too": (AtomList, "encoder", "Metadata: Encoder"),
-        "\xa9wrt": (AtomList, "writer", "Metadata: Writer"),
-        "covr": (AtomList, "cover", "Metadata: Cover art"),
-        "----": (AtomList, "misc", "Metadata: Miscellaneous"),
+            "trkn": (AtomList, "trkn", "Metadata: Track number"),
+            "disk": (AtomList, "disk", "Metadata: Disk number"),
+            "tmpo": (AtomList, "tempo", "Metadata: Tempo"),
+            "cpil": (AtomList, "cpil", "Metadata: Compilation"),
+            "gnre": (AtomList, "gnre", "Metadata: Genre"),
+            "\xa9cpy": (AtomList, "copyright", "Metadata: Copyright statement"),
+            "\xa9day": (AtomList, "date", "Metadata: Date of content creation"),
+            "\xa9dir": (AtomList, "director", "Metadata: Movie director"),
+            "\xa9ed1": (AtomList, "edit1", "Metadata: Edit date and description (1)"),
+            "\xa9ed2": (AtomList, "edit2", "Metadata: Edit date and description (2)"),
+            "\xa9ed3": (AtomList, "edit3", "Metadata: Edit date and description (3)"),
+            "\xa9ed4": (AtomList, "edit4", "Metadata: Edit date and description (4)"),
+            "\xa9ed5": (AtomList, "edit5", "Metadata: Edit date and description (5)"),
+            "\xa9ed6": (AtomList, "edit6", "Metadata: Edit date and description (6)"),
+            "\xa9ed7": (AtomList, "edit7", "Metadata: Edit date and description (7)"),
+            "\xa9ed8": (AtomList, "edit8", "Metadata: Edit date and description (8)"),
+            "\xa9ed9": (AtomList, "edit9", "Metadata: Edit date and description (9)"),
+            "\xa9fmt": (AtomList, "format", "Metadata: Movie format (CGI, digitized, etc.)"),
+            "\xa9inf": (AtomList, "info", "Metadata: Information about the movie"),
+            "\xa9prd": (AtomList, "producer", "Metadata: Movie producer"),
+            "\xa9prf": (AtomList, "performers", "Metadata: Performer names"),
+            "\xa9req": (AtomList, "requirements", "Metadata: Special hardware and software requirements"),
+            "\xa9src": (AtomList, "source", "Metadata: Credits for those who provided movie source content"),
+            "\xa9nam": (AtomList, "name", "Metadata: Name of song or video"),
+            "\xa9des": (AtomList, "description", "Metadata: File description"),
+            "\xa9cmt": (AtomList, "comment", "Metadata: General comment"),
+            "\xa9alb": (AtomList, "album", "Metadata: Album name"),
+            "\xa9gen": (AtomList, "genre", "Metadata: Custom genre"),
+            "\xa9ART": (AtomList, "artist", "Metadata: Artist name"),
+            "\xa9too": (AtomList, "encoder", "Metadata: Encoder"),
+            "\xa9wrt": (AtomList, "writer", "Metadata: Writer"),
+            "covr": (AtomList, "cover", "Metadata: Cover art"),
+            "----": (AtomList, "misc", "Metadata: Miscellaneous"),
         "tags": (AtomList, "tags", "File tags"),
         "tseg": (AtomList, "tseg", "tseg"),
         "chpl": (NeroChapters, "chpl", "Nero chapter data"),
-    }
+    }  # noqa
     tag_handler = [item[0] for item in tag_info]
     tag_desc = [item[1] for item in tag_info]
 
