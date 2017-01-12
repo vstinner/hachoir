@@ -258,7 +258,7 @@ class EditableInteger(EditableFixedField):
 
 
 class EditableTimestampMac32(EditableFixedField):
-    minval, maxval = timestampMac32(0), timestampMac32(2**32-1)
+    minval, maxval = timestampMac32(0), timestampMac32(2**32 - 1)
 
     def __init__(self, parent, name, *args):
         if args:
@@ -275,12 +275,13 @@ class EditableTimestampMac32(EditableFixedField):
     def _setValue(self, value):
         if not(self.minval <= value <= self.maxval):
             raise ValueError("Invalid value, must be in range %s..%s"
-                % (self.minval, self.maxval))
+                             % (self.minval, self.maxval))
         self._value = value
 
     def _write(self, output):
         timestamp = int((self.value - self.minval).total_seconds())
         output.writeBits(self._size, timestamp, self._parent.endian)
+
 
 def createEditableField(fieldset, field):
     if isInteger(field):
