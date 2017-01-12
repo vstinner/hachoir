@@ -6,6 +6,7 @@ Archive
 
 * 7zip: Compressed archive in 7z format
 * ace: ACE archive
+* bom_store: Apple bill-of-materials file
 * bzip2: bzip2 archive
 * cab: Microsoft Cabinet archive
 * gzip: gzip archive
@@ -122,4 +123,4 @@ Video
 * mpeg_ts: MPEG-2 Transport Stream
 * mpeg_video: MPEG video, version 1 or 2
 
-Total: 87 parsers
+Total: 88 parsers
