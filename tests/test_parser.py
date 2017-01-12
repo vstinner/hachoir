@@ -564,7 +564,7 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "width", 256)
         self.checkValue(parser, "jpeg_header_len", 10)
 
-    def checkNds(self):
+    def test_nds(self):
         parser = self.parse("nitrodir.nds")
         self.checkValue(parser, "/header/game_title", '.')
         self.checkValue(parser, "/header/header_crc16", 29398)
@@ -579,6 +579,15 @@ class TestParsers(unittest.TestCase):
         self.checkValue(
             parser, "/filename_table/directory[4]/entry[0]/is_directory", False)
         self.checkValue(parser, "/file[1]", b"Hello from file2.txt\n\n")
+
+    def test_prs_pak(self):
+        parser = self.parse("paktest.pak")
+        self.checkValue(
+            parser, "/file[0]/filename", "hachoir/png_331x90x8_truncated.png")
+        self.checkValue(parser, "/file[0]/size", 100)
+        self.checkValue(
+            parser, "/file[1]/filename", "hachoir/small_text.tar")
+        self.checkValue(parser, "/file[1]/size", 10240)
 
 
 class TestParserRandomStream(unittest.TestCase):
