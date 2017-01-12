@@ -92,6 +92,7 @@ Misc
 * gnomekeyring: Gnome keyring
 * hlp: Microsoft Windows Help (HLP)
 * lnk: Windows Shortcut (.lnk)
+* mapsforge_map: Mapsforge map file
 * mstask: .job 'at' file parser from ms windows
 * ole2: Microsoft Office document
 * pcf: X11 Portable Compiled Font (pcf)
@@ -120,4 +121,4 @@ Video
 * mpeg_ts: MPEG-2 Transport Stream
 * mpeg_video: MPEG video, version 1 or 2
 
-Total: 85 parsers
+Total: 86 parsers

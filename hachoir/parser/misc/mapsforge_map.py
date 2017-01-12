@@ -9,15 +9,14 @@ References:
 """
 
 from hachoir.parser import Parser
-from hachoir.field import (ParserError,
-    Bit, Bits, UInt8, UInt16, UInt32, Int32, UInt64, String, RawBytes,
-    PaddingBits, PaddingBytes,
-    Enum, Field, FieldSet, SeekableFieldSet, RootSeekableFieldSet)
-from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
+from hachoir.field import (Bit, Bits, UInt8, UInt16, UInt32, Int32, UInt64, String,
+                           PaddingBits,
+                           Enum, Field, FieldSet, SeekableFieldSet, RootSeekableFieldSet)
+from hachoir.core.endian import BIG_ENDIAN
 
 
 # micro-degrees factor:
-UDEG = float(1000*1000)
+UDEG = float(1000 * 1000)
 
 
 CoordinateEncoding = {
@@ -27,27 +26,30 @@ CoordinateEncoding = {
 
 
 class UIntVbe(Field):
+
     def __init__(self, parent, name, description=None):
         Field.__init__(self, parent, name, description=description)
 
         value = 0
         size = 0
         while True:
-            byteValue = self._parent.stream.readBytes(self.absolute_address + (size*8), 1)[0]
+            byteValue = self._parent.stream.readBytes(
+                self.absolute_address + (size * 8), 1)[0]
 
             haveMoreData = (byteValue & 0x80)
-            value = value | ((byteValue & 0x7f) << (size*7))
+            value = value | ((byteValue & 0x7f) << (size * 7))
             size += 1
             assert size < 100, "UIntVBE is too large"
 
             if not(haveMoreData):
                 break
 
-        self._size = size*8
+        self._size = size * 8
         self.createValue = lambda: value
 
 
 class IntVbe(Field):
+
     def __init__(self, parent, name, description=None):
         Field.__init__(self, parent, name, description=description)
 
@@ -55,7 +57,8 @@ class IntVbe(Field):
         size = 0
         shift = 0
         while True:
-            byteValue = self._parent.stream.readBytes(self.absolute_address + (size*8), 1)[0]
+            byteValue = self._parent.stream.readBytes(
+                self.absolute_address + (size * 8), 1)[0]
 
             haveMoreData = (byteValue & 0x80)
             if size == 0:
@@ -74,30 +77,33 @@ class IntVbe(Field):
         if isNegative:
             value *= -1
 
-        self._size = size*8
+        self._size = size * 8
         self.createValue = lambda: value
 
 
 class VbeString(FieldSet):
+
     def createFields(self):
         yield UIntVbe(self, "length")
         yield String(self, "chars", self["length"].value, charset="UTF-8")
 
-    def createDescription (self):
+    def createDescription(self):
         return '(%d B) "%s"' % (self["length"].value, self["chars"].value)
 
 
 class TagStringList(FieldSet):
+
     def createFields(self):
         yield UInt16(self, "num_tags")
         for i in range(self["num_tags"].value):
             yield VbeString(self, "tag[]")
 
-    def createDescription (self):
+    def createDescription(self):
         return "%d tag strings" % self["num_tags"].value
 
 
 class ZoomIntervalCfg(FieldSet):
+
     def createFields(self):
         yield UInt8(self, "base_zoom_level")
         yield UInt8(self, "min_zoom_level")
@@ -105,33 +111,37 @@ class ZoomIntervalCfg(FieldSet):
         yield UInt64(self, "subfile_start")
         yield UInt64(self, "subfile_size")
 
-    def createDescription (self):
+    def createDescription(self):
         return "zoom level around %d (%d - %d)" % (self["base_zoom_level"].value,
-            self["min_zoom_level"].value, self["max_zoom_level"].value)
+                                                   self["min_zoom_level"].value, self["max_zoom_level"].value)
 
 
 class TileIndexEntry(FieldSet):
+
     def createFields(self):
         yield Bit(self, "is_water_tile")
         yield Bits(self, "offset", 39)
 
 
 class TileZoomTable(FieldSet):
+
     def createFields(self):
         yield UIntVbe(self, "num_pois")
         yield UIntVbe(self, "num_ways")
 
-    def createDescription (self):
+    def createDescription(self):
         return "%d POIs, %d ways" % (self["num_pois"].value, self["num_ways"].value)
 
 
 class TileHeader(FieldSet):
-    def __init__ (self, parent, name, zoomIntervalCfg, **kw):
+
+    def __init__(self, parent, name, zoomIntervalCfg, **kw):
         FieldSet.__init__(self, parent, name, **kw)
         self.zoomIntervalCfg = zoomIntervalCfg
 
     def createFields(self):
-        numLevels = int(self.zoomIntervalCfg["max_zoom_level"].value - self.zoomIntervalCfg["min_zoom_level"].value) +1
+        numLevels = int(self.zoomIntervalCfg[
+                        "max_zoom_level"].value - self.zoomIntervalCfg["min_zoom_level"].value) + 1
         assert(numLevels < 50)
         for i in range(numLevels):
             yield TileZoomTable(self, "zoom_table_entry[]")
@@ -139,6 +149,7 @@ class TileHeader(FieldSet):
 
 
 class POIData(FieldSet):
+
     def createFields(self):
         if self["/have_debug"].value:
             yield String(self, "signature", 32)
@@ -165,24 +176,26 @@ class POIData(FieldSet):
         if self["have_ele"].value:
             yield IntVbe(self, "ele")
 
-    def createDescription (self):
+    def createDescription(self):
         s = "POI"
         if self["have_name"].value:
             s += ' "%s"' % self["name"]["chars"].value
-        s += " @ %f/%f" % (self["lat_diff"].value / UDEG, self["lon_diff"].value / UDEG)
+        s += " @ %f/%f" % (self["lat_diff"].value / UDEG,
+                           self["lon_diff"].value / UDEG)
         return s
 
 
-
 class SubTileBitmap(FieldSet):
-    static_size = 2*8
+    static_size = 2 * 8
+
     def createFields(self):
         for y in range(4):
             for x in range(4):
-                yield Bit(self, "is_used[%d,%d]" % (x,y))
+                yield Bit(self, "is_used[%d,%d]" % (x, y))
 
 
 class WayProperties(FieldSet):
+
     def createFields(self):
         if self["/have_debug"].value:
             yield String(self, "signature", 32)
@@ -191,14 +204,16 @@ class WayProperties(FieldSet):
 
         yield UIntVbe(self, "way_data_size")
 
-        # WayProperties is split into an outer and an inner field, to allow specifying data size for inner part:
+        # WayProperties is split into an outer and an inner field, to allow
+        # specifying data size for inner part:
         yield WayPropertiesInner(self, "inner", size=self["way_data_size"].value * 8)
 
 
 class WayPropertiesInner(FieldSet):
+
     def createFields(self):
         yield SubTileBitmap(self, "sub_tile_bitmap")
-        #yield Bits(self, "sub_tile_bitmap", 16)
+        # yield Bits(self, "sub_tile_bitmap", 16)
 
         yield Bits(self, "layer", 4)
         yield Bits(self, "num_tags", 4)
@@ -231,7 +246,7 @@ class WayPropertiesInner(FieldSet):
         for i in range(numWayDataBlocks):
             yield WayData(self, "way_data[]")
 
-    def createDescription (self):
+    def createDescription(self):
         s = "way"
         if self["have_name"].value:
             s += ' "%s"' % self["name"]["chars"].value
@@ -239,24 +254,28 @@ class WayPropertiesInner(FieldSet):
 
 
 class WayData(FieldSet):
+
     def createFields(self):
         yield UIntVbe(self, "num_coord_blocks")
         for i in range(self["num_coord_blocks"].value):
             yield WayCoordBlock(self, "way_coord_block[]")
 
+
 class WayCoordBlock(FieldSet):
+
     def createFields(self):
         yield UIntVbe(self, "num_way_nodes")
         yield IntVbe(self, "first_lat_diff")
         yield IntVbe(self, "first_lon_diff")
 
-        for i in range(self["num_way_nodes"].value-1):
+        for i in range(self["num_way_nodes"].value - 1):
             yield IntVbe(self, "lat_diff[]")
             yield IntVbe(self, "lon_diff[]")
 
 
 class TileData(FieldSet):
-    def __init__ (self, parent, name, zoomIntervalCfg, **kw):
+
+    def __init__(self, parent, name, zoomIntervalCfg, **kw):
         FieldSet.__init__(self, parent, name, **kw)
         self.zoomIntervalCfg = zoomIntervalCfg
 
@@ -268,21 +287,24 @@ class TileData(FieldSet):
 
         yield TileHeader(self, "tile_header", self.zoomIntervalCfg)
 
-        numLevels = int(self.zoomIntervalCfg["max_zoom_level"].value - self.zoomIntervalCfg["min_zoom_level"].value) +1
+        numLevels = int(self.zoomIntervalCfg[
+                        "max_zoom_level"].value - self.zoomIntervalCfg["min_zoom_level"].value) + 1
         for zoomLevel in range(numLevels):
-            zoomTableEntry = self["tile_header"]["zoom_table_entry[%d]" % zoomLevel]
+            zoomTableEntry = self["tile_header"][
+                "zoom_table_entry[%d]" % zoomLevel]
             for poiIndex in range(zoomTableEntry["num_pois"].value):
                 yield POIData(self, "poi_data[%d,%d]" % (zoomLevel, poiIndex))
 
         for zoomLevel in range(numLevels):
-            zoomTableEntry = self["tile_header"]["zoom_table_entry[%d]" % zoomLevel]
+            zoomTableEntry = self["tile_header"][
+                "zoom_table_entry[%d]" % zoomLevel]
             for wayIndex in range(zoomTableEntry["num_ways"].value):
                 yield WayProperties(self, "way_props[%d,%d]" % (zoomLevel, wayIndex))
-        
 
 
 class ZoomSubFile(SeekableFieldSet):
-    def __init__ (self, parent, name, zoomIntervalCfg, **kw):
+
+    def __init__(self, parent, name, zoomIntervalCfg, **kw):
         SeekableFieldSet.__init__(self, parent, name, **kw)
         self.zoomIntervalCfg = zoomIntervalCfg
 
@@ -300,9 +322,10 @@ class ZoomSubFile(SeekableFieldSet):
             indexEntries.append(entry)
             yield entry
 
-            i+=1
+            i += 1
             if numTiles is None:
-                # calculate number of tiles (TODO: better calc this from map bounding box)
+                # calculate number of tiles (TODO: better calc this from map
+                # bounding box)
                 firstOffset = self["tile_index_entry[0]"]["offset"].value
                 if self["/have_debug"].value:
                     firstOffset -= 16
@@ -324,13 +347,12 @@ class ZoomSubFile(SeekableFieldSet):
             yield TileData(self, "tile_data[%d]" % i, zoomIntervalCfg=self.zoomIntervalCfg, size=size)
 
 
-
 class MapsforgeMapFile(Parser, RootSeekableFieldSet):
     PARSER_TAGS = {
         "id": "mapsforge_map",
         "category": "misc",
         "file_ext": ("map",),
-        "min_size": 62*8,
+        "min_size": 62 * 8,
         "description": "Mapsforge map file",
     }
 
@@ -376,13 +398,12 @@ class MapsforgeMapFile(Parser, RootSeekableFieldSet):
         yield TagStringList(self, "poi_tags")
         yield TagStringList(self, "way_tags")
 
-
         yield UInt8(self, "num_zoom_intervals")
         for i in range(self["num_zoom_intervals"].value):
             yield ZoomIntervalCfg(self, "zoom_interval_cfg[]")
 
         for i in range(self["num_zoom_intervals"].value):
             zoomIntervalCfg = self["zoom_interval_cfg[%d]" % i]
-            self.seekByte(zoomIntervalCfg["subfile_start"].value, relative=False)
+            self.seekByte(zoomIntervalCfg[
+                          "subfile_start"].value, relative=False)
             yield ZoomSubFile(self, "subfile[]", size=zoomIntervalCfg["subfile_size"].value * 8, zoomIntervalCfg=zoomIntervalCfg)
-
