@@ -64,15 +64,6 @@ class FSInfo(StaticFieldSet):
 
 class FAT(FieldSet):
 
-    class FAT(FieldSet):
-
-        def createFields(self):
-            parent = self.parent
-            version = parent.parent.version
-            text_handler = parent.text_handler
-            while self.current_size < self._size:
-                yield textHandler(GenericInteger(self, 'entry[]', False, version), text_handler)
-
     def createFields(self):
         version = self.parent.version
         max_entry = 1 << min(28, version)
@@ -92,9 +83,9 @@ class FAT(FieldSet):
                 return "reserved value"
             else:
                 return str(i)
-        self.text_handler = FatEntry
+
         while self.current_size < self._size:
-            yield FAT.FAT(self, 'group[]', size=min(1000 * version, self._size - self.current_size))
+            yield textHandler(GenericInteger(self, 'entry[]', False, version), FatEntry)
 
 
 class Date(FieldSet):
@@ -411,13 +402,8 @@ class FAT_FS(Parser):
         if not sectors:
             sectors = boot["sectors2"].value
 
-        # Create one big padding field for the end
-        size = sectors * self.sector_size
-        if self._size:
-            size = min(size, self.size // 8)
-        padding = self.seekByte(size)
-        if padding:
-            yield padding
+        for i in range(sectors // boot['cluster_size'].value):
+            yield RawBytes(self, "sector[%d]" % (i + 2), self.cluster_size // 8)
 
 
 class FAT12(FAT_FS):

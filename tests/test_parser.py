@@ -482,8 +482,8 @@ class TestParsers(unittest.TestCase):
         self.checkDisplay(parser, "/boot/serial", "0x07d6090d")
         self.checkValue(parser, "/boot/label", "DellUtility")
         self.checkValue(parser, "/boot/fs_type", "FAT16")
-        self.checkValue(parser, "/fat[1]/group[0]/entry[2]", 3)
-        self.checkDisplay(parser, "/fat[0]/group[4]/entry[8]", "free cluster")
+        self.checkValue(parser, "/fat[1]/entry[2]", 3)
+        self.checkDisplay(parser, "/fat[0]/entry[4008]", "free cluster")
         self.checkDesc(parser, "/root[0]/entry[0]",
                        "Long filename part: 'command.com' [65]")
         self.checkDesc(parser, "/root[0]/entry[1]", "File: 'COMMAND.COM'")
