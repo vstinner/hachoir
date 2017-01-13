@@ -82,7 +82,7 @@ class Packet(FieldSet):
         if self["has_adaptation"].value:
             yield AdaptationField(self, "adaptation_field")
         if self["has_payload"].value:
-            yield RawBytes(self, "payload", 188-(self.current_size/8))
+            yield RawBytes(self, "payload", 188 - (self.current_size // 8))
         if self["has_error"].value:
             yield RawBytes(self, "error_correction", 16)
 
