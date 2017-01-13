@@ -612,6 +612,19 @@ class TestParsers(unittest.TestCase):
         self.checkValue(
             parser, "/object[1]/value/field[2]/value/field[0]", 11)
 
+    def test_mpeg_ts(self):
+        parser = self.parse("sample.ts")
+        self.checkValue(
+            parser, "/packet[0]/has_error", False)
+        self.checkValue(
+            parser, "/packet[0]/has_payload", True)
+        self.checkValue(
+            parser, "/packet[2]/has_adaptation", True)
+        self.checkValue(
+            parser, "/packet[2]/adaptation_field/pcr_base", 44)
+        self.checkValue(
+            parser, "/packet[78]/payload_unit_start", True)
+
 
 class TestParserRandomStream(unittest.TestCase):
 
