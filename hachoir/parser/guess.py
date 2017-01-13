@@ -109,7 +109,6 @@ class QueryParser(object):
                     fb = parser
             except Exception as err:
                 res = str(err)
-                raise
             if warn:
                 if parser == self.other:
                     warn = info
