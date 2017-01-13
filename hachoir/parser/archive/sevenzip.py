@@ -13,14 +13,13 @@ Date: February 26 2011
 """
 
 from hachoir.parser import Parser
-from hachoir.field import (Field, FieldSet, ParserError,
-                           CompressedField, CString,
+from hachoir.field import (Field, FieldSet, ParserError, CString,
                            Enum, Bit, Bits, UInt8, UInt32, UInt64,
                            Bytes, RawBytes, TimestampWin64)
 from hachoir.stream import StringInputStream
 from hachoir.core.endian import LITTLE_ENDIAN
-from hachoir.core.text_handler import textHandler, hexadecimal, filesizeHandler
-from hachoir.core.tools import createDict, alignValue
+from hachoir.core.text_handler import textHandler, hexadecimal
+from hachoir.core.tools import alignValue, humanFilesize, makePrintable
 from hachoir.parser.common.msdos import MSDOSFileAttr32
 
 try:
@@ -53,50 +52,102 @@ class SZUInt64(Field):
             self._size += 8
         self.createValue = lambda: value
 
-PROP_INFO = {
-    0x00: ('kEnd', 'End-of-header marker'),
 
-    0x01: ('kHeader', 'Archive header'),
+kEnd = 0x00
+kHeader = 0x01
+kArchiveProperties = 0x02
+kAdditionalStreamsInfo = 0x03
+kMainStreamsInfo = 0x04
+kFilesInfo = 0x05
+kPackInfo = 0x06
+kUnPackInfo = 0x07
+kSubStreamsInfo = 0x08
+kSize = 0x09
+kCRC = 0x0A
+kFolder = 0x0B
+kCodersUnPackSize = 0x0C
+kNumUnPackStream = 0x0D
+kEmptyStream = 0x0E
+kEmptyFile = 0x0F
+kAnti = 0x10
+kName = 0x11
+kCreationTime = 0x12
+kLastAccessTime = 0x13
+kLastWriteTime = 0x14
+kWinAttributes = 0x15
+kComment = 0x16
+kEncodedHeader = 0x17
+kStartPos = 0x18
+kDummy = 0x19
 
-    0x02: ('kArchiveProperties', 'Archive properties'),
-
-    0x03: ('kAdditionalStreamsInfo', 'AdditionalStreamsInfo'),
-    0x04: ('kMainStreamsInfo', 'MainStreamsInfo'),
-    0x05: ('kFilesInfo', 'FilesInfo'),
-
-    0x06: ('kPackInfo', 'PackInfo'),
-    0x07: ('kUnPackInfo', 'UnPackInfo'),
-    0x08: ('kSubStreamsInfo', 'SubStreamsInfo'),
-
-    0x09: ('kSize', 'Size'),
-    0x0A: ('kCRC', 'CRC'),
-
-    0x0B: ('kFolder', 'Folder'),
-
-    0x0C: ('kCodersUnPackSize', 'CodersUnPackSize'),
-    0x0D: ('kNumUnPackStream', 'NumUnPackStream'),
-
-    0x0E: ('kEmptyStream', 'EmptyStream'),
-    0x0F: ('kEmptyFile', 'EmptyFile'),
-    0x10: ('kAnti', 'Anti'),
-
-    0x11: ('kName', 'Name'),
-    0x12: ('kCreationTime', 'CreationTime'),
-    0x13: ('kLastAccessTime', 'LastAccessTime'),
-    0x14: ('kLastWriteTime', 'LastWriteTime'),
-    0x15: ('kWinAttributes', 'WinAttributes'),
-    0x16: ('kComment', 'Comment'),
-
-    0x17: ('kEncodedHeader', 'Encoded archive header'),
-
-    0x18: ('kStartPos', 'Unknown'),
-    0x19: ('kDummy', 'Dummy entry'),
+PROP_IDS = {
+    kEnd: 'kEnd',
+    kHeader: 'kHeader',
+    kArchiveProperties: 'kArchiveProperties',
+    kAdditionalStreamsInfo: 'kAdditionalStreamsInfo',
+    kMainStreamsInfo: 'kMainStreamsInfo',
+    kFilesInfo: 'kFilesInfo',
+    kPackInfo: 'kPackInfo',
+    kUnPackInfo: 'kUnPackInfo',
+    kSubStreamsInfo: 'kSubStreamsInfo',
+    kSize: 'kSize',
+    kCRC: 'kCRC',
+    kFolder: 'kFolder',
+    kCodersUnPackSize: 'kCodersUnPackSize',
+    kNumUnPackStream: 'kNumUnPackStream',
+    kEmptyStream: 'kEmptyStream',
+    kEmptyFile: 'kEmptyFile',
+    kAnti: 'kAnti',
+    kName: 'kName',
+    kCreationTime: 'kCreationTime',
+    kLastAccessTime: 'kLastAccessTime',
+    kLastWriteTime: 'kLastWriteTime',
+    kWinAttributes: 'kWinAttributes',
+    kComment: 'kComment',
+    kEncodedHeader: 'kEncodedHeader',
+    kStartPos: 'kStartPos',
+    kDummy: 'kDummy',
 }
-PROP_IDS = createDict(PROP_INFO, 0)
-PROP_DESC = createDict(PROP_INFO, 1)
-# create k* constants
-for k in PROP_IDS:
-    globals()[PROP_IDS[k]] = k
+
+PROP_DESC = {
+    kEnd: 'End-of-header marker',
+
+    kHeader: 'Archive header',
+
+    kArchiveProperties: 'Archive properties',
+
+    kAdditionalStreamsInfo: 'AdditionalStreamsInfo',
+    kMainStreamsInfo: 'MainStreamsInfo',
+    kFilesInfo: 'FilesInfo',
+
+    kPackInfo: 'PackInfo',
+    kUnPackInfo: 'UnPackInfo',
+    kSubStreamsInfo: 'SubStreamsInfo',
+
+    kSize: 'Size',
+    kCRC: 'CRC',
+
+    kFolder: 'Folder',
+
+    kCodersUnPackSize: 'CodersUnPackSize',
+    kNumUnPackStream: 'NumUnPackStream',
+
+    kEmptyStream: 'EmptyStream',
+    kEmptyFile: 'EmptyFile',
+    kAnti: 'Anti',
+
+    kName: 'Name',
+    kCreationTime: 'CreationTime',
+    kLastAccessTime: 'LastAccessTime',
+    kLastWriteTime: 'LastWriteTime',
+    kWinAttributes: 'WinAttributes',
+    kComment: 'Comment',
+
+    kEncodedHeader: 'Encoded archive header',
+
+    kStartPos: 'Unknown',
+    kDummy: 'Dummy entry',
+}
 
 
 def ReadNextByte(self):
@@ -213,6 +264,7 @@ class PackInfo(FieldSet):
             else:
                 raise ParserError("Unexpected ID (%i)" % uid)
 
+
 METHODS = {
     b"\0": "Copy",
     b"\3": "Delta",
@@ -260,24 +312,28 @@ METHODS = {
     b"\4\7": "7z-Reserved",
     b"\4\8": "CAB",
     b"\4\9\1": "NSIS-Deflate",
-    b"\4\9\1": "NSIS-BZip2",
+    b"\4\9\2": "NSIS-BZip2",
     b"\6\0": "Crypto-Reserved",
     b"\6\1\x00": "Crypto-AES128-ECB",
     b"\6\1\x01": "Crypto-AES128-CBC",
     b"\6\1\x02": "Crypto-AES128-CFB",
     b"\6\1\x03": "Crypto-AES128-OFB",
+    b"\6\1\x04": "Crypto-AES128-CTR",
     b"\6\1\x40": "Crypto-AES192-ECB",
     b"\6\1\x41": "Crypto-AES192-CBC",
     b"\6\1\x42": "Crypto-AES192-CFB",
     b"\6\1\x43": "Crypto-AES192-OFB",
+    b"\6\1\x44": "Crypto-AES192-CTR",
     b"\6\1\x80": "Crypto-AES256-ECB",
     b"\6\1\x81": "Crypto-AES256-CBC",
     b"\6\1\x82": "Crypto-AES256-CFB",
     b"\6\1\x83": "Crypto-AES256-OFB",
+    b"\6\1\x84": "Crypto-AES256-CTR",
     b"\6\1\xc0": "Crypto-AES-ECB",
     b"\6\1\xc1": "Crypto-AES-CBC",
     b"\6\1\xc2": "Crypto-AES-CFB",
     b"\6\1\xc3": "Crypto-AES-OFB",
+    b"\6\1\xc4": "Crypto-AES-CTR",
     b"\6\7": "Crypto-Reserved",
     b"\6\x0f": "Crypto-Reserved",
     b"\6\xf0": "Crypto-Misc",
