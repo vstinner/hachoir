@@ -7,6 +7,7 @@ References:
 
 Author: Robert Xiao <nneonneo@gmail.com>
 Creation Date: Jun 18, 2015
+Updated: Jan 12, 2017
 '''
 
 from hachoir.parser import Parser
@@ -71,7 +72,7 @@ class SerializedReference(FieldSet):
         return self.root.handles[self['handle'].value]
 
     def createValue(self):
-        return self.referent.value
+        return self['handle'].value
 
     def createDisplay(self):
         return "-> " + str(self.referent.display)
@@ -111,8 +112,11 @@ class FieldDesc(FieldSet):
 class ClassAnnotation(FieldSet):
 
     def createFields(self):
-        # TODO
-        yield Enum(UInt8(self, "endBlockData"), TYPECODE_NAMES)
+        while 1:
+            obj = SerializedContent(self, "contents[]")
+            yield obj
+            if isinstance(obj, EndBlockData):
+                break
 
 
 class SerializedClassDesc(FieldSet):
@@ -138,6 +142,9 @@ class SerializedClassDesc(FieldSet):
     def className(self):
         return self['className'].value
 
+    def createValue(self):
+        return self.className
+
 
 class ObjectValue(FieldSet):
 
@@ -159,9 +166,22 @@ class ObjectValue(FieldSet):
             field.fieldName = fieldDesc.fieldName
             yield field
 
+        if classDesc['classDescFlags_write_method'].value:
+            yield WriteObjectContents(self, "extra[]", "%s.writeObject() output" % classDesc['className'].value)
+
     def createFields(self):
         for field in self.gen_values(self.parent.classDesc):
             yield field
+
+
+class WriteObjectContents(FieldSet):
+
+    def createFields(self):
+        while 1:
+            obj = SerializedContent(self, "extra[]")
+            yield obj
+            if isinstance(obj, EndBlockData):
+                break
 
 
 class SerializedObject(FieldSet):
@@ -255,7 +275,15 @@ class BlockData(FieldSet):
 
     def createFields(self):
         yield Enum(UInt8(self, "typecode"), TYPECODE_NAMES)
-        # TODO
+        yield UInt8(self, "size")
+        if self['size'].value:
+            yield RawBytes(self, "data", self['size'].value)
+
+
+class EndBlockData(FieldSet):
+
+    def createFields(self):
+        yield Enum(UInt8(self, "typecode"), TYPECODE_NAMES)
 
 
 class StreamReset(FieldSet):
@@ -269,7 +297,9 @@ class BlockDataLong(FieldSet):
 
     def createFields(self):
         yield Enum(UInt8(self, "typecode"), TYPECODE_NAMES)
-        # TODO
+        yield UInt32(self, "size")
+        if self['size'].value:
+            yield RawBytes(self, "data", self['size'].value)
 
 
 class SerializedException(FieldSet):
@@ -347,7 +377,7 @@ TYPECODE_TABLE = {
     0x75: SerializedArray,
     0x76: SerializedClass,
     0x77: BlockData,
-    #    0x78: EndBlockData,
+    0x78: EndBlockData,
     0x79: StreamReset,
     0x7a: BlockDataLong,
     0x7b: SerializedException,
