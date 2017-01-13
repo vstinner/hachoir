@@ -600,6 +600,18 @@ class TestParsers(unittest.TestCase):
         self.checkValue(
             parser, "/next_hdr/encoded_hdr/unpack_info/num_folders", 1)
 
+    def test_java_serialized(self):
+        parser = self.parse("weka.model")
+        self.checkDisplay(
+            parser, "/object[0]/classDesc", "weka.classifiers.functions.SMO")
+        self.checkDisplay(
+            parser, "/object[1]/classDesc", "-> weka.core.Instances")
+        self.checkDesc(
+            parser, "/object[1]/value/field[2]/value/field[0]",
+            "java.util.ArrayList.size")
+        self.checkValue(
+            parser, "/object[1]/value/field[2]/value/field[0]", 11)
+
 
 class TestParserRandomStream(unittest.TestCase):
 
