@@ -3,7 +3,7 @@ Compiled Java classes parser.
 
 Author: Thomas de Grenier de Latour (TGL) <degrenier@easyconnect.fr>
 Creation: 2006/11/01
-Last-update: 2006/11/06
+Last-update: 2016/08/16
 
 Introduction:
  * This parser is for compiled Java classes, aka .class files.  What is nice
@@ -45,8 +45,6 @@ TODO/FIXME:
    the various formats differences, etc.
  * Write/compile some good tests cases.
  * Rework pretty-printing of CPIndex fields.  This str() thing sinks.
- * Add support of formats other than 46.0 (45.3 seems to already be ok, but
-   there are things to add for later formats).
  * Make parsing robust: currently, the parser will die on asserts as soon as
    something seems wrong.  It should rather be tolerant, print errors/warnings,
    and try its best to continue.  Check how error-handling is done in other
@@ -776,6 +774,9 @@ class CPInfo(FieldSet):
             raise ParserError("Not a valid constant pool element type: "
                               + self["tag"].value)
 
+    def createDescription(self):
+        return self.constant_type + "(%s)" % str(self)
+
 
 ###############################################################################
 # field_info {
@@ -813,11 +814,13 @@ class FieldInfo(FieldSet):
 
     def createDescription(self):
         bits = []
-        for mod in ['transient', 'protected', 'private', 'public', 'static', 'final', 'volatile']:
+        for mod in ['public', 'private', 'protected', 'static', 'final',
+                    'volatile', 'transient', 'synthetic', 'enum']:
             if self[mod].value:
                 bits.append(mod)
-        bits.append(parse_field_descriptor(str(self['descriptor_index'].get_cp_entry())))
-        bits.append(str(self['name_index'].get_cp_entry()))
+        bits.append(parse_field_descriptor(
+            str(self['descriptor_index'].get_cp_entry()),
+            name=str(self['name_index'].get_cp_entry())))
         return ' '.join(bits)
 
 
@@ -859,7 +862,9 @@ class MethodInfo(FieldSet):
 
     def createDescription(self):
         bits = []
-        for mod in ['strict', 'static', 'native', 'synchronized', 'protected', 'private', 'public', 'final', 'abstract']:
+        for mod in ['public', 'private', 'protected', 'static', 'final',
+                    'synchronized', 'bridge', 'varargs', 'native',
+                    'abstract', 'strict', 'synthetic']:
             if self[mod].value:
                 bits.append(mod)
         name = str(self['name_index'].get_cp_entry())
@@ -1064,7 +1069,8 @@ class InnerClassesEntry(StaticFieldSet):
 
     def createDescription(self):
         bits = []
-        for mod in ['super', 'static', 'protected', 'private', 'public', 'abstract', 'final', 'interface']:
+        for mod in ['public', 'private', 'protected', 'static', 'final', 'super',
+                    'interface', 'abstract', 'synthetic', 'annotation', 'enum']:
             if self[mod].value:
                 bits.append(mod)
         if not self['interface'].value:
