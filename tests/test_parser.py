@@ -589,6 +589,17 @@ class TestParsers(unittest.TestCase):
             parser, "/file[1]/filename", "hachoir/small_text.tar")
         self.checkValue(parser, "/file[1]/size", 10240)
 
+    def test_7zip(self):
+        parser = self.parse("archive.7z")
+        self.checkValue(parser, "/signature/major_ver", 0)
+        self.checkValue(parser, "/signature/minor_ver", 4)
+        self.checkValue(
+            parser, "/next_hdr/encoded_hdr/pack_info/pack_pos", 96634)
+        self.checkDisplay(
+            parser, "/next_hdr/encoded_hdr/pack_info/size_marker", 'kSize')
+        self.checkValue(
+            parser, "/next_hdr/encoded_hdr/unpack_info/num_folders", 1)
+
 
 class TestParserRandomStream(unittest.TestCase):
 
