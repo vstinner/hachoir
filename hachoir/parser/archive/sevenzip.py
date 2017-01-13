@@ -88,6 +88,9 @@ PROP_INFO = {
     0x16: ('kComment', 'Comment'),
 
     0x17: ('kEncodedHeader', 'Encoded archive header'),
+
+    0x18: ('kStartPos', 'Unknown'),
+    0x19: ('kDummy', 'Dummy entry'),
 }
 PROP_IDS = createDict(PROP_INFO, 0)
 PROP_DESC = createDict(PROP_INFO, 1)
@@ -148,7 +151,8 @@ class ArchiveProperty(FieldSet):
         yield PropID(self, "id")
         size = SZUInt64(self, "size")
         yield size
-        yield RawBytes(self, "data", size.value)
+        if size.value:
+            yield RawBytes(self, "data", size.value)
 
     def createDescription(self):
         return self['id'].display
@@ -210,86 +214,86 @@ class PackInfo(FieldSet):
                 raise ParserError("Unexpected ID (%i)" % uid)
 
 METHODS = {
-    "\0": "Copy",
-    "\3": "Delta",
-    "\4": "x86_BCJ",
-    "\5": "PowerPC",
-    "\6": "IA64",
-    "\7": "ARM_LE",
-    "\8": "ARMT_LE",  # thumb
-    "\9": "SPARC",
-    "\x21": "LZMA2",
-    "\2\3\2": "Common-Swap-2",
-    "\2\3\4": "Common-Swap-4",
-    "\3\1\1": "7z-LZMA",
-    "\3\3\1\3": "7z-Branch-x86-BCJ",
-    "\3\3\1\x1b": "7z-Branch-x86-BCJ2",
-    "\3\3\2\5": "7z-Branch-PowerPC-BE",
-    "\3\3\3\1": "7z-Branch-Alpha-LE",
-    "\3\3\4\1": "7z-Branch-IA64-LE",
-    "\3\3\5\1": "7z-Branch-ARM-LE",
-    "\3\3\6\5": "7z-Branch-M68-BE",
-    "\3\3\7\1": "7z-Branch-ARMT-LE",
-    "\3\3\8\5": "7z-Branch-SPARC-BE",
-    "\3\4\1": "7z-PPMD",
-    "\3\x7f\1": "7z-Experimental",
-    "\4\0": "Reserved",
-    "\4\1\0": "Zip-Copy",
-    "\4\1\1": "Zip-Shrink",
-    "\4\1\6": "Zip-Implode",
-    "\4\1\x08": "Zip-Deflate",
-    "\4\1\x09": "Zip-Deflate64",
-    "\4\1\x10": "Zip-BZip2",
-    "\4\1\x14": "Zip-LZMA",
-    "\4\1\x60": "Zip-JPEG",
-    "\4\1\x61": "Zip-WavPack",
-    "\4\1\x62": "Zip-PPMD",
-    "\4\1\x63": "Zip-wzAES",
-    "\4\2\2": "BZip2",
-    "\4\3\1": "RAR-15",
-    "\4\3\2": "RAR-20",
-    "\4\3\3": "RAR-29",
-    "\4\4\1": "Arj3",
-    "\4\4\2": "Arj4",
-    "\4\5": "Z",
-    "\4\6": "LZH",
-    "\4\7": "7z-Reserved",
-    "\4\8": "CAB",
-    "\4\9\1": "NSIS-Deflate",
-    "\4\9\1": "NSIS-BZip2",
-    "\6\0": "Crypto-Reserved",
-    "\6\1\x00": "Crypto-AES128-ECB",
-    "\6\1\x01": "Crypto-AES128-CBC",
-    "\6\1\x02": "Crypto-AES128-CFB",
-    "\6\1\x03": "Crypto-AES128-OFB",
-    "\6\1\x40": "Crypto-AES192-ECB",
-    "\6\1\x41": "Crypto-AES192-CBC",
-    "\6\1\x42": "Crypto-AES192-CFB",
-    "\6\1\x43": "Crypto-AES192-OFB",
-    "\6\1\x80": "Crypto-AES256-ECB",
-    "\6\1\x81": "Crypto-AES256-CBC",
-    "\6\1\x82": "Crypto-AES256-CFB",
-    "\6\1\x83": "Crypto-AES256-OFB",
-    "\6\1\xc0": "Crypto-AES-ECB",
-    "\6\1\xc1": "Crypto-AES-CBC",
-    "\6\1\xc2": "Crypto-AES-CFB",
-    "\6\1\xc3": "Crypto-AES-OFB",
-    "\6\7": "Crypto-Reserved",
-    "\6\x0f": "Crypto-Reserved",
-    "\6\xf0": "Crypto-Misc",
-    "\6\xf1\1\1": "Crypto-Zip",
-    "\6\xf1\3\2": "Crypto-RAR-Unknown",
-    "\6\xf1\3\3": "Crypto-RAR-29",  # AES128
-    "\6\xf1\7\1": "Crypto-7z",  # AES256
-    "\7\0": "Hash-None",
-    "\7\1": "Hash-CRC",
-    "\7\2": "Hash-SHA1",
-    "\7\3": "Hash-SHA256",
-    "\7\4": "Hash-SHA384",
-    "\7\5": "Hash-SHA512",
-    "\7\xf0": "Hash-Misc",
-    "\7\xf1\3\3": "Hash-RAR-29",  # modified SHA1
-    "\7\xf1\7\1": "Hash-7z",  # SHA256
+    b"\0": "Copy",
+    b"\3": "Delta",
+    b"\4": "x86_BCJ",
+    b"\5": "PowerPC",
+    b"\6": "IA64",
+    b"\7": "ARM_LE",
+    b"\8": "ARMT_LE",  # thumb
+    b"\9": "SPARC",
+    b"\x21": "LZMA2",
+    b"\2\3\2": "Common-Swap-2",
+    b"\2\3\4": "Common-Swap-4",
+    b"\3\1\1": "7z-LZMA",
+    b"\3\3\1\3": "7z-Branch-x86-BCJ",
+    b"\3\3\1\x1b": "7z-Branch-x86-BCJ2",
+    b"\3\3\2\5": "7z-Branch-PowerPC-BE",
+    b"\3\3\3\1": "7z-Branch-Alpha-LE",
+    b"\3\3\4\1": "7z-Branch-IA64-LE",
+    b"\3\3\5\1": "7z-Branch-ARM-LE",
+    b"\3\3\6\5": "7z-Branch-M68-BE",
+    b"\3\3\7\1": "7z-Branch-ARMT-LE",
+    b"\3\3\8\5": "7z-Branch-SPARC-BE",
+    b"\3\4\1": "7z-PPMD",
+    b"\3\x7f\1": "7z-Experimental",
+    b"\4\0": "Reserved",
+    b"\4\1\0": "Zip-Copy",
+    b"\4\1\1": "Zip-Shrink",
+    b"\4\1\6": "Zip-Implode",
+    b"\4\1\x08": "Zip-Deflate",
+    b"\4\1\x09": "Zip-Deflate64",
+    b"\4\1\x10": "Zip-BZip2",
+    b"\4\1\x14": "Zip-LZMA",
+    b"\4\1\x60": "Zip-JPEG",
+    b"\4\1\x61": "Zip-WavPack",
+    b"\4\1\x62": "Zip-PPMD",
+    b"\4\1\x63": "Zip-wzAES",
+    b"\4\2\2": "BZip2",
+    b"\4\3\1": "RAR-15",
+    b"\4\3\2": "RAR-20",
+    b"\4\3\3": "RAR-29",
+    b"\4\4\1": "Arj3",
+    b"\4\4\2": "Arj4",
+    b"\4\5": "Z",
+    b"\4\6": "LZH",
+    b"\4\7": "7z-Reserved",
+    b"\4\8": "CAB",
+    b"\4\9\1": "NSIS-Deflate",
+    b"\4\9\1": "NSIS-BZip2",
+    b"\6\0": "Crypto-Reserved",
+    b"\6\1\x00": "Crypto-AES128-ECB",
+    b"\6\1\x01": "Crypto-AES128-CBC",
+    b"\6\1\x02": "Crypto-AES128-CFB",
+    b"\6\1\x03": "Crypto-AES128-OFB",
+    b"\6\1\x40": "Crypto-AES192-ECB",
+    b"\6\1\x41": "Crypto-AES192-CBC",
+    b"\6\1\x42": "Crypto-AES192-CFB",
+    b"\6\1\x43": "Crypto-AES192-OFB",
+    b"\6\1\x80": "Crypto-AES256-ECB",
+    b"\6\1\x81": "Crypto-AES256-CBC",
+    b"\6\1\x82": "Crypto-AES256-CFB",
+    b"\6\1\x83": "Crypto-AES256-OFB",
+    b"\6\1\xc0": "Crypto-AES-ECB",
+    b"\6\1\xc1": "Crypto-AES-CBC",
+    b"\6\1\xc2": "Crypto-AES-CFB",
+    b"\6\1\xc3": "Crypto-AES-OFB",
+    b"\6\7": "Crypto-Reserved",
+    b"\6\x0f": "Crypto-Reserved",
+    b"\6\xf0": "Crypto-Misc",
+    b"\6\xf1\1\1": "Crypto-Zip",
+    b"\6\xf1\3\2": "Crypto-RAR-Unknown",
+    b"\6\xf1\3\3": "Crypto-RAR-29",  # AES128
+    b"\6\xf1\7\1": "Crypto-7z",  # AES256
+    b"\7\0": "Hash-None",
+    b"\7\1": "Hash-CRC",
+    b"\7\2": "Hash-SHA1",
+    b"\7\3": "Hash-SHA256",
+    b"\7\4": "Hash-SHA384",
+    b"\7\5": "Hash-SHA512",
+    b"\7\xf0": "Hash-Misc",
+    b"\7\xf1\3\3": "Hash-RAR-29",  # modified SHA1
+    b"\7\xf1\7\1": "Hash-7z",  # SHA256
 }
 
 
@@ -579,6 +583,8 @@ class FilesInfo(FieldSet):
                 yield FileNames(self, "filenames")
             elif uid == kWinAttributes:
                 yield FileAttributes(self, "attributes")
+            elif uid == kDummy:
+                yield ArchiveProperty(self, "dummy[]")
             else:
                 yield ArchiveProperty(self, "prop[]")
 
@@ -663,7 +669,6 @@ class CompressedData(Bytes):
                 tags.append(("mime", mime_type))
             if filename:
                 tags.append(("filename", filename))
-            print(args)
             return StringInputStream(decompressor(self.value), **args)
         self.setSubIStream(createInputStream)
 
@@ -675,7 +680,7 @@ def get_header_decompressor(self):
     method = METHODS[coder['id'].value]
     if method == 'Copy':
         return lambda data: data
-    elif method == '7z-LZMA':
+    elif method == '7z-LZMA' and has_lzma:
         props = coder['properties'].value
         length = unpack_info['unpack_size[0][0]'].value
         return lambda data: lzmadecompress(props + data, maxlength=length)
