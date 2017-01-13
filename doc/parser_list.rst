@@ -109,6 +109,7 @@ Program
 * elf: ELF Unix/BSD program/library
 * exe: Microsoft Windows Portable Executable
 * java_class: Compiled Java class
+* java_serialized: Serialized Java object
 * nds_file: Nintendo DS game file
 * pifv: EFI Platform Initialization Firmware Volume
 * prc: Palm Resource File
@@ -123,4 +124,4 @@ Video
 * mpeg_ts: MPEG-2 Transport Stream
 * mpeg_video: MPEG video, version 1 or 2
 
-Total: 88 parsers
+Total: 89 parsers

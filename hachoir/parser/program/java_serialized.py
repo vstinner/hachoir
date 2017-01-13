@@ -12,13 +12,12 @@ Updated: Jan 12, 2017
 
 from hachoir.parser import Parser
 from hachoir.field import (
-    ParserError, FieldSet, StaticFieldSet,
+    ParserError, FieldSet,
     Enum, RawBytes, String, PascalString16, Float32, Float64,
     Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64,
     Bit, NullBits)
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal
-from hachoir.core.tools import paddingSize
 
 from .java import parse_field_descriptor
 
@@ -307,7 +306,7 @@ class SerializedException(FieldSet):
     def createFields(self):
         yield Enum(UInt8(self, "typecode"), TYPECODE_NAMES)
         self.root.resetHandles()
-        yield SerializableObject(self, "object")
+        yield SerializedObject(self, "object")
         self.root.resetHandles()
 
 
@@ -349,6 +348,7 @@ class SerializedEnum(FieldSet):
 
     def createDisplay(self):
         return '%s.%s' % (self.classDesc.className, self.value)
+
 
 TYPECODE_NAMES = {
     0x70: "NULL",
@@ -394,6 +394,7 @@ def SerializedContent(parent, name, description=None):
     if klass is None:
         raise ParserError("Unknown typecode 0x%02x" % tc)
     return klass(parent, name, description)
+
 
 VALUE_CLASS_MAP = {
     'B': Int8,
