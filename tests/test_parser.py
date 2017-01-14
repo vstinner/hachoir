@@ -625,6 +625,36 @@ class TestParsers(unittest.TestCase):
         self.checkValue(
             parser, "/packet[78]/payload_unit_start", True)
 
+    def test_macho_x86_ppc(self):
+        parser = self.parse("macos_10.5.macho")
+        self.checkDisplay(
+            parser, "/file[0]/header/cputype", "PowerPC")
+        self.checkDisplay(
+            parser, "/file[1]/header/cputype", "i386")
+        self.checkValue(
+            parser, "/file[0]/load_command[1]/data/segname", "__TEXT")
+        self.checkValue(
+            parser, "/file[0]/load_command[1]/data/section[1]/sectname", "__symbol_stub1")
+        self.checkValue(
+            parser, "/file[1]/load_command[1]/data/segname", "__TEXT")
+        self.checkValue(
+            parser, "/file[1]/load_command[1]/data/section[1]/sectname", "__cstring")
+
+    def test_macho_x86_64(self):
+        parser = self.parse("macos_10.12.macho")
+        self.checkDisplay(
+            parser, "/file[0]/header/cputype", "i386")
+        self.checkDisplay(
+            parser, "/file[1]/header/cputype", "x86_64")
+        self.checkValue(
+            parser, "/file[0]/load_command[1]/data/segname", "__TEXT")
+        self.checkValue(
+            parser, "/file[0]/load_command[1]/data/section[1]/sectname", "__symbol_stub")
+        self.checkValue(
+            parser, "/file[1]/load_command[1]/data/segname", "__TEXT")
+        self.checkValue(
+            parser, "/file[1]/load_command[1]/data/section[1]/sectname", "__stubs")
+
 
 class TestParserRandomStream(unittest.TestCase):
 

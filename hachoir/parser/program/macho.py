@@ -82,7 +82,6 @@ class MachoHeader(FieldSet):
         yield UInt32(self, "ncmds", "Number of load commands")
         yield UInt32(self, "sizeofcmds", "Total size of all load commands")
 
-        
         if self.endian == BIG_ENDIAN:
             yield NullBits(self, "flags_reserved", 32 - len(self.FLAGS))
             for flag in self.FLAGS[::-1]:
