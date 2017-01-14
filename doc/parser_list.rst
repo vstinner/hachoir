@@ -110,6 +110,8 @@ Program
 * exe: Microsoft Windows Portable Executable
 * java_class: Compiled Java class
 * java_serialized: Serialized Java object
+* macho: Mach-O program/library
+* macho_fat: Mach-O fat program/library
 * nds_file: Nintendo DS game file
 * pifv: EFI Platform Initialization Firmware Volume
 * prc: Palm Resource File
@@ -124,4 +126,4 @@ Video
 * mpeg_ts: MPEG-2 Transport Stream
 * mpeg_video: MPEG video, version 1 or 2
 
-Total: 89 parsers
+Total: 91 parsers

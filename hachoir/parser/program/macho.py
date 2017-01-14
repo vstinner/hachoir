@@ -1,14 +1,19 @@
 """
 Mach-O (Mac OS X executable file format) parser.
 
+Resources:
+- https://lowlevelbits.org/parsing-mach-o-files/
+- OS X ABI Mach-O File Format Reference
+  (mirrored at https://github.com/aidansteele/osx-abi-macho-file-format-reference)
+
 Author: Robert Xiao
 Creation date: February 11, 2015
+Updated: January 13, 2017
 """
 
 from hachoir.parser import HachoirParser
-from hachoir.field import (RootSeekableFieldSet, FieldSet, ParserError, Bit, NullBits, RawBits,
-    Int32, UInt8, UInt16, UInt32, UInt64, Enum,
-    String, RawBytes, Bytes)
+from hachoir.field import (RootSeekableFieldSet, FieldSet,
+                           Int32, UInt32, Enum, Bytes)
 from hachoir.core.text_handler import textHandler, hexadecimal
 from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 
@@ -19,18 +24,18 @@ CPU_TYPE = {
     1: 'VAX',
     6: 'MC680x0',
     7: 'i386',
-    7|CPU_ARCH_ABI64: 'x86_64',
+    7 | CPU_ARCH_ABI64: 'x86_64',
     8: 'MIPS',
     10: 'MC98000',
     11: 'HPPA',
     12: 'ARM',
-    12|CPU_ARCH_ABI64: 'ARM64',
+    12 | CPU_ARCH_ABI64: 'ARM64',
     13: 'MC88000',
     14: 'SPARC',
     15: 'I860',
     16: 'Alpha',
     18: 'PowerPC',
-    18|CPU_ARCH_ABI64: 'PowerPC64',
+    18 | CPU_ARCH_ABI64: 'PowerPC64',
 }
 
 FILE_TYPE = {
@@ -48,13 +53,15 @@ FILE_TYPE = {
 }
 
 MACHO_MAGICS = {
-    b"\xfe\xed\xfa\xce": (0, BIG_ENDIAN), # 32-bit big endian
-    b"\xce\xfa\xed\xfe": (0, LITTLE_ENDIAN), # 32-bit little endian
-    b"\xfe\xed\xfa\xcf": (1, BIG_ENDIAN), # 64-bit big endian
-    b"\xcf\xfa\xed\xfe": (1, LITTLE_ENDIAN), # 64-bit little endian
+    b"\xfe\xed\xfa\xce": (0, BIG_ENDIAN),  # 32-bit big endian
+    b"\xce\xfa\xed\xfe": (0, LITTLE_ENDIAN),  # 32-bit little endian
+    b"\xfe\xed\xfa\xcf": (1, BIG_ENDIAN),  # 64-bit big endian
+    b"\xcf\xfa\xed\xfe": (1, LITTLE_ENDIAN),  # 64-bit little endian
 }
 
+
 class MachoHeader(FieldSet):
+
     def createFields(self):
         yield Bytes(self, "magic", 4, "Mach-O signature")
         yield Enum(Int32(self, "cputype"), CPU_TYPE)
@@ -66,6 +73,7 @@ class MachoHeader(FieldSet):
         if self.parent.is64bit:
             yield UInt32(self, "reserved")
 
+
 class MachoLoadCommand(FieldSet):
     LOAD_COMMANDS = {
     }
@@ -75,7 +83,9 @@ class MachoLoadCommand(FieldSet):
         yield UInt32(self, "cmdsize")
         self._size = self['cmdsize'].value * 8
 
+
 class MachoFileBase(RootSeekableFieldSet):
+
     def createFields(self):
         baseaddr = self.absolute_address
         # Choose size and endianness based on magic
@@ -89,25 +99,27 @@ class MachoFileBase(RootSeekableFieldSet):
     def createDescription(self):
         return "Mach-O program/library: %s" % (self["header/cputype"].display)
 
+
 class MachoFile(HachoirParser, MachoFileBase):
     PARSER_TAGS = {
         "id": "macho",
         "category": "program",
         "file_ext": ("dylib", "bundle", "o", ""),
-        "min_size": (28+56)*8,  # Header + one segment load command
+        "min_size": (28 + 56) * 8,  # Header + one segment load command
         "mime": (
             "application/x-executable",
             "application/x-object",
             "application/x-sharedlib",
             "application/x-executable-file",
             "application/x-coredump"),
-        "magic": tuple((m,0) for m in MACHO_MAGICS),
+        "magic": tuple((m, 0) for m in MACHO_MAGICS),
         "description": "Mach-O program/library"
     }
     endian = BIG_ENDIAN
 
     def __init__(self, stream, **args):
-        MachoFileBase.__init__(self, None, "root", stream, None, stream.askSize(self))
+        MachoFileBase.__init__(self, None, "root", stream,
+                               None, stream.askSize(self))
         HachoirParser.__init__(self, stream, **args)
 
     def validate(self):
@@ -115,7 +127,9 @@ class MachoFile(HachoirParser, MachoFileBase):
             return "Invalid magic"
         return True
 
+
 class MachoFatArch(FieldSet):
+
     def createFields(self):
         yield Enum(Int32(self, "cputype"), CPU_TYPE)
         yield Int32(self, "cpusubtype")
@@ -124,12 +138,15 @@ class MachoFatArch(FieldSet):
         yield UInt32(self, "align")
         self['align'].createDescription = lambda: str(1 << self['align'].value)
 
+
 class MachoFatHeader(FieldSet):
+
     def createFields(self):
         yield Bytes(self, "magic", 4, "Mach-O signature")
         yield UInt32(self, "nfat_arch", "Number of architectures in this fat file")
         for i in range(self['nfat_arch'].value):
             yield MachoFatArch(self, 'arch[]')
+
 
 class MachoFatFile(HachoirParser, RootSeekableFieldSet):
     MAGIC_BE = b"\xca\xfe\xba\xbe"
@@ -140,7 +157,7 @@ class MachoFatFile(HachoirParser, RootSeekableFieldSet):
         "category": "program",
         "file_ext": ("dylib", "bundle", ""),
         # One page + size for one arch
-        "min_size": 4096*8 + MachoFile.PARSER_TAGS['min_size'],
+        "min_size": 4096 * 8 + MachoFile.PARSER_TAGS['min_size'],
         "mime": (
             "application/x-executable",
             "application/x-object",
@@ -153,7 +170,8 @@ class MachoFatFile(HachoirParser, RootSeekableFieldSet):
     endian = BIG_ENDIAN
 
     def __init__(self, stream, **args):
-        RootSeekableFieldSet.__init__(self, None, "root", stream, None, stream.askSize(self))
+        RootSeekableFieldSet.__init__(
+            self, None, "root", stream, None, stream.askSize(self))
         HachoirParser.__init__(self, stream, **args)
 
     def validate(self):
