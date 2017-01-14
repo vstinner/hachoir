@@ -286,62 +286,52 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "/group_desc/group[0]/free_blocks_count", 44)
         self.checkValue(parser, "/group[0]/block_bitmap/item[9]", False)
         self.checkDisplay(
-            parser, "/group[0]/inode_table/inode[1]/file_type", "Directory")
+            parser, "/group[0]/inode_table/inode[1]/mode/file_type", "Directory")
         self.checkDesc(parser, "/group[0]/inode_table/inode[10]",
-                       "Inode 11: file, size=1024 bytes, mode=drwxr-xr-x")
+                       "Inode 11: Directory, size=1024 bytes, mode=drwxr-xr-x")
         self.checkValue(parser, "/group[0]/inode_table/inode[11]/size", 1816)
         self.checkDisplay(
             parser, "/group[0]/inode_table/inode[11]/ctime", '2006-12-04 23:22:00')
         self.checkValue(
-            parser, "/superblock/feature_compat/DIR_PREALLOC", False)
+            parser, "/superblock/feature_compat/dir_prealloc", False)
         self.checkValue(
-            parser, "/superblock/feature_compat/IMAGIC_INODES", False)
+            parser, "/superblock/feature_compat/imagic_inodes", False)
         self.checkValue(
-            parser, "/superblock/feature_compat/HAS_JOURNAL", False)
-        self.checkValue(parser, "/superblock/feature_compat/EXT_ATTR", False)
-        self.checkValue(parser, "/superblock/feature_compat/RESIZE_INO", True)
-        self.checkValue(parser, "/superblock/feature_compat/DIR_INDEX", True)
+            parser, "/superblock/feature_compat/has_journal", False)
+        self.checkValue(parser, "/superblock/feature_compat/ext_attr", False)
+        self.checkValue(parser, "/superblock/feature_compat/resize_inode", True)
+        self.checkValue(parser, "/superblock/feature_compat/dir_index", True)
         self.checkValue(
-            parser, "/superblock/feature_incompat/COMPRESSION", False)
-        self.checkValue(parser, "/superblock/feature_incompat/FILETYPE", True)
-        self.checkValue(parser, "/superblock/feature_incompat/RECOVER", False)
+            parser, "/superblock/feature_incompat/compression", False)
+        self.checkValue(parser, "/superblock/feature_incompat/filetype", True)
+        self.checkValue(parser, "/superblock/feature_incompat/recover", False)
         self.checkValue(
-            parser, "/superblock/feature_incompat/JOURNAL_DEV", False)
-        self.checkValue(parser, "/superblock/feature_incompat/META_BG", False)
+            parser, "/superblock/feature_incompat/journal_dev", False)
+        self.checkValue(parser, "/superblock/feature_incompat/meta_bg", False)
         self.checkValue(
-            parser, "/superblock/feature_ro_compat/SPARSE_SUPER", True)
+            parser, "/superblock/feature_ro_compat/sparse_super", True)
         self.checkValue(
-            parser, "/superblock/feature_ro_compat/LARGE_FILE", False)
+            parser, "/superblock/feature_ro_compat/large_file", False)
         self.checkValue(
-            parser, "/superblock/feature_ro_compat/BTREE_DIR", False)
-        self.checkValue(parser, "/superblock/feature_incompat/FILETYPE", True)
-        self.checkValue(parser, "/superblock/feature_incompat/RECOVER", False)
-        self.checkValue(parser, "/superblock/hash_seed[0]", 721772090)
-        self.checkValue(parser, "/superblock/hash_seed[1]", 1548340876)
-        self.checkValue(parser, "/superblock/hash_seed[2]", 682462885)
-        self.checkValue(parser, "/superblock/hash_seed[3]", 847697135)
-        self.checkDisplay(parser, "/superblock/def_hash_version", "Tea")
+            parser, "/superblock/feature_ro_compat/btree_dir", False)
+        self.checkValue(parser, "/superblock/feature_incompat/filetype", True)
+        self.checkValue(parser, "/superblock/feature_incompat/recover", False)
+        self.checkDisplay(parser, "/superblock/def_hash_version", "TEA")
         self.checkValue(
-            parser, "/group[0]/inode_table/inode[0]/flags/SECRM", False)
+            parser, "/group[0]/inode_table/inode[0]/flags/secrm", False)
         self.checkDisplay(parser, "/superblock/rev_level",
                           "V2 format w/ dynamic inode sizes")
 
     def test_ext2_default_mount_opts(self):
         parser = self.parse("default_mount_opts.ext2")
-        self.checkValue(parser, "/superblock/default_mount_opts/DEBUG", False)
+        self.checkValue(parser, "/superblock/default_mount_opts/debug", False)
         self.checkValue(
-            parser, "/superblock/default_mount_opts/BSDGROUPS", False)
+            parser, "/superblock/default_mount_opts/bsdgroups", False)
         self.checkValue(
-            parser, "/superblock/default_mount_opts/XATTR_USER", True)
-        self.checkValue(parser, "/superblock/default_mount_opts/ACL", True)
-        self.checkValue(parser, "/superblock/default_mount_opts/UID16", False)
-        self.checkValue(parser, "/superblock/default_mount_opts/JMODE", False)
-        self.checkValue(
-            parser, "/superblock/default_mount_opts/JMODE_DATA", False)
-        self.checkValue(
-            parser, "/superblock/default_mount_opts/JMODE_ORDERED", False)
-        self.checkValue(
-            parser, "/superblock/default_mount_opts/JMODE_WBACK", False)
+            parser, "/superblock/default_mount_opts/xattr_user", True)
+        self.checkValue(parser, "/superblock/default_mount_opts/acl", True)
+        self.checkValue(parser, "/superblock/default_mount_opts/uid16", False)
+        self.checkDisplay(parser, "/superblock/default_mount_opts/jmode", "none")
 
     def test_bmp2(self):
         parser = self.parse("article01.bmp")

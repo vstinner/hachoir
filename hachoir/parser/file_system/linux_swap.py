@@ -34,8 +34,8 @@ class Page(RawBytes):
 class UUID(Bytes):
     static_size = 16 * 8
 
-    def __init__(self, parent, name):
-        Bytes.__init__(self, parent, name, 16)
+    def __init__(self, parent, name, *args, **kwargs):
+        Bytes.__init__(self, parent, name, 16, *args, **kwargs)
 
     def createDisplay(self):
         text = str2hex(self.value, format=r"%02x")
