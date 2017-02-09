@@ -11,8 +11,9 @@ Creation: 25 march 2005
 
 from hachoir.parser import Parser
 from hachoir.field import (FieldSet, UInt8,
-                           UInt16, Int32, UInt32, Int64, ParserError, Float64, Enum,
-                           Character, Bytes, RawBytes, PascalString8, TimestampUnix32)
+                           UInt16, Int32, UInt32, Int64, ParserError, Float64,
+                           Character, RawBytes, PascalString8, TimestampUnix32,
+                           Bit, String)
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.bits import long2raw
 from hachoir.core.text_handler import textHandler, hexadecimal
@@ -95,7 +96,16 @@ def parseBinaryComplex(parent):
 
 # --- Tuple and list ---
 def parseTuple(parent):
-    yield Int32(parent, "count", "Item count")
+    yield UInt32(parent, "count", "Item count")
+    count = parent["count"].value
+    if count < 0:
+        raise ParserError("Invalid tuple/list count")
+    for index in range(count):
+        yield Object(parent, "item[]")
+
+
+def parseSmallTuple(parent):
+    yield UInt8(parent, "count", "Item count")
     count = parent["count"].value
     if count < 0:
         raise ParserError("Invalid tuple/list count")
@@ -127,6 +137,16 @@ def parseDict(parent):
 
 def createDictDesc(parent):
     return "Dict: %s" % ("%s keys" % parent.count)
+
+
+def parseRef(parent):
+    yield UInt32(parent, "n", "Reference")
+
+
+def parseShortASCII(parent):
+    size = UInt8(parent, "len", "Number of ASCII characters")
+    yield size
+    yield String(parent, "text", size.value, "String content", charset="ASCII")
 
 # --- Code ---
 
@@ -187,18 +207,23 @@ class Object(FieldSet):
         'u': ("unicode", parseString, "Unicode", None),
         'R': ("string_ref", parseStringRef, "String ref", createStringRefDesc),
         '(': ("tuple", parseTuple, "Tuple", createTupleDesc),
+        ')': ("small_tuple", parseSmallTuple, "Tuple", createTupleDesc),
         '[': ("list", parseTuple, "List", createTupleDesc),
         '<': ("set", parseTuple, "Set", createTupleDesc),
         '>': ("frozenset", parseTuple, "Frozen set", createTupleDesc),
         '{': ("dict", parseDict, "Dict", createDictDesc),
         'c': ("code", parseCode, "Code", None),
+        'r': ("ref", parseRef, "Reference", None),
+        'z': ("short_ascii", parseShortASCII, "Short ASCII", None),
+        'Z': ("short_ascii_interned", parseShortASCII, "Short ASCII interned", None),
     }
 
     def __init__(self, parent, name, **kw):
         FieldSet.__init__(self, parent, name, **kw)
         code = self["bytecode"].value
         if code not in self.bytecode_info:
-            raise ParserError('Unknown bytecode: "%s"' % code)
+            raise ParserError('Unknown bytecode %r at position %s'
+                              % (code, self.absolute_address // 8))
         self.code_info = self.bytecode_info[code]
         if not name:
             self._name = self.code_info[0]
@@ -258,7 +283,8 @@ class Object(FieldSet):
             float(self["complex"].value))
 
     def createFields(self):
-        yield Character(self, "bytecode", "Bytecode")
+        yield BytecodeChar(self, "bytecode", "Bytecode")
+        yield Bit(self, "flag_ref", "Is a reference?")
         parser = self.code_info[1]
         if parser:
             yield from parser(self)
@@ -269,6 +295,10 @@ class Object(FieldSet):
             return create(self)
         else:
             return self.code_info[2]
+
+
+class BytecodeChar(Character):
+    static_size = 7
 
 
 class PythonCompiledFile(Parser):
@@ -283,8 +313,8 @@ class PythonCompiledFile(Parser):
 
     # Dictionnary which associate the pyc signature (32-bit integer)
     # to a Python version string (eg. "m\xf2\r\n" => "Python 2.4b1").
-    # This list comes from CPython source code, see "MAGIC"
-    # and "pyc_magic" in file Python/import.c
+    # This list comes from CPython source code, see MAGIC_NUMBER
+    # in file Lib/importlib/_bootstrap_external.py
     MAGIC = {
         # Python 1.x
         20121: ("1.5", 0x1050000),
@@ -337,6 +367,34 @@ class PythonCompiledFile(Parser):
         3170: ("3.2a1", 0x3020000),
         3180: ("3.2a2", 0x3020000),
         3190: ("Python 3.3a0", 0x3030000),
+        3200: ("Python 3.3a0 ", 0x3030000),
+        3210: ("Python 3.3a0 ", 0x3030000),
+        3220: ("Python 3.3a1 ", 0x3030000),
+        3230: ("Python 3.3a4 ", 0x3030000),
+        3250: ("Python 3.4a1 ", 0x3040000),
+        3260: ("Python 3.4a1 ", 0x3040000),
+        3270: ("Python 3.4a1 ", 0x3040000),
+        3280: ("Python 3.4a1 ", 0x3040000),
+        3290: ("Python 3.4a4 ", 0x3040000),
+        3300: ("Python 3.4a4 ", 0x3040000),
+        3310: ("Python 3.4rc2", 0x3040000),
+        3320: ("Python 3.5a0 ", 0x3050000),
+        3330: ("Python 3.5b1 ", 0x3050000),
+        3340: ("Python 3.5b2 ", 0x3050000),
+        3350: ("Python 3.5b2 ", 0x3050000),
+        3351: ("Python 3.5.2 ", 0x3050000),
+        3360: ("Python 3.6a0 ", 0x3060000),
+        3361: ("Python 3.6a0 ", 0x3060000),
+        3370: ("Python 3.6a1 ", 0x3060000),
+        3371: ("Python 3.6a1 ", 0x3060000),
+        3372: ("Python 3.6a1 ", 0x3060000),
+        3373: ("Python 3.6b1 ", 0x3060000),
+        3375: ("Python 3.6b1 ", 0x3060000),
+        3376: ("Python 3.6b1 ", 0x3060000),
+        3377: ("Python 3.6b1 ", 0x3060000),
+        3378: ("Python 3.6b2 ", 0x3060000),
+        3379: ("Python 3.6rc1", 0x3060000),
+        3390: ("Python 3.7a0 ", 0x3070000),
     }
 
     # Dictionnary which associate the pyc signature (4-byte long string)
@@ -347,12 +405,19 @@ class PythonCompiledFile(Parser):
         for magic, value in MAGIC.items())
 
     def validate(self):
-        signature = self.stream.readBits(0, 16, self.endian)
-        if signature not in self.MAGIC:
-            return "Unknown version (%s)" % signature
-        if self.stream.readBytes(2 * 8, 2) != b"\r\n":
-            return r"Wrong signature (\r\n)"
-        if self.stream.readBytes(8 * 8, 1) != b'c':
+        magic_number = self["magic_number"].value
+        if magic_number not in self.MAGIC:
+            return "Unknown magic number (%s)" % magic_number
+        if self["magic_string"].value != "\r\n":
+            return r"Wrong magic string (\r\n)"
+
+        version = self.getVersion()
+        if version >= 0x3030000 and self['magic_number'].value >= 3200:
+            offset = 12
+        else:
+            offset = 8
+        value = self.stream.readBits(offset * 8, 7, self.endian)
+        if value != ord(b'c'):
             return "First object bytecode is not code"
         return True
 
@@ -363,6 +428,10 @@ class PythonCompiledFile(Parser):
         return self.version
 
     def createFields(self):
-        yield Enum(Bytes(self, "signature", 4, "Python file signature and version"), self.STR_MAGIC)
+        yield UInt16(self, "magic_number", "Magic number")
+        yield String(self, "magic_string", 2, r"Magic string \r\n", charset="ASCII")
         yield TimestampUnix32(self, "timestamp", "Timestamp")
+        version = self.getVersion()
+        if version >= 0x3030000 and self['magic_number'].value >= 3200:
+            yield UInt32(self, "filesize", "Size of the Python source file (.py) modulo 2**32")
         yield Object(self, "content")

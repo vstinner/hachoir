@@ -5,6 +5,7 @@ Changelog
 hachoir 3.0a2
 =============
 
+* Python parser supports Python 3.3-3.7 .pyc files.
 * metadata: get comment from ZIP
 * Fix ResourceWarning warnings on files. Add a close() method and support for
   the context manager protocol ("with obj: ...") to parsers, input and output

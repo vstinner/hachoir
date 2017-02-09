@@ -232,6 +232,10 @@ class TestParsers(unittest.TestCase):
         parser = self.parse("pyc_example_2.5c1_pyc.bin")
         self.check_pyc(parser)
 
+    def check_pyc_37(self, parser):
+        parser = self.parse("python.cpython-37.pyc.bin")
+        self.checkValue(parser, "/content/consts/item[0]/name/text", "f")
+
     def test_java(self):
         parser = self.parse("ReferenceMap.class")
         self.checkValue(parser, "/minor_version", 3)
