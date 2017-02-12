@@ -1,7 +1,5 @@
 from hachoir.parser import createParser
-from hachoir.core.tools import makePrintable
 from hachoir.metadata import extractMetadata
-from hachoir.core.i18n import getTerminalCharset
 from sys import argv, stderr, exit
 
 if len(argv) != 2:
@@ -25,4 +23,3 @@ if not metadata:
 
 for line in metadata.exportPlaintext():
     print(line)
-

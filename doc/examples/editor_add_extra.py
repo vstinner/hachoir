@@ -9,6 +9,7 @@ with parser:
     extra = "abcd"
     editor["has_extra"].value = True
     editor.insertAfter("os",
-        EditableInteger(editor, "extra_length", False, 16, len(extra)),
-        EditableBytes(editor, "extra", extra))
+                       EditableInteger(editor, "extra_length", False,
+                                       16, len(extra)),
+                       EditableBytes(editor, "extra", extra))
     writeIntoFile(editor, "file_extra.gz")

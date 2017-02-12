@@ -8,4 +8,3 @@ with parser:
     del editor["filename"]
     editor["has_filename"].value = False
     writeIntoFile(editor, "noname.gz")
-
