@@ -44,9 +44,9 @@ class TestDoc(unittest.TestCase):
             print("--- End of test")
 
     def test_doc_directory(self):
-        self.check_doc('api.rst')
+        self.check_doc('developer.rst')
         self.check_doc('internals.rst')
-        self.check_doc('regex_api.rst')
+        self.check_doc('regex.rst')
 
     def test_tests_directory(self):
         self.check_doc('regex_regression.rst', subdir='.')
