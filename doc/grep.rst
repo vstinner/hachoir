@@ -1,8 +1,8 @@
 .. _grep:
 
-++++++++++++
-Hachoir Grep
-++++++++++++
+++++++++++++++++++++
+hachoir-grep program
+++++++++++++++++++++
 
 hachoir-grep is an experimantal search program based on Hachoir. Its goal is
 to search a substring in a binary file or list all strings.

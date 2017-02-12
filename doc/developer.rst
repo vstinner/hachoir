@@ -1,9 +1,54 @@
-+++++++++++
-Hachoir API
-+++++++++++
++++++++++++++++++++++++
+Hachoir3 for developers
++++++++++++++++++++++++
 
-This document is a presentation of Hachoir API. It tries to show most the
-interesting part of this tool, but is not exhaustive. Ok, let's start!
+Download code and run tests
+===========================
+
+To clone Git repository, type::
+
+    git clone https://github.com/haypo/hachoir3
+
+Enter hachoir3 directory::
+
+    cd hachoir3
+
+To run tests, type tox::
+
+    tox
+
+If tox is not already installed, install tox::
+
+    python3 -m pip install tox
+
+See also `Hachoir3 on the Travis CI <https://travis-ci.org/haypo/hachoir3>`_.
+
+
+Why using Hachoir parsers?
+==========================
+
+Why using slow Python code instead of fast hardcoded C code? Hachoir has many
+interesting features:
+
+* Autofix: Hachoir is able to open invalid / truncated files
+* Lazy: Open a file is very fast since no information is read from file,
+  data are read and/or computed when the user ask for it
+* Types: Hachoir has many predefined field types (integer, bit, string, etc.)
+  and supports string with charset (ISO-8859-1, UTF-8, UTF-16, ...)
+* Addresses and sizes are stored in bit, so flags are stored as classic fields
+* Endian: You have to set endian once, and then number are converted in the
+  right endian
+* Editor: Using Hachoir representation of data, you can edit, insert, remove
+  data and then save in a new file.
+
+
+Hachoir Metadata Example
+========================
+
+:ref:`hachoir-metadata <metadata>` example:
+
+.. literalinclude:: examples/metadata.py
+
 
 hachoir.stream: Stream manipulation
 ===================================
@@ -304,11 +349,3 @@ Lazy methods:
 * __iter__(): iterate over children
 * createFields(): main function of the parser, create the fields. Don't call
   this function directly.
-
-
-Hachoir Metadata Example
-========================
-
-:ref:`hachoir-metadata <metadata>` example:
-
-.. literalinclude:: examples/metadata.py

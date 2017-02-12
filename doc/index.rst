@@ -14,38 +14,48 @@ tubes; Hachoir is used by computer butchers to divide binary files into fields.
 
 Command line tools using Hachoir parsers:
 
-* :ref:`hachoir-grep <grep>`: find a text pattern in a binary file
 * :ref:`hachoir-metadata <metadata>`: get metadata from binary files
-* :ref:`hachoir-strip <strip>`: modify a file to remove metadata
 * :ref:`hachoir-urwid <urwid>`: display the content of a binary file in text mode
+* :ref:`hachoir-grep <grep>`: find a text pattern in a binary file
+* :ref:`hachoir-strip <strip>`: modify a file to remove metadata
 
 See also `Hachoir at Bitbucket <https://bitbucket.org/haypo/hachoir/>`_:
 original Hachoir for Python 2.
 
 
-Table Of Contents
-=================
+User Guide
+==========
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   core
-   parser
-   parser_list
-   metadata
    install
+   metadata
    urwid
-   regex
-   metadata_examples
-   api
-   internals
-   regex_api
-   editor
    subfile
    grep
    strip
+
+
+Developer Guide
+===============
+
+.. toctree::
+   :maxdepth: 1
+
+   developer
+   internals
+   parser
+   regex
+   editor
+
+Others pages
+============
+
+.. toctree::
+   :maxdepth: 1
+
    contact
    hacking
    authors
    changelog
-

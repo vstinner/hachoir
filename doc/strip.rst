@@ -1,8 +1,8 @@
 .. _strip:
 
-+++++++++++++
-Hachoir Strip
-+++++++++++++
++++++++++++++++++++++
+hachoir-strip program
++++++++++++++++++++++
 
 hachoir-strip is an experimental program based on Hachoir library: it removes
 "useless" informations from a file. Don't use it to create smaller file, you

@@ -1,8 +1,8 @@
 .. _urwid:
 
-+++++++++++++
-Hachoir Urwid
-+++++++++++++
++++++++++++++++++++++
+hachoir-urwid program
++++++++++++++++++++++
 
 hachoir-urwid is a binary file explorer based on Hachoir library to parse the
 files. Using this tool you can exactly know the meaning of each bit/byte of
@@ -59,12 +59,3 @@ Help
 Command line options: use --help option.
 
 In hachoir-use, use F1 key to get help (keyboard keys).
-
-
-Other Hachoir user interfaces
-=============================
-
-* [[hachoir-gtk]]
-* [[hachoir-http]]
-* [[hachoir-wx]]
-

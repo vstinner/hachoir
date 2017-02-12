@@ -1,6 +1,6 @@
-+++++++
-Subfile
-+++++++
++++++++++++++++++++++++
+hachoir-subfile program
++++++++++++++++++++++++
 
 hachoir-subfile is a tool based on hachoir-parser to find subfiles in any binary stream.
 
