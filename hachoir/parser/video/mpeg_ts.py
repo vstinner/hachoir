@@ -125,6 +125,7 @@ class MPEG_TS(Parser):
         "category": "video",
         "file_ext": ("ts", "m2ts", "mts"),
         "min_size": 188 * 8,
+        "mime": ("video/MP2T",),
         "description": "MPEG-2 Transport Stream"
     }
     endian = BIG_ENDIAN
