@@ -48,12 +48,17 @@ class AdaptationField(FieldSet):
 
 class Packet(FieldSet):
 
-    def __init__(self, *args):
-        FieldSet.__init__(self, *args)
-        if self["has_error"].value:
-            self._size = 204 * 8
+    def __init__(self, *args, **kw):
+        self._m2ts = kw.pop('m2ts', False)
+        FieldSet.__init__(self, *args, **kw)
+        if self._m2ts:
+            size = 4
         else:
-            self._size = 188 * 8
+            size = 0
+        size += 188
+        if self["has_error"].value:
+            size += 16
+        self._size = size * 8
 
     PID = {
         0x0000: "Program Association Table (PAT)",
@@ -67,6 +72,9 @@ class Packet(FieldSet):
     }
 
     def createFields(self):
+        if self._m2ts:
+            yield Bits(self, "c", 2)
+            yield Bits(self, "ats", 32 - 2)
         yield textHandler(UInt8(self, "sync", 8), hexadecimal)
         if self["sync"].value != 0x47:
             raise ParserError("MPEG-2 TS: Invalid synchronization byte")
@@ -82,7 +90,11 @@ class Packet(FieldSet):
         if self["has_adaptation"].value:
             yield AdaptationField(self, "adaptation_field")
         if self["has_payload"].value:
-            yield RawBytes(self, "payload", 188 - (self.current_size // 8))
+            size = 188
+            if self._m2ts:
+                size += 4
+            size -= (self.current_size // 8)
+            yield RawBytes(self, "payload", size)
         if self["has_error"].value:
             yield RawBytes(self, "error_correction", 16)
 
@@ -103,18 +115,31 @@ class Packet(FieldSet):
         return ""
 
 
+# M2TS 4 bytes + 188 bytes payload + 4 errors
+MAX_PACKET_SIZE = 208
+
+
 class MPEG_TS(Parser):
     PARSER_TAGS = {
         "id": "mpeg_ts",
         "category": "video",
-        "file_ext": ("ts",),
+        "file_ext": ("ts", "m2ts", "mts"),
         "min_size": 188 * 8,
         "description": "MPEG-2 Transport Stream"
     }
     endian = BIG_ENDIAN
 
+    def is_m2ts(self):
+        # FIXME: detect using file content, not file name
+        # maybe detect sync at offset+4 bytes?
+        source = self.stream.source
+        if not(source and source.startswith("file:")):
+            return True
+        filename = source[5:].lower()
+        return filename.endswith((".m2ts", ".mts"))
+
     def validate(self):
-        sync = self.stream.searchBytes(b"\x47", 0, 204 * 8)
+        sync = self.stream.searchBytes(b"\x47", 0, MAX_PACKET_SIZE * 8)
         if sync is None:
             return "Unable to find synchronization byte"
         for index in range(5):
@@ -131,11 +156,18 @@ class MPEG_TS(Parser):
         return True
 
     def createFields(self):
+        m2ts = self.is_m2ts()
+
         while not self.eof:
-            sync = self.stream.searchBytes(
-                b"\x47", self.current_size, self.current_size + 204 * 8)
+            current = self.current_size
+            next_sync = current
+            if m2ts:
+                next_sync += 4 * 8
+            sync = self.stream.searchBytes(b"\x47", current,
+                                           current + MAX_PACKET_SIZE * 8)
             if sync is None:
                 raise ParserError("Unable to find synchronization byte")
-            elif sync > self.current_size:
-                yield RawBytes(self, "incomplete_packet[]", (sync - self.current_size) // 8)
-            yield Packet(self, "packet[]")
+            elif sync > next_sync:
+                yield RawBytes(self, "incomplete_packet[]",
+                               (sync - current) // 8)
+            yield Packet(self, "packet[]", m2ts=m2ts)

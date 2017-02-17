@@ -619,6 +619,17 @@ class TestParsers(unittest.TestCase):
         self.checkValue(
             parser, "/packet[78]/payload_unit_start", True)
 
+    def test_m2ts(self):
+        parser = self.parse("Panasonic_AG_HMC_151.MTS")
+        self.checkValue(
+            parser, "/packet[0]/has_error", False)
+        self.checkValue(
+            parser, "/packet[0]/has_payload", True)
+        self.checkValue(
+            parser, "/packet[3]/has_adaptation", True)
+        self.checkValue(
+            parser, "/packet[3]/adaptation_field/pcr_base", 153)
+
     def test_macho_x86_ppc(self):
         parser = self.parse("macos_10.5.macho")
         self.checkDisplay(
