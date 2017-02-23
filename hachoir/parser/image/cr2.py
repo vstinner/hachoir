@@ -6,11 +6,11 @@ Creation date: 21 february 2017
 """
 
 from hachoir.parser import Parser
-from hachoir.field import SeekableFieldSet, RootSeekableFieldSet, Bytes, Bit, Bits, String, UInt8, UInt16, UInt32
+from hachoir.field import SeekableFieldSet, RootSeekableFieldSet, Bytes, String, UInt8, UInt16, UInt32
 from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal
-from hachoir.parser.image.exif import *
-from hachoir.core.log import log
+from hachoir.parser.image.exif import ParserError, IFD, IFD_TAGS
+
 
 def getStrips(ifd):
     data = {}
@@ -79,7 +79,7 @@ class CR2File(RootSeekableFieldSet, Parser):
 
         yield UInt16(self, "version", "TIFF version number")
         yield UInt32(self, "img_dir_ofs", "Next image directory offset")
-        
+
         yield String(self, "cr_identifier", 2, "Canon Raw marker", charset="ASCII")
         yield UInt8(self, "cr_major_version", "Canon Raw major version number")
         yield UInt8(self, "cr_minor_version", "Canon Raw minor version number")
@@ -87,7 +87,7 @@ class CR2File(RootSeekableFieldSet, Parser):
         yield textHandler(UInt32(self, "cr_raw_ifd_offset", "Offset to Raw IFD"), hexadecimal)
 
         offsets = [(self['img_dir_ofs'].value, 'ifd[]', IFD)]
-        
+
         while offsets:
             offset, name, klass = offsets.pop(0)
             self.seekByte(offset + iff_start // 8, relative=False)
@@ -99,7 +99,7 @@ class CR2File(RootSeekableFieldSet, Parser):
                 if tag in IFD_TAGS:
                     name, klass = IFD_TAGS[tag]
                     offsets.append((ifd.getEntryValues(entry)[
-                                0].value, name + '[]', klass))
+                                   0].value, name + '[]', klass))
             if ifd['next'].value != 0:
                 offsets.append((ifd['next'].value, 'ifd[]', IFD))
 

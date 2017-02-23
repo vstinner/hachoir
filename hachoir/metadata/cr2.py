@@ -1,9 +1,14 @@
-from hachoir.metadata.metadata import (registerExtractor, Metadata,
-                                       RootMetadata, MultipleMetadata)
+"""
+Canon CR2 raw image data, version 2.0 image metadata extractor.
+
+Authors: Fernando Crespo
+Creation date: 21 february 2017
+"""
+
+from hachoir.metadata.metadata import (registerExtractor, RootMetadata)
 from hachoir.parser.image import CR2File
-from hachoir.parser.image.png import getBitsPerPixel as pngBitsPerPixel
-from hachoir.parser.image.xcf import XcfProperty
 from hachoir.metadata.safe import fault_tolerant
+
 
 class CR2Metadata(RootMetadata):
     key_to_attr = {
@@ -47,5 +52,6 @@ class CR2Metadata(RootMetadata):
         if tag in {"XResolution", "YResolution"}:
             value = round(value)
         setattr(self, attrname, value)
+
 
 registerExtractor(CR2File, CR2Metadata)
