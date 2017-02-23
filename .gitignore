@@ -14,3 +14,5 @@ hachoir3.egg-info/
 
 # VSCode files
 .vscode/
+
+env/
