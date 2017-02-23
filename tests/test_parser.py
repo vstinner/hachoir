@@ -660,6 +660,11 @@ class TestParsers(unittest.TestCase):
         self.checkValue(
             parser, "/file[1]/load_command[1]/data/section[1]/sectname", "__stubs")
 
+    def test_cr2(self):
+        parser = self.parse("canon.raw.cr2")
+        self.checkValue(parser, "version", 42)
+        self.checkValue(parser, "cr_identifier", "CR")
+
 
 class TestParserRandomStream(unittest.TestCase):
 

@@ -462,6 +462,15 @@ class TestMetadata(unittest.TestCase):
         self.check_attr(meta, 'height_dpi', 200)
         self.check_attr(meta, 'producer', 'mieconvert')
 
+    def test_cr2(self):
+        meta = self.extract("canon.raw.cr2")
+        self.check_attr(meta, 'width', 5184)
+        self.check_attr(meta, 'height', 3456)
+        self.check_attr(meta, 'creation_date',
+                        datetime(2015, 11, 15, 13, 35, 29))
+        self.check_attr(meta, 'date_time_original',
+                        datetime(2015, 11, 15, 13, 35, 29))
+
 
 class TestMetadataCommandLine(unittest.TestCase):
 
