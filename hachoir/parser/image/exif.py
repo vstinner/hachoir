@@ -20,7 +20,7 @@ from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir.core.tools import createDict
 
 # maximum number of array entries in an IFD entry (excluding string types)
-MAX_COUNT = 1000
+MAX_COUNT = 9000
 
 
 def rationalFactory(class_name, size, field_class):

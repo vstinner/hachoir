@@ -9,3 +9,4 @@ from hachoir.parser.image.tga import TargaFile  # noqa
 from hachoir.parser.image.tiff import TiffFile  # noqa
 from hachoir.parser.image.wmf import WMF_File  # noqa
 from hachoir.parser.image.xcf import XcfFile  # noqa
+from hachoir.parser.image.cr2 import CR2File  # noqa
