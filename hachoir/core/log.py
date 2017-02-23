@@ -49,13 +49,10 @@ class Log:
             else:
                 self.__file = codecs.open(filename, "w", "utf-8")
             self._writeIntoFile("Starting Hachoir")
-        except IOError as err:
-            if err.errno == 2:
-                self.__file = None
-                self.info("[Log] setFilename(%s) fails: no such file"
-                          % filename)
-            else:
-                raise
+        except FileNotFoundError:
+            self.__file = None
+            self.info("[Log] setFilename(%s) fails: no such file"
+                      % filename)
 
     def _writeIntoFile(self, message):
         timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
