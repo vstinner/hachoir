@@ -10,3 +10,5 @@ For use hachoir-urwid, you will also need to install `urwid library
 <http://excess.org/urwid/>`_::
 
     python3 -m pip install -U urwid
+
+Hachoir3 requires Python 3.3 or newer.
