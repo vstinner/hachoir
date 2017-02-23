@@ -137,7 +137,7 @@ Video
 * flv: Macromedia Flash video
 * mov: Apple !QuickTime movie
 
-Command line pptions
+Command line options
 ====================
 
 Modes --mime and --type
