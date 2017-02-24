@@ -163,6 +163,7 @@ class IFDEntry(BasicIFDEntry):
         0x0131: ("Software", "Software used"),
         0x013B: ("Artist", "Person who created the image"),
         0x8298: ("Copyright", "Copyright holder"),
+        0x02bc: ("XMPPacket", "XMP Packet"),
         # TIFF-specific tags
         0x00FE: ("NewSubfileType", "NewSubfileType"),
         0x00FF: ("SubfileType", "SubfileType"),
@@ -351,6 +352,8 @@ class IFD(SeekableFieldSet):
             name = "value[%s]" % i
             if issubclass(entry.value_cls, Bytes):
                 yield entry.value_cls(self, name, count)
+            elif entry['tag'].value == 0x02bc:
+                yield String(self, name, count)
             else:
                 if count > 1:
                     name += "[]"
