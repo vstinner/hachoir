@@ -60,6 +60,7 @@ class TiffMetadata(RootMetadata):
         "DocumentName": "title",
         "XResolution": "width_dpi",
         "YResolution": "height_dpi",
+        "DateTime": "creation_date",
     }
 
     def extract(self, tiff):

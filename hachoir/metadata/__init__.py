@@ -11,3 +11,4 @@ import hachoir.metadata.misc  # noqa
 import hachoir.metadata.program  # noqa
 import hachoir.metadata.riff  # noqa
 import hachoir.metadata.video  # noqa
+import hachoir.metadata.cr2 # noqa
