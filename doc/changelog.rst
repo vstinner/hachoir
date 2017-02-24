@@ -2,14 +2,62 @@
 Changelog
 +++++++++
 
-hachoir 3.0a2
-=============
+hachoir 3.0a2 (2017-02-24)
+==========================
+
+Parsers:
+
+* Add initial parser for Mapsforge .map files (only version 3 supported)
+* Add parser for PAK files from "Project: Starfighter" game
+* Add OS X ``.bom`` parser
+* mov parser: add ``traf`` entry
+* Update iTunesDB Parser
+* 7zip: Improve and expand 7zip parser
+* tar: Support ustar prefix field in tar archives.
+* Enhance the Java class parser.
+* Added more field to exif extractor
+* Add WIP Mach-O parser
+* ntfs improvements: parse non-resident runlists
+* ext2: support ext4, massive parser improvements
+
+  Huge changeset that may break backwards compatibility, for better
+  consistency and deeper parsing. Basic rundown:
+
+  - Support many more (new) flags added in ext4 and beyond
+  - Create nice option displays for flags
+  - Improve handling of groups using SeekableFieldSet
+  - Parse (demarcate) inode data blocks
+  - Consistently use lower case for flag names
+
+* Enhance mpeg_ts parser to support MTS/M2TS; add MIME type
+
+New features:
 
 * Python parser supports Python 3.3-3.7 .pyc files.
 * metadata: get comment from ZIP
-* Fix ResourceWarning warnings on files. Add a close() method and support for
-  the context manager protocol ("with obj: ...") to parsers, input and output
-  streams.
+* Support InputIOStream.read(0)
+* Add a close() method and support for the context manager protocol
+  (``with obj: ...``) to parsers, input and output streams.
+* Add more file extensions for PE program parser.
+* ZIP: add MIME type for Android APK, ``.apk`` file.
+* Add editable field for TimestampMac32 type
+
+Bugfixes:
+
+* Issue #2: Fix saving a filed into a file in urwid
+
+  * FileFromInputStream: fix comparison between None and an int
+  * InputIOStream: open the file in binary mode
+
+* Fix OutputStream.writeBits() (was broken since the migration to Python 3)
+* Fix ResourceWarning warnings on files: use the new close() methods and
+  context managers.
+* Fix a few pending warnings on StopIteration.
+* Fixup and relocate hachoir-wx, which now works mostly properly.
+* Fix hachoir-parser matroska SimpleBlock
+* Fix Mac timestamp name
+
+Remove the unmaintained experimental HTTP interface.
 
 hachoir 3.0a1 (2017-01-09)
 ==========================
