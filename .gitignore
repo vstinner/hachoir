@@ -11,8 +11,3 @@ hachoir3.egg-info/
 
 # Mac files
 .DS_Store
-
-# VSCode files
-.vscode/
-
-env/
