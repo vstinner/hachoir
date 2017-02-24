@@ -9,7 +9,7 @@ from hachoir.parser import Parser
 from hachoir.field import SeekableFieldSet, RootSeekableFieldSet, Bytes, String, UInt8, UInt16, UInt32
 from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal
-from hachoir.parser.image.exif import ParserError, IFD, IFD_TAGS
+from hachoir.parser.image.exif import IFD, IFD_TAGS
 
 
 def getStrips(ifd):
@@ -68,10 +68,8 @@ class CR2File(RootSeekableFieldSet, Parser):
         return True
 
     def createFields(self):
-        iff_start = self.absolute_address + self.current_size
+        iff_start = self.absolute_address
         yield String(self, "endian", 2, "Endian ('II' or 'MM')", charset="ASCII")
-        if self["endian"].value not in ("II", "MM"):
-            raise ParserError("Invalid endian!")
         if self["endian"].value == "II":
             self.endian = LITTLE_ENDIAN
         else:

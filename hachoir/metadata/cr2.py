@@ -18,12 +18,14 @@ class CR2Metadata(RootMetadata):
         "DocumentName": "title",
         "XResolution": "width_dpi",
         "YResolution": "height_dpi",
-        "DateTime": "creation_date"
     }
 
     def extract(self, tiff):
         if "ifd[0]" in tiff:
             self.useIFD(tiff["ifd[0]"])
+            self.camera_manufacturer = tiff["ifd[0]"]["value[4]"].value
+            self.camera_model = tiff["ifd[0]"]["value[5]"].value
+
         if "exif[0]" in tiff:
             self.date_time_original = tiff["exif[0]"]["value[7]"].value
             self.date_time_digitized = tiff["exif[0]"]["value[8]"].value

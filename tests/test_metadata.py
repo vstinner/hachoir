@@ -470,6 +470,8 @@ class TestMetadata(unittest.TestCase):
                         datetime(2015, 11, 15, 13, 35, 29))
         self.check_attr(meta, 'date_time_original',
                         datetime(2015, 11, 15, 13, 35, 29))
+        self.check_attr(meta, 'camera_manufacturer', 'Canon')
+        self.check_attr(meta, 'camera_model', 'Canon EOS REBEL T5i')
 
 
 class TestMetadataCommandLine(unittest.TestCase):
