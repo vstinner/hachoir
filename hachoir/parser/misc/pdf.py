@@ -65,7 +65,7 @@ class PDFNumber(Field):
         # Get value
         val = parent.stream.readBytes(self.absolute_address, size)
         self.info("Number: size=%u value='%s'" % (size, val))
-        if val.find('.') != -1:
+        if val.find(b'.') != -1:
             self.createValue = lambda: float(val)
         else:
             self.createValue = lambda: int(val)
@@ -180,14 +180,27 @@ class LineEnd(FieldSet):
             addr = self.absolute_address + self.current_size
             char = self.stream.readBytes(addr, 1)
             if char == b'\x0A':
-                yield UInt8(self, "lf", "Line feed")
+                yield UInt8(self, "lf[]", "Line feed")
             elif char == b'\x0D':
-                yield UInt8(self, "cr", "Line feed")
+                yield UInt8(self, "cr[]", "Line feed")
             else:
                 self.info("Line ends at %u/%u, len %u" %
                           (addr, self.stream._size, self.current_size))
                 break
 
+class WhiteSpace(String):
+    """
+    Made of whitespace characters
+    """
+
+    def __init__(self, parent, name):
+        n = 0
+        while 1:
+            ch = parent.stream.readBytes(parent.absolute_address + parent.current_size + n*8, 1)
+            if not ch.isspace():
+                break
+            n += 1
+        String.__init__(self, parent, name, n)
 
 class PDFDictionaryPair(FieldSet):
 
@@ -293,8 +306,10 @@ class Body(FieldSet):
         while self.stream.readBytes(self.absolute_address + self.current_size, 1) == b'%':
             size = getLineEnd(self, 4)
             if size == 2:
+                yield String(self, "crc32_comment", 1)
                 yield textHandler(UInt16(self, "crc32"), hexadecimal)
             elif size == 4:
+                yield String(self, "crc32_comment", 1)
                 yield textHandler(UInt32(self, "crc32"), hexadecimal)
             elif self.stream.readBytes(self.absolute_address + self.current_size, size).isalpha():
                 yield String(self, "comment[]", size)
@@ -387,7 +402,7 @@ class CrossReferenceTable(FieldSet):
 
 
 class Catalog(FieldSet):
-    END_NAME = ['<', '/', '[']
+    END_NAME = [b'<', b'/', b'[']
 
     def __init__(self, parent, name, size=None, desc=None):
         FieldSet.__init__(self, parent, name, description=desc)
@@ -404,9 +419,9 @@ class Catalog(FieldSet):
         yield PDFNumber(self, "unknown[]")
         length = getElementEnd(self)
         for limit in self.END_NAME:
-            new_length = getElementEnd(self, limit) - len(limit)
-            if length is None or (new_length is not None and new_length < length):
-                length = new_length
+            new_length = getElementEnd(self, limit)
+            if length is None or (new_length is not None and new_length - len(limit) < length):
+                length = new_length - len(limit)
         yield String(self, "object", length, strip=' ')
         if self.stream.readBytes(self.absolute_address + self.current_size, 2) == b'<<':
             yield PDFDictionary(self, "key_list")
@@ -422,13 +437,14 @@ class Trailer(FieldSet):
 
     def createFields(self):
         yield RawBytes(self, "marker", len(self.MAGIC))
-        yield LineEnd(self, "line_end[]")
+        yield WhiteSpace(self, "sep[]")
         yield String(self, "start_attribute_marker", 2)
         addr = self.absolute_address + self.current_size
         while self.stream.readBytes(addr, 2) != b'>>':
+            yield WhiteSpace(self, "sep[]")
             t = PDFName(self, "type[]")
             yield t
-            name = t.value
+            name = t.value.decode()
             self.info("Parsing PDFName '%s'" % name)
             if name == "Size":
                 yield PDFNumber(self, "size", "Entries in the file cross-reference section")
