@@ -188,6 +188,7 @@ class LineEnd(FieldSet):
                           (addr, self.stream._size, self.current_size))
                 break
 
+
 class WhiteSpace(String):
     """
     Made of whitespace characters
@@ -196,11 +197,12 @@ class WhiteSpace(String):
     def __init__(self, parent, name):
         n = 0
         while 1:
-            ch = parent.stream.readBytes(parent.absolute_address + parent.current_size + n*8, 1)
+            ch = parent.stream.readBytes(parent.absolute_address + parent.current_size + n * 8, 1)
             if not ch.isspace():
                 break
             n += 1
         String.__init__(self, parent, name, n)
+
 
 class PDFDictionaryPair(FieldSet):
 
