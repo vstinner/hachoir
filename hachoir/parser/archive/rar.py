@@ -295,7 +295,7 @@ class Block(FieldSet):
             if parseBody:
                 self.parseBody = lambda: parseBody(self)
         else:
-            self.info("Processing as unknown block block of type %u" % type)
+            self.info("Processing as unknown block of type %u" % t)
 
         self._size = 8 * self["block_size"].value
         if t == 0x74 or t == 0x7A:
