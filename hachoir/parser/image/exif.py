@@ -19,9 +19,6 @@ from hachoir.field import (FieldSet, SeekableFieldSet, ParserError,
 from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
 from hachoir.core.tools import createDict
 
-# maximum number of array entries in an IFD entry (excluding string types)
-MAX_COUNT = 9000
-
 
 def rationalFactory(class_name, size, field_class):
     class Rational(FieldSet):
@@ -52,11 +49,31 @@ class ASCIIString(String):
 class IFDTag(UInt16):
 
     def getTag(self):
-        return self.parent.TAG_INFO.get(self.value, (hex(self.value), ""))
+        return self.parent.TAG_INFO.get(self.value, (hex(self.value), hex(self.value)))
 
     def createDisplay(self):
         return self.getTag()[0]
 
+
+class ValueArray(FieldSet):
+
+    def __init__(self, parent, name, type, count, description=None):
+        FieldSet.__init__(self, parent, name, size=type.static_size * count, description=description)
+        self.array_type = type
+        self.array_count = count
+
+    def createFields(self):
+        for i in range(self.array_count):
+            yield self.array_type(self, "data[]")
+
+    def createValue(self):
+        return [f.value for f in self]
+
+    def createDisplay(self):
+        if self.array_count > 16:
+            return '<Array of %d %s>' % (self.array_count, self.array_type.__name__)
+        else:
+            return '[' + ', '.join(f.display for f in self) + ']'
 
 class BasicIFDEntry(FieldSet):
     TYPE_BYTE = 0
@@ -91,11 +108,6 @@ class BasicIFDEntry(FieldSet):
             self.value_size = self.value_cls.static_size
         yield UInt32(self, "count", "Count")
 
-        if not issubclass(self.value_cls, Bytes) \
-                and self["count"].value > MAX_COUNT:
-            raise ParserError("EXIF: Invalid count value (%s)" %
-                              self["count"].value)
-
         count = self['count'].value
         totalsize = self.value_size * count
         if count == 0:
@@ -104,11 +116,10 @@ class BasicIFDEntry(FieldSet):
             name = "value"
             if issubclass(self.value_cls, Bytes):
                 yield self.value_cls(self, name, count)
+            elif count == 1:
+                yield self.value_cls(self, name)
             else:
-                if count > 1:
-                    name += "[]"
-                for i in range(count):
-                    yield self.value_cls(self, name)
+                yield ValueArray(self, name, self.value_cls, count)
             if totalsize < 32:
                 yield NullBits(self, "padding", 32 - totalsize)
         else:
@@ -127,6 +138,7 @@ class IFDEntry(BasicIFDEntry):
     EXIF_IFD_POINTER = 0x8769
     GPS_IFD_POINTER = 0x8825
     INTEROP_IFD_POINTER = 0xA005
+    SUBIFD_POINTERS = 0x014A
 
     TAG_INFO = {
         # image data structure
@@ -192,6 +204,7 @@ class IFDEntry(BasicIFDEntry):
         0x0143: ("TileLength", "TileLength"),
         0x0144: ("TileOffsets", "TileOffsets"),
         0x0145: ("TileByteCounts", "TileByteCounts"),
+        SUBIFD_POINTERS: ("SubIFDs", "SubIFDs"),
         0x014C: ("InkSet", "InkSet"),
         0x014D: ("InkNames", "InkNames"),
         0x014E: ("NumberOfInks", "NumberOfInks"),
@@ -352,13 +365,12 @@ class IFD(SeekableFieldSet):
             name = "value[%s]" % i
             if issubclass(entry.value_cls, Bytes):
                 yield entry.value_cls(self, name, count)
-            elif entry['tag'].value == 0x02bc:
+            elif entry['tag'].display == "XMPPacket":
                 yield String(self, name, count)
+            elif count == 1:
+                yield entry.value_cls(self, name)
             else:
-                if count > 1:
-                    name += "[]"
-                for i in range(count):
-                    yield entry.value_cls(self, name)
+                yield ValueArray(self, name, entry.value_cls, count)
 
     def getEntryValues(self, entry):
         n = int(entry.name.rsplit('[', 1)[1].strip(']'))
@@ -368,10 +380,12 @@ class IFD(SeekableFieldSet):
         else:
             field = 'value'
             base = entry
-        if field in base:
-            return [base[field]]
+        if field not in base:
+            return None
+        elif isinstance(base[field], ValueArray):
+            return list(base[field])
         else:
-            return base.array(field)
+            return [base[field]]
 
 
 class ExifIFD(IFD):
@@ -417,6 +431,10 @@ def TIFF(self):
                 name, klass = IFD_TAGS[tag]
                 offsets.append((ifd.getEntryValues(entry)[
                                0].value, name + '[]', klass))
+            elif tag == IFDEntry.SUBIFD_POINTERS:
+                for val in ifd.getEntryValues(entry):
+                    offsets.append((val.value, ifd.name + '[]', IFD))
+
         if ifd['next'].value != 0:
             offsets.append((ifd['next'].value, 'ifd[]', IFD))
 

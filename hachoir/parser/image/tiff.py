@@ -8,7 +8,7 @@ Creation date: 30 september 2006
 from hachoir.parser import Parser
 from hachoir.field import SeekableFieldSet, RootSeekableFieldSet, Bytes
 from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
-from hachoir.parser.image.exif import TIFF
+from hachoir.parser.image.exif import TIFF, IFD
 
 
 def getStrips(ifd):
@@ -22,6 +22,13 @@ def getStrips(ifd):
         for off, byte in zip(offs, bytes):
             yield off.value, byte.value
 
+    # image data
+    if "TileOffsets" in data and "TileByteCounts" in data:
+        offs = ifd.getEntryValues(data["TileOffsets"])
+        bytes = ifd.getEntryValues(data["TileByteCounts"])
+        for off, byte in zip(offs, bytes):
+            yield off.value, byte.value
+
 
 class ImageFile(SeekableFieldSet):
 
@@ -32,7 +39,8 @@ class ImageFile(SeekableFieldSet):
     def createFields(self):
         for off, byte in getStrips(self._ifd):
             self.seekByte(off, relative=False)
-            yield Bytes(self, "strip[]", byte)
+            field = Bytes(self, "strip[]", byte)
+            yield field
 
 
 class TiffFile(RootSeekableFieldSet, Parser):
@@ -67,7 +75,9 @@ class TiffFile(RootSeekableFieldSet, Parser):
     def createFields(self):
         yield from TIFF(self)
 
-        for ifd in self.array('ifd'):
+        for ifd in self:
+            if not isinstance(ifd, IFD):
+                continue
             offs = (off for off, byte in getStrips(ifd))
             self.seekByte(min(offs), relative=False)
             image = ImageFile(self, "image[]", "Image File", ifd)
