@@ -102,7 +102,7 @@ class PropertyIndex(FieldSet):
     COMPONENT_PROPERTY.update(COMMON_PROPERTY)
 
     def createFields(self):
-        if self["../.."].name.startswith("doc_summary"):
+        if self.root.IS_DOC_SUMMARY:
             enum = self.DOCUMENT_PROPERTY
         else:
             enum = self.COMPONENT_PROPERTY
@@ -336,6 +336,7 @@ class SummaryIndex(FieldSet):
 
 
 class Summary(OLE2FragmentParser):
+    IS_DOC_SUMMARY = False
     ENDIAN_CHECK = True
 
     def __init__(self, stream, **args):
@@ -368,6 +369,10 @@ class Summary(OLE2FragmentParser):
         size = (self.size - self.current_size) // 8
         if 0 < size:
             yield NullBytes(self, "end_padding", size)
+
+
+class DocSummary(Summary):
+    IS_DOC_SUMMARY = True
 
 
 class CompObj(OLE2FragmentParser):

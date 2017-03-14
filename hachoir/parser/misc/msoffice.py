@@ -16,7 +16,7 @@ from hachoir.field import (SubFile, FieldSet,
 from hachoir.core.text_handler import textHandler, hexadecimal
 from hachoir.parser.misc.ole2_util import OLE2FragmentParser, RawParser
 from hachoir.stream import StringInputStream
-from hachoir.parser.misc.msoffice_summary import Summary, CompObj
+from hachoir.parser.misc.msoffice_summary import Summary, DocSummary, CompObj
 from hachoir.parser.misc.word_doc import WordDocumentParser, WordTableParser
 
 
@@ -791,7 +791,7 @@ class ThumbsCatalog(OLE2FragmentParser):
 
 PROPERTY_NAME = {
     "Root Entry": ("root", RootEntry),
-    "\5DocumentSummaryInformation": ("doc_summary", Summary),
+    "\5DocumentSummaryInformation": ("doc_summary", DocSummary),
     "\5SummaryInformation": ("summary", Summary),
     "\1CompObj": ("compobj", CompObj),
     "Pictures": ("pictures", Pictures),
