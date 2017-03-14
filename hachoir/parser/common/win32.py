@@ -21,6 +21,7 @@ CODEPAGE_CHARSET = {
     1256: "WINDOWS-1256",
     1257: "WINDOWS-1257",
     1258: "WINDOWS-1258",
+    10000: "MacRoman",
     65001: "UTF-8",
 }
 
