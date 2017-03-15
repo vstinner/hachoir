@@ -219,7 +219,7 @@ class ConstantPool(FieldSet):
 
 
 ###############################################################################
-class CPIndex(UInt16):
+class CPIndexBase(object):
     """
     Holds index of a constant pool entry.
     """
@@ -235,7 +235,7 @@ class CPIndex(UInt16):
         - allow_zero states whether null index is allowed (sometimes, constant
           pool index is optionnal)
         """
-        UInt16.__init__(self, parent, name, description)
+        super().__init__(parent, name, description)
         if isinstance(target_types, str):
             self.target_types = (target_types,)
         else:
@@ -263,6 +263,14 @@ class CPIndex(UInt16):
         if self.target_types:
             assert cp_entry.constant_type in self.target_types
         return cp_entry
+
+
+class CPIndex(CPIndexBase, UInt16):
+    pass
+
+
+class CPIndexShort(CPIndexBase, UInt8):
+    pass
 
 
 ###############################################################################
@@ -309,7 +317,7 @@ class OpcodeCPIndexShort(JavaOpcode):
 
     def createFields(self):
         yield UInt8(self, "opcode")
-        yield UInt8(self, "index")
+        yield CPIndexShort(self, "index")
 
     def createDisplay(self):
         return "%s(%i)" % (self.op, self["index"].value)
