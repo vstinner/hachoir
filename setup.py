@@ -29,11 +29,17 @@ from imp import load_source
 from os import path
 from setuptools import find_packages
 
-SCRIPTS = ["hachoir-grep",
-           "hachoir-metadata",
-           "hachoir-strip",
-           "hachoir-urwid",
-           "hachoir-wx"]
+ENTRY_POINTS = {
+    'console_scripts': [
+        "hachoir-grep = hachoir.grep:main",
+        "hachoir-metadata = hachoir.metadata.main:main",
+        "hachoir-strip = hachoir.strip:main",
+        "hachoir-urwid = hachoir.urwid_ui:main"
+    ],
+    'gui_scripts': [
+        "hachoir-wx = hachoir.wx.main:main"
+    ]
+}
 # FIXME: hachoir-subfile is currently broken
 # "hachoir-subfile",
 
@@ -77,7 +83,8 @@ def main():
         "classifiers": CLASSIFIERS,
         "license": hachoir.LICENSE,
         "packages": find_packages(),
-        "scripts": SCRIPTS,
+        "package_data": {"hachoir.wx.resource": ['hachoir_wx.xrc']},
+        "entry_points": ENTRY_POINTS,
         "zip_safe": True,
     }
     setup(**install_options)
