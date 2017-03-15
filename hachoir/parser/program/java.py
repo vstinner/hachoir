@@ -309,6 +309,9 @@ class OpcodeCPIndex(JavaOpcode):
         yield CPIndex(self, "index")
 
     def createDisplay(self):
+        return "%s(%s)" % (self.op, self["index"].display)
+
+    def createValue(self):
         return "%s(%i)" % (self.op, self["index"].value)
 
 
@@ -320,6 +323,9 @@ class OpcodeCPIndexShort(JavaOpcode):
         yield CPIndexShort(self, "index")
 
     def createDisplay(self):
+        return "%s(%s)" % (self.op, self["index"].display)
+
+    def createValue(self):
         return "%s(%i)" % (self.op, self["index"].value)
 
 
