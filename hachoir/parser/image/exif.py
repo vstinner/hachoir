@@ -75,6 +75,7 @@ class ValueArray(FieldSet):
         else:
             return '[' + ', '.join(f.display for f in self) + ']'
 
+
 class BasicIFDEntry(FieldSet):
     TYPE_BYTE = 0
     TYPE_UNDEFINED = 7
