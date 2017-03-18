@@ -56,7 +56,7 @@ class TestMetadata(unittest.TestCase):
                          'video[1]': {'language': 'French',
                                       'width': '384',
                                       'height': '288',
-                                      'compression': 'V_MPEG4/ISO/AVC
+                                      'compression': 'V_MPEG4/ISO/AVC'
                                       },
                          'audio[1]': {'title': 'travail = aliénation (extrait)',
                                       'language': 'French',
