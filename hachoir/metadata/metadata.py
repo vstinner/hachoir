@@ -190,14 +190,6 @@ class Metadata(Logger):
 
         If priority is too small, metadata are empty and so None is returned.
 
-        >>> print RootMetadata().exportPlaintext()
-        None
-        >>> meta = RootMetadata()
-        >>> meta.copyright = unicode("© Hachoir", "UTF-8")
-        >>> print repr(meta.exportPlaintext())
-        [u'Metadata:', u'- Copyright: \xa9 Hachoir']
-
-        @see __str__() and __unicode__()
         """
         if priority is not None:
             priority = max(priority, MIN_PRIORITY)
@@ -225,8 +217,6 @@ class Metadata(Logger):
                     value = makeUnicode(item.value)
                 text[title][field] = value
         return text
-
-
 
     def __bool__(self):
         return any(item for item in self.__data.values())
