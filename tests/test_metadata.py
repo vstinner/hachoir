@@ -46,6 +46,31 @@ class TestMetadata(unittest.TestCase):
             sys.stdout.write("ok\n")
         return metadata
 
+    def test_dict_output(self):
+        required_meta = {'Common': {'duration': '0:00:17.844000',
+                                    'creation_date': '2006-08-16 11:04:36',
+                                    'producer': 'libebml v0.7.7 + libmatroska v0.8.0',
+                                    'mime_type': 'video/x-matroska',
+                                    'endian': 'Big endian'
+                                    },
+                         'video[1]': {'language': 'French',
+                                      'width': '384',
+                                      'height': '288',
+                                      'compression': 'V_MPEG4/ISO/AVC
+                                      },
+                         'audio[1]': {'title': 'travail = aliénation (extrait)',
+                                      'language': 'French',
+                                      'nb_channel': '1',
+                                      'sample_rate': '44100.0',
+                                      'compression': 'A_VORBIS'
+                                      }
+                         }
+        parser = createParser(os.path.join(DATADIR, "flashmob.mkv"))
+        extractor = extractMetadata(parser)
+        meta = extractor.exportDictionary(human=False)
+        parser.stream._input.close()
+        self.assertEqual(required_meta, meta)
+
     def check_attr(self, metadata, name, value):
         if self.verbose:
             sys.stdout.write("  - Check metadata %s=%s: " %
