@@ -65,10 +65,10 @@ class TestMetadata(unittest.TestCase):
                                       'compression': 'A_VORBIS'
                                       }
                          }
-        parser = createParser(os.path.join(DATADIR, "flashmob.mkv"))
-        extractor = extractMetadata(parser)
+        with createParser(os.path.join(DATADIR, "flashmob.mkv")) as parser:
+            extractor = extractMetadata(parser)
         meta = extractor.exportDictionary(human=False)
-        parser.stream._input.close()
+
         self.assertEqual(required_meta, meta)
 
     def check_attr(self, metadata, name, value):
