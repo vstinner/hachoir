@@ -458,7 +458,8 @@ class Stream(FieldSet):
     def createFields(self):
         padding = 0
         position = 0
-        while True:
+        streamlength = self["../length"].value
+        while position < streamlength * 8:
             next = ord(self.parent.stream.readBytes(
                 self.absolute_address + self.current_size + position, 1))
             if next == 0xff:
