@@ -1129,6 +1129,12 @@ class LineNumberTableEntry(StaticFieldSet):
         (UInt16, "line_number")
     )
 
+    def createValue(self):
+        return (self['start_pc'].value, self['line_number'].value)
+
+    def createDisplay(self):
+        return "%d @ line %d" % self.value
+
 
 class LocalVariableTableEntry(StaticFieldSet):
     format = (
