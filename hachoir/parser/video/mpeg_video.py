@@ -69,27 +69,41 @@ class CustomFragment(FieldSet):
 class Timestamp(FieldSet):
     static_size = 36
 
+    def createFields(self):
+        yield Bits(self, "ts_32_30", 3)
+        yield Bit(self, "sync[]")  # =True
+        yield Bits(self, "ts_29_15", 15)
+        yield Bit(self, "sync[]")  # =True
+        yield Bits(self, "ts_14_0", 15)
+        yield Bit(self, "sync[]")  # =True
+
     def createValue(self):
-        return (self["c"].value << 30) + (self["b"].value << 15) + self["a"].value
+        return ((self["ts_32_30"].value << 30)
+                + (self["ts_29_15"].value << 15)
+                + self["ts_14_0"].value)
+
+
+class SCRExt(FieldSet):
+    static_size = 46
 
     def createFields(self):
-        yield Bits(self, "c", 3)
+        yield Bits(self, "scr_32_30", 3)
         yield Bit(self, "sync[]")  # =True
-        yield Bits(self, "b", 15)
+        yield Bits(self, "scr_29_15", 15)
         yield Bit(self, "sync[]")  # =True
-        yield Bits(self, "a", 15)
+        yield Bits(self, "scr_14_0", 15)
+        yield Bit(self, "sync[]")  # =True
+        yield Bits(self, "scr_ext", 9)
         yield Bit(self, "sync[]")  # =True
 
+    def createDescription(self):
+        return "System Clock Reference (90kHz per tick), with extended 27MHz resolution"
 
-class SCR(FieldSet):
-    static_size = 35
-
-    def createFields(self):
-        yield Bits(self, "scr_a", 3)
-        yield Bit(self, "sync[]")  # =True
-        yield Bits(self, "scr_b", 15)
-        yield Bit(self, "sync[]")  # =True
-        yield Bits(self, "scr_c", 15)
+    def createValue(self):
+        return ((self["scr_32_30"].value << 30)
+                + (self["scr_29_15"].value << 15)
+                + self["scr_14_0"].value
+                + (self["scr_ext"].value / 300.0))
 
 
 class PackHeader(FieldSet):
@@ -98,10 +112,7 @@ class PackHeader(FieldSet):
         if self.stream.readBits(self.absolute_address, 2, self.endian) == 1:
             # MPEG version 2
             yield Bits(self, "sync[]", 2)
-            yield SCR(self, "scr")
-            yield Bit(self, "sync[]")
-            yield Bits(self, "scr_ext", 9)
-            yield Bit(self, "sync[]")
+            yield SCRExt(self, "scr")
             yield Bits(self, "mux_rate", 22)
             yield Bits(self, "sync[]", 2)
             yield PaddingBits(self, "reserved", 5, pattern=1)
@@ -112,12 +123,8 @@ class PackHeader(FieldSet):
         else:
             # MPEG version 1
             yield Bits(self, "sync[]", 4)
-            yield Bits(self, "scr_a", 3)
+            yield Timestamp(self, "scr")
             yield Bit(self, "sync[]")
-            yield Bits(self, "scr_b", 15)
-            yield Bit(self, "sync[]")
-            yield Bits(self, "scr_c", 15)
-            yield Bits(self, "sync[]", 2)
             yield Bits(self, "mux_rate", 22)
             yield Bit(self, "sync[]")
 
@@ -127,17 +134,12 @@ class PackHeader(FieldSet):
         sync0 = self["sync[0]"]
         if (sync0.size == 2 and sync0.value == 1):
             # MPEG2
-            pass
-            if not self["sync[1]"].value \
-                    or not self["sync[2]"].value \
-                    or self["sync[3]"].value != 3:
+            if self["sync[1]"].value != 3:
                 return "Invalid synchronisation bits"
         elif (sync0.size == 4 and sync0.value == 2):
             # MPEG1
             if not self["sync[1]"].value \
-                    or not self["sync[2]"].value \
-                    or self["sync[3]"].value != 3 \
-                    or not self["sync[4]"].value:
+                    or not self["sync[2]"].value:
                 return "Invalid synchronisation bits"
         else:
             return "Unknown version"
@@ -290,7 +292,7 @@ class PacketElement(FieldSet):
 
         if self["has_escr"].value:
             yield Bits(self, "sync[]", 2)  # =0
-            yield SCR(self, "escr")
+            yield SCRExt(self, "escr")
 
         if self["has_es_rate"].value:
             yield Bit(self, "sync[]")  # =True
