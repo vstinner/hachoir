@@ -12,10 +12,11 @@ Sources:
   https://ext4.wiki.kernel.org/index.php/Ext4_Disk_Layout
 """
 
-from hachoir.parser import HachoirParser
+from hachoir.parser import HachoirParser, Parser
 from hachoir.field import (RootSeekableFieldSet, SeekableFieldSet, FieldSet, ParserError,
                            Bit, Bits, UInt8, UInt16, UInt32,
-                           Enum, String, TimestampUnix32, RawBytes, NullBytes, PaddingBits, PaddingBytes)
+                           Enum, String, TimestampUnix32, RawBytes,
+                           NullBytes, PaddingBits, PaddingBytes, FragmentGroup, CustomFragment)
 from hachoir.core.tools import (humanDuration, humanFilesize)
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.text_handler import textHandler
@@ -291,6 +292,18 @@ class Inode(FieldSet):
             yield UInt32(self, "author", "Author ID (?)")
         else:
             yield RawBytes(self, "raw", 12, "Reserved")
+
+
+class Directory(Parser):
+    PARSER_TAGS = {}
+    endian = LITTLE_ENDIAN
+
+    def createFields(self):
+        while self.current_size < self.size:
+            yield DirectoryEntry(self, "entry[]")
+
+    def validate(self):
+        return True
 
 
 class Bitmap(FieldSet):
@@ -651,11 +664,17 @@ class Group(SeekableFieldSet):
             if inode['blocks'].value == 0:
                 continue
             blocks = inode.array('block')
+            if inode['mode/file_type'].display == 'Directory':
+                parser = Directory
+            else:
+                parser = None
+            group = FragmentGroup(parser=parser)
             for b in range(12):
                 if not blocks[b].value:
                     continue
                 self.seekBlock(blocks[b].value)
-                yield RawBytes(self, "inode[%d]block[]" % i, self.root.block_size)
+                yield CustomFragment(self, "inode[%d]block[]" % i, self.root.block_size * 8,
+                    None, group=group)
             if blocks[12].value:
                 # indirect block
                 self.seekBlock(blocks[12].value)
@@ -665,7 +684,8 @@ class Group(SeekableFieldSet):
                     if not b.value:
                         continue
                     self.seekBlock(b.value)
-                    yield RawBytes(self, "inode[%d]block[]" % i, self.root.block_size)
+                    yield CustomFragment(self, "inode[%d]block[]" % i, self.root.block_size * 8,
+                        None, group=group)
             if blocks[13].value:
                 # TODO: double-indirect block
                 pass
