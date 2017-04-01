@@ -12,7 +12,7 @@ from hachoir.parser import Parser
 from hachoir.field import (FieldSet, Enum,
                            CString, String,
                            UInt8, UInt16, UInt32, Bit, Bits, PaddingBits, NullBits,
-                           DateTimeMSDOS32, RawBytes)
+                           DateTimeMSDOS32, RawBytes, CustomFragment)
 from hachoir.core.text_handler import textHandler, hexadecimal, filesizeHandler
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.tools import paddingSize
@@ -98,48 +98,6 @@ class Flags(FieldSet):
         yield NullBits(self, "padding", 13)
 
 
-class FragmentGroup:
-
-    def __init__(self, parser):
-        self.items = []
-        self.parser = parser
-        self.args = {}
-
-    def add(self, item):
-        self.items.append(item)
-
-    def createInputStream(self):
-        # FIXME: Use lazy stream creation
-        data = []
-        for item in self.items:
-            data.append(item["rawdata"].value)
-        data = b"".join(data)
-
-        # FIXME: Use smarter code to send arguments
-        self.args["compr_level"] = self.items[
-            0].parent.parent.folder["compr_level"].value
-        tags = {"class": self.parser, "args": self.args}
-        tags = iter(tags.items())
-        return StringInputStream(data, "<fragment group>", tags=tags)
-
-
-class CustomFragment(FieldSet):
-
-    def __init__(self, parent, name, size, parser, description=None, group=None):
-        FieldSet.__init__(self, parent, name, description, size=size)
-        if not group:
-            group = FragmentGroup(parser)
-        self.field_size = size
-        self.group = group
-        self.group.add(self)
-
-    def createFields(self):
-        yield RawBytes(self, "rawdata", self.field_size // 8)
-
-    def _createInputStream(self, **args):
-        return self.group.createInputStream()
-
-
 class DataBlock(FieldSet):
 
     def __init__(self, *args, **kwargs):
@@ -172,6 +130,8 @@ class DataBlock(FieldSet):
             group = getattr(self.parent.folder, "lzx_group", None)
             field = CustomFragment(
                 self, "data", self["size"].value * 8, LZXStream, "LZX data fragment", group)
+            if group is None:
+                field.group.args["compr_level"] = self.parent.folder["compr_level"].value
             self.parent.folder.lzx_group = field.group
             yield field
 

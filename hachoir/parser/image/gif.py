@@ -14,10 +14,10 @@ from hachoir.field import (FieldSet, ParserError,
                            Enum, UInt8, UInt16,
                            Bit, Bits, NullBytes,
                            String, PascalString8, Character,
-                           NullBits, RawBytes)
+                           NullBits, RawBytes,
+                           CustomFragment)
 from hachoir.parser.image.common import PaletteRGB
 from hachoir.core.endian import LITTLE_ENDIAN
-from hachoir.stream import StringInputStream
 from hachoir.core.tools import humanDuration, paddingSize
 from hachoir.core.text_handler import textHandler, displayHandler, hexadecimal
 
@@ -25,48 +25,6 @@ from hachoir.core.text_handler import textHandler, displayHandler, hexadecimal
 MAX_WIDTH = 6000
 MAX_HEIGHT = MAX_WIDTH
 MAX_FILE_SIZE = 100 * 1024 * 1024
-
-
-class FragmentGroup:
-
-    def __init__(self, parser):
-        self.items = []
-        self.parser = parser
-        self.args = {}
-
-    def add(self, item):
-        self.items.append(item)
-
-    def createInputStream(self):
-        # FIXME: Use lazy stream creation
-        data = []
-        for item in self.items:
-            data.append(item["rawdata"].value)
-        data = "".join(data)
-
-        # FIXME: Use smarter code to send arguments
-        self.args["startbits"] = self.items[
-            0].parent["lzw_min_code_size"].value
-        tags = {"class": self.parser, "args": self.args}
-        tags = iter(tags.items())
-        return StringInputStream(data, "<fragment group>", tags=tags)
-
-
-class CustomFragment(FieldSet):
-
-    def __init__(self, parent, name, size, parser, description=None, group=None):
-        FieldSet.__init__(self, parent, name, description, size=size)
-        if not group:
-            group = FragmentGroup(parser)
-        self.group = group
-        self.group.add(self)
-
-    def createFields(self):
-        yield UInt8(self, "size")
-        yield RawBytes(self, "rawdata", self["size"].value)
-
-    def _createInputStream(self, **args):
-        return self.group.createInputStream()
 
 
 def rle_repr(l):
@@ -189,11 +147,14 @@ class Image(FieldSet):
         yield UInt8(self, "lzw_min_code_size", "LZW Minimum Code Size")
         group = None
         while True:
-            size = UInt8(self, "block_size")
+            size = UInt8(self, "image_block_size[]")
             if size.value == 0:
                 break
+            yield size
             block = CustomFragment(
-                self, "image_block[]", None, GifImageBlock, "GIF Image Block", group)
+                self, "image_block[]", size.value * 8, GifImageBlock, "GIF Image Block", group)
+            if group is None:
+                block.group.args["startbits"] = self["lzw_min_code_size"].value
             group = block.group
             yield block
         yield NullBytes(self, "terminator", 1, "Terminator (0)")

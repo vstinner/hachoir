@@ -41,6 +41,7 @@ from hachoir.field.timestamp import (GenericTimestamp,  # noqa
 
 # Special Field classes
 from hachoir.field.link import Link, Fragment  # noqa
+from hachoir.field.fragment import FragmentGroup, CustomFragment  # noqa
 
 available_types = (Bit, Bits, RawBits,
                    Bytes, RawBytes,

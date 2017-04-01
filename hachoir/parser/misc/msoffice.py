@@ -12,10 +12,9 @@ Creation: 8 january 2005
 
 from hachoir.field import (SubFile, FieldSet,
                            UInt8, UInt16, UInt32, Enum, String, CString,
-                           Bits, RawBytes)
+                           Bits, RawBytes, CustomFragment)
 from hachoir.core.text_handler import textHandler, hexadecimal
 from hachoir.parser.misc.ole2_util import OLE2FragmentParser, RawParser
-from hachoir.stream import StringInputStream
 from hachoir.parser.misc.msoffice_summary import Summary, DocSummary, CompObj
 from hachoir.parser.misc.word_doc import WordDocumentParser, WordTableParser
 
@@ -75,6 +74,7 @@ class RootEntry(OLE2FragmentParser):
             yield field
             if not fragment_group:
                 fragment_group = field.group
+                fragment_group.args["ole2"] = field.root
                 fragment_group.args["datasize"] = property["size"].value
                 fragment_group.args["ole2name"] = property["name"].value
             if block is None:
@@ -82,46 +82,6 @@ class RootEntry(OLE2FragmentParser):
             first = block
             previous = block
             size = ole2.ss_size
-
-
-class FragmentGroup:
-
-    def __init__(self, parser):
-        self.items = []
-        self.parser = parser
-        self.args = {}
-
-    def add(self, item):
-        self.items.append(item)
-
-    def createInputStream(self):
-        # FIXME: Use lazy stream creation
-        data = []
-        for item in self.items:
-            data.append(item["rawdata"].value)
-        data = b"".join(data)
-
-        # FIXME: Use smarter code to send arguments
-        self.args["ole2"] = self.items[0].root
-        tags = {"class": self.parser, "args": self.args}
-        tags = iter(tags.items())
-        return StringInputStream(data, "<fragment group>", tags=tags)
-
-
-class CustomFragment(FieldSet):
-
-    def __init__(self, parent, name, size, parser, description=None, group=None):
-        FieldSet.__init__(self, parent, name, description, size=size)
-        if not group:
-            group = FragmentGroup(parser)
-        self.group = group
-        self.group.add(self)
-
-    def createFields(self):
-        yield RawBytes(self, "rawdata", self.size // 8)
-
-    def _createInputStream(self, **args):
-        return self.group.createInputStream()
 
 
 class Pictures(OLE2FragmentParser):
