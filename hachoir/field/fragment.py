@@ -19,8 +19,9 @@ class FragmentGroup:
             data.append(item["rawdata"].value)
         data = b"".join(data)
 
-        # FIXME: Use smarter code to send arguments
-        tags = {"class": self.parser, "args": self.args}
+        tags = {"args": self.args}
+        if self.parser is not None:
+            tags["class"] = self.parser
         tags = iter(tags.items())
         return StringInputStream(data, "<fragment group>", tags=tags)
 
