@@ -104,15 +104,15 @@ class QueryParser(object):
                         setattr(parser_obj, key, value)
                 return parser_obj
             except ValidateError as err:
-                res = str(err)
                 if fallback and self.fallback:
                     fb = parser
-            except Exception as err:
-                res = str(err)
-            if warn:
                 if parser == self.other:
                     warn = info
-                warn("Skip parser '%s': %s" % (parser.__name__, res))
+                warn("Skip parser '%s': %s" % (parser.__name__, err))
+            except Exception as err:
+                if parser == self.other:
+                    warn = info
+                warn("Skip parser '%s': %s" % (parser.__name__, err))
             fallback = False
         if self.use_fallback and fb:
             warning("Force use of parser '%s'" % fb.__name__)
