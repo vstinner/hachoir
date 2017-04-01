@@ -41,3 +41,9 @@ class CustomFragment(FieldSet):
 
     def _createInputStream(self, **args):
         return self.group.createInputStream()
+
+    def createValue(self):
+        return self["rawdata"].value
+
+    def createDisplay(self):
+        return self["rawdata"].display
