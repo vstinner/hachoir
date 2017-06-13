@@ -318,6 +318,8 @@ def makePrintable(data, charset, quote=None, smart=True):
             data = ''.join((quote, data, quote))
     elif quote:
         data = "(empty)"
+    else:
+        data = ""
     data = data.encode(charset, "backslashreplace")
     if smart:
         # Replace \x00\x01 by \0\1
