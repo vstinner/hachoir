@@ -634,9 +634,12 @@ class JpegFile(Parser):
     def createContentSize(self):
         if "end" in self:
             return self["end"].absolute_address + self["end"].size
-        if "data" not in self:
+        if "data" in self:
+            start = self["data"].absolute_address
+        elif "image_data[0]" in self:
+            start = self["image_data[0]"].absolute_address
+        else:
             return None
-        start = self["data"].absolute_address
         end = self.stream.searchBytes(b"\xff\xd9", start, MAX_FILESIZE * 8)
         if end is not None:
             return end + 16
