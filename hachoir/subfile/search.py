@@ -185,7 +185,7 @@ class SearchSubfile:
             # Skip invalid offset
             if offset < 0:
                 continue
-            if offset < self.next_offset:
+            if self.next_offset and offset < self.next_offset:
                 continue
 
             # Create parser at found offset
