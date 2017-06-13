@@ -1,4 +1,4 @@
-"""
+r"""
 Parse string to create Regex object.
 
 TODO:

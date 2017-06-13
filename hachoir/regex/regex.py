@@ -64,7 +64,7 @@ def matchSingleValue(regex):
 
 
 def escapeRegex(text):
-    """
+    r"""
     Escape string to use it in a regular expression:
     prefix special characters « ^.+*?{}[]|()\$ » by an antislash.
     """
