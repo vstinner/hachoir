@@ -488,7 +488,7 @@ class ITunesDBFile(Parser):
         "id": "itunesdb",
         "category": "audio",
         "min_size": 44 * 8,
-        "magic": (('mhbd', 0),),
+        "magic": ((b'mhbd', 0),),
         "description": "iPod iTunesDB file"
     }
 

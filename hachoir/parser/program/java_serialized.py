@@ -422,7 +422,7 @@ class JavaSerializedFile(Parser):
         "file_ext": ("ser",),
         "mime": ("application/java-serialized-object",),
         "min_size": 4 * 4,
-        "magic": (("\xac\xed", 0),),
+        "magic": ((b"\xac\xed", 0),),
         "description": "Serialized Java object",
     }
 

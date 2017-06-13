@@ -141,7 +141,7 @@ class BmpFile(Parser):
         "file_ext": ("bmp",),
         "mime": ("image/x-ms-bmp", "image/x-bmp"),
         "min_size": 30 * 8,
-        #        "magic": (("BM", 0),),
+        #        "magic": ((b"BM", 0),),
         "magic_regex": ((
             # "BM", <filesize>, <reserved>, header_size=(12|40|108)
             b"BM.{4}.{8}[\x0C\x28\x6C]\0{3}",

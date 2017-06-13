@@ -402,8 +402,8 @@ class SwfFile(Parser):
     }
     PARSER_TAGS["magic"] = []
     for version in VALID_VERSIONS:
-        PARSER_TAGS["magic"].append(("FWS%c" % version, 0))
-        PARSER_TAGS["magic"].append(("CWS%c" % version, 0))
+        PARSER_TAGS["magic"].append((b"FWS%c" % version, 0))
+        PARSER_TAGS["magic"].append((b"CWS%c" % version, 0))
     endian = LITTLE_ENDIAN
     SWF_SCALE_FACTOR = 1.0 / 20
 

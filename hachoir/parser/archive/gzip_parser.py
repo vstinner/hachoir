@@ -24,7 +24,7 @@ class GzipParser(Parser):
         "min_size": 18 * 8,
         "magic_regex": (
             # (magic, compression=deflate, <flags>, <mtime>, )
-            ('\x1F\x8B\x08.{5}[\0\2\4\6][\x00-\x0D]', 0),
+            (b'\x1F\x8B\x08.{5}[\0\2\4\6][\x00-\x0D]', 0),
         ),
         "description": "gzip archive",
     }
