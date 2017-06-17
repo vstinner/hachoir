@@ -1,6 +1,7 @@
 from wx import App, EVT_MENU, ID_OK
 from wx.xrc import XRCID
 
+import hachoir.core.config as config
 from hachoir.parser.guess import createParser, guessParser
 from hachoir.stream.input import FileFromInputStream
 from hachoir.wx.dispatcher import dispatcher_t
@@ -44,6 +45,10 @@ class app_t(App):
         stream = field.getSubIStream()
         parser = guessParser(stream)
         if not parser:
+            msg = '[-] Unable to parse substream.'
+            if not config.verbose:
+                msg += ' (use --verbose to see validation errors)'
+            print(msg)
             return
         print('[+] Substream parser: %s.%s' % (parser.__module__, type(parser).__name__))
         subfile = FileFromInputStream(stream)

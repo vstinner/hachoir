@@ -36,7 +36,7 @@ class Fragments:
         while fragment is not None:
             data = fragment.getData()
             yield data and data.size
-            fragment = fragment.__next__
+            fragment = fragment.next
 
 
 class Fragment(FieldSet):

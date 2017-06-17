@@ -85,7 +85,7 @@ class FileFromInputStream:
             if size is None or (self._size is not None and self._size < pos + size):
                 size = self._size - pos
             if size <= 0:
-                return ''
+                return b''
             data = read(pos, size)
             self._offset += len(data)
             return data
@@ -122,7 +122,7 @@ class FileFromInputStream:
                 if self._size:
                     size = self._size - self._offset
                     if not size:
-                        return ''.join(data)
+                        return b''.join(data)
 
 
 class InputStream(Logger):
@@ -334,7 +334,7 @@ class InputPipe(object):
 
     def _get(self, index):
         if index >= len(self.buffers):
-            return ''
+            return b''
         buf = self.buffers[index]
         if buf is None:
             raise InputStreamError(
@@ -509,10 +509,10 @@ class FragmentedStream(InputStream):
         self.stream = field.parent.stream
         data = field.getData()
         self.fragments = [(0, data.absolute_address, data.size)]
-        self.next = field.__next__
+        self.next = field.next
         args.setdefault("source", "%s%s" % (self.stream.source, field.path))
         InputStream.__init__(self, **args)
-        if not self.__next__:
+        if not self.next:
             self._current_size = data.size
             self._setSize()
 
@@ -526,14 +526,14 @@ class FragmentedStream(InputStream):
             a, fa, fs = self.fragments[-1]
             while self.stream.sizeGe(fa + min(fs, end - a)):
                 a += fs
-                f = self.__next__
+                f = self.next
                 if a >= end:
                     self._current_size = end
                     if a == end and not f:
                         self._setSize()
                     return False
                 if f:
-                    self.next = f.__next__
+                    self.next = f.next
                     f = f.getData()
                 if not f:
                     self._current_size = a
@@ -553,7 +553,7 @@ class FragmentedStream(InputStream):
         if missing:
             size = self._size - address
             if size <= 0:
-                return 0, '', True
+                return 0, b'', True
         d = []
         i = lowerBound(self.fragments, lambda x: x[0] <= address)
         a, fa, fs = self.fragments[i - 1]
@@ -572,7 +572,7 @@ class FragmentedStream(InputStream):
             d += [v]
             size -= n
             if not size:
-                return s, ''.join(d), missing
+                return s, b''.join(d), missing
             a, fa, fs = self.fragments[i]
             i += 1
 
@@ -599,7 +599,7 @@ class ConcatStream(InputStream):
     def read(self, address, size):
         _size = self._size
         s = self.__size0 - address
-        shift, data, missing = None, '', False
+        shift, data, missing = None, b'', False
         if s > 0:
             s = min(size, s)
             shift, data, w = self.__streams[0].read(address, s)
