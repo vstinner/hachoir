@@ -252,7 +252,7 @@ class GenericFieldSet(BasicFieldSet):
                     self._fields.append(field._name, field)
             self._current_size = self._size
         else:
-            assert size < self._size or self._size is None
+            assert self._size is None or size < self._size
             self._size = size
         if self._size == self._current_size:
             self._field_generator = None
