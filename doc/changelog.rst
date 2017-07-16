@@ -2,6 +2,13 @@
 Changelog
 +++++++++
 
+hachoir 3.0a3
+=============
+
+Parsers:
+
+* Fix ELF parser (on Python 3)
+
 hachoir 3.0a2 (2017-02-24)
 ==========================
 

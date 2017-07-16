@@ -166,6 +166,7 @@ class SymbolStringTableOffset(UInt32):
         section_index = self['/header/shstrndx'].value
         section = self['/section[' + str(section_index) + ']']
         text = section.value[self.value:]
+        text = text.decode('utf-8')
         return text.split('\0', 1)[0]
 
 
