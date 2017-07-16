@@ -12,10 +12,11 @@ class ArchiveFileEntry(FieldSet):
 
     def createFields(self):
         yield UnixLine(self, "header", "Header")
-        info = self["header"].value.split()
-        if len(info) != 7:
-            raise ParserError("Invalid file entry header")
-        size = int(info[5])
+        info = self["header"].value
+        info = info.split()
+        if len(info) < 3:
+            raise ParserError("Invalid file entry header: %r" % info)
+        size = int(info[-2])
         if 0 < size:
             yield RawBytes(self, "content", size, "File data")
 
