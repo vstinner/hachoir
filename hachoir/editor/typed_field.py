@@ -279,7 +279,7 @@ class EditableTimestampMac32(EditableFixedField):
         self._value = value
 
     def _write(self, output):
-        timestamp = int((self.value - self.minval).total_seconds())
+        timestamp = int((self._value - self.minval).total_seconds())
         output.writeBits(self._size, timestamp, self._parent.endian)
 
 
