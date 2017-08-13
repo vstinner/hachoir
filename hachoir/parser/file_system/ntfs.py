@@ -140,7 +140,8 @@ class RunList(FieldSet):
         for entry in self.array('entry'):
             length, offset = entry.value
             curoff += offset
-            runs.append((length, curoff))
+            if entry['header'].value != 0:
+                runs.append((length, curoff))
         return runs
 
 
