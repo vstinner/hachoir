@@ -12,7 +12,7 @@ Creation date: 2007-01-19
 from hachoir.field import (FieldSet, ParserError, Enum,
                            Bit, Bits, SeekableFieldSet,
                            UInt16, UInt32, TimestampUnix32,
-                           RawBytes, PaddingBytes, NullBytes, NullBits,
+                           Bytes, RawBytes, PaddingBytes, NullBytes, NullBits,
                            CString, String)
 from hachoir.core.text_handler import textHandler, filesizeHandler, hexadecimal
 from hachoir.core.tools import createDict, paddingSize, alignValue, makePrintable
@@ -233,10 +233,24 @@ class Entry(FieldSet):
 
 class NameOffset(FieldSet):
 
+    def __init__(self, parent, name):
+        FieldSet.__init__(self, parent, name)
+        self.name_field = None
+
     def createFields(self):
-        yield UInt32(self, "name")
-        yield Bits(self, "offset", 31)
+        yield Bits(self, "name_offset", 31)
         yield Bit(self, "is_name")
+        yield Bits(self, "offset", 31)
+        yield Bit(self, "is_subdir")
+
+    def getResType(self):
+        return self.name_field.value
+
+    def createDescription(self):
+        if self["is_subdir"].value:
+            return "Sub-directory: %s at %s" % (self.name_field.display, self["offset"].value)
+        else:
+            return "Index: %s at %s" % (self.name_field.display, self["offset"].value)
 
 
 class IndexOffset(FieldSet):
@@ -247,15 +261,23 @@ class IndexOffset(FieldSet):
         self.res_type = res_type
 
     def createFields(self):
-        yield Enum(UInt32(self, "type"), self.TYPE_DESC)
+        if self.res_type is None:
+            # immediate subdirectory of the root
+            yield Enum(UInt32(self, "type"), self.TYPE_DESC)
+        else:
+            # sub-subdirectory, "type" field is just an ID
+            yield textHandler(UInt32(self, "type"), lambda field: "ID %d" % field.value)
         yield Bits(self, "offset", 31)
         yield Bit(self, "is_subdir")
+
+    def getResType(self):
+        return self["type"].value
 
     def createDescription(self):
         if self["is_subdir"].value:
             return "Sub-directory: %s at %s" % (self["type"].display, self["offset"].value)
         else:
-            return "Index: ID %s at %s" % (self["type"].display, self["offset"].value)
+            return "Index: %s at %s" % (self["type"].display, self["offset"].value)
 
 
 class ResourceContent(FieldSet):
@@ -312,13 +334,21 @@ class Header(FieldSet):
             return text
 
 
-class Name(FieldSet):
+class WidePascalString16(String):
 
-    def createFields(self):
-        yield UInt16(self, "length")
-        size = min(self["length"].value, 255)
-        if size:
-            yield String(self, "name", size, charset="UTF-16LE")
+    def __init__(self, parent, name, description=None,
+                 strip=None, nbytes=None, truncate=None):
+        Bytes.__init__(self, parent, name, 1, description)
+
+        self._format = "WidePascalString16"
+        self._strip = strip
+        self._truncate = truncate
+        self._character_size = 2
+        self._charset = "UTF-16-LE"
+        self._content_offset = 2
+        self._content_size = self._character_size * self._parent.stream.readBits(
+            self.absolute_address, self._content_offset * 8, self._parent.endian)
+        self._size = (self._content_size + self.content_offset) * 8
 
 
 class Directory(FieldSet):
@@ -358,6 +388,14 @@ class PE_Resource(SeekableFieldSet):
 
     def parseSub(self, directory, name, depth):
         indexes = []
+        for index in directory.array("name"):
+            if index["is_subdir"].value:
+                indexes.append(index)
+            self.seekByte(index["name_offset"].value)
+            field = WidePascalString16(self, name.replace("directory", "name"))
+            index.name_field = field
+            yield field
+
         for index in directory.array("index"):
             if index["is_subdir"].value:
                 indexes.append(index)
@@ -366,7 +404,7 @@ class PE_Resource(SeekableFieldSet):
         for index in indexes:
             self.seekByte(index["offset"].value)
             if depth == 1:
-                res_type = index["type"].value
+                res_type = index.getResType()
             else:
                 res_type = directory.res_type
             yield Directory(self, name, res_type)
