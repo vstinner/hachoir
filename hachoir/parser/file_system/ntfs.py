@@ -265,7 +265,7 @@ class Attribute(FieldSet):
     ATTR_INFO = {
         0x10: ('standard_info', 'STANDARD_INFORMATION ', parseStandardInfo),
         0x20: ('attr_list', 'ATTRIBUTE_LIST ', None),
-        0x30: ('filename', 'FILE_NAME ', parseFilename),
+        0x30: ('filename[]', 'FILE_NAME ', parseFilename),
         0x40: ('vol_ver', 'VOLUME_VERSION', None),
         0x50: ('security', 'SECURITY_DESCRIPTOR ', None),
         0x60: ('vol_name', 'VOLUME_NAME ', None),
@@ -329,10 +329,22 @@ class File(FieldSet):
 
     def createDescription(self):
         text = "File"
-        if "filename/filename" in self:
-            text += ' "%s"' % self["filename/filename"].value
-        if "filename/real_size" in self:
-            text += ' (%s)' % self["filename/real_size"].display
+        fileattr = None
+        for fn in self.array('filename'):
+            if 'filename' not in fn and fileattr is not None:
+                # Prefer file attributes with filenames
+                continue
+            if 'Win32' in fn['filename_namespace'].display:
+                # Prefer Win32 filename
+                fileattr = fn
+                break
+            else:
+                fileattr = fn
+
+        if fileattr:
+            if 'filename' in fileattr:
+                text += ' "%s"' % fileattr["filename"].value
+            text += ' (%s)' % fileattr["real_size"].display
         if "standard_info/file_attr" in self:
             text += ', %s' % self["standard_info/file_attr"].display
         return text
