@@ -606,6 +606,8 @@ class TestParsers(unittest.TestCase):
             parser, "/section_header[19]/flags/is_exec", False)
         self.checkValue(
             parser, "/section_header[19]/flags/is_tls", False)
+        self.checkValue(
+            parser, "/section_header[10]/flags/is_info_link", True)
 
     def test_cab(self):
         parser = self.parse("georgia.cab")

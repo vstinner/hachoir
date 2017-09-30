@@ -146,10 +146,18 @@ class SectionFlags(FieldSet):
             lambda: Bit(self, "is_writable", "Section contains writable data?"),
             lambda: Bit(self, "is_alloc", "Section occupies memory?"),
             lambda: Bit(self, "is_exec", "Section contains executable instructions?"),
-            lambda: NullBits(self, "reserved[]", 7),
+            lambda: NullBits(self, "reserved[]", 1),
+            lambda: Bit(self, "is_merged", "Section might be merged to eliminate duplication?"),
+            lambda: Bit(self, "is_strings", "Section contains nul terminated strings?"),
+            lambda: Bit(self, "is_info_link", "sh_info field of this section header holds section header table index?"),
+            lambda: Bit(self, "preserve_link_order", "Section requires special ordering for linker?"),
+            lambda: Bit(self, "os_nonconforming", "Section rqeuires OS-specific processing?"),
+            lambda: Bit(self, "is_group", "Section is a member of a section group?"),
             lambda: Bit(self, "is_tls", "Section contains TLS data?"),
-            lambda: NullBits(self, "reserved[]", 17),
-            lambda: RawBits(self, "processor_specific", 4, "Processor specific flags")
+            lambda: Bit(self, "is_compressed", "Section contains compressed data?"),
+            lambda: NullBits(self, "reserved[]", 8),
+            lambda: RawBits(self, "os_specific", 8, "OS specific flags"),
+            lambda: RawBits(self, "processor_specific", 4, "Processor specific flags"),
         )
 
         if self.root.endian == BIG_ENDIAN:
