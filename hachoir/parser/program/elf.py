@@ -3,6 +3,9 @@ ELF (Unix/BSD executable file format) parser.
 
 Author: Victor Stinner, Robert Xiao
 Creation date: 08 may 2006
+Reference:
+- System V Application Binary Interface - DRAFT - 10 June 2013
+  http://www.sco.com/developers/gabi/latest/contents.html
 """
 
 from hachoir.parser import HachoirParser
