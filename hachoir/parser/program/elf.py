@@ -37,6 +37,7 @@ class ElfHeader(FieldSet):
         19: "Intel 80960",
         20: "PowerPC 32-bit",
         21: "PowerPC 64-bit",
+        22: "IBM S390",
         36: "NEC V800",
         37: "Fujitsu FR20",
         38: "TRW RH-32",
