@@ -444,7 +444,7 @@ class TestParsers(unittest.TestCase):
         self.checkDisplay(parser, "/blocksize", "'9'")
         self.checkDisplay(parser, "/file/crc32", "0x8c3c1b7b")
 
-    def test_elf_program(self):
+    def test_elf_program_32lsb(self):
         parser = self.parse("ping_20020927-3ubuntu2")
         self.checkDisplay(parser, "/header/class", "32 bits")
         self.checkDisplay(parser, "/header/endian", "Little endian")
@@ -484,22 +484,46 @@ class TestParsers(unittest.TestCase):
             parser, "/section_header[17]/flags/is_exec", False)
         self.checkValue(
             parser, "/section_header[17]/flags/is_tls", False)
+
+    def test_elf_program_64lsb(self):
+        parser = self.parse("get-versions.64bit.little.elf")
+        self.checkDisplay(parser, "/header/endian", "Little endian")
+        self.checkDisplay(parser, "/header/type", "Executable file")
+        self.checkDisplay(parser, "/header/machine", "Advanced Micro Devices x86-64")
+        self.checkValue(parser, "/header/phentsize", 56)
+        self.checkDisplay(parser, "/prg_header[1]/type", "Program interpreter")
         self.checkValue(
-            parser, "/section_header[4]/flags/is_writable", False)
+            parser, "/section_header[0]/flags/is_writable", False)
         self.checkValue(
-            parser, "/section_header[4]/flags/is_alloc", True)
+            parser, "/section_header[0]/flags/is_alloc", False)
         self.checkValue(
-            parser, "/section_header[4]/flags/is_exec", False)
+            parser, "/section_header[0]/flags/is_exec", False)
         self.checkValue(
-            parser, "/section_header[4]/flags/is_tls", False)
+            parser, "/section_header[0]/flags/is_tls", False)
         self.checkValue(
-            parser, "/section_header[5]/flags/is_writable", False)
+            parser, "/section_header[1]/flags/is_writable", False)
         self.checkValue(
-            parser, "/section_header[5]/flags/is_alloc", True)
+            parser, "/section_header[1]/flags/is_alloc", True)
         self.checkValue(
-            parser, "/section_header[5]/flags/is_exec", False)
+            parser, "/section_header[1]/flags/is_exec", False)
         self.checkValue(
-            parser, "/section_header[5]/flags/is_tls", False)
+            parser, "/section_header[1]/flags/is_tls", False)
+        self.checkValue(
+            parser, "/section_header[10]/flags/is_writable", False)
+        self.checkValue(
+            parser, "/section_header[10]/flags/is_alloc", True)
+        self.checkValue(
+            parser, "/section_header[10]/flags/is_exec", True)
+        self.checkValue(
+            parser, "/section_header[10]/flags/is_tls", False)
+        self.checkValue(
+            parser, "/section_header[18]/flags/is_writable", True)
+        self.checkValue(
+            parser, "/section_header[18]/flags/is_alloc", True)
+        self.checkValue(
+            parser, "/section_header[18]/flags/is_exec", False)
+        self.checkValue(
+            parser, "/section_header[18]/flags/is_tls", False)
 
     def test_cab(self):
         parser = self.parse("georgia.cab")
