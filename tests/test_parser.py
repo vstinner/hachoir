@@ -566,6 +566,47 @@ class TestParsers(unittest.TestCase):
         self.checkValue(
             parser, "/section_header[19]/flags/is_tls", False)
 
+    def test_elf_program_64msb(self):
+        parser = self.parse("mev.64bit.big.elf")
+        self.checkDisplay(parser, "/header/class", "64 bits")
+        self.checkDisplay(parser, "/header/endian", "Big endian")
+        self.checkDisplay(parser, "/header/type", "Shared object file")
+        self.checkDisplay(parser, "/header/machine", "IBM S390")
+        self.checkValue(parser, "/header/phentsize", 56)
+        self.checkDisplay(parser, "/prg_header[1]/type", "Program interpreter")
+        self.checkValue(
+            parser, "/section_header[0]/flags/is_writable", False)
+        self.checkValue(
+            parser, "/section_header[0]/flags/is_alloc", False)
+        self.checkValue(
+            parser, "/section_header[0]/flags/is_exec", False)
+        self.checkValue(
+            parser, "/section_header[0]/flags/is_tls", False)
+        self.checkValue(
+            parser, "/section_header[1]/flags/is_writable", False)
+        self.checkValue(
+            parser, "/section_header[1]/flags/is_alloc", True)
+        self.checkValue(
+            parser, "/section_header[1]/flags/is_exec", False)
+        self.checkValue(
+            parser, "/section_header[1]/flags/is_tls", False)
+        self.checkValue(
+            parser, "/section_header[13]/flags/is_writable", False)
+        self.checkValue(
+            parser, "/section_header[13]/flags/is_alloc", True)
+        self.checkValue(
+            parser, "/section_header[13]/flags/is_exec", True)
+        self.checkValue(
+            parser, "/section_header[13]/flags/is_tls", False)
+        self.checkValue(
+            parser, "/section_header[19]/flags/is_writable", True)
+        self.checkValue(
+            parser, "/section_header[19]/flags/is_alloc", True)
+        self.checkValue(
+            parser, "/section_header[19]/flags/is_exec", False)
+        self.checkValue(
+            parser, "/section_header[19]/flags/is_tls", False)
+
     def test_cab(self):
         parser = self.parse("georgia.cab")
         self.checkDisplay(parser, "/minor_version", "3")
