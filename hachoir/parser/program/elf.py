@@ -154,8 +154,8 @@ class SectionFlags(FieldSet):
             yield Bit(self, "is_exec", "Section contains executable instructions?")
             yield NullBits(self, "reserved[]", 7)
             yield Bit(self, "is_tls", "Section contains TLS data?")
-            yield RawBits(self, "processor_specific", 4, "Processor specific flags")
             yield NullBits(self, "reserved[]", 17)
+            yield RawBits(self, "processor_specific", 4, "Processor specific flags")
             if self.root.is64bit:
                 yield RawBits(self, "reserved[]", 32)
 
