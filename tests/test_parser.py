@@ -449,7 +449,7 @@ class TestParsers(unittest.TestCase):
         self.checkDisplay(parser, "/header/class", "32 bits")
         self.checkDisplay(parser, "/header/endian", "Little endian")
         self.checkDisplay(parser, "/header/type", "Executable file")
-        self.checkDisplay(parser, "/header/machine", "Intel 80386"),
+        self.checkDisplay(parser, "/header/machine", "Intel 80386")
         self.checkValue(parser, "/header/phentsize", 32)
         self.checkDisplay(parser, "/prg_header[1]/type", "Program interpreter")
 
