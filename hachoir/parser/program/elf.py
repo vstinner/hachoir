@@ -148,7 +148,7 @@ class SectionFlags(FieldSet):
             lambda: Bit(self, "is_exec", "Section contains executable instructions?"),
             lambda: NullBits(self, "reserved[]", 7),
             lambda: Bit(self, "is_tls", "Section contains TLS data?"),
-            lambda: NullBits(self, "reserved[]", 17)
+            lambda: NullBits(self, "reserved[]", 17),
             lambda: RawBits(self, "processor_specific", 4, "Processor specific flags")
         )
 
