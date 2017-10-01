@@ -163,7 +163,7 @@ class SectionFlags(FieldSet):
         if self.root.endian == BIG_ENDIAN:
             if self.root.is64bit:
                 yield RawBits(self, "reserved[]", 32)
-            for t in reversed (field_thunks):
+            for t in reversed(field_thunks):
                 yield t()
         else:
             for t in field_thunks:
