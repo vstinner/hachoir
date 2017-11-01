@@ -295,7 +295,9 @@ class Inode(FieldSet):
 
 
 class Directory(Parser):
-    PARSER_TAGS = {}
+    PARSER_TAGS = {
+        "description": "Directory of EXT2/EXT3 file system",
+    }
     endian = LITTLE_ENDIAN
 
     def createFields(self):
