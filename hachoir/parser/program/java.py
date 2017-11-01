@@ -113,7 +113,7 @@ def eat_descriptor(descr):
     if (descr[0] == 'L'):
         try:
             end = descr.find(';')
-        except:
+        except Exception:
             raise ParserError("Not a valid descriptor string: " + descr)
         type = descr[1:end]
         descr = descr[end:]

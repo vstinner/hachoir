@@ -318,7 +318,7 @@ class ID3_TrackLength(FieldSet):
         try:
             ms = int(field.value)
             return humanDuration(ms)
-        except:
+        except Exception:
             return field.value
 
 

@@ -125,7 +125,7 @@ class field_view_imp_t:
             self.fields[item + MAXITEMS]
             if item + MAXITEMS + parent_count > self.view.GetItemCount():
                 self.view.SetItemCount(item + MAXITEMS + parent_count)
-        except:
+        except Exception:
             if len(self.fields) + parent_count != self.view.GetItemCount():
                 self.view.SetItemCount(len(self.fields) + parent_count)
         field = self.fields[item]

@@ -475,35 +475,35 @@ class Separator(Text):
         self.info.set_text(self.format % args)
 
     def cols(self, maxcol):
-        l = len(self.get_text()[0])
+        lines = len(self.get_text()[0])
         r = len(self.info.get_text()[0])
-        lr = l + r
+        lr = lines + r
         mc = maxcol - 2
         if lr <= mc:
-            return l, r
-        return l * mc // lr, r * mc // lr
+            return lines, r
+        return lines * mc // lr, r * mc // lr
 
     if urwid_ver < '0.9.8':
         def render(self, xxx_todo_changeme, focus=False):
             (maxcol,) = xxx_todo_changeme
-            l, r = self.cols(maxcol)
+            lines, r = self.cols(maxcol)
             return CanvasJoin([
-                Text.render(self, (l,), focus),
+                Text.render(self, (lines,), focus),
                 maxcol - r, self.info.render((r,)),
             ])
     else:
         def render(self, xxx_todo_changeme1, focus=False):
             (maxcol,) = xxx_todo_changeme1
-            l, r = self.cols(maxcol)
+            lines, r = self.cols(maxcol)
             return CanvasJoin([
-                (Text.render(self, (l,), focus), None, True, maxcol - r),
+                (Text.render(self, (lines,), focus), None, True, maxcol - r),
                 (self.info.render((r,)), None, False, r),
             ])
 
     def rows(self, xxx_todo_changeme3, focus=False):
         (maxcol,) = xxx_todo_changeme3
-        l, r = self.cols(maxcol)
-        return max(Text.rows(self, (l,), focus), self.info.rows((r,)))
+        lines, r = self.cols(maxcol)
+        return max(Text.rows(self, (lines,), focus), self.info.rows((r,)))
 
 
 class Input(Edit):

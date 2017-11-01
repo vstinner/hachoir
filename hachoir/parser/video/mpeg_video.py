@@ -561,7 +561,7 @@ class MPEGVideoFile(Parser):
                 # force chunk to be processed, so that CustomFragments are
                 # complete
                 chunk['content/data']
-            except:
+            except Exception:
                 pass
             yield chunk
 

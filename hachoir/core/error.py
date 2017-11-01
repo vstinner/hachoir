@@ -17,7 +17,7 @@ def getBacktrace(empty="Empty backtrace."):
         trace = traceback.format_exception(*info)
         if trace[0] != "None\n":
             return "".join(trace)
-    except:
+    except Exception:
         # No i18n here (imagine if i18n function calls error...)
         return "Error while trying to get backtrace"
     return empty

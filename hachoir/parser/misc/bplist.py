@@ -303,7 +303,7 @@ class BPList(HachoirParser, RootSeekableFieldSet):
             while True:
                 try:
                     self.seekByte(1024)
-                except:
+                except Exception:
                     break
             self.seekByte(self.size // 8 - 32)
         yield BPListTrailer(self, "trailer")
