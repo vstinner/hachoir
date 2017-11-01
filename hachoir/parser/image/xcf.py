@@ -4,7 +4,7 @@ Gimp image parser (XCF file, ".xcf" extension).
 You can find informations about XCF file in Gimp source code. URL to read
 CVS online:
   http://cvs.gnome.org/viewcvs/gimp/app/xcf/
-  \--> files xcf-read.c and xcf-load.c
+  files xcf-read.c and xcf-load.c
 
 Author: Victor Stinner
 """

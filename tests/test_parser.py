@@ -178,7 +178,7 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "file[0]/crc32", 0x4C6D13ED)
         self.checkValue(parser, "new_sub_block[1]/crc32", 0x34528E23)
         self.checkValue(parser, "file[1]/filename",
-                        ".svn\prop-base\README.svn-base")
+                        r".svn\prop-base\README.svn-base")
         self.checkValue(parser, "new_sub_block[1]/filename", 'ACL')
         # archive_end bad candidate for checking
         self.checkValue(parser, "new_sub_block[362]/crc32", 0x6C84C95E)
@@ -187,7 +187,7 @@ class TestParsers(unittest.TestCase):
         parser = self.parse("hachoir-core.ace")
         self.checkValue(parser, "header/crc16", 0xA9BE)
         self.checkValue(parser, "file[0]/reserved", 0x4554)
-        self.checkValue(parser, "file[1]/filename", "hachoir_core\.svn")
+        self.checkValue(parser, "file[1]/filename", r"hachoir_core\.svn")
         self.checkValue(parser, "file[2]/parameters", 0x000A)
         # End of archive, lots of work...
         # self.checkValue(parser, "new_recovery[0]/signature", "**ACE**")
