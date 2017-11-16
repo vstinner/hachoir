@@ -44,13 +44,16 @@ class DirectoryEntry(FieldSet):
         yield UInt16(self, "rec_len", "Record length")
         yield UInt8(self, "name_len", "Name length")
         yield Enum(UInt8(self, "file_type", "File type"), self.file_type)
-        yield String(self, "name", self["name_len"].value, "File name")
+        if self["name_len"].value > 0:
+            yield String(self, "name", self["name_len"].value, "File name")
         size = (self._size - self.current_size) // 8
         if size:
             yield NullBytes(self, "padding", size)
 
     def createDescription(self):
-        name = self["name"].value.strip("\0")
+        name = None
+        if self["name_len"].value > 0:
+            name = self["name"].value.strip("\0")
         if name:
             return "Directory entry: %s" % name
         else:
