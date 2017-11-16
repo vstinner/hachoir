@@ -191,10 +191,11 @@ class Inode(FieldSet):
     inode_type_name = {
         1: "list of bad blocks",
         2: "Root directory",
-        3: "ACL inode",
-        4: "ACL inode",
+        3: "User quota inode",
+        4: "Group quota inode",
         5: "Boot loader",
         6: "Undelete directory",
+        7: "Reserved group descriptors",
         8: "EXT3 journal"
     }
     static_size = (68 + 15 * 4) * 8
