@@ -7,7 +7,7 @@ Download code and run tests
 
 To clone Git repository, type::
 
-    git clone https://github.com/haypo/hachoir3
+    git clone https://github.com/vstinner/hachoir3
 
 Enter hachoir3 directory::
 

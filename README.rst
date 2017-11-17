@@ -21,7 +21,7 @@ by butchers to divide meat into long tubes; Hachoir is used by computer
 butchers to divide binary files into fields.
 
 * `Hachoir3 website <http://hachoir3.readthedocs.io/>`_ (source code, bugs)
-* `Hachoir3 on GitHub (Source code, bug tracker) <https://github.com/haypo/hachoir3>`_
+* `Hachoir3 on GitHub (Source code, bug tracker) <https://github.com/vstinner/hachoir3>`_
 * License: GNU GPL v2
 
 Command line tools using Hachoir parsers:
