@@ -239,6 +239,16 @@ class Inode(FieldSet):
                 return out + ' (-> %s)' % (self['link_target'].value)
         return out
 
+    def is_fast_symlink(self):
+        self.seekByte(4 * 15 + 4)
+        acl = UInt32(self, "file_acl")
+
+        b = 0
+        if acl.value > 0:
+            b = (2 << self["/superblock/log_block_size"].value)
+
+        return (self['blocks'].value - b == 0)
+
     def createFields(self):
         os = self["/superblock/creator_os"].value
 
@@ -264,7 +274,7 @@ class Inode(FieldSet):
             yield UInt8(self, "dev_minor", "Minor number of the block/char device")
             yield UInt8(self, "dev_major", "Major number of the block/char device")
             yield NullBytes(self, "block_unused", 58)
-        elif filetype == 'l' and self['size'].value <= 60 and self['blocks'].value == 0:
+        elif filetype == 'l' and self.is_fast_symlink():
             yield String(self, "link_target", self['size'].value, "Target filename of this symlink")
             rest = 60 - self['size'].value
             if rest:

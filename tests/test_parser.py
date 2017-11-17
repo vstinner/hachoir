@@ -337,6 +337,11 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "/superblock/default_mount_opts/uid16", False)
         self.checkDisplay(parser, "/superblock/default_mount_opts/jmode", "none")
 
+    def test_ext2_variety_inode_types(self):
+        parser = self.parse("types.ext2")
+        self.checkDesc(parser, "/group[0]/inode_table/inode[12]",
+                       "Inode 13: Symbolic link (-> XYZ), size=3 bytes, mode=lrwxrwxrwx")
+
     def test_bmp2(self):
         parser = self.parse("article01.bmp")
         self.checkDisplay(parser, "/header/red_mask", '0x00ff0000')
