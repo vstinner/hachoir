@@ -670,6 +670,8 @@ class Group(SeekableFieldSet):
             if inode['blocks'].value == 0:
                 continue
             blocks = inode.array('block')
+            if not blocks:
+                continue
             if inode['mode/file_type'].display == 'Directory':
                 parser = Directory
             else:
