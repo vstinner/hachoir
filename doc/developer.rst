@@ -21,7 +21,7 @@ If tox is not already installed, install tox::
 
     python3 -m pip install tox
 
-See also `Hachoir3 on the Travis CI <https://travis-ci.org/haypo/hachoir3>`_.
+See also `Hachoir3 on the Travis CI <https://travis-ci.org/vstinner/hachoir3>`_.
 
 
 Why using Hachoir parsers?
