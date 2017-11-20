@@ -5,7 +5,7 @@ Hachoir Authors
 Team:
 
 * Julien Muchembled <jm AT jm10 DOT no-ip DOT com>
-* Victor Stinner aka haypo <victor DOT stinner AT gmail DOT com>
+* Victor Stinner <victor DOT stinner AT gmail DOT com>
 * Robert Xiao aka nneonneo <nneonneo AT gmail.com> - improve SeekableFieldSet
 
 Packagers:

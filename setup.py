@@ -8,7 +8,7 @@
 #  - run: git commit -a
 #  - run: git push
 #  - check Travis CI status:
-#    https://travis-ci.org/haypo/hachoir3
+#    https://travis-ci.org/vstinner/hachoir3
 #
 # Release a new version:
 #
