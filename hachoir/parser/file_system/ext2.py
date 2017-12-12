@@ -44,13 +44,16 @@ class DirectoryEntry(FieldSet):
         yield UInt16(self, "rec_len", "Record length")
         yield UInt8(self, "name_len", "Name length")
         yield Enum(UInt8(self, "file_type", "File type"), self.file_type)
-        yield String(self, "name", self["name_len"].value, "File name")
+        if self["name_len"].value > 0:
+            yield String(self, "name", self["name_len"].value, "File name")
         size = (self._size - self.current_size) // 8
         if size:
             yield NullBytes(self, "padding", size)
 
     def createDescription(self):
-        name = self["name"].value.strip("\0")
+        name = None
+        if self["name_len"].value > 0:
+            name = self["name"].value.strip("\0")
         if name:
             return "Directory entry: %s" % name
         else:
@@ -191,10 +194,11 @@ class Inode(FieldSet):
     inode_type_name = {
         1: "list of bad blocks",
         2: "Root directory",
-        3: "ACL inode",
-        4: "ACL inode",
+        3: "User quota inode",
+        4: "Group quota inode",
         5: "Boot loader",
         6: "Undelete directory",
+        7: "Reserved group descriptors",
         8: "EXT3 journal"
     }
     static_size = (68 + 15 * 4) * 8
@@ -235,6 +239,16 @@ class Inode(FieldSet):
                 return out + ' (-> %s)' % (self['link_target'].value)
         return out
 
+    def is_fast_symlink(self):
+        self.seekByte(4 * 15 + 4)
+        acl = UInt32(self, "file_acl")
+
+        b = 0
+        if acl.value > 0:
+            b = (2 << self["/superblock/log_block_size"].value)
+
+        return (self['blocks'].value - b == 0)
+
     def createFields(self):
         os = self["/superblock/creator_os"].value
 
@@ -260,7 +274,7 @@ class Inode(FieldSet):
             yield UInt8(self, "dev_minor", "Minor number of the block/char device")
             yield UInt8(self, "dev_major", "Major number of the block/char device")
             yield NullBytes(self, "block_unused", 58)
-        elif filetype == 'l' and self['size'].value <= 60 and self['blocks'].value == 0:
+        elif filetype == 'l' and self.is_fast_symlink():
             yield String(self, "link_target", self['size'].value, "Target filename of this symlink")
             rest = 60 - self['size'].value
             if rest:
@@ -666,6 +680,8 @@ class Group(SeekableFieldSet):
             if inode['blocks'].value == 0:
                 continue
             blocks = inode.array('block')
+            if not blocks:
+                continue
             if inode['mode/file_type'].display == 'Directory':
                 parser = Directory
             else:
