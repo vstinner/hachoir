@@ -5,6 +5,7 @@ Resources:
 - https://lowlevelbits.org/parsing-mach-o-files/
 - OS X ABI Mach-O File Format Reference
   (mirrored at https://github.com/aidansteele/osx-abi-macho-file-format-reference)
+- https://llvm.org/svn/llvm-project/llvm/trunk/include/llvm/BinaryFormat/
 
 Author: Robert Xiao
 Creation date: February 11, 2015
@@ -12,8 +13,9 @@ Updated: January 13, 2017
 """
 
 from hachoir.parser import HachoirParser
-from hachoir.field import (RootSeekableFieldSet, FieldSet,
-                           Bit, NullBits, String, RawBytes, Bytes,
+from hachoir.field import (RootSeekableFieldSet, SeekableFieldSet, FieldSet,
+                           Bit, NullBits, String, CString,
+                           RawBytes, Bytes, PaddingBytes,
                            Int32, UInt32, UInt64, Enum)
 from hachoir.core.text_handler import textHandler, hexadecimal
 from hachoir.core.endian import LITTLE_ENDIAN, BIG_ENDIAN
@@ -100,8 +102,7 @@ class MachoHeader(FieldSet):
             self['ncmds'].value,
             '|'.join(f for f in self.FLAGS if self['flags_' + f.lower()].value))
 
-
-class LC_UUID(FieldSet):
+class UuidCommand(FieldSet):
     static_size = 16 * 8
 
     def createFields(self):
@@ -118,8 +119,7 @@ class LC_UUID(FieldSet):
     def createDescription(self):
         return "UUID for corresponding dSYM file"
 
-
-class LC_SEGMENT(FieldSet):
+class SegmentCommand(FieldSet):
 
     def createFields(self):
         yield String(self, "segname", 16, strip="\0")
@@ -141,7 +141,7 @@ class LC_SEGMENT(FieldSet):
         return "Load segment %s" % (self['segname'].value)
 
 
-class LC_SEGMENT_64(FieldSet):
+class SegmentCommand64(FieldSet):
 
     def createFields(self):
         yield String(self, "segname", 16, strip="\0")
@@ -162,9 +162,84 @@ class LC_SEGMENT_64(FieldSet):
     def createDescription(self):
         return "Load segment %s" % (self['segname'].value)
 
+class SymtabCommand(FieldSet):
+    def createFields(self):
+        yield UInt32(self, "symoff")
+        yield UInt32(self, "nsyms")
+        yield UInt32(self, "stroff")
+        yield UInt32(self, "strsize")
+
+class SymsegCommand(FieldSet):
+    def createFields(Self):
+        yield UInt32(self, "offset")
+        yield UInt32(self, "size")
+
+class DysymtabCommand(FieldSet):
+    def createFields(self):
+        yield UInt32(self, "ilocalsym")
+        yield UInt32(self, "nlocalsym")
+        yield UInt32(self, "iextdefsym")
+        yield UInt32(self, "nextdefsym")
+        yield UInt32(self, "iundefsym")
+        yield UInt32(self, "nundefsym")
+        yield UInt32(self, "tocoff")
+        yield UInt32(self, "ntoc")
+        yield UInt32(self, "modtaboff")
+        yield UInt32(self, "nmodtab")
+        yield UInt32(self, "extrefsymoff")
+        yield UInt32(self, "nextrefsyms")
+        yield UInt32(self, "indirectsymoff")
+        yield UInt32(self, "nindirectsyms")
+        yield UInt32(self, "extreloff")
+        yield UInt32(self, "nextrel")
+        yield UInt32(self, "locreloff")
+        yield UInt32(self, "nlocrel")
+
+class DylinkerCommand(FieldSet):
+    def createFields(self):
+        yield UInt32(self, "offset")
+        yield CString(self, "name")
+
+    def createValue(self):
+        return self['name'].value
+
+class VersionMinCommand(FieldSet):
+    def createFields(self):
+        yield UInt32(self, "version")
+        yield UInt32(self, "sdk")
+
+    def createDisplay(self):
+        version = self['version'].value
+        sdk = self['sdk'].value
+        return "%d.%d.%d sdk %d.%d.%d" % (
+            version >> 16, (version >> 8) & 0xff, version & 0xff,
+            sdk >> 16, (sdk >> 8) & 0xff, sdk & 0xff)
+
+class DyldInfoCommand(FieldSet):
+    def createFields(self):
+        yield UInt32(self, "rebase_off")
+        yield UInt32(self, "rebase_size")
+        yield UInt32(self, "bind_off")
+        yield UInt32(self, "bind_size")
+        yield UInt32(self, "weak_bind_off")
+        yield UInt32(self, "weak_bind_size")
+        yield UInt32(self, "lazy_bind_off")
+        yield UInt32(self, "lazy_bind_size")
+        yield UInt32(self, "export_off")
+        yield UInt32(self, "export_size")
+
+class DylibCommand(FieldSet):
+    def createFields(self):
+        yield UInt32(self, "offset")
+        yield UInt32(self, "timestamp")
+        yield UInt32(self, "current_version")
+        yield UInt32(self, "compatibility_version")
+        yield CString(self, "name")
+
+    def createValue(self):
+        return self['name'].value
 
 class MachoSection(FieldSet):
-
     def createFields(self):
         yield String(self, "sectname", 16, strip="\0")
         yield String(self, "segname", 16, strip="\0")
@@ -210,52 +285,105 @@ class MachoSection64(FieldSet):
 
 class MachoLoadCommand(FieldSet):
     LC_REQ_DYLD = 0x80000000
-    LOAD_COMMANDS = {
-        1: ("Segment", LC_SEGMENT),
-        2: ("Symbol table", None),
-        3: ("Symbol segment", None),
-        4: ("Thread", None),
-        5: ("UNIX thread", None),
-        6: ("Load fixed VM library", None),
-        7: ("Fixed VM library identification", None),
-        8: ("Object identification", None),
-        9: ("Fixed VM file inclusion", None),
-        0xa: ("Prepage", None),
-        0xb: ("Dynamic symbol table", None),
-        0xc: ("Load dynamic library", None),
-        0xd: ("Dynamic library identification", None),
-        0xe: ("Load dynamic linker", None),
-        0xf: ("Dynamic linker identification", None),
-        0x10: ("Prebound modules", None),
-        0x11: ("Image routines", None),
-        0x12: ("Sub-framework", None),
-        0x13: ("Sub-umbrella", None),
-        0x14: ("Sub-client", None),
-        0x15: ("Sub-library", None),
-        0x16: ("Two-level lookup hints", None),
-        0x17: ("Prebind checksum", None),
 
-        0x18 | LC_REQ_DYLD: ("Load dynamic library weakly", None),
-        0x19: ("64-bit segment", LC_SEGMENT_64),
-        0x1a: ("64-bit image routines", None),
-        0x1b: ("UUID", LC_UUID),
-        0x1c | LC_REQ_DYLD: ("Runpath additions", None),
-        0x1d: ("Code signature", None),
-        0x1e: ("Segment split info", None),
-        0x1f | LC_REQ_DYLD: ("Load and re-export dylib", None),
-        0x20: ("Lazy load dynamic library", None),
-        0x21: ("Encrypted segment information", None),
-        0x22: ("Compressed dyld info", None),
-        0x22 | LC_REQ_DYLD: ("Compressed dyld info", None),
-        0x23 | LC_REQ_DYLD: ("Load upward dylib", None),
-        0x24: ("Minimum macOS version", None),
-        0x25: ("Minimum iOS version", None),
-        0x26: ("Compressed function start address table", None),
-        0x27: ("dyld environment variables", None),
-        0x28 | LC_REQ_DYLD: ("Main thread info", None),
-        0x29: ("Table of non-instructions in text segment", None),
-        0x2a: ("Source code version info", None),
-        0x2b: ("Code signing info from linked dylibs", None),
+    LC_SEGMENT = 0x1
+    LC_SYMTAB = 0x2
+    LC_SYMSEG = 0x3
+    LC_THREAD = 0x4
+    LC_UNIXTHREAD = 0x5
+    LC_LOADFVMLIB = 0x6
+    LC_IDFVMLIB = 0x7
+    LC_IDENT = 0x8
+    LC_FVMFILE = 0x9
+    LC_PREPAGE = 0xa
+    LC_DYSYMTAB = 0xb
+    LC_LOAD_DYLIB = 0xc
+    LC_ID_DYLIB = 0xd
+    LC_LOAD_DYLINKER = 0xe
+    LC_ID_DYLINKER = 0xf
+    LC_PREBOUND_DYLIB = 0x10
+    LC_ROUTINES = 0x11
+    LC_SUB_FRAMEWORK = 0x12
+    LC_SUB_UMBRELLA = 0x13
+    LC_SUB_CLIENT = 0x14
+    LC_SUB_LIBRARY = 0x15
+    LC_TWOLEVEL_HINTS = 0x16
+    LC_PREBIND_CKSUM = 0x17
+    LC_LOAD_WEAK_DYLIB = 0x18 | LC_REQ_DYLD
+    LC_SEGMENT_64 = 0x19
+    LC_ROUTINES_64 = 0x1a
+    LC_UUID = 0x1b
+    LC_RPATH = 0x1c | LC_REQ_DYLD
+    LC_CODE_SIGNATURE = 0x1d
+    LC_SEGMENT_SPLIT_INFO = 0x1e
+    LC_REEXPORT_DYLIB = 0x1f | LC_REQ_DYLD
+    LC_LAZY_LOAD_DYLIB = 0x20
+    LC_ENCRYPTION_INFO = 0x21
+    LC_DYLD_INFO = 0x22
+    LC_DYLD_INFO_ONLY = 0x22 | LC_REQ_DYLD
+    LC_LOAD_UPWARD_DYLIB = 0x23 | LC_REQ_DYLD
+    LC_VERSION_MIN_MACOSX = 0x24
+    LC_VERSION_MIN_IPHONEOS = 0x25
+    LC_FUNCTION_STARTS = 0x26
+    LC_DYLD_ENVIRONMENT = 0x27
+    LC_MAIN = 0x28 | LC_REQ_DYLD
+    LC_DATA_IN_CODE = 0x29
+    LC_SOURCE_VERSION = 0x2a
+    LC_DYLIB_CODE_SIGN_DRS = 0x2b
+    LC_ENCRYPTION_INFO_64 = 0x2c
+    LC_LINKER_OPTION = 0x2d
+    LC_LINKER_OPTIMIZATION_HINT = 0x2e
+    LC_VERSION_MIN_TVOS = 0x2f
+    LC_VERSION_MIN_WATCHOS = 0x30
+    LC_NOTE = 0x31
+    LC_BUILD_VERSION = 0x32
+
+    LOAD_COMMANDS = {
+        LC_SEGMENT: ("Segment", SegmentCommand),
+        LC_SYMTAB: ("Symbol table", SymtabCommand),
+        LC_SYMSEG: ("Symbol segment", SymsegCommand),
+        LC_THREAD: ("Thread", None),
+        LC_UNIXTHREAD: ("UNIX thread", None),
+        LC_LOADFVMLIB: ("Load fixed VM library", None),
+        LC_IDFVMLIB: ("Fixed VM library identification", None),
+        LC_IDENT: ("Object identification", None),
+        LC_FVMFILE: ("Fixed VM file inclusion", None),
+        LC_PREPAGE: ("Prepage", None),
+        LC_DYSYMTAB: ("Dynamic symbol table", DysymtabCommand),
+        LC_LOAD_DYLIB: ("Load dynamic library", DylibCommand),
+        LC_ID_DYLIB: ("Dynamic library identification", None),
+        LC_LOAD_DYLINKER: ("Load dynamic linker", DylinkerCommand),
+        LC_ID_DYLINKER: ("Dynamic linker identification", None),
+        LC_PREBOUND_DYLIB: ("Prebound modules", None),
+        LC_ROUTINES: ("Image routines", None),
+        LC_SUB_FRAMEWORK: ("Sub-framework", None),
+        LC_SUB_UMBRELLA: ("Sub-umbrella", None),
+        LC_SUB_CLIENT: ("Sub-client", None),
+        LC_SUB_LIBRARY: ("Sub-library", None),
+        LC_TWOLEVEL_HINTS: ("Two-level lookup hints", None),
+        LC_PREBIND_CKSUM: ("Prebind checksum", None),
+
+        LC_LOAD_WEAK_DYLIB: ("Load dynamic library weakly", None),
+        LC_SEGMENT_64: ("64-bit segment", SegmentCommand64),
+        LC_ROUTINES_64: ("64-bit image routines", None),
+        LC_UUID: ("UUID", UuidCommand),
+        LC_RPATH: ("Runpath additions", None),
+        LC_CODE_SIGNATURE: ("Code signature", None),
+        LC_SEGMENT_SPLIT_INFO: ("Segment split info", None),
+        LC_REEXPORT_DYLIB: ("Load and re-export dylib", None),
+        LC_LAZY_LOAD_DYLIB: ("Lazy load dynamic library", None),
+        LC_ENCRYPTION_INFO: ("Encrypted segment information", None),
+        LC_DYLD_INFO: ("Compressed dyld info", DyldInfoCommand),
+        LC_DYLD_INFO_ONLY: ("Compressed dyld info", DyldInfoCommand),
+        LC_LOAD_UPWARD_DYLIB: ("Load upward dylib", None),
+        LC_VERSION_MIN_MACOSX: ("Minimum macOS version", VersionMinCommand),
+        LC_VERSION_MIN_IPHONEOS: ("Minimum iOS version", VersionMinCommand),
+        LC_FUNCTION_STARTS: ("Compressed function start address table", None),
+        LC_DYLD_ENVIRONMENT: ("dyld environment variables", None),
+        LC_MAIN: ("Main thread info", None),
+        LC_DATA_IN_CODE: ("Table of non-instructions in text segment", None),
+        LC_SOURCE_VERSION: ("Source code version info", None),
+        LC_DYLIB_CODE_SIGN_DRS: ("Code signing info from linked dylibs", None),
     }
     LOAD_COMMANDS_DISPLAY = {k: v[0] for k, v in LOAD_COMMANDS.items()}
 
@@ -266,6 +394,10 @@ class MachoLoadCommand(FieldSet):
         desc, parser = self.LOAD_COMMANDS.get(self['cmd'].value, ("", None))
         if parser:
             yield parser(self, "data")
+            # data is word aligned. TODO: 8 bytes for 64-bit
+            padding_length = -(self.current_size // 8) % 4
+            if padding_length:
+                yield PaddingBytes(self, "padding", padding_length)
         else:
             yield RawBytes(self, "data",
                            self['cmdsize'].value - self.current_size // 8)
