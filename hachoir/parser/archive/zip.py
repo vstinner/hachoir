@@ -12,6 +12,7 @@ from hachoir.field import (FieldSet, ParserError,
                            UInt8, UInt16, UInt32, UInt64,
                            String, PascalString16,
                            RawBytes)
+from hachoir.stream.input import ReadStreamError
 from hachoir.core.text_handler import textHandler, filesizeHandler, hexadecimal
 from hachoir.core.tools import makeUnicode
 from hachoir.core.endian import LITTLE_ENDIAN
@@ -395,6 +396,16 @@ class ZipFile(Parser):
         "min_size": (4 + 26) * 8,  # header + file entry
         "description": "ZIP archive"
     }
+    CHUNK_TYPES = {
+        FileEntry.HEADER: (FileEntry, "file[]", None),
+        ZipDataDescriptor.HEADER: (ZipDataDescriptor, "spanning[]", None),
+        0x30304b50: (ZipDataDescriptor, "temporary_spanning[]", None),
+        ZipCentralDirectory.HEADER: (ZipCentralDirectory, "central_directory[]", None),
+        ZipEndCentralDirectory.HEADER: (ZipEndCentralDirectory, "end_central_directory", "End of central directory"),
+        Zip64EndCentralDirectory.HEADER: (Zip64EndCentralDirectory, "end64_central_directory", "ZIP64 end of central directory"),
+        ZipSignature.HEADER: (ZipSignature, "signature", "Signature"),
+        Zip64EndCentralDirectoryLocator.HEADER: (Zip64EndCentralDirectoryLocator, "end_locator", "ZIP64 Enf of central directory locator"),
+    }
 
     def validate(self):
         if self["header[0]"].value != FileEntry.HEADER:
@@ -413,29 +424,26 @@ class ZipFile(Parser):
         self.signature = None
         self.central_directory = []
         while not self.eof:
-            header = textHandler(
+            skip = 0
+            while True:
+                try:
+                    header = self.stream.readBits(self.absolute_address + self.current_size + skip, 32, self.endian)
+                    if header in self.CHUNK_TYPES:
+                        break
+                    skipdelta = self.stream.searchBytes(b'PK', self.absolute_address + self.current_size + skip + 8)
+                    if skipdelta is None:
+                        return
+                    skip = skipdelta - (self.absolute_address + self.current_size)
+                except ReadStreamError:
+                    return
+            if skip:
+                yield RawBytes(self, "unparsed[]", skip//8)
+
+            yield textHandler(
                 UInt32(self, "header[]", "Header"), hexadecimal)
-            yield header
-            header = header.value
-            if header == FileEntry.HEADER:
-                yield FileEntry(self, "file[]")
-            elif header == ZipDataDescriptor.HEADER:
-                yield ZipDataDescriptor(self, "spanning[]")
-            elif header == 0x30304b50:
-                yield ZipDataDescriptor(self, "temporary_spanning[]")
-            elif header == ZipCentralDirectory.HEADER:
-                yield ZipCentralDirectory(self, "central_directory[]")
-            elif header == ZipEndCentralDirectory.HEADER:
-                yield ZipEndCentralDirectory(self, "end_central_directory", "End of central directory")
-            elif header == Zip64EndCentralDirectory.HEADER:
-                yield Zip64EndCentralDirectory(self, "end64_central_directory", "ZIP64 end of central directory")
-            elif header == ZipSignature.HEADER:
-                yield ZipSignature(self, "signature", "Signature")
-            elif header == Zip64EndCentralDirectoryLocator.HEADER:
-                yield Zip64EndCentralDirectoryLocator(self, "end_locator", "ZIP64 Enf of central directory locator")
-            else:
-                raise ParserError(
-                    "Error, unknown ZIP header (0x%08X)." % header)
+
+            ftype, fname, fdesc = self.CHUNK_TYPES[header]
+            yield ftype(self, fname, fdesc)
 
     def createMimeType(self):
         if self["file[0]/filename"].value == "mimetype":
