@@ -10,6 +10,10 @@ Hachoir
    :alt: Build status of hachoir3 on Travis CI
    :target: https://travis-ci.org/vstinner/hachoir3
 
+.. image:: http://unmaintained.tech/badge.svg
+   :target: http://unmaintained.tech/
+   :alt: No Maintenance Intended
+
 Hachoir is a Python library to view and edit a binary stream field by field.
 In other words, Hachoir allows you to "browse" any binary stream just like you
 browse directories and files.
