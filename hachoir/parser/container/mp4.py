@@ -1,5 +1,5 @@
 """
-Apple Quicktime Movie (file extension ".mov") parser.
+ISO base media file format / Apple Quicktime Movie parser.
 
 Documents:
 - Parsing and Writing QuickTime Files in Java (by Chris Adamson, 02/19/2003)
@@ -1330,7 +1330,7 @@ class Atom(FieldSet):
         return "Atom: %s" % self["tag"].value
 
 
-class MovFile(Parser):
+class MP4File(Parser):
     PARSER_TAGS = {
         "id": "mov",
         "category": "video",
