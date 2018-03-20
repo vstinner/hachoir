@@ -13,7 +13,7 @@ Updated: January 13, 2017
 """
 
 from hachoir.parser import HachoirParser
-from hachoir.field import (RootSeekableFieldSet, SeekableFieldSet, FieldSet,
+from hachoir.field import (RootSeekableFieldSet, FieldSet,
                            Bit, NullBits, String, CString,
                            RawBytes, Bytes, PaddingBytes,
                            Int32, UInt32, UInt64, Enum)
@@ -102,6 +102,7 @@ class MachoHeader(FieldSet):
             self['ncmds'].value,
             '|'.join(f for f in self.FLAGS if self['flags_' + f.lower()].value))
 
+
 class UuidCommand(FieldSet):
     static_size = 16 * 8
 
@@ -118,6 +119,7 @@ class UuidCommand(FieldSet):
 
     def createDescription(self):
         return "UUID for corresponding dSYM file"
+
 
 class SegmentCommand(FieldSet):
 
@@ -162,6 +164,7 @@ class SegmentCommand64(FieldSet):
     def createDescription(self):
         return "Load segment %s" % (self['segname'].value)
 
+
 class SymtabCommand(FieldSet):
     def createFields(self):
         yield UInt32(self, "symoff")
@@ -169,10 +172,12 @@ class SymtabCommand(FieldSet):
         yield UInt32(self, "stroff")
         yield UInt32(self, "strsize")
 
+
 class SymsegCommand(FieldSet):
-    def createFields(Self):
+    def createFields(self):
         yield UInt32(self, "offset")
         yield UInt32(self, "size")
+
 
 class DysymtabCommand(FieldSet):
     def createFields(self):
@@ -195,6 +200,7 @@ class DysymtabCommand(FieldSet):
         yield UInt32(self, "locreloff")
         yield UInt32(self, "nlocrel")
 
+
 class DylinkerCommand(FieldSet):
     def createFields(self):
         yield UInt32(self, "offset")
@@ -202,6 +208,7 @@ class DylinkerCommand(FieldSet):
 
     def createValue(self):
         return self['name'].value
+
 
 class VersionMinCommand(FieldSet):
     def createFields(self):
@@ -214,6 +221,7 @@ class VersionMinCommand(FieldSet):
         return "%d.%d.%d sdk %d.%d.%d" % (
             version >> 16, (version >> 8) & 0xff, version & 0xff,
             sdk >> 16, (sdk >> 8) & 0xff, sdk & 0xff)
+
 
 class DyldInfoCommand(FieldSet):
     def createFields(self):
@@ -228,6 +236,7 @@ class DyldInfoCommand(FieldSet):
         yield UInt32(self, "export_off")
         yield UInt32(self, "export_size")
 
+
 class DylibCommand(FieldSet):
     def createFields(self):
         yield UInt32(self, "offset")
@@ -238,6 +247,7 @@ class DylibCommand(FieldSet):
 
     def createValue(self):
         return self['name'].value
+
 
 class MachoSection(FieldSet):
     def createFields(self):
@@ -394,8 +404,8 @@ class MachoLoadCommand(FieldSet):
         desc, parser = self.LOAD_COMMANDS.get(self['cmd'].value, ("", None))
         if parser:
             yield parser(self, "data")
-            # data is word aligned. TODO: 8 bytes for 64-bit
-            padding_length = -(self.current_size // 8) % 4
+            # data is word aligned
+            padding_length = self['cmdsize'].value - self.current_size // 8
             if padding_length:
                 yield PaddingBytes(self, "padding", padding_length)
         else:
