@@ -51,8 +51,11 @@ class InstanceLength(Bits):
         self._size = size
         self.createValue = lambda: value
 
+
 # ISO/IEC 14496-1:2010 7.2.6.5
 ES_DescrTag = 0x03
+
+
 def ESDescriptor(self):
     yield UInt16(self, "ES_ID")
     yield Bit(self, "streamDependenceFlag")
@@ -73,9 +76,10 @@ def ESDescriptor(self):
         yield Descriptor(self, "descr[]")
 
 
-
 # ISO/IEC 14496-1:2010 7.2.6.6
 DecoderConfigDescrTag = 0x04
+
+
 def DecoderConfigDescriptor(self):
     yield UInt8(self, "objectTypeIndication")
     yield Bits(self, "streamType", 6)
@@ -98,11 +102,14 @@ class AudioObjectType(FieldSet):
         yield Bits(self, "audioObjectType", 5)
         if self["audioObjectType"].value == 31:
             yield Bits(self, "audioObjectTypeExt", 6)
+
     def createValue(self):
         if self["audioObjectType"].value < 31:
             return self["audioObjectType"].value
         else:
-            return 32+self["audioObjectTypeExt"].value
+            return 32 + self["audioObjectTypeExt"].value
+
+
 # ISO/IEC 14496-4:2009 1.6.3.4
 class SamplingFrequency(FieldSet):
     frequencyIndex = [
@@ -132,6 +139,7 @@ class SamplingFrequency(FieldSet):
         else:
             return self.frequencyIndex[self["samplingFrequencyIndex"].value]
 
+
 class AudioSpecificConfig(FieldSet):
     def createFields(self):
         yield AudioObjectType(self, "audioObjectType")
@@ -146,16 +154,18 @@ class AudioSpecificConfig(FieldSet):
             if self["extensionAudioObjectType"].value == 22:
                 yield Bits(self, "extensionChannelConfiguration", 4)
 
-        if audioObjectType == 2: # AAC-LC
+        if audioObjectType == 2:  # AAC-LC
             raise NotImplementedError
-        elif audioObjectType == 39: # AAC-ELD
+        elif audioObjectType == 39:  # AAC-ELD
             yield ELDSpecificConfig(self, "eldConfig")
         else:
-            raise NotImplementedError # TODO
+            raise NotImplementedError  # TODO
+
 
 # ISO/IEC 14496-4:2009 4.6.20.3
 class ELDSpecificConfig(FieldSet):
     ELDEXT_TERM = 0
+
     def createFields(self):
         yield Bit(self, "frameLengthFlag")
         yield Bit(self, "aacSectionDataResilienceFlag")
@@ -170,21 +180,25 @@ class ELDSpecificConfig(FieldSet):
 
         while True:
             typ = Bits(self, "eldExtType[]", 4)
-            if typ.value == ELDEXT_TERM:
+            if typ.value == self.ELDEXT_TERM:
                 break
             raise NotImplementedError
 
 
 # ISO/IEC 14496-1:2010 7.2.6.7
 DecSpecificInfoTag = 0x05
+
+
 def DecoderSpecificInfo(self, objectType):
     if objectType == 0x40:
         yield AudioSpecificConfig(self, "config")
     else:
         yield RawBytes(self, "data", self["sizeOfInstance"].value)
 
+
 # ISO/IEC 14496-1:2010 7.2.2.2
 class Descriptor(FieldSet):
+    # TODO: this is very annoying to represent without backtracking
     handlers = {
         DecoderConfigDescrTag: DecoderConfigDescriptor,
         ES_DescrTag: ESDescriptor,
@@ -208,7 +222,6 @@ class Descriptor(FieldSet):
             yield from handler(self)
         else:
             yield RawBytes(self, "data", self["sizeOfInstance"].value)
-
 
 
 def timestampMac64(value):
@@ -249,6 +262,7 @@ class AtomList(FieldSet):
     def createFields(self):
         while not self.eof:
             yield Atom(self, "atom[]")
+
 
 # ISO/IEC 14496-12:2012 8.3.2
 class TrackHeader(FieldSet):
@@ -523,6 +537,7 @@ class HintMediaHeader(FieldSet):
         yield UInt32(self, "avg_bit_rate")
         yield UInt32(self, "reserved[]")
 
+
 # ISO/IEC 14496-12:2012 8.7.2
 class DataEntryUrl(FieldSet):
 
@@ -554,6 +569,7 @@ class DataReference(FieldSet):
         for i in range(self['count'].value):
             yield Atom(self, "atom[]")
 
+
 # ISO/IEC 14496-12:2012 8.6.5
 class EditList(FieldSet):
 
@@ -583,6 +599,7 @@ class Load(FieldSet):
         yield UInt32(self, "flags")
         # KeepInBuffer = 0x00000004; HighQuality = 0x00000100; SingleFieldVideo = 0x00100000
         yield UInt32(self, "hints")
+
 
 # ISO/IEC 14496-12:2012 8.2.2
 class MovieHeader(FieldSet):
@@ -622,6 +639,7 @@ class MovieHeader(FieldSet):
         yield UInt32(self, "current_time")
         yield UInt32(self, "next_track_ID", "Value to use as the track ID for the next track added")
 
+
 # ISO/IEC 14496-12:2012 4.3
 class FileType(FieldSet):
 
@@ -631,6 +649,7 @@ class FileType(FieldSet):
         while not self.eof:
             yield String(self, "compat_brand[]", 4, "Compatible brand")
 
+
 # ISO/IEC 14496-12:2012 8.8.5
 class MovieFragmentHeader(FieldSet):
 
@@ -638,6 +657,7 @@ class MovieFragmentHeader(FieldSet):
         yield UInt8(self, "version", "Version")
         yield NullBits(self, "flags", 24)
         yield UInt32(self, "sequence_number")
+
 
 # ISO/IEC 14496-12:2012 8.8.7
 class TrackFragmentHeaderBox(FieldSet):
@@ -647,20 +667,31 @@ class TrackFragmentHeaderBox(FieldSet):
         flags = self["flags"].value
 
         yield UInt32(self, "track_ID")
-        if flags & 0x1: yield UInt64(self, "base_data_offset")
-        if flags & 0x2: yield UInt32(self, "sample_description_index")
-        if flags & 0x8: yield UInt32(self, "default_sample_duration")
-        if flags & 0x10: yield UInt32(self, "default_sample_size")
-        if flags & 0x20: yield UInt32(self, "default_sample_flags")
+        if flags & 0x1:
+            yield UInt64(self, "base_data_offset")
+        if flags & 0x2:
+            yield UInt32(self, "sample_description_index")
+        if flags & 0x8:
+            yield UInt32(self, "default_sample_duration")
+        if flags & 0x10:
+            yield UInt32(self, "default_sample_size")
+        if flags & 0x20:
+            yield UInt32(self, "default_sample_flags")
+
 
 # ISO/IEC 14496-12:2012 8.8.8
 class TrackRunSample(FieldSet):
     def createFields(self):
         flags = self["../flags"].value
-        if flags & 0x100: yield UInt32(self, "sample_duration")
-        if flags & 0x200: yield UInt32(self, "sample_size")
-        if flags & 0x400: yield UInt32(self, "sample_flags")
-        if flags & 0x800: yield UInt32(self, "sample_composition_time_offset")
+        if flags & 0x100:
+            yield UInt32(self, "sample_duration")
+        if flags & 0x200:
+            yield UInt32(self, "sample_size")
+        if flags & 0x400:
+            yield UInt32(self, "sample_flags")
+        if flags & 0x800:
+            yield UInt32(self, "sample_composition_time_offset")
+
 
 class TrackRunBox(FieldSet):
     def createFields(self):
@@ -669,11 +700,12 @@ class TrackRunBox(FieldSet):
         flags = self["flags"].value
 
         yield UInt32(self, "sample_count")
-        if flags & 0x1: yield UInt32(self, "data_offset")
-        if flags & 0x4: yield UInt32(self, "first_sample_flags")
+        if flags & 0x1:
+            yield UInt32(self, "data_offset")
+        if flags & 0x4:
+            yield UInt32(self, "first_sample_flags")
         for i in range(self["sample_count"].value):
             yield TrackRunSample(self, "sample[]")
-
 
 
 # ISO/IEC 14496-12:2012 8.8.10
@@ -816,6 +848,7 @@ class NeroChapters(FieldSet):
             yield UInt64(self, "chapter_start[]")
             yield PascalString8(self, "chapter_name[]", charset='UTF-8')
 
+
 # ISO/IEC 14496-12:2012 8.6.1.2
 class SampleDecodeTimeTable(FieldSet):
 
@@ -858,6 +891,7 @@ class ChunkOffsetTable64(FieldSet):
         for i in range(self['count'].value):
             yield UInt64(self, "chunk_offset[]")
 
+
 # ISO/IEC 14496-14:2003 5.6
 class ESDBox(FieldSet):
     def createFields(self):
@@ -865,6 +899,7 @@ class ESDBox(FieldSet):
         yield NullBits(self, "flags", 24)
 
         yield Descriptor(self, "ES", restrict=ESDescriptor)
+
 
 # ETSI TS 102 366 v1.2.1 F.6
 class EC3SpecificBoxSubstream(FieldSet):
@@ -881,11 +916,12 @@ class EC3SpecificBoxSubstream(FieldSet):
         else:
             yield NullBits(self, "reserved2", 1)
 
+
 class EC3SpecificBox(FieldSet):
     def createFields(self):
         yield Bits(self, "data_rate", 13)
         yield Bits(self, "num_ind_sub", 3)
-        for i in range(self["num_ind_sub"].value+1):
+        for i in range(self["num_ind_sub"].value + 1):
             yield EC3SpecificBoxSubstream(self, "sub[]")
 
 
@@ -920,6 +956,7 @@ class AVCDecoderConfigurationRecord(FieldSet):
             for i in range(self["numOfSequenceParameterSetExt"].value):
                 yield PascalString16(self, "sequenceParameterSetExtNALUnit[]")
 
+
 # ISO/IEC 14496-15:2014 5.4.2.1
 class MPEG4BitRateBox(FieldSet):
     def createFields(self):
@@ -927,9 +964,11 @@ class MPEG4BitRateBox(FieldSet):
         yield UInt32(self, "maxBitrate")
         yield UInt32(self, "avgBitrate")
 
+
 class AVCConfigurationBox(FieldSet):
     def createFields(self):
         yield AVCDecoderConfigurationRecord(self, "AVCConfig")
+
 
 # ISO/IEC 14496-12:2012 8.5.2.2
 def VisualSampleEntry(self):
@@ -949,6 +988,7 @@ def VisualSampleEntry(self):
     yield UInt16(self, "depth", "Bit depth of image")
     yield Int16(self, "unknown")
 
+
 def AudioSampleEntry(self):
     yield NullBytes(self, "reserved[]", 8)
     yield UInt16(self, "channels", "Number of audio channels")
@@ -956,6 +996,7 @@ def AudioSampleEntry(self):
     yield UInt16(self, "unknown")
     yield NullBytes(self, "reserved[]", 2)
     yield QTFloat32(self, "samplerate", "Sample rate in Hz")
+
 
 class SampleEntry(FieldSet):
 
@@ -985,6 +1026,7 @@ class SampleEntry(FieldSet):
             if size > 0:
                 yield RawBytes(self, "extra_data", size)
 
+
 # ISO/IEC 14496-12:2012 8.5.2
 class SampleDescription(FieldSet):
 
@@ -994,6 +1036,7 @@ class SampleDescription(FieldSet):
         yield UInt32(self, "count", description="Total entries in table")
         for i in range(self['count'].value):
             yield SampleEntry(self, "sample_entry[]")
+
 
 # ISO/IEC 14496-12:2012 8.6.2
 class SyncSampleTable(FieldSet):
@@ -1032,6 +1075,7 @@ class CompactSampleSizeTable(FieldSet):
         if self.current_size % 8 != 0:
             yield NullBits(self, "padding[]", 8 - (self.current_size % 8))
 
+
 # ISO/IEC 14496-12:2012 8.7.4
 class SampleToChunkTable(FieldSet):
 
@@ -1044,6 +1088,7 @@ class SampleToChunkTable(FieldSet):
             yield UInt32(self, "samples_per_chunk[]")
             yield UInt32(self, "sample_description_index[]")
 
+
 # ISO/IEC 14496-12:2012 8.12.1
 class ProtectionSchemeInfoBox(FieldSet):
     def createFields(self):
@@ -1053,10 +1098,12 @@ class ProtectionSchemeInfoBox(FieldSet):
         if not self.eof:
             yield Atom(self, "info")
 
+
 # ISO/IEC 14496-12:2012 8.12.2
 class OriginalFormatBox(FieldSet):
     def createFields(self):
         yield RawBytes(self, "data_format", 4)
+
 
 # ISO/IEC 14496-12:2012 8.12.5
 class SchemeTypeBox(FieldSet):
@@ -1068,10 +1115,12 @@ class SchemeTypeBox(FieldSet):
         if self["flags"].value & 0x1:
             yield CString(self, "scheme_uri")
 
+
 # ISO/IEC 14496-12:2012 8.12.6
 class SchemeInformationBox(FieldSet):
     def createFields(self):
         yield Atom(self, "scheme_specific_data")
+
 
 # ISO/IEC 14496-12:2012 8.16.3
 class SegmentIndexBoxReference(FieldSet):
@@ -1082,6 +1131,7 @@ class SegmentIndexBoxReference(FieldSet):
         yield Bit(self, "starts_with_SAP")
         yield Bits(self, "SAP_type", 3)
         yield Bits(self, "SAP_delta_time", 28)
+
 
 class SegmentIndexBox(FieldSet):
     def createFields(self):
@@ -1100,15 +1150,17 @@ class SegmentIndexBox(FieldSet):
         for i in range(self["reference_count"].value):
             yield SegmentIndexBoxReference(self, "reference[]")
 
+
 # ISO/IEC 23001-7:2016 7.2
 class SampleEncryptionItem(FieldSet):
     def createFields(self):
-        yield RawBytes(self, "IV", 8) # TODO: Per_Sample_IV_Size
+        yield RawBytes(self, "IV", 8)  # TODO: Per_Sample_IV_Size
         if self["../flags"].value & 0x2:
             yield UInt16(self, "subsample_count")
             for i in range(self["subsample_count"].value):
                 yield UInt16(self, "BytesOfClearData[]")
                 yield UInt32(self, "ByteOfProtectedData[]")
+
 
 class SampleEncryptionBox(FieldSet):
     def createFields(self):
@@ -1135,6 +1187,7 @@ class ProtectionSystemSpecificHeaderBox(FieldSet):
 
         yield UInt32(self, "DataSize")
         yield RawBytes(self, "Data", self["DataSize"].value)
+
 
 # ISO/IEC 23001-7:2016 8.2
 class TrackEncryptionBox(FieldSet):
