@@ -3,9 +3,9 @@ from hachoir.metadata.metadata import (registerExtractor,
                                        Metadata, RootMetadata, MultipleMetadata)
 from hachoir.metadata.metadata_item import QUALITY_GOOD
 from hachoir.metadata.safe import fault_tolerant
-from hachoir.parser.video import MovFile, AsfFile, FlvFile
+from hachoir.parser.video import AsfFile, FlvFile
 from hachoir.parser.video.asf import Descriptor as ASF_Descriptor
-from hachoir.parser.container import MkvFile
+from hachoir.parser.container import MkvFile, MP4File
 from hachoir.parser.container.mkv import dateToDatetime
 from hachoir.core.tools import makeUnicode, makePrintable, timedelta2seconds
 from datetime import timedelta
@@ -215,7 +215,7 @@ class FlvMetadata(MultipleMetadata):
             self.height = int(entry["value"].value)
 
 
-class MovMetadata(RootMetadata):
+class MP4Metadata(RootMetadata):
 
     def extract(self, mov):
         for atom in mov:
@@ -417,7 +417,7 @@ class AsfMetadata(MultipleMetadata):
 #                    meta.compression = text
 
 
-registerExtractor(MovFile, MovMetadata)
+registerExtractor(MP4File, MP4Metadata)
 registerExtractor(AsfFile, AsfMetadata)
 registerExtractor(FlvFile, FlvMetadata)
 registerExtractor(MkvFile, MkvMetadata)
