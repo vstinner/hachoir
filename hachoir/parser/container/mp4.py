@@ -850,7 +850,7 @@ class AVCDecoderConfigurationRecord(FieldSet):
             yield NullBits(self, "reserved[]", 5)
             yield Bits(self, "bit_depth_chroma_minus8", 3)
 
-            yield UBInt8(self, "numOfSequenceParameterSetExt")
+            yield UInt8(self, "numOfSequenceParameterSetExt")
             for i in range(self["numOfSequenceParameterSetExt"].value):
                 yield PascalString16(self, "sequenceParameterSetExtNALUnit[]")
 
@@ -1097,7 +1097,7 @@ class TrackEncryptionBox(FieldSet):
             yield NullBits(self, "reserved2", 8)
         else:
             yield Bits(self, "default_crypt_byte_block", 4)
-            yield BIts(self, "default_skip_byte_block", 4)
+            yield Bits(self, "default_skip_byte_block", 4)
         yield UInt8(self, "default_isProtected")
         yield UInt8(self, "default_Per_sample_IV_Size")
         yield RawBytes(self, "default_KID", 16)
