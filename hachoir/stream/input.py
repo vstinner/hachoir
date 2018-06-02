@@ -95,8 +95,8 @@ class FileFromInputStream:
             if size is None or max_size < size:
                 size = max_size
             if size <= 0:
-                return ''
-            data = '', ''
+                return b''
+            data = b'', b''
             self._offset = max(
                 0, self.stream._current_size // 8 + self._offset)
             self._from_end = False
