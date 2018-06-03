@@ -356,8 +356,8 @@ class ElfFile(HachoirParser, RootSeekableFieldSet):
 
         for index in range(self["header/shnum"].value):
             field = self["section_header[" + str(index) + "]"]
-            # skip NOBITS sections
             if field['size'].value != 0 and field['type'].value != 8:
+                # skip NOBITS sections
                 self.seekByte(field['LMA'].value, relative=False)
                 yield RawBytes(self, "section[" + str(index) + "]", field['size'].value)
 
