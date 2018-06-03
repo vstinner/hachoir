@@ -2,6 +2,15 @@
 Changelog
 +++++++++
 
+hachoir 3.0a4
+=============
+
+* Project renamed from Hachoir3 to Hachoir
+* GitHub project moved from https://github.com/vstinner/hachoir3
+  to https://github.com/vstinner/hachoir
+* Documentation moved from http://hachoir3.readthedocs.io/
+  to http://hachoir.readthedocs.io/
+
 hachoir 3.0a3
 =============
 

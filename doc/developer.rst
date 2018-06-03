@@ -1,17 +1,17 @@
-+++++++++++++++++++++++
-Hachoir3 for developers
-+++++++++++++++++++++++
+++++++++++++++++++++++
+Hachoir for developers
+++++++++++++++++++++++
 
 Download code and run tests
 ===========================
 
 To clone Git repository, type::
 
-    git clone https://github.com/vstinner/hachoir3
+    git clone https://github.com/vstinner/hachoir
 
-Enter hachoir3 directory::
+Enter hachoir directory::
 
-    cd hachoir3
+    cd hachoir
 
 To run tests, type tox::
 
@@ -21,7 +21,7 @@ If tox is not already installed, install tox::
 
     python3 -m pip install tox
 
-See also `Hachoir3 on the Travis CI <https://travis-ci.org/vstinner/hachoir3>`_.
+See also `Hachoir on the Travis CI <https://travis-ci.org/vstinner/hachoir>`_.
 
 
 Why using Hachoir parsers?

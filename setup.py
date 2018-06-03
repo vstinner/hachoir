@@ -8,7 +8,7 @@
 #  - run: git commit -a
 #  - run: git push
 #  - check Travis CI status:
-#    https://travis-ci.org/vstinner/hachoir3
+#    https://travis-ci.org/vstinner/hachoir
 #
 # Release a new version:
 #
@@ -18,7 +18,7 @@
 #  - run: python3 setup.py sdist bdist_wheel
 #  - FIXME: register? twine register dist/hachoir-x.y.z.tar.gz
 #  - twine upload dist/*
-#  - check http://pypi.python.org/pypi/hachoir3
+#  - check http://pypi.python.org/pypi/hachoir
 #
 # After the release:
 #

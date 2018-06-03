@@ -1,14 +1,14 @@
-++++++++++++++++
-Install Hachoir3
-++++++++++++++++
++++++++++++++
+Install Hachoir
++++++++++++++++
 
-To install Hachoir3, type::
+To install Hachoir, type::
 
-    python3 -m pip install -U hachoir3
+    python3 -m pip install -U hachoir
 
 For use hachoir-urwid, you will also need to install `urwid library
 <http://excess.org/urwid/>`_::
 
     python3 -m pip install -U urwid
 
-Hachoir3 requires Python 3.3 or newer.
+Hachoir requires Python 3.3 or newer.
