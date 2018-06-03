@@ -408,12 +408,17 @@ class ZipFile(Parser):
     }
 
     def validate(self):
-        if self["header[0]"].value != FileEntry.HEADER:
-            return "Invalid magic"
+        try:
+            if self["header[0]"].value != FileEntry.HEADER:
+                return "Invalid magic"
+        except Exception as err:
+            return "Unable to get header #0"
+
         try:
             file0 = self["file[0]"]
         except Exception as err:
             return "Unable to get file #0"
+
         err = file0.validate()
         if err:
             return "File #0: %s" % err
@@ -432,9 +437,13 @@ class ZipFile(Parser):
                         break
                     skipdelta = self.stream.searchBytes(b'PK', self.absolute_address + self.current_size + skip + 8)
                     if skipdelta is None:
+                        if not self.current_size:
+                            raise ParserError("Failed to find any zip headers")
                         return
                     skip = skipdelta - (self.absolute_address + self.current_size)
                 except ReadStreamError:
+                    if not self.current_size:
+                        raise ParserError("Failed to read stream")
                     return
             if skip:
                 yield RawBytes(self, "unparsed[]", skip // 8)
