@@ -437,7 +437,7 @@ class ZipFile(Parser):
                 except ReadStreamError:
                     return
             if skip:
-                yield RawBytes(self, "unparsed[]", skip//8)
+                yield RawBytes(self, "unparsed[]", skip // 8)
 
             yield textHandler(
                 UInt32(self, "header[]", "Header"), hexadecimal)
