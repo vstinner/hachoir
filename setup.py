@@ -3,9 +3,10 @@
 # Prepare a release:
 #
 #  - check version: hachoir/version.py and doc/conf.py
-#  - run tests: tox
 #  - set the release date: edit doc/changelog.rst
 #  - run: git commit -a
+#  - Remove untracked files/dirs: git clean -fdx
+#  - run tests: tox
 #  - run: git push
 #  - check Travis CI status:
 #    https://travis-ci.org/vstinner/hachoir
@@ -14,15 +15,12 @@
 #
 #  - run: git tag x.y.z
 #  - run: git push --tags
-#  - rm -rf dist/
+#  - Remove untracked files/dirs: git clean -fdx
 #  - run: python3 setup.py sdist bdist_wheel
-#  - FIXME: register? twine register dist/hachoir-x.y.z.tar.gz
 #  - twine upload dist/*
-#  - check http://pypi.python.org/pypi/hachoir
 #
 # After the release:
 #
-#  - update doc/install.rst
 #  - set version to N+1: hachoir/version.py and doc/conf.py
 
 from imp import load_source

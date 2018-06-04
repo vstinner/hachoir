@@ -2,8 +2,8 @@
 Changelog
 +++++++++
 
-hachoir 3.0a3
-=============
+hachoir 3.0a3 (2018-06-04)
+==========================
 
 Project renamed from Hachoir3 to Hachoir:
 
