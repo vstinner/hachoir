@@ -135,7 +135,7 @@ class EditableString(EditableField):
     def __init__(self, parent, name, *args, **kw):
         if len(args) == 2:
             value = args[1]
-            assert isinstance(value, str)  # TODO: support Unicode
+            assert isinstance(value, bytes)  # TODO: support Unicode
         elif not args:
             value = None
         else:
@@ -164,6 +164,7 @@ class EditableString(EditableField):
         size = len(value)
         if self._format in self.MAX_SIZE and self.MAX_SIZE[self._format] < size:
             raise ValueError("String is too big")
+        assert isinstance(value, bytes)
         self._value = value
 
     def _computeSize(self):

@@ -90,17 +90,17 @@ class MpegAudioInjecter(Injecter):
             if field.name.startswith("padding["):
                 data.append(field.value)
         if data:
-            return "".join(data)
+            return b"".join(data)
         else:
             return None
 
     def write(self, data):
         count = 30
         self.packet_size = 3
-        data = "\0" * (self.packet_size * count - 1)
+        data = b"\0" * (self.packet_size * count - 1)
         print("Packet size: %s" % self.packet_size)
         print("Check input message")
-        if "\xff" in data:
+        if b"\xff" in data:
             raise InjecterError(
                 "Sorry, MPEG audio injecter disallows 0xFF byte")
 
@@ -116,6 +116,7 @@ class MpegAudioInjecter(Injecter):
         output = self.frames
         while index < len(data):
             padding = data[index:index + self.packet_size]
+            print(index, index + self.packet_size, type(padding))
             name = "frame[%u]" % field_index
             print("Insert %s before %s" % (len(padding), name))
             output.insertAfter(name, EditableString(
@@ -158,6 +159,7 @@ def main():
         print("Write your message and valid with CTRL+D:")
         stdout.flush()
         data = stdin.read()
+        data = data.encode('utf-8')
 
         print("Hide message")
         injecter.write(data)
