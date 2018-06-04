@@ -96,6 +96,11 @@ def processFile(values, filename,
                 parser.error("Hachoir can't extract metadata, but is able to parse: %s"
                              % filename)
                 return False
+        else:
+            if values.type:
+                result = parser.description
+            else:
+                result = parser.mime_type
 
     if display:
         # Display metadatas on stdout
@@ -111,10 +116,7 @@ def processFile(values, filename,
                 for line in text:
                     print(makePrintable(line, charset))
         else:
-            if values.type:
-                text = parser.description
-            else:
-                text = parser.mime_type
+            text = result
             if display_filename:
                 text = "%s: %s" % (filename, text)
             print(text)
