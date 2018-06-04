@@ -70,8 +70,8 @@ class Metadata(Logger):
         >>> from datetime import timedelta
         >>> a = RootMetadata()
         >>> a.duration = timedelta(seconds=2300)
-        >>> a.get('duration')
-        datetime.timedelta(0, 2300)
+        >>> a.get('duration') == timedelta(seconds=2300)
+        True
         >>> a.get('author', 'Anonymous')
         'Anonymous'
         """
