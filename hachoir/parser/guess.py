@@ -8,7 +8,6 @@ from hachoir.core.error import warning, info
 from hachoir.parser import ValidateError, HachoirParserList
 from hachoir.stream import FileInputStream
 import weakref
-import collections
 
 
 class QueryParser(object):
@@ -51,7 +50,7 @@ class QueryParser(object):
         if tag is None:
             self.parsers.clear()
             return []
-        elif isinstance(tag, collections.Callable):
+        elif callable(tag):
             parsers = [parser for parser in self.parsers if tag(parser)]
             for parser in parsers:
                 self.parsers.remove(parser)

@@ -1,6 +1,5 @@
 from hachoir.field import Field, FieldSet, ParserError, Bytes, MissingField
 from hachoir.stream import FragmentedStream
-import collections
 
 
 class Link(Field):
@@ -71,7 +70,7 @@ class Fragment(FieldSet):
 
     def _getNext(self):
         next = self._feedLinks()._next
-        if isinstance(next, collections.Callable):
+        if callable(next):
             self._next = next = next()
         return next
     next = property(_getNext)

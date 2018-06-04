@@ -17,7 +17,6 @@ from hachoir.core.tools import humanDatetime
 from hachoir.core.text_handler import textHandler, hexadecimal
 from hachoir.parser.container.ogg import XiphInt
 from datetime import datetime, timedelta
-import collections
 
 
 class RawInt(GenericInteger):
@@ -584,7 +583,7 @@ class EBML(FieldSet):
         yield RawInt(self, 'id')
         yield Unsigned(self, 'size')
         for val in self.val[1:]:
-            if isinstance(val, collections.Callable):
+            if callable(val):
                 yield val(self)
             else:
                 while not self.eof:

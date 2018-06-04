@@ -14,7 +14,6 @@ from hachoir.field import (StaticFieldSet, FieldSet,
 from hachoir.core.text_handler import textHandler, filesizeHandler, hexadecimal
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.parser.common.msdos import MSDOSFileAttr32
-import collections
 
 MAX_FILESIZE = 1000 * 1024 * 1024
 
@@ -284,7 +283,7 @@ class Block(FieldSet):
         if t in self.BLOCK_INFO:
             self._name, desc, parseFlags, parseHeader, parseBody = self.BLOCK_INFO[
                 t]
-            if isinstance(desc, collections.Callable):
+            if callable(desc):
                 self.createDescription = lambda: desc(self)
             elif desc:
                 self._description = desc

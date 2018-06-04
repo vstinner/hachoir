@@ -13,7 +13,6 @@ from hachoir.field import (FieldSet,
                            RawBytes, String, GenericVector, ParserError)
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal
-import collections
 
 MAX_ENVPOINTS = 32
 
@@ -283,7 +282,7 @@ class ModplugBlock(FieldSet):
         self.has_size = False
         if t in self.BLOCK_INFO:
             self._name, self.has_size, desc, parseBlock = self.BLOCK_INFO[t]
-            if isinstance(desc, collections.Callable):
+            if callable(desc):
                 self.createDescription = lambda: desc(self)
             if parseBlock:
                 self.parseBlock = lambda: parseBlock(self)
