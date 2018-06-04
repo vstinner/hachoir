@@ -6,18 +6,13 @@ TODO
 ====
 
 * Fix hachoir-subfile: hachoir.regex only supports Unicode?
-* Remove old files? See MANIFEST.in for the list of "IGNORED files"
 * Write more tests:
 
   - use coverage to check which parsers are never tested
   - write tests for hachoir-subfile
 
-* Rename Dict.iteritems()
-* wxPython doesn't support Python3 on Fedora
 * convert all methods names to PEP8!!!
 * test hachoir-gtk
-* test hachoir-http
-* convert remaining wiki pages
 
 
 subfile
@@ -44,10 +39,3 @@ Compute content size
 
  * gzip: need to decompress flow (deflate using zlib)
  * bzip2: need to decompress flow
-
-Ideas
-^^^^^
-
-Use http://www.gnu.org/software/gperf/ (GNU perfect hash function generator)
-for faster pattern recognition?
-
