@@ -1,11 +1,16 @@
 import wx
 
 
+MAXITEMS = 1000
+
+
 class FieldNodeData(object):
     def __init__(self, field):
         self.field = field
-        self.enumerated = False
         self.child_map = {}
+        self.enumerated = False
+        self.seen = set()
+        self.limit = MAXITEMS
 
 
 class tree_view_t(wx.TreeCtrl):
@@ -34,29 +39,58 @@ class tree_view_t(wx.TreeCtrl):
         self.AppendItem(node, "loading...")
         self.SetItemData(node, FieldNodeData(field))
 
-    def enumerate_node(self, node, field):
-        self.DeleteChildren(node)
+    def enumerate_node(self, node, target=None, extend=0):
         data = self.GetItemData(node)
-        data.field = field
-        for child in field:
+        if data.enumerated:
+            return
+
+        if target in data.seen:
+            target = None
+
+        n = len(data.seen)
+        data.limit = max(n, data.limit + extend)
+        if n == data.limit and not target:
+            return
+
+        # remove placeholder ("more..." or "loading...")
+        self.Delete(self.GetLastChild(node))
+
+        i = 0
+        while 1:
+            try:
+                child = data.field[n + i]
+            except Exception:
+                # save memory
+                data.limit = None
+                data.seen = None
+                data.enumerated = True
+                return
+
             if child.is_field_set:
                 childnode = self.AppendItem(node, child.name)
                 data.child_map[child.name] = childnode
                 self.setup_new_node(childnode, child)
-        data.enumerated = True
+
+            i += 1
+            data.seen.add(child.name)
+            if (not target or target == child.name) and len(data.seen) >= data.limit:
+                self.AppendItem(node, "more...")
+                break
 
     def find_node(self, field):
         path = field.path
-        curfield = field['/']
         curnode = self.root
-        for seg in path.split('/'):
+        segs = path.split('/')
+        for i, seg in enumerate(segs):
             if seg:
-                curfield = curfield[seg]
                 curnode = self.GetItemData(curnode).child_map[seg]
-            data = self.GetItemData(curnode)
-            if data.enumerated:
-                continue
-            self.enumerate_node(curnode, curfield)
+
+            if i < len(segs) - 1:
+                nextseg = segs[i + 1]
+            else:
+                nextseg = None
+
+            self.enumerate_node(curnode, nextseg)
         return curnode
 
     def update_root_name(self):
@@ -64,12 +98,17 @@ class tree_view_t(wx.TreeCtrl):
             self.SetItemText(self.root, self.filename)
 
     def OnExpand(self, event):
-        data = self.GetItemData(event.Item)
-        if not data.enumerated:
-            self.enumerate_node(event.Item, data.field)
+        self.enumerate_node(event.Item)
 
     def OnActivate(self, event):
         data = self.GetItemData(event.Item)
+        if not data:
+            # clicked on a "more..." item
+            node = self.GetItemParent(event.Item)
+            self.SetFocusedItem(self.GetPrevSibling(event.Item))
+            self.enumerate_node(node, extend=MAXITEMS)
+            self.SetFocusedItem(self.GetNextSibling(self.GetFocusedItem()))
+            return
         self.dispatcher.trigger('field_activated', data.field)
 
     # --- dispatcher events ---
@@ -84,6 +123,7 @@ class tree_view_t(wx.TreeCtrl):
 
     def on_field_activated(self, dispatcher, field):
         self.cur_field = field
+        self.GetItemData(self.root).field = field['/']
         node = self.find_node(field)
         self.Expand(node)
         self.SelectItem(node)
