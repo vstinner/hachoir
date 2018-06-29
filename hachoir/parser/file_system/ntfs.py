@@ -292,7 +292,7 @@ class File(FieldSet):
 
     def createFields(self):
         yield Bytes(self, "signature", 4, "Usually the magic is 'FILE'")
-        yield UInt16(self, "usa_ofs", "Update Sequence Array offset")
+        yield UInt16(self, "usa_offset", "Update Sequence Array offset")
         yield UInt16(self, "usa_count", "Update Sequence Array count")
         yield UInt64(self, "lsn", "$LogFile sequence number for this record")
         yield UInt16(self, "sequence_number", "Number of times this mft record has been reused")
@@ -307,6 +307,15 @@ class File(FieldSet):
         # The below fields are specific to NTFS 3.1+ (Windows XP and above)
         yield NullBytes(self, "reserved", 2)
         yield UInt32(self, "mft_record_number", "Number of this mft record")
+
+        if self["usa_offset"].value:
+            padding = self.seekByte(self["usa_offset"].value, relative=True)
+            if padding:
+                yield padding
+
+            yield UInt16(self, "usa_number")
+            for i in range(self["usa_count"].value):
+                yield UInt16(self, "usa_value[]")
 
         padding = self.seekByte(self["attrs_offset"].value, relative=True)
         if padding:
