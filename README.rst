@@ -35,7 +35,7 @@ Command line tools using Hachoir parsers:
 * hachoir-strip: modify a file to remove metadata
 * hachoir-urwid: display the content of a binary file in text mode
 
-Installation instructions: https://github.com/vstinner/hachoir/blob/master/doc/install.rst
+Installation instructions: http://hachoir.readthedocs.io/en/latest/install.html
 
 Hachoir is written for Python 3.3+, it uses the new ``yield from`` syntax.
 For Python 2, see the old `Hachoir project on Bitbucket
