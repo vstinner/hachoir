@@ -349,3 +349,12 @@ Lazy methods:
 * __iter__(): iterate over children
 * createFields(): main function of the parser, create the fields. Don't call
   this function directly.
+
+Log
+===
+
+Change Hachoir verbosity, make Hachoir quiet::
+
+   from hachoir.core import config
+   config.quiet = True
+
