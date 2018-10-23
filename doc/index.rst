@@ -19,8 +19,8 @@ Command line tools using Hachoir parsers:
 * :ref:`hachoir-grep <grep>`: find a text pattern in a binary file
 * :ref:`hachoir-strip <strip>`: modify a file to remove metadata
 
-See also `Hachoir at Bitbucket <https://bitbucket.org/vstinner/hachoir/>`_:
-original Hachoir for Python 2.
+.. image:: images/urwid.png
+   :alt: hachoir-urwid screenshot (MP3 audio file)
 
 
 User Guide

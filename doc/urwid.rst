@@ -11,8 +11,11 @@ your files. With direction keys, you can navigate in the field tree. The key
 useful when you would like to compare hexadecimal data and Hachoir
 reprensentation.
 
-**hachoir-urwid** is the most sexy user interface based on hachoir.parser to
+**hachoir-urwid** is the most user friendly interface based on Hachoir to
 explore a binary file.
+
+.. image:: images/urwid.png
+   :alt: hachoir-urwid screenshot (MP3 audio file)
 
 Command line options
 ====================
