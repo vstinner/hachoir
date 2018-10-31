@@ -248,7 +248,7 @@ class GenericString(Bytes):
                 self.warning(
                     "Fix truncated %s string: add missing nul byte" % self._charset)
                 return text
-            except UnicodeDecodeError as err:
+            except UnicodeDecodeError:
                 pass
 
         # On error, use FALLBACK_CHARSET

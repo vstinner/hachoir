@@ -411,12 +411,12 @@ class ZipFile(Parser):
         try:
             if self["header[0]"].value != FileEntry.HEADER:
                 return "Invalid magic"
-        except Exception as err:
+        except Exception:
             return "Unable to get header #0"
 
         try:
             file0 = self["file[0]"]
-        except Exception as err:
+        except Exception:
             return "Unable to get file #0"
 
         err = file0.validate()
