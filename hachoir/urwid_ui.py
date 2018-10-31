@@ -711,7 +711,10 @@ def exploreFieldSet(field_set, args, options={}):
                         _resize += txt.rows(size[:1])
                     if log.height < _resize and (resize is None or resize < _resize):
                         resize = _resize
-                    log.set_focus(len(msgs[1]) - 1)
+                    try:
+                        log.set_focus(len(msgs[1]) - 1)
+                    except IndexError:
+                        pass
                     sep.set_info(*tuple(log_count))
                     msgs[0] = []
                 if resize is not None:
