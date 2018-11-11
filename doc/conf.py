@@ -23,7 +23,15 @@ import sys, os
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = []
+extensions = [
+    # Auto-generate documentation from code.
+    'sphinx.ext.autodoc',
+    # Convert Google or numpy-style docstrings to rst.
+    'sphinx.ext.napoleon',
+]
+
+# Augment sys.path to allow project module import.
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -84,6 +92,11 @@ pygments_style = 'sphinx'
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 
+
+# -- Options for Napoleon ----------------------------------------------------
+napoleon_include_init_with_doc = True
+# Include documentation for any special members that have a docstring.
+napoleon_include_special_with_doc = True
 
 # -- Options for HTML output ---------------------------------------------------
 

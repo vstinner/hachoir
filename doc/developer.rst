@@ -257,49 +257,8 @@ To create your own type, you can use:
 Field class
 ===========
 
-Read only attributes:
-
-* name (str): Name of the field, is unique in parent field set
-* address (long): address in bits relative to parent address
-* absolute_address (long): address in bits relative to input stream
-* parent (GenericFieldSet): parent field (is a field set)
-* is_field_set (bool) <~~~ can be replaced: the field contains other fields?
-* index (int): index of the field in parent field set (first index is 0)
-
-Read only and lazy attributes:
-
-* size (long), cached: size of the field in bits
-* description (str|unicode), cached: informal description
-* display (unicode): value with human representation as unicode string
-* raw_display (unicode): value with raw representation as unicode string
-* path (str): concatenation with slash separator of all field name from
-  the root field
-
-Method that can be replaced:
-
-* createDescription(): create value of 'description' attribute
-* createValue(): create value of 'value' attribute
-* createDisplay(): create value of 'display' attribute
-* _createInputStream(): create an InputStream containing the field content
-
-Aliases (method):
-
-* __str__() <=> read display attribute
-* __unicode__() <=> read display attribute
-* __getitem__(key): alias to getField(key, False)
-
-Other methods:
-
-* static_size: helper to compute field size. If the value is an integer, the
-  type has constant size. If it's a function, the size depends of the arguments.
-* hasValue(): check if the field has a value or not (default: self.value is not None)
-* getField(key, const=True): get the field with specified key,
-  if const is True the field set will not be changed
-* __contains__(key)
-* getSubIStream(): return a tagged InputStream containing the field content
-* setSubIStream(): helper to replace _createInputStream (the old one is passed
-  to the new one to allow chaining)
-
+.. autoclass:: hachoir.field.field.Field
+   :members:
 
 Field set class
 ===============
