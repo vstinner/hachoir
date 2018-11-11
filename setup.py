@@ -83,6 +83,11 @@ def main():
         "packages": find_packages(),
         "package_data": {"hachoir.wx.resource": ['hachoir_wx.xrc']},
         "entry_points": ENTRY_POINTS,
+        "extras_require": {
+            "urwid": [
+                "urwid==1.3.1"
+            ]
+        },
         "zip_safe": True,
     }
     setup(**install_options)
