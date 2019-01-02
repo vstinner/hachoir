@@ -159,6 +159,10 @@ class ObjectValue(FieldSet):
         if isinstance(classDesc, SerializedProxyClassDesc):
             return
 
+        if classDesc['classDescFlags_externalizable'].value:
+            yield WriteObjectContents(self, "external[]", "%s.writeExternal() output" % classDesc['className'].value)
+            return
+
         for fieldDesc in classDesc.array('fieldDesc'):
             tc = fieldDesc['typecode'].value
             klass = VALUE_CLASS_MAP[tc]
