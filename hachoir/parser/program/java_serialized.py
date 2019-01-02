@@ -152,10 +152,12 @@ class ObjectValue(FieldSet):
             classDesc = classDesc.referent
         if isinstance(classDesc, SerializedNull):
             return
-        # TODO: proxy class desc
 
         for field in self.gen_values(classDesc['superClassDesc']):
             yield field
+
+        if isinstance(classDesc, SerializedProxyClassDesc):
+            return
 
         for fieldDesc in classDesc.array('fieldDesc'):
             tc = fieldDesc['typecode'].value
@@ -325,7 +327,17 @@ class SerializedProxyClassDesc(FieldSet):
 
     def createFields(self):
         yield Enum(UInt8(self, "typecode"), TYPECODE_NAMES)
-        # TODO
+
+        self.root.newHandle(self)
+        yield Int32(self, "proxyInterfaceName_count")
+        for i in range(self['proxyInterfaceName_count'].value):
+            yield PascalString16(self, "proxyInterfaceName[]", charset="UTF-8")
+        yield ClassAnnotation(self, "classAnnotation")
+        yield SerializedContent(self, "superClassDesc")
+
+    @property
+    def className(self):
+        return '<Proxy implements %s>' % (', '.join(v.value for v in self.array('proxyInterfaceName')))
 
 
 class SerializedEnum(FieldSet):
