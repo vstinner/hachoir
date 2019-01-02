@@ -829,6 +829,13 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "ifd[0]/value[4]", 'Canon')
         self.checkValue(parser, "ifd[0]/value[5]", 'Canon EOS REBEL T5i')
 
+    def test_tga(self):
+        parser = self.parse("32bpp.tga")
+        self.checkValue(parser, "/width", 800)
+        self.checkValue(parser, "/height", 600)
+        self.checkValue(parser, "/bpp", 32)
+        self.checkDisplay(parser, "/codec", "True-color RLE")
+
 
 class TestParserRandomStream(unittest.TestCase):
 
