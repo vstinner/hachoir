@@ -7,7 +7,7 @@ from shutil import copyfileobj
 
 
 def field_index(field_set, field):
-    return field_set._fields.index(field._getName())
+    return field_set._fields.index(field.name)
 
 
 def field_from_index(field_set, index):
@@ -22,7 +22,7 @@ def can_convert(from_field, to_type):
     if has_static_size(from_field) and has_static_size(to_type):
         return from_field.static_size == to_type.static_size
     elif has_static_size(to_type):
-        return from_field._getSize() == to_type.static_size
+        return from_field.size == to_type.static_size
     else:
         return False
 
@@ -33,11 +33,11 @@ def field_type_name(field):
 
 def convert_size(from_field, to_type):
     if not(('Byte' in field_type_name(from_field)) ^ ('Byte' in to_type.__name__)):
-        return from_field._getSize()
+        return from_field.size
     elif 'Byte' in field_type_name(from_field):
-        return from_field._getSize() * 8
+        return from_field.size * 8
     else:
-        return from_field._getSize() // 8
+        return from_field.size // 8
 
 
 def save_substream_to_disk(field, dest_path):

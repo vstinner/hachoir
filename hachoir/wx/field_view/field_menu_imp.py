@@ -45,6 +45,6 @@ class field_menu_imp_t:
         self.dispatcher.trigger('field_open_window_here', self.selected)
 
     def on_dump_to_disk(self, event):
-        dump_path = self.view.ask_for_dump_file('Dump "' + self.selected._getPath() + '" To Disk...')
+        dump_path = self.view.ask_for_dump_file('Dump "' + self.selected.path + '" To Disk...')
         if dump_path is not None:
             save_substream_to_disk(self.selected, dump_path)

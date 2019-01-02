@@ -11,7 +11,7 @@ class frame_view_imp_t:
         self.filename = filename
 
     def format_title(self, field):
-        field_path = field._getPath()
+        field_path = field.path
         return self.filename + '/' + field_path[1:]
 
     def on_field_activated(self, dispatcher, field):

@@ -20,7 +20,7 @@ def format_data(field):
 
 
 def format_name(field):
-    name = field._getName()
+    name = field.name
     if field.is_field_set:
         name += '/'
 
