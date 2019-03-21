@@ -2,6 +2,23 @@
 Changelog
 +++++++++
 
+hachoir 3.0a4 (2019-03-21)
+==========================
+
+* Issue #36: Hachoir now requires Python 3.6 or newer.
+* Add "pip install hachoir[urwid]" extra dependency for hachoir-urwi
+* wx: Implement tree view lazy-loading.
+* enhance the documentation
+* urwid: ignore set_focus() error
+* Generate `Field` docs from soure code.
+* ntfs: parse update sequence array.
+* zip: use magic to identify files.
+* elf: reduce duplication of MAGIC
+* fat: handle the common case where root_start = 2 more gracefully
+* tga: Support 32-bit images. Fixes #39.
+* java_serialized: Support serialized proxy classes.
+* java_serialized: fix support for Externalizable classes
+
 hachoir 3.0a3 (2018-06-04)
 ==========================
 
