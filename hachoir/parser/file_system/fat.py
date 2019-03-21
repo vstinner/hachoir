@@ -316,11 +316,11 @@ class InodeGen:
             error("(FAT) address %u doesn't point to a padding field" % address)
             return
         if last:
-            next = None
+            link_next = None
         else:
-            def next():
+            def link_next():
                 return self(field)
-        field.setLinks(prev.first, next)
+        field.setLinks(prev.first, link_next)
         self.root.writeFieldsIn(padding, address, (field,))
         return field
 
