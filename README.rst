@@ -37,6 +37,4 @@ Command line tools using Hachoir parsers:
 
 Installation instructions: http://hachoir.readthedocs.io/en/latest/install.html
 
-Hachoir is written for Python 3.3+, it uses the new ``yield from`` syntax.
-For Python 2, see the old `Hachoir project on Bitbucket
-<https://bitbucket.org/vstinner/hachoir>`_.
+Hachoir is written for Python 3.6 or newer.

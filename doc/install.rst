@@ -16,4 +16,4 @@ To use hachoir-wx, you will also need to install `wxPython
 
     python3 -m pip install -U wxPython
 
-Hachoir requires Python 3.3 or newer.
+Hachoir requires Python 3.6 or newer.
