@@ -71,6 +71,23 @@ class TestMetadata(unittest.TestCase):
 
         self.assertEqual(required_meta, meta)
 
+    def test_plaintext_output(self):
+        expected_plaintext = [['Video stream:',
+                               '- Language: French',
+                               '- Image width: 384 pixels',
+                               '- Image height: 288 pixels',
+                               '- Compression: V_MPEG4/ISO/AVC'],
+                              ['Audio stream:',
+                               '- Title: travail = aliénation (extrait)',
+                               '- Language: French',
+                               '- Channel: mono',
+                               '- Sample rate: 44.1 kHz',
+                               '- Compression: A_VORBIS']]
+        with createParser(os.path.join(DATADIR, "flashmob.mkv")) as parser:
+            extractor = extractMetadata(parser)
+        groups = [g.exportPlaintext() for g in extractor.iterGroups()]
+        self.assertEqual(groups, expected_plaintext)
+
     def check_attr(self, metadata, name, value):
         if self.verbose:
             sys.stdout.write("  - Check metadata %s=%s: " %
