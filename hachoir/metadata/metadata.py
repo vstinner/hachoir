@@ -243,7 +243,7 @@ class MultipleMetadata(RootMetadata):
         return self.__groups[key]
 
     def iterGroups(self):
-        return iter(self.__groups.values())
+        return iter(self.__groups.values)
 
     def __bool__(self):
         if RootMetadata.__bool__(self):
