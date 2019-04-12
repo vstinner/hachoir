@@ -10,13 +10,13 @@
 #  - run: git push
 #  - check Travis CI status:
 #    https://travis-ci.org/vstinner/hachoir
+#  - run: git tag x.y.z
+#  - Remove untracked files/dirs: git clean -fdx
+#  - run: python3 setup.py sdist bdist_wheel
 #
 # Release a new version:
 #
-#  - run: git tag x.y.z
-#  - run: git push --tags
-#  - Remove untracked files/dirs: git clean -fdx
-#  - run: python3 setup.py sdist bdist_wheel
+#  - git push --tags
 #  - twine upload dist/*
 #
 # After the release:
