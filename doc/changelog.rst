@@ -2,6 +2,12 @@
 Changelog
 +++++++++
 
+hachoir 3.0a5 (2019-04-12)
+==========================
+
+* metadata: Fix for calling ``Dict.values`` property from
+  ``MultipleMetadata.iterGroups`` method.
+
 hachoir 3.0a4 (2019-03-21)
 ==========================
 
