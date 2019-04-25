@@ -32,7 +32,7 @@ ENTRY_POINTS = {
         "hachoir-grep = hachoir.grep:main",
         "hachoir-metadata = hachoir.metadata.main:main",
         "hachoir-strip = hachoir.strip:main",
-        "hachoir-urwid = hachoir.urwid_ui:main"
+        "hachoir-urwid = hachoir.urwid:main"
     ],
     'gui_scripts': [
         "hachoir-wx = hachoir.wx.main:main"

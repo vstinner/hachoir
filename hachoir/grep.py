@@ -190,3 +190,7 @@ def main():
     except KeyboardInterrupt:
         print("Program interrupted (CTRL+C).")
         sys.exit(1)
+
+
+if __name__ == '__main__':
+    main()

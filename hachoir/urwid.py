@@ -834,3 +834,7 @@ def main():
                 "display_size": values.display_size,
                 "display_value": values.display_value,
             })
+
+
+if __name__ == "__main__":
+    main()
