@@ -297,7 +297,7 @@ class TestMetadata(unittest.TestCase):
         meta = self.extract("matrix_ping_pong.wmv")
         self.check_attr(meta, "title", "欽ちゃん＆香取慎吾の全日本仮装大賞")
         self.check_attr(meta, "duration", timedelta(
-            minutes=1, seconds=47, milliseconds=258))
+            minutes=1, seconds=43, milliseconds=900))
         self.check_attr(meta, "creation_date", datetime(
             2003, 6, 16, 7, 57, 23, 235000))
         self.check_attr(meta, "audio[1]/sample_rate", 8000)
