@@ -384,7 +384,7 @@ class AsfMetadata(MultipleMetadata):
     @fault_tolerant
     def useFileProp(self, prop, is_vbr):
         self.creation_date = prop["creation_date"].value
-        self.duration = prop["play_duration"].value
+        self.duration = prop["play_duration"].value - prop["preroll"].value
         if prop["seekable"].value:
             self.comment = "Is seekable"
         value = prop["max_bitrate"].value
