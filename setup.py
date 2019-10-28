@@ -10,18 +10,18 @@
 #  - run: git push
 #  - check Travis CI status:
 #    https://travis-ci.org/vstinner/hachoir
-#  - run: git tag x.y.z
-#  - Remove untracked files/dirs: git clean -fdx
-#  - run: python3 setup.py sdist bdist_wheel
 #
 # Release a new version:
 #
+#  - git tag x.y.z
+#  - git clean -fdx  # Remove untracked files/dirs
+#  - python3 setup.py sdist bdist_wheel
 #  - git push --tags
 #  - twine upload dist/*
 #
 # After the release:
 #
-#  - set version to N+1: hachoir/__version__.py and doc/conf.py
+#  - set version to N+1: hachoir/__init__.py and doc/conf.py
 
 ENTRY_POINTS = {
     'console_scripts': [
