@@ -65,21 +65,21 @@ CLASSIFIERS = [
 def main():
     from setuptools import setup
 
-    hachoir = load_source("version", path.join("hachoir", "version.py"))
+    import hachoir
 
     readme = open('README.rst')
     long_description = readme.read()
     readme.close()
 
     install_options = {
-        "name": hachoir.PACKAGE,
-        "version": hachoir.VERSION,
-        "url": hachoir.WEBSITE,
+        "name": "hachoir",
+        "version": hachoir.__version__,
+        "url": 'http://hachoir.readthedocs.io/',
         "author": "Hachoir team (see AUTHORS file)",
         "description": "Package of Hachoir parsers used to open binary files",
         "long_description": long_description,
         "classifiers": CLASSIFIERS,
-        "license": hachoir.LICENSE,
+        "license": 'GNU GPL v2',
         "packages": find_packages(),
         "package_data": {"hachoir.wx.resource": ['hachoir_wx.xrc']},
         "entry_points": ENTRY_POINTS,

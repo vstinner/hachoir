@@ -2,6 +2,13 @@
 Changelog
 +++++++++
 
+hachoir 3.1.0 (2019-10-28)
+==========================
+
+* Add __main__ submodule to urwid, metadata, strip, wx.  It's now possible to
+  run ``python3 -m hachoir.metadata filename`` for example.
+* Remove hachoir.version submodule; add hachoir.VERSION constant.
+
 hachoir 3.0a5 (2019-04-12)
 ==========================
 
