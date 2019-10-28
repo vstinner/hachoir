@@ -23,10 +23,6 @@
 #
 #  - set version to N+1: hachoir/version.py and doc/conf.py
 
-from imp import load_source
-from os import path
-from setuptools import find_packages
-
 ENTRY_POINTS = {
     'console_scripts': [
         "hachoir-grep = hachoir.grep:main",
@@ -64,6 +60,7 @@ CLASSIFIERS = [
 
 def main():
     from setuptools import setup
+    from setuptools import find_packages
 
     import hachoir
 

@@ -1,13 +1,12 @@
 from optparse import OptionGroup
 from hachoir.core.log import log
-from hachoir import version
+from hachoir import __version__
 import hachoir.core.config as config
 import sys
 
 
 def displayVersion(*args):
-    print("Hachoir version %s" % version.VERSION)
-    print("Website: %s" % version.WEBSITE)
+    print("Hachoir version %s" % __version__)
     sys.exit(0)
 
 
