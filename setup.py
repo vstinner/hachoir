@@ -2,7 +2,7 @@
 #
 # Prepare a release:
 #
-#  - check version: hachoir/version.py and doc/conf.py
+#  - check version: hachoir/__init__.py and doc/conf.py
 #  - set the release date: edit doc/changelog.rst
 #  - run: git commit -a
 #  - Remove untracked files/dirs: git clean -fdx
@@ -21,7 +21,7 @@
 #
 # After the release:
 #
-#  - set version to N+1: hachoir/version.py and doc/conf.py
+#  - set version to N+1: hachoir/__version__.py and doc/conf.py
 
 ENTRY_POINTS = {
     'console_scripts': [
