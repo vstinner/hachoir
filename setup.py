@@ -6,7 +6,7 @@
 #  - set the release date: edit doc/changelog.rst
 #  - run: git commit -a
 #  - Remove untracked files/dirs: git clean -fdx
-#  - run tests: tox
+#  - run tests: tox --parallel auto
 #  - run: git push
 #  - check Travis CI status:
 #    https://travis-ci.org/vstinner/hachoir

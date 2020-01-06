@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from hachoir.wx.app import app_t
-from hachoir.version import PACKAGE, VERSION, WEBSITE
+from hachoir import __version__
 from hachoir.core.cmd_line import getHachoirOptions, configureHachoir
 from optparse import OptionParser
 import sys
@@ -24,8 +24,7 @@ def parseOptions():
 
 
 def main():
-    print("%s version %s" % (PACKAGE, VERSION))
-    print(WEBSITE)
+    print("hachoir version %s" % __version__)
     print()
     values, filename = parseOptions()
     configureHachoir(values)
