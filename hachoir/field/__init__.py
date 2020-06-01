@@ -34,7 +34,8 @@ from hachoir.field.vector import GenericVector, UserVector  # noqa
 
 # Complex types
 from hachoir.field.float import Float32, Float64, Float80  # noqa
-from hachoir.field.timestamp import (GenericTimestamp,  # noqa
+from hachoir.field.timestamp import (  # noqa
+    GenericTimestamp,
     TimestampUnix32, TimestampUnix64, TimestampMac32, TimestampUUID60,
     TimestampWin64, TimedeltaMillisWin64,
     DateTimeMSDOS32, TimeDateMSDOS32, TimedeltaWin64)
