@@ -392,7 +392,7 @@ class CrossReferenceTable(FieldSet):
         FieldSet.__init__(self, parent, name, description=desc)
         pos = self.stream.searchBytesLength(Trailer.MAGIC, False)
         if pos is None:
-            raise ParserError("Can't find '%s' starting at %u"
+            raise ParserError("Can't find '%s' starting at %u" %
                               (Trailer.MAGIC, self.absolute_address // 8))
         self._size = 8 * pos - self.absolute_address
 
