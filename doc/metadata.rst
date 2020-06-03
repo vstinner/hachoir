@@ -141,25 +141,6 @@ Command line options
 ====================
 
 Modes --mime and --type
-=======================
-
-Option --mime ask to just display file MIME type (works like UNIX
-"file --mime" program)::
-
-    $ hachoir-metadata --mime logo-Kubuntu.png sheep_on_drugs.mp3 wormux_32x32_16c.ico
-    logo-Kubuntu.png: image/png
-    sheep_on_drugs.mp3: audio/mpeg
-    wormux_32x32_16c.ico: image/x-ico
-
-Option --file display short description of file type (works like
-UNIX "file" program)::
-
-    $ hachoir-metadata --type logo-Kubuntu.png sheep_on_drugs.mp3 wormux_32x32_16c.ico
-    logo-Kubuntu.png: PNG picture: 331x90x8 (alpha layer)
-    sheep_on_drugs.mp3: MPEG v1 layer III, 128.0 Kbit/sec, 44.1 KHz, Joint stereo
-    wormux_32x32_16c.ico: Microsoft Windows icon: 16x16x32
-
-Modes --mime and --type
 -----------------------
 
 Option ``--mime`` ask to just display file MIME type::
@@ -171,7 +152,7 @@ Option ``--mime`` ask to just display file MIME type::
 
 (it works like UNIX "file --mime" program)
 
-Option ``--file`` display short description of file type::
+Option ``--type`` display short description of file type::
 
     $ hachoir-metadata --type logo-Kubuntu.png sheep_on_drugs.mp3 wormux_32x32_16c.ico
     logo-Kubuntu.png: PNG picture: 331x90x8 (alpha layer)
