@@ -21,7 +21,7 @@ def displayParserList(*args):
     sys.exit(0)
 
 
-def parseOptions():
+def parseOptions(args):
     parser = OptionParser(usage="%prog [options] files")
     parser.add_option("--type", help="Only display file type (description)",
                       action="store_true", default=False)
@@ -32,6 +32,8 @@ def parseOptions():
                       action="store", default="9", type="choice",
                       choices=[str(choice) for choice in range(1, 9 + 1)])
     parser.add_option("--raw", help="Raw output",
+                      action="store_true", default=False)
+    parser.add_option("--get-dict", help="Raw output",
                       action="store_true", default=False)
     parser.add_option("--bench", help="Run benchmark",
                       action="store_true", default=False)
@@ -52,7 +54,7 @@ def parseOptions():
     parser.add_option("--debug", help="Debug mode",
                       default=False, action="store_true")
 
-    values, filename = parser.parse_args()
+    values, filename = parser.parse_args(args=args)
     if len(filename) == 0:
         parser.print_help()
         sys.exit(1)
@@ -102,6 +104,9 @@ def processFile(values, filename,
             else:
                 result = parser.mime_type
 
+    if values.get_dict:
+        config.RESULT_DICTS.append(metadata.exportDictionary(priority=priority, human=human))
+    
     if display:
         # Display metadatas on stdout
         if extract_metadata:
@@ -144,10 +149,10 @@ def profile(values, filenames):
     return runProfiler(processFiles, (values, filenames), {'display': False})
 
 
-def main():
+def main(args=None):
     try:
         # Parser options and initialize Hachoir
-        values, filenames = parseOptions()
+        values, filenames = parseOptions(args)
 
         if values.debug:
             hachoir_config.debug = True
@@ -160,6 +165,10 @@ def main():
             ok = profile(values, filenames)
         elif values.bench:
             ok = benchmarkMetadata(values, filenames)
+        elif values.get_dict:
+            config.RESULT_DICTS = []
+            ok = processFiles(values, filenames, display=False)
+            return config.RESULT_DICTS
         else:
             ok = processFiles(values, filenames)
     except KeyboardInterrupt:
