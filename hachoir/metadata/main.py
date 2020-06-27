@@ -106,7 +106,7 @@ def processFile(values, filename,
 
     if values.get_dict:
         config.RESULT_DICTS.append(metadata.exportDictionary(priority=priority, human=human))
-    
+
     if display:
         # Display metadatas on stdout
         if extract_metadata:
