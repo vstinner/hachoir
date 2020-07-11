@@ -10,6 +10,7 @@ from hachoir.metadata import config
 from optparse import OptionParser
 from hachoir.metadata import extractMetadata
 from hachoir.metadata.metadata import extractors as metadata_extractors
+import os
 import sys
 
 
@@ -21,7 +22,7 @@ def displayParserList(*args):
     sys.exit(0)
 
 
-def parseOptions(args):
+def parseOptions(args=None):
     parser = OptionParser(usage="%prog [options] files")
     parser.add_option("--type", help="Only display file type (description)",
                       action="store_true", default=False)
@@ -32,8 +33,6 @@ def parseOptions(args):
                       action="store", default="9", type="choice",
                       choices=[str(choice) for choice in range(1, 9 + 1)])
     parser.add_option("--raw", help="Raw output",
-                      action="store_true", default=False)
-    parser.add_option("--get-dict", help="Raw output",
                       action="store_true", default=False)
     parser.add_option("--bench", help="Run benchmark",
                       action="store_true", default=False)
@@ -104,8 +103,22 @@ def processFile(values, filename,
             else:
                 result = parser.mime_type
 
-    if values.get_dict:
-        config.RESULT_DICTS.append(metadata.exportDictionary(priority=priority, human=human))
+    if hasattr(config, 'RESULT_DICTS'):
+        # Append a python Dictionary, to be used within pyhton
+        if extract_metadata:
+            dict_ = metadata.exportDictionary(priority=priority, human=human)
+            if not dict_:
+                dict_ = {"message": "(no metadata, priority may be too small)"}
+            if display_filename:
+                dict_.setdefault("file path", filename)
+        else:
+            if values.type:
+                dict_ = {('type' if values.raw else 'Type'): result}
+            else:
+                dict_ = {('mime_type' if values.raw else 'MIME type'): result}
+            if display_filename:
+                dict_.setdefault("file path", filename)
+        config.RESULT_DICTS.append(dict_)
 
     if display:
         # Display metadatas on stdout
@@ -149,10 +162,63 @@ def profile(values, filenames):
     return runProfiler(processFiles, (values, filenames), {'display': False})
 
 
-def main(args=None):
+def getMetadata(args, display=False):
+    """
+    Return a list of dictionaries.
+
+    Take a list of argument(s) and file path(s).
+    Must have a file path in the list.
+
+    Examples:
+        getMetadata(["--raw", "C:\\myVid.mkv"])
+        getMetadata(["--raw", "C:\\myVid.mkv", "D\\myPic.jpg", "--mime"])
+
+    Arguments available for the list:
+        --type      Only display file type (description) - default is False
+        --mime      Only display MIME type - default - default is False
+        --level     Quantity of information to display from 1 to 9 (9 is the maximum) - default is 9
+        --raw       Raw output - default is False
+        --quality   Information quality (0.0=fastest, 1.0=best, and default is 0.5)
+        --maxlen    Maximum string length in characters, 0 means unlimited
+                        (default is defined in ...\hachoir\metadata\config.py (usually 300))
+
+    Raises:
+        FileNotFoundError: If the args list do not contain any file path.
+        ValueError: If the args list contain an not supported arg.
+    """
+    valid_options = [
+        "--type",
+        "--mime",
+        "--level",
+        "--raw",
+        "--quality",
+        "--maxlen",
+    ]
+
+    # Validate args
+    file_path = [arg for arg in args if os.path.exists(arg)]
+    if not file_path:
+        raise FileNotFoundError("No file path in args")
+    invalid_options = [
+        arg
+        for arg in args
+        if arg not in valid_options and arg not in file_path
+    ]
+    if invalid_options:
+        raise ValueError("Invalid arguments")
+
+    # Parser options and initialize Hachoir
+    values, filenames = parseOptions(args)
+
+    config.RESULT_DICTS = []
+    processFiles(values, filenames, display)
+    return config.RESULT_DICTS
+
+
+def main():
     try:
         # Parser options and initialize Hachoir
-        values, filenames = parseOptions(args)
+        values, filenames = parseOptions()
 
         if values.debug:
             hachoir_config.debug = True
@@ -165,10 +231,6 @@ def main(args=None):
             ok = profile(values, filenames)
         elif values.bench:
             ok = benchmarkMetadata(values, filenames)
-        elif values.get_dict:
-            config.RESULT_DICTS = []
-            ok = processFiles(values, filenames, display=False)
-            return config.RESULT_DICTS
         else:
             ok = processFiles(values, filenames)
     except KeyboardInterrupt:
