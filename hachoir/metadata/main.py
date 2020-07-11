@@ -180,7 +180,7 @@ def getMetadata(args, display=False):
         --raw       Raw output - default is False
         --quality   Information quality (0.0=fastest, 1.0=best, and default is 0.5)
         --maxlen    Maximum string length in characters, 0 means unlimited
-                        (default is defined in ...\hachoir\metadata\config.py (usually 300))
+                        (default is defined in ...\\hachoir\\metadata\\config.py (usually 300))
 
     Raises:
         FileNotFoundError: If the args list do not contain any file path.
