@@ -9,7 +9,7 @@
 #  - run tests: tox --parallel auto
 #  - run: git push
 #  - check Travis CI status:
-#    https://travis-ci.org/vstinner/hachoir
+#    https://travis-ci.com/github/vstinner/hachoir
 #
 # Release a new version:
 #

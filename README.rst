@@ -6,9 +6,9 @@ Hachoir
    :alt: Latest release on the Python Cheeseshop (PyPI)
    :target: https://pypi.python.org/pypi/hachoir
 
-.. image:: https://travis-ci.org/vstinner/hachoir.svg?branch=master
+.. image:: https://travis-ci.com/vstinner/hachoir.svg?branch=master
    :alt: Build status of hachoir on Travis CI
-   :target: https://travis-ci.org/vstinner/hachoir
+   :target: https://travis-ci.com/github/vstinner/hachoir
 
 .. image:: http://unmaintained.tech/badge.svg
    :target: http://unmaintained.tech/
