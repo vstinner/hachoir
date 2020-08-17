@@ -2,6 +2,7 @@ from io import StringIO
 from hachoir.core.endian import BIG_ENDIAN, LITTLE_ENDIAN
 from hachoir.core.bits import long2raw
 from hachoir.stream import StreamError
+from hachoir.core import config
 from errno import EBADF
 
 MAX_READ_NBYTES = 2 ** 16
@@ -116,7 +117,7 @@ class OutputStream(object):
         else:
             # Arbitrary limit (because we should use a buffer, like copyBytesFrom(),
             # but with endianess problem
-            assert nb_bits <= 128
+            assert nb_bits <= config.max_bit_length
             data = input.readBits(address, nb_bits, endian)
             self.writeBits(nb_bits, data, endian)
 
