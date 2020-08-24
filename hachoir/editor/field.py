@@ -63,7 +63,7 @@ class FakeField(object):
         addr = self._parent._getFieldInputAddress(self._name)
         input = self._parent.input
         stream = input.stream
-        if size % 8:
+        if size % 8 or addr % 8:
             output.copyBitsFrom(stream, addr, size, input.endian)
         else:
             output.copyBytesFrom(stream, addr, size // 8)

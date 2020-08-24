@@ -112,14 +112,11 @@ class OutputStream(object):
         self.writeBytes(raw)
 
     def copyBitsFrom(self, input, address, nb_bits, endian):
-        if (nb_bits % 8) == 0:
-            self.copyBytesFrom(input, address, nb_bits // 8)
-        else:
-            # Arbitrary limit (because we should use a buffer, like copyBytesFrom(),
-            # but with endianess problem
-            assert nb_bits <= config.max_bit_length
-            data = input.readBits(address, nb_bits, endian)
-            self.writeBits(nb_bits, data, endian)
+        # Arbitrary limit (because we should use a buffer, like copyBytesFrom(),
+        # but with endianess problem
+        assert nb_bits <= config.max_bit_length
+        data = input.readBits(address, nb_bits, endian)
+        self.writeBits(nb_bits, data, endian)
 
     def copyBytesFrom(self, input, address, nb_bytes):
         if (address % 8):
