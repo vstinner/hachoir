@@ -1,10 +1,11 @@
 import unittest
 from io import BytesIO
-from hachoir.core.endian import BIG_ENDIAN, LITTLE_ENDIAN
+from hachoir.core.endian import BIG_ENDIAN
 from hachoir.editor import createEditor
-from hachoir.field import FieldSet, Parser, Bits
+from hachoir.field import Parser, Bits
 from hachoir.stream import StringInputStream, OutputStream
 from hachoir.test import setup_tests
+
 
 class TestEditor(unittest.TestCase):
     def test_bit_alignment(self):
@@ -26,6 +27,7 @@ class TestEditor(unittest.TestCase):
         # X is the modified bit
         #                              .....,,,,,,,,,,,,,,,,..X,,,,,,,,
         self.assertEqual(output_bits, "11111111111111111111111011111110")
+
 
 class TestParser(Parser):
     endian = BIG_ENDIAN
