@@ -26,8 +26,8 @@ def FileInputStream(filename, real_filename=None, **args):
         raise InputStreamError(
             "Unable to open file %s: %s" % (filename, errmsg))
     filename = (getattr(filename, 'name', '')
-                    if hasattr(filename, 'read')
-                    else str(real_filename))
+                if hasattr(filename, 'read')
+                else str(real_filename))
     source = "file:" + filename
     offset = args.pop("offset", 0)
     size = args.pop("size", None)
