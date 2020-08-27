@@ -1,5 +1,6 @@
 from hachoir.core.i18n import guessBytesCharset
 from hachoir.stream import InputIOStream, InputSubStream, InputStreamError
+import io
 
 
 def FileInputStream(filename, real_filename=None, **args):
@@ -11,15 +12,22 @@ def FileInputStream(filename, real_filename=None, **args):
     not able to convert filename to real unicode string (ie. you have to
     use unicode(name, 'replace') or unicode(name, 'ignore')).
     """
-    assert isinstance(filename, str)
     if not real_filename:
         real_filename = filename
     try:
-        inputio = open(real_filename, 'rb')
+        if isinstance(filename, str):
+            inputio = open(filename, 'rb')
+        elif isinstance(filename, bytes):
+            inputio = io.BytesIO(filename)
+        else:
+            inputio = filename
     except IOError as err:
         errmsg = str(err)
         raise InputStreamError(
             "Unable to open file %s: %s" % (filename, errmsg))
+    filename = (getattr(filename, 'name', '')
+                    if hasattr(filename, 'read')
+                    else str(real_filename))
     source = "file:" + filename
     offset = args.pop("offset", 0)
     size = args.pop("size", None)
