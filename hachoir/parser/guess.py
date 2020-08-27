@@ -127,7 +127,8 @@ def createParser(filename, real_filename=None, tags=None):
     Create a parser from a file or returns None on error.
 
     Options:
-    - filename (unicode): Input file name ;
+    - file (unicode|bytes|io.IOBase): Input file name, byte array
+        or a byte io.IOBase stream  ;
     - real_filename (str|unicode): Real file name.
     """
     if not tags:
