@@ -13,18 +13,18 @@ def FileInputStream(filename, real_filename=None, **args):
     use unicode(name, 'replace') or unicode(name, 'ignore')).
     """
     if not real_filename:
-        real_filename = filename
+        real_filename = (filename if isinstance(filename, str)
+                         else getattr(filename, 'name', ''))
     try:
         if isinstance(filename, str):
             inputio = open(real_filename, 'rb')
         else:
             inputio = filename
+            filename = getattr(filename, 'name', '')
     except IOError as err:
         errmsg = str(err)
         raise InputStreamError(
             "Unable to open file %s: %s" % (filename, errmsg))
-    filename = (filename if isinstance(filename, str)
-                else getattr(filename, 'name', ''))
     source = "file:" + filename
     offset = args.pop("offset", 0)
     size = args.pop("size", None)
