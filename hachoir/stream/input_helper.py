@@ -5,7 +5,8 @@ import io
 
 def FileInputStream(filename, real_filename=None, **args):
     """
-    Create an input stream of a file. filename must be unicode.
+    Create an input stream of a file. filename must be unicode or a file
+    object.
 
     real_filename is an optional argument used to specify the real filename,
     its type can be 'str' or 'unicode'. Use real_filename when you are
@@ -16,18 +17,15 @@ def FileInputStream(filename, real_filename=None, **args):
         real_filename = filename
     try:
         if isinstance(filename, str):
-            inputio = open(filename, 'rb')
-        elif isinstance(filename, bytes):
-            inputio = io.BytesIO(filename)
+            inputio = open(real_filename, 'rb')
         else:
             inputio = filename
     except IOError as err:
         errmsg = str(err)
         raise InputStreamError(
             "Unable to open file %s: %s" % (filename, errmsg))
-    filename = (getattr(filename, 'name', '')
-                if hasattr(filename, 'read')
-                else str(real_filename))
+    filename = (filename if isinstance(filename, str)
+                else getattr(filename, 'name', ''))
     source = "file:" + filename
     offset = args.pop("offset", 0)
     size = args.pop("size", None)
