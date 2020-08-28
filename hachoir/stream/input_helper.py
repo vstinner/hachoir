@@ -1,6 +1,5 @@
 from hachoir.core.i18n import guessBytesCharset
 from hachoir.stream import InputIOStream, InputSubStream, InputStreamError
-import io
 
 
 def FileInputStream(filename, real_filename=None, **args):
