@@ -2,6 +2,11 @@
 Changelog
 +++++++++
 
+hachoir 3.1.2 (2020-02-15)
+==========================
+
+* Fix a SyntaxWarning in the PDF parser.
+
 hachoir 3.1.1 (2020-01-06)
 ==========================
 
