@@ -1,7 +1,0 @@
-language: python
-env:
-  - TOXENV=py36
-  - TOXENV=doc
-  - TOXENV=pep8
-install: pip install -U tox
-script: tox
