@@ -6,9 +6,9 @@ Hachoir
    :alt: Latest release on the Python Cheeseshop (PyPI)
    :target: https://pypi.python.org/pypi/hachoir
 
-.. image:: https://github.com/vstinenr/hachoir/actions/workflows/build.yml/badge.svg
+.. image:: https://github.com/vstinner/hachoir/actions/workflows/build.yml/badge.svg
    :alt: Build status of hachoir on GitHub Actions
-   :target: https://github.com/vstinenr/hachoir/actions
+   :target: https://github.com/vstinner/hachoir/actions
 
 .. image:: http://unmaintained.tech/badge.svg
    :target: http://unmaintained.tech/
