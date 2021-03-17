@@ -2,6 +2,12 @@
 Changelog
 +++++++++
 
+hachoir 3.1.3 (WIP)
+===================
+* The development branch ``master`` was renamed to ``main``.
+  See https://sfconservancy.org/news/2020/jun/23/gitbranchname/ for the
+  rationale.
+
 hachoir 3.1.2 (2020-02-15)
 ==========================
 
