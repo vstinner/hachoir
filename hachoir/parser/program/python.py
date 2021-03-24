@@ -11,7 +11,7 @@ Creation: 25 march 2005
 
 from hachoir.parser import Parser
 from hachoir.field import (
-    FieldSet, UInt8,
+    Field, FieldSet, UInt8,
     UInt16, Int32, UInt32, Int64, UInt64,
     ParserError, Float64,
     Character, RawBytes, PascalString8, TimestampUnix32,
@@ -19,6 +19,7 @@ from hachoir.field import (
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.bits import long2raw
 from hachoir.core.text_handler import textHandler, hexadecimal
+from hachoir.core import config
 
 DISASSEMBLE = False
 
@@ -53,12 +54,25 @@ def parseString(parent):
         disassembleBytecode(parent["text"])
 
 
+def createStringValue(parent):
+    if parent.name == "lnotab":
+        return "<lnotab>"
+    return parent["text"]
+
+
 def parseStringRef(parent):
     yield textHandler(UInt32(parent, "ref"), hexadecimal)
 
 
 def createStringRefDesc(parent):
     return "String ref: %s" % parent["ref"].display
+
+
+def createStringRefValue(parent):
+    value = parent["ref"].value
+    if hasattr(parent.root, 'string_table') and 0 <= value < len(parent.root.string_table):
+        return parent.root.string_table[value]
+    return None
 
 # --- Integers ---
 
@@ -71,15 +85,35 @@ def parseInt64(parent):
     yield Int64(parent, "value")
 
 
+def createIntValue(parent):
+    return parent["value"]
+
+
 def parseLong(parent):
     yield Int32(parent, "digit_count")
     for index in range(abs(parent["digit_count"].value)):
         yield UInt16(parent, "digit[]")
 
 
+def createLongValue(parent):
+    is_negative = parent["digit_count"].value < 0
+    count = abs(parent["digit_count"].value)
+    total = 0
+    for index in range(count - 1, -1, -1):
+        total <<= 15
+        total += parent["digit[%u]" % index].value
+    if is_negative:
+        total = -total
+    return total
+
+
 # --- Float and complex ---
 def parseFloat(parent):
     yield PascalString8(parent, "value")
+
+
+def createFloatValue(parent):
+    return float(parent["value"].value)
 
 
 def parseBinaryFloat(parent):
@@ -94,6 +128,12 @@ def parseComplex(parent):
 def parseBinaryComplex(parent):
     yield Float64(parent, "real")
     yield Float64(parent, "complex")
+
+
+def createComplexValue(parent):
+    return complex(
+        float(parent["real"].value),
+        float(parent["complex"].value))
 
 
 # --- Tuple and list ---
@@ -121,6 +161,12 @@ def createTupleDesc(parent):
     return "%s: %s" % (parent.code_info[2], items)
 
 
+def tupleValueCreator(constructor):
+    def createTupleValue(parent):
+        return constructor([v.value for v in parent.array("item")])
+    return createTupleValue
+
+
 # --- Dict ---
 def parseDict(parent):
     """
@@ -141,14 +187,42 @@ def createDictDesc(parent):
     return "Dict: %s" % ("%s keys" % parent.count)
 
 
+def createDictValue(parent):
+    return {k.value: v.value for k, v in zip(parent.array("key"), parent.array("value"))}
+
+
 def parseRef(parent):
     yield UInt32(parent, "n", "Reference")
+
+
+def createRefDesc(parent):
+    value = parent["n"].value
+    if hasattr(parent.root, 'object_table') and 0 <= value < len(parent.root.object_table):
+        return 'Reference: %s' % parent.root.object_table[value].description
+    else:
+        return 'Reference: %d' % value
+
+
+def createRefValue(parent):
+    value = parent["n"].value
+    if hasattr(parent.root, 'object_table') and 0 <= value < len(parent.root.object_table):
+        return parent.root.object_table[value]
+    else:
+        return None
+
+
+def parseASCII(parent):
+    size = UInt32(parent, "len", "Number of ASCII characters")
+    yield size
+    if size.value:
+        yield String(parent, "text", size.value, "String content", charset="ASCII")
 
 
 def parseShortASCII(parent):
     size = UInt8(parent, "len", "Number of ASCII characters")
     yield size
-    yield String(parent, "text", size.value, "String content", charset="ASCII")
+    if size.value:
+        yield String(parent, "text", size.value, "String content", charset="ASCII")
 
 # --- Code ---
 
@@ -207,35 +281,37 @@ def parseCode(parent):
 class Object(FieldSet):
     bytecode_info = {
         # Don't contains any data
-        '0': ("null", None, "NULL", None),
-        'N': ("none", None, "None", None),
-        'F': ("false", None, "False", None),
-        'T': ("true", None, "True", None),
-        'S': ("stop_iter", None, "StopIter", None),
-        '.': ("ellipsis", None, "ELLIPSIS", None),
-        '?': ("unknown", None, "Unknown", None),
+        '0': ("null", None, "NULL", None, None),
+        'N': ("none", None, "None", None, lambda parent: None),
+        'F': ("false", None, "False", None, lambda parent: False),
+        'T': ("true", None, "True", None, lambda parent: True),
+        'S': ("stop_iter", None, "StopIter", None, None),
+        '.': ("ellipsis", None, "ELLIPSIS", None, lambda parent: ...),
+        '?': ("unknown", None, "Unknown", None, None),
 
-        'i': ("int32", parseInt32, "Int32", None),
-        'I': ("int64", parseInt64, "Int64", None),
-        'f': ("float", parseFloat, "Float", None),
-        'g': ("bin_float", parseBinaryFloat, "Binary float", None),
-        'x': ("complex", parseComplex, "Complex", None),
-        'y': ("bin_complex", parseBinaryComplex, "Binary complex", None),
-        'l': ("long", parseLong, "Long", None),
-        's': ("string", parseString, "String", None),
-        't': ("interned", parseString, "Interned", None),
-        'u': ("unicode", parseString, "Unicode", None),
-        'R': ("string_ref", parseStringRef, "String ref", createStringRefDesc),
-        '(': ("tuple", parseTuple, "Tuple", createTupleDesc),
-        ')': ("small_tuple", parseSmallTuple, "Tuple", createTupleDesc),
-        '[': ("list", parseTuple, "List", createTupleDesc),
-        '<': ("set", parseTuple, "Set", createTupleDesc),
-        '>': ("frozenset", parseTuple, "Frozen set", createTupleDesc),
-        '{': ("dict", parseDict, "Dict", createDictDesc),
-        'c': ("code", parseCode, "Code", None),
-        'r': ("ref", parseRef, "Reference", None),
-        'z': ("short_ascii", parseShortASCII, "Short ASCII", None),
-        'Z': ("short_ascii_interned", parseShortASCII, "Short ASCII interned", None),
+        'i': ("int32", parseInt32, "Int32", None, createIntValue),
+        'I': ("int64", parseInt64, "Int64", None, createIntValue),
+        'f': ("float", parseFloat, "Float", None, createFloatValue),
+        'g': ("bin_float", parseBinaryFloat, "Binary float", None, createFloatValue),
+        'x': ("complex", parseComplex, "Complex", None, createComplexValue),
+        'y': ("bin_complex", parseBinaryComplex, "Binary complex", None, createComplexValue),
+        'l': ("long", parseLong, "Long", None, createLongValue),
+        's': ("string", parseString, "String", None, createStringValue),
+        't': ("interned", parseString, "Interned", None, createStringValue),
+        'u': ("unicode", parseString, "Unicode", None, createStringValue),
+        'R': ("string_ref", parseStringRef, "String ref", createStringRefDesc, createStringRefValue),
+        '(': ("tuple", parseTuple, "Tuple", createTupleDesc, tupleValueCreator(tuple)),
+        ')': ("small_tuple", parseSmallTuple, "Tuple", createTupleDesc, tupleValueCreator(tuple)),
+        '[': ("list", parseTuple, "List", createTupleDesc, tupleValueCreator(list)),
+        '<': ("set", parseTuple, "Set", createTupleDesc, tupleValueCreator(set)),
+        '>': ("frozenset", parseTuple, "Frozen set", createTupleDesc, tupleValueCreator(frozenset)),
+        '{': ("dict", parseDict, "Dict", createDictDesc, createDictValue),
+        'c': ("code", parseCode, "Code", None, None),
+        'r': ("ref", parseRef, "Reference", createRefDesc, createRefValue),
+        'a': ("ascii", parseASCII, "ASCII", None, createStringValue),
+        'A': ("ascii_interned", parseASCII, "ASCII interned", None, createStringValue),
+        'z': ("short_ascii", parseShortASCII, "Short ASCII", None, createStringValue),
+        'Z': ("short_ascii_interned", parseShortASCII, "Short ASCII interned", None, createStringValue),
     }
 
     def __init__(self, parent, name, **kw):
@@ -247,64 +323,40 @@ class Object(FieldSet):
         self.code_info = self.bytecode_info[code]
         if not name:
             self._name = self.code_info[0]
-        if code == "l":
-            self.createValue = self.createValueLong
-        elif code in ("i", "I", "f", "g"):
-            self.createValue = lambda: self["value"].value
-        elif code == "T":
-            self.createValue = lambda: True
-        elif code == "F":
-            self.createValue = lambda: False
-        elif code in ("x", "y"):
-            self.createValue = self.createValueComplex
-        elif code in ("s", "t", "u"):
-            self.createValue = self.createValueString
-            self.createDisplay = self.createDisplayString
-            if code == 't':
-                if not hasattr(self.root, 'string_table'):
-                    self.root.string_table = []
-                self.root.string_table.append(self)
-        elif code == 'R':
-            if hasattr(self.root, 'string_table'):
-                self.createValue = self.createValueStringRef
+        if code in ("t", "A", "Z"):
+            if not hasattr(self.root, 'string_table'):
+                self.root.string_table = []
+            self.root.string_table.append(self)
 
-    def createValueString(self):
-        if "text" in self:
-            return self["text"].value
-        else:
-            return ""
+    def createValue(self):
+        create = self.code_info[4]
+        if create:
+            res = create(self)
+            if isinstance(res, Field):
+                return res.value
+            else:
+                return res
+        return None
 
-    def createDisplayString(self):
-        if "text" in self:
-            return self["text"].display
-        else:
-            return "(empty)"
-
-    def createValueLong(self):
-        is_negative = self["digit_count"].value < 0
-        count = abs(self["digit_count"].value)
-        total = 0
-        for index in range(count - 1, -1, -1):
-            total <<= 15
-            total += self["digit[%u]" % index].value
-        if is_negative:
-            total = -total
-        return total
-
-    def createValueStringRef(self):
-        return self.root.string_table[self['ref'].value].value
-
-    def createDisplayStringRef(self):
-        return self.root.string_table[self['ref'].value].display
-
-    def createValueComplex(self):
-        return complex(
-            float(self["real"].value),
-            float(self["complex"].value))
+    def createDisplay(self):
+        create = self.code_info[4]
+        if create:
+            res = create(self)
+            if isinstance(res, Field):
+                return res.display
+            res = repr(res)
+            if len(res) >= config.max_string_length:
+                res = res[:config.max_string_length] + "..."
+            return res
+        return None
 
     def createFields(self):
         yield BytecodeChar(self, "bytecode", "Bytecode")
         yield Bit(self, "flag_ref", "Is a reference?")
+        if self["flag_ref"].value:
+            if not hasattr(self.root, 'object_table'):
+                self.root.object_table = []
+            self.root.object_table.append(self)
         parser = self.code_info[1]
         if parser:
             yield from parser(self)
@@ -537,6 +589,7 @@ class PythonCompiledFile(Parser):
     def createFields(self):
         yield UInt16(self, "magic_number", "Magic number")
         yield String(self, "magic_string", 2, r"Magic string \r\n", charset="ASCII")
+
         version = self.getVersion()
 
         # PEP 552: Deterministic pycs #31650 (Python 3.7a4); magic=3392
@@ -549,7 +602,7 @@ class PythonCompiledFile(Parser):
             use_hash = False
 
         if use_hash:
-            yield UInt64(self, "hash")
+            yield UInt64(self, "hash", "SipHash hash of the source file")
         else:
             yield TimestampUnix32(self, "timestamp", "Timestamp modulo 2**32")
             if version >= 0x3030000 and self['magic_number'].value >= 3200:
