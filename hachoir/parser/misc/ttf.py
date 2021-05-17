@@ -227,10 +227,39 @@ def parseNames(self):
         yield NullBytes(self, "padding_end", padding)
 
 
+def parseMaxp(self):
+    # Read header
+    yield Version16Dot16(self, "format", "format version")
+    yield UInt16(self, "numGlyphs", "Number of glyphs")
+    if self["format"].value >= 1:
+        yield UInt16(self, "maxPoints", "Maximum points in a non-composite glyph")
+        yield UInt16(self, "maxContours", "Maximum contours in a non-composite glyph")
+        yield UInt16(self, "maxCompositePoints", "Maximum points in a composite glyph")
+        yield UInt16(
+            self, "maxCompositeContours", "Maximum contours in a composite glyph"
+        )
+        yield UInt16(self, "maxZones", "Do instructions use the twilight zone?")
+        yield UInt16(self, "maxTwilightPoints", "Maximum points used in Z0")
+        yield UInt16(self, "maxStorage", "Number of Storage Area locations")
+        yield UInt16(self, "maxFunctionDefs", "Number of function definitions")
+        yield UInt16(self, "maxInstructionDefs", "Number of instruction definitions")
+        yield UInt16(self, "maxStackElements", "Maximum stack depth")
+        yield UInt16(
+            self, "maxSizeOfInstructions", "Maximum byte count for glyph instructions"
+        )
+        yield UInt16(
+            self,
+            "maxComponentElements",
+            "Maximum number of components at glyph top level",
+        )
+        yield UInt16(self, "maxComponentDepth", "Maximum level of recursion")
+
+
 class Table(FieldSet):
     TAG_INFO = {
         "head": ("header", "Font header", parseFontHeader),
         "name": ("names", "Names", parseNames),
+        "maxp": ("maxp", "Maximum Profile", parseMaxp),
     }
 
     def __init__(self, parent, name, table, **kw):
