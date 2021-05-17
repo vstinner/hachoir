@@ -2,6 +2,8 @@
 TrueType Font parser.
 
 Documents:
+ - "The OpenType Specification"
+   https://docs.microsoft.com/en-us/typography/opentype/spec/
  - "An Introduction to TrueType Fonts: A look inside the TTF format"
    written by "NRSI: Computers & Writing Systems"
    http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&item_id=IWS-Chapter08
