@@ -313,10 +313,9 @@ def parseCmap(self):
         last = offset
 
         # Add padding if any
-        if offset > (self.current_size / 8) - start:
-            padding = self.seekByte(offset, relative=True, null=False)
-            if padding:
-                yield padding
+        padding = self.seekByte(offset, relative=True, null=False)
+        if padding:
+            yield padding
         format = UInt16(self, "format").value
         if format == 0:
             yield CmapTable0(self, "cmap table format 0")
