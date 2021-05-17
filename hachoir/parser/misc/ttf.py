@@ -475,7 +475,7 @@ def parseHhea(self):
     yield Int16(self, "caretOffset", "Caret offset")
     yield GenericVector(self, "reserved", 4, Int16)
     yield Int16(self, "metricDataFormat", "Metric data format")
-    yield Int16(self, "numberOfHMetrics", "Number of horizontal metrics")
+    yield UInt16(self, "numberOfHMetrics", "Number of horizontal metrics")
 
 
 class fsType(FieldSet):
