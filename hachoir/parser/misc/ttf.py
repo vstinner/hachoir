@@ -16,6 +16,7 @@ from hachoir.parser import Parser
 from hachoir.field import (
     FieldSet,
     ParserError,
+    UInt8,
     UInt16,
     UInt32,
     Int16,
@@ -293,6 +294,51 @@ def parseHhea(self):
     yield Int16(self, "numberOfHMetrics", "Number of horizontal metrics")
 
 
+def parseOS2(self):
+    yield UInt16(self, "version", "Table version")
+    yield Int16(self, "xAvgCharWidth")
+    yield UInt16(self, "usWeightClass")
+    yield UInt16(self, "usWidthClass")
+    yield UInt16(self, "fsType")
+    yield Int16(self, "ySubscriptXSize")
+    yield Int16(self, "ySubscriptYSize")
+    yield Int16(self, "ySubscriptXOffset")
+    yield Int16(self, "ySubscriptYOffset")
+    yield Int16(self, "ySuperscriptXSize")
+    yield Int16(self, "ySuperscriptYSize")
+    yield Int16(self, "ySuperscriptXOffset")
+    yield Int16(self, "ySuperscriptYOffset")
+    yield Int16(self, "yStrikeoutSize")
+    yield Int16(self, "yStrikeoutPosition")
+    yield Int16(self, "sFamilyClass")
+    yield GenericVector(self, "panose", 10, UInt8)
+    yield UInt32(self, "ulUnicodeRange1")
+    yield UInt32(self, "ulUnicodeRange2")
+    yield UInt32(self, "ulUnicodeRange3")
+    yield UInt32(self, "ulUnicodeRange4")
+    yield Tag(self, "achVendID", "Vendor ID")
+    yield UInt16(self, "fsSelection")
+    yield UInt16(self, "usFirstCharIndex")
+    yield UInt16(self, "usLastCharIndex")
+    yield Int16(self, "sTypoAscender")
+    yield Int16(self, "sTypoDescender")
+    yield Int16(self, "sTypoLineGap")
+    yield UInt16(self, "usWinAscent")
+    yield UInt16(self, "usWinDescent")
+    if self["version"].value >= 1:
+        yield UInt32(self, "ulCodePageRange1")
+        yield UInt32(self, "ulCodePageRange2")
+    if self["version"].value >= 2:
+        yield Int16(self, "sxHeight")
+        yield Int16(self, "sCapHeight")
+        yield UInt16(self, "usDefaultChar")
+        yield UInt16(self, "usBreakChar")
+        yield UInt16(self, "usMaxContext")
+    if self["version"].value >= 5:
+        yield UInt16(self, "usLowerOpticalPointSize")
+        yield UInt16(self, "usUpperOpticalPointSize")
+
+
 parseScriptList = parseFeatureList = parseLookupList = lambda x: None
 
 
@@ -336,6 +382,7 @@ class Table(FieldSet):
         "maxp": ("maxp", "Maximum Profile", parseMaxp),
         "hhea": ("hhea", "Horizontal Header", parseHhea),
         "GSUB": ("GSUB", "Glyph Substitutions", parseGSUB),
+        "OS/2": ("OS/2", "OS/2 and Windows Metrics", parseOS2),
     }
 
     def __init__(self, parent, name, table, **kw):
