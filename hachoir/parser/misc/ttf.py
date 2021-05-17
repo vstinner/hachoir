@@ -88,6 +88,11 @@ FWORD = Int16
 UFWORD = UInt16
 
 
+class Tag(String):
+    def __init__(self, parent, name, description=None):
+        String.__init__(self, parent, name, 4, description)
+
+
 class Version16Dot16(FieldSet):
     static_size = 32
 
@@ -101,7 +106,7 @@ class Version16Dot16(FieldSet):
 
 class TableHeader(FieldSet):
     def createFields(self):
-        yield String(self, "tag", 4)
+        yield Tag(self, "tag")
         yield textHandler(UInt32(self, "checksum"), hexadecimal)
         yield UInt32(self, "offset")
         yield filesizeHandler(UInt32(self, "size"))
