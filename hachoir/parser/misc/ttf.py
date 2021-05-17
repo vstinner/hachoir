@@ -70,8 +70,18 @@ CHARSET_MAP = {
 }
 
 
-class TableHeader(FieldSet):
+class Version16Dot16(FieldSet):
+    static_size = 32
 
+    def createFields(self):
+        yield UInt16(self, "major")
+        yield UInt16(self, "minor")
+
+    def createValue(self):
+        return float("%u.%x" % (self["major"].value, self["minor"].value))
+
+
+class TableHeader(FieldSet):
     def createFields(self):
         yield String(self, "tag", 4)
         yield textHandler(UInt32(self, "checksum"), hexadecimal)
