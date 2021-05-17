@@ -30,6 +30,7 @@ from hachoir.field import (
     Enum,
     TimestampMac32,
     GenericVector,
+    PascalString8,
 )
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal, filesizeHandler
@@ -348,6 +349,45 @@ def parseOS2(self):
         yield UInt16(self, "usUpperOpticalPointSize")
 
 
+def parsePost(self):
+    yield Version16Dot16(self, "version", "Table version")
+    yield Fixed(
+        self,
+        "italicAngle",
+        "Italic angle in counter-clockwise degrees from the vertical.",
+    )
+    yield FWORD(self, "underlinePosition", "Top of underline to baseline")
+    yield FWORD(self, "underlineThickness", "Suggested underline thickness")
+    yield UInt32(self, "isFixedPitch", "Is the font fixed pitch?")
+    yield UInt32(self, "minMemType42", "Minimum memory usage (OpenType)")
+    yield UInt32(self, "maxMemType42", "Maximum memory usage (OpenType)")
+    yield UInt32(self, "minMemType1", "Minimum memory usage (Type 1)")
+    yield UInt32(self, "maxMemType1", "Maximum memory usage (Type 1)")
+    if self["version"].value == 2.0:
+        yield UInt16(self, "numGlyphs")
+        indices = GenericVector(
+            self,
+            "Array of indices into the string data",
+            self["numGlyphs"].value,
+            UInt16,
+            "glyphNameIndex",
+        )
+        yield indices
+        for gid, index in enumerate(indices):
+            if index.value >= 258:
+                yield PascalString8(self, "glyphname[%i]" % gid)
+    elif self["version"].value == 2.0:
+        yield UInt16(self, "numGlyphs")
+        indices = GenericVector(
+            self,
+            "Difference between graphic index and standard order of glyph",
+            self["numGlyphs"].value,
+            UInt16,
+            "offset",
+        )
+        yield indices
+
+
 parseScriptList = parseFeatureList = parseLookupList = lambda x: None
 
 
@@ -392,6 +432,7 @@ class Table(FieldSet):
         "hhea": ("hhea", "Horizontal Header", parseHhea),
         "GSUB": ("GSUB", "Glyph Substitutions", parseGSUB),
         "OS/2": ("OS/2", "OS/2 and Windows Metrics", parseOS2),
+        "post": ("post", "PostScript", parsePost),
     }
 
     def __init__(self, parent, name, table, **kw):
