@@ -426,11 +426,11 @@ def parseGSUB(self):
 
 class Table(FieldSet):
     TAG_INFO = {
-        "head": ("header", "Font header", parseFontHeader),
-        "name": ("names", "Names", parseNames),
-        "maxp": ("maxp", "Maximum Profile", parseMaxp),
-        "hhea": ("hhea", "Horizontal Header", parseHhea),
         "GSUB": ("GSUB", "Glyph Substitutions", parseGSUB),
+        "head": ("header", "Font header", parseFontHeader),
+        "hhea": ("hhea", "Horizontal Header", parseHhea),
+        "maxp": ("maxp", "Maximum Profile", parseMaxp),
+        "name": ("names", "Names", parseNames),
         "OS/2": ("OS/2", "OS/2 and Windows Metrics", parseOS2),
         "post": ("post", "PostScript", parsePost),
     }
