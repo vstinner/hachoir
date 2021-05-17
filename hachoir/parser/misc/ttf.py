@@ -270,11 +270,67 @@ def parseMaxp(self):
         yield UInt16(self, "maxComponentDepth", "Maximum level of recursion")
 
 
+def parseHhea(self):
+    yield UInt16(self, "majorVersion", "Major version")
+    yield UInt16(self, "minorVersion", "Minor version")
+    yield FWORD(self, "ascender", "Typographic ascent")
+    yield FWORD(self, "descender", "Typographic descent")
+    yield FWORD(self, "lineGap", "Typographic linegap")
+    yield UFWORD(self, "advanceWidthMax", "Maximum advance width")
+    yield FWORD(self, "minLeftSideBearing", "Minimum left sidebearing value")
+    yield FWORD(self, "minRightSideBearing", "Minimum right sidebearing value")
+    yield FWORD(self, "xMaxExtent", "Maximum X extent")
+    yield Int16(self, "caretSlopeRise", "Caret slope rise")
+    yield Int16(self, "caretSlopeRun", "Caret slope run")
+    yield Int16(self, "caretOffset", "Caret offset")
+    yield GenericVector(self, "reserved", 4, Int16)
+    yield Int16(self, "metricDataFormat", "Metric data format")
+    yield Int16(self, "numberOfHMetrics", "Number of horizontal metrics")
+
+
+parseScriptList = parseFeatureList = parseLookupList = lambda x: None
+
+
+def parseGSUB(self):
+    yield UInt16(self, "majorVersion", "Major version")
+    yield UInt16(self, "minorVersion", "Minor version")
+    SUBTABLES = [
+        ("script list", parseScriptList),
+        ("feature list", parseFeatureList),
+        ("lookup list", parseLookupList),
+    ]
+    offsets = []
+    for description, parser in SUBTABLES:
+        name = description.title().replace(" ", "")
+        offset = UInt16(
+            self, name[0].lower() + name[1:], "Offset to %s table" % description
+        )
+        yield offset
+        offsets.append((offset.value, parser))
+    if self["min_ver"].value == 1:
+        offset = UInt32(
+            self, "featureVariationsOffset", "Offset to feature variations table"
+        )
+        offsets.append((offset.value, parseFeatureVariationsTable))
+
+    offsets.sort(key=lambda field: field[0])
+    padding = self.seekByte(offsets[0][0], null=True)
+    if padding:
+        yield padding
+    lastOffset, first_parser = offsets[0]
+    for offset, parser in offsets[1:]:
+        # yield parser(self)
+        yield RawBytes(self, "content", offset - lastOffset)
+        lastOffset = offset
+
+
 class Table(FieldSet):
     TAG_INFO = {
         "head": ("header", "Font header", parseFontHeader),
         "name": ("names", "Names", parseNames),
         "maxp": ("maxp", "Maximum Profile", parseMaxp),
+        "hhea": ("hhea", "Horizontal Header", parseHhea),
+        "GSUB": ("GSUB", "Glyph Substitutions", parseGSUB),
     }
 
     def __init__(self, parent, name, table, **kw):
