@@ -18,6 +18,7 @@ from hachoir.field import (
     ParserError,
     UInt8,
     UInt16,
+    UInt24,
     UInt32,
     Int16,
     Bit,
@@ -203,6 +204,130 @@ def parseFontHeader(self):
     yield Enum(UInt16(self, "font_dir", "Font direction hint"), DIRECTION_NAME)
     yield Enum(UInt16(self, "ofst_format"), {0: "short offsets", 1: "long"})
     yield UInt16(self, "glyph_format", "(=0)")
+
+
+class EncodingRecord(FieldSet):
+    static_size = 64
+
+    def createFields(self):
+        yield Enum(UInt16(self, "platformID"), PLATFORM_NAME)
+        yield UInt16(self, "encodingID")
+        self.offset = UInt32(self, "subtableOffset")
+        yield self.offset
+
+
+class CmapTable0(FieldSet):
+    def createFields(self):
+        yield UInt16(self, "format", "Table format")
+        yield UInt16(self, "length", "Length in bytes")
+        yield UInt16(self, "language", "Language ID")
+        yield GenericVector(self, "mapping", 256, UInt8)
+
+
+class CmapTable4(FieldSet):
+    def createFields(self):
+        yield UInt16(self, "format", "Table format")
+        yield UInt16(self, "length", "Length in bytes")
+        yield UInt16(self, "language", "Language ID")
+        yield UInt16(self, "segCountX2", "Twice the number of segments")
+        segments = self["segCountX2"].value // 2
+        yield UInt16(self, "searchRange")
+        yield UInt16(self, "entrySelector")
+        yield UInt16(self, "rangeShift")
+        yield GenericVector(self, "endCode", segments, UInt16)
+        yield PaddingBits(self, "reserved[]", 16)
+        yield GenericVector(self, "startCode", segments, UInt16)
+        yield GenericVector(self, "idDelta", segments, Int16)
+        yield GenericVector(self, "idRangeOffsets", segments, UInt16)
+        remainder = (self["length"].value - (self.current_size / 8)) / 2
+        if remainder:
+            yield GenericVector(self, "glyphIdArray", remainder, UInt16)
+
+
+class CmapTable6(FieldSet):
+    def createFields(self):
+        yield UInt16(self, "format", "Table format")
+        yield UInt16(self, "length", "Length in bytes")
+        yield UInt16(self, "language", "Language ID")
+        yield UInt16(self, "firstCode", "First character code of subrange")
+        yield UInt16(self, "entryCount", "Number of character codes in subrange")
+        yield GenericVector(self, "glyphIdArray", self["entryCount"].value, UInt16)
+
+
+class SequentialMapGroup(FieldSet):
+    def createFields(self):
+        yield UInt32(self, "startCharCode", "First character code in this group")
+        yield UInt32(self, "endCharCode", "First character code in this group")
+        yield UInt32(
+            self,
+            "startGlyphID",
+            "Glyph index corresponding to the starting character code",
+        )
+
+
+class CmapTable12(FieldSet):
+    def createFields(self):
+        yield UInt16(self, "format", "Table format")
+        yield PaddingBits(self, "reserved[]", 16)
+        yield UInt32(self, "length", "Length in bytes")
+        yield UInt32(self, "language", "Language ID")
+        yield UInt32(self, "numGroups", "Number of groupings which follow")
+        for i in range(self["numGroups"].value):
+            yield SequentialMapGroup(self, "mapgroup[]")
+
+
+class VariationSelector(FieldSet):
+    def createFields(self):
+        yield UInt24(self, "varSelector", "Variation selector")
+        yield UInt32(self, "defaultUVSOffset", "Offset to default UVS table")
+        yield UInt32(self, "nonDefaultUVSOffset", "Offset to non-default UVS table")
+
+
+class CmapTable14(FieldSet):
+    def createFields(self):
+        yield UInt16(self, "format", "Table format")
+        yield UInt32(self, "length", "Length in bytes")
+        yield UInt32(
+            self, "numVarSelectorRecords", "Number of variation selector records"
+        )
+        for i in range(self["numVarSelectorRecords"].value):
+            yield VariationSelector(self, "variationSelector[]")
+
+
+def parseCmap(self):
+    start = self.current_size / 8
+    yield UInt16(self, "version")
+    numTables = UInt16(self, "numTables", "Number of encoding tables")
+    yield numTables
+    encodingRecords = []
+    for index in range(numTables.value):
+        entry = EncodingRecord(self, "encodingRecords[]")
+        yield entry
+        encodingRecords.append(entry)
+    encodingRecords.sort(key=lambda field: field["subtableOffset"].value)
+    last = None
+    for er in encodingRecords:
+        offset = er["subtableOffset"].value
+        if last and last == offset:
+            continue
+        last = offset
+
+        # Add padding if any
+        if offset > (self.current_size / 8) - start:
+            padding = self.seekByte(offset, relative=True, null=False)
+            if padding:
+                yield padding
+        format = UInt16(self, "format").value
+        if format == 0:
+            yield CmapTable0(self, "cmap table format 0")
+        elif format == 4:
+            yield CmapTable4(self, "cmap table format 4")
+        elif format == 6:
+            yield CmapTable6(self, "cmap table format 6")
+        elif format == 12:
+            yield CmapTable12(self, "cmap table format 12")
+        elif format == 14:
+            yield CmapTable14(self, "cmap table format 14")
 
 
 def parseNames(self):
@@ -427,6 +552,7 @@ def parseGSUB(self):
 class Table(FieldSet):
     TAG_INFO = {
         "GSUB": ("GSUB", "Glyph Substitutions", parseGSUB),
+        "cmap": ("cmap", "Character to Glyph Index Mapping", parseCmap),
         "head": ("header", "Font header", parseFontHeader),
         "hhea": ("hhea", "Horizontal Header", parseHhea),
         "maxp": ("maxp", "Maximum Profile", parseMaxp),
