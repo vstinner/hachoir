@@ -86,6 +86,12 @@ CHARSET_MAP = {
     3: {1: "UTF-16-BE"},
 }
 
+PERMISSIONS = {
+    0: "Installable embedding",
+    2: "Restricted License embedding",
+    4: "Preview & Print embedding",
+    8: "Editable embedding",
+}
 
 FWORD = Int16
 UFWORD = UInt16
@@ -472,12 +478,25 @@ def parseHhea(self):
     yield Int16(self, "numberOfHMetrics", "Number of horizontal metrics")
 
 
+class fsType(FieldSet):
+    def createFields(self):
+        yield Enum(Bits(self, "usage_permissions", 3), PERMISSIONS)
+        yield PaddingBits(self, "reserved[]", 7)
+        yield Bit(self, "no_subsetting", "Font may not be subsetted prior to embedding")
+        yield Bit(
+            self,
+            "bitmap_embedding",
+            "Only bitmaps contained in the font may be embedded",
+        )
+        yield PaddingBits(self, "reserved[]", 6)
+
+
 def parseOS2(self):
     yield UInt16(self, "version", "Table version")
     yield Int16(self, "xAvgCharWidth")
     yield UInt16(self, "usWeightClass")
     yield UInt16(self, "usWidthClass")
-    yield UInt16(self, "fsType")
+    yield fsType(self, "fsType")
     yield Int16(self, "ySubscriptXSize")
     yield Int16(self, "ySubscriptYSize")
     yield Int16(self, "ySubscriptXOffset")
