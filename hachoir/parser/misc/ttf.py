@@ -122,6 +122,16 @@ class Fixed(FieldSet):
         return self["int_part"].value + float(self["float_part"].value) / 65536
 
 
+class F2DOT14(FieldSet):
+    static_size = 16
+
+    def createFields(self):
+        yield Int16(self, "int_part")
+
+    def createValue(self):
+        return self["int_part"].value / 16384
+
+
 class TableHeader(FieldSet):
     def createFields(self):
         yield Tag(self, "tag")
@@ -210,6 +220,32 @@ def parseFontHeader(self):
     yield Enum(UInt16(self, "font_dir", "Font direction hint"), DIRECTION_NAME)
     yield Enum(UInt16(self, "ofst_format"), {0: "short offsets", 1: "long"})
     yield UInt16(self, "glyph_format", "(=0)")
+
+
+class AxisValueMap(FieldSet):
+    static_size = 32
+
+    def createFields(self):
+        yield F2DOT14(self, "fromCoordinate")
+        yield F2DOT14(self, "toCoordinate")
+
+
+class SegmentMaps(FieldSet):
+    def createFields(self):
+        yield UInt16(
+            self, "positionMapCount", "The number of correspondence pairs for this axis"
+        )
+        for _ in range(self["positionMapCount"].value):
+            yield (AxisValueMap(self, "axisValueMaps[]"))
+
+
+def parseAvar(self):
+    yield UInt16(self, "majorVersion", "Major version")
+    yield UInt16(self, "minorVersion", "Minor version")
+    yield PaddingBits(self, "reserved[]", 16)
+    yield UInt16(self, "axisCount", "The number of variation axes for this font")
+    for _ in range(self["axisCount"].value):
+        yield (SegmentMaps(self, "segmentMaps[]"))
 
 
 class EncodingRecord(FieldSet):
@@ -615,6 +651,7 @@ class Table(FieldSet):
     TAG_INFO = {
         "DSIG": ("DSIG", "Digital Signature", parseDSIG),
         "GSUB": ("GSUB", "Glyph Substitutions", parseGSUB),
+        "avar": ("avar", "Axis variation table", parseAvar),
         "cmap": ("cmap", "Character to Glyph Index Mapping", parseCmap),
         "head": ("header", "Font header", parseFontHeader),
         "hhea": ("hhea", "Horizontal Header", parseHhea),
