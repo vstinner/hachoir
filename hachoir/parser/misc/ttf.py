@@ -329,6 +329,50 @@ def parseCmap(self):
             yield CmapTable14(self, "cmap table format 14")
 
 
+class SignatureRecord(FieldSet):
+    def createFields(self):
+        yield UInt16(self, "format", "Table format")
+        yield UInt16(self, "length", "Length of signature")
+        yield UInt16(self, "signatureBlockOffset", "Offset to signature block")
+
+
+class SignatureBlock(FieldSet):
+    def createFields(self):
+        yield PaddingBits(self, "reserved[]", 32)
+        yield UInt32(
+            self,
+            "length",
+            "Length (in bytes) of the PKCS#7 packet in the signature field",
+        )
+        yield String(self, "signature", self["length"].value, "Signature block")
+
+
+def parseDSIG(self):
+    yield UInt32(self, "version")
+    yield UInt16(self, "numSignatures", "Number of signatures in the table")
+    yield Bit(self, "flag", "Cannot be resigned")
+    yield PaddingBits(self, "reserved[]", 7)
+    entries = []
+    for i in range(self["numSignatures"].value):
+        record = SignatureRecord(self, "signatureRecords[]")
+        entries.append(record)
+        yield record
+    entries.sort(key=lambda field: field["signatureBlockOffset"].value)
+    for entry in entries:
+        offset = er["signatureBlockOffset"].value
+        if last and last == offset:
+            continue
+        last = offset
+        # Add padding if any
+        padding = self.seekByte(offset, relative=True, null=False)
+        if padding:
+            yield padding
+
+    padding = (self.size - self.current_size) // 8
+    if padding:
+        yield NullBytes(self, "padding_end", padding)
+
+
 def parseNames(self):
     # Read header
     yield UInt16(self, "format")
@@ -550,6 +594,7 @@ def parseGSUB(self):
 
 class Table(FieldSet):
     TAG_INFO = {
+        "DSIG": ("DSIG", "Digital Signature", parseDSIG),
         "GSUB": ("GSUB", "Glyph Substitutions", parseGSUB),
         "cmap": ("cmap", "Character to Glyph Index Mapping", parseCmap),
         "head": ("header", "Font header", parseFontHeader),
