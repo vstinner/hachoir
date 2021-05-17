@@ -13,11 +13,22 @@ Creation date: 2007-02-08
 """
 
 from hachoir.parser import Parser
-from hachoir.field import (FieldSet, ParserError,
-                           UInt16, UInt32, Bit, Bits,
-                           PaddingBits, NullBytes,
-                           String, RawBytes, Bytes, Enum,
-                           TimestampMac32)
+from hachoir.field import (
+    FieldSet,
+    ParserError,
+    UInt16,
+    UInt32,
+    Bit,
+    Bits,
+    PaddingBits,
+    NullBytes,
+    String,
+    RawBytes,
+    Bytes,
+    Enum,
+    TimestampMac32,
+    GenericVector,
+)
 from hachoir.core.endian import BIG_ENDIAN
 from hachoir.core.text_handler import textHandler, hexadecimal, filesizeHandler
 
@@ -95,7 +106,6 @@ class TableHeader(FieldSet):
 
 
 class NameHeader(FieldSet):
-
     def createFields(self):
         yield Enum(UInt16(self, "platformID"), PLATFORM_NAME)
         yield UInt16(self, "encodingID")
@@ -147,7 +157,7 @@ def parseFontHeader(self):
     yield Bits(self, "adobe", 2, "(used by Adobe)")
 
     yield UInt16(self, "unit_per_em", "Units per em")
-    if not(16 <= self["unit_per_em"].value <= 16384):
+    if not (16 <= self["unit_per_em"].value <= 16384):
         raise ParserError("TTF: Invalid unit/em value")
     yield UInt32(self, "created_high")
     yield TimestampMac32(self, "created")
@@ -178,13 +188,11 @@ def parseNames(self):
     # Read header
     yield UInt16(self, "format")
     if self["format"].value != 0:
-        raise ParserError("TTF (names): Invalid format (%u)" %
-                          self["format"].value)
+        raise ParserError("TTF (names): Invalid format (%u)" % self["format"].value)
     yield UInt16(self, "count")
     yield UInt16(self, "offset")
     if MAX_NAME_COUNT < self["count"].value:
-        raise ParserError("Invalid number of names (%s)"
-                          % self["count"].value)
+        raise ParserError("Invalid number of names (%s)" % self["count"].value)
 
     # Read name index
     entries = []
@@ -220,7 +228,9 @@ def parseNames(self):
         # Read value
         size = entry["length"].value
         if size:
-            yield String(self, "value[]", size, entry.description, charset=entry.getCharset())
+            yield String(
+                self, "value[]", size, entry.description, charset=entry.getCharset()
+            )
 
     padding = (self.size - self.current_size) // 8
     if padding:
