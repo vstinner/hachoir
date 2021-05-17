@@ -18,6 +18,7 @@ from hachoir.field import (
     ParserError,
     UInt16,
     UInt32,
+    Int16,
     Bit,
     Bits,
     PaddingBits,
@@ -81,6 +82,10 @@ CHARSET_MAP = {
     1: {0: "MacRoman"},
     3: {1: "UTF-16-BE"},
 }
+
+
+FWORD = Int16
+UFWORD = UInt16
 
 
 class Version16Dot16(FieldSet):
