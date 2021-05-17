@@ -105,6 +105,15 @@ class Version16Dot16(FieldSet):
         return float("%u.%x" % (self["major"].value, self["minor"].value))
 
 
+class Fixed(FieldSet):
+    def createFields(self):
+        yield UInt16(self, "int_part")
+        yield UInt16(self, "float_part")
+
+    def createValue(self):
+        return self["int_part"].value + float(self["float_part"].value) / 65536
+
+
 class TableHeader(FieldSet):
     def createFields(self):
         yield Tag(self, "tag")
