@@ -251,10 +251,15 @@ class TrueTypeFontFile(Parser):
     }
 
     def validate(self):
-        if self["maj_ver"].value != 1:
-            return "Invalid major version (%u)" % self["maj_ver"].value
-        if self["min_ver"].value != 0:
-            return "Invalid minor version (%u)" % self["min_ver"].value
+        if self["maj_ver"].value == 1 and self["min_ver"].value == 0:
+            pass
+        elif self["maj_ver"].value == 0x4F54 and self["min_ver"].value == 0x544F:
+            pass
+        else:
+            return "Invalid version (%u.%u)" % (
+                self["maj_ver"].value,
+                self["min_ver"].value,
+            )
         if not (MIN_NB_TABLE <= self["nb_table"].value <= MAX_NB_TABLE):
             return "Invalid number of table (%u)" % self["nb_table"].value
         return True
