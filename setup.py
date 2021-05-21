@@ -83,6 +83,9 @@ def main():
         "extras_require": {
             "urwid": [
                 "urwid==1.3.1"
+            ],
+            "wx": [
+                "darkdetect==0.3.1"
             ]
         },
         "zip_safe": True,

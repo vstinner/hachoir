@@ -1,4 +1,5 @@
 import wx
+import darkdetect
 from .file_cache import FileCache
 
 
@@ -168,7 +169,10 @@ class hex_view_t(wx.ScrolledWindow):
 
         # Draw "textbox" rects under the hex and text views
         dc.SetPen(wx.NullPen)
-        dc.SetBrush(wx.WHITE_BRUSH)
+        if darkdetect.isDark():
+            dc.SetBrush(wx.BLACK_BRUSH)
+        else:
+            dc.SetBrush(wx.WHITE_BRUSH)
         dc.DrawRectangle(lo.boxstart('hex'), 0, lo.boxwidth('hex'), h)
         dc.DrawRectangle(lo.boxstart('text'), 0, lo.boxwidth('text'), h)
 
