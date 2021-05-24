@@ -591,8 +591,8 @@ def parseHhea(self):
 
 class fsType(FieldSet):
     def createFields(self):
-        yield Enum(Bits(self, "usage_permissions", 3), PERMISSIONS)
-        yield PaddingBits(self, "reserved[]", 7)
+        yield Enum(Bits(self, "usage_permissions", 4), PERMISSIONS)
+        yield PaddingBits(self, "reserved[]", 4)
         yield Bit(self, "no_subsetting", "Font may not be subsetted prior to embedding")
         yield Bit(
             self,
