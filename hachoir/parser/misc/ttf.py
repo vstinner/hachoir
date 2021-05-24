@@ -337,7 +337,6 @@ class CmapTable14(FieldSet):
 
 
 def parseCmap(self):
-    start = self.current_size / 8
     yield UInt16(self, "version")
     numTables = UInt16(self, "numTables", "Number of encoding tables")
     yield numTables
@@ -400,8 +399,9 @@ def parseDSIG(self):
         entries.append(record)
         yield record
     entries.sort(key=lambda field: field["signatureBlockOffset"].value)
+    last = None
     for entry in entries:
-        offset = er["signatureBlockOffset"].value
+        offset = entry["signatureBlockOffset"].value
         if last and last == offset:
             continue
         last = offset
@@ -611,7 +611,8 @@ def parsePost(self):
         yield indices
 
 
-parseScriptList = parseFeatureList = parseLookupList = lambda x: None
+# This is work-in-progress until I work out good ways to do random-access on offsets
+parseScriptList = parseFeatureList = parseLookupList = parseFeatureVariationsTable = lambda x: None
 
 
 def parseGSUB(self):
