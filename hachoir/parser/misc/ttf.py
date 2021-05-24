@@ -122,6 +122,16 @@ class Fixed(FieldSet):
         return self["int_part"].value + float(self["float_part"].value) / 65536
 
 
+class Tuple(FieldSet):
+    def __init__(self, parent, name, axisCount):
+        super().__init__(parent, name, description="Tuple Record")
+        self.axisCount = axisCount
+
+    def createFields(self):
+        for _ in range(self.axisCount):
+            yield (Fixed(self, "coordinate[]"))
+
+
 class F2DOT14(FieldSet):
     static_size = 16
 
@@ -246,6 +256,71 @@ def parseAvar(self):
     yield UInt16(self, "axisCount", "The number of variation axes for this font")
     for _ in range(self["axisCount"].value):
         yield (SegmentMaps(self, "segmentMaps[]"))
+
+
+class VariationAxisRecord(FieldSet):
+    def createFields(self):
+        yield Tag(self, "axisTag", "Tag identifying the design variation for the axis")
+        yield Fixed(self, "minValue", "The minimum coordinate value for the axis")
+        yield Fixed(self, "defaultValue", "The default coordinate value for the axis")
+        yield Fixed(self, "maxValue", "The maximum coordinate value for the axis")
+        yield PaddingBits(self, "reservedFlags", 15)
+        yield Bit(
+            self, "hidden", "The axis should not be exposed directly in user interfaces"
+        )
+        yield UInt16(
+            self,
+            "axisNameID",
+            "The name ID for entries in the 'name' table that provide a display name for this axis",
+        )
+
+
+class InstanceRecord(FieldSet):
+    def __init__(self, parent, name, axisCount, hasPSNameID=False):
+        super().__init__(parent, name, description="Instance record")
+        self.axisCount = axisCount
+        self.hasPSNameID = hasPSNameID
+
+    def createFields(self):
+        yield UInt16(
+            self, "subfamilyNameID", "Name ID for subfamily names for this instance"
+        )
+        yield PaddingBits(self, "reservedFlags", 16)
+        yield Tuple(self, "coordinates", axisCount=self.axisCount)
+        if self.hasPSNameID:
+            yield UInt16(
+                self,
+                "postScriptNameID",
+                "Name ID for PostScript names for this instance",
+            )
+
+
+def parseFvar(self):
+    yield UInt16(self, "majorVersion", "Major version")
+    yield UInt16(self, "minorVersion", "Minor version")
+    yield UInt16(
+        self, "axisArrayOffset", "Offset to the start of the VariationAxisRecord array."
+    )
+    yield PaddingBits(self, "reserved[]", 16)
+    yield UInt16(self, "axisCount", "The number of variation axes for this font")
+    yield UInt16(self, "axisSize", "The size in bytes of each VariationAxisRecord")
+    yield UInt16(self, "instanceCount", "The number of named instances for this font")
+    yield UInt16(self, "instanceSize", "The size in bytes of each InstanceRecord")
+    if self["axisArrayOffset"].value > 16:
+        yield PaddingBits(self, "padding", 8 * (self["axisArrayOffset"].value - 16))
+    for _ in range(self["axisCount"].value):
+        yield (VariationAxisRecord(self, "axes[]"))
+    for _ in range(self["instanceCount"].value):
+        yield (
+            InstanceRecord(
+                self,
+                "instances[]",
+                axisCount=self["axisCount"].value,
+                hasPSNameID=(
+                    self["instanceSize"].value == (2 * self["axisCount"].value + 6)
+                ),
+            )
+        )
 
 
 class EncodingRecord(FieldSet):
@@ -612,7 +687,9 @@ def parsePost(self):
 
 
 # This is work-in-progress until I work out good ways to do random-access on offsets
-parseScriptList = parseFeatureList = parseLookupList = parseFeatureVariationsTable = lambda x: None
+parseScriptList = (
+    parseFeatureList
+) = parseLookupList = parseFeatureVariationsTable = lambda x: None
 
 
 def parseGSUB(self):
@@ -654,6 +731,7 @@ class Table(FieldSet):
         "GSUB": ("GSUB", "Glyph Substitutions", parseGSUB),
         "avar": ("avar", "Axis variation table", parseAvar),
         "cmap": ("cmap", "Character to Glyph Index Mapping", parseCmap),
+        "fvar": ("fvar", "Font variations table", parseFvar),
         "head": ("header", "Font header", parseFontHeader),
         "hhea": ("hhea", "Horizontal Header", parseHhea),
         "maxp": ("maxp", "Maximum Profile", parseMaxp),
