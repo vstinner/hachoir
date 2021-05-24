@@ -736,7 +736,7 @@ class Table(FieldSet):
         "hhea": ("hhea", "Horizontal Header", parseHhea),
         "maxp": ("maxp", "Maximum Profile", parseMaxp),
         "name": ("names", "Names", parseNames),
-        "OS/2": ("OS/2", "OS/2 and Windows Metrics", parseOS2),
+        "OS/2": ("OS_2", "OS/2 and Windows Metrics", parseOS2),
         "post": ("post", "PostScript", parsePost),
     }
 
