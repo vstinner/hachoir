@@ -836,6 +836,12 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "/bpp", 32)
         self.checkDisplay(parser, "/codec", "True-color RLE")
 
+    def test_ttf(self):
+        parser = self.parse("deja_vu_serif-2.7.ttf")
+        self.checkValue(parser, "/hhea/ascender", 1901)
+        self.checkValue(parser, "/maxp/maxCompositePoints", 101)
+        self.checkValue(parser, "/cmap/encodingRecords[1]/platformID", 1)
+
 
 class TestParserRandomStream(unittest.TestCase):
 
