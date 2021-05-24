@@ -841,6 +841,7 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "/hhea/ascender", 1901)
         self.checkValue(parser, "/maxp/maxCompositePoints", 101)
         self.checkValue(parser, "/cmap/encodingRecords[1]/platformID", 1)
+        self.checkValue(parser, "/OS_2/achVendID", "Deja")
 
 
 class TestParserRandomStream(unittest.TestCase):
