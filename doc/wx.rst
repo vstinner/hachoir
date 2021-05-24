@@ -22,3 +22,4 @@ Command line options
 * ``--preload=10``: Load 10 fields when loading a new field set
 * ``--path="/header/bpp"``: Open the specified path and focus on the field
 * ``--parser=PARSERID``: Force a parser (and skip parser validation)
+* ``--help``: Show all command line options
