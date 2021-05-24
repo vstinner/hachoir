@@ -4,7 +4,7 @@ from .file_cache import FileCache
 try:
     import darkdetect
     darkmode = darkdetect.isDark()
-except ImportError as e:
+except ImportError:
     darkmode = False
 
 
