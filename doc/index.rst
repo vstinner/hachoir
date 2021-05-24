@@ -16,6 +16,7 @@ Command line tools using Hachoir parsers:
 
 * :ref:`hachoir-metadata <metadata>`: get metadata from binary files
 * :ref:`hachoir-urwid <urwid>`: display the content of a binary file in text mode
+* :ref:`hachoir-wx <wx>`: display the content of a binary file in GUI mode
 * :ref:`hachoir-grep <grep>`: find a text pattern in a binary file
 * :ref:`hachoir-strip <strip>`: modify a file to remove metadata
 
@@ -32,6 +33,7 @@ User Guide
    install
    metadata
    urwid
+   wx
    subfile
    grep
    strip
