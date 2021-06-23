@@ -169,7 +169,7 @@ class LZXBlock(FieldSet):
                     field._description = "Literal value %r" % chr(
                         field.realvalue)
                     current_decoded_size += 1
-                    self.parent.uncompressed_data += chr(field.realvalue)
+                    self.parent.uncompressed_data.append(field.realvalue)
                     yield field
                     continue
                 position_header, length_header = divmod(
@@ -243,8 +243,7 @@ class LZXBlock(FieldSet):
                     self.parent.r2 = self.parent.r1
                     self.parent.r1 = self.parent.r0
                     self.parent.r0 = position
-                self.parent.uncompressed_data = extend_data(
-                    self.parent.uncompressed_data, length, position)
+                extend_data(self.parent.uncompressed_data, length, position)
                 current_decoded_size += length
         elif self.block_type == 3:  # Uncompressed block
             padding = paddingSize(self.address + self.current_size, 16)
@@ -271,7 +270,7 @@ class LZXStream(Parser):
     endian = MIDDLE_ENDIAN
 
     def createFields(self):
-        self.uncompressed_data = ""
+        self.uncompressed_data = bytearray()
         self.r0 = 1
         self.r1 = 1
         self.r2 = 1
@@ -291,6 +290,6 @@ class LZXStream(Parser):
 def lzx_decompress(stream, window_bits):
     data = LZXStream(stream)
     data.compr_level = window_bits
-    for unused in data:
+    for _ in data:
         pass
     return data.uncompressed_data
