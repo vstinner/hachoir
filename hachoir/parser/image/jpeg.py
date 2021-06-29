@@ -387,7 +387,10 @@ class JpegImageData(FieldSet):
             end = self.stream.searchBytes(b"\xff", start, MAX_FILESIZE * 8)
             if end is None:
                 # this is a bad sign, since it means there is no terminator
-                # we ignore this; it likely means a truncated image
+                # this likely means a truncated image:
+                # set the size to the remaining length of the stream
+                # to avoid being forced to parse subfields to calculate size
+                self._size = self.stream._size - self.absolute_address
                 break
             if self.stream.readBytes(end, 2) == b'\xff\x00':
                 # padding: false alarm
