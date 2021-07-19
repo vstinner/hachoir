@@ -61,7 +61,7 @@ class TimeDateMSDOS32(FieldSet):
 
     def createValue(self):
         return datetime(
-            1980 + self["year"].value, self["month"].value, self["day"].value,
+            1980 + self["year"].value, self["month"].value or 1, self["day"].value or 1,
             self["hour"].value, self["minute"].value, 2 * self["second"].value)
 
     def createDisplay(self):
