@@ -843,6 +843,16 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "/cmap/encodingRecords[1]/platformID", 1)
         self.checkValue(parser, "/OS_2/achVendID", "Deja")
 
+    def test_fit(self):
+        parser = self.parse("test_file.fit")
+        self.checkValue(parser, "/header/datasize", 8148)
+        self.checkValue(parser, "/definition[18]/msgNumber", 325)
+        self.checkValue(parser, "/definition[18]/fieldDefinition[6]/number", 5)
+        self.checkValue(parser, "/definition[18]/RecordHeader/msgType", 2)
+        self.checkValue(parser, "/data[50]/field0", 1000231166)
+        self.checkValue(parser, "/data[50]/field1", 111)
+        self.checkValue(parser, "/data[50]/field2", 96)
+
 
 class TestParserRandomStream(unittest.TestCase):
 
