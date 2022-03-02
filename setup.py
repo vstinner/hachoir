@@ -72,6 +72,9 @@ def main():
         "name": "hachoir",
         "version": hachoir.__version__,
         "url": 'http://hachoir.readthedocs.io/',
+        "project_urls": {
+            "Source": "https://github.com/vstinner/hachoir",
+        },
         "author": "Hachoir team (see AUTHORS file)",
         "description": "Package of Hachoir parsers used to open binary files",
         "long_description": long_description,
