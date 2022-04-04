@@ -8,8 +8,8 @@
 #  - Remove untracked files/dirs: git clean -fdx
 #  - run tests: tox --parallel auto
 #  - run: git push
-#  - check Travis CI status:
-#    https://travis-ci.com/github/vstinner/hachoir
+#  - check GitHub Actions status:
+#    https://github.com/vstinner/hachoir/actions
 #
 # Release a new version:
 #

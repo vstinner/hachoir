@@ -2,11 +2,20 @@
 Changelog
 +++++++++
 
-hachoir 3.1.3 (WIP)
-===================
+hachoir 3.1.3 (2022-04-04)
+==========================
 * The development branch ``master`` was renamed to ``main``.
   See https://sfconservancy.org/news/2020/jun/23/gitbranchname/ for the
   rationale.
+* Replace Travis CI with GitHub Actions.
+* ttf: Support OpenType magic number (OTTO).
+* hachoir-wx: Load darkdetect and test once, fallback if not found.
+* Add hachoir-wx docs.
+* jpeg: Set the size of a JpegImageData with no terminator to the
+ remaining length in the stream to avoid parsing subfields of the JpegImageData
+ if possible.
+* fit: Add parser of Garmin fit files.
+* lzx: Fix LZX decompression.
 
 hachoir 3.1.2 (2020-02-15)
 ==========================
