@@ -12,8 +12,8 @@ hachoir 3.1.3 (2022-04-04)
 * hachoir-wx: Load darkdetect and test once, fallback if not found.
 * Add hachoir-wx docs.
 * jpeg: Set the size of a JpegImageData with no terminator to the
- remaining length in the stream to avoid parsing subfields of the JpegImageData
- if possible.
+  remaining length in the stream to avoid parsing subfields of the JpegImageData
+  if possible.
 * fit: Add parser of Garmin fit files.
 * lzx: Fix LZX decompression.
 
