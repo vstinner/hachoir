@@ -4,7 +4,7 @@ string, number, hexadecimal, etc.
 """
 
 from hachoir.core.endian import BIG_ENDIAN, LITTLE_ENDIAN, MIDDLE_ENDIAN
-from struct import calcsize, unpack, error as struct_error
+from struct import calcsize, error as struct_error
 
 
 def swap16(value):
