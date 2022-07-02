@@ -1,12 +1,6 @@
 import wx
 from .file_cache import FileCache
 
-try:
-    import darkdetect
-    darkmode = darkdetect.isDark()
-except ImportError:
-    darkmode = False
-
 
 textchars = set('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ ')
 text_view_transtable = bytes([c if chr(c) in textchars else ord('.') for c in range(256)])
@@ -174,10 +168,7 @@ class hex_view_t(wx.ScrolledWindow):
 
         # Draw "textbox" rects under the hex and text views
         dc.SetPen(wx.NullPen)
-        if darkmode:
-            dc.SetBrush(wx.BLACK_BRUSH)
-        else:
-            dc.SetBrush(wx.WHITE_BRUSH)
+        dc.SetBrush(wx.Brush(wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOW)))
         dc.DrawRectangle(lo.boxstart('hex'), 0, lo.boxwidth('hex'), h)
         dc.DrawRectangle(lo.boxstart('text'), 0, lo.boxwidth('text'), h)
 
@@ -186,7 +177,7 @@ class hex_view_t(wx.ScrolledWindow):
 
         # Draw highlights under the selected field
         if self.field_span is not None:
-            dc.SetBrush(wx.LIGHT_GREY_BRUSH)
+            dc.SetBrush(wx.Brush(wx.SystemSettings.GetColour(wx.SYS_COLOUR_HOTLIGHT)))
             self.highlight_region(dc, *self.field_span)
 
         # Draw the actual text
