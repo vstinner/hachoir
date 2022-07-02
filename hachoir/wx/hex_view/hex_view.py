@@ -149,15 +149,15 @@ class hex_view_t(wx.ScrolledWindow):
             hl_start = max(start, rowstart)
             hl_end = min(end, rowend)
 
-            hy = ch * row - offset
-            hx = self.layout.textstart('hex') + (hl_start - rowstart) * 3 * cw
-            hw = ((hl_end - hl_start) * 3 - 1) * cw
-            hh = ch
+            hy = int(ch * row - offset)
+            hx = int(self.layout.textstart('hex') + (hl_start - rowstart) * 3 * cw)
+            hw = int(((hl_end - hl_start) * 3 - 1) * cw)
+            hh = int(ch)
 
             dc.DrawRectangle(hx, hy, hw, hh)
 
-            hx = self.layout.textstart('text') + (hl_start - rowstart) * cw
-            hw = (hl_end - hl_start) * cw
+            hx = int(self.layout.textstart('text') + (hl_start - rowstart) * cw)
+            hw = int((hl_end - hl_start) * cw)
             dc.DrawRectangle(hx, hy, hw, hh)
 
     def OnPaint(self, event):
