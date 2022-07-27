@@ -859,6 +859,20 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "/data[50]/field1", 111)
         self.checkValue(parser, "/data[50]/field2", 96)
 
+    def test_arj(self):
+        parser = self.parse("example2.arj")
+        self.checkValue(parser, "/header/crc", 0xd2fe10aa)
+        self.checkValue(parser, "/header/filename", "example2.arj")
+        self.checkValue(parser, "/file_header[1]/filename", "usr/bin/awk")
+        self.checkValue(parser, "/file_header[1]/original_size", 125416)
+
+    def test_arj2(self):
+        parser = self.parse("example4_chapters.arj")
+        self.checkValue(parser, "/header/crc", 0x967cc3b)
+        self.checkValue(parser, "/header/filename", "example4.arj")
+        self.checkValue(parser, "/file_header[15]/filename", "usr/bin/groups")
+        self.checkValue(parser, "/file_header[15]/original_size", 35000)
+
 
 class TestParserRandomStream(unittest.TestCase):
 
