@@ -1,3 +1,9 @@
+"""
+ARJ archive file parser
+
+https://github.com/FarGroup/FarManager/blob/master/plugins/multiarc/arc.doc/arj.txt
+"""
+
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.field import (FieldSet, ParserError,
                            CString, Enum, RawBytes,
