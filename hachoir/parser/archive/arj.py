@@ -61,7 +61,6 @@ class BaseBlock(FieldSet):
         name_position = fhs.address // 8 + fhs.value
         current_position = self["last_chapter"].address // 8 + 1
         if name_position > current_position:
-            # yield UInt32(self, "reserved2")
             yield RawBytes(self, "reserved2", name_position - current_position)
 
         yield CString(self, "filename", "File name", charset="ASCII")
