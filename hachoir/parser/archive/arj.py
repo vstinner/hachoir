@@ -1,6 +1,6 @@
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.field import (FieldSet, ParserError,
-                           CString, Enum, RawBytes
+                           CString, Enum, RawBytes,
                            UInt8, UInt16, UInt32,
                            Bytes)
 from hachoir.parser import Parser
