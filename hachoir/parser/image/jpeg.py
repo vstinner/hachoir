@@ -205,7 +205,7 @@ class SOSComponent(FieldSet):
     def createFields(self):
         comp_id = UInt8(self, "component_id")
         yield comp_id
-        if not(1 <= comp_id.value <= self["../nr_components"].value):
+        if not (1 <= comp_id.value <= self["../nr_components"].value):
             raise ParserError("JPEG error: Invalid component-id")
         yield Bits(self, "dc_coding_table", 4, "DC entropy coding table destination selector")
         yield Bits(self, "ac_coding_table", 4, "AC entropy coding table destination selector")

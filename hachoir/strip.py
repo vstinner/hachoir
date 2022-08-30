@@ -278,7 +278,7 @@ def main():
         if parser:
             editor = createEditor(parser)
             ok &= stripEditor(editor, filename + ".new",
-                              level, not(values.quiet))
+                              level, not values.quiet)
         else:
             ok = False
     if ok:

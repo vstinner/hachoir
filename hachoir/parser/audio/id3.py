@@ -451,7 +451,7 @@ class ID3_Chunk(FieldSet):
 
         if size:
             cls = None
-            if not(is_compressed):
+            if not is_compressed:
                 tag = self["tag"].value
                 if tag in ID3_Chunk.handler:
                     cls = ID3_Chunk.handler[tag]

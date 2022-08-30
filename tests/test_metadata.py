@@ -126,7 +126,7 @@ class TestMetadata(unittest.TestCase):
 
             # Check type
             if type(read) != type(value) \
-                    and not(isinstance(value, int) and isinstance(value, int)):
+                    and not (isinstance(value, int) and isinstance(value, int)):
                 if self.verbose:
                     sys.stdout.write("wrong type (%s instead of %s)!\n"
                                      % (type(read).__name__, type(value).__name__))

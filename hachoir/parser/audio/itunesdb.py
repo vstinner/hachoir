@@ -128,7 +128,7 @@ class DataObject(FieldSet):
                 yield padding
             for i in range(self["entry_count"].value):
                 yield UInt32(self, "index[" + str(i) + "]", "Index of the " + str(i) + "nth mhit")
-        elif(self["type"].value < 15) or (self["type"].value > 17) or (self["type"].value >= 200):
+        elif (self["type"].value < 15) or (self["type"].value > 17) or (self["type"].value >= 200):
             yield UInt32(self, "unknown[]")
             yield UInt32(self, "unknown[]")
             yield UInt32(self, "position", "Position")

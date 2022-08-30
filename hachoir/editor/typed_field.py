@@ -101,7 +101,7 @@ class EditableBits(EditableFixedField):
             self._is_altered = True
 
     def _setValue(self, value):
-        if not(0 <= value < (1 << self._size)):
+        if not (0 <= value < (1 << self._size)):
             raise ValueError("Invalid value, must be in range %s..%s"
                              % (0, (1 << self._size) - 1))
         self._value = value
@@ -248,7 +248,7 @@ class EditableInteger(EditableFixedField):
         else:
             valid = self.VALID_VALUE_UNSIGNED
         minval, maxval = valid[self._size]
-        if not(minval <= value <= maxval):
+        if not (minval <= value <= maxval):
             raise ValueError("Invalid value, must be in range %s..%s"
                              % (minval, maxval))
         self._value = value
@@ -274,7 +274,7 @@ class EditableTimestampMac32(EditableFixedField):
         EditableFixedField.__init__(self, parent, name, value, 32)
 
     def _setValue(self, value):
-        if not(self.minval <= value <= self.maxval):
+        if not (self.minval <= value <= self.maxval):
             raise ValueError("Invalid value, must be in range %s..%s"
                              % (self.minval, self.maxval))
         self._value = value

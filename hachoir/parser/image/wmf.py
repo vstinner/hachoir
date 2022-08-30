@@ -597,7 +597,7 @@ class WMF_File(Parser):
             yield UInt32(self, "max_record_size", "The size of largest record in 16-bit words")
             yield UInt16(self, "nb_params", "Not Used (always 0)")
 
-        while not(self.eof):
+        while not self.eof:
             yield Function(self, "func[]")
 
     def isEMF(self):

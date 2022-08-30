@@ -41,7 +41,7 @@ class UIntVbe(Field):
             size += 1
             assert size < 100, "UIntVBE is too large"
 
-            if not(haveMoreData):
+            if not haveMoreData:
                 break
 
         self._size = size * 8
@@ -71,7 +71,7 @@ class IntVbe(Field):
             size += 1
             assert size < 100, "IntVBE is too large"
 
-            if not(haveMoreData):
+            if not haveMoreData:
                 break
 
         if isNegative:
@@ -142,7 +142,7 @@ class TileHeader(FieldSet):
     def createFields(self):
         numLevels = int(self.zoomIntervalCfg[
                         "max_zoom_level"].value - self.zoomIntervalCfg["min_zoom_level"].value) + 1
-        assert(numLevels < 50)
+        assert (numLevels < 50)
         for i in range(numLevels):
             yield TileZoomTable(self, "zoom_table_entry[]")
         yield UIntVbe(self, "first_way_offset")

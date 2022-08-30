@@ -244,7 +244,7 @@ class PacketElement(FieldSet):
             yield Bits(self, "sync[]", 4)  # =2, or 3 if has_dts=True
             yield Timestamp(self, "pts")
         if self["has_dts"].value:
-            if not(self["has_pts"].value):
+            if not self["has_pts"].value:
                 raise ParserError("Invalid PTS/DTS values")
             yield Bits(self, "sync[]", 4)  # =1
             yield Timestamp(self, "dts")

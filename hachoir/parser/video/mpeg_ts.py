@@ -134,7 +134,7 @@ class MPEG_TS(Parser):
         # FIXME: detect using file content, not file name
         # maybe detect sync at offset+4 bytes?
         source = self.stream.source
-        if not(source and source.startswith("file:")):
+        if not (source and source.startswith("file:")):
             return True
         filename = source[5:].lower()
         return filename.endswith((".m2ts", ".mts"))

@@ -32,7 +32,7 @@ def field_type_name(field):
 
 
 def convert_size(from_field, to_type):
-    if not(('Byte' in field_type_name(from_field)) ^ ('Byte' in to_type.__name__)):
+    if not (('Byte' in field_type_name(from_field)) ^ ('Byte' in to_type.__name__)):
         return from_field.size
     elif 'Byte' in field_type_name(from_field):
         return from_field.size * 8

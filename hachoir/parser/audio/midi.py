@@ -29,7 +29,7 @@ class Integer(Bits):
         while True:
             bits = stream.readBits(addr, 8, parent.endian)
             value = (value << 7) + (bits & 127)
-            if not(bits & 128):
+            if not (bits & 128):
                 break
             addr += 8
             self._size += 8

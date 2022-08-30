@@ -747,7 +747,7 @@ class EXT2_FS(HachoirParser, RootSeekableFieldSet):
     def validate(self):
         if self.stream.readBytes((1024 + 56) * 8, 2) != b"\x53\xEF":
             return "Invalid magic number"
-        if not(0 <= self["superblock/log_block_size"].value <= 2):
+        if not (0 <= self["superblock/log_block_size"].value <= 2):
             return "Invalid (log) block size"
         if self["superblock/inode_size"].value not in (0, 128):
             return "Unsupported inode size"
