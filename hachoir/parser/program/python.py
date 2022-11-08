@@ -10,10 +10,12 @@ Creation: 25 march 2005
 """
 
 from hachoir.parser import Parser
-from hachoir.field import (FieldSet, UInt8,
-                           UInt16, Int32, UInt32, Int64, ParserError, Float64,
-                           Character, RawBytes, PascalString8, TimestampUnix32,
-                           Bit, String)
+from hachoir.field import (
+    FieldSet, UInt8,
+    UInt16, Int32, UInt32, Int64, UInt64,
+    ParserError, Float64,
+    Character, RawBytes, PascalString8, TimestampUnix32,
+    Bit, String, NullBits)
 from hachoir.core.endian import LITTLE_ENDIAN
 from hachoir.core.bits import long2raw
 from hachoir.core.text_handler import textHandler, hexadecimal
@@ -152,13 +154,17 @@ def parseShortASCII(parent):
 
 
 def parseCode(parent):
-    if 0x3000000 <= parent.root.getVersion():
+    version = parent.root.getVersion()
+    if 0x3000000 <= version:
         yield UInt32(parent, "arg_count", "Argument count")
+        if 0x3080000 <= version:
+            yield UInt32(parent, "posonlyargcount", "Positional only argument count")
         yield UInt32(parent, "kwonlyargcount", "Keyword only argument count")
-        yield UInt32(parent, "nb_locals", "Number of local variables")
+        if version < 0x30B0000:
+            yield UInt32(parent, "nb_locals", "Number of local variables")
         yield UInt32(parent, "stack_size", "Stack size")
         yield UInt32(parent, "flags")
-    elif 0x2030000 <= parent.root.getVersion():
+    elif 0x2030000 <= version:
         yield UInt32(parent, "arg_count", "Argument count")
         yield UInt32(parent, "nb_locals", "Number of local variables")
         yield UInt32(parent, "stack_size", "Stack size")
@@ -168,20 +174,34 @@ def parseCode(parent):
         yield UInt16(parent, "nb_locals", "Number of local variables")
         yield UInt16(parent, "stack_size", "Stack size")
         yield UInt16(parent, "flags")
+
     yield Object(parent, "compiled_code")
     yield Object(parent, "consts")
     yield Object(parent, "names")
-    yield Object(parent, "varnames")
-    if 0x2000000 <= parent.root.getVersion():
-        yield Object(parent, "freevars")
-        yield Object(parent, "cellvars")
+    if 0x30B0000 <= version:
+        yield Object(parent, "co_localsplusnames")
+        yield Object(parent, "co_localspluskinds")
+    else:
+        yield Object(parent, "varnames")
+        if 0x2000000 <= version:
+            yield Object(parent, "freevars")
+            yield Object(parent, "cellvars")
+
     yield Object(parent, "filename")
     yield Object(parent, "name")
-    if 0x2030000 <= parent.root.getVersion():
+    if 0x30B0000 <= version:
+        yield Object(parent, "qualname")
+
+    if 0x2030000 <= version:
         yield UInt32(parent, "firstlineno", "First line number")
     else:
         yield UInt16(parent, "firstlineno", "First line number")
-    yield Object(parent, "lnotab")
+    if 0x30A0000 <= version:
+        yield Object(parent, "linetable")
+        if 0x30B0000 <= version:
+            yield Object(parent, "exceptiontable")
+    else:
+        yield Object(parent, "lnotab")
 
 
 class Object(FieldSet):
@@ -301,6 +321,16 @@ class BytecodeChar(Character):
     static_size = 7
 
 
+PY_RELEASE_LEVEL_ALPHA = 0xA
+PY_RELEASE_LEVEL_FINAL = 0xF
+
+
+def VERSION(major, minor, release_level=PY_RELEASE_LEVEL_FINAL, serial=0):
+    micro = 0
+    return ((major << 24) + (minor << 16) + (micro << 8)
+            + (release_level << 4) + (serial << 0))
+
+
 class PythonCompiledFile(Parser):
     PARSER_TAGS = {
         "id": "python",
@@ -394,7 +424,90 @@ class PythonCompiledFile(Parser):
         3377: ("Python 3.6b1 ", 0x3060000),
         3378: ("Python 3.6b2 ", 0x3060000),
         3379: ("Python 3.6rc1", 0x3060000),
-        3390: ("Python 3.7a0 ", 0x3070000),
+        3390: ("Python 3.7a1", 0x30700A1),
+        3391: ("Python 3.7a2", 0x30700A2),
+        3392: ("Python 3.7a4", 0x30700A4),
+        3393: ("Python 3.7b1", 0x30700B1),
+        3394: ("Python 3.7b5", 0x30700B5),
+        3400: ("Python 3.8a1", VERSION(3, 8)),
+        3401: ("Python 3.8a1", VERSION(3, 8)),
+        3410: ("Python 3.8a1", VERSION(3, 8)),
+        3411: ("Python 3.8b2", VERSION(3, 8)),
+        3412: ("Python 3.8b2", VERSION(3, 8)),
+        3413: ("Python 3.8b4", VERSION(3, 8)),
+        3420: ("Python 3.9a0", VERSION(3, 9)),
+        3421: ("Python 3.9a0", VERSION(3, 9)),
+        3422: ("Python 3.9a0", VERSION(3, 9)),
+        3423: ("Python 3.9a2", VERSION(3, 9)),
+        3424: ("Python 3.9a2", VERSION(3, 9)),
+        3425: ("Python 3.9a2", VERSION(3, 9)),
+        3430: ("Python 3.10a1", VERSION(3, 10)),
+        3431: ("Python 3.10a1", VERSION(3, 10)),
+        3432: ("Python 3.10a2", VERSION(3, 10)),
+        3433: ("Python 3.10a2", VERSION(3, 10)),
+        3434: ("Python 3.10a6", VERSION(3, 10)),
+        3435: ("Python 3.10a7", VERSION(3, 10)),
+        3436: ("Python 3.10b1", VERSION(3, 10)),
+        3437: ("Python 3.10b1", VERSION(3, 10)),
+        3438: ("Python 3.10b1", VERSION(3, 10)),
+        3439: ("Python 3.10b1", VERSION(3, 10)),
+        3450: ("Python 3.11a1", VERSION(3, 11)),
+        3451: ("Python 3.11a1", VERSION(3, 11)),
+        3452: ("Python 3.11a1", VERSION(3, 11)),
+        3453: ("Python 3.11a1", VERSION(3, 11)),
+        3454: ("Python 3.11a1", VERSION(3, 11)),
+        3455: ("Python 3.11a1", VERSION(3, 11)),
+        3456: ("Python 3.11a1", VERSION(3, 11)),
+        3457: ("Python 3.11a1", VERSION(3, 11)),
+        3458: ("Python 3.11a1", VERSION(3, 11)),
+        3459: ("Python 3.11a1", VERSION(3, 11)),
+        3460: ("Python 3.11a1", VERSION(3, 11)),
+        3461: ("Python 3.11a1", VERSION(3, 11)),
+        3462: ("Python 3.11a2", VERSION(3, 11)),
+        3463: ("Python 3.11a3", VERSION(3, 11)),
+        3464: ("Python 3.11a3", VERSION(3, 11)),
+        3465: ("Python 3.11a3", VERSION(3, 11)),
+        3466: ("Python 3.11a4", VERSION(3, 11)),
+        3467: ("Python 3.11a4", VERSION(3, 11)),
+        3468: ("Python 3.11a4", VERSION(3, 11)),
+        3469: ("Python 3.11a4", VERSION(3, 11)),
+        3470: ("Python 3.11a4", VERSION(3, 11)),
+        3471: ("Python 3.11a4", VERSION(3, 11)),
+        3472: ("Python 3.11a4", VERSION(3, 11)),
+        3473: ("Python 3.11a4", VERSION(3, 11)),
+        3474: ("Python 3.11a4", VERSION(3, 11)),
+        3475: ("Python 3.11a5", VERSION(3, 11)),
+        3476: ("Python 3.11a5", VERSION(3, 11)),
+        3477: ("Python 3.11a5", VERSION(3, 11)),
+        3478: ("Python 3.11a5", VERSION(3, 11)),
+        3479: ("Python 3.11a5", VERSION(3, 11)),
+        3480: ("Python 3.11a5", VERSION(3, 11)),
+        3481: ("Python 3.11a5", VERSION(3, 11)),
+        3482: ("Python 3.11a5", VERSION(3, 11)),
+        3483: ("Python 3.11a5", VERSION(3, 11)),
+        3484: ("Python 3.11a5", VERSION(3, 11)),
+        3485: ("Python 3.11a5", VERSION(3, 11)),
+        3486: ("Python 3.11a6", VERSION(3, 11)),
+        3487: ("Python 3.11a6", VERSION(3, 11)),
+        3488: ("Python 3.11a6", VERSION(3, 11)),
+        3489: ("Python 3.11a6", VERSION(3, 11)),
+        3490: ("Python 3.11a6", VERSION(3, 11)),
+        3491: ("Python 3.11a6", VERSION(3, 11)),
+        3492: ("Python 3.11a7", VERSION(3, 11)),
+        3493: ("Python 3.11a7", VERSION(3, 11)),
+        3494: ("Python 3.11a7", VERSION(3, 11)),
+        3500: ("Python 3.12a1", VERSION(3, 12)),
+        3501: ("Python 3.12a1", VERSION(3, 12)),
+        3502: ("Python 3.12a1", VERSION(3, 12)),
+        3503: ("Python 3.12a1", VERSION(3, 12)),
+        3504: ("Python 3.12a1", VERSION(3, 12)),
+        3505: ("Python 3.12a1", VERSION(3, 12)),
+        3506: ("Python 3.12a1", VERSION(3, 12)),
+        3507: ("Python 3.12a1", VERSION(3, 12)),
+        3508: ("Python 3.12a1", VERSION(3, 12)),
+        3509: ("Python 3.12a1", VERSION(3, 12)),
+        3510: ("Python 3.12a1", VERSION(3, 12)),
+        3511: ("Python 3.12a1", VERSION(3, 12)),
     }
 
     # Dictionnary which associate the pyc signature (4-byte long string)
@@ -416,9 +529,10 @@ class PythonCompiledFile(Parser):
             offset = 12
         else:
             offset = 8
-        value = self.stream.readBits(offset * 8, 7, self.endian)
-        if value != ord(b'c'):
-            return "First object bytecode is not code"
+        if 0:
+            value = self.stream.readBits(offset * 8, 7, self.endian)
+            if value != ord(b'c'):
+                return "First object bytecode is not code"
         return True
 
     def getVersion(self):
@@ -430,8 +544,22 @@ class PythonCompiledFile(Parser):
     def createFields(self):
         yield UInt16(self, "magic_number", "Magic number")
         yield String(self, "magic_string", 2, r"Magic string \r\n", charset="ASCII")
-        yield TimestampUnix32(self, "timestamp", "Timestamp")
         version = self.getVersion()
-        if version >= 0x3030000 and self['magic_number'].value >= 3200:
-            yield UInt32(self, "filesize", "Size of the Python source file (.py) modulo 2**32")
+
+        # PEP 552: Deterministic pycs #31650 (Python 3.7a4); magic=3392
+        if version >= 0x30700A4:
+            yield Bit(self, "use_hash", "Is hash based?")
+            yield Bit(self, "checked")
+            yield NullBits(self, "reserved", 30)
+            use_hash = self['use_hash'].value
+        else:
+            use_hash = False
+
+        if use_hash:
+            yield UInt64(self, "hash")
+        else:
+            yield TimestampUnix32(self, "timestamp", "Timestamp modulo 2**32")
+            if version >= 0x3030000 and self['magic_number'].value >= 3200:
+                yield UInt32(self, "filesize", "Size of the Python source file (.py) modulo 2**32")
+
         yield Object(self, "content")
