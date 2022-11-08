@@ -529,10 +529,9 @@ class PythonCompiledFile(Parser):
             offset = 12
         else:
             offset = 8
-        if 0:
-            value = self.stream.readBits(offset * 8, 7, self.endian)
-            if value != ord(b'c'):
-                return "First object bytecode is not code"
+        value = self.stream.readBits(offset * 8, 7, self.endian)
+        if value != ord(b'c'):
+            return "First object bytecode is not code"
         return True
 
     def getVersion(self):
