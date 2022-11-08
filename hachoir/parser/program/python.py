@@ -524,13 +524,7 @@ class PythonCompiledFile(Parser):
         if self["magic_string"].value != "\r\n":
             return r"Wrong magic string (\r\n)"
 
-        version = self.getVersion()
-        if version >= 0x3030000 and self['magic_number'].value >= 3200:
-            offset = 12
-        else:
-            offset = 8
-        value = self.stream.readBits(offset * 8, 7, self.endian)
-        if value != ord(b'c'):
+        if self["content/bytecode"].value != "c":
             return "First object bytecode is not code"
         return True
 
