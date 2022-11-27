@@ -63,7 +63,7 @@ def parseOptions():
         if len(arguments) < 2:
             parser.print_help()
             sys.exit(1)
-        pattern = str(arguments[0], "ascii")
+        pattern = arguments[0]
         filenames = arguments[1:]
     return values, pattern, filenames
 
