@@ -2,8 +2,15 @@
 Changelog
 +++++++++
 
+hachoir 3.2.0 (2022-11-27)
+==========================
+
+* Fix hachoir-grep command line parsing.
+* PYC parser supports Python 3.12.
+
 hachoir 3.1.3 (2022-04-04)
 ==========================
+
 * The development branch ``master`` was renamed to ``main``.
   See https://sfconservancy.org/news/2020/jun/23/gitbranchname/ for the
   rationale.
