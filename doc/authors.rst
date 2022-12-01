@@ -23,7 +23,7 @@ Contributors
 * Aurélien Jacobs <aurel AT gnuage DOT org> - AVI parser big contributor
 * Christophe Fergeau <teuf AT gnome.org> - Improve iTunesDB parser
 * Christophe Gisquet <christophe.gisquet AT free.fr> - Write RAR parser
-* Cyril Zorin <cyril.zorin AT gmail.com> - Author of 3DO parser
+* Cyril Zorin <cyril.zorin AT gmail.com> - Author of hachoir-wx, 3DO and game parsers
 * Elie Roudninski aka adema <liliroud AT hotmail.com> - Started Gtk GUI
 * Feth Arezki <feth AT arezki.net> - Fix hachoir-metadata-qt to save the current directory
 * Frédéric Weisbecker <chantecode AT gmail.com> - Author of ReiserFS parser
