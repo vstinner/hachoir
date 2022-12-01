@@ -13,6 +13,10 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python: ['3.11']
+        include:
+          # Python 3.6 uses old Ubuntu 20.04
+          - os: ubuntu-20.04
+            python: '3.6'
 
     steps:
         # https://github.com/actions/checkout
