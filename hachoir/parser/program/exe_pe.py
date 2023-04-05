@@ -189,7 +189,8 @@ class PE_OptHeader(FieldSet):
         yield filesizeHandler(UInt32(self, "size_uninit_data", "Size of uninitialized data"))
         yield textHandler(UInt32(self, "entry_point", "Address (RVA) of the code entry point"), hexadecimal)
         yield textHandler(UInt32(self, "base_code", "Base (RVA) of code"), hexadecimal)
-        if not is_pe32plus: yield textHandler(UInt32(self, "base_data", "Base (RVA) of data"), hexadecimal)
+        if not is_pe32plus:
+            yield textHandler(UInt32(self, "base_data", "Base (RVA) of data"), hexadecimal)
         yield textHandler(VarUInt(self, "image_base", "Image base (RVA)"), hexadecimal)
         yield filesizeHandler(UInt32(self, "sect_align", "Section alignment"))
         yield filesizeHandler(UInt32(self, "file_align", "File alignment"))
