@@ -45,7 +45,7 @@ UNIT_NAME = {1: "Meter"}
 COMPRESSION_NAME = {
     0: "deflate"  # with 32K sliding window
 }
-MAX_CHUNK_SIZE = 5 * 1024 * 1024  # Maximum chunk size (5 MB)
+MAX_CHUNK_SIZE = 64 * 1024 * 1024  # Maximum chunk size heuristic (64 MB)
 
 
 def headerParse(parent):

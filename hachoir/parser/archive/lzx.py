@@ -174,7 +174,7 @@ class LZXBlock(FieldSet):
                     field._description = "Literal value %r" % chr(
                         field.realvalue)
                     current_decoded_size += 1
-                    self.parent.uncompressed_data.append(field.realvalue)
+                    self.parent._lzx_window.append(field.realvalue)
                     yield field
                     continue
                 position_header, length_header = divmod(
@@ -248,7 +248,7 @@ class LZXBlock(FieldSet):
                     self.parent.r2 = self.parent.r1
                     self.parent.r1 = self.parent.r0
                     self.parent.r0 = position
-                extend_data(self.parent.uncompressed_data, length, position)
+                extend_data(self.parent._lzx_window, length, position)
                 current_decoded_size += length
         elif self.block_type == 3:  # Uncompressed block
             padding = paddingSize(self.address + self.current_size, 16)
@@ -265,13 +265,16 @@ class LZXBlock(FieldSet):
             self.parent.r1 = self["r[1]"].value
             self.parent.r2 = self["r[2]"].value
             yield RawBytes(self, "data", self.uncompressed_size)
-            self.parent.uncompressed_data += self["data"].value
+            self.parent._lzx_window += self["data"].value
             if self["block_size"].value % 2:
                 yield PaddingBits(self, "padding", 8)
         else:
             raise ParserError("Unknown block type %d!" % self.block_type)
 
-        # Fixup Intel jumps if necessary
+        # Fixup Intel jumps if necessary (fixups are only applied to the final output, not to the LZX window)
+        self.parent.uncompressed_data += self.parent._lzx_window[-self.uncompressed_size:]
+        self.parent._lzx_window = self.parent._lzx_window[-(1 << self.root.compr_level):]
+
         if (
             intel_started
             and self.parent["filesize_indicator"].value
@@ -305,6 +308,7 @@ class LZXStream(Parser):
 
     def createFields(self):
         self.uncompressed_data = bytearray()
+        self._lzx_window = bytearray()
         self.r0 = 1
         self.r1 = 1
         self.r2 = 1

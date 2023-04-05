@@ -56,7 +56,7 @@ class field_view_imp_t:
         self.dispatcher.trigger('field_show_ops', field)
 
     def on_address_relative(self, dispatcher):
-        self.addr_func = lambda field: field._getAddress()
+        self.addr_func = lambda field: field.address
         self.refill_view()
 
     def on_address_absolute(self, dispatcher):

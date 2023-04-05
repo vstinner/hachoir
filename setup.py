@@ -88,7 +88,6 @@ def main():
                 "urwid==1.3.1"
             ],
             "wx": [
-                "darkdetect",
                 "wxPython==4.*"
             ]
         },

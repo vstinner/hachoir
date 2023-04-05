@@ -240,11 +240,13 @@ class Inode(FieldSet):
         return out
 
     def is_fast_symlink(self):
-        self.seekByte(4 * 15 + 4)
-        acl = UInt32(self, "file_acl")
+        acl_addr = self.absolute_address + self.current_size
+        # skip 15 blocks + version field
+        acl_addr += (4 * 15 + 4) * 8
+        acl = self.stream.readBits(acl_addr, 32, self.endian)
 
         b = 0
-        if acl.value > 0:
+        if acl > 0:
             b = (2 << self["/superblock/log_block_size"].value)
 
         return (self['blocks'].value - b == 0)
