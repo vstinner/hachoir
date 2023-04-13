@@ -21,25 +21,22 @@ runtests.py --coverage is equivalent of:
 # Originally written by Beech Horn (for NDB).
 
 from __future__ import print_function
-import optparse
 import gc
+import importlib.machinery
 import logging
+import optparse
 import os
 import re
 import sys
 import textwrap
+import unittest.signals
+
 from hachoir.test import setup_tests
 try:
     import coverage
 except ImportError:
     coverage = None
 
-try:
-    import unittest
-    from unittest.signals import installHandler
-except ImportError:
-    import unittest2 as unittest
-    from unittest2.signals import installHandler
 
 ARGS = optparse.OptionParser(description="Run all unittests.", usage="%prog")
 ARGS.add_option(
@@ -72,17 +69,9 @@ ARGS.add_option(
     help='optional regex patterns to match test ids (default all tests)')
 
 
-if sys.version_info >= (3, 3):
-    import importlib.machinery
-
-    def load_module(modname, sourcefile):
-        loader = importlib.machinery.SourceFileLoader(modname, sourcefile)
-        return loader.load_module()
-else:
-    import imp
-
-    def load_module(modname, sourcefile):
-        return imp.load_source(modname, sourcefile)
+def load_module(modname, sourcefile):
+    loader = importlib.machinery.SourceFileLoader(modname, sourcefile)
+    return loader.load_module()
 
 
 def load_modules(basedir, suffix='.py'):
@@ -262,7 +251,7 @@ def runtests():
     elif v >= 4:
         logger.setLevel(logging.DEBUG)
     if catchbreak:
-        installHandler()
+        unittest.signals.installHandler()
     try:
         if args.forever:
             while True:
