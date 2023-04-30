@@ -69,7 +69,7 @@ And then use search() to find all patterns::
     4..5: [cd]
     6..7: [cd]
 
-You can also attach an objet to a pattern with 'user' (user data) argument::
+You can also attach an object to a pattern with 'user' (user data) argument::
 
     >>> p = PatternMatching()
     >>> p.addString("un", 1)
