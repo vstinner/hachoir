@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run Tulip unittests.
+"""Run tests.
 
 Usage:
   python3 runtests.py [flags] [pattern] ...
@@ -20,7 +20,6 @@ runtests.py --coverage is equivalent of:
 
 # Originally written by Beech Horn (for NDB).
 
-from __future__ import print_function
 import gc
 import importlib.machinery
 import logging
@@ -29,6 +28,7 @@ import os
 import re
 import sys
 import textwrap
+import types
 import unittest.signals
 
 from hachoir.test import setup_tests
@@ -69,9 +69,13 @@ ARGS.add_option(
     help='optional regex patterns to match test ids (default all tests)')
 
 
-def load_module(modname, sourcefile):
-    loader = importlib.machinery.SourceFileLoader(modname, sourcefile)
-    return loader.load_module()
+def load_module(module_name, filename):
+    loader = importlib.machinery.SourceFileLoader(module_name, filename)
+    module = types.ModuleType(loader.name)
+    module.__file__ = filename
+    sys.modules[module.__name__] = module
+    loader.exec_module(module)
+    return module
 
 
 def load_modules(basedir, suffix='.py'):
