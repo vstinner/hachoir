@@ -1312,7 +1312,7 @@ class MP4File(Parser):
         if size < 8:
             return "Invalid first atom size"
         tag = self.stream.readBytes(4 * 8, 4)
-        if tag not in (b"ftyp", b"moov", b"free"):
+        if tag not in (b"ftyp", b"moov", b"free", b"skip"):
             return "Unknown MOV file type"
         return True
 
