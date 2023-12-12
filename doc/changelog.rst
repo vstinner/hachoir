@@ -5,23 +5,32 @@ Changelog
 hachoir 3.3.0 (2023-12-12)
 ==========================
 
-* Add ARJ archive parser. Patch by Oleg Gubanov.
-* Support new features in JDK 9-14.  Mostly, this is support for the new
-  ``invokedynamic`` opcode and supporting constant pool entries.
-* Ext2/3/4: fix handling of symlink inodes.
-* PNG: Bump up maximum chunk size heuristic.
-* PDF: Fix some issues caused by code updated from Python 2 to Python 3.
-* PYC: add value creation, misc fixes.
-* LZX: Fix decompression of window refs to Intel jump fixups.
-* core: speed up ``str2long()`` significantly by using ``int.from_bytes()``.
-* wx: fix compatibility with newer wxPython.
-* wx: Use system default colours for window and highlight in hex editor.
-* EXE: Support PE32+ optional header.
-* EXE: Increase default number of sections to handle complex programs.
-* Remove Python 2 code.
-* Port runtests.py to Python 3.12.
-* Fix documentation build. Remove napoleon extension, it's broken on Python
-  3.11.
+* Parsers:
+
+  * Add ARJ archive parser. Patch by Oleg Gubanov.
+  * JAVA: Support new features in JDK 9-14.  Mostly, this is support for the
+    new ``invokedynamic`` opcode and supporting constant pool entries.
+  * Ext2/3/4: fix handling of symlink inodes.
+  * PNG: Bump up maximum chunk size heuristic.
+  * PDF: Fix some issues caused by code updated from Python 2 to Python 3.
+  * PYC: add value creation, misc fixes.
+  * LZX: Fix decompression of window refs to Intel jump fixups.
+  * EXE: Support PE32+ optional header.
+  * EXE: Increase default number of sections to handle complex programs.
+  * MP4: Allow QuickTime movies to start with "skip" atom.
+
+* hachoir-wx:
+
+  * Fix compatibility with newer wxPython.
+  * Use system default colours for window and highlight in hex editor.
+
+* Other changes:
+
+  * core: speed up ``str2long()`` significantly by using ``int.from_bytes()``.
+  * Remove Python 2 code.
+  * Port runtests.py to Python 3.12.
+  * Fix documentation build. Remove napoleon extension, it's broken on Python
+    3.11.
 
 hachoir 3.2.0 (2022-11-27)
 ==========================
