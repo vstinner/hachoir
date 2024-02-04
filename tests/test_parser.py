@@ -348,6 +348,16 @@ class TestParsers(unittest.TestCase):
         self.checkDesc(parser, "/group[0]/inode_table/inode[12]",
                        "Inode 13: Symbolic link (-> XYZ), size=3 bytes, mode=lrwxrwxrwx")
 
+    def test_ext2_various_inode_sizes(self):
+        for bsize, isize in [(1024, 1024), (2048, 512), (4096, 128)]:
+            fname = "bsize-%d-isize-%d.ext2" % (bsize, isize)
+            parser = self.parse(fname)
+            self.checkValue(parser, "/superblock/inode_size", isize)
+            self.checkValue(parser, "/group[0]/inode_table/inode[11]/size", 6)
+            self.checkDesc(parser, "/group[0]/inode_table/inode[12]",
+                           "Inode 13: Symbolic link (-> source), size=6 bytes, mode=lrwxrwxrwx")
+            self.checkValue(parser, "/group[0]/inode[11]block[0]", b"hello\n" + b'\0' * (bsize - 6))
+
     def test_bmp2(self):
         parser = self.parse("article01.bmp")
         self.checkDisplay(parser, "/header/red_mask", '0x00ff0000')
