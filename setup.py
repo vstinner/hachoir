@@ -85,7 +85,7 @@ def main():
         "entry_points": ENTRY_POINTS,
         "extras_require": {
             "urwid": [
-                "urwid==1.3.1"
+                "urwid"
             ],
             "wx": [
                 "wxPython==4.*"
