@@ -900,6 +900,20 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "/data/compressed_block[5]/nlen", 56691)
         self.checkValue(parser, "/data_checksum", 0xe85c1f89)
 
+    def test_zlib_large_uncompressed_block(self):
+        parser = self.parse("usa_railroad.jpg.0.zlib")
+        self.checkValue(parser, "/data/compressed_block[0]/final", False)
+        self.checkValue(parser, "/data/compressed_block[0]/compression_type", 0)
+        self.checkValue(parser, "/data/compressed_block[0]/padding[0]", 0)
+        self.checkValue(parser, "/data/compressed_block[0]/len", 65535)
+        self.checkValue(parser, "/data/compressed_block[0]/nlen", 0)
+        self.checkValue(parser, "/data/compressed_block[1]/final", True)
+        self.checkValue(parser, "/data/compressed_block[1]/compression_type", 0)
+        self.checkValue(parser, "/data/compressed_block[1]/padding[0]", 0)
+        self.checkValue(parser, "/data/compressed_block[1]/len", 38213)
+        self.checkValue(parser, "/data/compressed_block[1]/nlen", 27322)
+        self.checkValue(parser, "/data_checksum", 0xe85c1f89)
+
 
 class TestParserRandomStream(unittest.TestCase):
 
