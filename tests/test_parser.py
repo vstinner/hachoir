@@ -883,6 +883,23 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "/file_header[15]/filename", "usr/bin/groups")
         self.checkValue(parser, "/file_header[15]/original_size", 35000)
 
+    def test_zlib(self):
+        parser = self.parse("usa_railroad.jpg.6.zlib")
+        self.checkValue(parser, "/compression_method", 8)
+        self.checkValue(parser, "/compression_info", 7)
+        self.checkValue(parser, "/flag_check_bits", 30)
+        self.checkValue(parser, "/flag_dictionary_present", False)
+        self.checkValue(parser, "/flag_compression_level", 1)
+        self.checkValue(parser, "/data/compressed_block[0]/final", False)
+        self.checkValue(parser, "/data/compressed_block[0]/compression_type", 2)
+        self.checkValue(parser, "/data/compressed_block[0]/huff_num_length_codes", 29)
+        self.checkValue(parser, "/data/compressed_block[0]/length_code[16383]", 16380)
+        self.checkValue(parser, "/data/compressed_block[5]/final", True)
+        self.checkValue(parser, "/data/compressed_block[5]/compression_type", 0)
+        self.checkValue(parser, "/data/compressed_block[5]/len", 8844)
+        self.checkValue(parser, "/data/compressed_block[5]/nlen", 56691)
+        self.checkValue(parser, "/data_checksum", 0xe85c1f89)
+
 
 class TestParserRandomStream(unittest.TestCase):
 
