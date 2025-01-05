@@ -10,8 +10,16 @@ from optparse import OptionGroup, OptionParser
 import sys
 
 
-def printFieldSet(field_set, args, options={}):
-    pass
+def printFieldSet(field_set, args, options={}, indent=0):
+    indent_string = "  " * indent
+    for field in field_set:
+        value_display = ""
+        if field.value is not None:
+            value_display = f" = {field.display}"
+        print(f"{indent_string}{field.name} ({field.__class__.__name__}, {field.size}){value_display}")
+
+        if field.is_field_set:
+            printFieldSet(field, args, options, indent + 1)
 
 
 def displayParserList(*args):
