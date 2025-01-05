@@ -14,9 +14,12 @@ def printFieldSet(field_set, args, options={}, indent=0):
     indent_string = "  " * indent
     for field in field_set:
         value_display = ""
-        if field.value is not None:
+        if field.value is not None and options["display_value"]:
             value_display = f" = {field.display}"
-        print(f"{indent_string}{field.name} ({field.__class__.__name__}, {field.size}){value_display}")
+        size_display = ""
+        if options["display_size"]:
+            size_display = f", {field.size}"
+        print(f"{indent_string}{field.name} ({field.__class__.__name__}{size_display}){value_display}")
 
         if field.is_field_set:
             printFieldSet(field, args, options, indent + 1)
