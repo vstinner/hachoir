@@ -914,6 +914,14 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "/data/compressed_block[1]/nlen", 27322)
         self.checkValue(parser, "/data_checksum", 0xe85c1f89)
 
+    def test_git_pack(self):
+        parser = self.parse("pack-31c691f659cbc7841ca55a26a342fdaf0b89c533.pack")
+        self.checkValue(parser, "/version", 2)
+        self.checkValue(parser, "/num_objects", 7)
+        self.checkDesc(parser, "/object[0]", "type=OBJ_COMMIT, decompressed size=244")
+        # FIXME: also check parsing of objects (with sub-parsers)
+        self.checkValue(parser, "/checksum", 0x31c691f659cbc7841ca55a26a342fdaf0b89c533)
+
 
 class TestParserRandomStream(unittest.TestCase):
 
