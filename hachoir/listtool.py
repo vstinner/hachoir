@@ -28,7 +28,7 @@ def displayParserList(*args):
 
 
 def parseOptions():
-    parser = OptionParser(usage="%prog [options] filename")
+    parser = OptionParser(usage="%prog [options] filename [filenames...]")
 
     common = OptionGroup(parser, "List Tool", "Options of list tool")
     common.add_option("--parser", help="Use the specified parser (use its identifier)",
@@ -51,10 +51,10 @@ def parseOptions():
     parser.add_option_group(hachoir)
 
     values, arguments = parser.parse_args()
-    if len(arguments) != 1:
+    if len(arguments) < 1:
         parser.print_help()
         sys.exit(1)
-    return values, arguments[0]
+    return values, arguments
 
 
 def openParser(parser_id, filename, offset, size):
@@ -74,22 +74,24 @@ def openParser(parser_id, filename, offset, size):
 
 def main():
     # Parse options and initialize Hachoir
-    values, filename = parseOptions()
+    values, filenames = parseOptions()
     configureHachoir(values)
 
     # Open file and create parser
-    parser, err = openParser(values.parser, filename,
-                             values.offset, values.size)
-    if err:
-        print(err)
-        sys.exit(1)
+    for filename in filenames:
+        print(f"File: {filename}")
+        parser, err = openParser(values.parser, filename,
+                                 values.offset, values.size)
+        if err:
+            print(err)
+            sys.exit(1)
 
-    # Explore file
-    with parser:
-        printFieldSet(parser, values, {
-            "display_size": values.display_size,
-            "display_value": values.display_value,
-        })
+        # Explore file
+        with parser:
+            printFieldSet(parser, values, {
+                "display_size": values.display_size,
+                "display_value": values.display_value,
+            })
 
 
 if __name__ == "__main__":
