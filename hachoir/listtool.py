@@ -19,7 +19,10 @@ def printFieldSet(field_set, args, options={}, indent=0):
         size_display = ""
         if options["display_size"]:
             size_display = f", {field.size}b"
-        print(f"{indent_string}{field.name} <{field.__class__.__name__}{size_display}> ({field.description}){value_display}")
+        description_display = ""
+        if options["display_description"]:
+            description_display = f" ({field.description})"
+        print(f"{indent_string}{field.name} <{field.__class__.__name__}{size_display}>{description_display}{value_display}")
 
         if field.is_field_set:
             printFieldSet(field, args, options, indent + 1)
@@ -42,6 +45,8 @@ def parseOptions():
                       action="callback", callback=displayParserList)
     common.add_option("--size", help="Maximum size of bytes of input file",
                       type="long", action="store", default=None)
+    common.add_option("--description", dest="display_description", help="Display description",
+                      action="store_true", default=False)
     common.add_option("--hide-value", dest="display_value", help="Don't display value",
                       action="store_false", default=True)
     common.add_option("--hide-size", dest="display_size", help="Don't display size",
@@ -92,6 +97,7 @@ def main():
         # Explore file
         with parser:
             printFieldSet(parser, values, {
+                "display_description": values.display_description,
                 "display_size": values.display_size,
                 "display_value": values.display_value,
             })
