@@ -95,8 +95,16 @@ def main():
     configureHachoir(values)
 
     # Open file and create parser
+    showing_multiple_files = len(filenames) > 1
+    i = 0
     for filename in filenames:
-        print(f"File: {filename}")
+
+        i += 1
+        if i > 1:
+            print()
+        if showing_multiple_files:
+            print(f"File: {filename}")
+
         parser, err = openParser(values.parser, filename,
                                  values.offset, values.size)
         if err:
