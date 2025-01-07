@@ -10,6 +10,13 @@ from optparse import OptionGroup, OptionParser
 import sys
 
 
+def format_size(num_bits):
+    if num_bits % 8 == 0:
+        return f"{num_bits // 8}B"
+    else:
+        return f"{num_bits}b"
+
+
 def printFieldSet(field_set, args, options={}, indent=0):
     indent_string = " " * options["indent_width"] * indent
     for field in field_set:
@@ -18,7 +25,7 @@ def printFieldSet(field_set, args, options={}, indent=0):
             value_display = f": {field.display}"
         size_display = ""
         if options["display_size"]:
-            size_display = f", {field.size}b"
+            size_display = f", {format_size(field.size)}"
         description_display = ""
         if options["display_description"]:
             description_display = f" ({field.description})"
