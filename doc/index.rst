@@ -19,6 +19,7 @@ Command line tools using Hachoir parsers:
 * :ref:`hachoir-wx <wx>`: display the content of a binary file in GUI mode
 * :ref:`hachoir-grep <grep>`: find a text pattern in a binary file
 * :ref:`hachoir-strip <strip>`: modify a file to remove metadata
+* :ref:`hachoir-list <list>`: print decoded content of a binary file
 
 .. image:: images/urwid.png
    :alt: hachoir-urwid screenshot (MP3 audio file)
@@ -37,6 +38,7 @@ User Guide
    subfile
    grep
    strip
+   list
 
 
 Developer Guide
