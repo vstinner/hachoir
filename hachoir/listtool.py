@@ -11,7 +11,7 @@ import sys
 
 
 def printFieldSet(field_set, args, options={}, indent=0):
-    indent_string = "  " * indent
+    indent_string = " " * options["indent_width"] * indent
     for field in field_set:
         value_display = ""
         if field.value is not None and options["display_value"]:
@@ -51,6 +51,8 @@ def parseOptions():
                       action="store_false", default=True)
     common.add_option("--hide-size", dest="display_size", help="Don't display size",
                       action="store_false", default=True)
+    common.add_option("--indent-width", dest="indent_width", help="Indentation width",
+                      type="long", action="store", default=2)
     common.add_option("--version", help="Display version and exit",
                       action="callback", callback=displayVersion)
     parser.add_option_group(common)
@@ -100,6 +102,7 @@ def main():
                 "display_description": values.display_description,
                 "display_size": values.display_size,
                 "display_value": values.display_value,
+                "indent_width": values.indent_width,
             })
 
 
