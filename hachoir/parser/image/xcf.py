@@ -1,9 +1,8 @@
 """
 Gimp image parser (XCF file, ".xcf" extension).
 
-You can find informations about XCF file in Gimp source code. URL to read
-CVS online:
-  http://cvs.gnome.org/viewcvs/gimp/app/xcf/
+You can find informations about XCF file in Gimp source code :
+  https://gitlab.gnome.org/GNOME/gimp/-/tree/master/app/xcf
   files xcf-read.c and xcf-load.c
 
 Author: Victor Stinner
@@ -50,29 +49,71 @@ class LayerOffsets(StaticFieldSet):
 class LayerMode(FieldSet):
     static_size = 32
     MODE_NAME = {
-        0: "Normal",
-        1: "Dissolve",
-        2: "Behind",
-        3: "Multiply",
-        4: "Screen",
-        5: "Overlay",
-        6: "Difference",
-        7: "Addition",
-        8: "Subtract",
-        9: "Darken only",
-        10: "Lighten only",
-        11: "Hue",
-        12: "Saturation",
-        13: "Color",
-        14: "Value",
-        15: "Divide",
-        16: "Dodge",
-        17: "Burn",
-        18: "Hard light",
-        19: "Soft light",
-        20: "Grain extract",
-        21: "Grain merge",
-        22: "Color erase"
+        # Since "ancient times":
+        0: "Normal (legacy)",
+        1: "Dissolve (legacy) [random dithering to discrete alpha)",
+        2: "Behind (legacy) [not selectable in the GIMP UI]",
+        3: "Multiply (legacy)",
+        4: "Screen (legacy)",
+        5: "Old broken Overlay",
+        6: "Difference (legacy)",
+        7: "Addition (legacy)",
+        8: "Subtract (legacy)",
+        9: "Darken only (legacy)",
+        10: "Lighten only (legacy)",
+        11: "Hue (HSV) (legacy)",
+        12: "Saturation (HSV) (legacy)",
+        13: "Color (HSL) (legacy)",
+        14: "Value (HSV) (legacy)",
+        15: "Divide (legacy)",
+        16: "Dodge (legacy)",
+        17: "Burn (legacy)",
+        18: "Hard light (legacy)",
+        # Since XCF 2 (GIMP 2.8)
+        19: "Soft light (legacy)",
+        20: "Grain extract (legacy)",
+        21: "Grain merge (legacy)",
+        22: "Color erase (legacy)",
+        # Since XCF 9 (GIMP 2.10.0)
+        23: "Overlay",
+        24: "Hue (LCH)",
+        25: "Chroma (LCH)",
+        26: "Color (LCH)",
+        27: "Lightness (LCH)",
+        # Since XCF 10 (GIMP 2.10.0)
+        29: "Behind",
+        30: "Multiply",
+        31: "Screen",
+        32: "Difference",
+        33: "Addition",
+        34: "Subtract",
+        35: "Darken only",
+        36: "Lighten only",
+        37: "Hue (HSV)",
+        38: "Saturation (HSV)",
+        39: "Color (HSL)",
+        40: "Value (HSV)",
+        41: "Divide",
+        42: "Dodge",
+        43: "Burn",
+        44: "Hard light",
+        45: "Soft light",
+        46: "Grain extract",
+        47: "Grain merge",
+        48: "Vivid light",
+        49: "Pin light",
+        50: "Linear light",
+        51: "Hard mix",
+        52: "Exclusion",
+        53: "Linear burn",
+        54: "Luma/Luminance darken only",
+        55: "Luma/Luminance lighten only",
+        56: "Luminance",
+        57: "Color erase",
+        58: "Erase",
+        59: "Merge",
+        60: "Split",
+        61: "Pass through",
     }
 
     def createFields(self):
@@ -228,6 +269,26 @@ class XcfProperty(FieldSet):
         24: "User unit",
         25: "Vectors",
         26: "Text layer flags",
+        27: "Old Sample points",
+        28: "Lock content",
+        29: "Group item",
+        30: "Item path",
+        31: "Group item flags",
+        32: "Lock position",
+        33: "Float opacity",
+        34: "Color tag",
+        35: "Composite mode",
+        36: "Composite space",
+        37: "Blend space",
+        38: "Float color",
+        39: "Sample points",
+        40: "Item set",
+        41: "Item set item",
+        42: "Lock visibility",
+        43: "Selected path",
+        44: "Filter region",
+        45: "Filter argument",
+        46: "Filter clip",
     }
 
     handler = {
@@ -297,7 +358,7 @@ class XcfFile(Parser):
     }
 
     def validate(self):
-        if self.stream.readBytes(0, 14) not in (b'gimp xcf file\0', b'gimp xcf v002\0'):
+        if self.stream.readBytes(0, 9) != b'gimp xcf ':
             return "Wrong signature"
         return True
 
