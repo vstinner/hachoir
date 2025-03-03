@@ -10,7 +10,7 @@ Author: Victor Stinner
 
 from hachoir.parser import Parser
 from hachoir.field import (StaticFieldSet, FieldSet, ParserError,
-                           UInt8, UInt32, Enum, Float32, String, PascalString32, RawBytes)
+                           UInt8, UInt32, UInt64, Enum, Float32, String, PascalString32, RawBytes)
 from hachoir.parser.image.common import RGBA
 from hachoir.core.endian import NETWORK_ENDIAN
 
@@ -152,7 +152,10 @@ class XcfLevel(FieldSet):
             return
         data_offsets = []
         while (self.absolute_address + self.current_size) // 8 < offset:
-            chunk = UInt32(self, "data_offset[]", "Data offset")
+            if self._parent._parent._parent.version >= 11:
+                chunk = UInt64(self, "data_offset[]", "Data offset")
+            else:
+                chunk = UInt32(self, "data_offset[]", "Data offset")
             yield chunk
             if chunk.value == 0:
                 break
@@ -176,7 +179,10 @@ class XcfHierarchy(FieldSet):
 
         offsets = []
         while True:
-            chunk = UInt32(self, "offset[]", "Level offset")
+            if self._parent._parent.version >= 11:
+                chunk = UInt64(self, "offset[]", "Level offset")
+            else:
+                chunk = UInt32(self, "offset[]", "Level offset")
             yield chunk
             if chunk.value == 0:
                 break
@@ -196,7 +202,12 @@ class XcfChannel(FieldSet):
         yield UInt32(self, "height", "Channel height")
         yield PascalString32(self, "name", "Channel name", strip="\0", charset="UTF-8")
         yield from readProperties(self)
-        yield UInt32(self, "hierarchy_ofs", "Hierarchy offset")
+
+        if self._parent.version >= 11:
+            yield UInt64(self, "hierarchy_ofs", "Hierarchy offset")
+        else:
+            yield UInt32(self, "hierarchy_ofs", "Hierarchy offset")
+
         yield XcfHierarchy(self, "hierarchy", "Hierarchy")
 
     def createDescription(self):
@@ -213,12 +224,15 @@ class XcfLayer(FieldSet):
         for prop in readProperties(self):
             yield prop
 
-        # --
-        # TODO: Hack for Gimp 1.2 files
-        # --
-
-        yield UInt32(self, "hierarchy_ofs", "Hierarchy offset")
-        yield UInt32(self, "mask_ofs", "Layer mask offset")
+        if self._parent.version >= 11:
+            yield UInt64(self, "hierarchy_ofs", "Hierarchy offset")
+            yield UInt64(self, "mask_ofs", "Layer mask offset")
+        else:
+            # --
+            # TODO: Hack for Gimp 1.2 files
+            # --
+            yield UInt32(self, "hierarchy_ofs", "Hierarchy offset")
+            yield UInt32(self, "mask_ofs", "Layer mask offset")
         padding = self.seekByte(self["hierarchy_ofs"].value, relative=False)
         if padding is not None:
             yield padding
@@ -357,6 +371,53 @@ class XcfFile(Parser):
         2: "Indexed"
     }
 
+    # Doc : https://testing.developer.gimp.org/core/standards/xcf/#header
+    # NOTE: XCF 3 or older's precision was always "8-bit gamma integer".
+
+    # For XCF 4 (which was a development version, hence
+    # this format should not be found often and may be
+    # ignored by readers), its value may be one of:
+    IMAGE_PRECISION_NAME_XCF4 = {
+        0: "8-bit gamma integer",
+        1: "16-bit gamma integer",
+        2: "32-bit linear integer",
+        3: "16-bit linear floating point",
+        4: "32-bit linear floating point",
+    }
+
+    # For XCF 5 or 6 (which were development versions,
+    # hence these formats may be ignored by readers),
+    # its value may be one of:
+    IMAGE_PRECISION_NAME_XCF5 = {
+        100: "8-bit linear integer",
+        150: "8-bit gamma integer",
+        200: "16-bit linear integer",
+        250: "16-bit gamma integer",
+        300: "32-bit linear integer",
+        350: "32-bit gamma integer",
+        400: "16-bit linear floating point",
+        450: "16-bit gamma floating point",
+        500: "32-bit linear floating point",
+        550: "32-bit gamma floating point"
+    }
+
+    IMAGE_PRECISION_NAME_XCF7 = {
+        100: "8-bit linear integer",
+        150: "8-bit gamma integer",
+        200: "16-bit linear integer",
+        250: "16-bit gamma integer",
+        300: "32-bit linear integer",
+        350: "32-bit gamma integer",
+        500: "16-bit linear floating point",
+        550: "16-bit gamma floating point",
+        600: "32-bit linear floating point",
+        650: "32-bit gamma floating point",
+        700: "64-bit linear floating point",
+        750: "64-bit gamma floating point",
+    }
+
+    version = 0
+
     def validate(self):
         if self.stream.readBytes(0, 9) != b'gimp xcf ':
             return "Wrong signature"
@@ -364,19 +425,31 @@ class XcfFile(Parser):
 
     def createFields(self):
         # Read signature
-        yield String(self, "signature", 14, "Gimp picture signature (ends with nul byte)", charset="ASCII")
+        signature = String(self, "signature", 14, "Gimp picture signature (ends with nul byte)", charset="ASCII")
+        yield signature
+        if signature.createValue() != 'gimp xcf file\0':
+            self.version = int(str(signature)[11:-3])
 
         # Read image general informations (width, height, type)
         yield UInt32(self, "width", "Image width")
         yield UInt32(self, "height", "Image height")
         yield Enum(UInt32(self, "type", "Image type"), self.IMAGE_TYPE_NAME)
+        if self.version == 4:
+            yield Enum(UInt32(self, "precision", "Image precision"), self.IMAGE_PRECISION_NAME_XCF4)
+        elif self.version in [5, 6]:
+            yield Enum(UInt32(self, "precision", "Image precision"), self.IMAGE_PRECISION_NAME_XCF5)
+        elif self.version >= 7:
+            yield Enum(UInt32(self, "precision", "Image precision"), self.IMAGE_PRECISION_NAME_XCF7)
         for prop in readProperties(self):
             yield prop
 
         # Read layer offsets
         layer_offsets = []
         while True:
-            chunk = UInt32(self, "layer_offset[]", "Layer offset")
+            if self.version >= 11:
+                chunk = UInt64(self, "layer_offset[]", "Layer offset")
+            else:
+                chunk = UInt32(self, "layer_offset[]", "Layer offset")
             yield chunk
             if chunk.value == 0:
                 break
@@ -385,7 +458,10 @@ class XcfFile(Parser):
         # Read channel offsets
         channel_offsets = []
         while True:
-            chunk = UInt32(self, "channel_offset[]", "Channel offset")
+            if self.version >= 11:
+                chunk = UInt64(self, "channel_offset[]", "Channel offset")
+            else:
+                chunk = UInt32(self, "channel_offset[]", "Channel offset")
             yield chunk
             if chunk.value == 0:
                 break
