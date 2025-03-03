@@ -883,6 +883,45 @@ class TestParsers(unittest.TestCase):
         self.checkValue(parser, "/file_header[15]/filename", "usr/bin/groups")
         self.checkValue(parser, "/file_header[15]/original_size", 35000)
 
+    def test_xcf1(self):
+        parser = self.parse("minimal_xcf1.xcf")
+        self.checkValue(parser, "/signature", "gimp xcf file\0")
+        self.checkValue(parser, "/layer[0]/width", 1)
+        self.checkValue(parser, "/layer[0]/height", 1)
+        self.checkValue(parser, "/layer[0]/name", "Background")
+        self.checkValue(parser, "/layer[0]/hierarchy/bpp", 3)
+        self.checkValue(parser, "/layer[0]/hierarchy/level[0]/offset", 196)
+
+    def test_xcf3(self):
+        parser = self.parse("minimal_xcf3.xcf")
+        self.checkValue(parser, "/signature", "gimp xcf v003\0")
+        self.checkValue(parser, "/layer[0]/width", 1)
+        self.checkValue(parser, "/layer[0]/height", 1)
+        self.checkValue(parser, "/layer[0]/name", "Background")
+        self.checkValue(parser, "/layer[0]/hierarchy/bpp", 3)
+        self.checkValue(parser, "/layer[0]/hierarchy/level[0]/offset", 196)
+
+    def test_xcf10(self):
+        parser = self.parse("minimal_xcf10.xcf")
+        self.checkValue(parser, "/signature", "gimp xcf v010\0")
+        self.checkValue(parser, "/layer[0]/width", 1)
+        self.checkValue(parser, "/layer[0]/height", 1)
+        self.checkValue(parser, "/layer[0]/name", "Background")
+        self.checkValue(parser, "/layer[0]/hierarchy/bpp", 3)
+        self.checkValue(parser, "/layer[0]/hierarchy/level[0]/offset", 200)
+
+    def test_xcf11(self):
+        parser = self.parse("1024x1024-better-compression.xcf")
+        self.checkValue(parser, "/signature", "gimp xcf v011\0")
+        self.checkValue(parser, "/layer[0]/width", 512)
+        self.checkValue(parser, "/layer[0]/height", 512)
+        self.checkValue(parser, "/layer[0]/name", "Layer 2")
+        self.checkValue(parser, "/layer[0]/hierarchy/level[2]/width", 128)
+        self.checkValue(parser, "/layer[1]/name", "Layer 1")
+        self.checkValue(parser, "/layer[1]/hierarchy/level[2]/width", 128)
+        self.checkValue(parser, "/layer[2]/name", "Background")
+        self.checkValue(parser, "/layer[2]/hierarchy/level[1]/width", 256)
+
     def test_zlib(self):
         parser = self.parse("usa_railroad.jpg.6.zlib")
         self.checkValue(parser, "/compression_method", 8)
