@@ -118,7 +118,6 @@ def eat_descriptor(descr):
         type = descr[1:end]
         descr = descr[end:]
     else:
-        global code_to_type_name
         try:
             type = code_to_type_name[descr[0]]
         except KeyError:
