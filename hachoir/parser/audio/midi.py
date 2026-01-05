@@ -156,7 +156,7 @@ class Command(FieldSet):
             self.command = self["command"].value
         if self.command == 0xFF:
             yield Enum(textHandler(UInt8(self, "meta_command"), hexadecimal), self.META_COMMAND_DESC)
-            yield UInt8(self, "data_len")
+            yield Integer(self, "data_len")
             size = self["data_len"].value
             if size:
                 command = self["meta_command"].value
