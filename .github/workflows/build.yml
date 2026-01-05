@@ -15,8 +15,8 @@ jobs:
         python: ['3.14']
         include:
           # Python 3.6 uses old Ubuntu 20.04
-          - os: ubuntu-24.04
-            python: '3.6'
+          - os: ubuntu-22.04
+            python: '3.7'
 
     steps:
         # https://github.com/actions/checkout
