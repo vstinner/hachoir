@@ -12,18 +12,18 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python: ['3.11']
+        python: ['3.14']
         include:
           # Python 3.6 uses old Ubuntu 20.04
-          - os: ubuntu-20.04
-            python: '3.6'
+          - os: ubuntu-22.04
+            python: '3.7'
 
     steps:
         # https://github.com/actions/checkout
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup Python
         # https://github.com/actions/setup-python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
       - name: Install Tox and any other packages
