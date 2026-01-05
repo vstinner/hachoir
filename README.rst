@@ -37,4 +37,4 @@ Command line tools using Hachoir parsers:
 
 Installation instructions: http://hachoir.readthedocs.io/en/latest/install.html
 
-Hachoir is written for Python 3.6 or newer.
+Hachoir is written for Python 3.7 or newer.
