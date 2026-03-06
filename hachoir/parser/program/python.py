@@ -228,6 +228,7 @@ def parseShortASCII(parent):
     if size.value:
         yield String(parent, "text", size.value, "String content", charset="ASCII")
 
+
 def parseSlice(parent):
     yield Object(parent, "start")
     yield Object(parent, "stop")
