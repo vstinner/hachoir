@@ -329,7 +329,7 @@ class Object(FieldSet):
 
 
 tag_info_list = Object.TAG_INFO
-Object.TAG_INFO = dict((parser[1].guid, parser) for parser in tag_info_list)
+Object.TAG_INFO = {parser[1].guid: parser for parser in tag_info_list}
 
 
 class AsfFile(Parser):

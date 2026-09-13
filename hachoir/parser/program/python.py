@@ -395,6 +395,11 @@ def VERSION(major, minor, release_level=PY_RELEASE_LEVEL_FINAL, serial=0):
             + (release_level << 4) + (serial << 0))
 
 
+def create_magic_bytes(magic):
+    num = magic | (ord('\r') << 16) | (ord('\n') << 24)
+    return long2raw(num, LITTLE_ENDIAN)
+
+
 class PythonCompiledFile(Parser):
     PARSER_TAGS = {
         "id": "python",
@@ -681,10 +686,9 @@ class PythonCompiledFile(Parser):
 
     # Dictionnary which associate the pyc signature (4-byte long string)
     # to a Python version string (eg. "m\xf2\r\n" => "2.4b1")
-    STR_MAGIC = dict(
-        (long2raw(magic | (ord('\r') << 16) |
-                  (ord('\n') << 24), LITTLE_ENDIAN), value[0])
-        for magic, value in MAGIC.items())
+    STR_MAGIC = {
+        create_magic_bytes(magic): value[0]
+        for magic, value in MAGIC.items()}
 
     def validate(self):
         magic_number = self["magic_number"].value

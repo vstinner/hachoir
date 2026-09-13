@@ -467,7 +467,7 @@ def createDict(data, index):
     >>> createDict(data, 2)
     {10: 'a', 20: 'b'}
     """
-    return dict((key, values[index]) for key, values in data.items())
+    return {key: values[index] for key, values in data.items()}
 
 
 # Start of UNIX timestamp (Epoch): 1st January 1970 at 00:00

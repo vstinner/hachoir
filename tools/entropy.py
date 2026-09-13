@@ -5,7 +5,7 @@ from math import log
 class Entropy:
 
     def __init__(self):
-        self.frequence = dict((index, 0) for index in range(256))
+        self.frequence = {index: 0 for index in range(256)}
         self.count = 0
 
     def readBytes(self, bytes):
