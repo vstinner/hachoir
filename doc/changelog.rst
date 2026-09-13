@@ -2,12 +2,31 @@
 Changelog
 +++++++++
 
-hachoir 3.4.0
-=============
+hachoir 3.4.0 (2026-09-13)
+==========================
 
 * Parsers:
 
-  * Python: add Python 3.16 support.
+  * Add Git pack parser.
+  * Python: Add Python 3.16 support.
+  * MIDI: Fixed parsing of length of meta_command.
+  * XCF: Support xcf >= 4 and xcf >= 11.
+  * zlib: Fix length parsing for uncompressed data.
+  * ELF: Add more type names in ProgramHeader32.
+  * ext2: Add support to various inode sizes.
+
+* Tools:
+
+  * Add hachoir-list tool: dump a file contents with one field per line.
+  * hachoir-urwid supports latest urwid version.
+
+* Contributors:
+
+  * Bartosz Sławecki
+  * Ferry Jérémie
+  * Masatake YAMATO
+  * Oliver Gerlich
+  * Sebastien Ponce
 
 hachoir 3.3.0 (2023-12-12)
 ==========================
