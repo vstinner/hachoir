@@ -96,10 +96,8 @@ def main():
 
     # Open file and create parser
     showing_multiple_files = len(filenames) > 1
-    i = 0
-    for filename in filenames:
+    for i, filename in enumerate(filenames):
 
-        i += 1
         if i > 1:
             print()
         if showing_multiple_files:
