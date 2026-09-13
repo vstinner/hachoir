@@ -38,7 +38,7 @@ class GenericString(Bytes):
                      "fixed", "Pascal8", "Pascal16", "Pascal32")
 
     # 8-bit charsets
-    CHARSET_8BIT = set((
+    CHARSET_8BIT = {
         "ASCII",          # ANSI X3.4-1968
         "MacRoman",
         "CP037",          # EBCDIC 037
@@ -67,7 +67,7 @@ class GenericString(Bytes):
         "ISO-8859-14",    # Latin-8
         "ISO-8859-15",    # Latin-9 or ("Latin-0")
         "ISO-8859-16",    # Latin-10
-    ))
+    }
 
     # UTF-xx charset familly
     UTF_CHARSET = {

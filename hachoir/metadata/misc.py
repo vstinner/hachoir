@@ -98,17 +98,17 @@ class OLE2_Metadata(RootMetadata):
         14: "nb_page",
         18: "producer",
     }
-    IGNORE_SUMMARY = set((
+    IGNORE_SUMMARY = {
         1,  # Code page
-    ))
+    }
 
     DOC_SUMMARY_ID_TO_ATTR = {
         3: "title",     # Subject
         14: "author",    # Manager
     }
-    IGNORE_DOC_SUMMARY = set((
+    IGNORE_DOC_SUMMARY = {
         1,  # Code page
-    ))
+    }
 
     def extract(self, ole2):
         self._extract(ole2)

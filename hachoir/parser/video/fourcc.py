@@ -8,7 +8,7 @@
 #
 
 # List of codecs with no compression (compression rate=1.0)
-UNCOMPRESSED_AUDIO = set((1, 3, 6))
+UNCOMPRESSED_AUDIO = {1, 3, 6}
 
 audio_codec_name = {
     0x0000: 'Microsoft Unknown Wave Format',

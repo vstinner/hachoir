@@ -15,8 +15,8 @@ class ExeMetadata(RootMetadata):
         "FileDescription": "title",
         "ProductVersion": "version",
     }
-    SKIP_KEY = set(("InternalName", "OriginalFilename",
-                    "FileVersion", "BuildVersion"))
+    SKIP_KEY = {"InternalName", "OriginalFilename",
+                "FileVersion", "BuildVersion"}
 
     def extract(self, exe):
         if exe.isPE():

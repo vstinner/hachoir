@@ -263,12 +263,12 @@ class AsfMetadata(MultipleMetadata):
         "Year": "creation_date",
         "AlbumArtist": "author",
     }
-    SKIP_EXT_DESC = set((
+    SKIP_EXT_DESC = {
         # Useless informations
         "WMFSDKNeeded", "WMFSDKVersion",
         "Buffer Average", "VBR Peak", "EncodingTime",
         "MediaPrimaryClassID", "UniqueFileIdentifier",
-    ))
+    }
 
     def extract(self, asf):
         if "header/content" in asf:

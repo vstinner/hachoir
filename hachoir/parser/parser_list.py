@@ -107,7 +107,7 @@ class ParserList:
                 extensions |= set(file_ext)
 
             # Remove empty extension
-            extensions -= set(('',))
+            extensions -= {''}
 
             # Convert to list and sort by ASCII order
             extensions = list(extensions)

@@ -54,7 +54,7 @@ class AuFile(Parser):
     CODEC_NAME = createDict(CODEC_INFO, 1)
 
     # FIXME: 4, 5, 7, 8 channels are supported?
-    VALID_NB_CHANNEL = set((1, 2))
+    VALID_NB_CHANNEL = {1, 2}
 
     def validate(self):
         if self.stream.readBytes(0, 4) != b".snd":
