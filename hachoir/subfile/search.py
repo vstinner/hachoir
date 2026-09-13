@@ -4,7 +4,7 @@ from hachoir.core.memory import limitedMemory
 from hachoir.subfile.data_rate import DataRate
 from hachoir.subfile.output import Output
 from hachoir.subfile.pattern import HachoirPatternMatching as PatternMatching
-from sys import stderr
+from sys import stdout, stderr
 from time import time
 
 
@@ -108,20 +108,23 @@ class SearchSubfile:
         bytes = (self.size - self.start_offset) // 8
         print("[+] Start search on %s bytes (%s)" % (
             bytes, humanFilesize(bytes)), file=stderr)
-        print(file=stderr)
+        print(file=stderr, flush=True)
         self.stats = {}
         self.current_offset = self.start_offset
         self.main_start = time()
 
     def mainFooter(self):
+        stdout.flush()
         print(file=stderr)
         print("[+] End of search -- offset=%s (%s)" % (
-            self.current_offset // 8, humanFilesize(self.current_offset // 8)), file=stderr)
+            self.current_offset // 8, humanFilesize(self.current_offset // 8)),
+            file=stderr, flush=True)
         size = (self.current_offset - self.start_offset) // 8
         duration = time() - self.main_start
         if 0.1 <= duration:
             print("Total time: %s -- global rate: %s/sec" % (
-                humanDuration(duration * 1000), humanFilesize(size // duration)), file=stderr)
+                humanDuration(duration * 1000), humanFilesize(size // duration)),
+                file=stderr, flush=True)
 
     def searchSubfiles(self):
         """
