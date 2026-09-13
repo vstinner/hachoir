@@ -33,7 +33,7 @@ def fixTimeout(second):
     Fix timeout value: convert to integer with a minimum of 1 second
     """
     if isinstance(second, float):
-        second = int(ceil(second))
+        second = ceil(second)
     assert isinstance(second, int)
     return max(second, 1)
 

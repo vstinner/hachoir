@@ -132,7 +132,7 @@ class Benchmark:
         total_time = diff
 
         # Compute needed number of calls
-        count = int(floor(self.max_time / diff))
+        count = floor(self.max_time / diff)
         count = max(count, self.min_count)
         if self.max_count:
             count = min(count, self.max_count)
