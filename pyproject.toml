@@ -7,6 +7,8 @@ ignore = [
     "DTZ001",  # `datetime.datetime()` called without a `tzinfo` argument
     "RET501",  # Do not explicitly `return None`
     "PLR1711", # Useless `return` statement at end of function
+    "RUF012",  # Mutable default value for class attribute
+    "B006",    # Do not use mutable data structures for argument defaults
 ]
 #fixable = ["ALL"]
 #unfixable = []

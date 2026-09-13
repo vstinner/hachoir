@@ -131,7 +131,7 @@ def guessBytesCharset(data, default=None):
         pass
 
     # Create a set of non-ASCII characters
-    non_ascii_set = set(byte for byte in data if byte >= 128)
+    non_ascii_set = {byte for byte in data if byte >= 128}
     for characters, charset in CHARSET_CHARACTERS:
         if characters.issuperset(non_ascii_set):
             return charset

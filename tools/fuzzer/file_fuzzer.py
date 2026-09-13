@@ -156,7 +156,7 @@ class FileFuzzer:
         start = time()
         try:
             parser = guessParser(stream)
-        except InputStreamError as err:
+        except InputStreamError:
             parser = None
         if not parser:
             self.info("Unable to create parser: stop")
