@@ -14,7 +14,12 @@ from weakref import WeakKeyDictionary
 from optparse import OptionGroup, OptionParser
 import os
 import sys
-import urwid.curses_display
+try:
+    import urwid.curses_display
+except ImportError:
+    import urwid
+    import urwid.display.curses as curses_display
+    urwid.curses_display = curses_display
 
 try:
     from urwid import __version__ as urwid_ver
