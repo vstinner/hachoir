@@ -1,0 +1,10 @@
+[tool.ruff.lint]
+ignore = [
+    "I001",
+    "UP031",
+    "E722",    # Do not use bare `except`
+    "BLE001",  # Do not catch blind exception: `Exception`
+    "DTZ001",  # `datetime.datetime()` called without a `tzinfo` argument
+]
+#fixable = ["ALL"]
+#unfixable = []
