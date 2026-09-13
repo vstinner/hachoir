@@ -22,7 +22,7 @@ class TestEditor(unittest.TestCase):
         output_stream = OutputStream(output_io)
 
         editor.writeInto(output_stream)
-        output_bits = "{0:b}".format(int.from_bytes(output_io.getvalue(), 'big'))
+        output_bits = "{:b}".format(int.from_bytes(output_io.getvalue(), 'big'))
 
         # X is the modified bit
         #                              .....,,,,,,,,,,,,,,,,..X,,,,,,,,

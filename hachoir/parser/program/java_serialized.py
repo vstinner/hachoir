@@ -175,8 +175,7 @@ class ObjectValue(FieldSet):
             yield WriteObjectContents(self, "extra[]", "%s.writeObject() output" % classDesc['className'].value)
 
     def createFields(self):
-        for field in self.gen_values(self.parent.classDesc):
-            yield field
+        yield from self.gen_values(self.parent.classDesc)
 
 
 class WriteObjectContents(FieldSet):

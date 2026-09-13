@@ -221,8 +221,7 @@ class XcfLayer(FieldSet):
         yield UInt32(self, "height", "Layer height in pixels")
         yield Enum(UInt32(self, "type", "Layer type"), XcfFile.IMAGE_TYPE_NAME)
         yield PascalString32(self, "name", "Layer name", strip="\0", charset="UTF-8")
-        for prop in readProperties(self):
-            yield prop
+        yield from readProperties(self)
 
         if self._parent.version >= 11:
             yield UInt64(self, "hierarchy_ofs", "Hierarchy offset")
@@ -440,8 +439,7 @@ class XcfFile(Parser):
             yield Enum(UInt32(self, "precision", "Image precision"), self.IMAGE_PRECISION_NAME_XCF5)
         elif self.version >= 7:
             yield Enum(UInt32(self, "precision", "Image precision"), self.IMAGE_PRECISION_NAME_XCF7)
-        for prop in readProperties(self):
-            yield prop
+        yield from readProperties(self)
 
         # Read layer offsets
         layer_offsets = []
