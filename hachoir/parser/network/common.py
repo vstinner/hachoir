@@ -11,12 +11,7 @@ def ip2name(addr):
     try:
         if addr in ip2name.cache:
             return ip2name.cache[addr]
-        # FIXME: Workaround Python bug
-        # Need double try/except to catch the bug
-        try:
-            name = gethostbyaddr(addr)[0]
-        except KeyboardInterrupt:
-            raise
+        name = gethostbyaddr(addr)[0]
     except (socket_host_error, ValueError):
         name = addr
     except (socket_host_error, KeyboardInterrupt, ValueError):
