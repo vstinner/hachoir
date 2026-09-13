@@ -43,11 +43,10 @@ class Log:
 
         # Create log file (or open it in append mode, if it already exists)
         try:
-            import codecs
             if append:
-                self.__file = codecs.open(filename, "a", "utf-8")
+                self.__file = open(filename, "a", "utf-8")
             else:
-                self.__file = codecs.open(filename, "w", "utf-8")
+                self.__file = open(filename, "w", "utf-8")
             self._writeIntoFile("Starting Hachoir")
         except FileNotFoundError:
             self.__file = None
