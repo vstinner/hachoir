@@ -14,36 +14,36 @@ Regex examples
 Regex are optimized during their creation::
 
    >>> from hachoir.regex import parse, createRange, createString
-   >>> createString("bike") + createString("motor")
-   <RegexString 'bikemotor'>
-   >>> parse('(foo|fooo|foot|football)')
-   <RegexAnd 'foo(|[ot]|tball)'>
+   >>> createString(b"bike") + createString(b"motor")
+   <RegexString b'bikemotor'>
+   >>> parse(b'(foo|fooo|foot|football)')
+   <RegexAnd b'foo(|[ot]|tball)'>
 
 Create character range::
 
-   >>> regex = createString("1") | createString("3")
+   >>> regex = createString(b"1") | createString(b"3")
    >>> regex
-   <RegexRange '[13]'>
-   >>> regex |= createRange("2", "4")
+   <RegexRange b'[13]'>
+   >>> regex |= createRange(b"2", b"4")
    >>> regex
-   <RegexRange '[1-4]'>
+   <RegexRange b'[1-4]'>
 
 As you can see, you can use classic "a|b" (or) and "a+b" (and)
 Python operators. Example of regular expressions using repetition::
 
-   >>> parse("(a{2,}){3,4}")
-   <RegexRepeat 'a{6,}'>
-   >>> parse("(a*|b)*")
-   <RegexRepeat '[ab]*'>
-   >>> parse("(a*|b|){4,5}")
-   <RegexRepeat '(a+|b){0,5}'>
+   >>> parse(b"(a{2,}){3,4}")
+   <RegexRepeat b'a{6,}'>
+   >>> parse(b"(a*|b)*")
+   <RegexRepeat b'[ab]*'>
+   >>> parse(b"(a*|b|){4,5}")
+   <RegexRepeat b'(a+|b){0,5}'>
 
 Compute minimum/maximum matched pattern::
 
-   >>> r=parse('(cat|horse)')
+   >>> r=parse(b'(cat|horse)')
    >>> r.minLength(), r.maxLength()
    (3, 5)
-   >>> r=parse('(a{2,}|b+)')
+   >>> r=parse(b'(a{2,}|b+)')
    >>> r.minLength(), r.maxLength()
    (1, None)
 
@@ -55,30 +55,30 @@ Use addString() and addRegex() to add your patterns::
 
     >>> from hachoir.regex import PatternMatching
     >>> p = PatternMatching()
-    >>> p.addString("a")
-    >>> p.addString("b")
-    >>> p.addRegex("[cd]")
+    >>> p.addString(b"a")
+    >>> p.addString(b"b")
+    >>> p.addRegex(b"[cd]")
 
 And then use search() to find all patterns::
 
-    >>> for start, end, item in p.search("a b c d"):
+    >>> for start, end, item in p.search(b"a b c d"):
     ...    print("%s..%s: %s" % (start, end, item))
     ...
-    0..1: a
-    2..3: b
-    4..5: [cd]
-    6..7: [cd]
+    0..1: b'a'
+    2..3: b'b'
+    4..5: b'[cd]'
+    6..7: b'[cd]'
 
 You can also attach an object to a pattern with 'user' (user data) argument::
 
     >>> p = PatternMatching()
-    >>> p.addString("un", 1)
-    >>> p.addString("deux", 2)
-    >>> for start, end, item in p.search("un deux"):
+    >>> p.addString(b"un", 1)
+    >>> p.addString(b"deux", 2)
+    >>> for start, end, item in p.search(b"un deux"):
     ...    print("%r at %s: user=%r" % (item, start, item.user))
     ...
-    <StringPattern 'un'> at 0: user=1
-    <StringPattern 'deux'> at 3: user=2
+    <StringPattern b'un'> at 0: user=1
+    <StringPattern b'deux'> at 3: user=2
 
 Create regular expressions
 ==========================
@@ -104,22 +104,22 @@ Create regex with string
 ::
 
     >>> from hachoir.regex import parse
-    >>> parse('')
-    <RegexEmpty ''>
-    >>> parse('abc')
-    <RegexString 'abc'>
-    >>> parse('[bc]d')
-    <RegexAnd '[bc]d'>
-    >>> parse('a(b|[cd]|(e|f))g')
-    <RegexAnd 'a[b-f]g'>
-    >>> parse('([a-z]|[b-])')
-    <RegexRange '[a-z-]'>
-    >>> parse('^^..$$')
-    <RegexAnd '^..$'>
-    >>> parse('chats?')
-    <RegexAnd 'chats?'>
-    >>> parse(' +abc')
-    <RegexAnd ' +abc'>
+    >>> parse(b'')
+    <RegexEmpty b''>
+    >>> parse(b'abc')
+    <RegexString b'abc'>
+    >>> parse(b'[bc]d')
+    <RegexAnd b'[bc]d'>
+    >>> parse(b'a(b|[cd]|(e|f))g')
+    <RegexAnd b'a[b-f]g'>
+    >>> parse(b'([a-z]|[b-])')
+    <RegexRange b'[a-z-]'>
+    >>> parse(b'^^..$$')
+    <RegexAnd b'^..$'>
+    >>> parse(b'chats?')
+    <RegexAnd b'chats?'>
+    >>> parse(b' +abc')
+    <RegexAnd b' +abc'>
 
 Create regex with the API
 -------------------------
@@ -127,14 +127,14 @@ Create regex with the API
 ::
 
     >>> from hachoir.regex import createString, createRange
-    >>> createString('')
-    <RegexEmpty ''>
-    >>> createString('abc')
-    <RegexString 'abc'>
-    >>> createRange('a', 'b', 'c')
-    <RegexRange '[a-c]'>
-    >>> createRange('a', 'b', 'c', exclude=True)
-    <RegexRange '[^a-c]'>
+    >>> createString(b'')
+    <RegexEmpty b''>
+    >>> createString(b'abc')
+    <RegexString b'abc'>
+    >>> createRange(b'a', b'b', b'c')
+    <RegexRange b'[a-c]'>
+    >>> createRange(b'a', b'b', b'c', exclude=True)
+    <RegexRange b'[^a-c]'>
 
 
 Manipulate regular expressions
@@ -143,26 +143,28 @@ Manipulate regular expressions
 Convert to string::
 
     >>> from hachoir.regex import createRange, createString
-    >>> str(createString('abc'))
-    'abc'
-    >>> repr(createString('abc'))
-    "<RegexString 'abc'>"
+    >>> bytes(createString(b'abc'))
+    b'abc'
+    >>> str(createString(b'abc'))
+    "b'abc'"
+    >>> repr(createString(b'abc'))
+    "<RegexString b'abc'>"
 
 Operatiors "and" and "or"::
 
-    >>> createString("bike") & createString("motor")
-    <RegexString 'bikemotor'>
-    >>> createString("bike") | createString("motor")
-    <RegexOr '(bike|motor)'>
+    >>> createString(b"bike") & createString(b"motor")
+    <RegexString b'bikemotor'>
+    >>> createString(b"bike") | createString(b"motor")
+    <RegexOr b'(bike|motor)'>
 
 You can also use operator "+", it's just an alias to a & b::
 
-    >>> createString("big ") + createString("bike")
-    <RegexString 'big bike'>
+    >>> createString(b"big ") + createString(b"bike")
+    <RegexString b'big bike'>
 
 Compute minimum/maximum matched pattern::
 
-    >>> r=parse('(cat|horse)')
+    >>> r=parse(b'(cat|horse)')
     >>> r.minLength(), r.maxLength()
     (3, 5)
 
@@ -174,28 +176,28 @@ The library includes many optimization to keep small and fast expressions.
 
 Group prefix::
 
-    >>> createString("blue") | createString("brown")
-    <RegexAnd 'b(lue|rown)'>
-    >>> createString("moto") | parse("mot.")
-    <RegexAnd 'mot.'>
-    >>> parse("(ma|mb|mc)")
-    <RegexAnd 'm[a-c]'>
-    >>> parse("(maa|mbb|mcc)")
-    <RegexAnd 'm(aa|bb|cc)'>
+    >>> createString(b"blue") | createString(b"brown")
+    <RegexAnd b'b(lue|rown)'>
+    >>> createString(b"moto") | parse(b"mot.")
+    <RegexAnd b'mot.'>
+    >>> parse(b"(ma|mb|mc)")
+    <RegexAnd b'm[a-c]'>
+    >>> parse(b"(maa|mbb|mcc)")
+    <RegexAnd b'm(aa|bb|cc)'>
 
 Merge ranges::
 
     >>> from hachoir.regex import createRange
-    >>> regex = createString("1") | createString("3"); regex
-    <RegexRange '[13]'>
-    >>> regex = regex | createRange("2"); regex
-    <RegexRange '[1-3]'>
-    >>> regex = regex | createString("0"); regex
-    <RegexRange '[0-3]'>
-    >>> regex = regex | createRange("5", "6"); regex
-    <RegexRange '[0-356]'>
-    >>> regex = regex | createRange("4"); regex
-    <RegexRange '[0-6]'>
+    >>> regex = createString(b"1") | createString(b"3"); regex
+    <RegexRange b'[13]'>
+    >>> regex = regex | createRange(b"2"); regex
+    <RegexRange b'[1-3]'>
+    >>> regex = regex | createString(b"0"); regex
+    <RegexRange b'[0-3]'>
+    >>> regex = regex | createRange(b"5", b"6"); regex
+    <RegexRange b'[0-356]'>
+    >>> regex = regex | createRange(b"4"); regex
+    <RegexRange b'[0-6]'>
 
 
 PatternMaching class
@@ -206,34 +208,34 @@ Use addString() and addRegex() to add your patterns::
 
     >>> from hachoir.regex import PatternMatching
     >>> p = PatternMatching()
-    >>> p.addString("a")
-    >>> p.addString("b")
-    >>> p.addRegex("[cd]")
+    >>> p.addString(b"a")
+    >>> p.addString(b"b")
+    >>> p.addRegex(b"[cd]")
 
 And then use search() to find all patterns::
 
-    >>> for start, end, item in p.search("a b c d"):
+    >>> for start, end, item in p.search(b"a b c d"):
     ...    print("%s..%s: %s" % (start, end, item))
     ...
-    0..1: a
-    2..3: b
-    4..5: [cd]
-    6..7: [cd]
+    0..1: b'a'
+    2..3: b'b'
+    4..5: b'[cd]'
+    6..7: b'[cd]'
 
 Item is a Pattern object, not the matched string. To be exact, it's a
 StringPattern for string and a RegexPattern for regex. You can associate an
 "user" value to each Pattern object::
 
     >>> p2 = PatternMatching()
-    >>> p2.addString("un", 1)
-    >>> p2.addString("deux", 2)
-    >>> p2.addRegex("(trois|three)", 3)
-    >>> for start, end, item in p2.search("un deux trois"):
+    >>> p2.addString(b"un", 1)
+    >>> p2.addString(b"deux", 2)
+    >>> p2.addRegex(b"(trois|three)", 3)
+    >>> for start, end, item in p2.search(b"un deux trois"):
     ...    print("%r at %s: user=%r" % (item, start, item.user))
     ...
-    <StringPattern 'un'> at 0: user=1
-    <StringPattern 'deux'> at 3: user=2
-    <RegexPattern 't(rois|hree)'> at 8: user=3
+    <StringPattern b'un'> at 0: user=1
+    <StringPattern b'deux'> at 3: user=2
+    <RegexPattern b't(rois|hree)'> at 8: user=3
 
 You can associate any Python object to an item, not only an integer!
 

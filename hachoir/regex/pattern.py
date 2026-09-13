@@ -18,13 +18,15 @@ class StringPattern(Pattern):
 
     def __init__(self, text, user=None):
         Pattern.__init__(self, user)
+        assert isinstance(text, bytes)
         self.text = text
 
     def __str__(self):
-        return makePrintable(self.text, 'ASCII')
+        regex = makePrintable(self.text, 'ASCII')
+        return "b'%s'" % (regex,)
 
     def __repr__(self):
-        return "<StringPattern '%s'>" % self
+        return "<StringPattern %s>" % str(self)
 
 
 class RegexPattern(Pattern):
@@ -38,10 +40,10 @@ class RegexPattern(Pattern):
         self._compiled_regex = None
 
     def __str__(self):
-        return makePrintable(str(self.regex), 'ASCII')
+        return str(self.regex)
 
     def __repr__(self):
-        return "<RegexPattern '%s'>" % self
+        return "<RegexPattern %s>" % str(self)
 
     def match(self, data):
         return self.compiled_regex.match(data)
@@ -59,19 +61,19 @@ class PatternMatching:
 
     Create your patterns:
 
-    >>> p=PatternMatching()
-    >>> p.addString("a")
-    >>> p.addString("b")
-    >>> p.addRegex("[cd]e")
+    >>> p = PatternMatching()
+    >>> p.addString(b"a")
+    >>> p.addString(b"b")
+    >>> p.addRegex(b"[cd]e")
 
     Search patterns:
 
-    >>> for item in p.search("a b ce"):
+    >>> for item in p.search(b"a b ce"):
     ...    print(item)
     ...
-    (0, 1, <StringPattern 'a'>)
-    (2, 3, <StringPattern 'b'>)
-    (4, 6, <RegexPattern '[cd]e'>)
+    (0, 1, <StringPattern b'a'>)
+    (2, 3, <StringPattern b'b'>)
+    (4, 6, <RegexPattern b'[cd]e'>)
     """
 
     def __init__(self):
@@ -151,6 +153,7 @@ class PatternMatching:
         Search patterns in data.
         Return a generator of tuples: (start, end, item)
         """
+        assert isinstance(data, bytes)
         if not self.max_length:
             # No pattern: returns nothing
             return

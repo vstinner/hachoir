@@ -44,13 +44,13 @@ def matchSingleValue(regex):
 
     >>> matchSingleValue(RegexEmpty())
     True
-    >>> matchSingleValue(createString("abc"))
+    >>> matchSingleValue(createString(b"abc"))
     True
-    >>> matchSingleValue(createRange("a", "b"))
+    >>> matchSingleValue(createRange(b"a", b"b"))
     False
-    >>> matchSingleValue(createRange("a"))
+    >>> matchSingleValue(createRange(b"a"))
     True
-    >>> matchSingleValue(RegexAnd((RegexStart(), createString("abc"))))
+    >>> matchSingleValue(RegexAnd((RegexStart(), createString(b"abc"))))
     True
     """
     cls = regex.__class__
@@ -68,7 +68,7 @@ def escapeRegex(text):
     Escape string to use it in a regular expression:
     prefix special characters « ^.+*?{}[]|()\$ » by an antislash.
     """
-    return re.sub(r"([][^.+*?{}|()\\$])", r"\\\1", text)
+    return re.sub(br"([][^.+*?{}|()\\$])", br"\\\1", text)
 
 
 def _join(func, regex_list):
@@ -84,11 +84,12 @@ def _join(func, regex_list):
 
 def createString(text):
     """
-    >>> createString('')
-    <RegexEmpty ''>
-    >>> createString('abc')
-    <RegexString 'abc'>
+    >>> createString(b'')
+    <RegexEmpty b''>
+    >>> createString(b'abc')
+    <RegexString b'abc'>
     """
+    assert isinstance(text, bytes)
     if text:
         return RegexString(text)
     else:
@@ -99,10 +100,10 @@ def createRange(*text, **kw):
     """
     Create a regex range using character list.
 
-    >>> createRange("a", "d", "b")
-    <RegexRange '[abd]'>
-    >>> createRange("-", "9", "4", "3", "0")
-    <RegexRange '[0349-]'>
+    >>> createRange(b"a", b"d", b"b")
+    <RegexRange b'[abd]'>
+    >>> createRange(b"-", b"9", b"4", b"3", b"0")
+    <RegexRange b'[0349-]'>
     """
     ranges = (RegexRangeCharacter(item) for item in text)
     return RegexRange(ranges, kw.get('exclude', False))
@@ -127,21 +128,28 @@ class Regex:
         """
         return self.minLength()
 
-    def __str__(self, **kw):
+    def __bytes__(self, **kw):
         if not hasattr(self, "_str_value"):
             self._str_value = {}
         key = kw.get('python', False)
         if key not in self._str_value:
-            self._str_value[key] = self._str(**kw)
-        return self._str_value[key]
+            self._str_value[key] = self._bytes(**kw)
+        result = self._str_value[key]
+        assert isinstance(result, bytes)
+        return result
 
-    def _str(self, **kw):
+    def _bytes(self, **kw):
         raise NotImplementedError()
 
-    def __repr__(self, **kw):
-        regex = self.__str__(**kw)
+    def __str__(self, **kw):
+        regex = self.__bytes__(**kw)
         regex = makePrintable(regex, 'ASCII')
-        return "<%s '%s'>" % (
+        return "b'%s'" % (regex,)
+
+    def __repr__(self, **kw):
+        regex = self.__bytes__(**kw)
+        regex = makePrintable(regex, 'ASCII')
+        return "<%s b'%s'>" % (
             self.__class__.__name__, regex)
 
     def __contains__(self, item):
@@ -177,8 +185,8 @@ class Regex:
         Create new optimized version of a & b.
         Returns None if there is no interesting optimization.
 
-        >>> RegexEmpty() & RegexString('a')
-        <RegexString 'a'>
+        >>> RegexEmpty() & RegexString(b'a')
+        <RegexString b'a'>
         """
         if regex.__class__ == RegexEmpty:
             return self
@@ -257,7 +265,7 @@ class Regex:
             "Class %s has no method _eq()" % self.__class__.__name__)
 
     def compile(self, **kw):
-        return re.compile(self.__str__(**kw))
+        return re.compile(self.__bytes__(**kw))
 
     def findPrefix(self, regex):
         """
@@ -277,8 +285,8 @@ class RegexEmpty(Regex):
     def minLength(self):
         return 0
 
-    def _str(self, **kw):
-        return ''
+    def _bytes(self, **kw):
+        return b''
 
     def _and(self, other):
         return other
@@ -294,8 +302,8 @@ class RegexWord(RegexEmpty):
             return self
         return None
 
-    def _str(self, **kw):
-        return r'\b'
+    def _bytes(self, **kw):
+        return br'\b'
 
 
 class RegexStart(RegexEmpty):
@@ -305,8 +313,8 @@ class RegexStart(RegexEmpty):
             return self
         return None
 
-    def _str(self, **kw):
-        return '^'
+    def _bytes(self, **kw):
+        return b'^'
 
 
 class RegexEnd(RegexStart):
@@ -316,8 +324,8 @@ class RegexEnd(RegexStart):
             return self
         return None
 
-    def _str(self, **kw):
-        return '$'
+    def _bytes(self, **kw):
+        return b'$'
 
 
 class RegexDot(Regex):
@@ -325,8 +333,8 @@ class RegexDot(Regex):
     def minLength(self):
         return 1
 
-    def _str(self, **kw):
-        return '.'
+    def _bytes(self, **kw):
+        return b'.'
 
     def _match(self, other):
         if other.__class__ == RegexRange:
@@ -342,7 +350,7 @@ class RegexDot(Regex):
 class RegexString(Regex):
 
     def __init__(self, text=""):
-        assert isinstance(text, str)
+        assert isinstance(text, bytes)
         self.text = text
         assert 1 <= len(self.text)
 
@@ -351,14 +359,14 @@ class RegexString(Regex):
 
     def _and(self, regex):
         """
-        >>> RegexString('a') + RegexString('b')
-        <RegexString 'ab'>
+        >>> RegexString(b'a') + RegexString(b'b')
+        <RegexString b'ab'>
         """
         if regex.__class__ == RegexString:
             return RegexString(self.text + regex.text)
         return None
 
-    def _str(self, **kw):
+    def _bytes(self, **kw):
         return escapeRegex(self.text)
 
     def findPrefix(self, regex):
@@ -367,8 +375,8 @@ class RegexString(Regex):
          - None if there is no common prefix
          - (prefix, regexa, regexb) otherwise => prefix + (regexa|regexb)
 
-        >>> RegexString('color red').findPrefix(RegexString('color blue'))
-        (<RegexString 'color '>, <RegexString 'red'>, <RegexString 'blue'>)
+        >>> RegexString(b'color red').findPrefix(RegexString(b'color blue'))
+        (<RegexString b'color '>, <RegexString b'red'>, <RegexString b'blue'>)
         """
         if regex.__class__ != RegexString:
             return None
@@ -393,15 +401,15 @@ class RegexString(Regex):
     def _or_(self, other, reverse):
         """
         Remove duplicate:
-        >>> RegexString("color") | RegexString("color")
-        <RegexString 'color'>
+        >>> RegexString(b"color") | RegexString(b"color")
+        <RegexString b'color'>
 
         Group prefix:
 
-        >>> RegexString("color red") | RegexString("color blue")
-        <RegexAnd 'color (red|blue)'>
-        >>> RegexString("color red") | RegexString("color")
-        <RegexAnd 'color( red|)'>
+        >>> RegexString(b"color red") | RegexString(b"color blue")
+        <RegexAnd b'color (red|blue)'>
+        >>> RegexString(b"color red") | RegexString(b"color")
+        <RegexAnd b'color( red|)'>
 
         """
 
@@ -426,6 +434,8 @@ class RegexString(Regex):
 class RegexRangeItem:
 
     def __init__(self, cmin, cmax=None):
+        assert isinstance(cmin, int)
+        assert isinstance(cmax, int)
         try:
             self.cmin = cmin
             if cmax is not None:
@@ -446,14 +456,14 @@ class RegexRangeItem:
         assert issubclass(value.__class__, RegexRangeItem)
         return (self.cmin <= value.cmin) and (value.cmax <= self.cmax)
 
-    def __str__(self, **kw):
-        cmin = chr(self.cmin)
+    def __bytes__(self, **kw):
+        cmin = bytes((self.cmin,))
         if self.cmin != self.cmax:
-            cmax = chr(self.cmax)
+            cmax = bytes((self.cmax,))
             if (self.cmin + 1) == self.cmax:
-                return "%s%s" % (cmin, cmax)
+                return b"%s%s" % (cmin, cmax)
             else:
-                return "%s-%s" % (cmin, cmax)
+                return b"%s-%s" % (cmin, cmax)
         else:
             return cmin
 
@@ -477,6 +487,7 @@ class RegexRange(Regex):
             self.ranges.sort(key=lambda item: item.cmin)
         else:
             self.ranges = tuple(ranges)
+        assert all(isinstance(item, RegexRangeItem) for item in self.ranges)
         self.exclude = exclude
 
     @staticmethod
@@ -514,10 +525,10 @@ class RegexRange(Regex):
 
     def _match(self, other):
         """
-        >>> createRange("a") | createRange("b")
-        <RegexRange '[ab]'>
-        >>> createRange("a", "b", exclude=True) | createRange("a", "c", exclude=True)
-        <RegexRange '[^a-c]'>
+        >>> createRange(b"a") | createRange(b"b")
+        <RegexRange b'[ab]'>
+        >>> createRange(b"a", b"b", exclude=True) | createRange(b"a", b"c", exclude=True)
+        <RegexRange b'[^a-c]'>
         """
         if not self.exclude and other.__class__ == RegexString and len(other.text) == 1:
             branges = (RegexRangeCharacter(other.text),)
@@ -532,10 +543,10 @@ class RegexRange(Regex):
 
     def _or_(self, other, reverse):
         """
-        >>> createRange("a") | createRange("b")
-        <RegexRange '[ab]'>
-        >>> createRange("a", "b", exclude=True) | createRange("a", "c", exclude=True)
-        <RegexRange '[^a-c]'>
+        >>> createRange(b"a") | createRange(b"b")
+        <RegexRange b'[ab]'>
+        >>> createRange(b"a", b"b", exclude=True) | createRange(b"a", b"c", exclude=True)
+        <RegexRange b'[^a-c]'>
         """
         if not self.exclude and other.__class__ == RegexString and len(other.text) == 1:
             branges = (RegexRangeCharacter(other.text),)
@@ -548,23 +559,23 @@ class RegexRange(Regex):
             RegexRange.rangeAdd(ranges, itemb)
         return RegexRange(ranges, self.exclude, optimize=False)
 
-    def _str(self, **kw):
-        content = [str(item) for item in self.ranges]
-        if "-" in content:
-            content.remove("-")
-            suffix = "-"
+    def _bytes(self, **kw):
+        content = [bytes(item) for item in self.ranges]
+        if b"-" in content:
+            content.remove(b"-")
+            suffix = b"-"
         else:
-            suffix = ""
-        if "]" in content:
-            content.remove("]")
-            prefix = "]"
+            suffix = b""
+        if b"]" in content:
+            content.remove(b"]")
+            prefix = b"]"
         else:
-            prefix = ""
-        text = prefix + (''.join(content)) + suffix
+            prefix = b""
+        text = prefix + (b''.join(content)) + suffix
         if self.exclude:
-            return "[^%s]" % text
+            return b"[^%s]" % text
         else:
-            return "[%s]" % text
+            return b"[%s]" % text
 
     def _eq(self, other):
         if self.exclude != other.exclude:
@@ -588,7 +599,7 @@ class RegexAnd(Regex):
 
     def minLength(self):
         """
-        >>> regex=((RegexString('a') | RegexString('bcd')) + RegexString('z'))
+        >>> regex=((RegexString(b'a') | RegexString(b'bcd')) + RegexString(b'z'))
         >>> regex.minLength()
         2
         """
@@ -596,8 +607,8 @@ class RegexAnd(Regex):
 
     def maxLength(self):
         """
-        >>> regex=RegexOr((RegexString('a'), RegexString('bcd')))
-        >>> RegexAnd((regex, RegexString('z'))).maxLength()
+        >>> regex=RegexOr((RegexString(b'a'), RegexString(b'bcd')))
+        >>> RegexAnd((regex, RegexString(b'z'))).maxLength()
         4
         """
         return self._minmaxLength(regex.maxLength() for regex in self.content)
@@ -638,9 +649,9 @@ class RegexAnd(Regex):
     def _and(self, regex):
         """
         >>> RegexDot() + RegexDot()
-        <RegexAnd '..'>
-        >>> RegexDot() + RegexString('a') + RegexString('b')
-        <RegexAnd '.ab'>
+        <RegexAnd b'..'>
+        >>> RegexDot() + RegexString(b'a') + RegexString(b'b')
+        <RegexAnd b'.ab'>
         """
 
         if regex.__class__ == RegexAnd:
@@ -654,14 +665,14 @@ class RegexAnd(Regex):
             return self
         return RegexAnd(self.content + [regex])
 
-    def _str(self, **kw):
-        return ''.join(item.__str__(**kw) for item in self.content)
+    def _bytes(self, **kw):
+        return b''.join(item.__bytes__(**kw) for item in self.content)
 
     @classmethod
     def join(cls, regex):
         """
-        >>> RegexAnd.join( (RegexString('Big '), RegexString('fish')) )
-        <RegexString 'Big fish'>
+        >>> RegexAnd.join( (RegexString(b'Big '), RegexString(b'fish')) )
+        <RegexString b'Big fish'>
         """
         return _join(operator.__and__, regex)
 
@@ -695,10 +706,10 @@ class RegexOr(Regex):
 
     def _or_(self, other, reverse):
         """
-        >>> (RegexString("abc") | RegexString("123")) | (RegexString("plop") | RegexString("456"))
-        <RegexOr '(abc|123|plop|456)'>
-        >>> RegexString("mouse") | createRange('a') | RegexString("2006") | createRange('z')
-        <RegexOr '(mouse|[az]|2006)'>
+        >>> (RegexString(b"abc") | RegexString(b"123")) | (RegexString(b"plop") | RegexString(b"456"))
+        <RegexOr b'(abc|123|plop|456)'>
+        >>> RegexString(b"mouse") | createRange(b'a') | RegexString(b"2006") | createRange(b'z')
+        <RegexOr b'(mouse|[az]|2006)'>
         """
         if other.__class__ == RegexOr:
             total = self
@@ -717,12 +728,12 @@ class RegexOr(Regex):
             content = [other] + list(self.content)
         return RegexOr(content, optimize=False)
 
-    def _str(self, **kw):
-        content = '|'.join(item.__str__(**kw) for item in self.content)
+    def _bytes(self, **kw):
+        content = b'|'.join(item.__bytes__(**kw) for item in self.content)
         if kw.get('python', False):
-            return "(?:%s)" % content
+            return b"(?:%s)" % content
         else:
-            return "(%s)" % content
+            return b"(%s)" % content
 
     def _minmaxLength(self, lengths, func):
         value = None
@@ -746,8 +757,8 @@ class RegexOr(Regex):
     @classmethod
     def join(cls, regex):
         """
-        >>> RegexOr.join( (RegexString('a'), RegexString('b'), RegexString('c')) )
-        <RegexRange '[a-c]'>
+        >>> RegexOr.join( (RegexString(b'a'), RegexString(b'b'), RegexString(b'c')) )
+        <RegexRange b'[a-c]'>
         """
         return _join(operator.__or__, regex)
 
@@ -805,17 +816,17 @@ def optimizeRepeatOr(rmin, rmax, regex):
 
 class RegexRepeat(Regex):
     """
-    >>> a=createString('a')
+    >>> a = createString(b'a')
     >>> RegexRepeat(a, 0, None)
-    <RegexRepeat 'a*'>
+    <RegexRepeat b'a*'>
     >>> RegexRepeat(a, 1, None)
-    <RegexRepeat 'a+'>
+    <RegexRepeat b'a+'>
     >>> RegexRepeat(a, 0, 1)
-    <RegexRepeat 'a?'>
+    <RegexRepeat b'a?'>
     >>> RegexRepeat(a, 0, 1)
-    <RegexRepeat 'a?'>
+    <RegexRepeat b'a?'>
     >>> RegexRepeat(a, 1, 3)
-    <RegexRepeat 'a{1,3}'>
+    <RegexRepeat b'a{1,3}'>
     """
 
     def __init__(self, regex, rmin, rmax, optimize=True):
@@ -852,10 +863,10 @@ class RegexRepeat(Regex):
 
     def minLength(self):
         """
-        >>> r=RegexRepeat(createString("abc") | createString("01"), 1, 3)
+        >>> r=RegexRepeat(createString(b"abc") | createString(b"01"), 1, 3)
         >>> r.minLength(), r.maxLength()
         (2, 9)
-        >>> r=RegexRepeat(createString("abc") | createString("01"), 4, None)
+        >>> r=RegexRepeat(createString(b"abc") | createString(b"01"), 4, None)
         >>> r.minLength(), r.maxLength()
         (8, None)
         """
@@ -870,23 +881,23 @@ class RegexRepeat(Regex):
         else:
             return None
 
-    def _str(self, **kw):
-        text = str(self.regex)
+    def _bytes(self, **kw):
+        text = bytes(self.regex)
         if self.regex.__class__ == RegexAnd \
                 or (self.regex.__class__ == RegexString and 1 < len(self.regex.text)):
-            text = "(%s)" % text
+            text = b"(%s)" % text
         if self.min == 0 and self.max == 1:
-            return "%s?" % text
+            return b"%s?" % text
         if self.min == self.max:
-            return "%s{%u}" % (text, self.min)
+            return b"%s{%u}" % (text, self.min)
         if self.max is None:
             if self.min == 0:
-                return "%s*" % text
+                return b"%s*" % text
             elif self.min == 1:
-                return "%s+" % text
+                return b"%s+" % text
             else:
-                return "%s{%u,}" % (text, self.min)
-        return "%s{%u,%u}" % (text, self.min, self.max)
+                return b"%s{%u,}" % (text, self.min)
+        return b"%s{%u,%u}" % (text, self.min, self.max)
 
     def _eq(self, other):
         if self.min != other.min:

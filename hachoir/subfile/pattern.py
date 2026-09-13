@@ -23,14 +23,14 @@ class HachoirPatternMatching(PatternMatching):
         # Create string patterns
         for parser in parser_list:
             for (magic, offset) in parser.getParserTags().get("magic", ()):
-                self.addString(magic.decode('latin1'), (offset, parser))
+                self.addString(magic, (offset, parser))
 
         # Create regex patterns
         for parser in parser_list:
             for (regex, offset) in parser.getParserTags().get("magic_regex", ()):
-                self.addRegex(regex.decode('latin1'), (offset, parser))
+                self.addRegex(regex, (offset, parser))
         self.commit()
 
     def search(self, data):
-        for start, stop, item in PatternMatching.search(self, data.decode('latin1')):
+        for start, stop, item in PatternMatching.search(self, data):
             yield (item.user[1], start * 8 - item.user[0])
