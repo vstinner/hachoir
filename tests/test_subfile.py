@@ -59,4 +59,3 @@ class SubfileTests(unittest.TestCase):
 if __name__ == "__main__":
     setup_tests()
     unittest.main()
-

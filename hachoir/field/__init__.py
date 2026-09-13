@@ -4,9 +4,9 @@ from hachoir.field.bit_field import Bit, Bits, RawBits
 from hachoir.field.byte_field import Bytes, RawBytes
 from hachoir.field.sub_file import SubFile, CompressedField  # noqa: F401
 from hachoir.field.character import Character
-from hachoir.field.integer import (Int8,  Int16,  Int24,  Int32,  Int64,
-                                   UInt8, UInt16, UInt24, UInt32, UInt64,
-                                   GenericInteger)  # noqa: F401
+from hachoir.field.integer import (Int8, Int16, Int24, Int32, Int64,
+                                   UInt8, UInt16, UInt24, UInt32, UInt64)
+from hachoir.field.integer import GenericInteger  # noqa: F401
 from hachoir.field.enum import Enum  # noqa: F401
 from hachoir.field.string_field import (GenericString,  # noqa: F401
                                         String, CString, UnixLine,

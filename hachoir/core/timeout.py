@@ -42,7 +42,7 @@ if not IMPLEMENTATION:
         from signal import signal, alarm, SIGALRM
 
         # signal.alarm() implementation
-        def limitedTime(second, func, *args, **kw):
+        def limitedTime(second, func, *args, **kw):  # noqa: F811
             second = fixTimeout(second)
             old_alarm = signal(SIGALRM, signalHandler)
             try:
@@ -58,12 +58,12 @@ if not IMPLEMENTATION:
 
 if not IMPLEMENTATION:
     try:
-        from signal import signal, SIGXCPU
+        from signal import signal, SIGXCPU  # noqa: F811
         from resource import getrlimit, setrlimit, RLIMIT_CPU
 
         # resource.setrlimit(RLIMIT_CPU) implementation
         # "Bug": timeout is 'CPU' time so sleep() are not part of the timeout
-        def limitedTime(second, func, *args, **kw):
+        def limitedTime(second, func, *args, **kw):  # noqa: F811
             second = fixTimeout(second)
             old_alarm = signal(SIGXCPU, signalHandler)
             current = getrlimit(RLIMIT_CPU)

@@ -1,1 +1,1 @@
-from .resource import *
+from .resource import *  # noqa: F401, F403
