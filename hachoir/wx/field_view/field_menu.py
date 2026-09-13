@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from hachoir.wx.dialogs import file_save_dialog
 import wx
