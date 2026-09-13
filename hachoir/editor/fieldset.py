@@ -6,7 +6,7 @@ import weakref  # Python 2.1
 import struct
 
 
-class EditableFieldSet(object):
+class EditableFieldSet:
     MAX_SIZE = (1 << 40)  # Arbitrary limit to catch errors
     is_field_set = True
 

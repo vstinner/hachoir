@@ -1,4 +1,4 @@
-class EventHandler(object):
+class EventHandler:
     """
     Class to connect events to event handlers.
     """

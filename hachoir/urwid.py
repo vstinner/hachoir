@@ -28,7 +28,7 @@ except ImportError:
 try:
     from urwid import ListWalker
 except ImportError:
-    class ListWalker(object):
+    class ListWalker:
 
         def _modified(self):
             pass

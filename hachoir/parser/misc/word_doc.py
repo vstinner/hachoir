@@ -331,7 +331,7 @@ class WidePascalString16(String):
         self._size = (self._content_size + self.content_offset) * 8
 
 
-class TableParsers(object):
+class TableParsers:
 
     class Bte(FieldSet):
         'Bin Table Entry'

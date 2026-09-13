@@ -10,7 +10,7 @@ from hachoir.stream import FileInputStream
 import weakref
 
 
-class QueryParser(object):
+class QueryParser:
     fallback = None
     other = None
 

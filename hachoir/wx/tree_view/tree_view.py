@@ -4,7 +4,7 @@ import wx
 MAXITEMS = 1000
 
 
-class FieldNodeData(object):
+class FieldNodeData:
     def __init__(self, field):
         self.field = field
         self.child_map = {}

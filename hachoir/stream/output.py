@@ -12,7 +12,7 @@ class OutputStreamError(StreamError):
     pass
 
 
-class OutputStream(object):
+class OutputStream:
 
     def __init__(self, output, filename=None):
         self._output = output

@@ -6,7 +6,7 @@ textchars = set('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!
 text_view_transtable = bytes([c if chr(c) in textchars else ord('.') for c in range(256)])
 
 
-class HexViewLayout(object):
+class HexViewLayout:
     ''' Encapsulates information about the layout of the address, hex and text panes. '''
     def __init__(self):
         self.winsize = (100, 100)

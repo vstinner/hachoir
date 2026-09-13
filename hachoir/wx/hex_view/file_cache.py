@@ -1,7 +1,7 @@
 from functools import lru_cache
 
 
-class FileCache(object):
+class FileCache:
     CHUNKSIZE = 4096
 
     def __init__(self, file):

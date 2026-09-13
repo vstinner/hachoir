@@ -10,7 +10,7 @@ class UniqKeyError(Exception):
     """
 
 
-class Dict(object):
+class Dict:
     """
     This class works like classic Python dict() but has an important method:
     __iter__() which allow to iterate into the dictionnary _values_ (and not

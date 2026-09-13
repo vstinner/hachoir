@@ -9,7 +9,7 @@ class ValidateError(Exception):
     pass
 
 
-class HachoirParser(object):
+class HachoirParser:
     """
     A parser is the root of all other fields. It create first level of fields
     and have special attributes and methods:

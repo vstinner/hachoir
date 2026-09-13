@@ -217,7 +217,7 @@ class ConstantPool(FieldSet):
 
 
 ###############################################################################
-class CPIndexBase(object):
+class CPIndexBase:
     """
     Holds index of a constant pool entry.
     """

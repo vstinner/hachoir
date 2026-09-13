@@ -279,7 +279,7 @@ class InputStream(Logger):
         return FileFromInputStream(self)
 
 
-class InputPipe(object):
+class InputPipe:
     """
     InputPipe makes input streams seekable by caching a certain
     amount of data. The memory usage may be unlimited in worst cases.

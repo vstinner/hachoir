@@ -7,7 +7,7 @@ import sys
 # Parser list ################################################################
 
 
-class ParserList(object):
+class ParserList:
     VALID_CATEGORY = ("archive", "audio", "container", "file_system",
                       "game", "image", "misc", "program", "video")
     ID_REGEX = re.compile("^[a-z0-9][a-z0-9_]{2,}$")

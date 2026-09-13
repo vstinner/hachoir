@@ -5,7 +5,7 @@ class EditorError(Exception):
     pass
 
 
-class FakeField(object):
+class FakeField:
     """
     This class have API looks similar to Field API, but objects don't contain
     any value: all values are _computed_ by parent methods.
