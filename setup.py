@@ -63,9 +63,8 @@ def main():
 
     import hachoir
 
-    readme = open('README.rst')
-    long_description = readme.read()
-    readme.close()
+    with open('README.rst') as readme:
+        long_description = readme.read()
 
     install_options = {
         "name": "hachoir",

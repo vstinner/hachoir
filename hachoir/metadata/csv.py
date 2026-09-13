@@ -21,15 +21,15 @@ class Extractor:
         self.invalid = 0
 
     def main(self):
-        output = codecs.open(OUTPUT_FILENAME, "w", self.charset)
-        for filename in self.findFiles(self.directory, '*.doc'):
-            self.total += 1
-            line = self.processFile(filename)
-            if line:
-                print(line, file=output)
-            else:
-                self.invalid += 1
-        output.close()
+        with open(OUTPUT_FILENAME, "w", self.charset) as output:
+            for filename in self.findFiles(self.directory, '*.doc'):
+                self.total += 1
+                line = self.processFile(filename)
+                if line:
+                    print(line, file=output)
+                else:
+                    self.invalid += 1
+            output.close()
         self.summary()
 
     def summary(self):

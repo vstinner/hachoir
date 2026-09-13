@@ -31,7 +31,8 @@ def getMemorySize():
     This function only works on Linux (use /proc/self/statm file).
     """
     try:
-        statm = open('/proc/self/statm').readline().split()
+        with open('/proc/self/statm') as fp:
+            statm = fp.readline().split()
     except OSError:
         return None
     return int(statm[0]) * PAGE_SIZE

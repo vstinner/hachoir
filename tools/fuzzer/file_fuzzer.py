@@ -191,5 +191,6 @@ class FileFuzzer:
         if prefix:
             filename = "%s-%s" % (prefix, filename)
         filename = path.join(self.fuzzer.error_dir, filename)
-        open(filename, "wb").write(data)
+        with open(filename, "wb") as fp:
+            fp.write(data)
         print("=> Store file %s" % filename)

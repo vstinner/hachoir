@@ -38,7 +38,8 @@ def main():
     if len(argv) != 2:
         print("usage: %s filename" % argv[0], file=stderr)
         exit(1)
-    data = open(argv[1], 'rb').read()
+    with open(argv[1], 'rb') as fp:
+        data = fp.read()
     offsets = []
     for offset in findDeflateBlocks(data):
         print("Offset %s" % offset)
