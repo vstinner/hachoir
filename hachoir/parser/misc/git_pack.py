@@ -216,7 +216,7 @@ class GitPackFile(Parser):
         "file_ext": (".pack",),
         "mime": (u"application/octet-stream",),
         "min_size": (4 + 4 + 4) * 8,  # just the header
-        "magic": ((b'PACK',),),
+        "magic": [(b'PACK', 0)],
         "description": "Git pack file",
     }
 
