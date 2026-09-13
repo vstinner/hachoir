@@ -14,7 +14,7 @@ def ip2name(addr):
         name = gethostbyaddr(addr)[0]
     except (socket_host_error, ValueError):
         name = addr
-    except (socket_host_error, KeyboardInterrupt, ValueError):
+    except KeyboardInterrupt:
         ip2name.resolve = False
         name = addr
     ip2name.cache[addr] = name

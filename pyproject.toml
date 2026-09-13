@@ -14,6 +14,10 @@ ignore = [
     "SIM103",  # Return the condition
     "B019",    # Use of `functools.lru_cache` can lead to memory leaks
     "PLR1704", # Redefining argument with the local name `offset`
+    "SIM102",  # Use a single `if` statement instead of nested `if` statements
+    "PLR1730", # Replace `if` statement with `.. min ...`
+    "SIM114",  # Combine `if` branches using logical `or` operator
+    "DTZ002",  # `datetime.datetime.today()` used
 ]
 #fixable = ["ALL"]
 #unfixable = []

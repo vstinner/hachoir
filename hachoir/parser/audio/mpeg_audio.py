@@ -285,8 +285,8 @@ def createMpegAudioMagic():
     # MPEG frame magic
     # TODO: Use longer magic: 32 bits instead of 16 bits
     SYNC_BITS = 2047
-    for version in Frame.VERSION_NAME.keys():
-        for layer in Frame.LAYER_NAME.keys():
+    for version in Frame.VERSION_NAME:
+        for layer in Frame.LAYER_NAME:
             for crc16 in (0, 1):
                 magic = (SYNC_BITS << 5) | (
                     version << 3) | (layer << 1) | crc16
