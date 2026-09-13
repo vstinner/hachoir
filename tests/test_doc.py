@@ -25,7 +25,7 @@ class TestDoc(unittest.TestCase):
             fullpath = os.path.join('..', 'doc', filename)
         else:
             fullpath = os.path.join(subdir, filename)
-        failure, nb_test = doctest.testfile(
+        failure, _nb_test = doctest.testfile(
             fullpath, optionflags=doctest.ELLIPSIS, name=name)
         if failure:
             self.fail("error")
@@ -36,7 +36,7 @@ class TestDoc(unittest.TestCase):
         if self.verbose:
             print("--- Test module %s" % name)
         module = importModule(name)
-        failure, nb_test = doctest.testmod(module)
+        failure, _nb_test = doctest.testmod(module)
         if failure:
             self.fail("error")
         if self.verbose:

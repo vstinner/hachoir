@@ -89,7 +89,7 @@ class AMFObject(FieldSet):
         FieldSet.__init__(self, *args, **kw)
         code = self["type"].value
         try:
-            self.parser, desc = self.tag_info[code]
+            self.parser, _desc = self.tag_info[code]
             if code == self.CODE_DATE:
                 self.createValue = self.createValueDate
         except KeyError:

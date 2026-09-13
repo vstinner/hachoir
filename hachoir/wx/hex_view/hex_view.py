@@ -45,8 +45,8 @@ class HexViewLayout:
         return self._textcols
 
     def update(self):
-        w, h = self.winsize
-        cw, ch = self.charsize
+        w, _h = self.winsize
+        cw, _ch = self.charsize
         mw = (self.hpad + self.hborder) * 2   # total margin width
 
         # calculate width of address pane
@@ -164,7 +164,7 @@ class hex_view_t(wx.ScrolledWindow):
         cw /= float(len(teststr))
         lo.set_charsize((cw, ch))
 
-        w, h = lo.winsize
+        _w, h = lo.winsize
 
         # Draw "textbox" rects under the hex and text views
         dc.SetPen(wx.NullPen)
@@ -224,7 +224,7 @@ class hex_view_t(wx.ScrolledWindow):
 
         tc = self.layout.textcols
         tr = self.layout.textrows
-        cw, ch = self.layout.charsize
+        _cw, ch = self.layout.charsize
 
         startrow = start // tc
         endrow = (end + tc - 1) // tc

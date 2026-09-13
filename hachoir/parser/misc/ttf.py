@@ -718,7 +718,7 @@ def parseGSUB(self):
     padding = self.seekByte(offsets[0][0], null=True)
     if padding:
         yield padding
-    lastOffset, first_parser = offsets[0]
+    lastOffset, _first_parser = offsets[0]
     for offset, parser in offsets[1:]:
         # yield parser(self)
         yield RawBytes(self, "content", offset - lastOffset)

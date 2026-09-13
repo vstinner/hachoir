@@ -401,7 +401,7 @@ class MachoLoadCommand(FieldSet):
         yield Enum(UInt32(self, "cmd"), self.LOAD_COMMANDS_DISPLAY)
         yield UInt32(self, "cmdsize")
         self._size = self['cmdsize'].value * 8
-        desc, parser = self.LOAD_COMMANDS.get(self['cmd'].value, ("", None))
+        _desc, parser = self.LOAD_COMMANDS.get(self['cmd'].value, ("", None))
         if parser:
             yield parser(self, "data")
             # data is word aligned

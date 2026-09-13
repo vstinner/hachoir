@@ -74,7 +74,7 @@ class FileFromInputStream:
 
     def read(self, size=None):
         def read(address, size):
-            shift, data, missing = self.stream.read(8 * address, 8 * size)
+            shift, data, _missing = self.stream.read(8 * address, 8 * size)
             if shift:
                 raise InputStreamError("TODO: handle non-byte-aligned data")
             return data

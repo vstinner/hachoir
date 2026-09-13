@@ -287,7 +287,7 @@ class ResourceContent(FieldSet):
         self.entry = entry
         res_type = self.getResType()
         if res_type in RESOURCE_TYPE:
-            self._name, description, self._parser = RESOURCE_TYPE[res_type]
+            self._name, _description, self._parser = RESOURCE_TYPE[res_type]
         else:
             self._parser = None
 

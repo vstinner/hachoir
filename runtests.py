@@ -200,7 +200,7 @@ class TestRunner(unittest.TextTestRunner):
 def runtests():
     setup_tests()
 
-    args, commands = ARGS.parse_args()
+    args, _commands = ARGS.parse_args()
 
     if args.coverage and coverage is None:
         URL = "bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py"

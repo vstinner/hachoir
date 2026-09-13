@@ -316,7 +316,7 @@ class IP(Layer):
         proto = self["protocol"].value
         if proto not in self.PROTOCOL_INFO:
             return None
-        name, parser, desc = self.PROTOCOL_INFO[proto]
+        name, parser, _desc = self.PROTOCOL_INFO[proto]
         if not parser:
             return None
         return parser(parent, name)
@@ -399,7 +399,7 @@ class Layer2(Layer):
 
     def parseNext(self, parent):
         try:
-            name, parser, desc = self.PROTO_INFO[self["protocol"].value]
+            name, parser, _desc = self.PROTO_INFO[self["protocol"].value]
             return parser(parent, name)
         except KeyError:
             return None
