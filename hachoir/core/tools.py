@@ -315,7 +315,7 @@ def makePrintable(data, charset, quote=None, smart=True):
         if quote:
             if quote in "\"'":
                 data = data.replace(quote, '\\' + quote)
-            data = ''.join((quote, data, quote))
+            data = f"{quote}{data}{quote}"
     elif quote:
         data = "(empty)"
     else:

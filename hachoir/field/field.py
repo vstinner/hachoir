@@ -16,9 +16,9 @@ class FieldError(Exception):
 
 def joinPath(path, name):
     if path != "/":
-        return "/".join((path, name))
+        return f"{path}/{name}"
     else:
-        return "/%s" % name
+        return f"/{name}"
 
 
 class MissingField(KeyError, FieldError):
