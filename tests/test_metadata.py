@@ -322,7 +322,7 @@ class TestMetadata(unittest.TestCase):
         self.check_attr(meta, "aperture_value", 6),
         self.check_attr(meta, "exposure_bias_value", -0.5),
         self.check_attr(meta, "focal_length", 137),
-        self.check_attr(meta, "flashpix_version", u"0100"),
+        self.check_attr(meta, "flashpix_version", "0100"),
         self.check_attr(meta, "focal_plane_x_resolution", 1322.0),
         self.check_attr(meta, "focal_plane_y_resolution", 1322.0),
         self.check_attr(meta, "focal_length_in_35mm_film", 205),

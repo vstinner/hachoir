@@ -30,7 +30,7 @@ class PRSPakFile(Parser):
         "id": "prs_pak",
         "category": "archive",
         "file_ext": ("pak",),
-        "mime": (u"application/octet-stream",),
+        "mime": ("application/octet-stream",),
         "min_size": 4 * 8,  # just the identifier
         "magic": ((b'PACK', 0),),
         "description": "Parallel Realities Starfighter .pak archive",

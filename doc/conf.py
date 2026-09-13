@@ -44,8 +44,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Hachoir'
-copyright = u'2014, Victor Stinner'
+project = 'Hachoir'
+copyright = '2014, Victor Stinner'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -187,8 +187,8 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'Hachoir.tex', u'Hachoir Documentation',
-   u'Victor Stinner', 'manual'),
+  ('index', 'Hachoir.tex', 'Hachoir Documentation',
+   'Victor Stinner', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -217,8 +217,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'hachoir', u'Hachoir Documentation',
-     [u'Victor Stinner'], 1)
+    ('index', 'hachoir', 'Hachoir Documentation',
+     ['Victor Stinner'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -231,8 +231,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'Hachoir', u'Hachoir Documentation',
-   u'Victor Stinner', 'Hachoir', 'One line description of project.',
+  ('index', 'Hachoir', 'Hachoir Documentation',
+   'Victor Stinner', 'Hachoir', 'One line description of project.',
    'Miscellaneous'),
 ]
 
