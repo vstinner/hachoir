@@ -81,7 +81,7 @@ class EditableFieldSet:
                 self.input.setUniqueFieldName(field)
 
         # Check that there is no duplicate in inserted fields
-        new_names = list(field.name for field in new_fields)
+        new_names = [field.name for field in new_fields]
         names_set = set(new_names)
         if len(names_set) != len(new_fields):
             duplicates = (name for name in names_set if 1 <

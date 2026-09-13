@@ -75,7 +75,7 @@ class TestParsers(unittest.TestCase):
         if len(fieldset) != len(names):
             self.fail("invalid length (%u)" % len(fieldset))
         names = list(names)
-        read = list(field.name for field in fieldset)
+        read = [field.name for field in fieldset]
         self.assertEqual(names, read,
                          "wrong names (%s)" % ", ".join(read))
 
