@@ -28,14 +28,13 @@ ENTRY_POINTS = {
         "hachoir-grep = hachoir.grep:main",
         "hachoir-metadata = hachoir.metadata.main:main",
         "hachoir-strip = hachoir.strip:main",
-        "hachoir-urwid = hachoir.urwid:main"
+        "hachoir-urwid = hachoir.urwid:main",
+        "hachoir-subfile= hachoir.subfile.main:main",
     ],
     'gui_scripts': [
         "hachoir-wx = hachoir.wx.main:main"
     ]
 }
-# FIXME: hachoir-subfile is currently broken
-# "hachoir-subfile",
 
 CLASSIFIERS = [
     'Development Status :: 5 - Production/Stable',

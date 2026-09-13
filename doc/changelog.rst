@@ -2,6 +2,11 @@
 Changelog
 +++++++++
 
+hachoir 3.4.1
+=============
+
+* Fix hachoir-subfile: it was broken since the migration to Python 3.
+
 hachoir 3.4.0 (2026-09-13)
 ==========================
 
