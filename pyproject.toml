@@ -6,6 +6,7 @@ ignore = [
     "BLE001",  # Do not catch blind exception: `Exception`
     "DTZ001",  # `datetime.datetime()` called without a `tzinfo` argument
     "RET501",  # Do not explicitly `return None`
+    "PLR1711", # Useless `return` statement at end of function
 ]
 #fixable = ["ALL"]
 #unfixable = []
