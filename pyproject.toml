@@ -1,23 +1,26 @@
 [tool.ruff.lint]
 ignore = [
-    "I001",
-    "UP031",
-    "E722",    # Do not use bare `except`
+    "B006",    # Do not use mutable data structures for argument defaults
+    "B019",    # Use of `functools.lru_cache` can lead to memory leaks
+    "B023",    # Function definition does not bind loop variable `scaleval`
     "BLE001",  # Do not catch blind exception: `Exception`
     "DTZ001",  # `datetime.datetime()` called without a `tzinfo` argument
-    "RET501",  # Do not explicitly `return None`
-    "PLR1711", # Useless `return` statement at end of function
-    "RUF012",  # Mutable default value for class attribute
-    "B006",    # Do not use mutable data structures for argument defaults
-    "SIM115",  # Use a context manager for opening files
-    "RUF100",  # Unused `noqa` directive
-    "SIM103",  # Return the condition
-    "B019",    # Use of `functools.lru_cache` can lead to memory leaks
-    "PLR1704", # Redefining argument with the local name `offset`
-    "SIM102",  # Use a single `if` statement instead of nested `if` statements
-    "PLR1730", # Replace `if` statement with `.. min ...`
-    "SIM114",  # Combine `if` branches using logical `or` operator
     "DTZ002",  # `datetime.datetime.today()` used
+    "E722",    # Do not use bare `except`
+    "I001",    # Import block is un-sorted or un-formatted
+    "PERF402", # Use `list` or `list.copy` to create a copy of a list
+    "PLR1704", # Redefining argument with the local name `offset`
+    "PLR1711", # Useless `return` statement at end of function
+    "PLR1730", # Replace `if` statement with `.. min ...`
+    "RET501",  # Do not explicitly `return None`
+    "RUF012",  # Mutable default value for class attribute
+    "RUF100",  # Unused `noqa` directive
+    "S110",    # `try`-`except`-`pass` detected, consider logging the exception
+    "SIM102",  # Use a single `if` statement instead of nested `if` statements
+    "SIM103",  # Return the condition
+    "SIM114",  # Combine `if` branches using logical `or` operator
+    "SIM115",  # Use a context manager for opening files
+    "UP031",   # Use format specifiers instead of percent format
 ]
 #fixable = ["ALL"]
 #unfixable = []
