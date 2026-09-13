@@ -44,7 +44,6 @@ class Bits(RawBits):
     @see: L{Bit}
     @see: L{RawBits}
     """
-    pass
 
 
 class Bit(RawBits):

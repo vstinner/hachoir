@@ -12,7 +12,6 @@ class FieldError(Exception):
     """
     Error raised by a :class:`Field`
     """
-    pass
 
 
 def joinPath(path, name):

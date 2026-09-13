@@ -10,7 +10,6 @@ class ParserError(FieldError):
 
     @see: L{FieldError}
     """
-    pass
 
 
 class MatchError(FieldError):
@@ -20,7 +19,6 @@ class MatchError(FieldError):
 
     @see: L{FieldError}
     """
-    pass
 
 
 class BasicFieldSet(Field):

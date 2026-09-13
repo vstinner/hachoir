@@ -11,7 +11,6 @@ class Timeout(RuntimeError):
     """
     Timeout error, inherits from RuntimeError
     """
-    pass
 
 
 def signalHandler(signum, frame):

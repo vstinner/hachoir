@@ -69,4 +69,3 @@ class Bytes(RawBytes):
 
     @see: L{RawBytes}
     """
-    pass
