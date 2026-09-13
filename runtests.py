@@ -85,20 +85,20 @@ def load_modules(basedir, suffix='.py'):
         modpath = os.path.join(dir, '__init__.py')
         if os.path.isfile(modpath):
             mod = os.path.split(dir)[-1]
-            files.append(('{0}{1}'.format(prefix, mod), modpath))
+            files.append((f'{prefix}{mod}', modpath))
 
-            prefix = '{0}{1}.'.format(prefix, mod)
+            prefix = f'{prefix}{mod}.'
 
         for name in os.listdir(dir):
             path = os.path.join(dir, name)
 
             if os.path.isdir(path):
-                files.extend(list_dir('{0}{1}.'.format(prefix, name), path))
+                files.extend(list_dir(f'{prefix}{name}.', path))
             else:
                 if (name != '__init__.py' and
                     name.endswith(suffix) and
                         not name.startswith(('.', '_'))):
-                    files.append(('{0}{1}'.format(prefix, name[:-3]), path))
+                    files.append((f'{prefix}{name[:-3]}', path))
 
         return files
 
@@ -112,7 +112,7 @@ def load_modules(basedir, suffix='.py'):
         except SyntaxError:
             raise
         except Exception as err:
-            print("Skipping '{0}': {1}".format(modname, err), file=sys.stderr)
+            print(f"Skipping '{modname}': {err}", file=sys.stderr)
 
     return mods
 
@@ -175,8 +175,8 @@ class TestResult(unittest.TextTestResult):
         if gc.garbage:
             if self.showAll:
                 self.stream.writeln(
-                    "    Warning: test created {} uncollectable "
-                    "object(s).".format(len(gc.garbage)))
+                    f"    Warning: test created {len(gc.garbage)} uncollectable "
+                    "object(s).")
             # move the uncollectable objects somewhere so we don't see
             # them again
             self.leaks.append((self.getDescription(test), gc.garbage[:]))
@@ -189,7 +189,7 @@ class TestRunner(unittest.TextTestRunner):
     def run(self, test):
         result = super().run(test)
         if result.leaks:
-            self.stream.writeln("{0} tests leaks:".format(len(result.leaks)))
+            self.stream.writeln(f"{len(result.leaks)} tests leaks:")
             for name, leaks in result.leaks:
                 self.stream.writeln(' ' * 4 + name + ':')
                 for leak in leaks:
@@ -204,23 +204,23 @@ def runtests():
 
     if args.coverage and coverage is None:
         URL = "bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py"
-        print(textwrap.dedent("""
+        print(textwrap.dedent(f"""
             coverage package is not installed.
 
             To install coverage3 for Python 3, you need:
               - Setuptools (https://pypi.python.org/pypi/setuptools)
 
               What worked for me:
-              - download {0}
-                 * curl -O https://{0}
+              - download {URL}
+                 * curl -O https://{URL}
               - python3 ez_setup.py
               - python3 -m easy_install coverage
-        """.format(URL)).strip())
+        """).strip())
         sys.exit(1)
 
     testsdir = os.path.abspath(args.testsdir)
     if not os.path.isdir(testsdir):
-        print("Tests directory is not found: {0}\n".format(testsdir))
+        print(f"Tests directory is not found: {testsdir}\n")
         ARGS.print_help()
         return
 
@@ -278,7 +278,7 @@ def runtests():
             cov.report(show_missing=False)
             here = os.path.dirname(os.path.abspath(__file__))
             print("\nFor html report:")
-            print("open file://{0}/htmlcov/index.html".format(here))
+            print(f"open file://{here}/htmlcov/index.html")
 
 
 if __name__ == '__main__':
