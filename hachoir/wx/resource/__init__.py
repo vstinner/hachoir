@@ -1,1 +1,1 @@
-from .resource import *   # noqa
+from .resource import *

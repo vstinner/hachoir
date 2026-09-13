@@ -6,7 +6,6 @@ from sys import argv, stderr, exit
 from os import walk
 from os.path import join as path_join
 from fnmatch import fnmatch
-import codecs
 
 OUTPUT_FILENAME = "metadata.csv"
 

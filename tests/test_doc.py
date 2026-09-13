@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import doctest
-import hachoir.core.i18n   # noqa: import it because it does change the locale
 from hachoir.test import setup_tests
 import os
 import unittest

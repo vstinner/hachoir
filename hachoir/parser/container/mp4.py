@@ -1242,7 +1242,7 @@ class Atom(FieldSet):
         "tags": (AtomList, "tags", "File tags"),
         "tseg": (AtomList, "tseg", "tseg"),
         "chpl": (NeroChapters, "chpl", "Nero chapter data"),
-    }  # noqa
+    }
     tag_handler = [item[0] for item in tag_info]
     tag_desc = [item[1] for item in tag_info]
 
