@@ -41,7 +41,6 @@ def convert_size(from_field, to_type):
 
 
 def save_substream_to_disk(field, dest_path):
-    dest_stream = open(dest_path, 'wb')
-    f = FileFromInputStream(field.getSubIStream())
-    copyfileobj(f, dest_stream)
-    dest_stream.close()
+    with open(dest_path, 'wb') as dest_stream:
+        f = FileFromInputStream(field.getSubIStream())
+        copyfileobj(f, dest_stream)
