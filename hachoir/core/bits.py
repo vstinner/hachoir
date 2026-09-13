@@ -148,7 +148,7 @@ def byte2bin(number, classic_mode=True):
     '01010000'
     """
     text = ""
-    for i in range(0, 8):
+    for i in range(8):
         if classic_mode:
             mask = 1 << (7 - i)
         else:

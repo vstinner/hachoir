@@ -51,14 +51,14 @@ def readColor(parent):
 
 def readVertexList(parent):
     yield UInt16(parent, "count", "Vertex count")
-    for index in range(0, parent["count"].value):
+    for index in range(parent["count"].value):
         yield Vertex(parent, "vertex[]", "Vertex")
 
 
 def readPolygonList(parent):
     count = UInt16(parent, "count", "Vertex count")
     yield count
-    for i in range(0, count.value):
+    for i in range(count.value):
         yield Polygon(parent, "polygon[]")
     size = parent["size"].value * 8
     while parent.current_size < size:

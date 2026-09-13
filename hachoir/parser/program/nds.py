@@ -125,7 +125,7 @@ class FileNameTable(SeekableFieldSet):
         for i in range(1, numDirs):
             yield FileNameDirTable(self, "dir_table[]")
 
-        for i in range(0, numDirs):
+        for i in range(numDirs):
             dt = self["dir_table[%d]" % i]
             offset = self.startOffset + dt["entry_start"].value
             self.seekByte(offset, relative=False)
@@ -147,7 +147,7 @@ class FATContent(FieldSet):
 
     def createFields(self):
         num_entries = self.parent["header"]["fat_size"].value // 8
-        for i in range(0, num_entries):
+        for i in range(num_entries):
             yield FATFileEntry(self, "entry[]")
 
 
@@ -191,7 +191,7 @@ class Banner(FieldSet):
         yield Crc16(self, "crc", self.stream.readBytes(self.absolute_address + (32 * 8), (2112 - 32)))
         yield RawBytes(self, "reserved", 28)
         yield BannerIcon(self, "icon_data")
-        for i in range(0, 16):
+        for i in range(16):
             yield NdsColor(self, "palette_color[]")
         yield String(self, "title_jp", 256, charset="UTF-16-LE", truncate="\0")
         yield String(self, "title_en", 256, charset="UTF-16-LE", truncate="\0")

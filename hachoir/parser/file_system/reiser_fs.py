@@ -58,7 +58,7 @@ class BitmapBlock(SeekableFieldSet):
     def createFields(self):
         block_size = self["/superblock/blocksize"].value
 
-        for i in range(0, block_size * 8):
+        for i in range(block_size * 8):
             yield BlockState(self, "block[]", i)
 
 

@@ -190,7 +190,7 @@ class FieldArray(FieldSet):
         self.array_elements_extra_args = elements_extra_args
 
     def createFields(self):
-        for i in range(0, self.array_length):
+        for i in range(self.array_length):
             yield self.array_elements_class(self, "%s[%d]" % (self.name, i),
                                             **self.array_elements_extra_args)
 

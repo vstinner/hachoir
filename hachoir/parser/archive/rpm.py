@@ -199,7 +199,7 @@ class PropertySet(FieldSet):
 
         # Read item header
         items = []
-        for i in range(0, self["count"].value):
+        for i in range(self["count"].value):
             item = ItemHeader(self, "item[]")
             yield item
             items.append(item)

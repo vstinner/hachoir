@@ -142,7 +142,7 @@ class DictionaryItem(FieldSet):
 
 # Map first chunk byte => type
 TAGS = {b'd': Dictionary, b'i': Integer, b'l': List}
-for index in range(0, 9 + 1):
+for index in range(9 + 1):
     TAGS[str(index).encode('ascii')] = TorrentString
 
 # Create an entry
