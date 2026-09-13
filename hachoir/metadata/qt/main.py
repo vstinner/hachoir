@@ -22,7 +22,7 @@ config.quiet = True
 class CustomTableWidgetItem(QTableWidgetItem):
 
     def __init__(self, parent=None):
-        super(CustomTableWidgetItem, self).__init__(parent)
+        super().__init__(parent)
         self.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 
 

@@ -450,7 +450,7 @@ class GenericFieldSet(BasicFieldSet):
                 "Unable to replace %s: field doesn't exist!" % name)
         assert 1 <= len(new_fields)
         old_field = self[name]
-        total_size = sum((field.size for field in new_fields))
+        total_size = sum(field.size for field in new_fields)
         if old_field.size != total_size:
             raise ParserError("Unable to replace %s: "
                               "new field(s) hasn't same size (%u bits instead of %u bits)!"
