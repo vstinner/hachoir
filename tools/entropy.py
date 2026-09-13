@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from math import log
+from math import log2
 
 
 class Entropy:
@@ -20,7 +20,7 @@ class Entropy:
             if not value:
                 continue
             p_i = float(value) / self.count
-            h -= p_i * log(p_i, 2)
+            h -= p_i * log2(p_i)
         return h
 
 from time import time

@@ -131,9 +131,9 @@ class HachoirParser:
     @classmethod
     def getParserTags(cls):
         tags = {}
-        for cls in reversed(getmro(cls)):
-            if hasattr(cls, "PARSER_TAGS"):
-                tags.update(cls.PARSER_TAGS)
+        for child in reversed(getmro(cls)):
+            if hasattr(child, "PARSER_TAGS"):
+                tags.update(child.PARSER_TAGS)
         return tags
 
     @classmethod

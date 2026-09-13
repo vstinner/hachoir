@@ -78,12 +78,12 @@ class IcoFile(Parser):
         #            (b"\0\0\2\0", 0), # Cursor
         #        ),
         "magic_regex": ((
-            # signature=0, type=(1|2), count in 1..20,
-            b"\0\0[\1\2]\0[\x01-\x14]."
-            # size=(16x16|32x32|48x48|64x64),
-            b"(\x10\x10|\x20\x20|\x30\x30|\x40\x40)"
-            # nb_color=0 or 16; nb_plane=(0|1|4), bpp=(0|8|24|32)
-            b"[\x00\x10]\0[\0\1\4][\0\x08\x18\x20]\0",
+            (# signature=0, type=(1|2), count in 1..20,
+             b"\0\0[\1\2]\0[\x01-\x14]."
+             # size=(16x16|32x32|48x48|64x64),
+             b"(\x10\x10|\x20\x20|\x30\x30|\x40\x40)"
+             # nb_color=0 or 16; nb_plane=(0|1|4), bpp=(0|8|24|32)
+             b"[\x00\x10]\0[\0\1\4][\0\x08\x18\x20]\0"),
             0),),
         "description": "Microsoft Windows icon or cursor",
     }

@@ -30,8 +30,8 @@ class TorrentMetadata(RootMetadata):
             value = field.value
             setattr(self, key, value)
         elif field.name == "info" and "value" in field:
-            for field in field["value"]:
-                self.processInfo(field)
+            for subfield in field["value"]:
+                self.processInfo(subfield)
 
     @fault_tolerant
     def processInfo(self, field):

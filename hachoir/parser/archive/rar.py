@@ -149,8 +149,7 @@ class FileFlags(FieldSet):
         yield Bit(self, "is_solid", "Information from previous files is used (solid flag)")
         # The 3 following lines are what blocks more staticity
         yield Enum(Bits(self, "dictionary_size", 3, "Dictionary size"), DICTIONARY_SIZE)
-        for bit in commonFlags(self):
-            yield bit
+        yield from commonFlags(self)
         yield Bit(self, "is_large", "file64 operations needed")
         yield Bit(self, "is_unicode", "Filename also encoded using Unicode")
         yield Bit(self, "has_salt", "Has salt for encryption")

@@ -44,7 +44,7 @@ class ZSTcpu(StaticFieldSet):
         (UInt16, "xpc"),
         (UInt8, "xirqb", "which bank the irqs start at"),
         (UInt8, "debugger", "Start with debugger (1: yes, 0: no)"),
-        (UInt32, "Curtable" "Current table address"),
+        (UInt32, "Curtable", "Current table address"),
         (UInt8, "curnmi", "if in NMI (1=yes)"),
         (UInt32, "cycpbl", "percentage left of CPU/SPC to run (3.58 = 175)"),
         (UInt32, "cycpblt", "percentage of CPU/SPC to run"),

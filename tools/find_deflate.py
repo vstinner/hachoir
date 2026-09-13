@@ -8,7 +8,7 @@ MIN_SIZE = 2
 
 def canDeflate(compressed_data):
     try:
-        data = decompress(compressed_data)
+        decompress(compressed_data)
         return True
     except zlib_error:
         return False

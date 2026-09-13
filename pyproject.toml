@@ -10,6 +10,7 @@ ignore = [
     "RUF012",  # Mutable default value for class attribute
     "B006",    # Do not use mutable data structures for argument defaults
     "SIM115",  # Use a context manager for opening files
+    "RUF100",  # Unused `noqa` directive
 ]
 #fixable = ["ALL"]
 #unfixable = []
