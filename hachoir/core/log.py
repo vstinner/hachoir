@@ -1,7 +1,7 @@
 import os
 import sys
 import time
-import hachoir.core.config as config
+from hachoir.core import config
 
 
 class Log:

@@ -2,7 +2,7 @@ from hachoir.field import (MissingField, BasicFieldSet, Field, ParserError,
                            createRawField, createNullField, createPaddingField, FakeArray)
 from hachoir.core.dict import Dict, UniqKeyError
 from hachoir.core.tools import lowerBound, makeUnicode
-import hachoir.core.config as config
+from hachoir.core import config
 
 
 class GenericFieldSet(BasicFieldSet):

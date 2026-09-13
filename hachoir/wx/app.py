@@ -1,7 +1,7 @@
 from wx import App, EVT_MENU, ID_OK
 from wx.xrc import XRCID
 
-import hachoir.core.config as config
+from hachoir.core import config
 from hachoir.parser.guess import createParser, guessParser
 from hachoir.stream.input import FileFromInputStream
 from hachoir.wx.dispatcher import dispatcher_t

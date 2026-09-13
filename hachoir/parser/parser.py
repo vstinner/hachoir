@@ -1,4 +1,4 @@
-import hachoir.core.config as config
+from hachoir.core import config
 from hachoir.field import Parser as GenericParser
 from hachoir.core.error import error
 from hachoir.core.tools import makeUnicode

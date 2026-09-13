@@ -1,7 +1,7 @@
 from optparse import OptionGroup
 from hachoir.core.log import log
 from hachoir import __version__
-import hachoir.core.config as config
+from hachoir.core import config
 import sys
 
 
