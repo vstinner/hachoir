@@ -32,7 +32,7 @@ def getMemorySize():
     """
     try:
         statm = open('/proc/self/statm').readline().split()
-    except IOError:
+    except OSError:
         return None
     return int(statm[0]) * PAGE_SIZE
 

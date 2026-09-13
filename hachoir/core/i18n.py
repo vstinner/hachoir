@@ -70,7 +70,7 @@ def initLocale():
     # Setup locales
     try:
         locale.setlocale(locale.LC_ALL, "")
-    except (locale.Error, IOError):
+    except (OSError, locale.Error):
         pass
 
 

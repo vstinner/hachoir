@@ -401,7 +401,7 @@ class InputIOStream(InputStream):
             try:
                 input.seek(0, 2)
                 size = input.tell() * 8
-            except IOError as err:
+            except OSError as err:
                 if err.errno == ESPIPE:
                     input = InputPipe(input, self._setSize)
                 else:

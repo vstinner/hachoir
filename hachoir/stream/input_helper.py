@@ -21,7 +21,7 @@ def FileInputStream(filename, real_filename=None, **args):
         else:
             inputio = filename
             filename = getattr(filename, 'name', '')
-    except IOError as err:
+    except OSError as err:
         errmsg = str(err)
         raise InputStreamError(
             "Unable to open file %s: %s" % (filename, errmsg))

@@ -158,7 +158,7 @@ class ConsoleGrep(Grep):
         with self.parser:
             try:
                 self.grep(self.parser)
-            except IOError as err:
+            except OSError as err:
                 if err[0] == errno.EPIPE:
                     # Ignore broken PIPE error
                     return
