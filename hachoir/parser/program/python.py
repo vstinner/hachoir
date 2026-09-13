@@ -306,7 +306,7 @@ class Object(FieldSet):
         'x': ("complex", parseComplex, "Complex", None, createComplexValue),
         'y': ("bin_complex", parseBinaryComplex, "Binary complex", None, createComplexValue),
         'l': ("long", parseLong, "Long", None, createLongValue),
-        's': ("string", parseString, "String", None, createStringValue),
+        's': ("bytes", parseString, "Bytes", None, createStringValue),
         't': ("interned", parseString, "Interned", None, createStringValue),
         'u': ("unicode", parseString, "Unicode", None, createStringValue),
         'R': ("string_ref", parseStringRef, "String ref", createStringRefDesc, createStringRefValue),
@@ -407,8 +407,8 @@ class PythonCompiledFile(Parser):
 
     # Dictionnary which associate the pyc signature (32-bit integer)
     # to a Python version string (eg. "m\xf2\r\n" => "Python 2.4b1").
-    # This list comes from CPython source code, see MAGIC_NUMBER
-    # in file Lib/importlib/_bootstrap_external.py
+    # This list comes from CPython source code, see PYC_MAGIC_NUMBER
+    # in file Include/internal/pycore_magic_number.h.
     MAGIC = {
         # Python 1.x
         20121: ("1.5", 0x1050000),
@@ -666,6 +666,17 @@ class PythonCompiledFile(Parser):
         3659: ("Python 3.15a4", VERSION(3, 15)),
         3660: ("Python 3.15a4", VERSION(3, 15)),
         3661: ("Python 3.15a4", VERSION(3, 15)),
+        3662: ("Python 3.15a8", VERSION(3, 15)),
+        3663: ("Python 3.15a8", VERSION(3, 15)),
+        3664: ("Python 3.15a8", VERSION(3, 15)),
+        3665: ("Python 3.15a8", VERSION(3, 15)),
+        3666: ("Python 3.15b1", VERSION(3, 15)),
+        3700: ("Python 3.16a0", VERSION(3, 16)),
+        3701: ("Python 3.16a0", VERSION(3, 16)),
+        3702: ("Python 3.16a1", VERSION(3, 16)),
+        3703: ("Python 3.16a1", VERSION(3, 16)),
+        3704: ("Python 3.16a1", VERSION(3, 16)),
+        3705: ("Python 3.16a1", VERSION(3, 16)),
     }
 
     # Dictionnary which associate the pyc signature (4-byte long string)

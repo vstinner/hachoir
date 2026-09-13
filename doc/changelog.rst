@@ -2,6 +2,13 @@
 Changelog
 +++++++++
 
+hachoir 3.4.0
+=============
+
+* Parsers:
+
+  * Python: add Python 3.16 support.
+
 hachoir 3.3.0 (2023-12-12)
 ==========================
 
