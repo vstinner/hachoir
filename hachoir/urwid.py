@@ -7,19 +7,18 @@ from hachoir.core.cmd_line import displayVersion
 from hachoir.field import Field, MissingField
 from hachoir.stream import InputFieldStream, InputStreamError, FileInputStream
 from hachoir.parser import guessParser, HachoirParserList
-from urwid import (AttrWrap, BoxAdapter, CanvasJoin, Edit, Frame, ListBox,
-                   Pile, Text, WidgetPlaceholder)
+from urwid import (AttrMap, AttrWrap, BoxAdapter, CanvasJoin, Edit, Frame,
+                   ListBox, Pile, Text, WidgetPlaceholder)
 from shutil import copyfileobj
 from weakref import WeakKeyDictionary
 from optparse import OptionGroup, OptionParser
 import os
 import sys
 try:
-    import urwid.curses_display
-except ImportError:
-    import urwid
     import urwid.display.curses as curses_display
-    urwid.curses_display = curses_display
+except ImportError:
+    # urwid older than 2.4.0
+    from urwid import curses_display
 
 try:
     from urwid import __version__ as urwid_ver
@@ -524,7 +523,7 @@ class Input(Edit):
         self.set_caption(caption)
         self.set_edit_text(text)
         self._end = True  # TODO: find a better way to move the cursor the end.
-        self._top[0](AttrWrap(self, 'input'))
+        self._top[0](AttrMap(self, 'input'))
 
     def move_cursor_to_coords(self, size, x, y):
         if self._end:
@@ -590,7 +589,7 @@ def getHelpMessage():
 def exploreFieldSet(field_set, args, options={}):
     charset = getTerminalCharset()
 
-    ui = urwid.curses_display.Screen()
+    ui = curses_display.Screen()
     ui.register_palette((
         ('focus', 'white', 'dark blue'),
         ('sep', 'white', 'dark red'),
@@ -632,7 +631,7 @@ def exploreFieldSet(field_set, args, options={}):
 
     log = BoxAdapter(ListBox(msgs[1]), 0)
     log.selectable = lambda: False
-    wrapped_sep = AttrWrap(sep, 'sep')
+    wrapped_sep = AttrMap(sep, 'sep')
     footer = Pile([('flow', wrapped_sep), log])
 
     # awful way to allow the user to hide the log widget
@@ -644,14 +643,14 @@ def exploreFieldSet(field_set, args, options={}):
     top = Frame(body, None, footer)
 
     def input_enter(w):
-        footer.widget_list[0] = w
-        footer.set_focus(0)
-        top.set_focus('footer')
+        footer.contents[0] = (w, footer.contents[0][1])
+        footer.focus_position = 0
+        top.focus_position = 'footer'
 
     def input_leave():
-        footer.widget_list[0] = wrapped_sep
-        footer.set_focus(0)
-        top.set_focus('body')
+        footer.contents[0] = (wrapped_sep, footer.contents[0][1])
+        footer.focus_position = 0
+        top.focus_position = 'body'
     input = Input(input_enter, input_leave)
 
     def run():
@@ -745,7 +744,8 @@ def exploreFieldSet(field_set, args, options={}):
                     break
 
     try:
-        ui.run_wrapper(run)
+        with ui.start():
+            run()
     except Exception:
         pending = [msg.get_text()[0] for msg in msgs[1][msgs[2]:]] + \
                   ["[*]%s %s" % (prefix, text)

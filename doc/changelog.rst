@@ -6,6 +6,8 @@ hachoir 3.4.1
 =============
 
 * Fix hachoir-subfile: it was broken since the migration to Python 3.
+* hachoir-urwid: Support urwid 5.0: stop using urwid APIs removed in urwid 5.0
+  and the deprecated ``urwid.curses_display`` module path.
 
 hachoir 3.4.0 (2026-09-13)
 ==========================
