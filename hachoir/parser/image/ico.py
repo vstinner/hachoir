@@ -78,7 +78,8 @@ class IcoFile(Parser):
         #            (b"\0\0\2\0", 0), # Cursor
         #        ),
         "magic_regex": ((
-            (# signature=0, type=(1|2), count in 1..20,
+            (
+             # signature=0, type=(1|2), count in 1..20,
              b"\0\0[\1\2]\0[\x01-\x14]."
              # size=(16x16|32x32|48x48|64x64),
              b"(\x10\x10|\x20\x20|\x30\x30|\x40\x40)"
